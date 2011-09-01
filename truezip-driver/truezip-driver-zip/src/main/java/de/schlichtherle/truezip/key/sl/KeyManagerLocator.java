@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.key.AbstractKeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
+import static de.schlichtherle.truezip.util.Maps.*;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -84,7 +85,7 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
             }
             final Map<Class<?>, KeyManager<?>>
                     fast = new LinkedHashMap<Class<?>, KeyManager<?>>(
-                        sorted.size() * 4 / 3 + 1);
+                        initialCapacity(sorted.size()));
             for (final Map.Entry<Class<?>, KeyManager<?>> entry : sorted.entrySet()) {
                 final Class<?> type = entry.getKey();
                 final KeyManager<?> manager = entry.getValue();

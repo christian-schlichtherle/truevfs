@@ -8,33 +8,33 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import org.apache.commons.compress.archivers.ArchiveEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
-import java.io.OutputStream;
+import de.schlichtherle.truezip.socket.InputShop;
+import de.schlichtherle.truezip.socket.InputSocket;
+import static de.schlichtherle.truezip.util.Maps.*;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.archivers.tar.TarUtils;
-
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static org.apache.commons.compress.archivers.tar.TarConstants.*;
+import org.apache.commons.compress.archivers.tar.TarUtils;
 
 /**
  * Presents a {@link TarArchiveInputStream} as a randomly accessible archive.
@@ -68,7 +68,8 @@ implements InputShop<TTarArchiveEntry> {
 
     /** Maps entry names to I/O pool entries. */
     private final Map<String, TTarArchiveEntry>
-            entries = new LinkedHashMap<String, TTarArchiveEntry>();
+            entries = new LinkedHashMap<String, TTarArchiveEntry>(
+                    initialCapacity(TarOutputShop.OVERHEAD_SIZE));
 
     /**
      * Extracts the entire TAR input stream into a temporary directory in order

@@ -35,11 +35,11 @@ implements ZipOutputStreamParameters {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link DefaultZipOutputStreamParameters}
-     * returns {@code ZipOutputStream#INITIAL_SIZE}.
+     * returns {@code ZipOutputStream#OVERHEAD_SIZE}.
      */
     @Override
-    public int getInitialSize() {
-        return ZipOutputStream.INITIAL_SIZE;
+    public int getOverheadSize() {
+        return ZipOutputStream.OVERHEAD_SIZE;
     }
 
     /**

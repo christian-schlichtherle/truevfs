@@ -47,18 +47,18 @@ extends FsArchiveFileSystem<E> {
      * @return {@code true}
      */
     @Override
-    public boolean isReadOnly() {
+    boolean isReadOnly() {
         return true;
     }
 
     @Override
-    public boolean isTouched() {
+    boolean isTouched() {
         assert !super.isTouched();
         return false;
     }
 
     @Override
-    public FsArchiveFileSystemOperation<E> mknod(
+    FsArchiveFileSystemOperation<E> mknod(
             FsEntryName name,
             Type type,
             BitField<FsOutputOption> options,
@@ -68,19 +68,19 @@ extends FsArchiveFileSystem<E> {
     }
 
     @Override
-    public void unlink(FsEntryName path)
+    void unlink(FsEntryName path)
     throws FsArchiveFileSystemException {
         throw new FsReadOnlyArchiveFileSystemException();
     }
 
     @Override
-    public boolean setTime(FsEntryName path, BitField<Access> types, long value)
+    boolean setTime(FsEntryName path, BitField<Access> types, long value)
     throws FsArchiveFileSystemException {
         throw new FsReadOnlyArchiveFileSystemException();
     }
 
     @Override
-    public boolean setTime(FsEntryName path, Map<Access, Long> times)
+    boolean setTime(FsEntryName path, Map<Access, Long> times)
     throws FsArchiveFileSystemException {
         throw new FsReadOnlyArchiveFileSystemException();
     }

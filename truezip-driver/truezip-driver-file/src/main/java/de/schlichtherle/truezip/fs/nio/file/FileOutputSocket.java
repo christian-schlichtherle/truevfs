@@ -18,6 +18,7 @@ import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import static de.schlichtherle.truezip.util.Maps.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -52,7 +53,7 @@ import java.util.Set;
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private static final int
-            INITIAL_CAPACITY = FsOutputOption.values().length * 4 / 3;
+            INITIAL_CAPACITY = initialCapacity(FsOutputOption.values().length);
     private static final StandardOpenOption[] 
             WRITE_STANDARD_OPEN_OPTION = {
                 StandardOpenOption.WRITE,

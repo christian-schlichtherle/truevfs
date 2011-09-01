@@ -8,26 +8,27 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.io.Streams;
+import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
-import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import static de.schlichtherle.truezip.util.Maps.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 
 /**
  * An implementation of {@link OutputShop} to write TAR archives.
@@ -55,9 +56,18 @@ public class TarOutputShop
 extends TarArchiveOutputStream
 implements OutputShop<TTarArchiveEntry> {
 
+    /**
+     * The number of entries which can be initially accomodated by
+     * the internal hash map without resizing it, which is {@value}.
+     * 
+     * @since  TrueZIP 7.3
+     */
+    public static final int OVERHEAD_SIZE = FsArchiveFileSystem.OVERHEAD_SIZE;
+
     /** Maps entry names to tar entries [String -> TTarArchiveEntry]. */
     private final Map<String, TTarArchiveEntry> entries
-            = new LinkedHashMap<String, TTarArchiveEntry>();
+            = new LinkedHashMap<String, TTarArchiveEntry>(
+                    initialCapacity(OVERHEAD_SIZE));
 
     private final IOPool<?> pool;
     private boolean busy;

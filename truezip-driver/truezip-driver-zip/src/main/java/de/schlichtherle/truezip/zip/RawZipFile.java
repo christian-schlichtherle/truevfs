@@ -12,13 +12,14 @@ import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.rof.IntervalReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
+import static de.schlichtherle.truezip.util.Maps.*;
 import de.schlichtherle.truezip.util.Pool;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.*;
-import static de.schlichtherle.truezip.zip.ZipParametersUtils.*;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
+import static de.schlichtherle.truezip.zip.ZipParametersUtils.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -363,7 +364,7 @@ implements Iterable<E>, Closeable {
     private void mountCentralDirectory(final ReadOnlyFile rof, int numEntries)
     throws IOException {
         final Map<String, E> entries = new LinkedHashMap<String, E>(
-                Math.max(numEntries * 4 / 3 + 1, 16));
+                Math.max(initialCapacity(numEntries), 16));
         final byte[] cfh = new byte[CFH_MIN_LEN];
         for (; ; numEntries--) {
             rof.readFully(cfh, 0, 4);

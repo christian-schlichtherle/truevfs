@@ -21,15 +21,18 @@ public interface ZipOutputStreamParameters
 extends ZipCharsetParameters {
 
     /**
-     * Returns the initial size (not capacity) of the internal hash map to hold
-     * the entries.
-     * When appending to an existing archive file, the number of entries in the
-     * appendee is added to this property.
+     * Returns the number of entries which can be additionally accomodated by
+     * the internal hash map without resizing it, which is {@value}.
+     * When a new ZIP file is created, this constant is used in order to
+     * compute the initial capacity of the internal hash map.
+     * When an existing ZIP file is appended to, this constant is added to the
+     * number of entries in order to compute the initial capacity of the
+     * internal hash map.
      * 
-     * @return The initial size (not capacity) of the internal hash map to hold
-     * the entries.
+     * @return The number of entries which can be additionally accomodated by
+     *         the internal hash map without resizing it.
      */
-    int getInitialSize();
+    int getOverheadSize();
 
     /**
      * Returns the default compression method for entries.
