@@ -32,13 +32,55 @@
                 implementation.
             </li>
             <li>
-                Support for arbitrary character sets, in particular
+                Support for
+                {@link de.schlichtherle.truezip.zip.ZipOutputStream#ZipOutputStream(java.io.OutputStream,de.schlichtherle.truezip.zip.ZipFile) appending}
+                to an existing ZIP file.
+            </li>
+            <li>
+                Support for
+                {@link de.schlichtherle.truezip.zip.ZipFile#recoverLostEntries() recovering}
+                lost entries when reading a ZIP File.
+            </li>
+            <li>
+                Support for
+                {@link de.schlichtherle.truezip.zip.ZipEntry#isEncrypted() reading}
+                and
+                {@link de.schlichtherle.truezip.zip.ZipEntry#setEncrypted(boolean) writing}
+                encrypted or authenticated ZIP entries.
+                Currently, only the
+                <a href="http://www.winzip.com/win/en/aes_info.htm">WinZip AES Specification</a>
+                is supported.
+                You need to implement the interface
+                {@link de.schlichtherle.truezip.zip.WinZipAesParameters}
+                and inject it for reading
+                and writing to the
+                {@link de.schlichtherle.truezip.zip.ZipFile#setCryptoParameters(de.schlichtherle.truezip.zip.ZipCryptoParameters) ZipFile.setCryptoParameters(ZipCryptoParameters)}
+                and
+                {@link de.schlichtherle.truezip.zip.ZipOutputStream#setCryptoParameters(de.schlichtherle.truezip.zip.ZipCryptoParameters) ZipOutputStream.setCryptoParameters(ZipCryptoParameters)}
+                classes.
+            </li>
+            <li>
+                Support for
+                {@link de.schlichtherle.truezip.zip.ZipEntry#getMethod() reading}
+                and
+                {@link de.schlichtherle.truezip.zip.ZipEntry#setMethod(int) writing}
+                BZIP2 compressed ZIP entries.
+            </li>
+            <li>
+                Support for selectable character sets, in particular
                 IBM Code Page 437 (alias IBM PC) for PKZIP compatibility
                 and UTF-8 for Java Archive (JAR) compatibility.
                 Note that using any other character set except CP437 or UTF-8
                 is strongly discouraged because it will result in
                 interoperability issues with third party tools, especially
                 when sharing archive files between different locales!
+            </li>
+            <li>
+                Support for
+                {@link de.schlichtherle.truezip.zip.ZipEntry#getExternalAttributes() reading}
+                and
+                {@link de.schlichtherle.truezip.zip.ZipEntry#setExternalAttributes(long) writing}
+                external file attributes.
             </li>
             <li>
                 Support for reading and writing ZIP64 extensions with the

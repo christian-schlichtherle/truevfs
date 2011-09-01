@@ -8,9 +8,9 @@ Encrypted Application File Format
 
     Suppose you're writing a plug-in for the next generation application
     which shall use an archive file format with a custom file suffix as a
-    container for some application data and you need to make sure that nobody
-    can read or modify the contents of the custom file format aside from the
-    application.
+    persistent container for some application data and you need to make sure
+    that nobody can read or modify the contents of the custom file format
+    aside from your application.
 
     Then, wouldn't it be nice if you wouldn't need to worry about how to read
     or write archive files using cumbersome archive type specific APIs?
