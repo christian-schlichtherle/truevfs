@@ -64,8 +64,9 @@ Key Features
         concurrently read and write entries within the same archive file.
 
     [Scalable]
-        The TrueZIP Kernel and driver modules apply pooling of expensive
-        resources in order to reduce the overall memory footprint.
+        The TrueZIP Kernel precomputes the initial capacity of HashMap objects
+        as much as possible in order to reduce heap fragmentation caused by
+        frequent resizing of hash tables when adding large numbers of entries.
         Given enough heap space to hold the archive file system meta data,
         TrueZIP can access thousands of archive files with thousands of entries
         in many different threads concurrently.
