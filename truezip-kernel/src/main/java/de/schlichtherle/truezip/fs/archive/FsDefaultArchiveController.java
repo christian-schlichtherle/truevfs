@@ -82,13 +82,13 @@ extends FsFileSystemArchiveController<E> {
      * An {@link InputArchive} object used to mount the (virtual) archive file system
      * and read the entries from the archive file.
      */
-    private @CheckForNull InputArchive inputArchive;
+    private @CheckForNull InputArchive<E> inputArchive;
 
     /**
      * The (possibly temporary) {@link OutputArchive} we are writing newly
      * created or modified entries to.
      */
-    private @CheckForNull OutputArchive outputArchive;
+    private @CheckForNull OutputArchive<E> outputArchive;
 
     private final FsArchiveFileSystemTouchListener<E> touchListener
             = new TouchListener();
@@ -123,21 +123,21 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
-    private @CheckForNull InputArchive getInputArchive() {
+    private @CheckForNull InputArchive<E> getInputArchive() {
         return inputArchive;
     }
 
-    private void setInputArchive(final @CheckForNull InputArchive inputArchive) {
+    private void setInputArchive(final @CheckForNull InputArchive<E> inputArchive) {
         this.inputArchive = inputArchive;
         if (null != inputArchive)
             setTouched(true);
     }
 
-    private @CheckForNull OutputArchive getOutputArchive() {
+    private @CheckForNull OutputArchive<E> getOutputArchive() {
         return outputArchive;
     }
 
-    private void setOutputArchive(final @CheckForNull OutputArchive outputArchive) {
+    private void setOutputArchive(final @CheckForNull OutputArchive<E> outputArchive) {
         this.outputArchive = outputArchive;
         if (null != outputArchive)
             setTouched(true);
@@ -169,7 +169,7 @@ extends FsFileSystemArchiveController<E> {
             final boolean readOnly = !parent.isWritable(parentName);
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, parentName, MOUNT_INPUT_OPTIONS);
-            final InputArchive ia = new InputArchive(
+            final InputArchive<E> ia = new InputArchive<E>(
                     driver.newInputShop(getModel(), socket));
             setInputArchive(ia);
             setFileSystem(newPopulatedFileSystem(driver,
@@ -216,8 +216,8 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException on any I/O error.
      * @return The output.
      */
-    private OutputArchive makeOutput() throws IOException {
-        OutputArchive oa = getOutputArchive();
+    private OutputArchive<E> makeOutput() throws IOException {
+        OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
             return oa;
         final BitField<FsOutputOption> options = getContext()
@@ -226,8 +226,8 @@ extends FsFileSystemArchiveController<E> {
                 .set(CACHE);
         final OutputSocket<?> socket = driver.getOutputSocket(
                 parent, parentName, options, null);
-        final InputArchive ia = getInputArchive();
-        oa = new OutputArchive(driver.newOutputShop(
+        final InputArchive<E> ia = getInputArchive();
+        oa = new OutputArchive<E>(driver.newOutputShop(
                 getModel(),
                 socket,
                 null == ia ? null : ia.getDriverProduct()));
@@ -237,7 +237,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     InputSocket<?> getInputSocket(final String name) {
-        final InputArchive ia = getInputArchive();
+        final InputArchive<E> ia = getInputArchive();
         assert null != ia; // make FindBugs happy
         return ia.getInputSocket(name);
     }
@@ -266,7 +266,7 @@ extends FsFileSystemArchiveController<E> {
             return;
         Boolean grow = null;
         String aen; // archive entry name
-        final OutputArchive oa = getOutputArchive(); // output archive
+        final OutputArchive<E> oa = getOutputArchive(); // output archive
         final E oae; // output archive entry
         if (null != oa) {
             aen = ce.getEntry().getName();
@@ -282,7 +282,7 @@ extends FsFileSystemArchiveController<E> {
             aen = null;
             oae = null;
         }
-        final InputArchive ia = getInputArchive(); // input archive
+        final InputArchive<E> ia = getInputArchive(); // input archive
         final E iae; // input archive entry
         if (null != ia) {
             if (null == aen)
@@ -361,11 +361,11 @@ extends FsFileSystemArchiveController<E> {
         } // FilterExceptionHandler
 
         assert isFileSystemTouched();
-        final OutputArchive oa = getOutputArchive();
+        final OutputArchive<E> oa = getOutputArchive();
         assert null != oa;
-        final InputArchive ia = getInputArchive();
+        final InputArchive<E> ia = getInputArchive();
         copy(   getFileSystem(),
-                null == ia ? new DummyInputService<E>() : ia.getDriverProduct(),
+                null == ia ? new DummyInputArchive<E>() : ia.getDriverProduct(),
                 oa.getDriverProduct(),
                 new FilterExceptionHandler());
     }
@@ -422,9 +422,9 @@ extends FsFileSystemArchiveController<E> {
     throws X {
         setFileSystem(null);
         try {
-            final InputArchive ia = getInputArchive();
+            final InputArchive<E> ia = getInputArchive();
             setInputArchive(null);
-            if (ia != null) {
+            if (null != ia) {
                 try {
                     ia.close();
                 } catch (IOException ex) {
@@ -432,9 +432,9 @@ extends FsFileSystemArchiveController<E> {
                 }
             }
         } finally {
-            final OutputArchive oa = getOutputArchive();
+            final OutputArchive<E> oa = getOutputArchive();
             setOutputArchive(null);
-            if (oa != null) {
+            if (null != oa) {
                 try {
                     oa.close();
                 } catch (IOException ex) {
@@ -450,23 +450,19 @@ extends FsFileSystemArchiveController<E> {
     }
 
     /**
-     * A dummy input service to substitute for {@code null}.
+     * A dummy input archive to substitute for {@code null} when copying.
      * 
      * @param <E> The type of the entries.
      */
-    private static final class DummyInputService<E extends Entry>
-    implements InputShop<E> {
-        @Override
-        public void close() throws IOException {
-        }
-
+    private static final class DummyInputArchive<E extends Entry>
+    implements InputService<E> {
         @Override
         public int getSize() {
             return 0;
         }
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
-		@Override
+        @Override
         public Iterator<E> iterator() {
             return (Iterator) Collections.emptyList().iterator();
         }
@@ -478,13 +474,11 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public InputSocket<? extends E> getInputSocket(String name) {
-            if (null == name)
-                throw new NullPointerException();
             throw new UnsupportedOperationException();
         }
     } // DummyInputService
 
-    private final class InputArchive
+    private static final class InputArchive<E extends FsArchiveEntry>
     extends DecoratingInputShop<E, InputShop<E>> {
         final InputShop<E> driverProduct;
 
@@ -503,7 +497,7 @@ extends FsFileSystemArchiveController<E> {
         }
     } // InputArchive
 
-    private final class OutputArchive
+    private static final class OutputArchive<E extends FsArchiveEntry>
     extends DecoratingOutputShop<E, OutputShop<E>> {
         final OutputShop<E> driverProduct;
 
