@@ -709,12 +709,16 @@ implements Iterable<E>, Closeable {
         }
     }
 
+    final Map<String, E> getRawEntries() {
+        return entries;
+    }
+
     private String decode(byte[] bytes) {
         return new String(bytes, charset);
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    @CheckForNull byte[] getRawComment() {
+    @CheckForNull final byte[] getRawComment() {
         return this.comment;
     }
 
@@ -855,7 +859,7 @@ implements Iterable<E>, Closeable {
                 new EntryReadOnlyFile(length - postamble, postamble));
     }
 
-    OffsetMapper getOffsetMapper() {
+    final OffsetMapper getOffsetMapper() {
         return mapper;
     }
 
