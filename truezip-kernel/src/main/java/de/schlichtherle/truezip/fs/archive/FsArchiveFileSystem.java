@@ -39,11 +39,11 @@ import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A read/write virtual file system for archive entries.
- * Have a look at the online <a href="http://truezip.java.net/FAQ.html">FAQ</a>
+ * Have a look at the online <a href="http://truezip.java.net/faq.html">FAQ</a>
  * to get the concept of how this works.
  * 
  * @param   <E> The type of the archive entries.
- * @see     <a href="http://truezip.java.net/FAQ.html">Frequently Asked Questions</a>
+ * @see     <a href="http://truezip.java.net/faq.html">Frequently Asked Questions</a>
  * @author  Christian Schlichtherle
  * @version $Id$
  */
