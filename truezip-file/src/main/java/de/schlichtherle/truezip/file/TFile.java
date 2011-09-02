@@ -2823,7 +2823,7 @@ public final class TFile extends File {
                 dstDelegate = dstFile.delegate;
             } else {
                 dstArchived = false;
-                dstDelegate = src;
+                dstDelegate = dst;
             }
             if (!srcArchived && !dstArchived)
                 if (srcDelegate.renameTo(dstDelegate))
