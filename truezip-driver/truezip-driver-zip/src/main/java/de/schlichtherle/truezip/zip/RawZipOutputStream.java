@@ -107,8 +107,7 @@ implements Iterable<E> {
             this.comment = appendee.getRawComment();
             final Map<String, E> entries = new LinkedHashMap<String, E>(
                     initialCapacity(appendee.size() + param.getOverheadSize()));
-            for (E entry : appendee)
-                entries.put(entry.getName(), entry);
+            entries.putAll(appendee.getRawEntries());
             this.entries = entries;
         } else {
             this.charset = param.getCharset();
