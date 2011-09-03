@@ -65,9 +65,8 @@ import java.util.ResourceBundle;
 @DefaultAnnotation(NonNull.class)
 public class Nzip extends Application {
 
-    private static final String CLASS_NAME = Nzip.class.getName();
     private static final ResourceBundle resources
-            = ResourceBundle.getBundle(CLASS_NAME);
+            = ResourceBundle.getBundle(Nzip.class.getName());
     private static final IOPoolProvider POOL_PROVIDER = IOPoolLocator.SINGLETON;
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
@@ -553,6 +552,7 @@ public class Nzip extends Application {
         return true;
     }
 
+    @SuppressWarnings("ProtectedInnerClass")
     protected static class IllegalUsageException
     extends Application.IllegalUsageException {
         private static final long serialVersionUID = 2660653252314854276L;

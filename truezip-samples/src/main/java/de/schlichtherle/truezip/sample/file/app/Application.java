@@ -13,6 +13,7 @@ import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 import de.schlichtherle.truezip.file.TApplication;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
@@ -47,11 +48,11 @@ abstract class Application extends TApplication<RuntimeException> {
      * @param err the error output stream.
      * @param autoFlush if the output streams are not {@link PrintStream}s,
      *        then they are wrapped in a new {@code PrintStream} with
-     *        this as the additional constructor parameter.
+     *        this value as the additional constructor parameter.
      */
     protected Application(
-            final OutputStream out,
-            final OutputStream err,
+            final @Nullable OutputStream out,
+            final @Nullable OutputStream err,
             final boolean autoFlush) {
         this.out = out instanceof PrintStream
                 ? (PrintStream) out
@@ -127,6 +128,7 @@ abstract class Application extends TApplication<RuntimeException> {
     protected abstract int runChecked(String[] args) throws Exception;
 
     /** Indicates illegal application parameters. */
+    @SuppressWarnings("PackageVisibleInnerClass")
     protected static class IllegalUsageException extends Exception {
         private static final long serialVersionUID = 1985623981423542464L;
 
