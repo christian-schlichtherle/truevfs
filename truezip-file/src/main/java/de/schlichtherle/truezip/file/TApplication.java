@@ -24,10 +24,10 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 //import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
- * A template class which runs the <i>setup-work-sync</i> life cycle of a
- * typical TrueZIP File* application.
- * The life cycle consists of the {@link #setup} phase and one or more
- * iterations of the {@link #work} and finally {@link #sync} phases.
+ * A template class which aids in establishing the typical
+ * <i>setup-work-sync</i> life cycle of a TrueZIP application.
+ * The established life cycle consists of the {@link #setup} phase and one or
+ * more iterations of the {@link #work} and finally {@link #sync} phases.
  * <p>
  * Subclass or copy-and-edit the source code of this template class to meet
  * your requirements.
