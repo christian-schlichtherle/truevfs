@@ -37,12 +37,14 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
         return def;
     }
 
+    /** A factory for {@link Deflater} objects. */
     private static class DeflaterFactory {
         protected Deflater newDeflater() {
             return new Deflater(DEFAULT_COMPRESSION, true);
         }
     }
 
+    /** A factory for {@link Jdk6Deflater} objects. */
     private static final class Jdk6DeflaterFactory extends DeflaterFactory {
         @Override
         protected Deflater newDeflater() {
