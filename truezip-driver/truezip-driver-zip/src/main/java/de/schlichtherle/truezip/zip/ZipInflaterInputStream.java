@@ -45,12 +45,14 @@ final class ZipInflaterInputStream extends InflaterInputStream {
         super.close();
     }
 
+    /** A factory for {@link Inflater} objects. */
     private static class InflaterFactory {
         protected Inflater newInflater() {
             return new Inflater(true);
         }
     }
 
+    /** A factory for {@link Jdk6Inflater} objects. */
     private static final class Jdk6InflaterFactory extends InflaterFactory {
         @Override
         protected Inflater newInflater() {
