@@ -174,37 +174,17 @@
                                         <link>http://findbugs.sourceforge.net/api/</link>
                                     </links>
                                 </configuration>
-                                <reportSets>
-                                    <reportSet>
-                                        <id>default</id>
-                                        <reports>
-                                            <report>javadoc</report>
-                                        </reports>
-                                    </reportSet>
-                                    <reportSet>
-                                        <id>aggregate</id>
-                                        <reports>
-                                            <report>aggregate</report>
-                                        </reports>
-                                    </reportSet>
-                                </reportSets>
+                                <reports>
+                                    <report>javadoc</report>
+                                    <report>aggregate</report>
+                                </reports>
                             </plugin>
                             <plugin>
                                 <artifactId>maven-jxr-plugin</artifactId>
-                                <reportSets>
-                                    <reportSet>
-                                        <id>default</id>
-                                        <reports>
-                                            <report>jxr</report>
-                                        </reports>
-                                    </reportSet>
-                                    <reportSet>
-                                        <id>aggregate</id>
-                                        <reports>
-                                            <report>aggregate</report>
-                                        </reports>
-                                    </reportSet>
-                                </reportSets>
+                                <reports>
+                                    <report>jxr</report>
+                                    <report>aggregate</report>
+                                </reports>
                             </plugin>
                             <plugin>
                                 <groupId>org.codehaus.mojo</groupId>
