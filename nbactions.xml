@@ -69,10 +69,10 @@
         </goals>
     </action>
     <action>
-        <actionName>CUSTOM-site-deploy</actionName>
-        <displayName>site-deploy</displayName>
+        <actionName>CUSTOM-site:stage</actionName>
+        <displayName>site:stage</displayName>
         <goals>
-            <goal>site-deploy</goal>
+            <goal>site:stage</goal>
         </goals>
     </action>
     <action>
