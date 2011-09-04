@@ -140,7 +140,8 @@ implements Iterable<FsController<?>> {
             throw new IllegalArgumentException();
 
         class Sync implements Visitor {
-            @Override public void
+            @Override
+            public void
             visit(FsController<?> controller) throws IOException {
                 controller.sync(options, handler);
             }
