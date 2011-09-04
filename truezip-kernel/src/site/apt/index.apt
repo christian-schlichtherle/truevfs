@@ -10,8 +10,9 @@ About
     manages their state and commits unsynchronized changes if required or
     requested.
     The TrueZIP Kernel uses file system drivers to access these resources.
-    It provides multithreading, multiplexing, caching and buffering so that
-    the file system drivers do not need to take care of this.
+    It provides federating, multithreading, multiplexing, caching and
+    accounting so that archive file system drivers do not need to take care of
+    these aspects of a virtual file system.
 
     In contrast to the modules
     {{{../truezip-path/index.html}TrueZIP Path}}
@@ -34,19 +35,3 @@ About
     {{{../truezip-samples/kernel-usage.html}TrueZIP Kernel API Usage}}
     in the module
     {{{../truezip-samples/index.html}TrueZIP Samples}}.
-
-    There is no tutorial for how to write a file system driver yet,
-    but there's comprehensive Javadoc:
-
-    * If you are going to write a federated file system driver
-      (i.e. archive driver), please consult the Javadoc for
-      {{{../apidocs/de/schlichtherle/truezip/fs/archive/FsArchiveDriver.html}<<<de.schlichtherle.truezip.fs.archive.FsArchiveDriver>>>}}.
-
-    * If you are going to write a non-federated file system driver,
-      please consult the Javadoc for
-      {{{../apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<de.schlichtherle.truezip.fs.FsDriver>>>}}.
-
-    []
-
-    For examples, please consult the {{{../source-repository.html}source code}}
-    for the file system drivers which ship with TrueZIP.
