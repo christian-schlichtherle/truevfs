@@ -255,7 +255,7 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web/</url>
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
         </site>
     </distributionManagement>
 
