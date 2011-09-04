@@ -42,11 +42,11 @@ public final class FileDriver extends FsDriver {
     /**
      * {@inheritDoc}
      * 
-     * @return {@code 10} or {@code -10}, depending on the availability of the
-     *         NIO.2 API.
+     * @return {@code 100} or {@link Integer#MIN_VALUE}, depending on the
+     *         availability of the NIO.2 API.
      */
     @Override
     public int getPriority() {
-        return JSE7.AVAILABLE ? 100 : -100;
+        return JSE7.AVAILABLE ? 100 : Integer.MIN_VALUE;
     }
 }
