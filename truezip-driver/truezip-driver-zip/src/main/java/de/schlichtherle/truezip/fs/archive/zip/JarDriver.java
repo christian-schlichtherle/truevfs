@@ -8,15 +8,10 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 
