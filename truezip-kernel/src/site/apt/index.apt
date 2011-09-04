@@ -1,10 +1,10 @@
     -----------------------
-    About
+    About TrueZIP Kernel
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-About
+About TrueZIP Kernel
 
     This module implements virtual file systems (VFS) from arbitrary resources,
     manages their state and commits unsynchronized changes if required or

@@ -1,10 +1,10 @@
     -----------------------
-    About
+    About TrueZIP Driver ZIP.RAES (TZP)
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-About
+About TrueZIP Driver ZIP.RAES (TZP)
 
     This module contains the file system driver service class
     {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriverService.html}ZipRaesDriverService}}
