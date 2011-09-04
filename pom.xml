@@ -175,15 +175,15 @@
                                     </links>
                                 </configuration>
                                 <reports>
-                                    <report>javadoc</report>
                                     <report>aggregate</report>
+                                    <report>javadoc</report>
                                 </reports>
                             </plugin>
                             <plugin>
                                 <artifactId>maven-jxr-plugin</artifactId>
                                 <reports>
-                                    <report>jxr</report>
                                     <report>aggregate</report>
+                                    <report>jxr</report>
                                 </reports>
                             </plugin>
                             <plugin>
