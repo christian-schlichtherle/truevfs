@@ -6,10 +6,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.sample.file.app;
+package de.schlichtherle.truezip.file.sample;
 
+import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.IOException;
 
 /**
@@ -24,15 +24,16 @@ import java.io.IOException;
  * @author     Christian Schlichtherle
  * @version    $Id$
  */
-public final class PathCat extends Application {
+@Deprecated
+public final class PathCat extends TApplication<IOException> {
 
     /** Equivalent to {@code System.exit(new PathCat().run(args));}. */
-    public static void main(String[] args) throws FsSyncException {
+    public static void main(String[] args) throws IOException {
         System.exit(new PathCat().run(args));
     }
 
     @Override
-    protected int runChecked(String[] args) throws IOException {
+    protected int work(String[] args) throws IOException {
         for (String path : args)
             pathCat(path);
         return 0;
@@ -50,8 +51,7 @@ public final class PathCat extends Application {
      * @throws IOException if accessing the resource results in an I/O error.
      */
     static void pathCat(String resource) throws IOException {
-        TFile file = new TFile(resource);
-        file.output(System.out);
+        new TFile(resource).output(System.out);
     }
 // END SNIPPET: cat
 }

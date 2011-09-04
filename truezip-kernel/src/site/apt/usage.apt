@@ -51,11 +51,7 @@ TrueZIP Kernel Usage
         (adressed by the "http" scheme).
 
     * If you need to access file system specific entry properties,
-        e.g. the property
-        {{{../apidocs/de/schlichtherle/truezip/zip/ZipEntry.html#getComment()}<<<comment>>>}}
-        of the class
-        {{{../apidocs/de/schlichtherle/truezip/zip/ZipEntry.html}<<<ZipEntry>>>}}
-        in a ZIP file.
+        e.g. the comment of an entry in a ZIP file.
 
     * If you want to reduce the number of kernel calls required to query
         a set of properties for the same file system entry.
@@ -80,7 +76,7 @@ $ cat fileA fileB
     Here's how to copy the contents of the path name parameter <<<resource>>>
     to the standard output using the API of the module TrueZIP File*:
 
-%{snippet|id=cat|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/app/PathCat.java}
+%{snippet|id=cat|file=truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/PathCat.java}
 
     Suppose that the modules TrueZIP Driver ZIP
     (Maven artifactId <<<truezip-driver-zip>>>) and TrueZIP Driver File
@@ -103,7 +99,7 @@ $ cat fileA fileB
     If an application needs to address URIs, too, then the following code
     could be used instead:
 
-%{snippet|id=cat|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/file/app/UriCat.java}
+%{snippet|id=cat|file=truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/UriCat.java}
 
     Using the same configuration like before, the following URIs could now be
     addressed with the code above:
@@ -130,7 +126,7 @@ $ cat fileA fileB
     Now for comparison, let's implement the same functionality using the API
     of the module TrueZIP Kernel.
 
-%{snippet|id=cat|file=truezip-samples/src/main/java/de/schlichtherle/truezip/sample/kernel/app/Cat.java}
+%{snippet|id=cat|file=truezip-kernel/src/test/java/de/schlichtherle/truezip/fs/sample/Cat.java}
 
     Using the same configuration like before, this code could access the same
     URIs than before.

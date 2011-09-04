@@ -377,11 +377,6 @@ try {
                 <li>Otherwise, you can use the API of the
                     <a href="truezip-kernel/index.html">TrueZIP Kernel</a>
                     module.
-                    There's a
-                    <a href="truezip-samples/kernel-usage.html">Usage</a>
-                    article with samples in the
-                    <a href="truezip-samples/index.html">TrueZIP Samples</a>
-                    module.
                 </li>
                 </ul>
             </answer>

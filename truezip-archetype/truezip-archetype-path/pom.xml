@@ -20,5 +20,5 @@
     <packaging>maven-archetype</packaging>
 
     <name>TrueZIP Archetype Path</name>
-    <description>TrueZIP Path module application - requires JSE 7+.</description>
+    <description>TrueZIP Path module application - requires JSE 7.</description>
 </project>

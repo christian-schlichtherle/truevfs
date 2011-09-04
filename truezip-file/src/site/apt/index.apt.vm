@@ -27,7 +27,7 @@ About
 
     For example, an application could access an entry within an archive
     file using a
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     like this:
 
 +--+
@@ -56,7 +56,7 @@ try {
     {{{../truezip-samples/index.html}TrueZIP Samples}} module.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.schlichtherle.truezip.file>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.schlichtherle.truezip.file>>>}}
 
 * Swing GUI
 
@@ -64,4 +64,4 @@ try {
     and choosing entries in archive files.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{../apidocs/de/schlichtherle/truezip/file/swing/package-summary.html}<<<de.schlichtherle.truezip.file.swing>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/swing/package-summary.html}<<<de.schlichtherle.truezip.file.swing>>>}}

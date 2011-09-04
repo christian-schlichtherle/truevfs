@@ -7,7 +7,7 @@
 About
 
     This module contains the file system driver service class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/http/HttpDriverService.html}HttpDriverServive}}
+    {{{./apidocs/de/schlichtherle/truezip/fs/http/HttpDriverService.html}HttpDriverServive}}
     which provides the following map of file system drivers:
 
 *--*--*

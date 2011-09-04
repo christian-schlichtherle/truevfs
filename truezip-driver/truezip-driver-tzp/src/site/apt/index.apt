@@ -7,13 +7,11 @@
 About
 
     This module contains the file system driver service class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriverService.html}ZipRaesDriverService}}
+    {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriverService.html}ZipRaesDriverService}}
     which provides the following map of file system drivers:
 
 *--*--*
 ||URI Schemes||File System Driver Class|
-*--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}|
 *--+--+
 |<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
 *--+--+
@@ -83,7 +81,9 @@ About
         ZIP.RAES files at the expense of authentication strength due to the
         frequent collisions of CRC-32 values.
         This strategy is configurable by selecting either the
-        <<<SafeZipRaesDriver>>> or the <<<ParanoidZipRaesDriver>>>.
+        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+        or the
+        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
 
     [Fast Access]
         RAES Type 0 uses CTR mode.

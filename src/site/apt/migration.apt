@@ -136,7 +136,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
     application, too.
     In the documentation of the module TrueZIP Samples, there's an article
     about
-    {{{./truezip-samples/key-management.html}key management}}
+    {{{./truezip-driver/truezip-driver-tzp/key-management.html}key management}}
     which demonstrates this.
 
 ** Optional: Configure {Archive Detection}
