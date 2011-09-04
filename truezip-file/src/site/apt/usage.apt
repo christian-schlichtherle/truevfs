@@ -13,37 +13,37 @@ TrueZIP File* Usage
 * Basic Operations
 
     In order to create a new archive file, an application can simply call
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}.
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}.
 
     In order to delete it, an application can call
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
     Like a plain old directory, this is only possible if the archive file is
     empty.
     Alternatively, an application could call
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#deleteAll()}<<<TFile.deleteAll()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#deleteAll()}<<<TFile.deleteAll()>>>}}
     in order to delete the (virtual) directory in one go, regardless of its
     contents.
 
     To read an archive <entry>, an application can simply create a
-    {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
     or a
-    {{{./apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}
     object.
     Note that an application cannot use these classes to read a valid archive
     <file> itself.
 
     Likewise, to write an archive <entry>, an application can simply create a
-    {{{./apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
     or a
-    {{{./apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
     object.
     Note that an application cannot use these classes to write a valid archive
     <file> itself.
 
     If an application just needs to copy data however, using one of the
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#bulkIOMethods}copy methods}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#bulkIOMethods}copy methods}}
     in the class
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     is highly recommended instead of using
     <<<TFile(In|Out)putStream>>> or <<<TFile(Reader|Writer)>>> directly.
     These methods use pooled buffers and pooled threads and do not need to
@@ -122,9 +122,9 @@ TrueZIP File* Usage
     Archive file synchronization is performed semi-automatic:
 
     * Manual synchronization happens when the application calls
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
         or
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}.
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}.
 
     * Automatic synchronization happens when the JVM terminates (from a JVM
         shutdown hook) or when the application modifies an archive entry more
@@ -137,18 +137,18 @@ TrueZIP File* Usage
     archive file (see {{{Third_Party_Access}below}} ) or to monitor progress
     (see {{{Monitoring_Progress}below}}).
     It also enables some control over any exceptions thrown:
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
     or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
     may throw an
     {{{../apidocs/de/schlichtherle/truezip/fs/FsSyncException.html}<<<FsSyncException>>>}}.
     An application may catch these exceptions and act on them individually
     (see {{{Exception_Handling}below}}).
 
     However, calling
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
     or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
     too often may increase the overall runtime:
     On each call, all remaining entries in the archive file are copied to the
     archive file again if the archive file did already exist.
@@ -186,14 +186,14 @@ TrueZIP File* Usage
     In this context, third parties are:
 
     [[1]] Instances of the class
-          {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
+          {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
           which do not detect the same set of archive files in the path due
           to the use of a differently configured
-          {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+          {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
 
     [[1]] Instances of the class <<<File>>> which are not instances of the
           class
-          {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
+          {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}.
 
     [[1]] Other definitions of the classes in the TrueZIP Kernel module which
           have been loaded by different class loaders.
@@ -205,29 +205,29 @@ TrueZIP File* Usage
     As a rule of thumb, the same archive file or entry within an archive file
     should not be accessed by different <<<File>>> class objects
     - let it be <<<File>>> or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     objects - or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     objects with a different
-    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
     parameters.
     This ensures that the state associated to an archive file is not shadowed
     or bypassed.
 
     To ensure that all
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     objects recognize the same set of archive files in a path, it's recommended
     <not> to use constructors or methods of the
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     class with an explicit
-    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
     parameter.
 
     If the prerequisites for these recommendations don't apply or if the
     recommendations can't be followed, an application may call
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
     or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
     to perform an explicit synchronization.
     This clears all state information so that the third party can then safely
     access any archive file.
@@ -240,9 +240,9 @@ TrueZIP File* Usage
 
 ** Exception Handling
 
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
     are guaranteed to process <all> archive files which are in use or have been
     touched by an application.
     However, processing some of these archive files may fail for any I/O
@@ -328,9 +328,9 @@ TrueZIP File* Usage
 %{snippet|id=performance2|file=truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/Usage.java}
 
     In essence: If at all, an application should never call
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
     or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
     in a loop which modifies an archive file.
 
     The situation gets more complicated with implicit remounting:
@@ -343,7 +343,7 @@ TrueZIP File* Usage
 %{snippet|id=performance3|file=truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/Usage.java}
 
     Each call to
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#createNewFile()}<<<TFile.createNewFile()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#createNewFile()}<<<TFile.createNewFile()>>>}}
     is a modification operation.
     Hence, on the second call to this method, TrueZIP needs to do an automatic
     synchronization which writes all entries in the archive file created so far
@@ -356,7 +356,7 @@ TrueZIP File* Usage
 %{snippet|id=performance4|file=truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/Usage.java}
 
     When
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}
     gets called, the entry has already been
     written and so an implicit remount is triggered, which writes all entries
     in the archive file created so far to disk again.
@@ -371,7 +371,7 @@ TrueZIP File* Usage
 
     To avoid accidental synchronization when copying data, please consider
     using the advanced
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#CopyMethods}copy methods}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#CopyMethods}copy methods}}
     instead.
     These methods are easy to use and provide best performance.
 
@@ -381,15 +381,15 @@ TrueZIP File* Usage
     control:
 
     [[1]] When the JVM terminates, calling
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
         or
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
         is recommended in order to handle exceptions explicitly.
 
     [[2]] Otherwise, in order to achieve best performance,
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
         or
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
         should not get called unless either third party access or explicit
         exception handling is required.
 
@@ -443,7 +443,7 @@ TrueZIP File* Usage
         only observe the result.
 
     [[3]] Otherwise, all
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
         instances which recognize the same set of archive file types and are
         defined by the same class loader can't monitor or influence the changes
         as they are in progress - they can only observe the result.
@@ -451,7 +451,7 @@ TrueZIP File* Usage
     []
 
     These conditions apply regardless of whether the
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
     instances are used by different threads or not.
     In other words, TrueZIP is thread safe as much as you could expect from a
     platform file system.
@@ -468,19 +468,19 @@ TrueZIP File* Usage
     For an application, the root directory behaves like any other directory and
     is addressed by naming the archive file in a path:
     For example, an application may list its contents by calling
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#list()}<<<TFile.list()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#list()}<<<TFile.list()>>>}}
     or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}
 
     An archive may contain directories for which no entry is present in the
     file although they contain at least one member in their directory tree for
     which an entry is actually present in the file.
     Similarly, if
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isLenient()}<<<TFile.isLenient()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isLenient()}<<<TFile.isLenient()>>>}}
     returns <<<true>>> (which is the default), an archive entry may be created
     in an archive file although its parent directory hasn't been explicitly
     created by calling
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}
     before.
 
     Such a directory is called a <ghost directory>:
@@ -491,10 +491,10 @@ TrueZIP File* Usage
 
     To the application, a ghost directory behaves like a regular directory with
     the exception that its last modification time returned by
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#lastModified()}<<<TFile.lastModified()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#lastModified()}<<<TFile.lastModified()>>>}}
     is <<<0L>>>.
     If the application sets the last modification time explicitly using
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}},
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}},
     then the ghost directory reincarnates as a regular directory and will be
     output to the archive file.
 
@@ -537,15 +537,15 @@ TrueZIP File* Usage
     name it's up to the individual methods how they behave in this case.
     This could happen with archive files created by external tools only.
     Both
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
     will return <<<true>>> in this case and in fact they are the only methods
     an application can rely upon to act properly in this situation:
     Many other methods use a combination of
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
     calls and will show an undefined behavior.
 
     The good news is that both the file and the directory coexist in the

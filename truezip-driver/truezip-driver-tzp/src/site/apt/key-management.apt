@@ -18,12 +18,12 @@ TrueZIP Key Management
 
     At runtime, all RAES encrypted ZIP files are managed by an instance of a
     sub-class of the abstract archive driver implementation class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriver.html}<<<ZipRaesDriver>>>}}
-    - typically an instance of the class
+    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriver.html}<<<ZipRaesDriver>>>}}.
+    By default, this is an instance of the class
     {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
 
-    Whenever the archive driver reads or writes an RAES encrypted ZIP file,
-    it uses an instance of an implementation of the generic interface
+    Whenever this archive driver class reads or writes a RAES encrypted ZIP
+    file, it uses an instance of an implementation of the generic interface
     {{{../../apidocs/de/schlichtherle/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
     in order to obtain an instance of an implementation of the generic interface
     {{{../../apidocs/de/schlichtherle/truezip/key/KeyManager.html}<<<KeyManager>>>}}
@@ -51,13 +51,13 @@ TrueZIP Key Management
     constructor.
     However, it does not check if the file in question is a prospective
     ZIP.RAES file or any other detectable archive type, e.g. ZIP, TAR etc.
-    In addition, it does <not> check whether the file in question is truly a
-    archive file or just a false positive archive file, that is a regular file
+    In addition, it does <not> check whether the file in question is truly an
+    archive file or just a false positive archive file, e.g. a regular file
     which accidentally or intentionally uses a detectable archive file suffix.
     To discriminate the latter case, an application would normally have to call
     {{{../../apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}.
     However, it <must not> do so yet in this case because this would require
-    to prompt the user for the password before it could have been set
+    to prompt the user for the password before it even could have been set
     programmatically!
 
     This implies that there is a chance that the application sets a password
@@ -68,20 +68,25 @@ TrueZIP Key Management
     {{{../../apidocs/de/schlichtherle/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}.
     check.
 
-* Setting Passwords For All ZIP.RAES Files By Implementing A View
+* Setting Passwords For All ZIP.RAES Files By Implementing A Custom Driver
 
     If you need to set passwords for <all> RAES encrypted ZIP files,
     then the following is the simplest approach:
 
-%{snippet|id=setAllPasswords|file=truezip-driver/truezip-driver-tzp/src/test/java/de/schlichtherle/truezip/fs/archive/zip/raes/sample/KeyManagement.java}
+%{snippet|id=setAllPasswords1|file=truezip-driver/truezip-driver-tzp/src/test/java/de/schlichtherle/truezip/fs/archive/zip/raes/sample/KeyManagement.java}
+
+    This example basically removes the use of the key manager by subclassing
+    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+    and overriding the relevant methods for dealing with RAES parameters.
+
+* Setting Passwords For All ZIP.RAES Files By Implementing A Custom View
+
+    Another option is to customize the key manager itself:
+
+%{snippet|id=setAllPasswords2|file=truezip-driver/truezip-driver-tzp/src/test/java/de/schlichtherle/truezip/fs/archive/zip/raes/sample/KeyManagement.java}
 
     This example instantiates the class
     {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/PromptingKeyManagerService.html}<<<PromptingKeyManagerService>>>}}
     which applies the Model-View-Controller pattern to manage its key providers.
     Here I simply substitute the default view class with a custom
     implementation.
-
-    Note that the <<<controller>>> parameter provides the method
-    {{{../../apidocs/de/schlichtherle/truezip/key/PromptingKeyProvider.Controller.html#getResource()}<<<Controller.getResource()>>>}}
-    which identifies the prospective archive file so that an application
-    could programmatically set passwords for individual resource URIs, too.

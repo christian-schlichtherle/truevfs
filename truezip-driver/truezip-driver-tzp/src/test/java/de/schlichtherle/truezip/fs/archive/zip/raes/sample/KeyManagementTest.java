@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
 
+import java.io.InputStream;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.util.Random;
 import java.util.logging.Level;
@@ -15,10 +16,13 @@ import java.util.logging.Logger;
 import org.junit.Before;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.file.TFileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -96,21 +100,36 @@ public class KeyManagementTest {
     public void testSetPassword() throws IOException {
         final TFile archive = new TFile(temp);
         KeyManagement.setPassword(archive, password);
-        makeArchive(archive);
+        roundTripTest(archive);
     }
 
     @Test
-    public void testSetAllPasswords() throws IOException {
-        KeyManagement.setAllPasswords(password);
-        makeArchive(new TFile(temp));
+    public void testSetAllPasswords1() throws IOException {
+        KeyManagement.setAllPasswords1(password);
+        roundTripTest(new TFile(temp));
     }
 
-    private void makeArchive(TFile archive) throws IOException {
-        OutputStream out = new TFileOutputStream(new TFile(archive, "entry"));
+    @Test
+    public void testSetAllPasswords2() throws IOException {
+        KeyManagement.setAllPasswords2(password);
+        roundTripTest(new TFile(temp));
+    }
+
+    private void roundTripTest(TFile archive) throws IOException {
+        TFile file = new TFile(archive, "entry");
+        OutputStream out = new TFileOutputStream(file);
         try {
             out.write(data);
         } finally {
             out.close();
         }
+        out = new ByteArrayOutputStream(data.length);
+        InputStream in = new TFileInputStream(file);
+        try {
+            TFile.cat(in, out);
+        } finally {
+            in.close();
+        }
+        Arrays.equals(data, ((ByteArrayOutputStream) out).toByteArray());
     }
 }

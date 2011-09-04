@@ -20,14 +20,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 public class RaesKeyException extends RaesParametersException {
     private static final long serialVersionUID = 1375629384612351398L;
-
-    /**
-     * Constructs a RAES key exception with
-     * a detail message indicating that RAES key retrieval has failed.
-     */
-    public RaesKeyException() {
-        super("RAES key retrieval has failed!");
-    }
     
     /**
      * Constructs a RAES key exception with
