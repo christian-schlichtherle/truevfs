@@ -76,7 +76,7 @@ extends FsFileSystemArchiveController<E> {
 
     private final FsArchiveDriver<E> driver;
     private final FsController<?> parent;
-    private final FsEntryName parentName;
+    private final FsEntryName target;
 
     /**
      * An {@link InputArchive} object used to mount the (virtual) archive file system
@@ -111,15 +111,14 @@ extends FsFileSystemArchiveController<E> {
             throw new IllegalArgumentException("Parent/member mismatch!");
         this.driver = driver;
         this.parent = parent;
-        this.parentName = getMountPoint().getPath().resolve(ROOT)
-                .getEntryName();
+        this.target = getMountPoint().getPath().getEntryName();
         assert invariants();
     }
 
     private boolean invariants() {
         assert null != driver;
         assert null != parent;
-        assert null != parentName;
+        assert null != target;
         return true;
     }
 
@@ -166,9 +165,9 @@ extends FsFileSystemArchiveController<E> {
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property changes
             // to TRUE once a file is opened for reading!
-            final boolean readOnly = !parent.isWritable(parentName);
+            final boolean readOnly = !parent.isWritable(target);
             final InputSocket<?> socket = driver.getInputSocket(
-                    parent, parentName, MOUNT_INPUT_OPTIONS);
+                    parent, target, MOUNT_INPUT_OPTIONS);
             final InputArchive<E> ia = new InputArchive<E>(
                     driver.newInputShop(getModel(), socket));
             setInputArchive(ia);
@@ -182,7 +181,7 @@ extends FsFileSystemArchiveController<E> {
             if (!autoCreate) {
                 final FsEntry parentEntry;
                 try {
-                    parentEntry = parent.getEntry(parentName);
+                    parentEntry = parent.getEntry(target);
                 } catch (FsException ex2) {
                     assert false;
                     throw ex2;
@@ -194,7 +193,7 @@ extends FsFileSystemArchiveController<E> {
                     throw new FsCacheableFalsePositiveException(ex);
                 throw new FsFalsePositiveException(ex);
             }
-            if (null != parent.getEntry(parentName))
+            if (null != parent.getEntry(target))
                 throw new FsCacheableFalsePositiveException(ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
@@ -225,7 +224,7 @@ extends FsFileSystemArchiveController<E> {
                 .and(OUTPUT_PREFERENCES_MASK)
                 .set(CACHE);
         final OutputSocket<?> socket = driver.getOutputSocket(
-                parent, parentName, options, null);
+                parent, target, options, null);
         final InputArchive<E> ia = getInputArchive();
         oa = new OutputArchive<E>(driver.newOutputShop(
                 getModel(),
