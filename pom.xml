@@ -223,23 +223,6 @@
                             </plugin-->
                         </reportPlugins>
                     </configuration>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.maven.wagon</groupId>
-                            <artifactId>wagon-scm</artifactId>
-                            <version>1.0</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.apache.maven.scm</groupId>
-                            <artifactId>maven-scm-api</artifactId>
-                            <version>1.5</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.apache.maven.scm</groupId>
-                            <artifactId>maven-scm-provider-hg</artifactId>
-                            <version>1.5</version>
-                        </dependency>
-                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -272,7 +255,7 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <url>scm:hg:ssh://hg.java.net/truezip~web</url>
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web/</url>
         </site>
     </distributionManagement>
 
