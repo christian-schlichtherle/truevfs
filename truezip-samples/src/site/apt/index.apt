@@ -1,0 +1,20 @@
+    -----------------------
+    About TrueZIP Samples
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP Samples
+
+    Sample applications to demonstrate the usage of various TrueZIP module
+    APIs.
+
+    Some of these samples use rather advanced or exotic features which
+    makes them more complex than necessary for a typical application.
+
+    By design, the sample applications use all file system drivers which
+    can be located at run time.
+    Location of the available file system drivers is performed by
+    scanning the class path - see the Javadoc for the TrueZIP Kernel class
+    {{{../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}<<<FsDriverLocator>>>}}
+    for more information.

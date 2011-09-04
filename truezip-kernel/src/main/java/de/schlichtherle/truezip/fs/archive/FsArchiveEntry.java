@@ -1,0 +1,65 @@
+/*
+ * Copyright (C) 2006-2011 Schlichtherle IT Services
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
+package de.schlichtherle.truezip.fs.archive;
+
+import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+/**
+ * Represents an entry in an archive file.
+ * Archive drivers need to implement this interface in order to enable their
+ * client (i.e. archive controllers) to read and write archive entries from
+ * and to archive files of their respective supported type.
+ * <p>
+ * Implementations do <em>not</em> need to be thread-safe.
+ * 
+ * @author  Christian Schlichtherle
+ * @version $Id$
+ */
+@DefaultAnnotation(NonNull.class)
+public interface FsArchiveEntry extends Entry {
+
+    /**
+     * Returns the type of this archive entry.
+     *
+     * @return The type of this archive entry.
+     */
+    Type getType();
+
+    /**
+     * Sets the size of the given type for this archive entry.
+     *
+     * @param  type the size type.
+     * @param  value the size of the given size type for this archive entry in
+     *         bytes or
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
+     * @return {@code false} if and only if setting a size for the given type
+     *         is unsupported.
+     * @throws NullPointerException if {@code type} is {@code null}.
+     * @throws IllegalArgumentException if {@code value} is negative and not
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
+     */
+    boolean setSize(Size type, long value);
+
+    /**
+     * Sets the last access time of the given type for this archive entry.
+     *
+     * @param  type the access type.
+     * @param  value the last time of the given access type for this archive
+     *         entry in milliseconds since the epoch or
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
+     * @return {@code false} if and only if setting a time for the given type
+     *         is unsupported.
+     * @throws NullPointerException if {@code type} is {@code null}.
+     * @throws IllegalArgumentException if {@code value} is negative and not
+     *         {@value de.schlichtherle.truezip.entry.Entry#UNKNOWN}.
+     */
+    boolean setTime(Access type, long value);
+}
