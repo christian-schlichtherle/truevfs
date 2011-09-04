@@ -26,7 +26,7 @@ About TrueZIP Driver ZIP
     make its file system drivers available for service location in the
     client API modules.
 
-Key Features
+* Key Features
 
     [Appending To Existing ZIP Files]
         New ZIP entries can get appended to existing ZIP files using a client
