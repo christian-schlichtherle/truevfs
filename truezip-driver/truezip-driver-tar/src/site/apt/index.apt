@@ -7,7 +7,7 @@
 About
 
     This module contains the file system driver service class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/tar/TarDriverService.html}TarDriverService}}
+    {{{./apidocs/de/schlichtherle/truezip/fs/archive/tar/TarDriverService.html}TarDriverService}}
     which provides the following map of file system drivers:
 
 *--*--*

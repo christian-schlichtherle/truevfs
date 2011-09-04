@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.sample.kernel.app;
+package de.schlichtherle.truezip.fs.sample;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;

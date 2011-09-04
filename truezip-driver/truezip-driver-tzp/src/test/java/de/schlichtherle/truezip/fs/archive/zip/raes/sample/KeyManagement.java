@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.sample.zip.raes;
+package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.file.TArchiveDetector;
@@ -31,12 +31,13 @@ import java.util.Arrays;
  * programmatically instead of prompting the user for a key by means of the
  * default Swing or Console based user interfaces.
  *
- * @author     Christian Schlichtherle
- * @version    $Id$
  * @deprecated This sample code should <em>not</em> be considered part of the
  *             public API.
  *             If you want to use it, then copy it, don't call it!
+ * @author     Christian Schlichtherle
+ * @version    $Id$
  */
+@Deprecated
 @DefaultAnnotation(NonNull.class)
 public final class KeyManagement {
 

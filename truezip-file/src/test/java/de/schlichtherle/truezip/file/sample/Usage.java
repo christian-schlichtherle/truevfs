@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.sample.file;
+package de.schlichtherle.truezip.file.sample;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
@@ -20,14 +20,14 @@ import java.io.InputStream;
 /**
  * A collection of code snippets to demonstrate the usage of the API in the
  * TrueZIP File* module.
- * Because most of the snippets are useless in isolation, this class is not
- * available for applications.
- * The benefit of having this class at all is that these code snippets get
- * checked by the compiler and are subject for automated refactoring.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @deprecated This class contains code snippets which are useless in
+ *             isolation, so it should not get used in applications.
+ * @author     Christian Schlichtherle
+ * @version    $Id$
  */
+@Deprecated
+@SuppressWarnings("CallToThreadDumpStack")
 abstract class Usage {
 
     /** Nope! */

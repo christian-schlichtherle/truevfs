@@ -32,10 +32,14 @@ import java.io.OutputStream;
  * Note that this class is not intended to access RAES encrypted ZIP files -
  * use the {@link TFile} class for this task instead.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class RaesFiles {
+
+    /** You cannot instantiate this class. */
+    private RaesFiles() {
+    }
 
     /**
      * Encrypts the given plain file to the given RAES file.
@@ -98,16 +102,16 @@ public class RaesFiles {
      * parent directory path except the files themselves, which are not
      * recognized as archive files.
      * 
-     * @param strongAuthentication If this is {@code true}, the whole
-     *        contents of encrypted file get authenticated, which can be a
-     *        time consuming operation.
+     * @param authenticate If this is {@code true}, the entire contents of the
+     *        encrypted file get authenticated, which can be a time consuming
+     *        operation.
      *        Otherwise, only the key/password and the file length get
      *        authenticated.
      */
     public static void decrypt(
             final String raesFilePath,
             final String plainFilePath,
-            final boolean strongAuthentication,
+            final boolean authenticate,
             final TArchiveDetector detector)
     throws IOException {
         final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
@@ -119,7 +123,7 @@ public class RaesFiles {
         try {
             final RaesReadOnlyFile rrof
                     = RaesReadOnlyFile.getInstance(rof, params);
-            if (strongAuthentication)
+            if (authenticate)
                 rrof.authenticate();
             final InputStream in = new ReadOnlyFileInputStream(rrof);
             final OutputStream out = new TFileOutputStream(plainFile, false);

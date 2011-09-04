@@ -76,7 +76,7 @@ TFile.setDefaultArchiveDetector(
     instance of your own implementation of the interface
     {{{../apidocs/de/schlichtherle/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}.
     For more information, please refer to the article about
-    {{{./truezip-samples/key-management.html}Key Management}}.
+    {{{./truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
 
     Now you can easily create or overwrite an entry in your custom application
     file format like this:

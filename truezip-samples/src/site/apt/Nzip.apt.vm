@@ -7,7 +7,7 @@
 Nzip - a Comprehensive Command Line Utility
 
     The Nzip command line utility implemented by the class
-    {{{../apidocs/de/schlichtherle/truezip/sample/file/app/Nzip.html}<<<de.schlichtherle.truezip.sample.file.app.Nzip>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/sample/file/app/Nzip.html}<<<de.schlichtherle.truezip.sample.file.app.Nzip>>>}}
     showcases the power of the {{{../truezip-file/index.html}TrueZIP File*}} API.
 
     This is a comprehensive command line utility which allows you to work with

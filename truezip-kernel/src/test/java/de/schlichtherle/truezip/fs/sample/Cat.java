@@ -6,9 +6,8 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.sample.kernel.app;
+package de.schlichtherle.truezip.fs.sample;
 
-import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsDefaultDriver;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -20,6 +19,7 @@ import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -32,7 +32,7 @@ import java.net.URISyntaxException;
  * driver which is available on the run-time class path.
  *
  * @deprecated Since TrueZIP 7.2, the new TrueZIP Path API provides the same
- *             functionality with much more ease.
+ *             functionality with much more ease and comfort.
  *             Use the Maven archetype for the module TrueZIP Path instead.
  *             Its group ID is {@code de.schlichtherle.truezip}.
  *             Its artifact ID is {@code truezip-archetype-path}.
@@ -65,7 +65,6 @@ public final class Cat {
     throws IOException, URISyntaxException {
         // Get a manager for the life cycle of controllers for federated
         // file systems.
-        // Alternatively, we could use new FsDefaultManager();
         FsManager manager = FsManagerLocator.SINGLETON.get();
         try {
             // Search the class path for the set of all supported file system
@@ -74,12 +73,14 @@ public final class Cat {
                     driver = new FsDefaultDriver(FsDriverLocator.SINGLETON);
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the
-            // TFile class for transformation from a normal path name.
-            // Using the TFile class rather than the File class enables the
-            // caller to specify archive files in a path name, but at the cost
-            // of adding a dependency on the TrueZIP File* module.
+            // File class for transformation from a normal path name.
+            // Using the File class rather than the TFile class implies that
+            // the caller cannot specify an archive file in a path name.
+            // To overcome this limitation, you should use a TFile instead.
+            // Unfortunately, this would introduce a cyclic dependency on the
+            // module TrueZIP File*, so it's not an option for this sample.
             URI uri = new URI(resource);
-            uri = uri.isAbsolute() ? uri : new TFile(resource).toURI();
+            uri = uri.isAbsolute() ? uri : new File(resource).toURI();
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager
                     .getController(     path.getMountPoint(), driver)

@@ -6,10 +6,10 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.sample.file.app;
+package de.schlichtherle.truezip.file.sample;
 
+import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,16 +26,16 @@ import java.net.URISyntaxException;
  * @author     Christian Schlichtherle
  * @version    $Id$
  */
-public final class UriCat extends Application {
+@Deprecated
+public final class UriCat extends TApplication<Exception> {
 
     /** Equivalent to {@code System.exit(new CatPath().run(args));}. */
-    public static void main(String[] args) throws FsSyncException {
+    public static void main(String[] args) throws Exception {
         System.exit(new UriCat().run(args));
     }
 
     @Override
-    protected int runChecked(String[] args)
-    throws IOException, URISyntaxException {
+    protected int work(String[] args) throws Exception {
         for (String path : args)
             uriCat(path);
         return 0;

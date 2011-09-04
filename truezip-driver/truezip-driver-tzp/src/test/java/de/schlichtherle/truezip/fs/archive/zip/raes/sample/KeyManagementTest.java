@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.sample.zip.raes;
+package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
 
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.util.Random;
@@ -25,10 +25,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * @deprecated Just because the unit under test has been deprecated.
  * @author     Christian Schlichtherle
  * @version    $Id$
- * @deprecated Just because the unit under test has been deprecated.
  */
+@Deprecated
 public class KeyManagementTest {
 
     private static final Logger logger = Logger.getLogger(

@@ -47,7 +47,7 @@ public class ApplicationTest {
         }
 
         @Override
-        public int runChecked(String[] args) throws Exception {
+        protected int runChecked(String[] args) throws Exception {
             if (null == args)
                 throw new NullPointerException();
             return 0;
