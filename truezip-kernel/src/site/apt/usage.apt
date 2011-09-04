@@ -4,18 +4,32 @@
     Christian Schlichtherle
     ---
 
-%{toc}
+TrueZIP Kernel Usage
 
-Abstract
+* Abstract
 
     This article showcases the TrueZIP&#160;Kernel API in contrast to the
     {{{../truezip-file/index.html}TrueZIP File*}} API.
-    Since TrueZIP 7.2, the new {{{../truezip-path/index.html}TrueZIP Path}} API
-    provides the same functionality than the TrueZIP&#160;Kernel API with much
-    more ease, so you might consider this document as being deprecated,
-    except for educational purposes.
 
-TrueZIP Kernel versus TrueZIP File*
+* Design
+
+    In contrast to the modules
+    {{{../truezip-path/index.html}TrueZIP Path}}
+    or
+    {{{../truezip-file/index.html}TrueZIP File*}},
+    the API of this module is more complex to use, yet very extensible because
+    it relies on Dependency Injection for the resolution of
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}}
+    and
+    {{{./apidocs/de/schlichtherle/truezip/socket/IOPool.html}I/O entry pools}}.
+    It also provides service locators for
+    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system driver providers}}
+    and
+    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}I/O entry pool providers}}
+    in order to enable applications to resolve these dependencies easily at
+    runtime.
+
+* TrueZIP Kernel versus TrueZIP File*
 
     The API of the TrueZIP Kernel module is considerably different to the API
     of the TrueZIP File* module:
@@ -48,7 +62,7 @@ TrueZIP Kernel versus TrueZIP File*
 
     []
 
-Basic Operations
+* Basic Operations
 
     Suppose you'ld like to imitate the functionality of the <<<cat(1)>>> Unix
     command line utility.

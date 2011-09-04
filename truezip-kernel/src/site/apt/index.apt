@@ -9,29 +9,21 @@ About
     This module implements virtual file systems (VFS) from arbitrary resources,
     manages their state and commits unsynchronized changes if required or
     requested.
-    The TrueZIP Kernel uses file system drivers to access these resources.
+    The TrueZIP Kernel uses
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}} to access
+    these resources.
     It provides federating, multithreading, multiplexing, caching and
     accounting so that archive file system drivers do not need to take care of
     these aspects of a virtual file system.
 
-    In contrast to the modules
-    {{{../truezip-path/index.html}TrueZIP Path}}
-    or
-    {{{../truezip-file/index.html}TrueZIP File*}},
-    the API of this module is more complex to use, yet very extensible because
-    it relies on Dependency Injection for the resolution of
-    {{{../apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}}
-    and
-    {{{../apidocs/de/schlichtherle/truezip/socket/IOPool.html}I/O entry pools}}.
-    It also provides service locators for
-    {{{../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system driver providers}}
-    and
-    {{{../apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}I/O entry pool providers}}
-    in order to enable applications to resolve these dependencies easily at
-    runtime.
+* Disclaimer
 
-    For a comparison example between the TrueZIP File* API and the TrueZIP
-    Kernel API, please refer to the article
-    {{{../truezip-samples/kernel-usage.html}TrueZIP Kernel API Usage}}
-    in the module
-    {{{../truezip-samples/index.html}TrueZIP Samples}}.
+    The TrueZIP Kernel is still a field of research, i.e. there may be
+    backwards incompatible changes to its API in order to improve it.
+    Therefore, an application developer should never use the API of the module
+    TrueZIP&#160;Kernel directly, but instead use the API of the client
+    modules {{{../truezip-file/index.html}TrueZIP&#160;File*}} or
+    {{{../truezip-path/index.html}TrueZIP&#160;Path}}
+    (introduced in TrueZIP 7.2).
+    The API of these modules provide all of the functionality of the
+    TrueZIP&#160;Kernel and more with ease and comfort.
