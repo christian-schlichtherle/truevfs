@@ -1,10 +1,10 @@
     -----------------------
-    About
+    About TrueZIP Driver HTTP(S)
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-About
+About TrueZIP Driver HTTP(S)
 
     This module contains the file system driver service class
     {{{./apidocs/de/schlichtherle/truezip/fs/http/HttpDriverService.html}HttpDriverServive}}
