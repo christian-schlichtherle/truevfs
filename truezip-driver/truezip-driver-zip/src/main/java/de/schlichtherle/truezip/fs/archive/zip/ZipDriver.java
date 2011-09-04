@@ -17,6 +17,7 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
@@ -354,6 +355,17 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         return Deflater.BEST_COMPRESSION;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns the expression
+     * {@code new ZipController(superNewController(model, parent), this)}.
+     * This method should be overridden in order to call only
+     * {@link #superNewController} if and only if you are overriding
+     * {@link #zipCryptoParameters(de.schlichtherle.truezip.fs.FsModel, java.nio.charset.Charset)}, too,
+     * and do not want to use the key manager to resolve passwords,
+     * e.g. for WinZip AES encryption.
+     */
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
@@ -361,7 +373,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     }
 
     /**
-     * Equivalent to {@code super.newController(model, parent)}.
+     * Equivalent to calling
+     * {@link FsArchiveDriver#newController} on the {@link FsArchiveDriver}
+     * class.
      * Call this method when overriding {@link #newController} and you need the
      * default file system controller chain instead of the implementation in
      * the class {@link ZipDriver}.
