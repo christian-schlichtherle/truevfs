@@ -81,6 +81,12 @@ Key Features
         {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#setCryptoParameters(de.schlichtherle.truezip.zip.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
         respectively.
 
+        Mind you that the WinZip AES encryption scheme does <not> encrypt and
+        <not> authenticate the ZIP entry meta data, e.g. the comments or ZIP
+        entry names.
+        If you want this, then use the
+        {{{../truezip-driver-tzp/index.html}ZIP.RAES}} file format instead.
+
     [BZIP2 Compression]
         When reading or writing a ZIP file, ZIP entry data can get decompressed
         or compressed using the BZIP2 algorithm.

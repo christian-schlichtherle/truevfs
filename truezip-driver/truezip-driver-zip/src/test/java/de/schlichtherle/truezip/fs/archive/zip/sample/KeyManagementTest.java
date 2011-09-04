@@ -6,14 +6,20 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
+package de.schlichtherle.truezip.fs.archive.zip.sample;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.file.TFileOutputStream;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import static de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTest.*;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +42,7 @@ public class KeyManagementTest {
     private static final String PREFIX = "tzp";
     private static final String SUFFIX = "eaff";
     private static final String PASSWORD = "secret";
+    private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
     private static final Random rnd = new Random();
 
@@ -83,7 +90,7 @@ public class KeyManagementTest {
         TArchiveDetector detector = KeyManagement.newArchiveDetector1(
                 TFile.getDefaultArchiveDetector(),
                 SUFFIX,
-                PASSWORD.toCharArray());
+                PASSWORD.getBytes(US_ASCII));
         roundTripTest(new TFile(temp, detector), data);
     }
 
@@ -94,5 +101,24 @@ public class KeyManagementTest {
                 SUFFIX,
                 PASSWORD.toCharArray());
         roundTripTest(new TFile(temp, detector), data);
+    }
+
+    public static void roundTripTest(TFile archive, byte[] data)
+    throws IOException {
+        TFile file = new TFile(archive, "entry");
+        OutputStream out = new TFileOutputStream(file);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
+        }
+        out = new ByteArrayOutputStream(data.length);
+        InputStream in = new TFileInputStream(file);
+        try {
+            TFile.cat(in, out);
+        } finally {
+            in.close();
+        }
+        Arrays.equals(data, ((ByteArrayOutputStream) out).toByteArray());
     }
 }
