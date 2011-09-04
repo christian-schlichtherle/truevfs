@@ -13,16 +13,16 @@ About
 *--*--*
 ||URI Schemes||File System Driver Class|
 *--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}|
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}|
 *--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
     make its file system drivers available for service location in the
     client API modules.
 
-Key Features
+* Key Features
 
     This module employs a custom archive file format, namely ZIP.RAES
     alias TZP (short) alias RAES encrypted ZIP file (long).
