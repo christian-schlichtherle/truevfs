@@ -26,4 +26,12 @@
         make its file system drivers available for service location in the
         client API modules.
     </description>
+
+    <dependencies>
+        <!--dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.1.2</version>
+        </dependency-->
+    </dependencies>
 </project>

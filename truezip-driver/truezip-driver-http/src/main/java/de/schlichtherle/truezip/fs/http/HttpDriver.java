@@ -48,6 +48,6 @@ public final class HttpDriver extends FsDriver {
                 : model.getParent().equals(parent.getModel());
         if (null != parent)
             throw new IllegalArgumentException();
-        return new HttpController(model, this);
+        return new HttpController(this, model);
     }
 }
