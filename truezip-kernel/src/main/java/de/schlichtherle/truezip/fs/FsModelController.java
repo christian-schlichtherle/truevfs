@@ -44,11 +44,11 @@ extends FsController<M>  {
         return model;
     }
 
-    protected FsMountPoint getMountPoint() {
+    public FsMountPoint getMountPoint() {
         return model.getMountPoint();
     }
 
-    protected boolean isTouched() {
+    public boolean isTouched() {
         return model.isTouched();
     }
 
