@@ -67,24 +67,19 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool) {
-            final File dir = getTempDir(file);
-            final String name = getTempName();
+            final File dir = getParent();
+            final String name = getFileName();
             this.pool = pool = new TempFilePool(dir, name);
         }
         return pool.allocate();
     }
 
-    private File getTempDir(File file) {
-        /*for (; null != file; file = file.getParentFile())
-            if (file.isDirectory())
-                return file;*/
-        file = file.getParentFile();
-        if (null != file)
-            return file;
-        return CURRENT_DIRECTORY;
+    private File getParent() {
+        final File file= this.file.getParentFile();
+        return null != file ? file : CURRENT_DIRECTORY;
     }
 
-    private @Nullable String getTempName() {
+    private @Nullable String getFileName() {
         // See http://java.net/jira/browse/TRUEZIP-152
         final String name = this.file.getName();
         assert !name.isEmpty();
