@@ -88,16 +88,22 @@ public final class FsDefaultManager extends FsManager {
      * the alternative observer pattern.
      */
     private final class ScheduledModel extends FsDefaultModel {
+        volatile boolean touched;
         final FsFederatingController controller;
 
         @SuppressWarnings("LeakingThisInConstructor")
         ScheduledModel( final FsMountPoint mountPoint,
-                        final @CheckForNull FsController<?> parent,
+                        final FsController<?> parent,
                         final FsCompositeDriver driver) {
-            super(mountPoint, null == parent ? null : parent.getModel());
+            super(mountPoint, parent.getModel());
             schedule(false);
             this.controller = new FsFederatingController(
                     driver.newController(this, parent));
+        }
+
+        @Override
+        public boolean isTouched() {
+            return touched;
         }
 
         /**
@@ -105,10 +111,10 @@ public final class FsDefaultManager extends FsManager {
          * to the given touch status.
          */
         @Override
-        public void setTouched(boolean touched) {
-            if (touched == super.isTouched())
+        public void setTouched(final boolean touched) {
+            if (touched == this.touched)
                 return;
-            super.setTouched(touched);
+            this.touched = touched;
             schedule(touched);
         }
 
@@ -119,7 +125,7 @@ public final class FsDefaultManager extends FsManager {
                             .newLink(this));
             }
         }
-    } // class ScheduledModel
+    } // ScheduledModel
 
     @Override
     public synchronized int getSize() {

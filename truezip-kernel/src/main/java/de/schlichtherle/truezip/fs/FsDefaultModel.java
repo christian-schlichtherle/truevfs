@@ -14,7 +14,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * The default implementation of a file system model.
+ * The default implementation of a file system model for non-federated file
+ * systems.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -25,7 +26,6 @@ public class FsDefaultModel extends FsModel {
 
     private final FsMountPoint mountPoint;
     private final @CheckForNull FsModel parent;
-    private volatile boolean touched;
 
     public FsDefaultModel(  final FsMountPoint mountPoint,
                             final @CheckForNull FsModel parent) {
@@ -48,15 +48,5 @@ public class FsDefaultModel extends FsModel {
     @Override
     public final FsModel getParent() {
         return parent;
-    }
-
-    @Override
-    public boolean isTouched() {
-        return touched;
-    }
-
-    @Override
-    public void setTouched(boolean touched) {
-        this.touched = touched;
     }
 }
