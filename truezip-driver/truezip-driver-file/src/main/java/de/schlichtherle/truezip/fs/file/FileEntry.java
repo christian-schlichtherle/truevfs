@@ -64,7 +64,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         this.name = name.toString();
     }
 
-    public final FileEntry createTempFile() throws IOException {
+    final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool) {
             final File file = this.file;
