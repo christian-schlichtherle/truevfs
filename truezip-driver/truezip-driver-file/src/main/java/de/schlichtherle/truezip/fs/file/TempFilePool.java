@@ -103,5 +103,5 @@ final class TempFilePool implements IOPool<FileEntry> {
                 super.finalize();
             }
         }
-    } // class PoolEntry
+    } // PoolEntry
 }
