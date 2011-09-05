@@ -51,8 +51,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * Performs a functional test of a particular FsArchiveDriver by using the
- * API of the TrueZIP Path* module.
+ * Performs integration testing of a particular {@link FsArchiveDriver}
+ * by using the API of the TrueZIP Path module.
  *
  * @see     TFileTestSuite Test suite for the TrueZIP File* API.
  * @author  Christian Schlichtherle
