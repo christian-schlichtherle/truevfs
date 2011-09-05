@@ -71,7 +71,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         return readAttributes(path, BasicFileAttributes.class);
     }
 
-    public final FileEntry createTempFile() throws IOException {
+    final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool) {
             final Path path = this.path;
