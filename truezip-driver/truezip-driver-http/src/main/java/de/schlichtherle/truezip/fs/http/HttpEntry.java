@@ -14,10 +14,13 @@ import static de.schlichtherle.truezip.entry.Entry.Size.*;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.FsInputOption;
+import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -43,29 +46,25 @@ import net.jcip.annotations.Immutable;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
-    private static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS
-            = BitField.noneOf(FsOutputOption.class);
-
+    private HttpController controller;
     private final String name;
     private final URL url;
-    private HttpController controller;
     private volatile @CheckForNull URLConnection connection;
 
-    HttpEntry(  final FsMountPoint mountPoint,
-                final FsEntryName name,
-                final HttpController controller) {
+    HttpEntry(  final HttpController controller,
+                final FsEntryName name) {
+        assert null != controller;
+        this.controller = controller;
         this.name = name.toString();
         try {
-            this.url = mountPoint.resolve(name).toUri().toURL();
+            this.url = controller.resolve(name).toUri().toURL();
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException(ex);
         }
-        assert null != controller;
-        this.controller = controller;
     }
 
-    HttpController getController() {
-        return controller;
+    IOPool<?> getPool() {
+        return controller.getPool();
     }
 
     /** Returns the decorated URL. */
@@ -133,17 +132,21 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     @Override
     public InputSocket<HttpEntry> getInputSocket() {
-        return new HttpInputSocket(this);
+        return getInputSocket(NO_INPUT_OPTIONS);
+    }
+
+    InputSocket<HttpEntry> getInputSocket(BitField<FsInputOption> options) {
+        return new HttpInputSocket(this, options);
     }
 
     @Override
     public OutputSocket<HttpEntry> getOutputSocket() {
-        return new HttpOutputSocket(NO_OUTPUT_OPTIONS, null, this);
+        return getOutputSocket(NO_OUTPUT_OPTIONS, null);
     }
 
-    public OutputSocket<HttpEntry> getOutputSocket(
+    OutputSocket<HttpEntry> getOutputSocket(
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
-        return new HttpOutputSocket(options, template, this);
+        return new HttpOutputSocket(this, options, template);
     }
 }

@@ -8,11 +8,13 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
+import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -32,8 +34,10 @@ final class HttpInputSocket extends InputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 
-    HttpInputSocket(final HttpEntry entry) {
+    HttpInputSocket(final HttpEntry                entry, 
+                    final BitField<FsInputOption> options) {
         assert null != entry;
+        assert null != options;
         this.entry = entry;
     }
 
@@ -44,8 +48,7 @@ final class HttpInputSocket extends InputSocket<HttpEntry> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        final IOPool.Entry<?>
-                temp = entry.getController().getDriver().getPool().allocate();
+        final IOPool.Entry<?> temp = entry.getPool().allocate();
         try {
             Streams.copy(   entry.getConnection().getInputStream(),
                             temp.getOutputSocket().newOutputStream());
@@ -72,7 +75,7 @@ final class HttpInputSocket extends InputSocket<HttpEntry> {
                     temp.release();
                 }
             }
-        } // class TempReadOnlyFile
+        } // TempReadOnlyFile
 
         return new TempReadOnlyFile();
     }

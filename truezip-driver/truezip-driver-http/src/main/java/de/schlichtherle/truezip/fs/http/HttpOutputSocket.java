@@ -32,9 +32,9 @@ final class HttpOutputSocket extends OutputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 
-    HttpOutputSocket(   final               BitField<FsOutputOption> options,
-                        final @CheckForNull Entry                    template,
-                        final               HttpEntry                entry) {
+    HttpOutputSocket(   final               HttpEntry                entry,
+                        final               BitField<FsOutputOption> options,
+                        final @CheckForNull Entry                    template) {
         assert null != entry;
         assert null != options;
         this.entry    = entry;

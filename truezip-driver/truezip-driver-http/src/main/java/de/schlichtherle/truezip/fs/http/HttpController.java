@@ -20,8 +20,10 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsModelController;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOption;
+import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -43,7 +45,7 @@ final class HttpController extends FsModelController<FsModel>  {
 
     private final HttpDriver driver;
 
-    HttpController(final FsModel model, final HttpDriver driver) {
+    HttpController(final HttpDriver driver, final FsModel model) {
         super(model);
         if (null != model.getParent())
             throw new IllegalArgumentException();
@@ -51,8 +53,12 @@ final class HttpController extends FsModelController<FsModel>  {
         this.driver = driver;
     }
 
-    HttpDriver getDriver() {
-        return driver;
+    IOPool<?> getPool() {
+        return driver.getPool();
+    }
+
+    FsPath resolve(FsEntryName name) {
+        return getMountPoint().resolve(name);
     }
 
     @Override
@@ -77,7 +83,7 @@ final class HttpController extends FsModelController<FsModel>  {
 
     @Override
     public HttpEntry getEntry(FsEntryName name) throws IOException {
-        HttpEntry entry = new HttpEntry(getModel().getMountPoint(), name, this);
+        HttpEntry entry = new HttpEntry(this, name);
         return entry.isType(FILE) ? entry : null;
     }
 
@@ -109,7 +115,7 @@ final class HttpController extends FsModelController<FsModel>  {
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new HttpEntry(getModel().getMountPoint(), name, this).getInputSocket();
+        return new HttpEntry(this, name).getInputSocket(options);
     }
 
     @Override
@@ -117,7 +123,7 @@ final class HttpController extends FsModelController<FsModel>  {
             FsEntryName name,
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
-        return new HttpEntry(getModel().getMountPoint(), name, this).getOutputSocket(options, template);
+        return new HttpEntry(this, name).getOutputSocket(options, template);
     }
 
     @Override
