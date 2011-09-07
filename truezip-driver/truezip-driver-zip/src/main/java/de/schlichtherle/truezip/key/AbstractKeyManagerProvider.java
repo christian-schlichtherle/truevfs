@@ -26,9 +26,8 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <K> KeyManager<K> get(Class<K> type) {
-        final Map<Class<?>, KeyManager<?>> map = get();
-        final KeyManager<?> manager = map.get(type);
+    public final <K> KeyManager<K> get(final Class<K> type) {
+        final KeyManager<?> manager = get().get(type);
         if (null == manager)
             throw new ServiceConfigurationError("No key manager available for " + type);
         return (KeyManager<K>) manager;
