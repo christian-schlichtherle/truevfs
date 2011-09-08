@@ -933,9 +933,12 @@ public final class TPath implements Path {
     }
 
     private String toString0() {
-        return getName()
-                .getSchemeSpecificPart()
-                .replace(SEPARATOR_CHAR, separatorChar);
+        final URI name = getName();
+        // If name is not absolute, we must call name.getSchemeSpecificPart(),
+        // not just name.toString() in order to get the *decoded* URI!
+        return name.isAbsolute()
+                ? name.toString()
+                : name.getSchemeSpecificPart().replace(SEPARATOR_CHAR, separatorChar);
     }
 
     SeekableByteChannel newByteChannel(
