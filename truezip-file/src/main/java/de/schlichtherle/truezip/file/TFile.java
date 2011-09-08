@@ -576,21 +576,8 @@ public final class TFile extends File {
 
     /**
      * Constructs a new {@code TFile} instance from the given {@code uri}.
-     * This method behaves similar to the super class constructor
-     * {@link File#File(URI)} with the following amendment:
-     * If the given URI is opaque, it must match the pattern
-     * {@code <scheme>:<uri>!/<entry>}.
-     * The constructed file object then parses the URI to address an entry in
-     * a federated file system (i.e. prospective archive file) with the name
-     * {@code <entry>} in the prospective archive file addressed by
-     * {@code <uri>} which is of the type identified by {@code <scheme>}  .
-     * This is recursively applied to access entries within other prospective
-     * archive files until {@code <uri>} is a hierarchical URI.
-     * The scheme component of this hierarchical URI must be {@code file}.
-     * <p>
-     * The constructed {@code TFile} instance uses the
-     * {@link #getDefaultArchiveDetector() default archive detector} to look
-     * up archive file system drivers for the named URI scheme components.
+     * This constructor is equivalent to
+     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(FsPath.create(uri, CANONICALIZE), TConfig.get().getArchiveDetector())}</code>,
      *
      * @param  uri an absolute URI which has a scheme component which is
      *         known by the
@@ -607,7 +594,8 @@ public final class TFile extends File {
 
     /**
      * Constructs a new {@code TFile} instance from the given {@code path}.
-     * This constructor is consistent with {@link #TFile(URI)}.
+     * This constructor is equivalent to
+     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(path, TConfig.get().getArchiveDetector())}</code>
      *
      * @param  path a path with an absolute
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
@@ -624,7 +612,39 @@ public final class TFile extends File {
         this(path, TConfig.get().getArchiveDetector());
     }
 
-    private TFile(FsPath path, TArchiveDetector detector) {
+    /**
+     * Constructs a new {@code TFile} instance for the given {@code path} and
+     * {@code detector}.
+     * <p>
+     * This constructor is a super set of the super class constructor
+     * {@link File#File(URI)} with the following additional features:
+     * If the given URI is opaque, it must match the pattern
+     * {@code <scheme>:<uri>!/<entry>}.
+     * The constructed file object then parses the URI to address an entry in
+     * a federated file system (i.e. prospective archive file) with the name
+     * {@code <entry>} in the prospective archive file addressed by
+     * {@code <uri>} which is of the type identified by {@code <scheme>}  .
+     * This is recursively applied to access entries within other prospective
+     * archive files until {@code <uri>} is a hierarchical URI.
+     * The scheme component of this hierarchical URI must be {@code file}.
+     * <p>
+     * The constructed {@code TFile} instance uses the
+     * {@link #getDefaultArchiveDetector() default archive detector} to look
+     * up archive file system drivers for the named URI scheme components.
+     *
+     * @param  path a path with an absolute
+     *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
+     *         scheme component which is known by the given {@code detector}.
+     * @param  detector the archive detector to look up archive file system
+     *         drivers for the named URI scheme components.
+     * @throws IllegalArgumentException if the
+     *         {@link FsPath#toHierarchicalUri() hierarchical URI} of the given
+     *         path does not conform to the syntax constraints for
+     *         {@link File#File(URI)}.
+     * @see    #toFsPath()
+     * @since  TrueZIP 7.3.2
+     */
+    public TFile(FsPath path, TArchiveDetector detector) {
         super(path.toHierarchicalUri());
         parse(path, detector);
     }
