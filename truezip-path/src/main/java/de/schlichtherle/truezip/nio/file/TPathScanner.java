@@ -147,8 +147,8 @@ final class TPathScanner {
     private static URI fixChecked(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
         final String a = uri.getAuthority();
-        if (null == ssp // fixUnchecked bug: null == new URI("foo").scan(neAw URI("..")).getRawSchemeSpecificPart()
-                || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // fixUnchecked empty authority
+        if (null == ssp // URI bug: null == new URI("foo").resolve(new URI("..")).getRawSchemeSpecificPart()
+                || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // empty authority
             return new UriBuilder(uri).toUri();
         return uri;
     }
