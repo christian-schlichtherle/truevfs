@@ -76,8 +76,13 @@ public class HttpDriver extends FsDriver {
      * Equivalent to {@code getClient().execute(entry.newHead())}.
      */
     protected HttpResponse executeHead(HttpEntry entry) throws IOException {
+        // This version could be better when using a CachingHttpDriver:
+        /*HttpUriRequest request = entry.newGet();
+        HttpResponse response = getClient().execute(request);
+        request.abort();
+        return response;*/
+
         return getClient().execute(entry.newHead());
-        //return executeGet(uri);
     }
 
     /**
