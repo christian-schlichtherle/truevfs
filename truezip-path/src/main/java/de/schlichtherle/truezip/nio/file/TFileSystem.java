@@ -522,7 +522,7 @@ public final class TFileSystem extends FileSystem {
                     times,
                     path.getOutputPreferences());
         }
-    } // class FsEntryAttributeView
+    } // FsEntryAttributeView
 
     private final class FsEntryAttributes
     implements BasicFileAttributes {
@@ -580,5 +580,5 @@ public final class TFileSystem extends FileSystem {
         public Object fileKey() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
-    } // class FsEntryAttributes
+    } // FsEntryAttributes
 }
