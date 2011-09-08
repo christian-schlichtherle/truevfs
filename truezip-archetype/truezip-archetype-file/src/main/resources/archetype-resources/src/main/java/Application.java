@@ -11,8 +11,8 @@
  */
 package ${package};
 
-import de.schlichtherle.truezip.crypto.raes.param.swing.HurlingWindowFeedback;
-import de.schlichtherle.truezip.crypto.raes.param.swing.InvalidKeyFeedback;
+import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
+import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 import de.schlichtherle.truezip.file.TApplication;
 
 /**
