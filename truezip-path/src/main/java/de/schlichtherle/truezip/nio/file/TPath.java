@@ -831,7 +831,7 @@ public final class TPath implements Path {
      * If this path was constructed by the
      * {@link #TPath(File) file constructor}, then the returned <em>new</em>
      * {@code TFile} object compares {@link TFile#equals(Object) equal} with
-     * this file object, even if it was a plain {@link File} object.
+     * that file object, even if it was a plain {@link File} object.
      * 
      * @return A {@code TFile} object for this path.
      * @throws UnsupportedOperationException if this path is not file based,
@@ -842,7 +842,7 @@ public final class TPath implements Path {
     public TFile toFile() {
         try {
             return getName().isAbsolute()
-                    ? new TFile(getAddress())
+                    ? new TFile(getAddress(), getArchiveDetector())
                     : new TFile(toString(), getArchiveDetector());
         } catch (IllegalArgumentException ex) {
             throw new UnsupportedOperationException(ex);
