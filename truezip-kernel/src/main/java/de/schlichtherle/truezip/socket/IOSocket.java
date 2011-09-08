@@ -19,16 +19,17 @@ import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * An abstract factory for objects to do some I/O on a
+ * An abstract class for objects to do some I/O on a
  * {@link #getLocalTarget() local target}.
- * I/O sockets can be used to {@link #copy(InputSocket, OutputSocket) copy}
- * data easily and very fast. 
+ * I/O sockets are designed to {@link #copy(InputSocket, OutputSocket) copy}
+ * data fast and easily. 
  * When copying data, the local target gets connected to a
  * {@link #getPeerTarget() peer target}.
  * Once connected, the sockets can then setup the data to be transferred by
  * the copy method.
- * This feature enables to avoid data recompression when copying a compressed
- * archive entry to another archive entry of the same type.
+ * For example, this feature can get used to avoid data recompression when
+ * copying a compressed archive entry to another archive entry of the same
+ * type.
  *
  * @param   <LT> the type of the {@link #getLocalTarget() local target}
  *          for I/O operations.
@@ -98,8 +99,8 @@ public abstract class IOSocket<LT, PT> {
         final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;
         try {
-            // .connect(input) is redundant unless .newInputStream() messed
-            // with the connection.
+            // .connect(input) is actually redundant unless .newInputStream()
+            // messed with the connection.
             out = output.connect(input).newOutputStream();
         } finally {
             if (null == out) { // exception?

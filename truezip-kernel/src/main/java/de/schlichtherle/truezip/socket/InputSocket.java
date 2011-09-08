@@ -21,8 +21,8 @@ import java.nio.channels.SeekableByteChannel;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
- * An abstract factory for input streams and read only files for reading bytes
- * from its <i>local target</i>.
+ * An abstract factory for input resources for reading bytes from its
+ * <i>local target</i>.
  * <p>
  * Note that the entity relationship between input sockets and output sockets
  * is n:1, i.e. any input socket can have at most one peer output socket, but
@@ -55,17 +55,18 @@ extends IOSocket<E, Entry> {
     }
 
     /**
-     * Binds the peer target of the given socket to this socket.
+     * Binds this socket to given socket by inheriting its
+     * {@link #getPeerTarget() peer target}.
      * Note that this method does <em>not</em> change the state of the
      * given socket and does <em>not</em> connect this socket to the peer
-     * socket, i.e. it does not set this socket as the peer of of the given
+     * socket, that is it does not set this socket as the peer of of the given
      * socket.
      *
-     * @param  to the input socket which has a peer target to share.
+     * @param  to the input socket with the peer target to inherit.
      * @return {@code this}
      */
     public final InputSocket<E> bind(@CheckForNull final InputSocket<?> to) {
-        peer = null == to ? null : to.peer;
+        this.peer = null == to ? null : to.peer;
         return this;
     }
 
