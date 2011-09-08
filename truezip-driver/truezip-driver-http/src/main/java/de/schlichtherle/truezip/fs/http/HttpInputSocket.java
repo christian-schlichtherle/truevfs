@@ -9,6 +9,7 @@
 package de.schlichtherle.truezip.fs.http;
 
 import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -19,6 +20,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -48,13 +50,27 @@ final class HttpInputSocket extends InputSocket<HttpEntry> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        final IOPool.Entry<?> temp = entry.getPool().allocate();
+        final IOPool.Entry<?> temp;
+        final InputStream in = entry.getInputStream();
         try {
-            Streams.copy(   entry.getConnection().getInputStream(),
-                            temp.getOutputSocket().newOutputStream());
-        } catch (IOException ex) {
-            temp.release();
-            throw ex;
+            temp = entry.getPool().allocate();
+            try {
+                final OutputStream out = temp.getOutputSocket().newOutputStream();
+                try {
+                    Streams.cat(in, out);
+                } finally {
+                    out.close();
+                }
+            } catch (IOException ex) {
+                temp.release();
+                throw ex;
+            }
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+                throw new InputException(ex);
+            }
         }
 
         class TempReadOnlyFile extends DecoratingReadOnlyFile {
@@ -82,6 +98,6 @@ final class HttpInputSocket extends InputSocket<HttpEntry> {
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return entry.getConnection().getInputStream();
+        return entry.getInputStream();
     }
 }

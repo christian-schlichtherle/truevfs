@@ -18,22 +18,31 @@ import de.schlichtherle.truezip.fs.FsInputOption;
 import static de.schlichtherle.truezip.fs.FsInputOptions.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.text.ParseException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 import net.jcip.annotations.Immutable;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 
 /**
  * An HTTP(S) entry.
@@ -48,33 +57,43 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     private HttpController controller;
     private final String name;
-    private final URL url;
-    private volatile @CheckForNull URLConnection connection;
+    private final URI uri;
 
     HttpEntry(  final HttpController controller,
                 final FsEntryName name) {
         assert null != controller;
         this.controller = controller;
         this.name = name.toString();
-        try {
-            this.url = controller.resolve(name).toUri().toURL();
-        } catch (MalformedURLException ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        this.uri = controller.resolve(name).toUri();
     }
 
     IOPool<?> getPool() {
         return controller.getPool();
     }
 
-    /** Returns the decorated URL. */
-    URL getUrl() {
-        return url;
+    private HttpResponse executeHead() throws IOException {
+        return controller.executeHead(uri);
     }
 
-    URLConnection getConnection() throws IOException {
-        final URLConnection connection = this.connection;
-        return null != connection ? connection : (this.connection = url.openConnection());
+    private HttpResponse executeGet() throws IOException {
+        return controller.executeGet(uri);
+    }
+
+    private @CheckForNull String getHeaderField(String name) throws IOException {
+        final Header header = executeHead().getLastHeader(name);
+        return null == header ? null : header.getValue();
+    }
+
+    InputStream getInputStream() throws IOException {
+        final HttpResponse response = executeGet();
+        final HttpEntity entity = response.getEntity();
+        if (null == entity)
+            throw new FileNotFoundException(name + " (" + response.getStatusLine() + ")");
+        return entity.getContent();
+    }
+
+    OutputStream getOutputStream() throws IOException {
+        throw new ReadOnlyFileSystemTypeException();
     }
 
     @Override
@@ -86,11 +105,11 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     @SuppressWarnings("unchecked")
     public Set<Type> getTypes() {
         try {
-            getConnection();
-            return FILE_TYPE_SET;
-        } catch (IOException failure) {
-            return Collections.EMPTY_SET;
+            if (null != executeHead())
+                return FILE_TYPE_SET;
+        } catch (IOException ex) {
         }
+        return Collections.EMPTY_SET;
     }
 
     @Override
@@ -98,28 +117,36 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         if (FILE != type)
             return false;
         try {
-            getConnection();
-            return true;
-        } catch (IOException failure) {
-            return false;
+            if (null != executeHead())
+                return true;
+        } catch (IOException ex) {
         }
+        return false;
     }
 
     @Override
     public long getSize(final Size type) {
+        if (DATA != type)
+            return UNKNOWN;
         try {
-            if (DATA == type)
-                return getConnection().getContentLength();
+            final String field = getHeaderField("content-length");
+            if (null != field)
+                return Long.parseLong(field);
         } catch (IOException ex) {
         }
         return UNKNOWN;
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public long getTime(Access type) {
+        if (WRITE != type)
+            return UNKNOWN;
         try {
-            if (WRITE == type)
-                return getConnection().getLastModified();
+            final String field = getHeaderField("last-modified");
+            if (null != field)
+                return Date.parse(field);
+        } catch (IllegalArgumentException ex) {
         } catch (IOException ex) {
         }
         return UNKNOWN;

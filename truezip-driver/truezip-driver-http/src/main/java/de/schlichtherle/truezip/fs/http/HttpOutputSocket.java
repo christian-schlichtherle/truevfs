@@ -8,12 +8,12 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,6 +21,7 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * An output socket for HTTP(S) entries.
+ * Right now, this is only a dummy.
  * 
  * @see     HttpInputSocket
  * @author  Christian Schlichtherle
@@ -47,6 +48,6 @@ final class HttpOutputSocket extends OutputSocket<HttpEntry> {
 
     @Override
     public OutputStream newOutputStream() throws IOException {
-        return entry.getConnection().getOutputStream();
+        return entry.getOutputStream();
     }
 }
