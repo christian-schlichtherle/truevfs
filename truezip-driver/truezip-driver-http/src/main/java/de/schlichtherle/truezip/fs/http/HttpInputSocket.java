@@ -32,7 +32,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class HttpInputSocket extends InputSocket<HttpEntry> {
+public class HttpInputSocket extends InputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 

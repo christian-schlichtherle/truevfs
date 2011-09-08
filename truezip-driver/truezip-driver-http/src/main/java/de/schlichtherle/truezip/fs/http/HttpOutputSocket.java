@@ -29,7 +29,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class HttpOutputSocket extends OutputSocket<HttpEntry> {
+public class HttpOutputSocket extends OutputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 

@@ -17,13 +17,11 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.net.URI;
 import net.jcip.annotations.Immutable;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
 /**
  * A file system driver for the HTTP(S) schemes.
@@ -45,7 +43,7 @@ public class HttpDriver extends FsDriver {
         this.provider = provider;
     }
 
-    IOPool<?> getPool() {
+    final IOPool<?> getPool() {
         return provider.get();
     }
 
@@ -63,30 +61,31 @@ public class HttpDriver extends FsDriver {
      * Returns a new http client.
      * <p>
      * The implementation in the class {@link HttpDriver} simply returns
-     * {@code new DefaultHttpClient()}.
+     * {@code new DefaultHttpClient(new ThreadSafeClientConnManager())}.
      * If you need special configuration, e.g. for authentication or caching,
      * then you should override this method.
      * 
      * @return A new http client.
      */
     protected HttpClient newClient() {
-        return new DefaultHttpClient();
+        return new DefaultHttpClient(new ThreadSafeClientConnManager());
     }
 
     /**
      * Executes the HEAD request method for the given URI.
-     * Equivalent to {@code getClient().execute(new HttpHead(uri))}.
+     * Equivalent to {@code getClient().execute(entry.newHead())}.
      */
-    protected HttpResponse executeHead(URI uri) throws IOException {
-        return getClient().execute(new HttpHead(uri));
+    protected HttpResponse executeHead(HttpEntry entry) throws IOException {
+        return getClient().execute(entry.newHead());
+        //return executeGet(uri);
     }
 
     /**
      * Executes the GET request method for the given URI.
-     * Equivalent to {@code getClient().execute(new HttpGet(uri))}.
+     * Equivalent to {@code getClient().execute(entry.newGet())}.
      */
-    protected HttpResponse executeGet(URI uri) throws IOException {
-        return getClient().execute(new HttpGet(uri));
+    protected HttpResponse executeGet(HttpEntry entry) throws IOException {
+        return getClient().execute(entry.newGet());
     }
 
     @Override

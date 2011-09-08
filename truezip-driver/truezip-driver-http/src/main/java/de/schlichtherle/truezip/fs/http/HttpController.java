@@ -30,13 +30,9 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.net.URI;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
 
 /**
  * A file system controller for the HTTP(S) schemes.
@@ -46,7 +42,7 @@ import org.apache.http.client.methods.HttpHead;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-final class HttpController extends FsModelController<FsModel>  {
+public class HttpController extends FsModelController<FsModel>  {
 
     private final HttpDriver driver;
 
@@ -58,19 +54,23 @@ final class HttpController extends FsModelController<FsModel>  {
         this.driver = driver;
     }
 
-    IOPool<?> getPool() {
+    final IOPool<?> getPool() {
         return driver.getPool();
     }
 
-    HttpResponse executeHead(URI uri) throws IOException {
-        return driver.executeHead(uri);
+    final HttpResponse executeHead(HttpEntry entry) throws IOException {
+        return driver.executeHead(entry);
     }
 
-    HttpResponse executeGet(URI uri) throws IOException {
-        return driver.executeGet(uri);
+    final HttpResponse executeGet(HttpEntry entry) throws IOException {
+        return driver.executeGet(entry);
     }
 
-    FsPath resolve(FsEntryName name) {
+    protected HttpEntry newEntry(FsEntryName name) {
+        return new HttpEntry(this, name);
+    }
+
+    final FsPath resolve(FsEntryName name) {
         return getMountPoint().resolve(name);
     }
 
@@ -96,7 +96,7 @@ final class HttpController extends FsModelController<FsModel>  {
 
     @Override
     public HttpEntry getEntry(FsEntryName name) throws IOException {
-        HttpEntry entry = new HttpEntry(this, name);
+        HttpEntry entry = newEntry(name);
         return entry.isType(FILE) ? entry : null;
     }
 
@@ -128,7 +128,7 @@ final class HttpController extends FsModelController<FsModel>  {
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new HttpEntry(this, name).getInputSocket(options);
+        return newEntry(name).newInputSocket(options);
     }
 
     @Override
@@ -136,7 +136,7 @@ final class HttpController extends FsModelController<FsModel>  {
             FsEntryName name,
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
-        return new HttpEntry(this, name).getOutputSocket(options, template);
+        return newEntry(name).newOutputSocket(options, template);
     }
 
     @Override

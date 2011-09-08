@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -40,9 +39,9 @@ import net.jcip.annotations.Immutable;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpUriRequest;
 
 /**
  * An HTTP(S) entry.
@@ -53,11 +52,11 @@ import org.apache.http.client.methods.HttpHead;
 @Immutable
 @DefaultAnnotation(NonNull.class)
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
+public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     private HttpController controller;
     private final String name;
-    private final URI uri;
+    protected final URI uri;
 
     HttpEntry(  final HttpController controller,
                 final FsEntryName name) {
@@ -67,16 +66,24 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         this.uri = controller.resolve(name).toUri();
     }
 
-    IOPool<?> getPool() {
+    final IOPool<?> getPool() {
         return controller.getPool();
     }
 
     private HttpResponse executeHead() throws IOException {
-        return controller.executeHead(uri);
+        return controller.executeHead(this);
     }
 
     private HttpResponse executeGet() throws IOException {
-        return controller.executeGet(uri);
+        return controller.executeGet(this);
+    }
+
+    protected HttpUriRequest newHead() {
+        return new HttpHead(uri);
+    }
+
+    protected HttpUriRequest newGet() {
+        return new HttpGet(uri);
     }
 
     private @CheckForNull String getHeaderField(String name) throws IOException {
@@ -84,7 +91,7 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         return null == header ? null : header.getValue();
     }
 
-    InputStream getInputStream() throws IOException {
+    final InputStream getInputStream() throws IOException {
         final HttpResponse response = executeGet();
         final HttpEntity entity = response.getEntity();
         if (null == entity)
@@ -92,7 +99,7 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         return entity.getContent();
     }
 
-    OutputStream getOutputStream() throws IOException {
+    final OutputStream getOutputStream() throws IOException {
         throw new ReadOnlyFileSystemTypeException();
     }
 
@@ -159,19 +166,19 @@ final class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     @Override
     public InputSocket<HttpEntry> getInputSocket() {
-        return getInputSocket(NO_INPUT_OPTIONS);
+        return newInputSocket(NO_INPUT_OPTIONS);
     }
 
-    InputSocket<HttpEntry> getInputSocket(BitField<FsInputOption> options) {
+    protected InputSocket<HttpEntry> newInputSocket(BitField<FsInputOption> options) {
         return new HttpInputSocket(this, options);
     }
 
     @Override
     public OutputSocket<HttpEntry> getOutputSocket() {
-        return getOutputSocket(NO_OUTPUT_OPTIONS, null);
+        return newOutputSocket(NO_OUTPUT_OPTIONS, null);
     }
 
-    OutputSocket<HttpEntry> getOutputSocket(
+    protected OutputSocket<HttpEntry> newOutputSocket(
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
         return new HttpOutputSocket(this, options, template);
