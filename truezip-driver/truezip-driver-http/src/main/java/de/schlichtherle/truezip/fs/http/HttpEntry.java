@@ -91,7 +91,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         return null == header ? null : header.getValue();
     }
 
-    final InputStream getInputStream() throws IOException {
+    protected InputStream getInputStream() throws IOException {
         final HttpResponse response = executeGet();
         final HttpEntity entity = response.getEntity();
         if (null == entity)
@@ -99,7 +99,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         return entity.getContent();
     }
 
-    final OutputStream getOutputStream() throws IOException {
+    protected OutputStream getOutputStream() throws IOException {
         throw new ReadOnlyFileSystemTypeException();
     }
 
