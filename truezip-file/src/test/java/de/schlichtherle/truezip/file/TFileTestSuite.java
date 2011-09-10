@@ -127,12 +127,11 @@ extends TestBase<D> {
         InputStream in = new TFileInputStream(path);
         Reference<FsController<?>> ref = new WeakReference<FsController<?>>(new TFile(path).getInnerArchive().getController());
         gc();
-        assertNotNull(ref.get());
-        in.close();
-        gc();
-        assertNotNull(ref.get());
         assertSame(ref.get(), new TFile(path).getInnerArchive().getController());
+        in.close();
         in = null; // leaves file!
+        gc();
+        assertSame(ref.get(), new TFile(path).getInnerArchive().getController());
         TFile.umount();
         gc();
         assertNull(ref.get());
@@ -148,11 +147,10 @@ extends TestBase<D> {
         OutputStream out = new TFileOutputStream(path);
         Reference<FsController<?>> ref = new WeakReference<FsController<?>>(new TFile(path).getInnerArchive().getController());
         gc();
-        assertNotNull(ref.get());
+        assertSame(ref.get(), new TFile(path).getInnerArchive().getController());
         out.close();
         out = null; // leaves file!
         gc();
-        assertNotNull(ref.get());
         assertSame(ref.get(), new TFile(path).getInnerArchive().getController());
         TFile.umount();
         gc();
