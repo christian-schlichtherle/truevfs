@@ -34,7 +34,7 @@ implements SeekableByteChannel {
     /**
      * Constructs a new decorating seekable byte channel.
      *
-     * @param channel the seekable byte channel to decorate.
+     * @param channel the nullable seekable byte channel to decorate.
      */
     protected DecoratingSeekableByteChannel(
             final @Nullable SeekableByteChannel channel) {
