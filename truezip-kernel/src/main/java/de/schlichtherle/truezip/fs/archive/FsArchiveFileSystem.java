@@ -224,20 +224,8 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * Returns {@code true} if and only if this archive file system has been
-     * modified since its time of creation.
-     * 
-     * @return {@code true} if and only if this archive file system has been
-     *         modified since its time of creation.
-     */
-    boolean isTouched() {
-        return touched;
-    }
-
-    /**
-     * Ensures that the controller's data structures required to output
-     * entries are properly initialized and marks this (virtual) archive
-     * file system as touched.
+     * Marks this (virtual) archive file system as touched and notifies the
+     * listener if and only if the touch status is changing.
      *
      * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
      *         file system is read only.
@@ -245,7 +233,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *         operation for any reason.
      */
     private void touch() throws FsArchiveFileSystemException {
-        if (touched)
+        if (this.touched)
             return;
         // Order is important here because of veto exceptions!
         final FsArchiveFileSystemEvent<E> event
@@ -258,7 +246,7 @@ implements Iterable<FsCovariantEntry<E>> {
         } catch (IOException ex) {
             throw new FsArchiveFileSystemException(null, "touch vetoed", ex);
         }
-        touched = true;
+        this.touched = true;
         for (FsArchiveFileSystemTouchListener<? super E> listener : listeners)
             listener.afterTouch(event);
     }

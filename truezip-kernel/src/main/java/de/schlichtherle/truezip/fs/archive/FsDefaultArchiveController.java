@@ -49,8 +49,8 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
-import static java.lang.Boolean.*;
 import java.util.Collections;
 import java.util.Iterator;
 import net.jcip.annotations.NotThreadSafe;
@@ -121,7 +121,7 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
-    private @CheckForNull InputArchive<E> getInputArchive() {
+    private @Nullable InputArchive<E> getInputArchive() {
         return inputArchive;
     }
 
@@ -131,7 +131,7 @@ extends FsFileSystemArchiveController<E> {
             setTouched(true);
     }
 
-    private @CheckForNull OutputArchive<E> getOutputArchive() {
+    private @Nullable OutputArchive<E> getOutputArchive() {
         return outputArchive;
     }
 
@@ -304,9 +304,8 @@ extends FsFileSystemArchiveController<E> {
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert !isFileSystemTouched() || null != getOutputArchive(); // file system touched => output archive
         try {
-            if (!options.get(ABORT_CHANGES) && isFileSystemTouched())
+            if (!options.get(ABORT_CHANGES))
                 performSync(handler);
         } finally {
             try {
@@ -358,9 +357,9 @@ extends FsFileSystemArchiveController<E> {
             }
         } // FilterExceptionHandler
 
-        assert isFileSystemTouched();
         final OutputArchive<E> oa = getOutputArchive();
-        assert null != oa;
+        if (null == oa)
+            return;
         final InputArchive<E> ia = getInputArchive();
         copy(   getFileSystem(),
                 null == ia ? new DummyInputArchive<E>() : ia.getDriverProduct(),
@@ -440,11 +439,6 @@ extends FsFileSystemArchiveController<E> {
                 }
             }
         }
-    }
-
-    private boolean isFileSystemTouched() {
-        final FsArchiveFileSystem<E> fileSystem = getFileSystem();
-        return null != fileSystem && fileSystem.isTouched();
     }
 
     /**
@@ -531,7 +525,7 @@ extends FsFileSystemArchiveController<E> {
         @Override
         public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
             assert event.getSource() == getFileSystem();
-            //setTouched(true);
+            assert isTouched();
         }
     } // TouchListener
 }
