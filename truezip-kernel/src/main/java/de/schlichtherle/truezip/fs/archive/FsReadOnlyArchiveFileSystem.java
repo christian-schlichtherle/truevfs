@@ -52,12 +52,6 @@ extends FsArchiveFileSystem<E> {
     }
 
     @Override
-    boolean isTouched() {
-        assert !super.isTouched();
-        return false;
-    }
-
-    @Override
     FsArchiveFileSystemOperation<E> mknod(
             FsEntryName name,
             Type type,
