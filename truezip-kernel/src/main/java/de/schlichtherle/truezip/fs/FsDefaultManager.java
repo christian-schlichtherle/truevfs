@@ -39,8 +39,8 @@ public final class FsDefaultManager extends FsManager {
      * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private final Map<FsMountPoint, Link<ScheduledModel>> schedulers
-            = new WeakHashMap<FsMountPoint, Link<ScheduledModel>>();
+    private final Map<FsMountPoint, Link<FsFederatingController>> schedulers
+            = new WeakHashMap<FsMountPoint, Link<FsFederatingController>>();
 
     private final Type optionalScheduleType;
 
@@ -68,15 +68,20 @@ public final class FsDefaultManager extends FsManager {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
-            return driver.newController(new FsDefaultModel(mountPoint, null), null);
+            final FsModel model = new FsDefaultModel(mountPoint, null);
+            return driver.newController(model, null);
         }
-        ScheduledModel model = Links.getTarget(schedulers.get(mountPoint));
-        if (null == model) {
+        FsFederatingController controller = Links.getTarget(schedulers.get(
+                mountPoint));
+        if (null == controller) {
             if (null == parent)
                 parent = getController(mountPoint.getParent(), null, driver);
-            model = new ScheduledModel(mountPoint, parent, driver);
+            final ScheduledModel model = new ScheduledModel(
+                    mountPoint, parent.getModel());
+            model.setController(controller = new FsFederatingController(
+                    driver.newController(model, parent)));
         }
-        return model.controller;
+        return controller;
     }
 
     /**
@@ -88,17 +93,18 @@ public final class FsDefaultManager extends FsManager {
      * the alternative observer pattern.
      */
     private final class ScheduledModel extends FsDefaultModel {
+        FsFederatingController controller;
         volatile boolean touched;
-        final FsFederatingController controller;
 
-        @SuppressWarnings("LeakingThisInConstructor")
-        ScheduledModel( final FsMountPoint mountPoint,
-                        final FsController<?> parent,
-                        final FsCompositeDriver driver) {
-            super(mountPoint, parent.getModel());
+        ScheduledModel(FsMountPoint mountPoint, FsModel parent) {
+            super(mountPoint, parent);
+        }
+
+        void setController(final FsFederatingController controller) {
+            assert null != controller;
+            assert !touched;
+            this.controller = controller;
             schedule(false);
-            this.controller = new FsFederatingController(
-                    driver.newController(this, parent));
         }
 
         @Override
@@ -122,7 +128,7 @@ public final class FsDefaultManager extends FsManager {
             synchronized (FsDefaultManager.this) {
                 schedulers.put(getMountPoint(),
                         (mandatory ? STRONG : optionalScheduleType)
-                            .newLink(this));
+                            .newLink(controller));
             }
         }
     } // ScheduledModel
@@ -140,10 +146,8 @@ public final class FsDefaultManager extends FsManager {
     private Set<FsController<?>> getControllers() {
         final Set<FsController<?>> snapshot
                 = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
-        for (final Link<ScheduledModel> link : schedulers.values()) {
-            final ScheduledModel model = Links.getTarget(link);
-            final FsFederatingController controller
-                    = model == null ? null : model.controller;
+        for (final Link<FsFederatingController> link : schedulers.values()) {
+            final FsController<?> controller = Links.getTarget(link);
             if (null != controller)
                 snapshot.add(controller);
         }
