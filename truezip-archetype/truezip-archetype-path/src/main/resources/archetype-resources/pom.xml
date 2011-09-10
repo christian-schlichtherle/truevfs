@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+
+    <name>${artifactId}</name>
+    <description>TrueZIP Application Project</description>
+
+    <dependencies>
+        <!-- A TrueZIP application typically has a compile time dependency on
+             one or more of the modules TrueZIP File*, TrueZIP Path or TrueZIP
+             Kernel.
+             -->
+        <dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-path</artifactId>
+            <version>${truezip.version}</version>
+        </dependency>
+
+        <!-- Special driver for instrumentation with JMX and java.util.logging. -->
+        <!--dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-driver-jmx-jul</artifactId>
+            <version>${truezip.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This optional dependency provides some nice swing classes. -->
+        <!--dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-swing</artifactId>
+            <version>${truezip.version}</version>
+        </dependency-->
+
+        <!-- An application typically has a dependency on one or more file
+             system driver modules for accessing their respective file system
+             types.
+               When using the TrueZIP File* API, file system drivers get
+             automatically enumerated from the class path by a service locator
+             singleton, so adding a run time dependency is sufficient for
+             accessing the respective file system types.
+               When using the TrueZIP Kernel API however, using the service
+             locator singleton is optional, so you may need to promote these
+             run time dependencies to compile time dependencies.
+             -->
+
+        <!-- This driver provides access to the following URI schemes:
+             file: OS file system.
+             This dependency is already added by the modules TrueZIP File* and
+             TrueZIP Path.
+             -->
+        <!--dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-driver-file</artifactId>
+            <version>${truezip.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This driver provides access to the following URI schemes:
+             http|https: Hyper Text Transport Protocol.
+             You cannot access these schemes via the TrueZIP File* API;
+             you'ld need to use the TrueZIP Kernel API instead.
+             -->
+        <!--dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-driver-http</artifactId>
+            <version>${truezip.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             tar: TAR file format.
+             tgz|tar.gz: GZIP compressed TAR file format.
+             tb2|tbz|tar.bz2: BZIP2 compressed TAR file format.
+             -->
+        <dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-driver-tar</artifactId>
+            <version>${truezip.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             tzp|zip.rae|zip.raes: RAES encrypted ZIP file format.
+             -->
+        <dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-driver-tzp</artifactId>
+            <version>${truezip.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- This driver provides access to the following URI schemes and
+             archive file suffixes:
+             zip: ZIP file format.
+             ear|jar|war: JAR file format.
+             odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth: Open Document File format.
+             exe: Self extracting ZIP file format.
+             -->
+        <dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-driver-zip</artifactId>
+            <version>${truezip.version}</version>
+            <!--scope>runtime</scope-->
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <showDeprecation>true</showDeprecation>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <truezip.version>
+            LATEST <!-- TODO: Enter version number to enhance build stability! -->
+        </truezip.version>
+    </properties>
+</project>
