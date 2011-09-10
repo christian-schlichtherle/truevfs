@@ -273,9 +273,8 @@ extends FsFileSystemArchiveController<E> {
                 grow = getContext().get(GROW);
                 if (!grow
                         || null == intention && !driver.getRedundantMetaDataSupport()
-                        || WRITE == intention && !driver.getRedundantContentSupport()) {
+                        || WRITE == intention && !driver.getRedundantContentSupport())
                     throw new FsNotSyncedException();
-                }
             }
         } else {
             aen = null;
@@ -287,17 +286,17 @@ extends FsFileSystemArchiveController<E> {
             if (null == aen)
                 aen = ce.getEntry().getName();
             iae = ia.getEntry(aen);
-            if (null != iae)
+            if (null != iae) {
                 if (null == grow)
                     grow = getContext().get(GROW);
                 if (!grow)
                     return;
+            }
         } else {
             iae = null;
         }
-        if (READ == intention && (null == iae || iae != oae && oae != null)) {
+        if (READ == intention && (null == iae || iae != oae && oae != null))
             throw new FsNotSyncedException();
-        }
     }
 
     @Override
