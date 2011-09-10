@@ -85,18 +85,4 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
         if (0 < lock.getReadHoldCount())
             throw new FsNotWriteLockedException(ex);
     }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[delegate=")
-                .append(delegate)
-                .append("]")
-                .toString();
-    }
 }
