@@ -15,7 +15,7 @@ import net.jcip.annotations.ThreadSafe;
  * Indicates an exceptional condition when synchronizing the changes in a
  * federated file system to its parent file system.
  * An exception of this class implies that no or only insignificant parts
- * of the data of the federated file system have been lost.
+ * of the data of the federated file system has been lost.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
