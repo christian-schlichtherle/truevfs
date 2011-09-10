@@ -62,11 +62,7 @@ public abstract class DecoratingOutputStream extends OutputStream {
 
     @Override
     public void close() throws IOException {
-        try {
-            flush();
-        } finally {
-            delegate.close();
-        }
+        delegate.close();
     }
 
     /**
