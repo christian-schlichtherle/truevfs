@@ -8,12 +8,12 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
+import de.schlichtherle.truezip.io.IOExceptionOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -87,26 +87,25 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
     }
 
-    private void commit(final FileEntry temp) throws IOException {
+    private void close(final FileEntry temp, final boolean commit)
+    throws IOException {
         final File entryFile = entry.getFile();
-        final File tempFile = temp.getFile();
         if (temp != entry) {
+            final File tempFile = temp.getFile();
             copyAttributes(tempFile);
-            if (!move(tempFile, entryFile)) {
-                IOSocket.copy(  temp.getInputSocket(),
-                                entry.getOutputSocket());
-                copyAttributes(entryFile);
+            if (commit) {
+                if (!move(tempFile, entryFile)) {
+                    IOSocket.copy(  temp.getInputSocket(),
+                                    entry.getOutputSocket());
+                    copyAttributes(entryFile);
+                }
+                release(temp, null);
+            } else {
+                // Leave temp file for post-mortem analysis.
             }
-            release(temp, null);
         } else {
             copyAttributes(entryFile);
         }
-    }
-    
-    private static boolean move(File src, File dst) {
-        return src.exists()
-                && (!dst.exists() || dst.delete())
-                && src.renameTo(dst);
     }
 
     private void copyAttributes(final File file) throws IOException {
@@ -116,6 +115,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final long time = template.getTime(WRITE);
         if (UNKNOWN != time && !file.setLastModified(time))
             throw new IOException(file + " (cannot preserve last modification time)");
+    }
+
+    private static boolean move(File src, File dst) {
+        return src.exists()
+                && (!dst.exists() || dst.delete())
+                && src.renameTo(dst);
     }
 
     private void release(
@@ -134,7 +139,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        class OutputStream extends DecoratingOutputStream {
+        class OutputStream extends IOExceptionOutputStream {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {
@@ -147,9 +152,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 closed = true;
                 try {
-                    delegate.close();
+                    super.close();
                 } finally {
-                    commit(temp);
+                    close(temp, null == exception);
                 }
             }
         } // OutputStream
