@@ -372,10 +372,9 @@ implements Iterable<FsCovariantEntry<E>> {
      * <p>
      * To commit the transaction, you need to call
      * {@link FsArchiveFileSystemOperation#run} on the returned object, which
-     * will mark this archive file system as {@link #isTouched() touched} and
-     * set the last modification time of the created and linked archive file
-     * system entries to the system's current time at the moment of the call
-     * to this method.
+     * will mark this archive file system as touched and set the last
+     * modification time of the created and linked archive file system entries
+     * to the system's current time at the moment of the call to this method.
      *
      * @param  name the archive file system entry name.
      * @param  type the type of the archive file system entry to create.
