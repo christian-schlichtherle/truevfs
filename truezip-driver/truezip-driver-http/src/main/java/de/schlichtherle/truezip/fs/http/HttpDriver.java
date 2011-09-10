@@ -32,6 +32,7 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public class HttpDriver extends FsDriver {
 
     private final IOPoolProvider provider;
