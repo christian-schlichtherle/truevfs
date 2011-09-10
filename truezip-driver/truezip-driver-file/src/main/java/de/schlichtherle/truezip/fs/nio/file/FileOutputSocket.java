@@ -13,8 +13,8 @@ import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.schlichtherle.truezip.io.IOExceptionOutputStream;
+import de.schlichtherle.truezip.io.IOExceptionSeekableByteChannel;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -128,23 +128,28 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return set.toArray(new OpenOption[set.size()]);
     }
 
-    private void commit(final FileEntry temp) throws IOException {
+    private void close(final FileEntry temp, final boolean commit)
+    throws IOException {
         final Path entryFile = entry.getPath();
-        final Path tempFile = temp.getPath();
         if (temp != entry) {
+            final Path tempFile = temp.getPath();
             copyAttributes(tempFile);
-            try {
-                move(tempFile, entryFile, REPLACE_EXISTING);
-            } catch (IOException ex) {
-                // Slow.
-                /*Files.copy(tempFile, entryFile,
-                        StandardCopyOption.REPLACE_EXISTING);*/
-                // Fast.
-                IOSocket.copy(  temp.getInputSocket(),
-                                entry.getOutputSocket());
-                copyAttributes(entryFile);
+            if (commit) {
+                try {
+                    move(tempFile, entryFile, REPLACE_EXISTING);
+                } catch (IOException ex) {
+                    // Slow.
+                    /*Files.copy(tempFile, entryFile,
+                            StandardCopyOption.REPLACE_EXISTING);*/
+                    // Fast.
+                    IOSocket.copy(  temp.getInputSocket(),
+                                    entry.getOutputSocket());
+                    copyAttributes(entryFile);
+                }
+                release(temp, null);
+            } else {
+                // Leave temp file for post-mortem analysis.
             }
-            release(temp, null);
         } else {
             copyAttributes(entryFile);
         }
@@ -180,7 +185,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         final FileEntry temp = begin();
 
-        class SeekableByteChannel extends DecoratingSeekableByteChannel {
+        class SeekableByteChannel extends IOExceptionSeekableByteChannel {
             boolean closed;
 
             SeekableByteChannel() throws IOException {
@@ -193,9 +198,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 closed = true;
                 try {
-                    delegate.close();
+                    super.close();
                 } finally {
-                    commit(temp);
+                    close(temp, null == exception);
                 }
             }
         } // SeekableByteChannel
@@ -213,7 +218,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        class OutputStream extends DecoratingOutputStream {
+        class OutputStream extends IOExceptionOutputStream {
             boolean closed;
 
             OutputStream() throws IOException {
@@ -226,9 +231,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 closed = true;
                 try {
-                    delegate.close();
+                    super.close();
                 } finally {
-                    commit(temp);
+                    close(temp, null == exception);
                 }
             }
         } // OutputStream
