@@ -270,7 +270,8 @@ extends FsFileSystemArchiveController<E> {
             aen = ce.getEntry().getName();
             oae = oa.getEntry(aen);
             if (null != oae) {
-                if (!(grow = getContext().get(GROW))
+                grow = getContext().get(GROW);
+                if (!grow
                         || null == intention && !driver.getRedundantMetaDataSupport()
                         || WRITE == intention && !driver.getRedundantContentSupport()) {
                     throw new FsNotSyncedException();
@@ -287,8 +288,9 @@ extends FsFileSystemArchiveController<E> {
                 aen = ce.getEntry().getName();
             iae = ia.getEntry(aen);
             if (null != iae)
-                if (FALSE.equals(grow)
-                        || null == grow && !getContext().get(GROW))
+                if (null == grow)
+                    grow = getContext().get(GROW);
+                if (!grow)
                     return;
         } else {
             iae = null;
@@ -365,13 +367,13 @@ extends FsFileSystemArchiveController<E> {
                 null == ia ? new DummyInputArchive<E>() : ia.getDriverProduct(),
                 oa.getDriverProduct(),
                 new FilterExceptionHandler());
-        }
+    }
 
     private static <E extends FsArchiveEntry, X extends IOException> void copy(
             final FsArchiveFileSystem<E> fileSystem,
             final InputService<E> input,
             final OutputService<E> output,
-            final ExceptionHandler<IOException, X> handler)
+            final ExceptionHandler<? super IOException, X> handler)
     throws X {
         for (final FsCovariantEntry<E> ce : fileSystem) {
             for (final E ae : ce.getEntries()) {
