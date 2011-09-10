@@ -17,7 +17,7 @@ import net.jcip.annotations.ThreadSafe;
  * federated file system to its parent file system.
  * Unless this is an instance of the sub-class {@link FsSyncWarningException},
  * an exception of this class implies that some or all
- * of the data of the federated file system have been lost.
+ * of the data of the federated file system has been lost.
  *
  * @author Christian Schlichtherle
  * @version $Id$
