@@ -16,7 +16,6 @@ import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsException;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsInputOption;
@@ -340,21 +339,20 @@ extends FsFileSystemArchiveController<E> {
     throws X {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
-            IOException last;
+            IOException warning;
 
             @Override
             public X fail(final IOException cause) {
-                last = cause;
+                assert false : "should not get used by copy()";
                 return handler.fail(new FsSyncException(getModel(), cause));
             }
 
             @Override
             public void warn(final IOException cause) throws X {
                 assert null != cause;
-                final IOException old = last;
-                last = cause;
-                if (null != old || !(cause instanceof InputException))
+                if (null != warning || !(cause instanceof InputException))
                     throw handler.fail(new FsSyncException(getModel(), cause));
+                warning = cause;
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
         } // FilterExceptionHandler
@@ -367,7 +365,7 @@ extends FsFileSystemArchiveController<E> {
                 null == ia ? new DummyInputArchive<E>() : ia.getDriverProduct(),
                 oa.getDriverProduct(),
                 new FilterExceptionHandler());
-    }
+        }
 
     private static <E extends FsArchiveEntry, X extends IOException> void copy(
             final FsArchiveFileSystem<E> fileSystem,
