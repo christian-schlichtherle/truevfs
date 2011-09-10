@@ -237,8 +237,6 @@ extends TestBase<D> {
         // Create regular archive file.
 
         createDirectory(file);
-        /*if (!file.isEntry())
-            assertFalse(exists(newNonArchivePath(file)));*/
         assertTrue(exists(file));
         assertTrue(isDirectory(file));
         assertFalse(isRegularFile(file));
@@ -1260,19 +1258,13 @@ extends TestBase<D> {
 
     private void assertRenameTo(TPath src, TPath dst) throws IOException {
         assertTrue(exists(src));
-        /*if (!src.isEntry())
-            assertTrue(exists(newNonArchivePath(src)));*/
         assertFalse(exists(dst));
-        //if (!dst.isEntry())
-            assertFalse(exists(newNonArchivePath(dst)));
+        assertFalse(exists(newNonArchivePath(dst)));
         assert TConfig.get().isLenient();
         src.toFile().mv(dst.toFile());
         assertFalse(exists(src));
-        //if (!src.isEntry())
-            assertFalse(exists(newNonArchivePath(src)));
+        assertFalse(exists(newNonArchivePath(src)));
         assertTrue(exists(dst));
-        /*if (!dst.isEntry())
-            assertFalse(exists(newNonArchivePath(dst)));*/
     }
 
     private static final String[] MEMBERS = {
@@ -1329,14 +1321,6 @@ extends TestBase<D> {
         assertMultithreadedSingleArchiveMultipleEntriesReading(20, 20);
     }
     
-    /**
-     * Creates a test archive file with the given number of entries and then
-     * creates the given number of threads where each of them reads all these
-     * entries.
-     *
-     * @param nEntries The number of archive file entries to be created.
-     * @param nThreads The number of threads to be created.
-     */
     private void assertMultithreadedSingleArchiveMultipleEntriesReading(
             final int nEntries,
             final int nThreads)
