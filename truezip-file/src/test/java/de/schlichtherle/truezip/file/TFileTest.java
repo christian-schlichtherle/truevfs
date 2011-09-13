@@ -438,7 +438,7 @@ public class TFileTest extends TestBase<MockArchiveDriver> {
     }
 
     @Test
-    public void testUriandFsPath() {
+    public void testUriAndFsPath() {
         for (final String[] params : new String[][] {
             { "/file", "file:/file" },
             { "/archive.mok", "mok:file:/archive.mok!/" },
