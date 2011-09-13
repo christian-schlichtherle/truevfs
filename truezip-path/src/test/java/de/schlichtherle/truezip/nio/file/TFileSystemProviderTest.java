@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.file.MockTestBase;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.*;
@@ -45,9 +46,9 @@ public class TFileSystemProviderTest extends MockTestBase {
             { "foo.mok", new String[] { "x", "bar.mok", "y" }, "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/x/bar.mok!/" },
             { "foo.mok", new String[] { "bar.mok" }, "mok:mok:" + CURRENT_DIRECTORY + "foo.mok!/bar.mok!/" },
             { "foo.mok", new String[] { "x" }, "mok:" + CURRENT_DIRECTORY + "foo.mok!/" },
-            { "foo.mok", NO_MORE, "mok:" + CURRENT_DIRECTORY + "foo.mok!/" },
+            { "foo.mok", NO_STRINGS, "mok:" + CURRENT_DIRECTORY + "foo.mok!/" },
             { "foo", new String[] { "x" }, null },
-            { "foo", NO_MORE, null },
+            { "foo", NO_STRINGS, null },
         }) {
             final String first = params[0].toString();
             final String[] more = (String[]) params[1];

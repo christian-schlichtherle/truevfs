@@ -8,12 +8,17 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.File;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 
@@ -24,8 +29,16 @@ import org.junit.Before;
 @DefaultAnnotation(NonNull.class)
 public abstract class TestBase<D extends FsArchiveDriver<?>> {
 
+    protected static final FsMountPoint
+            ROOT_DIRECTORY = FsMountPoint.create(URI.create("file:/"));
+    protected static final FsMountPoint
+            CURRENT_DIRECTORY = FsMountPoint.create(new File("").toURI());
+    protected static final String[] NO_STRINGS = new String[0];
+    private static final String ARCHIVE_DETECTOR = "archiveDetector";
+
     private @Nullable D driver;
     private @Nullable TArchiveDetector detector;
+    private @Nullable Map<String, ?> environment;
 
     protected abstract String getSuffixList();
 
@@ -47,16 +60,23 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
         return detector;
     }
 
+    protected final @Nullable Map<String, ?> getEnvironment() {
+        return environment;
+    }
+
     @Before
     public void setUp() throws Exception {
         final D driver = newArchiveDriver();
         final TArchiveDetector detector = new TArchiveDetector(
                 getSuffixList(), driver);
+        final Map<String, Object> environment = new HashMap<String, Object>();
+        environment.put(ARCHIVE_DETECTOR, detector);
         final TConfig config = TConfig.push();
         config.setLenient(true);
         config.setArchiveDetector(detector);
         this.driver = driver;
         this.detector = detector;
+        this.environment = environment;
     }
 
     @After
