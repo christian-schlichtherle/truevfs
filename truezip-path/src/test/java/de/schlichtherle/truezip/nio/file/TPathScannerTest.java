@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.file.MockTestBase;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.file.TConfig;
