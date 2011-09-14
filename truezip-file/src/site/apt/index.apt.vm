@@ -41,7 +41,7 @@ try {
 }
 +--+
 
-    This example presumes that the JARs of the file system driver modules
+    This example presumes that the JARs of the driver modules
     {{{../truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}
     and
     {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
