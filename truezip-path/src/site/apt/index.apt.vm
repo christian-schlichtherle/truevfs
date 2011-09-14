@@ -43,7 +43,7 @@ try (InputStream in = Files.newInputStream(path)) {
 }
 +--+
 
-    This example presumes that the JARs of the file system driver modules
+    This example presumes that the JARs of the driver modules
     {{{../truezip-driver/truezip-driver-http/index.html}TrueZIP Driver HTTP(S)}}
     and
     {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
