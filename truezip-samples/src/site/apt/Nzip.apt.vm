@@ -1,0 +1,159 @@
+    ---
+    Nzip Utility
+    ---
+    Christian Schlichtherle
+    ---
+
+Nzip - a Comprehensive Command Line Utility
+
+    The Nzip command line utility implemented by the class
+    {{{./apidocs/de/schlichtherle/truezip/sample/file/app/Nzip.html}<<<de.schlichtherle.truezip.sample.file.app.Nzip>>>}}
+    showcases the power of the {{{../truezip-file/index.html}TrueZIP File*}} API.
+
+    This is a comprehensive command line utility which allows you to work with
+    entries in any archive file supported by an archive driver
+    (<<<ZIP>>>, <<<TAR>>>, <<<TAR.GZ>>>, <<<TAR.BZ2>>> and relatives)
+    using Unix like commands
+    (<<<cat>>>, <<<cp>>>, <<<mv>>>, <<<rm>>>, <<<mkdir>>>, <<<mkdirs>>>,
+     <<<ls>>>, <<<ll>>> , <<<llr>>> , <<<touch>>> etc).
+    You can use this utility to conveniently copy entire directory trees into
+    an archive file or from an archive file or any other virtual or non-virtual
+    directory.
+
+* Setting The Stage
+
+    Before the examples are shown below, a little preparation is required in
+    order to make it easier to start the utility class from the command line.
+    With plain Java, you would have to start the utility class with a command
+    like this:
+
++--+
+$ java -jar truezip-${project.version}-jar-with-dependencies.jar Nzip %ARGS%
++--+
+
+    Where <<<%ARGS%>>> is a variable for arbitrary command line arguments - see
+    below.
+    This example uses TrueZIP's {{{../kick-start/no-maven.html}all-in-one JAR}}.
+
+    However, on Windows we would like to use something like this instead:
+
++--+
+$ nzip.cmd %ARGS%
++--+
+
+    This can be done by copying the following script file with the name
+    <<<nzip.cmd>>> in some directory on your <<<%PATH%>>>:
+
++--+
+@echo off
+
+rem set PROPS=-Djava.awt.headless=true
+rem set PROPS=-Djava.util.logging.config.file=logging.properties
+set JAR=%USERPROFILE%\.m2\repository\de\schlichtherle\truezip\truezip-samples\\${project.version}\truezip-samples-${project.version}-jar-with-dependencies.jar
+
+java -ea %PROPS% -jar "%JAR%" %*
++--+
+
+    On Unix/Linux, this should be a bash script with the name <<<nzip>>>
+    - I leave this as an exercise to you, however.
+
+* Examples
+
+    Following are some examples using the Nzip command line utility class.
+    If you need help with the available commands and options, just run the
+    Nzip command line utility class without parameters.
+    It will print some help on standard error output then.
+
+*--*--*
+||Command||Description|
+*--+--+
+|<<<nzip.cmd ll truezip-${project.version}-jar-with-dependencies.jar>>>|Prints a detailed listing of the contents of the root directory of the JAR file from which the tool is actually running.|
+*--+--+
+|<<<nzip.cmd llr truezip-${project.version}-jar-with-dependencies.jar>>>|Prints a recursive long listing of the contents of the root directory of the JAR file from which the tool is actually running.|
+*--+--+
+|<<<nzip.cmd cp truezip-${project.version}-jar-with-dependencies.jar/de/schlichtherle/truezip/sample/file/app/Nzip.class archive.zip>>>|Copies the file entry <<<de/schlichtherle/truezip/sample/file/app/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
+*--+--+
+|<<<nzip.cmd rm archive.zip/de/schlichtherle/truezip/sample/file/app/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/de/schlichtherle/truezip/sample/file/app>>>.|
+*--+--+
+|<<<nzip.cmd rmr archive.zip/de>>>|Recursively removes the directory entry <<<de>>> from <<<archive.zip>>>.|
+*--+--+
+|<<<nzip.cmd mkdir archive.zip/dir.zip>>>|Creates the new ZIP file <<<dir.zip>>> in the existing ZIP file <<<archive.zip>>>. Remember that this API treats archive files like directories, so you can simply create a ZIP file by calling the mkdir() method on a File object.|
+*--+--+
+|<<<nzip.cmd mkdirs archive.zip/a/b.zip/c/d.zip>>>|Creates the new directory <<<a>>> containing the new ZIP file <<<b.zip>>>, containing the new directory <<<c>>> containing the new ZIP file <<<d.zip>>> within the existing <<<archive.zip>>>.|
+*--+--+
+|<<<nzip.cmd rm archive.zip/a/b.zip/c/d.zip>>>|Removes the empty ZIP file <<<d.zip>>>. Note that similar to regular directories, this succeeds on empty ZIP files only.|
+*--+--+
+|<<<nzip.cmd touch archive.zip>>>|Updates the last modification time of the existing ZIP file <<<archive.zip>>> to the current time. Note that if the given file does not exist, it is created as a plain file - you cannot create ZIP files using this method (use mkdir instead).|
+*--+--+
+|<<<nzip.cmd mv archive.zip/Nzip.class .>>>|Moves the entry <<<Nzip.class>>> from the ZIP file <<<archive.zip>>> to the current directory <<<.>>> .|
+*--+--+
+
+    <<Note:>> Although TrueZIP has been designed to provide optimum performance,
+    the <<<Nzip>>> utility is a feature showcase which <cannot> serve as a
+    performance benchmark:
+    The utility uses some optional archive drivers which are not normally used
+    but provide extra safety and extra features at the price of performance,
+    such as CRC-32 checking, scanning <<<.exe>>> files for self extracting ZIP
+    files, etc.
+    Furthermore, the start time of a JVM makes Java almost useless for short
+    running command line utilities anyway.
+
+    Of course, you can substitute the <<<.zip>>> suffix in the examples above
+    with any other canonical file type suffix recognized by the archive file
+    drivers which are available on the run time class path
+    (<<<.ear>>>, <<<.jar>>>, <<<.war>>>, <<<.tar>>>, <<<.tgz>>>, <<<.tar.gz>>>,
+    <<<.tb2>>>, <<<.tbz>>>,  <<<.tar.bz2>>>, <<<.tzp>>>, <<<.zip.rae>>>,
+    <<<.zip.raes>>>).
+
+    For example, if you would like to use RAES encrypted ZIP files you would
+    simply name the suffix <<<.tzp>>> in a path.
+    So in order to copy the directory <<<directory>>> to an RAES encrypted ZIP
+    file <<<safe.tzp>>>, you could run:
+
++--+
+$ nzip.cmd cp directory safe.tzp
++--+
+
+    If you want to copy a plain file <<<file>>> instead, then run:
+
++--+
+$ nzip.cmd cp file safe.tzp/file
++--+
+
+** New Options for ZIP Files
+
+    In TrueZIP 7.1 and 7.3, new options have been added to the <<<cp>>>
+    command, primarily in order to support new options for ZIP files.
+
+    Use the following option in order to create a ZIP entry which is encrypted
+    according to the
+    {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES encryption}}
+    specification.
+
++--+
+$ nzip.cmd cp -encrypt file true.zip/file
++--+
+
+    Use the following option in order to append a ZIP entry to the end of an
+    existing ZIP file rather than reassembling the ZIP file.
+    This might come in handy if the ZIP file is rather large compared to the
+    single entry to add.
+
++--+
+$ nzip.cmd cp -grow file true.zip/file
++--+
+
+    Sometimes you might want to use the STORED method rather than the DEFLATED
+    method when writing an entry to a ZIP file.
+    There's an option for this, too:
+
++--+
+$ nzip.cmd cp -store file true.zip/file
++--+
+
+    For completeness, there's also an option to use the DEFLATED method.
+    This is the default however, so you don't need to specify it:
+
++--+
+$ nzip.cmd cp -compress file true.zip/file
++--+

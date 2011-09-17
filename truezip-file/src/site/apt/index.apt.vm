@@ -1,0 +1,67 @@
+    -----------------------
+    About TrueZIP File*
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP File*
+
+    This module provides the <<<TFile*>>> classes
+    for uniform, transparent, thread-safe,
+    read/write access to archive files as if they were just plain
+    directories in a file system path.
+
+    This is the primary API for JSE&#160;6 compliant TrueZIP applications:
+    Like the API of the module {{{../truezip-path/index.html}TrueZIP Path}},
+    this API is a facade for the module
+    {{{../truezip-kernel/index.html}TrueZIP Kernel}}.
+    In contrast to the TrueZIP Path API however, this API is limited
+    to access the platform file system and any archive files within
+    the platform file system.
+    In contrast to the TrueZIP Kernel API, both APIs are designed to be
+    easy to learn and convenient to use while providing a great level
+    of flexibility.
+    Because all virtual file system state is managed by the TrueZIP
+    Kernel module, this module can concurrently access the same file
+    systems than the TrueZIP Path module.
+
+    For example, an application could access an entry within an archive
+    file using a
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    like this:
+
++--+
+File file = new TFile("archive.tar.gz/README.TXT");
+OutputStream Out = new TFileOutputStream(file);
+try {
+    // Write archive entry contents here.
+    ...
+} finally {
+    out.close();
+}
++--+
+
+    This example presumes that the JARs of the driver modules
+    {{{../truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}
+    and
+    {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
+    are present on the run time class path.
+
+    For more examples, please use the Maven archetype for TrueZIP File* module
+    applications as described in the
+    {{{../kick-start/index.html}Kick-Starting TrueZIP}} section.
+    You might also want to
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    the source code of the
+    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+
+    For the API documentation, please refer to the Javadoc of the package
+    {{{./apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.schlichtherle.truezip.file>>>}}
+
+* Swing GUI
+
+    This module also provides Swing GUI classes for viewing file trees
+    and choosing entries in archive files.
+
+    For the API documentation, please refer to the Javadoc of the package
+    {{{./apidocs/de/schlichtherle/truezip/file/swing/package-summary.html}<<<de.schlichtherle.truezip.file.swing>>>}}
