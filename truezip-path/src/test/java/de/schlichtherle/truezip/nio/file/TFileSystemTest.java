@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.file.MockTestBase;
 import java.io.IOException;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
