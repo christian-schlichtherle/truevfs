@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
-
-import static java.nio.file.Files.*;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -47,7 +45,7 @@ final class FileInputSocket extends InputSocket<FileEntry> {
 
     @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return newByteChannel(entry.getPath());
+        return Files.newByteChannel(entry.getPath());
     }
 
     @Override
