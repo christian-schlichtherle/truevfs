@@ -14,11 +14,14 @@ Concepts
 
     TrueZIP applies the (in)famous three-tier architecture pattern:
 
-    [[1]] The client API tier is a facade for the kernel tier which provides
-          convenient-to-use APIs for TrueZIP applications.
+    [[1]] The access tier is a facade for the kernel tier which provides
+          convenient-to-use client APIs for TrueZIP applications.
           No file system state is managed by this tier, which enables a TrueZIP
           application to work with any API concurrently, too.
-          This tier consists of the modules TrueZIP File* and TrueZIP Path
+          This tier consists of the client API modules
+          {{{./truezip-file/index.html}TrueZIP&#160;File*}}
+          and
+          {{{./truezip-path/index.html}TrueZIP&#160;Path}}
           (since TrueZIP 7.2).
 
     [[1]] The kernel tier manages all virtual file system state.

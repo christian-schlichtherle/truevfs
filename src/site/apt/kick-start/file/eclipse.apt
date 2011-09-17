@@ -31,9 +31,9 @@ Kick-Starting TrueZIP Applications In Eclipse
     {{{../../apidocs/de/schlichtherle/truezip/fs/spi/FsDriverService.html}file system driver services}}.
     These file system driver services are contained in
     {{{../../truezip-driver/index.html}file system driver modules}}.
-    By adding file system driver modules to the run time class path of an
-    application, you trigger the TrueZIP File* module to add their file system
-    drivers to the
+    By adding the JAR artifacts of the file system driver modules to the run
+    time class path of your application, you trigger the module TrueZIP File*
+    to add their file system drivers to the
     {{{../../apidocs/de/schlichtherle/truezip/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
     of its
     {{{../../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}archive detection}}.
@@ -49,11 +49,11 @@ Kick-Starting TrueZIP Applications In Eclipse
 
     You need to have the following software installed:
 
-    * {{{http://www.eclipse.org/downloads/}Eclipse Helios}}
+    * {{{http://www.eclipse.org/downloads/}Eclipse&#160;Helios}} or later.
 
-    * JSE 6 for applications of the TrueZIP File* module.
+    * JSE&#160;6 for applications using the TrueZIP&#160;File* API.
 
-    * JSE 7 for applications of the TrueZIP Path module.
+    * JSE&#160;7 for applications using the TrueZIP&#160;Path API.
 
     []
 

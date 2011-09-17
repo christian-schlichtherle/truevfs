@@ -19,8 +19,8 @@ import net.jcip.annotations.Immutable;
 /**
  * A replacement for the class {@link FileWriter} for writing plain old files
  * or entries in an archive file.
- * Note that applications cannot write archive <em>files</em> directly using
- * this class - just their entries.
+ * Mind that applications cannot write archive files directly - just their
+ * entries!
  *
  * @see     TConfig#setLenient
  * @see     TFileReader

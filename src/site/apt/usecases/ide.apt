@@ -64,7 +64,7 @@ try {
     application:
 
 +--+
-Reader reader = new TFileReader("app.war/lib/lib.jar/META-INF/MANIFEST.MF");
+Reader reader = new TFileReader("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF");
 try {
     ...;
 } finally {

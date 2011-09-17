@@ -15,7 +15,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,8 +25,8 @@ import java.io.OutputStream;
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
  * files or entries in an archive file.
- * Note that applications cannot write archive <em>files</em> directly using
- * this class - just their entries.
+ * Mind that applications cannot write archive files directly - just their
+ * entries!
  * <p>
  * To prevent exceptions to be thrown subsequently, applications should
  * <em>always</em> close their streams using the following idiom:

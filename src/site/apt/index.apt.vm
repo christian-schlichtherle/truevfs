@@ -10,20 +10,10 @@ About TrueZIP
 
     TrueZIP is a Java based plug-in framework for virtual file
     systems (VFS) which provides transparent access to archive
-    files as if they were just plain directories.
-    The most recent version is TrueZIP&#160;${project.version}.
-    See the
+    files as if they were just plain directories - see
+    {{{./features.html}Key Features}}.
+    The most recent version is TrueZIP&#160;${project.version} - see
     {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
-
-    Key Claims:
-
-    [[1]] <<{Archive files are virtual directories}.>>
-
-    [[1]] <<{Reliability and robustness are primary concerns}.>>
-
-    [[1]] <<{Make simple things easy and complex things possible}.>>
-
-    []
 
 ** Supported File System Types
 
@@ -32,9 +22,9 @@ About TrueZIP
 *--*--*
 ||Module||Description
 *--+--+
-|{{{./truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}|Provides read/write access to the platform file system. Automatically uses NIO.2 if available (requires JSE&#160;7).
+|{{{./truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}|Provides read/write access to the platform file system. Automatically uses NIO.2 if JSE&#160;7 is available.
 *--+--+
-|{{{./truezip-driver/truezip-driver-http/index.html}TrueZIP Driver HTTP(S)}}|Provides read only access to HTTP(S) URLs.
+|{{{./truezip-driver/truezip-driver-http/index.html}TrueZIP Driver HTTP(S)}}|Provides read-only access to HTTP(S) URLs.
 *--+--+
 |{{{./truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}|Provides read/write access to TAR, TAR.GZ and TAR.BZ2 files.
 *--+--+
