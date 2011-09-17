@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.file.MockTestBase;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
@@ -37,8 +38,8 @@ public class TPathTest extends MockTestBase {
         if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
                 // $first, $more
-                { "c:", NO_MORE },
-                { "c:foo", NO_MORE },
+                { "c:", NO_STRINGS },
+                { "c:foo", NO_STRINGS },
             }) {
                 try {
                     new TPath(params[0].toString(), (String[]) params[1]);
@@ -54,9 +55,9 @@ public class TPathTest extends MockTestBase {
         if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
                 // $first, $more, $name, $address
-                //{ "c:foo", NO_MORE, "c:foo", "file:/c:foo" },
-                { "c:/foo", NO_MORE, "c:/foo", "file:/c:/foo" },
-                //{ "//", NO_MORE, "/", ROOT_DIRECTORY },
+                //{ "c:foo", NO_STRINGS, "c:foo", "file:/c:foo" },
+                { "c:/foo", NO_STRINGS, "c:/foo", "file:/c:/foo" },
+                //{ "//", NO_STRINGS, "/", ROOT_DIRECTORY },
                 { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
                 { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
             }) {
@@ -65,11 +66,11 @@ public class TPathTest extends MockTestBase {
         }
         for (Object[] params : new Object[][] {
             // $first, $more, $name, $address
-            { "/", NO_MORE, "/", ROOT_DIRECTORY },
-            { "/foo", NO_MORE, "/foo", ROOT_DIRECTORY + "foo" },
+            { "/", NO_STRINGS, "/", ROOT_DIRECTORY },
+            { "/foo", NO_STRINGS, "/foo", ROOT_DIRECTORY + "foo" },
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
-            //{ "///", NO_MORE, "/", ROOT_DIRECTORY },
+            //{ "///", NO_STRINGS, "/", ROOT_DIRECTORY },
             { "/foo", new String[] { "/bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "/foo//", new String[] { "//", "//bar//", "" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
@@ -80,9 +81,9 @@ public class TPathTest extends MockTestBase {
             { "/foo.mok", new String[] { "/bar.mok" }, "/foo.mok/bar.mok", "mok:mok:" + ROOT_DIRECTORY + "foo.mok!/bar.mok!/" },
             { "", new String[] { "/foo" }, "foo", CURRENT_DIRECTORY + "foo" },
             { "", new String[] { "foo" }, "foo", CURRENT_DIRECTORY + "foo" },
-            { "", NO_MORE, "", CURRENT_DIRECTORY },
-            { ".", NO_MORE, ".", CURRENT_DIRECTORY },
-            { "foo", NO_MORE, "foo", CURRENT_DIRECTORY + "foo" },
+            { "", NO_STRINGS, "", CURRENT_DIRECTORY },
+            { ".", NO_STRINGS, ".", CURRENT_DIRECTORY },
+            { "foo", NO_STRINGS, "foo", CURRENT_DIRECTORY + "foo" },
             { "foo", new String[] { "" }, "foo", CURRENT_DIRECTORY + "foo"},
             { "foo", new String[] { ".." }, "foo/..", CURRENT_DIRECTORY },
             { "foo", new String[] { "bar" }, "foo/bar", CURRENT_DIRECTORY + "foo/bar" },
@@ -393,9 +394,9 @@ public class TPathTest extends MockTestBase {
         if ('\\' == separatorChar) {
             for (Object[] params : new Object[][] {
                 // $first, $more
-                { "c:/foo", NO_MORE },
+                { "c:/foo", NO_STRINGS },
                 { "c:/foo", new String[] { "bar" } },
-                { "//foo/bar/boom", NO_MORE },
+                { "//foo/bar/boom", NO_STRINGS },
                 { "//foo/bar/boom", new String[] { "bang" } },
             }) {
                 assertElements(params);
@@ -404,10 +405,10 @@ public class TPathTest extends MockTestBase {
         for (Object[] params : new Object[][] {
             // $first, $more
             { "", null },
-            { "foo", NO_MORE },
+            { "foo", NO_STRINGS },
             { "foo", new String[] { "bar" } },
             { "/", null },
-            { "/foo", NO_MORE },
+            { "/foo", NO_STRINGS },
             { "/foo", new String[] { "bar" } },
         }) {
             assertElements(params);

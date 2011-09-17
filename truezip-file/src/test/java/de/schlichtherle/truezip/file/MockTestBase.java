@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.nio.file;
+package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
