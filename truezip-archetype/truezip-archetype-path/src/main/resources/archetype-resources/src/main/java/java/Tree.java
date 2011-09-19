@@ -1,15 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-/*
- * Copyright (C) 2011 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- */
-package ${package};
+package ${package}.java;
 
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.nio.file.TPath;
@@ -60,16 +52,8 @@ public class Tree extends Application<RuntimeException> {
     private void graph(Path file, String padding, String prefix) {
         if (!exists(file))
             throw new IllegalArgumentException(file + " (file or directory does not exist)");
-        PrintStream out = System.out;
-        out.print(padding);
-        out.print(prefix);
-        out.println(file.getFileName());
+        System.out.append(padding).append(prefix).println(file.getFileName());
         if (isDirectory(file)) {
-            String nextPadding = padding;
-            if (0 < prefix.length())
-                nextPadding += LAST_PREFIX.equals(prefix)
-                        ? LAST_PADDING
-                        : DEFAULT_PADDING;
             Set<Path> entries = new TreeSet<>();
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(file)) {
                 for (Path member : stream)
@@ -79,6 +63,11 @@ public class Tree extends Application<RuntimeException> {
             }
             int l = entries.size() - 1;
             if (0 <= l) {
+                String nextPadding = padding;
+                if (0 < prefix.length())
+                    nextPadding += LAST_PREFIX.equals(prefix)
+                            ? LAST_PADDING
+                            : DEFAULT_PADDING;
                 final Iterator<Path> it = entries.iterator();
                 for (int i = 0; i++ < l; )
                     graph(it.next(), nextPadding, DEFAULT_PREFIX);

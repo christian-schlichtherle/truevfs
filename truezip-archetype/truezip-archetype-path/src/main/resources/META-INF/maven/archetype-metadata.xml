@@ -7,6 +7,7 @@
             <directory>src/main/java</directory>
             <includes>
                 <include>**/*.java</include>
+                <include>**/*.scala</include>
             </includes>
         </fileSet>
         <fileSet filtered="false" encoding="UTF-8">
