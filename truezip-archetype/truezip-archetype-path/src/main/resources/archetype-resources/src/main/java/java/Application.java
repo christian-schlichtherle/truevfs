@@ -1,22 +1,14 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-/*
- * Copyright (C) 2011 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- */
-package ${package};
+package ${package}.java;
 
 import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 import de.schlichtherle.truezip.file.TApplication;
 
 /**
- * An abstract class which configures the TrueZIP FSP JSE7 module.
+ * An abstract class which configures the TrueZIP Path module.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -51,15 +43,4 @@ abstract class Application<E extends Exception> extends TApplication<E> {
         String impl = HurlingWindowFeedback.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }
-
-    /*@Override
-    protected void sync() throws FsSyncException {
-        try {
-            Thread.sleep(Long.MAX_VALUE);
-        } catch (InterruptedException ex) {
-            Logger  .getLogger(Application.class.getName())
-                    .log(Level.SEVERE, null, ex);
-        }
-        super.sync();
-    }*/
 }
