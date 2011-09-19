@@ -79,6 +79,10 @@
         <module>truezip-swing</module>
     </modules>
 
+    <properties>
+        <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -123,7 +127,6 @@
             <groupId>findbugs</groupId>
             <artifactId>annotations</artifactId>
             <version>1.0.0</version>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -258,8 +261,4 @@
             <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
         </site>
     </distributionManagement>
-
-    <properties>
-        <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
-    </properties>
 </project>
