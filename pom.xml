@@ -13,7 +13,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>epl10-oss-parent</artifactId>
-        <version>3</version>
+        <version>4</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
