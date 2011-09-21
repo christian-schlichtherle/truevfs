@@ -13,7 +13,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>epl10-oss-parent</artifactId>
-        <version>4</version>
+        <version>5</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -80,6 +80,8 @@
     </modules>
 
     <properties>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
     </properties>
 
@@ -139,6 +141,13 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
