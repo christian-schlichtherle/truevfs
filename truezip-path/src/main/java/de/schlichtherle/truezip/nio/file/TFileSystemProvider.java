@@ -8,22 +8,19 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import net.jcip.annotations.ThreadSafe;
-import java.util.logging.Logger;
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsEntry;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsInputOptions.*;
+import de.schlichtherle.truezip.fs.FsManager;
+import static de.schlichtherle.truezip.fs.FsManager.*;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsPath;
-import static de.schlichtherle.truezip.fs.FsManager.*;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -61,6 +58,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 import static java.util.logging.Level.*;
+import java.util.logging.Logger;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A {@link FileSystemProvider} implementation
