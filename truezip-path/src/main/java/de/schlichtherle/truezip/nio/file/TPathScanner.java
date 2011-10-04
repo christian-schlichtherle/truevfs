@@ -124,6 +124,38 @@ final class TPathScanner {
         }
     }
 
+    private FsPath scan(final String path) throws URISyntaxException {
+        splitter.split(path);
+        final String ps = splitter.getParentPath();
+        final FsEntryName men;
+        final FsPath pp;
+        if (null != ps) {
+            men = new FsEntryName(
+                    uri.path(splitter.getMemberName()).getUri(),
+                    NULL);
+            pp = scan(ps);
+        } else {
+            men = new FsEntryName(
+                    uri.path(path).query(memberQuery).getUri(),
+                    CANONICALIZE);
+            pp = root;
+        }
+        URI ppu;
+        FsPath mp;
+        if (men.isRoot() || (ppu = pp.toUri()).isOpaque() || !ppu.isAbsolute()) {
+            mp = pp.resolve(men);
+        } else {
+            final String pup = ppu.getPath();
+            if (!pup.endsWith(SEPARATOR))
+                ppu = new UriBuilder(ppu).path(pup + SEPARATOR_CHAR).getUri();
+            mp = new FsPath(new FsMountPoint(ppu), men);
+        }
+        final FsScheme s = detector.getScheme(men.toString());
+        if (null != s)
+            mp = new FsPath(new FsMountPoint(s, mp), ROOT);
+        return mp;
+    }
+
     static int pathPrefixLength(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
         final String a = uri.getAuthority();
@@ -153,6 +185,14 @@ final class TPathScanner {
         return uri;
     }
 
+    /**
+     * Returns whether or not the given path is absolute.
+     * <p>
+     * A path is absolute if it doesn't need to be combined with other path
+     * information in order to locate a file.
+     *
+     * @return Whether or not the given path is absolute.
+     */
     static boolean isAbsolute(URI uri) {
         return uri.isAbsolute() || Paths.isAbsolute(
                 uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
@@ -184,37 +224,5 @@ final class TPathScanner {
             en = new FsEntryName(pu, CANONICALIZE);
             return new FsPath(mp, en);
         }
-    }
-
-    private FsPath scan(final String path) throws URISyntaxException {
-        splitter.split(path);
-        final String ps = splitter.getParentPath();
-        final FsEntryName men;
-        final FsPath pp;
-        if (null != ps) {
-            men = new FsEntryName(
-                    uri.path(splitter.getMemberName()).getUri(),
-                    NULL);
-            pp = scan(ps);
-        } else {
-            men = new FsEntryName(
-                    uri.path(path).query(memberQuery).getUri(),
-                    CANONICALIZE);
-            pp = root;
-        }
-        URI ppu;
-        FsPath mp;
-        if (men.isRoot() || (ppu = pp.toUri()).isOpaque() || !ppu.isAbsolute()) {
-            mp = pp.resolve(men);
-        } else {
-            final String pup = ppu.getPath();
-            if (!pup.endsWith(SEPARATOR))
-                ppu = new UriBuilder(ppu).path(pup + SEPARATOR_CHAR).getUri();
-            mp = new FsPath(new FsMountPoint(ppu), men);
-        }
-        final FsScheme s = detector.getScheme(men.toString());
-        if (null != s)
-            mp = new FsPath(new FsMountPoint(s, mp), ROOT);
-        return mp;
     }
 }
