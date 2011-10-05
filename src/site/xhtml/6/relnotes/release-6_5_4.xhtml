@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2007-2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.5.4 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.5.4</h1>
+            <p class="subtitle">(February 27<sup>th</sup>, 2007)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>This is a feature and update release. Upgrading is recommended for all users.</p>
+            <h3>Support for OpenDocument Format (ODF)</h3>
+            <p>Most notably, support for reading and writing OpenDocument Format (ODF) files
+                has been added. Here&#39;s an example:</p>
+            <pre><code>
+// Recognize ODF text documents as created by OpenOffice Writer, e.g.
+File.setDefaultArchiveDetector(new DefaultArchiveDetector(&quot;odt&quot;));
+
+File document = new File(&quot;helloworld.odt&quot;);
+File content = new File(document, &quot;content.xml&quot;);
+try {
+    FileInputStream in = new FileInputStream(document);
+    try {
+        // Init DOM parser here...
+    } finally {
+        in.close(); // ALWAYS close the stream!
+    }
+} catch (IOException ex) {
+    ex.printStackTrace(); // maybe document is a false positive
+}</code></pre>
+            <p>If you want to create or modify an ODF file, make sure to create or overwrite
+                the entry <i>manifest</i> first in order to provide best performance. Otherwise,
+                the ODF archive driver buffers all output in temporary files until either this entry
+                is written or the archive file gets unmounted. This is because ODF files must always
+                start with this entry.</p>
+            <p>It is hoped that TrueZIP 7 alias TrueVFS can enhance the support for ODF files
+                so that encrypted ODF files can be read and written transparently, too (just like
+                RAES encrypted ZIP files are today). For this to work, TrueVFS would need to take
+                full control over the entry <i>META-INF/manifest.xml</i> and probably hide its existance
+                from the client application.</p>
+            <h3>Creation and Ordering of Archive Entries</h3>
+            <p>Directory archive entries are now only created in the output archive file if
+                they have been explicitly created with <code>File.mkdir()</code> or their last modification
+                time has been modified with <code>File.setLastModified(long)</code>. Otherwise,
+                they will just exist as so-called <i>ghost directories</i> in the virtual file system.
+                Just like before, ghost directories can also be read from the input archive file
+                and return <code>0L</code> upon a call to <code>File.lastModified()</code>. This
+                mimics the behavior of most archive tools, which do not write directory entries
+                at all. The concept of ghost directories is now documented in detail in the Javadoc
+                for the package <code>de.schlichtherle.io</code>.</p>
+            <p>When reading and writing archive files, the order of their entries is now preserved
+                due to a change from <code>HashMap</code> to <code>LinkedHashMap</code> in some
+                classes. Note that directory entries are still written after all file entries, if
+                at all (see above).</p>
+            <p>These changes imply that when copying archive files, the order of the entries
+                in the destination now more closely resembles the order in the source and that missing
+                directory entries in the source (called <i>ghost directories</i>) are no longer
+                created in the destination.</p>
+            <h3>Concurrency</h3>
+            <p>The ZIP driver family now supports concurrent writing of archive entries, just
+                like the TAR driver family did already. Previously, an <code>OutputArchiveBusyException</code>
+                was thrown. Don&#39;t expect wonders however: An archive file can still only get written
+                as an output stream. So only the archive entry output stream which was first created
+                will directly write to the archive file output stream. All others will write to
+                a temporary file which will be copied to the archive file output stream when the
+                archive entry output stream is closed and no other streams are busy or when the
+                archive file gets unmounted (which closes all archive entry streams first).</p>
+            <p>Of course, thread safety has been unaffected by these changes: TrueZIP&#39;s virtual
+                file system operations were and are <i>virtually atomic</i>. While not new, this
+                concept is now documented in detail in the Javadoc for the package <code>de.schlichtherle.io</code>.</p>
+            <h3>Miscellaneous</h3>
+            <p>Great efforts have been put into the Javadoc. There is also a new tutorial/manual
+                on the web site which covers the frequently asked questions. I hope you appreciate.</p>
+            <p>As usual, some minor optimizations and bugs have been fixed and the unit tests
+                have been extended to cover regressions for the fixes in future releases. TrueZIP
+                6.5 has been analyzed with <a href="http://findbugs.sourceforge.net">FindBugs</a>
+                in order to eliminate potential bugs. All remaining issues have been checked to
+                be false positives.</p>
+            <p>Starting from this release, the precompiled JAR contains full debugging information.
+                This should make a developer&#39;s life a bit easier: While it&#39;s easy to use tools like
+                ProGuard to strip the debugging information if you don&#39;t want it, you don&#39;t need
+                to do the more complicated build from the sources anymore if you need it.</p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_4</code>.</p>
+            <h3>Cross Package Updates</h3>
+            <ol>
+                <li><b>Enhanced:</b> Javadoc in all packages and many classes.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.crypto.io</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>CipherReadOnlyFile.read()</code> returned a negative
+                    integer for bytes in the inclusive range 128 to 255.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>File.deleteAll()</code> bypassed the internal state
+                    associated with archive files.</li>
+                <li><b>Fixed:</b> The copy operations in the <code>File</code> class threw an
+                    <code>IOException</code> instead of a <code>FileNotFoundException</code> if
+                    a file archive entry should get copied over a directory archive entry.</li>
+                <li><b>Fixed:</b> The package internal <code>ArchiveControllers</code> class
+                    now forces the key manager singleton to get loaded and instanctiated at
+                    startup rather than on demand. With on-demand key manager instantiation,
+                    this may have been deferred until the JVM shutdown hook is run. However,
+                    some environments (app servers) inhibit class loading in shutdown hooks.</li>
+                <li><b>Fixed:</b> <code>ChainableIOException.initCause(Throwable)</code> now
+                    throws a <code>ClassCastException</code> if parameter is not an <code>
+                        IOException</code>.</li>
+                <li><b>Changed:</b> Newly created directory entries are now written to an archive
+                    file only if they have been created with <code>File.mkdir()</code> or their
+                    last modification time has been set with <code>File.setLastModified(long)</code>.
+                    This mimics the behavior of most archive tools, which do not write directory
+                    entries.</li>
+                <li><b>Changed:</b> The method <code>DefaultArchiveDetector.getArchiveDriver(String)</code>
+                    now throws a <code>RuntimeException</code> if an archive driver class cannot
+                    get loaded or instantiated. Previously, a <code>WARNING</code> message was logged
+                    using <code>java.util.logging</code> and <code>null</code> was returned.</li>
+                <li><b>Enhanced:</b> When copying or renaming archive files, ghost directories
+                    in the source are now retained as ghost directories in the destination instead
+                    of being created as regular directories.</li>
+                <li><b>Enhanced:</b> When an archive file is automatically unmounted, the archive
+                    controller now waits for all entry streams to get closed instead of failing
+                    with an exception if any open entry streams are present. This is supported by
+                    the auto-close feature of entry streams, which closes an entry stream if gets
+                    picked up by the garbage collector.</li>
+                <li><b>Enhanced:</b> The file system now enumerates all entries in order via
+                    <code>LinkedHashMap</code>. This causes the order of entries to be preserved
+                    when copying archives, with the exception that all file entries are written
+                    before their directory entries.</li>
+                <li><b>Enhanced:</b> Archive drivers are now already created when constructing
+                    a <code>DefaultArchiveDetector</code> rather than when <code>getArchiveDetector(String)</code>
+                    is called in order to make the class fail early. This does not affect loading
+                    the global registry from configuration files on the class path. Another positive
+                    side effect is that there doesn&#39;t need to exist a separate archive driver for
+                    any archive file suffix any more, which slightly reduces the memory footprint.
+                    However, archive drivers are still not singletons.</li>
+                <li><b>Enhanced:</b> Removed redundant call to <code>
+                        System.runFinalization()</code> in <code>ArchiveControllers.umount()</code>.</li>
+                <li><b>Enhanced:</b> Setting the system property <code>
+                        de.schlichtherle.io.strict</code> to <code>true</code> now causes <code>
+                        File.isLenient()</code> to return <code>false</code> by default.</li>
+                <li><b>Enhanced:</b> <code>(In|Out)putArchiveMetaData</code> don&#39;t trigger
+                    garbage collection and finalization any more if <code>File.isLenient()</code>
+                    returns <code>false</code>.</li>
+                <li><b>Enhanced:</b> The system property <code>de.schlichtherle.io.registry</code>
+                    can now be set to a list of relative paths which are separated by path
+                    separators (<code>&#39;;&#39;</code> on Windows, <code>&#39;:&#39;</code> on Unix). These
+                    relative paths are then searched for configuration files on the class path.</li>
+                <li><b>Enhanced:</b> The system property <code>de.schlichtherle.io.default</code>
+                    can now be set to the list of archive file suffixes recognized by default.
+                    This overrules the <code>DEFAULT</code> keyword found in configuration
+                    files.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.spi</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>AbstractArchiveDriver</code>
+                    did not initialize the thread local encoder when deserialized.</li>
+                <li><b>Changed:</b> Deprecated <code>OutputArchive.storeDirectory()</code>,
+                    since the same can be done with <code>OutputArchive.getOutputStream()</code>
+                    and a subsequent <code>OutputStream.close()</code> on the returned stream.</li>
+                <li><b>New:</b> The new class <code>MultiplexedOutputArchive</code>
+                    provides concurrent writing of multiple archive entries by decorating arbitrary
+                    <code>OutputArchive</code> implementations. This eases the task of implementing
+                    an archive driver and benefits the client application because it allows concurrent
+                    writing of archive entries by multiple threads. Note that the TAR driver family
+                    already provided this feature before via a custom implementation. In this version,
+                    the implementation has been refactored to use the new class.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.tar</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>TarInputStream</code> did not recover all entry attributes
+                    properly. This resulted in unwanted changes of the attributes when a TAR file
+                    was updated.</li>
+                <li><b>Fixed:</b> If a TAR file contained multiple entries for the same name,
+                    some temporary files may have been left.</li>
+                <li><b>Fixed:</b> Entries created with <code>new TarEntry(String)</code> did
+                    not return <code>-1</code> as their last modification time. This did not affect
+                    previous releases, but would have affected this release due to update #1 in
+                    the package <code>de.schlichtherle.io</code>.</li>
+                <li><b>Fixed:</b> The TAR driver left a temporary file if a corrupted TAR file
+                    was read.</li>
+                <li><b>Fixed:</b> The TAR driver now produces GNU tar compatible file headers
+                    for long file names instead of allowing the class <code>TarOutputStream</code>
+                    in the package <code>org.apache.tools.tar</code> from <i>ant.jar</i> to throw
+                    an (undocumented) <code>RuntimeException</code>.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.archive.zip</code></h3>
+            <ol>
+                <li><b>New:</b> The classes <code>OdfDriver</code> and <code>OdfOutputArchive</code>
+                    support reading and writing of OpenDocument Format (ODF) files. For more information,
+                    please refer to the Javadoc for the driver class.</li>
+                <li><b>Enhanced:</b> The ZIP driver family
+                    now supports concurrent writing of multiple archive entries. See update #3 in
+                    the package <code>de.schlichtherle.io.archive.spi</code>.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.rof</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>BufferedReadOnlyFile.read()</code> returned a negative
+                    integer for bytes in the inclusive range 128 to 255.</li>
+                <li><b>Fixed:</b> <code>ChannelReadOnlyFile.read()</code> returned EOF after
+                    first use.</li>
+                <li><b>Fixed:</b> <code>ChannelReadOnlyFile.seek(long)</code> threw <code>IllegalArgumentException</code>
+                    instead of <code>IOException</code> on negative offset.</li>
+                <li><b>Fixed:</b> The class <code>MemoryMappedReadOnlyFile</code> did not
+                    work.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.swing</code></h3>
+            <ol>
+                <li><b>Fixed:</b> Illegal call to <code>
+                        FileSystemView.getSystemIcon(java.io.File)</code> for nonexistant file
+                    argument.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.io.swing.tree</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>FileTreeModel.nodeRemoved(java.io.File)</code> did
+                    not properly notify the tree of updates.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.key</code></h3>
+            <ol>
+                <li><b>Fixed:</b> <code>AbstractKeyProvider.getCreateKey()</code> and <code>
+                        AbstractKeyProvider.getOpenKey()</code> might have returned <code>null</code>
+                    instead of throwing an <code>UnknownKeyException</code>.</li>
+                <li><b>Changed:</b> Moved <code>PromptingKeyManager.getKeyProvider(String)</code>
+                    implementation to its abstract definition in the <code>KeyManager</code> base
+                    class and deprecated it. The client application cannot get affected adversely.</li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.util</code></h3>
+            <ol>
+                <li><b>New:</b> The class
+                    <a href="apidocs/de/schlichtherle/util/CanonicalStringSet.html">
+                        <code>de.schlichtherle.util.CanonicalStringSet</code>
+                    </a>
+                    is a convenient and powerful means to operate with expressions such as
+                    <code>"ear|jar|war|zip"</code>.
+                </li>
+            </ol>
+            <h3>Updates in the Package <code>de.schlichtherle.util.zip</code></h3>
+            <ol>
+                <li><b>Fixed:</b> The byte array for extra
+                    data in this class is now copied on any call to the getter or setter.</li>
+                <li><b>Fixed:</b> <code>BasicZipFile.RawCheckedInputStream.read()</code>
+                    did not provide a dummy byte to the inflater on EOF. This caused errors when
+                    assertions were enabled, but otherwise did not seem to have affected the CRC-32
+                    checking.</li>
+                <li><b>Fixed:</b> <code>
+                        BasicZipOutputStream.write(int)</code> wasn&#39;t overridden in <code>
+                        ZipOutputStream</code>.</li>
+                <li><b>Fixed:</b> <code>BasicZipFile.length()</code> threw <code>
+                        NullPointerException</code> instead of an <code>IOException</code> if the
+                    file was <code>close()</code>d before.</li>
+                <li><b>Enhanced:</b> The package now supports language encoding according to
+                    Appendix D of PKWARE&#39;s <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP File Format Specification</a>.
+                    This implies that the <code>BasicZipFile</code> class ignores its constructor
+                    parameter for the encoding if bit 11 of the General Purpose Bit Flag is set
+                    in an archive file.</li>
+                <li><b>Enhanced:</b> <code>BasicZipFile</code> now enumerates its entries in
+                    the order of the Central Directory Records.</li>
+                <li><b>Enhanced:</b> The property setters in
+                    the class <code>ZipEntry</code> now accept <code>UNKNOWN</code> (<code>-1</code>)
+                    as a value for numeric properties.</li>
+                <li><b>Enhanced:</b> The constructor of <code>BasicZipFile</code> now fails
+                    if it finds an unsupported compression method in a Central Directory Record
+                    instead of waiting until <code>getInputStream()</code> is called.</li>
+            </ol>
+        </div>
+    </body>
+</html>

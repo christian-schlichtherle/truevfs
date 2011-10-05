@@ -1,0 +1,181 @@
+    -----------------------
+    Concepts
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Concepts
+
+    TrueZIP is a Java based plug-in framework for virtual file systems (VFS)
+    which provides transparent access to archive files as if they were just
+    plain directories.
+
+* Overall Architecture
+
+    TrueZIP applies the (in)famous three-tier architecture pattern:
+
+    [[1]] The access tier is a facade for the kernel tier which provides
+          convenient-to-use client APIs for TrueZIP applications.
+          No file system state is managed by this tier, which enables a TrueZIP
+          application to work with any API concurrently, too.
+          This tier consists of the client API modules
+          {{{./truezip-file/index.html}TrueZIP&#160;File*}}
+          and
+          {{{./truezip-path/index.html}TrueZIP&#160;Path}}
+          (since TrueZIP 7.2).
+
+    [[1]] The kernel tier manages all virtual file system state.
+          It also provides multithreading, multiplexing, caching and buffering
+          so that the driver tier does not need to take care of this.
+          This tier solely consists of the module TrueZIP Kernel.
+
+    [[1]] The driver tier implements the I/O operations for their respective
+          (federated) file system type.
+          This tier consists of all file system driver modules like TrueZIP
+          Driver FILE, TrueZIP Driver ZIP etc.
+
+    []
+
+* Design Paradigms
+
+    The TrueZIP project employs several high level design paradigms which have
+    proven to be beneficial.
+    However, after all these are guidelines - not rules.
+    So they should get applied with some care.
+
+** Convention Over Configuration
+
+    The decomposition of this framework into separate modules enables users to
+    easily configure the initial setup of the application's archive detection
+    by simply adding or removing the JARs of the required file system driver
+    modules to or from the run time class path.
+    This will cause the application to automatically detect the canonical file
+    suffixes for the archive files supported by the respective file system
+    driver modules - no XML or property file editing is required.
+
+    The application can simply accept this
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}initial setup}}
+    of the
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector()}archive detection}}
+    in its 
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#get()}current configuration}}
+    or it can
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}explicitly override}}
+    it.
+    Check the {{{./faq.html#file}FAQ}} for the
+    {{{./truezip-file/index.html}TrueZIP File*}}
+    API for a discussion of some options to adapt the archive detection to your
+    needs.
+
+** Service Location
+
+    As an implication of the Convention Over Configuration design paradigm,
+    the
+    {{{./truezip-kernel/index.html}TrueZIP Kernel}}
+    module provides service locator singletons for the
+    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsManagerLocator.html}file system manager}},
+    the
+    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system drivers}}
+    and the
+    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}temporary I/O entry pool}}.
+
+    File system drivers may add additional service locators singletons.
+    For example, the
+    {{{./truezip-driver/truezip-driver-tzp/index.html}TrueZIP Driver ZIP.RAES (TZP)}}
+    module adds another service locator singleton for the
+    {{{./apidocs/de/schlichtherle/truezip/key/sl/KeyManagerLocator.html}key manager}}
+    which obtains passwords or key files required to encrypt and decrypt
+    RAES encrypted ZIP files.
+
+** Dependency Injection
+
+    Although the service locator singletons are provided by the TrueZIP Kernel
+    module, it does not actually use them.
+    To the contrary, the TrueZIP Kernel module fully relies on the Dependency
+    Injection design paradigm.
+    This enables the TrueZIP modules and TrueZIP application to inject a custom
+    implementation instance or simply a service locator singleton as a
+    dependency of a TrueZIP Kernel object.
+
+    For example, the file system manager service locator singleton and the file
+    system driver service locator singleton are used by the APIs of the TrueZIP
+    File* and
+    {{{./truezip-path/index.html}TrueZIP Path}}
+    modules in order to implement the Convention Over Configuration design
+    paradigm.
+    Likewise, the temporary I/O entry pool service locator singleton is used by
+    the file system driver modules.
+
+    No Dependency Injection framework is used in order to reduce TrueZIP's
+    dependency on third party projects.
+
+    Constructor injection is favored wherever possible in order to enable
+    immutable objects.
+
+** Immutable Classes
+
+    Immutable classes are favored wherever possible because they inherently
+    provide support for multithreading,
+    which is a key requirement for most TrueZIP Kernel classes.
+
+    For example, the classes
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsPath.html}<<<FsPath>>>}},
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsMountPoint.html}<<<FsMountPoint>>>}}
+    and
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsEntryName.html}<<<FsEntryName>>>}}
+    are immutable so that their instances can get safely shared among many
+    objects and threads.
+
+** Loose Coupling
+
+    Programming against interfaces or abstract classes is preferred over
+    implementation classes in order to ease exchanging implementation classes.
+
+    For example, the abstract classes
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsModel.html}<<<FsModel>>>}}
+    and
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsController.html}<<<FsController>>>}}
+    participate in a variant of the MVC design pattern which is known as the
+    Front Controller design pattern.
+    The numerous implementation classes participate in the different file
+    system driver modules in order to accommodate to the different contexts
+    of non-federated and federated file system types and implement their
+    specific behavior.
+
+** Open For Extension, Closed For Change
+
+    Abstract classes are favored over interfaces wherever the future addition
+    of more methods is anticipated in order to enable binary backwards
+    compatibility.
+
+    Wherever reasonable, classes, methods and fields are declared (package)
+    private and/or final in order to inhibit undesirable inheritance, enhance
+    maintainability and/or enable true immutability.
+
+    For example, the abstract classes <<<FsModel>>> and <<<FsController>>>
+    provide final implementations for <<<Object.equals(Object)>>>,
+    <<<Object.hashCode()>>> and <<<Object.toString()>>> because there is
+    exactly only one reasonable implementation for any implementation class.
+
+** Separation Of Concerns
+
+    The design of interfaces and abstract classes aims for strong cohesion in
+    order to ease implementation classes and enhance their extensibility and
+    reusability.
+    Where conflicts arise, the Law Of Demeter is sacrificed for strong cohesion.
+
+    The set of overridable public methods of abstract classes and interfaces is
+    reduced as much as reasonable in order to ease implementation classes.
+
+    For example, the abstract class
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<FsDriver>>>}}
+    consists of only one abstract method
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html#newController(de.schlichtherle.fs.FsModel,de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    which needs to get implemented in any file system driver module.    
+
+** Composition Over Inheritance
+
+    The declaration of classes or methods as final forces the use of
+    composition rather than inheritance which in turn enables dependency
+    resolution at run time and thus enhances the overall extensibility of the
+    architecture.

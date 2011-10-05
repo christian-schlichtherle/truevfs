@@ -1,0 +1,119 @@
+    -----------------------
+    About TrueZIP
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP
+
+* Welcome to the TrueZIP&#160;User&#160;Website!
+
+    TrueZIP is a Java based plug-in framework for virtual file
+    systems (VFS) which provides transparent access to archive
+    files as if they were just plain directories - see
+    {{{./features.html}Key Features}}.
+    The most recent version is TrueZIP&#160;${project.version} - see
+    {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
+
+** Supported File System Types
+
+    TrueZIP ships with the following pluggable file system driver modules:
+
+*--*--*
+||Module||Description
+*--+--+
+|{{{./truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}|Provides read/write access to the platform file system. Automatically uses NIO.2 if JSE&#160;7 is available.
+*--+--+
+|{{{./truezip-driver/truezip-driver-http/index.html}TrueZIP Driver HTTP(S)}}|Provides read-only access to HTTP(S) URLs.
+*--+--+
+|{{{./truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}|Provides read/write access to TAR, TAR.GZ and TAR.BZ2 files.
+*--+--+
+|{{{./truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}|Provides read/write access to ZIP, JAR, EAR, WAR etc. Supports appending to existing ZIP files, recovery of lost ZIP entries, WinZip AES encryption, BZIP2 compression, selectable character sets, external file attributes and ZIP64 extensions.
+*--+--+
+|{{{./truezip-driver/truezip-driver-tzp/index.html}TrueZIP Driver ZIP.RAES (TZP)}}|Provides read/write access to JAR files which are entirely wrapped in an envelope with AES-256/CTR encryption, SHA-256 authentication and PKCS #12 V1 PBKDF.
+*--+--+
+
+    Add the JAR artifact of these modules to the run time class path to
+    make their file system drivers available for service location in the client
+    API modules - see below.
+
+** Using TrueZIP
+
+    As an API, TrueZIP provides uniform, transparent, thread-safe,
+    read/write access to archive files as if they were just plain
+    directories in a file system path.
+    Starting with TrueZIP&#160;7.2, there are two client API modules available
+    which can get used concurrently to access the same file systems:
+
+*--*--*
+||Module||Description
+*--+--+
+|{{{./truezip-file/index.html}TrueZIP File*}}|Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too. Requires JSE&#160;6.
+*--+--+
+|{{{./truezip-path/index.html}TrueZIP Path}}|Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>. Requires JSE&#160;7.
+*--+--+
+
+    Writing an application for either API is really easy:
+    Have a look at the {{{./usecases/index.html}Use Cases}} for some samples
+    using the API of the module TrueZIP&#160;File*.
+
+** Extending TrueZIP
+
+    As a framework, TrueZIP provides the interfaces and classes to
+    write file system drivers which plug-in to its federated file
+    system space.
+    The module TrueZIP&#160;Kernel provides federating, multithreading,
+    multiplexing, caching and accounting so that archive file system drivers
+    do not need to take care of these aspects of a virtual file system.
+
+    There is no tutorial for how to write a file system driver yet,
+    but there's comprehensive Javadoc:
+
+    * If you are going to write a federated file system driver
+      (i.e. archive driver), please consult the Javadoc for
+      {{{./apidocs/de/schlichtherle/truezip/fs/archive/FsArchiveDriver.html}<<<de.schlichtherle.truezip.fs.archive.FsArchiveDriver>>>}}.
+
+    * If you are going to write a non-federated file system driver,
+      please consult the Javadoc for
+      {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<de.schlichtherle.truezip.fs.FsDriver>>>}}.
+
+    []
+
+    For examples, please {{{./source-repository.html}check out}} the source
+    code of this project and consult the file system driver implementations
+    which ship with TrueZIP.
+
+* Getting Started
+
+    [[1]] Read the
+          {{{./kick-start/index.html}Kick-Start}} section in order to generate,
+          build and run a TrueZIP File* or TrueZIP Path application in about
+          ten minutes!
+
+    [[1]] If you are looking for more sample code and applications,
+          please
+          {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+          the source code of the
+          {{{./truezip-samples/index.html}TrueZIP Samples}} module.
+
+    [[1]] If you need help, please read the {{{./faq.html}FAQ}}
+          before subscribing and posting to the
+          {{{./mail-lists.html}User Mailing List}}.
+
+    [[1]] Last, but not least, please read the
+          {{{./apidocs/index.html}Javadoc}}.
+
+    []
+
+    If you're still not fed up, you might also want to check out
+    {{{http://truezip.schlichtherle.de}The&#160;TrueZIP&#160;Blog}}
+    or the
+    {{{http://java.net/projects/truezip}TrueZIP&#160;Developer&#160;Website}}.
+
+    Note that the documentation on this site is generally split across modules,
+    so please check the section <Project Modules> in the navigation bar on
+    this page, too.
+
+* Migration from TrueZIP&#160;6
+
+    There's an {{{./migration.html}article}} for this here, too!

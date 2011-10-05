@@ -1,0 +1,67 @@
+#content {
+    counter-reset: level1;
+    font-size: 10pt;
+}
+#content * {
+    margin: 0 0 10pt;
+}
+#content li {
+    margin: 0 0 0.25em;
+}
+#content dt {
+    font-style: italic;
+    margin: 0 0 0 0;
+}
+#content dd {
+    margin: 0 0 0.5em 15pt;
+}
+#content h1, #content h2, #content h3, #content h4, #content h5, #content h6 {
+    margin: 20pt 0 10pt;
+}
+#content h2:before {
+    content: counter(level1) ". ";
+    counter-increment: level1;
+}
+#content h2 {
+    counter-reset: level2;
+}
+#content h3:before {
+    content: counter(level1) "." counter(level2) " ";
+    counter-increment: level2;
+}
+#content h3 {
+    counter-reset: level3;
+}
+#content h4:before {
+    content: counter(level1) "." counter(level2) "." counter(level3) " ";
+    counter-increment: level3;
+}
+#content .box, #content pre {
+    border: 1px solid #c0c0c0;
+    padding: 5pt;
+}
+#content #legend {
+    float: right;
+    font-size: 0.75em;
+}
+#content table {
+    border: 2px solid #c0c0c0;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+#content th, #content td {
+    padding: 5pt;
+}
+#content th {
+    background-color: #c0c0c0;
+    text-align: left;
+    font-weight: bold;
+}
+#content td {
+    background-color: #eeeeee;
+}
+#content .subtitle {
+    font-style: italic;
+    font-size: 1.2em;
+    margin-left: 15pt;
+}
