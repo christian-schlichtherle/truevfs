@@ -305,7 +305,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
             } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
                 continue; // TODO: http://java.net/jira/browse/TRUEZIP-132
             }
-            if (drivers.containsKey(scheme))
+            final FsDriver driver = drivers.get(scheme);
+            if (null != driver && driver.isFederated())
                 return scheme;
         }
         return null;
