@@ -10,8 +10,8 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -19,11 +19,10 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
@@ -60,7 +59,7 @@ public class TArchiveDetectorTest {
             }
         }
 
-        testIllegalConstructors(NullPointerException.class,
+        assertIllegalConstructors(NullPointerException.class,
                 new Object[][] {
                     { null, null },
                     { null, driver },
@@ -80,7 +79,7 @@ public class TArchiveDetectorTest {
                     //{ TArchiveDetector.NULL, new Object[] { "xyz", null } },
                });
 
-        testIllegalConstructors(IllegalArgumentException.class,
+        assertIllegalConstructors(IllegalArgumentException.class,
                 new Object[][] {
                     { "DRIVER" },
                     { "DEFAULT" },
@@ -121,7 +120,7 @@ public class TArchiveDetectorTest {
     }
 
     @SuppressWarnings({"unchecked", "ResultOfObjectAllocationIgnored"})
-    private void testIllegalConstructors(
+    private void assertIllegalConstructors(
             final Class<? extends Throwable> expected,
             final Object[][] list) {
         for (int i = 0; i < list.length; i++) {
@@ -318,6 +317,7 @@ public class TArchiveDetectorTest {
             { null, ".default" },
             { null, ".ear" },
             { null, ".exe" },
+            { null, ".file" },
             { null, ".null" },
             { null, ".z" },
             { null, "test" },

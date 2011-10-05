@@ -8,32 +8,27 @@
  */
 package de.schlichtherle.truezip.file;
 
-import java.net.URISyntaxException;
-import java.util.ServiceConfigurationError;
+import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
+import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.File;
-import java.util.logging.Logger;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+import static java.io.File.separator;
+import static java.io.File.separatorChar;
+import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.logging.Level;
-import de.schlichtherle.truezip.fs.FsPath;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URI;
-import org.junit.Test;
-
-import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static java.io.File.*;
+import java.net.URISyntaxException;
+import java.util.ServiceConfigurationError;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests archive type independent features of the {@link TFile} class.
@@ -72,6 +67,11 @@ public class TFileTest extends TestBase<MockArchiveDriver> {
         } finally {
             super.tearDown();
         }
+    }
+
+    @Test
+    public void testFileExtension() {
+        assert !new TFile("test.file").isArchive();
     }
 
     @Test
