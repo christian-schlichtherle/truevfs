@@ -9,15 +9,15 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.util.JSE7;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 import static java.util.zip.Deflater.*;
 import java.util.zip.DeflaterOutputStream;
 
 /**
- * A deflater output stream which uses a pooled {@link Deflater} and provides
+ * A deflater output stream which uses a custom {@link Deflater} and provides
  * access to it.
- * Deflaters are expensive to allocate, so pooling them improves performance.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -35,6 +35,13 @@ final class ZipDeflaterOutputStream extends DeflaterOutputStream {
 
     Deflater getDeflater() {
         return def;
+    }
+
+    @Override
+    public void close() throws IOException {
+        assert false : "This method should never get called by the current implementation.";
+        def.end();
+        super.close();
     }
 
     /** A factory for {@link Deflater} objects. */

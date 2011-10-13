@@ -1027,6 +1027,7 @@ implements Iterable<E> {
             final ZipEntry entry = RawZipOutputStream.this.entry;
             entry.setRawCompressedSize(deflater.getBytesWritten());
             entry.setRawSize(deflater.getBytesRead());
+            deflater.end();
             this.delegate.finish();
         }
     } // DeflaterOutputMethod

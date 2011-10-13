@@ -14,9 +14,8 @@ import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
 /**
- * An inflater input stream which uses a pooled {@link Inflater} and provides
+ * An inflater input stream which uses a custom {@link Inflater} and provides
  * access to it.
- * Inflaters are expensive to allocate, so pooling them improves performance.
  *
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -26,8 +25,6 @@ final class ZipInflaterInputStream extends InflaterInputStream {
     private static final InflaterFactory factory = JSE7.AVAILABLE
                         ? new InflaterFactory()        // JDK 7 is OK
                         : new Jdk6InflaterFactory();   // JDK 6 needs fixing
-
-    private boolean closed;
 
     ZipInflaterInputStream(DummyByteInputStream in, int size) {
         super(in, factory.newInflater(), size);
@@ -39,9 +36,7 @@ final class ZipInflaterInputStream extends InflaterInputStream {
 
     @Override
     public void close() throws IOException {
-        if (closed)
-            return;
-        closed = true;
+        inf.end();
         super.close();
     }
 
