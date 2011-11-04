@@ -35,7 +35,7 @@ object Tree extends Application {
 
   override protected def work(args: Array[String]) = {
     val listfiles = if (0 < args.length) args else Array(".")
-    listfiles.foreach(path => graph(new TPath(path)))
+    listfiles foreach (path => graph(new TPath(path)))
     0
   }
 
@@ -44,7 +44,7 @@ object Tree extends Application {
     System.out.append(padding).append(prefix).println(file.getFileName)
     if (isDirectory(file)) {
       // Create a sorted set from the directory stream.
-      val entries = new TreeSet[Path]() {
+      val entries = new TreeSet[Path] {
         val stream = newDirectoryStream(file)
         try {
           for (member <- stream) super.add(member)
@@ -57,7 +57,7 @@ object Tree extends Application {
         val nextPadding = padding + (
           if (prefix.isEmpty) ""
           else if (prefix == lastPrefix) lastPadding else defaultPadding)
-        entries.dropRight(1).foreach(graph(_, nextPadding, defaultPrefix))
+        entries.dropRight(1) foreach (graph(_, nextPadding, defaultPrefix))
         graph(entries.last, nextPadding, lastPrefix)
       }
     }
