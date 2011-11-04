@@ -31,9 +31,9 @@
     </modules>
 
     <dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-file</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
