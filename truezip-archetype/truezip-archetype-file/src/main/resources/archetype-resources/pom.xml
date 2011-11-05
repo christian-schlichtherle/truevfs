@@ -29,10 +29,11 @@
             <version>${truezip.version}</version>
         </dependency>
 
-        <!-- Special driver for instrumentation with JMX and java.util.logging. -->
+        <!-- Extension module for monitoring and management with JMX and
+             java.util.logging. -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-driver-jmx-jul</artifactId>
+            <artifactId>truezip-extension-jmx-jul</artifactId>
             <version>${truezip.version}</version>
             <scope>runtime</scope>
         </dependency-->
