@@ -48,14 +48,13 @@ final class TempFilePool implements IOPool<FileEntry> {
             @CheckForNull String name) {
         this.dir = dir;
         // See http://java.net/jira/browse/TRUEZIP-152
-        if (null != name)
-            name = "." + name + ".tmp";
+        name = null == name ? "tzp" : name + ".";
         this.name = name;
     }
 
     @Override
     public TempEntry allocate() throws IOException {
-        return new TempEntry(createTempFile("tzp", name, dir), this);
+        return new TempEntry(createTempFile(name, null, dir), this);
     }
 
     @Override
