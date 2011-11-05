@@ -143,8 +143,6 @@ public class RaesFiles {
             String path,
             TArchiveDetector detector) {
         TFile file = new TFile(path, detector);
-        TFile parent = file.getParentFile();
-        assert null != parent : "expected non-null from call context!";
-        return new TFile(parent, file.getName(), TArchiveDetector.NULL);
+        return new TFile(file.getParentFile(), file.getName(), TArchiveDetector.NULL);
     }
 }
