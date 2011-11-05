@@ -29,7 +29,6 @@ import static java.lang.Boolean.*;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessMode;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import static java.nio.file.Files.*;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -189,7 +188,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             boolean closed;
 
             SeekableByteChannel() throws IOException {
-                super(Files.newByteChannel(temp.getPath(), optionSet()));
+                super(newByteChannel(temp.getPath(), optionSet()));
             }
 
             @Override
@@ -222,7 +221,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             boolean closed;
 
             OutputStream() throws IOException {
-                super(Files.newOutputStream(temp.getPath(), optionArray()));
+                super(newOutputStream(temp.getPath(), optionArray()));
             }
 
             @Override
