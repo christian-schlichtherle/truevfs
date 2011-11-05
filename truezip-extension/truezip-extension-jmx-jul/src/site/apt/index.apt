@@ -41,14 +41,14 @@ Prerequisites
     {{{../../apidocs/de/schlichtherle/truezip/socket/spi/IOPoolService.html#getPriority()}priority}}
     of its custom I/O pool service is less than one on JSE 6 or less than 151
     on JSE 7 - see
-    {{{../../apidocs/de/schlichtherle/truezip/fs/inst/comp/CompositeIOPoolService.html()}<<<CompositeIOPoolService>>>}}.
+    {{{../../apidocs/de/schlichtherle/truezip/fs/inst/comp/CompositeIOPoolService.html}<<<CompositeIOPoolService>>>}}.
 
     [[1]] The application is <not> providing a custom
     {{{../../apidocs/de/schlichtherle/truezip/fs/spi/FsManagerService.html}<<<FsManagerService>>>}}
     or the
     {{{../../apidocs/de/schlichtherle/truezip/fs/spi/FsManagerService.html#getPriority()}priority}}
     of its custom file system manager service is less than 100 - see
-    {{{../../apidocs/de/schlichtherle/truezip/fs/inst/comp/CompositeManagerService.html()}<<<CompositeManagerService>>>}}.
+    {{{../../apidocs/de/schlichtherle/truezip/fs/inst/comp/CompositeManagerService.html}<<<CompositeManagerService>>>}}.
     
     []
 
