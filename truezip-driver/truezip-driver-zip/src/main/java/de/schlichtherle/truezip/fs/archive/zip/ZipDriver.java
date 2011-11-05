@@ -404,7 +404,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
                 entry.setSize(template.getSize(DATA));
             }
         }
-        if (mknod.get(STORE))
+        if (mknod.get(COMPRESS))
+            entry.setMethod(DEFLATED);
+        else if (mknod.get(STORE))
             entry.setMethod(STORED);
         if (DIRECTORY != type) {
             if (UNKNOWN == entry.getMethod()) {
