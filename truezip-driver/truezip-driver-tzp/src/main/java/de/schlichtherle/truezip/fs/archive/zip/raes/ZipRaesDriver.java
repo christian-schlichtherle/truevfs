@@ -179,21 +179,29 @@ public abstract class ZipRaesDriver extends JarDriver {
      * (usually a temporary file) in case the output is not copied from a file
      * system entry as its input.
      * <p>
-     * Furthermore, the output option preference {@link FsOutputOption#ENCRYPT}
-     * is cleared in order to prevent adding a redundant encryption layer for
-     * the individual ZIP entry.
-     * This would not have any effect on the security level, but increase the
-     * size of the resulting archive file and heat the CPU.
+     * Furthermore, the property {@link ZipEntry#isEncrypted} of the returned
+     * entry is cleared in order to prevent adding a redundant encryption
+     * layer for the individual ZIP entry because this would confuse users,
+     * increase the size of the resulting archive file and unecessarily heat
+     * the CPU.
      */
     @Override
     public ZipArchiveEntry newEntry(
-            String path,
-            Type type,
-            Entry template,
-            BitField<FsOutputOption> mknod)
+            final String path,
+            final Type type,
+            final Entry template,
+            final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        return super.newEntry(path, type, template,
-                mknod.set(COMPRESS).clear(ENCRYPT));
+        final ZipArchiveEntry entry
+                = super.newEntry(path, type, template, mknod.set(COMPRESS));
+        // Fix for http://java.net/jira/browse/TRUEZIP-176 :
+        // Entry level encryption is enabled if mknod.get(ENCRYPTED) is true
+        // OR template is an instance of ZipEntry
+        // AND ((ZipEntry) template).isEncrypted() is true.
+        // Now switch off entry level encryption because encryption is already
+        // provided by the RAES wrapper file format.
+        entry.clearEncryption();
+        return entry;
     }
 
     /**

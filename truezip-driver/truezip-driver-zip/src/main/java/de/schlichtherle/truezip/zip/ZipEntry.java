@@ -276,6 +276,21 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
+     * Sets the encryption property to {@code false} and removes any other
+     * encryption artifacts, e.g. a WinZip AES extra field.
+     * 
+     * @since TrueZIP 7.4
+     * @see   <a href="http://java.net/jira/browse/TRUEZIP-176">#TRUEZIP-176</a>
+     */
+    public final void clearEncryption() {
+        setEncrypted(false);
+        final WinZipAesEntryExtraField field
+                = (WinZipAesEntryExtraField) removeExtraField(WINZIP_AES_ID);
+        if (WINZIP_AES == getRawMethod())
+            setRawMethod(null == field ? UNKNOWN : field.getMethod());
+    }
+
+    /**
      * Returns the compression method for this entry.
      *
      * @see #setMethod(int)
