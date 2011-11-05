@@ -1,0 +1,18 @@
+    -----------------------
+    About TrueZIP Extension
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueZIP Extension
+
+    This module contains sub-modules with pluggable extensions.
+    The following sub-modules are available:
+
+    * {{{./truezip-extension-jmx-jul/index.html}TrueZIP Extension JMX/JUL}}
+
+    []
+
+    Add the JAR artifact of these sub-modules to the run time class path to
+    make their artifacts (file system managers or I/O pool services) available
+    for service location in the client API modules.
