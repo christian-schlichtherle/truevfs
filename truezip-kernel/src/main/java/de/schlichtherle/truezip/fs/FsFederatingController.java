@@ -259,9 +259,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<FsInputOption> options) {
-        return new FederatingInputSocket(
-                delegate.getInputSocket(name, options),
-                name, options);
+        return new Input(   delegate.getInputSocket(name, options),
+                            name, options);
     }
 
     @Override
@@ -269,9 +268,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             FsEntryName name,
             BitField<FsOutputOption> options,
             @CheckForNull Entry template) {
-        return new FederatingOutputSocket(
-                delegate.getOutputSocket(name, options, template),
-                name, options, template);
+        return new Output(  delegate.getOutputSocket(name, options, template),
+                            name, options, template);
     }
 
     @Override
@@ -312,12 +310,11 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
     }
 
-    private final class FederatingInputSocket
-    extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
-        FederatingInputSocket(  final InputSocket<?> input,
+        Input(  final InputSocket<?> input,
                 final FsEntryName name,
                 final BitField<FsInputOption> options) {
             super(input);
@@ -406,16 +403,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 }
             }
         }
-    } // FederatingInputSocket
+    } // Input
 
-    private final class FederatingOutputSocket
-    extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
 
-        FederatingOutputSocket(
-                final OutputSocket<?> output,
+        Output( final OutputSocket<?> output,
                 final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
@@ -487,5 +482,5 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 }
             }
         }
-    } // FederatingOutputSocket
+    } // Output
 }

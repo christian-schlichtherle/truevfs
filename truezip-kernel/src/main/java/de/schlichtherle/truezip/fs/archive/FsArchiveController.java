@@ -26,8 +26,6 @@ import de.schlichtherle.truezip.fs.FsInputOption;
 import de.schlichtherle.truezip.fs.FsNotSyncedException;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -200,14 +198,13 @@ extends FsConcurrentModelController {
     public final InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsInputOption> options) {
-        return new ArchiveInputSocket(name);
+        return new Input(name);
     }
 
-    private final class ArchiveInputSocket
-    extends InputSocket<FsArchiveEntry> {
+    private final class Input extends InputSocket<FsArchiveEntry> {
         final FsEntryName name;
 
-        ArchiveInputSocket(final FsEntryName name) {
+        Input(final FsEntryName name) {
             this.name = name;
         }
 
@@ -247,7 +244,7 @@ extends FsConcurrentModelController {
         public InputStream newInputStream() throws IOException {
             return getBoundSocket().newInputStream();
         }
-    } // ArchiveInputSocket
+    } // Input
 
     abstract InputSocket<?> getInputSocket(String name);
 
@@ -256,16 +253,15 @@ extends FsConcurrentModelController {
             FsEntryName name,
             BitField<FsOutputOption> options,
             Entry template) {
-        return new ArchiveOutputSocket(name, options, template);
+        return new Output(name, options, template);
     }
 
-    private final class ArchiveOutputSocket
-    extends OutputSocket<FsArchiveEntry> {
+    private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
         final boolean append;
         final @CheckForNull Entry template;
 
-        ArchiveOutputSocket( final FsEntryName name,
+        Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             this.name = name;
@@ -301,7 +297,7 @@ extends FsConcurrentModelController {
             InputStream in = null;
             if (append) {
                 try {
-                    in = new ArchiveInputSocket(name).newInputStream();
+                    in = new Input(name).newInputStream();
                 } catch (IOException ex) {
                     // When appending, there is no need for the entry to exist,
                     // so we can safely ignore this - fall through!
@@ -332,7 +328,7 @@ extends FsConcurrentModelController {
                 }
             }
         }
-    } // ArchiveOutputSocket
+    } // Output
 
     private static final class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>
