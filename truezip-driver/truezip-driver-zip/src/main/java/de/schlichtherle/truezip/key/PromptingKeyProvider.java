@@ -33,7 +33,7 @@ import net.jcip.annotations.ThreadSafe;
 public final class PromptingKeyProvider<K extends SafeKey<K>>
 extends SafeKeyProvider<K> {
 
-    private final PromptingKeyManager<K> manager;
+    private final View<K> view;
 
     private volatile State state = State.RESET;
 
@@ -44,13 +44,12 @@ extends SafeKeyProvider<K> {
 
     private volatile @CheckForNull CacheableUnknownKeyException exception;
 
-    PromptingKeyProvider(final PromptingKeyManager<K> manager) {
-        assert null != manager;
-        this.manager = manager;
+    PromptingKeyProvider(PromptingKeyManager<K> manager) {
+        this.view = manager.getView();
     }
 
     private View<K> getView() {
-        return manager.getView();
+        return view;
     }
 
     private State getState() {
