@@ -254,8 +254,8 @@ TFile.setDefaultArchiveDetector(
         </faq>
         <faq id="ignoreArchiveFile">
             <question>
-                The API should <em>not</em> detect a particular archive file as
-                a virtual directory.
+                The API should <em>not</em> detect an individual archive file
+                as a virtual directory.
                 How can I do this?
             </question>
             <answer>
@@ -523,8 +523,8 @@ TFile.cp(src.toFile(), dst.toFile());
         </faq>
         <faq id="ignoreArchivePath">
             <question>
-                The API should <em>not</em> detect a particular archive file as
-                a virtual directory.
+                The API should <em>not</em> detect an individual archive file
+                as a virtual directory.
                 How can I do this?
             </question>
             <answer>
