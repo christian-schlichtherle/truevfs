@@ -13,7 +13,7 @@
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
         <artifactId>truezip</artifactId>
-        <version>7.3.5-SNAPSHOT</version>
+        <version>7.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver</artifactId>
@@ -40,22 +40,8 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-file</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-path</artifactId>
                 <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-path</artifactId>
-                <version>${project.version}</version>
-                <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
         </dependencies>
