@@ -9,7 +9,7 @@
 
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import static de.schlichtherle.truezip.fs.archive.FsArchiveEntry.UNKNOWN;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOPool;
