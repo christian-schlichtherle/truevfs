@@ -170,7 +170,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns a new {@link JarArchiveEntry}, enforcing that the data gets
+     * Returns a new {@link ZipArchiveEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
      * This feature strengthens the security level of the authentication
