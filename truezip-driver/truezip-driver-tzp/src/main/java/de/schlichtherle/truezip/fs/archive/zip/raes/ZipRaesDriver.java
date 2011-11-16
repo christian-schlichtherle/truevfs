@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.archive.zip.JarArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.OptionOutputSocket;
 import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
@@ -179,11 +178,10 @@ public abstract class ZipRaesDriver extends JarDriver {
      * (usually a temporary file) in case the output is not copied from a file
      * system entry as its input.
      * <p>
-     * Furthermore, the property {@link ZipEntry#isEncrypted} of the returned
-     * entry is cleared in order to prevent adding a redundant encryption
-     * layer for the individual ZIP entry because this would confuse users,
-     * increase the size of the resulting archive file and unecessarily heat
-     * the CPU.
+     * Furthermore, the method {@link ZipArchiveEntry#clearEncryption()} is
+     * called in order to prevent adding a redundant encryption layer for the
+     * individual ZIP entry because this would confuse users, increase the size
+     * of the resulting archive file and unecessarily heat the CPU.
      */
     @Override
     public ZipArchiveEntry newEntry(
