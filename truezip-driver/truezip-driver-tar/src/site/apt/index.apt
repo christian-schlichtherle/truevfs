@@ -11,7 +11,7 @@ About TrueZIP Driver TAR
     which provides the following map of file system drivers:
 
 *--*--*
-||URI Schemes||File System Driver Class|
+||URI Schemes / Archive File Suffixes||File System Driver Class|
 *--+--+
 |<<<tar>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/tar/TarDriver.html}<<<TarDriver>>>}}|
 *--+--+

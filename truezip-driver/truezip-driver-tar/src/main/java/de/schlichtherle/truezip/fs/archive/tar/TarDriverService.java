@@ -22,7 +22,7 @@ import net.jcip.annotations.Immutable;
 <table border=1 cellpadding=5 summary="">
 <thead>
 <tr>
-<th>URI Schemes</th>
+<th>URI Schemes / Archive File Suffixes</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>
