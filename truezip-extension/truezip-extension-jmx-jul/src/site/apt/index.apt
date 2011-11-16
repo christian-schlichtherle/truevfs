@@ -6,6 +6,10 @@
 
 About TrueZIP Extension JMX/JUL
 
+    This module provides a file system manager and an I/O pool service in
+    order to extend the basic logging facility with additional monitoring and
+    management features via JMX and JUL.
+
     Without this extension module, TrueZIP uses <<<java.util.logging>>> (JUL)
     for logging nothing more than the initial setup for the file system manager,
     the I/O pool and the file system drivers.
@@ -14,10 +18,7 @@ About TrueZIP Extension JMX/JUL
     they are used for Java web applications or Java enterprise applications,
     it would be nice to know which archive files are currently mounted and
     which temporary files are allocated for this.
-
-    This module provides a file system manager and an I/O pool service in
-    order to extend the basic logging facility with additional monitoring and
-    management features via JMX and JUL.
+    This module has been built to provide you with this kind of information.
 
     Add the JAR artifact of this module to the run time class path to
     make its file system manager and I/O pool service available for
