@@ -22,22 +22,22 @@ import net.jcip.annotations.Immutable;
 
 /**
  * An archive driver which supports building archive files according to
- * the OpenDocument Format Specification (ODF), version 1.1.
- * This driver ensures that the entry named {@code mimetype}, if present at
- * all, is always written as the first entry and uses the {@code STORED} method
- * rather than the {@code DEFLATED} method in the resulting archive file in
- * order to meet the requirements of section 17.4 of the
- * <a href="http://www.oasis-open.org/committees/download.php/20847/OpenDocument-v1.1-cs1.pdf" target="_blank">OpenDocument Specification</a>,
- * version 1.1.
- * <p>
+ * the Open Document Format (ODF) Specification, V1.0 and later.
+ * This driver simply ensures that an entry named {@code mimetype}, if present
+ * at all, is always written as the very first entry using the method
+ * {@code STORED} rather than {@code DEFLATED} in the resulting archive file
+ * in order to meet the requirements of the ODF Specification.
  * Other than this, ODF files are treated like regular JAR files.
  * In particular, this class does <em>not</em> check an ODF file for the
- * existance of the {@code META-INF/manifest.xml} entry or any other entry.
+ * existence of the {@code META-INF/manifest.xml} entry or any other entry.
  * <p>
  * When using this driver to create or modify an ODF file, then in order to
- * achieve best performance, the {@code mimetype} entry should be created or
- * modified first in order to avoid temp file buffering of all other entries.
+ * achieve best performance, the {@code mimetype} entry should always get
+ * written first in order to avoid temp file buffering of all other entries.
  *
+ * @see     <a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf">Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream</a>
+ * @see     <a href="http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf">Open Document Format for Office Applications (OpenDocument) v1.1; Section 17.4: MIME Type Stream</a>
+ * @see     <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part3.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 3: Packages; Section 3.3: MIME Type Stream</a>
  * @see     OdfOutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
