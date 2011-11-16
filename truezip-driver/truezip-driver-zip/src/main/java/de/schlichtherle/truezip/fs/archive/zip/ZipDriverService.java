@@ -22,7 +22,7 @@ import net.jcip.annotations.Immutable;
 <table border=1 cellpadding=5 summary="">
 <thead>
 <tr>
-<th>URI Schemes</th>
+<th>URI Schemes / Archive File Suffixes</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>
@@ -36,7 +36,7 @@ import net.jcip.annotations.Immutable;
 <td>{@link de.schlichtherle.truezip.fs.archive.zip.ReadOnlySfxDriver}</td>
 </tr>
 <tr>
-<td>{@code odb}, {@code odf}, {@code odg}, {@code odm}, {@code odp}, {@code ods}, {@code odt}, {@code otg}, {@code oth}, {@code otp}, {@code ots}, {@code ott}</td>
+<td>{@code odt}, {@code ott}, {@code odg}, {@code otg}, {@code odp}, {@code otp}, {@code ods}, {@code ots}, {@code odc}, {@code otc}, {@code odi}, {@code oti}, {@code odf}, {@code otf}, {@code odm}, {@code oth}, {@code odb}</td>
 <td>{@link de.schlichtherle.truezip.fs.archive.zip.OdfDriver}</td>
 </tr>
 <tr>
@@ -49,6 +49,7 @@ import net.jcip.annotations.Immutable;
  * Note that the regular expression is actually decomposed into separate
  * {@link FsScheme} objects which get mapped individually.
  *
+ * @see     <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part1.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 1: OpenDocument Schema; Appendix C: MIME Types and File Name Extensions (Non Normative)</a>
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -58,8 +59,8 @@ public final class ZipDriverService extends FsDriverService {
     private static final Map<FsScheme, FsDriver>
             DRIVERS = newMap(new Object[][] {
                 { "zip", new ZipDriver(IOPoolLocator.SINGLETON) },
-                { "ear|jar|war", new JarDriver(IOPoolLocator.SINGLETON) },
-                { "odb|odf|odg|odm|odp|ods|odt|otg|oth|otp|ots|ott", new OdfDriver(IOPoolLocator.SINGLETON) },
+                { "ear}, {@code jar|war", new JarDriver(IOPoolLocator.SINGLETON) },
+                { "odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb", new OdfDriver(IOPoolLocator.SINGLETON) },
                 { "exe", new ReadOnlySfxDriver(IOPoolLocator.SINGLETON) },
             });
 
