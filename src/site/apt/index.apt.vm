@@ -39,19 +39,19 @@ About TrueZIP
 
 ** Using TrueZIP
 
-    As an API, TrueZIP provides uniform, transparent, thread-safe,
+    As a library, TrueZIP provides uniform, transparent, thread-safe,
     read/write access to archive files as if they were just plain
     directories in a file system path.
     Starting with TrueZIP&#160;7.2, there are two client API modules available
-    which can get used concurrently to access the same file systems:
+    which can get used concurrently to access the same (virtual) file systems:
 
-*--*--*
-||Module||Description
-*--+--+
-|{{{./truezip-file/index.html}TrueZIP File*}}|Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too. Requires JSE&#160;6.
-*--+--+
-|{{{./truezip-path/index.html}TrueZIP Path}}|Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>. Requires JSE&#160;7.
-*--+--+
+*--*--*--*
+||Module||Description||Requires
+*--+--+--+
+|{{{./truezip-file/index.html}TrueZIP File*}}|Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too.|JSE&#160;6
+*--+--+--+
+|{{{./truezip-path/index.html}TrueZIP Path}}|Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>.|JSE&#160;7
+*--+--+--+
 
     Writing an application for either API is really easy:
     Have a look at the {{{./usecases/index.html}Use Cases}} for some samples
@@ -66,8 +66,8 @@ About TrueZIP
     multiplexing, caching and accounting so that archive file system drivers
     do not need to take care of these aspects of a virtual file system.
 
-    There is no tutorial for how to write a file system driver yet,
-    but there's comprehensive Javadoc:
+    There is no tutorial for how to write a file system driver,
+    but there's comprehensive Javadoc and sample code:
 
     * If you are going to write a federated file system driver
       (i.e. archive driver), please consult the Javadoc for
@@ -79,9 +79,11 @@ About TrueZIP
 
     []
 
-    For examples, please {{{./source-repository.html}check out}} the source
-    code of this project and consult the file system driver implementations
-    which ship with TrueZIP.
+    For sample code, please
+    {{{./source-repository.html}check out}} or
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    the source code of this project and consult the file system driver
+    implementations which ship with TrueZIP, e.g. TrueZIP Driver FILE or TrueZIP Driver ZIP.
 
 * Getting Started
 
@@ -90,8 +92,8 @@ About TrueZIP
           build and run a TrueZIP File* or TrueZIP Path application in about
           ten minutes!
 
-    [[1]] If you are looking for more sample code and applications,
-          please
+    [[1]] If you are looking for more sample code and applications, please
+          {{{./source-repository.html}check out}} or
           {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
           the source code of the
           {{{./truezip-samples/index.html}TrueZIP Samples}} module.
@@ -105,14 +107,14 @@ About TrueZIP
 
     []
 
+    Note that the documentation on this site is generally split across modules,
+    so please check the section <Project Modules> in the navigation bar on
+    this page, too.
+
     If you're still not fed up, you might also want to check out
     {{{http://truezip.schlichtherle.de}The&#160;TrueZIP&#160;Blog}}
     or the
     {{{http://java.net/projects/truezip}TrueZIP&#160;Developer&#160;Website}}.
-
-    Note that the documentation on this site is generally split across modules,
-    so please check the section <Project Modules> in the navigation bar on
-    this page, too.
 
 * Migration from TrueZIP&#160;6
 
