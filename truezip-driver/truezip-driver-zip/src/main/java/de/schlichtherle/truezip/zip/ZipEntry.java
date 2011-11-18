@@ -570,17 +570,23 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Sets the serialized Extra Fields by making a protective copy.
+     * Note that this method parses the serialized Extra Fields according to
+     * the ZIP File Format Specification and limits its size to 64 KB.
+     * Therefore, this property cannot not be used to hold arbitrary
+     * application data.
+     * Consider storing such data in a separate entry instead.
      *
-     * @param data The byte array holding the serialized Extra Fields.
+     * @param  data The byte array holding the serialized Extra Fields.
+     * @throws RuntimeException if the serialized Extra Fields exceed 64 KB
+     *         or do not conform to the ZIP File Format Specification
      */
     public final void setExtra(final @CheckForNull byte[] data) {
         if (null != data)
             UShort.check(data.length, "Extra Fields too large", null);
-        if (null == data || data.length <= 0) {
+        if (null == data || data.length <= 0)
             this.fields = null;
-        } else {
+        else
             setExtraFields(data, false);
-        }
     }
 
     /**
@@ -595,12 +601,13 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Set extra fields and parse ZIP64 extra field.
+     * Sets extra fields and parses ZIP64 extra field.
      * This method <em>must not</em> get called before the uncompressed size,
      * compressed size and offset have been initialized!
      */
     final void setRawExtraFields(final byte[] data) {
-        assert 0 < data.length && UShort.check(data.length);
+        assert 0 < data.length;
+        assert UShort.check(data.length);
         setExtraFields(data, true);
     }
 
@@ -712,6 +719,16 @@ public class ZipEntry implements Cloneable {
         return comment;
     }
 
+    /**
+     * Sets the entry comment.
+     * Note that this method limits the comment size to 64 KB.
+     * Therefore, this property should not be used to hold arbitrary
+     * application data.
+     * Consider storing such data in a separate entry instead.
+     *
+     * @param  comment The entry comment.
+     * @throws RuntimeException if the entry comment exceeds 64 KB.
+     */
     public final void setComment(final @CheckForNull String comment) {
         if (null != comment)
             UShort.check(comment.length(), name, "Comment too long");
