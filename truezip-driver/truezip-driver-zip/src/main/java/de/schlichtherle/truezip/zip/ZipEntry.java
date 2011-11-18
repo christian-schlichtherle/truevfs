@@ -573,7 +573,7 @@ public class ZipEntry implements Cloneable {
      * Note that this method parses the serialized Extra Fields according to
      * the ZIP File Format Specification and limits its size to 64 KB.
      * Therefore, this property cannot not be used to hold arbitrary
-     * application data.
+     * (application) data.
      * Consider storing such data in a separate entry instead.
      *
      * @param  data The byte array holding the serialized Extra Fields.
@@ -723,7 +723,7 @@ public class ZipEntry implements Cloneable {
      * Sets the entry comment.
      * Note that this method limits the comment size to 64 KB.
      * Therefore, this property should not be used to hold arbitrary
-     * application data.
+     * (application) data.
      * Consider storing such data in a separate entry instead.
      *
      * @param  comment The entry comment.
