@@ -7,8 +7,8 @@
 Application File Format
 
     Suppose you're writing a plug-in for the next generation application
-    which shall use an archive file format with a custom file suffix as a
-    persistent container for some application data.
+    which shall use an archive file format with a custom file suffix
+    (extension) as a persistent container for some application data.
 
     Then, wouldn't it be nice if you wouldn't need to worry about how to read
     or write archive files using cumbersome archive type specific APIs?
