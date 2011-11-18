@@ -144,10 +144,10 @@ final class ExtraFields implements Cloneable {
 
     /**
      * Initializes this collection by deserializing a list of Extra Fields
-     * of {@code size} bytes from the
-     * byte array {@code data} at the zero based offset {@code off}.
-     * Upon return, this collection shall not access {@code data}
-     * subsequently and {@link #getExtraLength} must equal {@code size}.
+     * of {@code size} bytes from the byte array {@code data} at the zero
+     * based offset {@code off}.
+     * After return, this collection does not access {@code data} anymore
+     * and {@link #getExtraLength} equals {@code size}.
      *
      * @param  data The byte array to read the list of Extra Fields from.
      * @param  off The zero based offset in the byte array where the first byte
