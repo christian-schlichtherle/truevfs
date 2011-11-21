@@ -19,7 +19,7 @@
     <skin>
         <groupId>${project.groupId}</groupId>
         <artifactId>truezip-skin</artifactId>
-        <version>2</version>
+        <version>3</version>
     </skin>
     <body>
         <links>
