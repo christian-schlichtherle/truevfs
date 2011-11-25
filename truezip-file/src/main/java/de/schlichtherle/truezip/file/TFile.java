@@ -430,7 +430,7 @@ public final class TFile extends File {
             this.controller = tfile.controller;
         } else {
             this.delegate = file;
-            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+            this.detector = null != detector ? detector : getDefaultArchiveDetector();
             scan(null);
         }
 
@@ -467,7 +467,7 @@ public final class TFile extends File {
         super(path);
 
         this.delegate = new File(path);
-        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+        this.detector = null != detector ? detector : getDefaultArchiveDetector();
         scan(null);
 
         assert invariants();
@@ -508,7 +508,7 @@ public final class TFile extends File {
         super(parent, member);
 
         this.delegate = new File(parent, member);
-        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+        this.detector = null != detector ? detector : getDefaultArchiveDetector();
         scan(null);
 
         assert invariants();
@@ -567,7 +567,7 @@ public final class TFile extends File {
             this.detector = null != detector ? detector : p.detector;
             scan(p);
         } else {
-            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+            this.detector = null != detector ? detector : getDefaultArchiveDetector();
             scan(null);
         }
 
@@ -577,7 +577,7 @@ public final class TFile extends File {
     /**
      * Constructs a new {@code TFile} instance from the given {@code uri}.
      * This constructor is equivalent to
-     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(FsPath.create(uri, CANONICALIZE), TConfig.get().getArchiveDetector())}</code>,
+     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(FsPath.create(uri, CANONICALIZE), TFile.getDefaultArchiveDetector())}</code>,
      *
      * @param  uri an absolute URI which has a scheme component which is
      *         known by the
@@ -589,13 +589,13 @@ public final class TFile extends File {
      * @see    #TFile(FsPath)
      */
     public TFile(URI uri) {
-        this(FsPath.create(uri, CANONICALIZE), TConfig.get().getArchiveDetector());
+        this(FsPath.create(uri, CANONICALIZE), getDefaultArchiveDetector());
     }
 
     /**
      * Constructs a new {@code TFile} instance from the given {@code path}.
      * This constructor is equivalent to
-     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(path, TConfig.get().getArchiveDetector())}</code>
+     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(path, getDefaultArchiveDetector())}</code>
      *
      * @param  path a path with an absolute
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
@@ -609,7 +609,7 @@ public final class TFile extends File {
      * @see    #TFile(URI)
      */
     public TFile(FsPath path) {
-        this(path, TConfig.get().getArchiveDetector());
+        this(path, getDefaultArchiveDetector());
     }
 
     /**
@@ -880,7 +880,7 @@ public final class TFile extends File {
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         parse(  FsPath.create((URI) in.readObject(), CANONICALIZE),
-                TConfig.get().getArchiveDetector());
+                getDefaultArchiveDetector());
     }
 
     /**
