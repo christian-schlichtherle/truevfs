@@ -595,7 +595,7 @@ public final class TFile extends File {
     /**
      * Constructs a new {@code TFile} instance from the given {@code path}.
      * This constructor is equivalent to
-     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(path, getDefaultArchiveDetector())}</code>
+     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(path, TFile.getDefaultArchiveDetector())}</code>
      *
      * @param  path a path with an absolute
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
