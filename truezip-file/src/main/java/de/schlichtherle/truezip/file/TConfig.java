@@ -67,8 +67,8 @@ class MyApplication extends TApplication<IOException> {
         // Configure custom application file format.
         config.setArchiveDetector(new TArchiveDetector("aff",
                 new JarDriver(IOPoolLocator.SINGLETON)));
-        // Set FsOutputOption.GROW for appending-to rather than reassembling an
-        // archive file.
+        // Set FsOutputOption.GROW for appending-to rather than reassembling
+        // existing archive files.
         config.setOutputPreferences(
                 config.getOutputPreferences.set(FsOutputOption.GROW));
     }
@@ -158,8 +158,8 @@ TFile file = new TFile("archive.zip/entry");
 // stack.
 TConfig config = TConfig.push();
 try {
-    // Set FsOutputOption.GROW for appending-to rather than reassembling an
-    // archive file.
+    // Set FsOutputOption.GROW for appending-to rather than reassembling
+    // existing archive files.
     config.setOutputPreferences(
             config.getOutputPreferences.set(FsOutputOption.GROW));
 
