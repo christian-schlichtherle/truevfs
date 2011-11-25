@@ -86,7 +86,7 @@ class MyApplication extends TApplication<IOException> {
 TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
 
-// First, push a new current configuration on the inheritable thread local
+// First, push a new current configuration onto the inheritable thread local
 // stack.
 TConfig config = TConfig.push();
 try {
@@ -110,7 +110,7 @@ try {
 TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
 
-// First, push a new current configuration on the inheritable thread local
+// First, push a new current configuration onto the inheritable thread local
 // stack.
 try (TConfig config = TConfig.push()) {
     // Configure custom application file format "aff".
@@ -261,7 +261,7 @@ public final class TConfig implements Closeable {
 
     /**
      * Creates a new current configuration by copying the current configuration
-     * and pushing the copy on the inheritable thread local stack.
+     * and pushing the copy onto the inheritable thread local stack.
      * 
      * @return The new current configuration.
      * @see    #get()
