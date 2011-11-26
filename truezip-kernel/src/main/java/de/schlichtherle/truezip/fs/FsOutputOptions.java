@@ -42,12 +42,12 @@ public final class FsOutputOptions {
 
     /**
      * The mask of output preferences, which is
-     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#STORE}, {@link FsOutputOption#GROW}, {@link FsOutputOption#ENCRYPT})</code>.
+     * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#STORE}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#GROW}, {@link FsOutputOption#ENCRYPT})</code>.
      * 
      * @since TrueZIP 7.3
      */
     public static final BitField<FsOutputOption> OUTPUT_PREFERENCES_MASK
-            = BitField.of(CACHE, CREATE_PARENTS, COMPRESS, STORE, GROW, ENCRYPT);
+            = BitField.of(CACHE, CREATE_PARENTS, STORE, COMPRESS, GROW, ENCRYPT);
 
     /** You cannot instantiate this class. */
     private FsOutputOptions() {
