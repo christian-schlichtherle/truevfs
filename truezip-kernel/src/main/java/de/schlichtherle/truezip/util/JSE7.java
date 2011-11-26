@@ -8,10 +8,10 @@
  */
 package de.schlichtherle.truezip.util;
 
-import java.nio.file.Path;
-
 /**
- * Holds a static boolean telling us if the JSE 7 API is availabe for this JVM.
+ * Holds a static boolean telling us if the JSE&nbsp;7 API is availabe for this
+ * JVM.
+ * This is convenient if an a-priori test is required.
  * 
  * @author Christian Schlichtherle
  * @version $Id$
@@ -19,15 +19,16 @@ import java.nio.file.Path;
 public final class JSE7 {
 
     /**
-     * {@code true} if and only if the JSE 7 API is available for this JVM.
+     * Is {@code true} if and only if the JSE&nbsp7 API is available for this
+     * JVM.
      */
     public static final boolean AVAILABLE;
     static {
         boolean available;
         try {
-            Path.class.getName();
+            Class.forName("java.nio.file.Path");
             available = true;
-        } catch (NoClassDefFoundError notAvailable) {
+        } catch (ClassNotFoundException notAvailable) {
             available = false;
         }
         AVAILABLE = available;
