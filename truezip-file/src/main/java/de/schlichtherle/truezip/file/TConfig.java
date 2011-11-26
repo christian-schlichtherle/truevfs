@@ -328,9 +328,8 @@ public final class TConfig implements Closeable {
     /**
      * Returns the file system manager to use within this package.
      * Note that the current implementation effectively returns
-     * {@code FsManagerLocator.SINGLETON.get()}.
-     * However, this is considered to be an implementation which may be subject
-     * to change.
+     * {@code FsManagerLocator.SINGLETON.get()}, but this is considered to be
+     * an implementation detail which may be subject to change.
      * 
      * @return The file system manager to use within this package.
      */
