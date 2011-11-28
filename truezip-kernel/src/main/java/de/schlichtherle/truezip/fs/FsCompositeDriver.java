@@ -43,7 +43,7 @@ public interface FsCompositeDriver {
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      * @throws ServiceConfigurationError if no appropriate file system driver
-     *         is found for the scheme of the given mount point.
+     *         can get found for the scheme of the given mount point.
      * @see    FsDriver#newController
      */
     FsController<?>
