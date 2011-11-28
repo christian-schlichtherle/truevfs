@@ -167,13 +167,10 @@ extends FsDriver {
      */
     @Override
     public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
+    newController(final FsModel model, final FsController<?> parent) {
         assert !(model instanceof FsConcurrentModel);
         final FsConcurrentModel cmodel;
-        /*if (model instanceof FsConcurrentModel)
-            cmodel = (FsConcurrentModel) model;
-        else*/
-            cmodel = new FsConcurrentModel(model);
+        cmodel = new FsConcurrentModel(model);
         return  new FsSyncController<FsConcurrentModel>(
                     new FsConcurrentController(
                         new FsCachingController(
