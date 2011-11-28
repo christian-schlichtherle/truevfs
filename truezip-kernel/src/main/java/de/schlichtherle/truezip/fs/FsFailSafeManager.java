@@ -20,8 +20,16 @@ import net.jcip.annotations.ThreadSafe;
  * This is to protect an application from loss of data if {@link #sync} isn't
  * called explicitly before the JVM terminates.
  * <p>
+ * Note that the shutdown hook is removed before synchronization of the
+ * decorated file system manager in order to prevent a potential memory leak
+ * if this class is used in multi-classloader-environments, e.g. JEE.
+ * In most cases, this class cannot register the JVM shutdown hook again,
+ * so your application must repeat calling
+ * {@link #sync(BitField, ExceptionHandler)} everytime it has finished
+ * processing some changes to some archive files!
+ * <p>
  * If any exception occurs within the shutdown hook, its stacktrace is printed
- * to standard error - logging doesn't work in a shutdown hook.
+ * to standard error because logging doesn't work in a shutdown hook.
  *
  * @see     #getController(FsMountPoint, FsCompositeDriver)
  * @see     #sync
@@ -67,7 +75,12 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
      * {@inheritDoc}
      * <p>
      * If a shutdown hook for this manager is present, it's removed before
-     * synchronization of the decorated file system manager.
+     * synchronization of the decorated file system manager in order to prevent
+     * a potential memory leak if it's used in multi-classloader-environments,
+     * e.g. JEE.
+     * In most cases, this manager cannot register the JVM shutdown hook
+     * again, so your application must repeat this call everytime it has
+     * finished processing some changes to some archive files!
      */
     @Override
     public <X extends IOException> void
