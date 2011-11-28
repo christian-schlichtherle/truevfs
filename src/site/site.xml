@@ -35,7 +35,7 @@
     </skin>
     <body>
         <head>
-            <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog &raquo; Announcements Feed" href="http://truezip.schlichtherle.de/category/announcements/feed/"/>
+            <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed" href="http://truezip.schlichtherle.de/category/announcements/feed/"/>
         </head>
         <links>
             <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
