@@ -1,4 +1,4 @@
-##parse("common.vm")
+#parse("common.vm")
     -----------------------
     Application File Format
     -----------------------

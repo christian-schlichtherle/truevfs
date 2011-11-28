@@ -1,4 +1,4 @@
-##parse("common.vm")
+#parse("common.vm")
     -----------------------
     Encrypted Application File Format
     -----------------------

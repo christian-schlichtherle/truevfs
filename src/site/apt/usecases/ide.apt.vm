@@ -1,4 +1,4 @@
-##parse("common.vm")
+#parse("common.vm")
 #leadIn("Integrated Development Environment (IDE)",
   "Suppose you're writing a plug-in for the next generation IDE
    which shall show the users the contents of any assembly and allow them to
