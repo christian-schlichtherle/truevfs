@@ -1,3 +1,4 @@
+##parse("common.vm")
     -----------------------
     Encrypted Application File Format
     -----------------------
@@ -5,6 +6,8 @@
     -----------------------
 
 Encrypted Application File Format
+
+* Motivation
 
     Suppose you're writing a plug-in for the next generation application
     which shall use an archive file format with a custom file suffix
@@ -19,10 +22,12 @@ Encrypted Application File Format
     And wouldn't it be even nicer if you wouldn't have to write the Swing or
     console based dialog in order to prompt the user for a password?
 
+* Accessing Encrypted and Authenticated Application File Formats
+
     Thanks to the
-    {{{./truezip-file/index.html}TrueZIP File*}}
+    {{{../truezip-file/index.html}TrueZIP File*}}
     module, here's your relief:
-    Its
+    The
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
     {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
     and
@@ -43,7 +48,7 @@ TFile.setDefaultArchiveDetector(
 +-------------------------------------------------+
 
     Once this has been called, any new <<<TFile>>> object will recognize the
-    <<<".fox">>> and <<<".bax">>> file suffixes - whereby case is ignored -
+    file suffixes <<<fox>>> and <<<bax>>>, whereby case is ignored,
     and assume the ZIP.RAES file format to read or write these files.
 
     Note that TrueZIP automatically recognizes false positive archive files,
@@ -76,7 +81,7 @@ TFile.setDefaultArchiveDetector(
     instance of your own implementation of the interface
     {{{../apidocs/de/schlichtherle/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}.
     For more information, please refer to the article about
-    {{{./truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
+    {{{../truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
 
     Now you can easily create or overwrite an entry in your custom application
     file format like this:
@@ -118,3 +123,5 @@ new TFile("file.fox").rm_r();
     the application file because the <<<TFile>>> object refers to a virtual
     directory, which cannot get deleted using similar methods like
     <<<delete()>>> or <<<rm()>>> unless it's empty.
+
+#committing()
