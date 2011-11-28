@@ -24,12 +24,11 @@ import java.util.Map;
 public interface FsDriverProvider {
 
     /**
-     * Returns an unmodifiable map of file system schemes to drivers.
+     * Returns a dedicated immutable map of file system schemes to drivers.
      * Neither the keys nor the values of the returned map may be {@code null}
-     * and subsequent calls must return a map which compares at least
-     * {@link Map#equals(Object) equal} with the previously returned map.
+     * and subsequent calls must return the same map.
      *
-     * @return An immutable map of file system schemes to drivers.
+     * @return A dedicated immutable map of file system schemes to drivers.
      */
     Map<FsScheme, FsDriver> get();
 }

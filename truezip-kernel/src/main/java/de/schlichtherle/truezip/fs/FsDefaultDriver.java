@@ -32,7 +32,7 @@ public final class FsDefaultDriver extends FsAbstractCompositeDriver {
      * the scheme of a given mount point.
      */
     public FsDefaultDriver(final FsDriverProvider provider) {
-        this.drivers = provider.get(); // immutable map!
+        this.drivers = provider.get(); // dedicated immutable map!
         assert null != drivers;
     }
 
