@@ -1,3 +1,4 @@
+##parse("common.vm")
     -----------------------
     Application File Format
     -----------------------
@@ -6,6 +7,8 @@
 
 Application File Format
 
+* Motivation
+
     Suppose you're writing a plug-in for the next generation application
     which shall use an archive file format with a custom file suffix
     (extension) as a persistent container for some application data.
@@ -13,16 +16,19 @@ Application File Format
     Then, wouldn't it be nice if you wouldn't need to worry about how to read
     or write archive files using cumbersome archive type specific APIs?
 
+* Accessing Application File Formats
+
     Thanks to the
-    {{{./truezip-file/index.html}TrueZIP File*}}
+    {{{../truezip-file/index.html}TrueZIP File*}}
     module, here's your relief:
-    Its
+    The
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
     {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
     and
     {{{../apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
-    classes can read and write entries within an archive file as if they were
-    plain files in regular directories in the file system.
+    classes can read and write entries within an
+    archive file as if they were plain files in regular directories in the file
+    system.
 
     First, you need to register your custom application file format suffix
     with an instance of an archive driver class like this:
@@ -35,7 +41,7 @@ TFile.setDefaultArchiveDetector(
 +--+
 
     Once this has been called, any new <<<TFile>>> object will recognize the
-    <<<".foo">>> and <<<".bar">>> file suffixes - whereby case is ignored -
+    file suffixes <<<foo>>> and <<<bar>>>, whereby case is ignored,
     and assume the JAR file format to read or write these files.
 
     Note that TrueZIP automatically recognizes false positive archive files,
@@ -90,3 +96,5 @@ new TFile("file.foo").rm_r();
     the application file because the <<<TFile>>> object refers to a virtual
     directory, which cannot get deleted using similar methods like
     <<<delete()>>> or <<<rm()>>> unless it's empty.
+
+#committing()

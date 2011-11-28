@@ -15,6 +15,7 @@
         <menu name="Documentation">
             <item name="About" href="index.html"/>
             <item name="Usage" href="usage.html"/>
+            <item name="Configuration" href="configuration.html"/>
         </menu>
     </body>
 </project>

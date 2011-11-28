@@ -1,43 +1,10 @@
-    -----------------------
-    Search Engine (SE)
-    -----------------------
-    Christian Schlichtherle
-    -----------------------
+##parse("common.vm")
+#leadIn("Search Engine (SE)",
+  "Suppose you're writing the next generation SE which shall index all files in
+   the file system, including all file entries of all archive files.",
+  "false",
+  "Searching Archive Files")
 
-Search Engine (SE)
-
-    Suppose you're writing the next generation SE
-    which shall index all files in the file system, including all file entries
-    of all archive files.
-    Then you may need to support at least the following archive types:
-
-    * TAR.GZ
-
-    * TAR.BZ2
-
-    * ZIP
-
-    * JAR
-
-    * WAR
-
-    * EAR
-
-    * ...
-
-    []
-
-    You can easily figure that writing the code to read archive
-    files of all these types will be a cumbersome and tedious task because
-    each archive type comes with its own classes to read them.
-
-    Thanks to the
-    {{{./truezip-file/index.html}TrueZIP File*}}
-    module, here's your relief:
-    Its
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
-    class extends the <<<java.io.File>>> class in order to add the
-    required functionality.
     See how easy listing the contents of the top level directory of an archive
     file can be:
 
@@ -69,3 +36,11 @@ try {
     So <<<entry>>> may refer to a plain file, an entry in an archive file or an
     entry in an archive file which is contained in another archive file and so
     on.
+
+#configuring("<<<zip>>>",
+  "ZIP",
+  "module
+   {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+   needs",
+  "<<<truezip-driver-zip>>>")
+#committing()
