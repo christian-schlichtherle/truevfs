@@ -16,8 +16,8 @@ import net.jcip.annotations.Immutable;
 /**
  * An abstract composite driver.
  * This class provides an implementation of {@link #newController} which uses
- * the file system driver service returned by {@link #get()} to lookup the
- * appropriate driver for the scheme of a given mount point.
+ * the file system driver map returned by {@link #get()} to lookup the
+ * appropriate driver for the scheme of any given mount point.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -37,7 +37,7 @@ implements FsCompositeDriver, FsDriverProvider {
         final FsDriver driver = get().get(scheme);
         if (null == driver)
             throw new ServiceConfigurationError(scheme
-                    + " (unknown file system scheme - check run time class path configuration)");
+                    + " (Unknown file system scheme! May be the class path doesn't contain the respective driver module or it isn't set up correctly?)");
         return driver.newController(model, parent);
     }
 }
