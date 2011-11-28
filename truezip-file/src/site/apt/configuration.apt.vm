@@ -234,7 +234,7 @@ try (TConfig config = TConfig.push()) {
 
     These examples are very similar to the second example in the previous
     section.
-    However, these examples are <<thread-safe>>!
+    However, these examples are thread-safe!
 
     To understand why, you first need to know that
     <<<TFile.getDefaultArchiveDetector()>>>
@@ -317,6 +317,8 @@ class MyApplication extends TApplication<IOException> {
 
     Here, the current configuration is not only used to change the archive
     detector, but also to set FsOutputOption.GROW.
-    By overriding <<<TApplication.setup()>>>, it can be safely assumed that
-    there is no enclosing <<<TConfig.push/close>>> and hence <<<config>>> is
-    indeed the global configuration.
+    By overriding
+    {{{./apidocs/de/schlichtherle/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}},
+    it can be safely assumed that there is no enclosing
+    <<<TConfig.push|close()>>> and hence <<<config>>> is indeed the global
+    configuration.
