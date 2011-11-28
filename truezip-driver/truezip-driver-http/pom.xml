@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.schlichtherle.truezip</groupId>
+        <artifactId>truezip-driver</artifactId>
+        <version>7.4.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>truezip-driver-http</artifactId>
+
+    <name>TrueZIP Driver HTTP(S)</name>
+    <description>
+        The file system driver for the HTTP(S) scheme.
+
+        Add the JAR artifact of this module to the run time class path to
+        make its file system drivers available for service location in the
+        client API modules.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+    </dependencies>
+</project>
