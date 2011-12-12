@@ -44,11 +44,11 @@ implements Cloneable {
     private @Nullable LinkedHashSet<String> members;
 
     /**
-     * Constructs a new covariant file system entry with given path.
+     * Constructs a new covariant file system entry with the given path.
      * 
      * @param path the file system path.
      */
-    public FsCovariantEntry(final String path) {
+    public FsCovariantEntry(String path) {
         this.name = path.toString();
     }
 
