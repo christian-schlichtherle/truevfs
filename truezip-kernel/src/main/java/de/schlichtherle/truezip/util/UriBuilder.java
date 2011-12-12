@@ -182,53 +182,53 @@ public final class UriBuilder {
      * @see    #toString()
      */
     public String getString() throws URISyntaxException {
-        final StringBuilder b = resetBuilder();
-        int errIdx = -1;            // error index
-        String errMsg = null;       // error message
+        final StringBuilder r = resetBuilder(); // result
+        int errIdx = -1;                        // error index
+        String errMsg = null;                   // error message
         final String    s = scheme,
                         a = authority, p = path, q = query,
                         f = fragment;
         final boolean absUri = null != s;
         if (absUri)
-            b.append(s).append(':');
-        final int ssp = b.length(); // index of scheme specific part
+            r.append(s).append(':');
+        final int ssp = r.length();             // index of scheme specific part
         final boolean hasAuth = null != a;
         if (hasAuth)
-            encoder.encode(a, AUTHORITY, b.append("//"));
+            encoder.encode(a, AUTHORITY, r.append("//"));
         boolean absPath = false;
         if (null != p && !p.isEmpty()) {
             if (p.startsWith("/")) {
                 absPath = true;
-                encoder.encode(p, ABSOLUTE_PATH, b);
+                encoder.encode(p, ABSOLUTE_PATH, r);
             } else if (hasAuth) {
                 absPath = true;
-                errIdx = b.length();
+                errIdx = r.length();
                 errMsg = "Relative path with " + (a.isEmpty() ? "" : "non-") + "empty authority";
-                encoder.encode(p, ABSOLUTE_PATH, b);
+                encoder.encode(p, ABSOLUTE_PATH, r);
             } else if (absUri) {
-                encoder.encode(p, QUERY, b);
+                encoder.encode(p, QUERY, r);
             } else {
-                encoder.encode(p, PATH, b);
+                encoder.encode(p, PATH, r);
             }
         }
         if (null != q) {
-            b.append('?');
+            r.append('?');
             if (absUri && !absPath) {
-                errIdx = b.length();
+                errIdx = r.length();
                 errMsg = "Query in opaque URI";
             }
-            encoder.encode(q, QUERY, b);
+            encoder.encode(q, QUERY, r);
         }
         assert absUri == 0 < ssp;
-        if (absUri && ssp >= b.length()){
-            errIdx = b.length();
+        if (absUri && ssp >= r.length()){
+            errIdx = r.length();
             errMsg = "Empty scheme specific part in absolute URI";
         }
         if (null != f)
-            encoder.encode(f, FRAGMENT, b.append('#'));
+            encoder.encode(f, FRAGMENT, r.append('#'));
         if (absUri)
-            validateScheme((CharBuffer) CharBuffer.wrap(b).limit(s.length()));
-        final String u = b.toString();
+            validateScheme((CharBuffer) CharBuffer.wrap(r).limit(s.length()));
+        final String u = r.toString();
         if (0 <= errIdx)
             throw new QuotedUriSyntaxException(u, errMsg, errIdx);
         return u;
