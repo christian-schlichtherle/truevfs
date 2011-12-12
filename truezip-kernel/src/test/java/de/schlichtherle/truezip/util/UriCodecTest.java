@@ -82,7 +82,7 @@ public class UriCodecTest {
     }
 
     @SuppressWarnings("unchecked")
-	@Test
+    @Test
     public void testRoundTrip() {
         for (final Object[] test : new Object[][] {
             { ENCODING_MASK, "\ufffd", "%EF%BF%BD" }, // replacement character

@@ -69,9 +69,22 @@ public final class UriEncoder {
     }
 
     /**
+     * Constructs a new URI codec which uses the UTF-8 character set to encode
+     * non-US-ASCII characters.
+     * Equivalent to {@link #UriEncoder(Charset, boolean) UriEncoder(UTF8, false)}.
+     * 
+     * @param raw If {@code true}, then the {@code '%'} character doesn't get
+     *        quoted.
+     */
+    public UriEncoder(boolean raw) {
+        this(UTF8, raw);
+    }
+
+    /**
      * Constructs a new URI codec which uses the given character set to encode
      * non-US-ASCII characters.
      * Equivalent to {@link #UriEncoder(Charset, boolean) UriEncoder(charset, false)}.
+     * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
      */
     public UriEncoder(final @CheckForNull Charset charset) {
         this(charset, false);
@@ -90,6 +103,7 @@ public final class UriEncoder {
      *        interoperability with most applications!
      * @param raw If {@code true}, then the {@code '%'} character doesn't get
      *        quoted.
+     * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
      */
     public UriEncoder(final @CheckForNull Charset charset, final boolean raw) {
         this.encoder = null == charset ? null : charset.newEncoder();
@@ -186,12 +200,15 @@ public final class UriEncoder {
                         eB = ByteBuffer.allocate(3);
                     }
                     eS.append(es);
-                }  else if (eS != null) {
+                }  else if (null != eS) {
                     eS.append(dc);
                 }
+            /*} else if (Character.isISOControl(dc) || Character.isSpaceChar(dc)) {
+                // See http://java.net/jira/browse/TRUEZIP-180
+                throw new AssertionError("http://java.net/jira/browse/TRUEZIP-180");*/
             } else if (null != enc) {
-                if (eB == null) {
-                    if (eS == null) {
+                if (null == eB) {
+                    if (null == eS) {
                         if (null == (eS = stringBuilder))
                             eS = stringBuilder = new StringBuilder();
                         else
