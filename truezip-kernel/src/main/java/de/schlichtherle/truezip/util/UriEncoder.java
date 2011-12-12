@@ -84,9 +84,10 @@ public final class UriEncoder {
      * Constructs a new URI codec which uses the given character set to encode
      * non-US-ASCII characters.
      * Equivalent to {@link #UriEncoder(Charset, boolean) UriEncoder(charset, false)}.
+     * 
      * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
      */
-    public UriEncoder(final @CheckForNull Charset charset) {
+    public UriEncoder(@CheckForNull Charset charset) {
         this(charset, false);
     }
 
