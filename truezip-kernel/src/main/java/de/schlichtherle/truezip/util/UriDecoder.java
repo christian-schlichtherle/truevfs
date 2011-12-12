@@ -62,6 +62,7 @@ public final class UriDecoder {
      *        characters.
      *        Note that using any other character set than UTF-8 should void
      *        interoperability with most applications!
+     * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
      */
     public UriDecoder(final Charset charset) {
         this.decoder = charset.newDecoder();
