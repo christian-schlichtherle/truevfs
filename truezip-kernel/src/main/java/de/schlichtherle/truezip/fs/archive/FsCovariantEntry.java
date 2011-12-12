@@ -49,9 +49,7 @@ implements Cloneable {
      * @param path the file system path.
      */
     public FsCovariantEntry(final String path) {
-        if (null == path)
-            throw new NullPointerException();
-        this.name = path;
+        this.name = path.toString();
     }
 
     /**
