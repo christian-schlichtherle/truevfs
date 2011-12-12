@@ -798,14 +798,14 @@ public final class TFile extends File {
         final String parent = splitter.getParentPath();
         final String member = splitter.getMemberName();
 
-        if (member.length() == 0 || ".".equals(member)) {
+        if (0 == member.length() || ".".equals(member)) {
             // Fall through.
         } else if ("..".equals(member)) {
             skip++;
-        } else if (skip > 0) {
+        } else if (0 < skip) {
             skip--;
         } else {
-            if (ancestor != null) {
+            if (null != ancestor) {
                 final int pathLen = path.length();
                 final int ancestorPathLen = ancestor.getPath().length();
                 if (pathLen == ancestorPathLen) {
@@ -819,7 +819,7 @@ public final class TFile extends File {
                     enclArchive = ancestor.innerArchive;
                     if (!ancestor.isArchive()) {
                         if (ancestor.isEntry()) {
-                            if (enclEntryNameBuf.length() > 0) {
+                            if (0 < enclEntryNameBuf.length()) {
                                 enclEntryNameBuf.insert(0, '/');
                                 enclEntryNameBuf.insert(0, ancestor.enclEntryName.getPath());
                             } else { // TODO: Simplify this!
@@ -831,7 +831,7 @@ public final class TFile extends File {
                             assert enclArchive == null;
                             enclEntryNameBuf.setLength(0);
                         }
-                    } else if (enclEntryNameBuf.length() <= 0) { // TODO: Simplify this!
+                    } else if (0 >= enclEntryNameBuf.length()) { // TODO: Simplify this!
                         // Example: new TFile(new TFile("archive.zip"), ".")
                         assert enclArchive == ancestor;
                         innerArchive = this;
@@ -839,7 +839,7 @@ public final class TFile extends File {
                         if (ancestor.enclEntryName != null)
                             enclEntryNameBuf.append(ancestor.enclEntryName.getPath());
                     }
-                    if (innerArchive != this)
+                    if (this != innerArchive)
                         innerArchive = enclArchive;
                     return;
                 } else if (pathLen < ancestorPathLen) {
@@ -848,8 +848,8 @@ public final class TFile extends File {
                 }
             }
 
-            final boolean isArchive = detector.getScheme(path) != null;
-            if (enclEntryNameBuf.length() > 0) {
+            final boolean isArchive = null != detector.getScheme(path);
+            if (0 < enclEntryNameBuf.length()) {
                 if (isArchive) {
                     enclArchive = new TFile(path, detector); // use the same detector for the parent directory
                     if (innerArchive != this)
