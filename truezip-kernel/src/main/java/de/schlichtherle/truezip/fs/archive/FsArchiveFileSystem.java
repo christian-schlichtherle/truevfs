@@ -174,7 +174,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, rootTemplate));
         this.master = master;
         // Now perform a file system check to create missing parent directories
-        // and populate directories with their members - this needs to be done
+        // and populate directories with their members - this must be done
         // separately!
         for (final String path : paths)
             fix(path);
