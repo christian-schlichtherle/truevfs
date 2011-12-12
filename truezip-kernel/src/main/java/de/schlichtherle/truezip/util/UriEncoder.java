@@ -186,12 +186,12 @@ public final class UriEncoder {
                         eB = ByteBuffer.allocate(3);
                     }
                     eS.append(es);
-                }  else if (eS != null) {
+                }  else if (null != eS) {
                     eS.append(dc);
                 }
             } else if (null != enc) {
-                if (eB == null) {
-                    if (eS == null) {
+                if (null == eB) {
+                    if (null == eS) {
                         if (null == (eS = stringBuilder))
                             eS = stringBuilder = new StringBuilder();
                         else
