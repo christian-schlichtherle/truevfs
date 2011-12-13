@@ -136,7 +136,6 @@ public final class UriBuilder {
      * @return {@code this}
      */
     public UriBuilder clear() {
-        //uri = null;
         scheme = null;
         authority = null;
         path = null;
