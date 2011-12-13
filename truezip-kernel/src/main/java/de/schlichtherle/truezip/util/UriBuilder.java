@@ -473,7 +473,7 @@ public final class UriBuilder {
         setPath(path);
         return this;
     }
-    
+
     /**
      * Returns the URI query component.
      * If this URI builder has been {@link #setUri(URI) initialized} from an
@@ -505,7 +505,38 @@ public final class UriBuilder {
         setQuery(query);
         return this;
     }
-    
+
+    /**
+     * Sets the URI path an query components by splitting the given string at
+     * the first occurence of the query separator {@code '?'}.
+     *
+     * @param  pathQuery the combined URI path and query components.
+     * @since  TrueZIP 7.4.2
+     */
+    public void setPathQuery(final @CheckForNull String pathQuery) {
+        final int i = pathQuery.indexOf('?');
+        if (0 <= i) {
+            this.path = pathQuery.substring(0, i);
+            this.query = pathQuery.substring(i + 1);
+        } else {
+            this.path = pathQuery;
+            this.query = null;
+        }
+    }
+
+    /**
+     * Sets the URI path an query components by splitting the given string at
+     * the first occurence of the query separator {@code '?'}.
+     *
+     * @param  pathQuery the combined URI path and query components.
+     * @return {@code this}
+     * @since  TrueZIP 7.4.2
+     */
+    public UriBuilder pathQuery(@CheckForNull String pathQuery) {
+        setPathQuery(pathQuery);
+        return this;
+    }
+
     /**
      * Returns the URI fragment component.
      * 
