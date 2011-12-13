@@ -195,7 +195,7 @@ public final class UriEncoder {
             final char dc = dC.get();               // decoded character
             if (dc < 0x80) {
                 final String es = escapes[dc];      // escape sequence
-                if (null != es && (quotePercent || '%' != dc)) {
+                if (null != es && ('%' != dc || quotePercent)) {
                     if (null == eB) {
                         if (null == eS) {
                             if (null == (eS = stringBuilder))
