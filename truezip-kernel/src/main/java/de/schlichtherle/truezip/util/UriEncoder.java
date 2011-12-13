@@ -85,6 +85,12 @@ public final class UriEncoder {
      * non-US-ASCII characters.
      * Equivalent to {@link #UriEncoder(Charset, boolean) UriEncoder(charset, false)}.
      * 
+     * @param charset the character set to use for encoding non-US-ASCII
+     *        characters.
+     *        If this is {@code null}, then this codec preserves non-US-ASCII
+     *        characters.
+     *        Note that using any other character set than UTF-8 will void
+     *        interoperability with most applications!
      * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
      */
     public UriEncoder(@CheckForNull Charset charset) {
@@ -100,7 +106,7 @@ public final class UriEncoder {
      *        characters.
      *        If this is {@code null}, then this codec preserves non-US-ASCII
      *        characters.
-     *        Note that using any other character set than UTF-8 should void
+     *        Note that using any other character set than UTF-8 will void
      *        interoperability with most applications!
      * @param raw If {@code true}, then the {@code '%'} character doesn't get
      *        quoted.
