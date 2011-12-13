@@ -21,7 +21,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class FsManagerTestSuite {
@@ -84,15 +84,15 @@ public abstract class FsManagerTestSuite {
     public void testBackward() {
         for (final String[] params : new String[][] {
             {
-                "zip:zip:zip:file:/Ã¶uter.zip!/inner.zip!/nÃ¼ts.zip!/",
-                "zip:zip:file:/Ã¶uter.zip!/inner.zip!/",
-                "zip:file:/Ã¶uter.zip!/",
+                "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
+                "zip:zip:file:/öuter.zip!/inner.zip!/",
+                "zip:file:/öuter.zip!/",
                 //"file:/", // does NOT get mapped!
             },
             {
-                "zip:zip:zip:file:/fÃ¶o.zip!/bÃ¤r.zip!/bÃ¤z.zip!/",
-                "zip:zip:file:/fÃ¶o.zip!/bÃ¤r.zip!/",
-                "zip:file:/fÃ¶o.zip!/",
+                "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
+                "zip:zip:file:/föo.zip!/bär.zip!/",
+                "zip:file:/föo.zip!/",
                 //"file:/", // does NOT get mapped!
             },
         }) {
