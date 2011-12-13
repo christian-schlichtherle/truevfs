@@ -106,6 +106,7 @@ public class UriCodecTest {
             { ENCODING_MASK, "%a%", "%25a%25" }, // reverse embedded
             { ENCODING_MASK, " ", "%20" },
             { ENCODING_MASK, "\u0000", "%00" }, // control
+            { ENCODING_MASK, "\u00a0", "%C2%A0" }, // Non breaking space
             { ENCODING_MASK, "\u20ac", "%E2%82%AC" }, // Euro sign
             { ENCODING_MASK, "a\u20acb", "a%E2%82%ACb" }, // dito embedded
             { ENCODING_MASK, "\u20aca\u20ac", "%E2%82%ACa%E2%82%AC" }, // inverse embedding

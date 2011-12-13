@@ -55,8 +55,9 @@ public final class UriEncoder {
     private static final String
             DEFAULT_LEGAL_CHARS = ALPHANUM_CHARS + MARK_CHARS + ",;$&+=@";
 
-    private final @CheckForNull CharsetEncoder encoder;
-    private final boolean quotePercent;
+    private final CharsetEncoder encoder;
+    private final boolean encode;
+    private final boolean raw;
     private @CheckForNull StringBuilder stringBuilder;
 
     /**
@@ -87,11 +88,13 @@ public final class UriEncoder {
      * 
      * @param charset the character set to use for encoding non-US-ASCII
      *        characters.
-     *        If this is {@code null}, then this codec preserves non-US-ASCII
-     *        characters.
-     *        Note that using any other character set than UTF-8 will void
-     *        interoperability with most applications!
-     * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
+     *        If this parameter is {@code null},
+     *        then non-US-ASCII characters will get encoded to {@code UTF-8}
+     *        if and only if {@link Character#isISOControl(char)} or
+     *        {@link Character#isSpaceChar(char)} is {@code true},
+     *        so that most non-US-ASCII character would get preserved.
+     *        Note that providing any other value than {@code null} or
+     *        {@code UTF-8} will void interoperability with most applications.
      */
     public UriEncoder(@CheckForNull Charset charset) {
         this(charset, false);
@@ -104,17 +107,25 @@ public final class UriEncoder {
      * 
      * @param charset the character set to use for encoding non-US-ASCII
      *        characters.
-     *        If this is {@code null}, then this codec preserves non-US-ASCII
-     *        characters.
-     *        Note that using any other character set than UTF-8 will void
-     *        interoperability with most applications!
+     *        If this parameter is {@code null},
+     *        then non-US-ASCII characters will get encoded to {@code UTF-8}
+     *        if and only if {@link Character#isISOControl(char)} or
+     *        {@link Character#isSpaceChar(char)} is {@code true},
+     *        so that most non-US-ASCII character would get preserved.
+     *        Note that providing any other value than {@code null} or
+     *        {@code UTF-8} will void interoperability with most applications.
      * @param raw If {@code true}, then the {@code '%'} character doesn't get
      *        quoted.
-     * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
      */
-    public UriEncoder(final @CheckForNull Charset charset, final boolean raw) {
-        this.encoder = null == charset ? null : charset.newEncoder();
-        this.quotePercent = !raw;
+    public UriEncoder(@CheckForNull Charset charset, final boolean raw) {
+        if (!(this.encode = null != charset))
+            charset = UTF8;
+        this.encoder = charset.newEncoder();
+        this.raw = raw;
+    }
+
+    boolean isRaw() {
+        return raw;
     }
 
     private static void quote(final char dc, final StringBuilder eS) {
@@ -190,12 +201,13 @@ public final class UriEncoder {
         final CharBuffer dC = CharBuffer.wrap(dS);  // decoded characters
         ByteBuffer eB = null;                       // encoded bytes
         final CharsetEncoder enc = encoder;
+        final boolean encode = this.encode;
         while (dC.hasRemaining()) {
             dC.mark();
             final char dc = dC.get();               // decoded character
             if (dc < 0x80) {
                 final String es = escapes[dc];      // escape sequence
-                if (null != es && ('%' != dc || quotePercent)) {
+                if (!(null == es || '%' == dc && raw)) {
                     if (null == eB) {
                         if (null == eS) {
                             if (null == (eS = stringBuilder))
@@ -210,10 +222,9 @@ public final class UriEncoder {
                 }  else if (null != eS) {
                     eS.append(dc);
                 }
-            /*} else if (Character.isISOControl(dc) || Character.isSpaceChar(dc)) {
-                // See http://java.net/jira/browse/TRUEZIP-180
-                throw new AssertionError("http://java.net/jira/browse/TRUEZIP-180");*/
-            } else if (null != enc) {
+            } else if (Character.isISOControl(dc) ||
+                       Character.isSpaceChar(dc)  ||
+                       encode) {
                 if (null == eB) {
                     if (null == eS) {
                         if (null == (eS = stringBuilder))

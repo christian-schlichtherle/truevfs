@@ -51,20 +51,23 @@ public final class UriDecoder {
      * decode non-US-ASCII characters.
      */
     public UriDecoder() {
-        this(UTF8);
+        this(null);
     }
 
     /**
      * Constructs a new URI decoder which uses the given character set to
      * decode non-US-ASCII characters.
      * 
-     * @param charset the character set to use for decoding non-US-ASCII
+     * @param charset the character set to use for encoding non-US-ASCII
      *        characters.
-     *        Note that using any other character set than UTF-8 will void
-     *        interoperability with most applications!
-     * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
+     *        If this parameter is {@code null}, then it defaults to
+     *        {@code UTF-8}.
+     *        Note that providing any other value than {@code null} or
+     *        {@code UTF-8} will void interoperability with most applications.
      */
-    public UriDecoder(final Charset charset) {
+    public UriDecoder(@CheckForNull Charset charset) {
+        if (null == charset)
+            charset = UTF8;
         this.decoder = charset.newDecoder();
     }
 
