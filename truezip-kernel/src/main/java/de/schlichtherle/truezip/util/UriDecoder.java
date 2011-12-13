@@ -60,7 +60,7 @@ public final class UriDecoder {
      * 
      * @param charset the character set to use for decoding non-US-ASCII
      *        characters.
-     *        Note that using any other character set than UTF-8 should void
+     *        Note that using any other character set than UTF-8 will void
      *        interoperability with most applications!
      * @deprecated The use of any other charset than {@code UTF-8} is deprecated.
      */
