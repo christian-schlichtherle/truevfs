@@ -104,7 +104,7 @@ public final class UriBuilder {
      */
     public UriBuilder(boolean raw) {
         this.raw = raw;
-        this.encoder = new UriEncoder(null, raw);
+        this.encoder = new UriEncoder(raw);
     }
 
     /**
@@ -124,7 +124,7 @@ public final class UriBuilder {
      */
     public UriBuilder(URI uri, boolean raw) {
         this.raw = raw;
-        this.encoder = new UriEncoder(null, raw);
+        this.encoder = new UriEncoder(raw);
         setUri(uri); // OK - class is final!
     }
 
