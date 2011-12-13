@@ -364,20 +364,26 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         if (null != uri.getRawFragment())
             throw new QuotedUriSyntaxException(uri, "Fragment not allowed");
         if (uri.isOpaque()) {
-            final String ssp = uri.getSchemeSpecificPart();
+            final String ssp = uri.getRawSchemeSpecificPart();
             final int i = ssp.lastIndexOf(FsMountPoint.SEPARATOR);
             if (0 > i)
                 throw new QuotedUriSyntaxException(uri,
                         "Missing mount point separator \"" + FsMountPoint.SEPARATOR + '"');
+            final UriBuilder b = new UriBuilder(true);
             mountPoint = new FsMountPoint(
-                    new URI(uri.getScheme(), ssp.substring(0, i + 2), null),
+                    b.scheme(uri.getScheme())
+                     .path(ssp.substring(0, i + 2))
+                     .toUri(),
                     modifier);
             entryName = new FsEntryName(
-                    new URI(null, ssp.substring(i + 2), uri.getFragment()),
+                    b.clear()
+                     .pathQuery(ssp.substring(i + 2))
+                     .fragment(uri.getRawFragment())
+                     .toUri(),
                     modifier);
             if (NULL != modifier) {
                 URI mpu = mountPoint.toUri();
-                URI nuri = new URI(mpu.getScheme(), mpu.getSchemeSpecificPart() + toDecodedUri(entryName), null);
+                URI nuri = new URI(mpu.getScheme() + ':' + mpu.getRawSchemeSpecificPart() + entryName.toUri());
                 if (!uri.equals(nuri))
                     uri = nuri;
             }
@@ -395,16 +401,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         assert invariants();
     }
 
-    private static String toDecodedUri(final FsEntryName entryName) {
-        final URI u = entryName.toUri();
-        assert null == u.getScheme();
-        assert null == u.getAuthority();
-        assert null == u.getFragment();
-        final String p = u.getPath();
-        final String q = u.getQuery();
-        return q == null ? p : p + "?" + q;
-    }
-
     private boolean invariants() {
         assert null != toUri();
         assert null == toUri().getRawFragment();
@@ -412,11 +408,11 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         assert null != getEntryName();
         if (toUri().isOpaque()) {
             assert toUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
-            try {
+            /*try {
                 assert toUri().equals(new URI(getMountPoint().toUri().getScheme(), getMountPoint().toUri().getSchemeSpecificPart() + toDecodedUri(getEntryName()), null));
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
-            }
+            }*/
         } else if (toUri().isAbsolute()) {
             assert toUri().normalize() == toUri();
             assert toUri().equals(getMountPoint().toUri().resolve(getEntryName().toUri()));
