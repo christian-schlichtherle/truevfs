@@ -413,7 +413,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         if (toUri().isOpaque()) {
             assert toUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
             try {
-                assert toUri().equals(new URI(getMountPoint().toUri().getScheme(), mountPoint.toUri().getSchemeSpecificPart() + toDecodedUri(getEntryName()), null));
+                assert toUri().equals(new URI(getMountPoint().toUri().getScheme(), getMountPoint().toUri().getSchemeSpecificPart() + toDecodedUri(getEntryName()), null));
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
