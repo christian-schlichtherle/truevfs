@@ -82,10 +82,10 @@ public class UriBuilderTest {
             { "scheme:scheme-specific-part?noquery#fragment", "scheme", null, "scheme-specific-part?noquery", null, "fragment" },
             { "scheme:?#", "scheme", null, "?", null, "" },
             { "scheme:?", "scheme", null, "?", null, null },
+            { "föö%20bär", null, null, "föö bär", null, null },
+            { "foo:bär", "foo", null, "bär", null, null },
             // See http://java.net/jira/browse/TRUEZIP-180
-            //{ "Dichtheitspr%C3%BCfung%3A%C2%A0Moenikes%20l%C3%A4sst%20Dampf%20ab", null, null, "Dichtheitsprüfung:\u00a0Moenikes lässt Dampf ab", null, null },
-            //{ "f%C3%B6%C3%B6%20b%C3%A4r", null, null, "föö bär", null, null },
-            //{ "foo:b%C3%A4r", "foo", null, "bär", null, null },
+            { "Dichtheitsprüfung%3A%C2%A0Moenikes%20lässt%20Dampf%20ab", null, null, "Dichtheitsprüfung:\u00a0Moenikes lässt Dampf ab", null, null },
         }) {
             final URI u = URI.create(test[0]);
 

@@ -79,7 +79,6 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
 @NotThreadSafe
 public final class UriBuilder {
 
-    private final boolean raw;
     private final UriEncoder encoder;
     private @CheckForNull StringBuilder builder;
     private @CheckForNull String scheme;
@@ -103,8 +102,7 @@ public final class UriBuilder {
      *        quoted.
      */
     public UriBuilder(boolean raw) {
-        this.raw = raw;
-        this.encoder = new UriEncoder(raw);
+        this.encoder = new UriEncoder(null, raw);
     }
 
     /**
@@ -123,8 +121,7 @@ public final class UriBuilder {
      *        quoted.
      */
     public UriBuilder(URI uri, boolean raw) {
-        this.raw = raw;
-        this.encoder = new UriEncoder(raw);
+        this.encoder = new UriEncoder(null, raw);
         setUri(uri); // OK - class is final!
     }
 
@@ -353,7 +350,7 @@ public final class UriBuilder {
      * @param  uri the URI.
      */
     public void setUri(final URI uri) {
-        if (raw) {
+        if (encoder.isRaw()) {
             setScheme(uri.getScheme());
             setAuthority(uri.getRawAuthority());
             setPath(uri.isOpaque() ? uri.getRawSchemeSpecificPart() : uri.getRawPath());
