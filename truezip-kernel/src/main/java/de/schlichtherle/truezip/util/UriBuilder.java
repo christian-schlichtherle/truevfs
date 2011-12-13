@@ -511,8 +511,8 @@ public final class UriBuilder {
      * @since  TrueZIP 7.4.2
      */
     public void setPathQuery(final @CheckForNull String pathQuery) {
-        final int i = pathQuery.indexOf('?');
-        if (0 <= i) {
+        final int i;
+        if (null != pathQuery && 0 <= (i = pathQuery.indexOf('?'))) {
             this.path = pathQuery.substring(0, i);
             this.query = pathQuery.substring(i + 1);
         } else {
