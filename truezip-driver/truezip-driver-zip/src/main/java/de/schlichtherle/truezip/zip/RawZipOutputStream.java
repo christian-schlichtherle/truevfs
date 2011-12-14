@@ -554,46 +554,47 @@ implements Iterable<E> {
             return false;
         }
         final LEDataOutputStream dos = this.dos;
-        // Central File Header.
+        // central file header signature   4 bytes  (0x02014b50)
         dos.writeInt(CFH_SIG);
-        // Version Made By.
+        // version made by                 2 bytes
         dos.writeShort((entry.getRawPlatform() << 8) | 63);
-        // Version Needed To Extract.
+        // version needed to extract       2 bytes
         dos.writeShort(entry.getRawVersionNeededToExtract());
-        // General Purpose Bit Flags.
+        // general purpose bit flag        2 bytes
         dos.writeShort(entry.getGeneralPurposeBitFlags());
-        // Compression Method.
+        // compression method              2 bytes
         dos.writeShort(entry.getRawMethod());
-        // Last Mod. File Time / Date.
+        // last mod file time              2 bytes
+        // last mod file date              2 bytes
         dos.writeInt((int) entry.getRawTime());
-        // CRC-32.
+        // crc-32                          4 bytes
         dos.writeInt((int) entry.getRawCrc());
-        // Compressed Size.
-        dos.writeInt((int) csize);
-        // Uncompressed Size.
-        dos.writeInt((int) size);
-        // File Name Length.
+        // compressed size                 4 bytes
+        dos.writeInt((int) entry.getRawCompressedSize());
+        // uncompressed size               4 bytes
+        dos.writeInt((int) entry.getRawSize());
+        // file name length                2 bytes
         final byte[] name = encode(entry.getName());
         dos.writeShort(name.length);
-        // Extra Field Length.
+        // extra field length              2 bytes
         final byte[] extra = entry.getRawExtraFields();
         dos.writeShort(extra.length);
-        // File Comment Length.
+        // file comment length             2 bytes
         final byte[] comment = getCommentEncoded(entry);
         dos.writeShort(comment.length);
-        // Disk Number Start.
+        // disk number start               2 bytes
         dos.writeShort(0);
-        // Internal File Attributes.
+        // internal file attributes        2 bytes
         dos.writeShort(0);
-        // External File Attributes.
+        // external file attributes        4 bytes
         dos.writeInt((int) entry.getRawExternalAttributes());
-        // Relative Offset Of Local File Header.
+        // relative offset of local header 4 bytes
         dos.writeInt((int) entry.getRawOffset());
-        // File Name.
+        // file name (variable size)
         dos.write(name);
-        // Extra Field(s).
+        // extra field (variable size)
         dos.write(extra);
-        // File Comment.
+        // file comment (variable size)
         dos.write(comment);
 
         return true;
@@ -626,50 +627,71 @@ implements Iterable<E> {
         if (zip64) {
             final long zip64eocdOffset // relative offset of the zip64 end of central directory record
                     = dos.size();
-            // ZIP64 End Of Central Directory Record signature.
+            // zip64 end of central dir 
+            // signature                       4 bytes  (0x06064b50)
             dos.writeInt(ZIP64_EOCDR_SIG);
-            // Size Of ZIP64 End Of Central Directory Record.
+            // size of zip64 end of central
+            // directory record                8 bytes
             dos.writeLong(ZIP64_EOCDR_MIN_LEN - 12);
-            // Version Made By.
+            // version made by                 2 bytes
             dos.writeShort(63);
-            // Version Needed To Extract.
-            dos.writeShort(45);
-            // Number Of This Disk.
+            // version needed to extract       2 bytes
+            dos.writeShort(46); // due to potential use of BZIP2 compression
+            // number of this disk             4 bytes
             dos.writeInt(0);
-            // Number Of The Disk With The Start Of The Central Directory.
+            // number of the disk with the 
+            // start of the central directory  4 bytes
             dos.writeInt(0);
-            // Total Number Of Entries In The Central Directory On This Disk.
+            // total number of entries in the
+            // central directory on this disk  8 bytes
             dos.writeLong(cdEntries);
-            // Total Number Of Entries In The Central Directory.
+            // total number of entries in the
+            // central directory               8 bytes
             dos.writeLong(cdEntries);
-            // Size Of The Central Directory.
+            // size of the central directory   8 bytes
             dos.writeLong(cdSize);
-            // Offset Of Start Of Central Directory With Respect To The
-            // Starting Disk Number.
+            // offset of start of central
+            // directory with respect to
+            // the starting disk number        8 bytes
             dos.writeLong(cdOffset);
-            // ZIP64 End Of Central Directory Locator signature.
+            // zip64 extensible data sector    (variable size)
+            //
+            // zip64 end of central dir locator 
+            // signature                       4 bytes  (0x07064b50)
             dos.writeInt(ZIP64_EOCDL_SIG);
-            // Number Of The Disk With The Start Of The ZIP64 End Of Central Directory.
+            // number of the disk with the
+            // start of the zip64 end of 
+            // central directory               4 bytes
             dos.writeInt(0);
-            // Relative Offset Of The ZIP64 End Of Central Directory record.
+            // relative offset of the zip64
+            // end of central directory record 8 bytes
             dos.writeLong(zip64eocdOffset);
-            // Total Number Of Disks.
+            // total number of disks           4 bytes
             dos.writeInt(1);
         }
-        // End Of Central Directory record signature.
+        // end of central dir signature    4 bytes  (0x06054b50)
         dos.writeInt(EOCDR_SIG);
-        // Disk numbers.
+        // number of this disk             2 bytes
         dos.writeShort(0);
+        // number of the disk with the
+        // start of the central directory  2 bytes
         dos.writeShort(0);
-        // Number of entries.
+        // total number of entries in the
+        // central directory on this disk  2 bytes
         dos.writeShort(cdEntries16);
+        // total number of entries in
+        // the central directory           2 bytes
         dos.writeShort(cdEntries16);
-        // Length and offset of Central Directory.
+        // size of the central directory   4 bytes
         dos.writeInt((int) cdSize32);
+        // offset of start of central
+        // directory with respect to
+        // the starting disk number        4 bytes
         dos.writeInt((int) cdOffset32);
-        // ZIP file comment.
+        // .ZIP file comment length        2 bytes
         final byte[] comment = getRawComment();
         dos.writeShort(comment.length);
+        // .ZIP file comment       (variable size)
         dos.write(comment);
     }
 
@@ -765,19 +787,20 @@ implements Iterable<E> {
                               | (utf8      ? GPBF_UTF8 : 0);
             // Start changes.
             RawZipOutputStream.this.finished = false;
-            // Local File Header Signature.
+            // local file header signature     4 bytes  (0x04034b50)
             dos.writeInt(LFH_SIG);
-            // Version Needed To Extract.
+            // version needed to extract       2 bytes
             dos.writeShort(entry.getRawVersionNeededToExtract());
-            // General Purpose Bit Flag.
+            // general purpose bit flag        2 bytes
             dos.writeShort(general);
-            // Compression Method.
+            // compression method              2 bytes
             dos.writeShort(entry.getRawMethod());
-            // Last Mod. Time / Date in DOS format.
+            // last mod file time              2 bytes
+            // last mod file date              2 bytes
             dos.writeInt((int) entry.getRawTime());
-            // CRC-32.
-            // Compressed Size.
-            // Uncompressed Size.
+            // crc-32                          4 bytes
+            // compressed size                 4 bytes
+            // uncompressed size               4 bytes
             if (dd) {
                 dos.writeInt(0);
                 dos.writeInt(0);
@@ -787,15 +810,15 @@ implements Iterable<E> {
                 dos.writeInt((int) entry.getRawCompressedSize());
                 dos.writeInt((int) entry.getRawSize());
             }
-            // File Name Length.
+            // file name length                2 bytes
             final byte[] name = encode(entry.getName());
             dos.writeShort(name.length);
-            // Extra Field Length.
+            // extra field length              2 bytes
             final byte[] extra = entry.getRawExtraFields();
             dos.writeShort(extra.length);
-            // File Name.
+            // file name (variable size)
             dos.write(name);
-            // Extra Field(s).
+            // extra field (variable size)
             dos.write(extra);
             // Commit changes.
             entry.setGeneralPurposeBitFlags(general);
@@ -815,23 +838,22 @@ implements Iterable<E> {
             final long csize = RawZipOutputStream.this.dos.size()
                     - this.dataStart;
             final ZipEntry entry = RawZipOutputStream.this.entry;
+            assert UNKNOWN != entry.getCrc();
+            assert UNKNOWN != entry.getSize();
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
                 entry.setRawCompressedSize(csize);
-                final boolean zip64 = entry.isZip64ExtensionsRequired();
-                final long size = entry.getRawSize();
-                final long crc = entry.getRawCrc();
-                // Data Descriptor Signature.
+                // data descriptor signature       4 bytes  (0x08074b50)
                 dos.writeInt(DD_SIG);
-                // CRC-32.
-                dos.writeInt((int) crc);
-                // Compressed Size.
-                // Uncompressed Size.
-                if (zip64) {
+                // crc-32                          4 bytes
+                dos.writeInt((int) entry.getRawCrc());
+                // compressed size                 4 or 8 bytes
+                // uncompressed size               4 or 8 bytes
+                if (entry.isZip64ExtensionsRequired()) {
                     dos.writeLong(csize);
-                    dos.writeLong(size);
+                    dos.writeLong(entry.getSize());
                 } else {
-                    dos.writeInt((int) csize);
-                    dos.writeInt((int) size);
+                    dos.writeInt((int) entry.getRawCompressedSize());
+                    dos.writeInt((int) entry.getRawSize());
                 }
             } else if (entry.getCompressedSize() != csize) {
                 throw new ZipException(entry.getName()
@@ -990,7 +1012,7 @@ implements Iterable<E> {
             this.dout.flush(); // superfluous - should not buffer
             this.cout.finish();
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            entry.setRawCompressedSize(RawZipOutputStream.this.dos.size() - this.start);
+            //entry.setRawCompressedSize(RawZipOutputStream.this.dos.size() - this.start);
             entry.setRawSize(this.dout.size());
             this.delegate.finish();
         }
@@ -1025,7 +1047,7 @@ implements Iterable<E> {
             this.out.finish();
             final Deflater deflater = this.out.getDeflater();
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            entry.setRawCompressedSize(deflater.getBytesWritten());
+            //entry.setRawCompressedSize(deflater.getBytesWritten());
             entry.setRawSize(deflater.getBytesRead());
             deflater.end();
             this.delegate.finish();
