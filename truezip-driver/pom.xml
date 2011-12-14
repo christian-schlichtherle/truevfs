@@ -13,7 +13,7 @@
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
         <artifactId>truezip</artifactId>
-        <version>7.4.3</version>
+        <version>7.4.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-driver</artifactId>
