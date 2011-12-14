@@ -3239,14 +3239,15 @@ public final class TFile extends File {
      *         archive files and entries are only supported for instances of
      *         this class.
      * @param  detector the archive detector to use for detecting any
-     *         archive files in the source and destination directory tree.
+     *         archive files <em>within</em> the source and destination
+     *         directory tree.
      * @throws IOException if any I/O error occurs.
      * @since  TrueZIP 7.2
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void cp_r(   File src, File dst,
-                                TArchiveDetector detector)
+    public static void cp_r(File src, File dst,
+                            TArchiveDetector detector)
     throws IOException {
         TBIO.cp_r(false, src, dst, detector, detector);
     }
@@ -3307,9 +3308,9 @@ public final class TFile extends File {
      *         archive files and entries are only supported for instances of
      *         this class.
      * @param  srcDetector the archive detector to use for detecting any
-     *         archive files in the source directory tree.
+     *         archive files <em>within</em> the source directory tree.
      * @param  dstDetector the archive detector to use for detecting any
-     *         archive files in the destination directory tree.
+     *         archive files <em>within</em> the destination directory tree.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
@@ -3350,14 +3351,15 @@ public final class TFile extends File {
      *         archive files and entries are only supported for instances of
      *         this class.
      * @param  detector the archive detector to use for detecting any
-     *         archive files in the source and destination directory tree.
+     *         archive files <em>within</em> the source and destination
+     *         directory tree.
      * @throws IOException if any I/O error occurs.
      * @since  TrueZIP 7.2
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void cp_rp(   File src, File dst,
-                                TArchiveDetector detector)
+    public static void cp_rp(File src, File dst,
+                             TArchiveDetector detector)
     throws IOException {
         TBIO.cp_r(true, src, dst, detector, detector);
     }
@@ -3431,16 +3433,16 @@ public final class TFile extends File {
      *         archive files and entries are only supported for instances of
      *         this class.
      * @param  srcDetector the archive detector to use for detecting any
-     *         archive files in the source directory tree.
+     *         archive files <em>within</em> the source directory tree.
      * @param  dstDetector the archive detector to use for detecting any
-     *         archive files in the destination directory tree.
+     *         archive files <em>within</em> the destination directory tree.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void cp_rp(   File src, File dst,
-                                TArchiveDetector srcDetector,
-                                TArchiveDetector dstDetector)
+    public static void cp_rp(File src, File dst,
+                             TArchiveDetector srcDetector,
+                             TArchiveDetector dstDetector)
     throws IOException {
         TBIO.cp_r(true, src, dst, srcDetector, dstDetector);
     }
