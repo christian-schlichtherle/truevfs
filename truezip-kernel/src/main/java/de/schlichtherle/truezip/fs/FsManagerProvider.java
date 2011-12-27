@@ -26,7 +26,7 @@ public interface FsManagerProvider {
      * Returns the singleton file system manager.
      * <p>
      * Calling this method several times must return the <em>same</em> file
-     * system manager in order to ensure consistency of the virtual file system
+     * system manager in order to ensure integrity of the virtual file system
      * space.
      *
      * @return The file system manager.
