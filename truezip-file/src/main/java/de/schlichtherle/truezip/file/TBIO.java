@@ -34,7 +34,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
  * class accept plain old {@link File} objects.
  * However, full advantage is taken if a parameter is a {@link TFile} object.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -278,7 +278,7 @@ final class TBIO {
         return TConfig
                 .get()
                 .getManager()
-                .getController(path.getMountPoint(), getDetector(src))
+                .getController( path.getMountPoint(), getDetector(src))
                 .getInputSocket(path.getEntryName(), options);
     }
 
@@ -308,7 +308,7 @@ final class TBIO {
         return TConfig
                 .get()
                 .getManager()
-                .getController(path.getMountPoint(), getDetector(dst))
+                .getController(     path.getMountPoint(), getDetector(dst))
                 .getOutputSocket(   path.getEntryName(),
                                     options.clear(CREATE_PARENTS),
                                     template);
