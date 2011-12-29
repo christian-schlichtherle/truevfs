@@ -8,6 +8,9 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -20,11 +23,12 @@ import net.jcip.annotations.ThreadSafe;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(NonNull.class)
 @ThreadSafe
 public class FsSyncWarningException extends FsSyncException {
     private static final long serialVersionUID = 2302357394858347366L;
 
-    public FsSyncWarningException(FsModel model, IOException cause) {
+    public FsSyncWarningException(FsModel model, @Nullable IOException cause) {
         super(model, cause, -1);
     }
 }
