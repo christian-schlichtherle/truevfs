@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.*;
@@ -646,7 +647,7 @@ extends TestBase<D> {
         out.close();
         
         // Reopen stream and let the garbage collection close the stream automatically.
-        out = newOutputStream(file1);
+        newOutputStream(file1);
         out = null;
         gc();
         
@@ -1319,7 +1320,7 @@ extends TestBase<D> {
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesReading()
     throws Exception {
-        assertMultithreadedSingleArchiveMultipleEntriesReading(20, 20);
+        assertMultithreadedSingleArchiveMultipleEntriesReading(NUM_THREADS, NUM_THREADS);
     }
     
     private void assertMultithreadedSingleArchiveMultipleEntriesReading(
@@ -1328,36 +1329,32 @@ extends TestBase<D> {
     throws Exception {
         // Create test archive file.
         createTestArchive(nEntries);
-        
-        class CheckAllEntriesThread extends IOThread {
+
+        class CheckAllEntriesTask implements Callable<Void> {
             @Override
-            public void work() throws IOException {
+            public Void call() throws IOException {
                 assertArchiveEntries(archive, nEntries);
+                return null;
             }
-        } // CheckAllEntriesThread
-        
-        // Create and start all threads.
-        final IOThread[] threads = new IOThread[nThreads];
-        for (int i = 0; i < nThreads; i++) {
-            final IOThread thread = new CheckAllEntriesThread();
-            thread.start();
-            threads[i] = thread;
+        } // CheckAllEntriesTask
+
+        class CheckAllEntriesTaskFactory implements TaskFactory {
+            @Override
+            public Callable<Void> newTask(int threadNum) {
+                return new CheckAllEntriesTask();
+            }
+        } // CheckAllEntriesTaskFactory
+
+        try {
+            runParallel(new CheckAllEntriesTaskFactory(), nThreads);
+        } finally {
+            archive.toFile().rm_r();
         }
-        
-        // Wait for all threads until done.
-        for (int i = 0; i < nThreads; i++) {
-            final IOThread thread = threads[i];
-            thread.join();
-            if (thread.failure != null)
-                throw new IOException(thread.failure);
-        }
-        
-        archive.toFile().rm_r();
     }
-    
+
     private void createTestArchive(final int nEntries) throws IOException {
         for (int i = 0; i < nEntries; i++) {
-            final TPath entry = new TPath(archive + SEPARATOR + i);
+            final TPath entry = new TPath(archive.toString(), i + "");
             final OutputStream out = newOutputStream(entry);
             try {
                 out.write(data);
@@ -1399,8 +1396,8 @@ extends TestBase<D> {
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesWriting()
     throws Exception {
-        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, 20, false);
-        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, 20, true);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_THREADS, false);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_THREADS, true);
     }
     
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
@@ -1410,16 +1407,16 @@ extends TestBase<D> {
             throws Exception {
         assertTrue(TConfig.get().isLenient());
         
-        class WritingThread extends IOThread {
-            final int i;
+        class WritingTask implements Callable<Void> {
+            final int threadNum;
             
-            WritingThread(int i) {
-                this.i = i;
+            WritingTask(int threadNum) {
+                this.threadNum = threadNum;
             }
             
             @Override
-            public void work() throws IOException {
-                final TPath file = archive.resolve(i + "");
+            public Void call() throws IOException {
+                final TPath file = archive.resolve(threadNum + "");
                 OutputStream out;
                 while (true) {
                     try {
@@ -1450,34 +1447,30 @@ extends TestBase<D> {
                     if (wait)
                         throw new AssertionError(ex);
                 }
+                return null;
             }
-        } // WritingThread
-        
-        // Create and start all threads.
-        final IOThread[] threads = new IOThread[nThreads];
-        for (int i = 0; i < nThreads; i++) {
-            final IOThread thread = new WritingThread(i);
-            thread.start();
-            threads[i] = thread;
+        } // WritingTask
+
+        class WritingTaskFactory implements TaskFactory {
+            @Override
+            public Callable<Void> newTask(int threadNum) {
+                return new WritingTask(threadNum);
+            }
+        } // WritingTaskFactory
+
+        try {
+            runParallel(new WritingTaskFactory(), nThreads);
+        } finally {
+            assertArchiveEntries(archive, nThreads);
+            archive.toFile().rm_r();
         }
-        
-        // Wait for all threads to finish.
-        for (int i = 0; i < nThreads; i++) {
-            final IOThread thread = threads[i];
-            thread.join();
-            if (thread.failure != null)
-                throw new Exception(thread.failure);
-        }
-        
-        assertArchiveEntries(archive, nThreads);
-        archive.toFile().rm_r();
     }
 
     @Test
     public final void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
-        assertMultithreadedMultipleArchivesSingleEntryWriting(20, false);
-        assertMultithreadedMultipleArchivesSingleEntryWriting(20, true);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_THREADS, false);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_THREADS, true);
     }
 
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
@@ -1486,9 +1479,9 @@ extends TestBase<D> {
     throws Exception {
         assertTrue(TConfig.get().isLenient());
         
-        class WritingThread extends IOThread {
+        class WritingTask implements Callable<Void> {
             @Override
-            public void work() throws IOException {
+            public Void call() throws IOException {
                 final TPath archive = new TPath(createTempFile());
                 delete(archive);
                 final TPath file = archive.resolve("entry");
@@ -1522,44 +1515,19 @@ extends TestBase<D> {
                 } finally {
                     archive.toFile().rm_r();
                 }
+                return null;
             }
-        } // WritingThread
-        
-        // Create and start all threads.
-        final IOThread[] threads = new IOThread[nThreads];
-        for (int i = 0; i < nThreads; i++) {
-            final IOThread thread = new WritingThread();
-            thread.start();
-            threads[i] = thread;
-        }
-        
-        // Wait for all threads to finish.
-        for (int i = 0; i < nThreads; i++) {
-            final IOThread thread = threads[i];
-            thread.join();
-            if (thread.failure != null)
-                throw new Exception(thread.failure);
-        }
+        } // WritingTask
+
+        class WritingTaskFactory implements TaskFactory {
+            @Override
+            public Callable<Void> newTask(int threadNum) {
+                return new WritingTask();
+            }
+        } // WritingTaskFactory
+
+        runParallel(new WritingTaskFactory(), nThreads);
     }
-
-    private static abstract class IOThread extends Thread {
-        Throwable failure;
-
-        IOThread() {
-            setDaemon(true);
-        }
-
-        @Override
-        public final void run() {
-            try {
-                work();
-            } catch (Throwable exception) {
-                failure = exception;
-            }
-        }
-
-        abstract void work() throws IOException;
-    } // IOThread
 
     @Test
     public void testGrowing() throws IOException {
