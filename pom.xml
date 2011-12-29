@@ -7,7 +7,9 @@
   - which accompanies this distribution, and is available at
   - http://www.eclipse.org/legal/epl-v10.html
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -69,6 +71,12 @@
         <url>http://java.net/projects/truezip/sources/v7/show</url>
     </scm>
 
+    <properties>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
+    </properties>
+
     <modules>
         <module>truezip-archetype</module>
         <module>truezip-driver</module>
@@ -79,12 +87,6 @@
         <module>truezip-samples</module>
         <module>truezip-swing</module>
     </modules>
-
-    <properties>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
-    </properties>
 
     <dependencyManagement>
         <dependencies>
@@ -200,6 +202,7 @@
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
+                        <!-- For NetBeans. -->
                         <source>${maven.compiler.source}</source>
                         <target>${maven.compiler.target}</target>
                     </configuration>
