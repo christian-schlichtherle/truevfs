@@ -207,6 +207,7 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
+                        <argLine>-server</argLine>
                         <systemPropertyVariables>
                             <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
