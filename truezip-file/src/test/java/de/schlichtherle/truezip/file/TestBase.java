@@ -17,8 +17,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.*;
 import org.junit.After;
 import org.junit.Before;
 
@@ -34,6 +34,8 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
     protected static final FsMountPoint
             CURRENT_DIRECTORY = FsMountPoint.create(new File("").toURI());
     protected static final String[] NO_STRINGS = new String[0];
+    protected final int
+            NUM_THREADS = 10 * Runtime.getRuntime().availableProcessors();
     private static final String ARCHIVE_DETECTOR = "archiveDetector";
 
     private @Nullable D driver;
@@ -82,5 +84,31 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
     @After
     public void tearDown() throws Exception {
         TConfig.pop();
+    }
+
+    protected final void runParallel(
+            final TaskFactory factory,
+            final int nThreads)
+    throws InterruptedException, ExecutionException {
+        final Collection<Callable<Void>> tasks
+                = new ArrayList<Callable<Void>>(nThreads);
+        for (int i = 0; i < nThreads; i++)
+            tasks.add(factory.newTask(i));
+
+        final List<Future<Void>> results;
+        final ExecutorService executor = Executors.newFixedThreadPool(nThreads);
+        try {
+            results = executor.invokeAll(tasks);
+        } finally {
+            executor.shutdown();
+        }
+
+        for (final Future<Void> result : results)
+            result.get(); // check exception from task
+    }
+
+    @SuppressWarnings("ProtectedInnerClass")
+    protected interface TaskFactory {
+        Callable<Void> newTask(int threadNum);
     }
 }
