@@ -44,9 +44,8 @@ public class FsFalsePositiveException extends FsException {
 
     @Override
     public final FsFalsePositiveException initCause(Throwable cause) {
-        assert null != super.getCause();
         assert super.getCause() instanceof IOException;
-        super.initCause(cause);
-        throw new AssertionError("The preceeding statement should have thrown an IllegalStateException");
+        super.initCause((IOException) cause);
+        return this;
     }
 }
