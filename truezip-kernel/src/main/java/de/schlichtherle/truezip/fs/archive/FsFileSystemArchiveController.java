@@ -61,7 +61,7 @@ extends FsArchiveController<E> {
      * for this controller is acquired.
      * <p>
      * Upon normal termination, this method is expected to have called
-     * {@link setFileSystem} to assign the fully initialized file system
+     * {@link #setFileSystem} to assign the fully initialized file system
      * to this controller.
      * Other than this, the method must not have any side effects on the
      * state of this class or its super class.
