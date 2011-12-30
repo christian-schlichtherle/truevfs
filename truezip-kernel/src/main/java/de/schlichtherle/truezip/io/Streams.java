@@ -56,7 +56,7 @@ public final class Streams {
     public static final int BUFFER_SIZE = 8 * 1024;
 
     private static final ExecutorService executor
-            = Executors.newCachedThreadPool(new ReaderFactory());
+            = Executors.newCachedThreadPool(new ReaderThreadFactory());
     
     /** You cannot instantiate this class. */
     private Streams() {
@@ -152,7 +152,7 @@ public final class Streams {
          * The task that cycles through the buffers in order to fill them
          * with input.
          */
-        class Reader implements Runnable {
+        class ReaderTask implements Runnable {
             /** The index of the next buffer to be written. */
             int off;
 
@@ -177,7 +177,7 @@ public final class Streams {
                 do {
                     // Wait until a buffer is available.
                     final Buffer buffer;
-                    synchronized (Reader.this) {
+                    synchronized (ReaderTask.this) {
                         while (size >= _buffersLen) {
                             try {
                                 wait();
@@ -205,17 +205,17 @@ public final class Streams {
                     buffer.read = read;
 
                     // Advance head and notify writer.
-                    synchronized (Reader.this) {
+                    synchronized (ReaderTask.this) {
                         size++;
                         notify(); // only the writer could be waiting now!
                     }
                 } while (read != -1);
             }
-        } // class Reader
+        } // ReaderTask
 
         try {
-            final Reader reader = new Reader();
-            final Future<?> task = executor.submit(reader);
+            final ReaderTask task = new ReaderTask();
+            final Future<?> result = executor.submit(task);
 
             // Cache some data for better performance.
             final int buffersLen = buffers.length;
@@ -225,16 +225,16 @@ public final class Streams {
                 // Wait until a buffer is available.
                 final int off;
                 final Buffer buffer;
-                synchronized (reader) {
-                    while (reader.size <= 0) {
+                synchronized (task) {
+                    while (task.size <= 0) {
                         try {
-                            reader.wait();
+                            task.wait();
                         } catch (InterruptedException ex) {
                             Logger  .getLogger(Streams.class.getName())
                                     .log(Level.FINE, ex.getLocalizedMessage(), ex);
                         }
                     }
-                    off = reader.off;
+                    off = task.off;
                     buffer = buffers[off];
                 }
 
@@ -254,10 +254,10 @@ public final class Streams {
                     // thread cannot not reuse the same shared buffers that
                     // an unfinished reader thread of a previous call is
                     // still using.
-                    task.cancel(true);
+                    result.cancel(true);
                     while (true) {
                         try {
-                            task.get();
+                            result.get();
                             break;
                         } catch (CancellationException ex2) {
                             break;
@@ -272,16 +272,16 @@ public final class Streams {
                 }
 
                 // Advance tail and notify reader.
-                synchronized (reader) {
-                    reader.off = (off + 1) % buffersLen;
-                    reader.size--;
-                    reader.notify(); // only the reader could be waiting now!
+                synchronized (task) {
+                    task.off = (off + 1) % buffersLen;
+                    task.size--;
+                    task.notify(); // only the reader could be waiting now!
                 }
             }
             out.flush();
 
-            if (reader.exception != null)
-                throw reader.exception;
+            if (task.exception != null)
+                throw task.exception;
         } finally {
             Buffer.release(buffers);
         }
@@ -325,10 +325,10 @@ public final class Streams {
     } // Buffer
 
     /** A factory for reader threads. */
-    private static final class ReaderFactory implements ThreadFactory {
+    private static final class ReaderThreadFactory implements ThreadFactory {
         @Override
         public Thread newThread(Runnable r) {
-            return new Reader(r);
+            return new ReaderThread(r);
         }
     } // ReaderThreadFactory
 
@@ -336,10 +336,10 @@ public final class Streams {
      * A pooled and cached daemon thread which reads input streams.
      * You cannot use this class outside its package.
      */
-    public static final class Reader extends Thread {
-        Reader(Runnable r) {
-            super(ThreadGroups.getTopLevel(), r, Reader.class.getName());
+    public static final class ReaderThread extends Thread {
+        ReaderThread(Runnable r) {
+            super(ThreadGroups.getServerThreadGroup(), r, ReaderThread.class.getName());
             setDaemon(true);
         }
-    } // Reader
+    } // ReaderThread
 }

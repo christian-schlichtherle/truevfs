@@ -257,7 +257,7 @@ public final class FsResourceAccountant {
         }
 
         Collector() {
-            super(ThreadGroups.getTopLevel(), Collector.class.getName());
+            super(ThreadGroups.getServerThreadGroup(), Collector.class.getName());
             setPriority(MAX_PRIORITY - 2);
             setDaemon(true);
         }
