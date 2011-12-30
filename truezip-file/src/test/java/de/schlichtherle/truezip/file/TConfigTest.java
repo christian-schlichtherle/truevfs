@@ -213,7 +213,7 @@ public class TConfigTest {
     }
 
     @Test
-    public void testAdvancedUsage() {
+    public void testAdvancedUseCase() {
         final TConfig config1 = TConfig.get();
         assertThat(TConfig.get(), sameInstance(config1));
         final TArchiveDetector detector1 = config1.getArchiveDetector();
