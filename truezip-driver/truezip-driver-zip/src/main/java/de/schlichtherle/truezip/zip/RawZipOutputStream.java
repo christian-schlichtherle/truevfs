@@ -981,7 +981,6 @@ implements Iterable<E> {
 
         @Nullable BZip2CompressorOutputStream cout;
         @Nullable LEDataOutputStream dout;
-        long start;
 
         BZip2OutputMethod(OutputMethod processor) {
             super(processor);
@@ -998,7 +997,6 @@ implements Iterable<E> {
             assert null == this.cout;
             assert null == this.dout;
             OutputStream out = this.delegate.start();
-            this.start = RawZipOutputStream.this.dos.size();
             final long size = entry.getSize();
             final int blockSize = UNKNOWN != size
                     ? BZip2CompressorOutputStream.chooseBlockSize(size)
@@ -1012,7 +1010,6 @@ implements Iterable<E> {
             this.dout.flush(); // superfluous - should not buffer
             this.cout.finish();
             final ZipEntry entry = RawZipOutputStream.this.entry;
-            //entry.setRawCompressedSize(RawZipOutputStream.this.dos.size() - this.start);
             entry.setRawSize(this.dout.size());
             this.delegate.finish();
         }
