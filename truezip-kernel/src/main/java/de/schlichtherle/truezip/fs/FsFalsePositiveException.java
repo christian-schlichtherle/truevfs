@@ -43,6 +43,7 @@ public class FsFalsePositiveException extends FsException {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     public final FsFalsePositiveException initCause(Throwable cause) {
         assert super.getCause() instanceof IOException;
         super.initCause((IOException) cause);
