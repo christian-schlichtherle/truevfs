@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
@@ -20,6 +21,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class FsDecoratingManager<M extends FsManager>
 extends FsManager {
 
@@ -30,7 +32,7 @@ extends FsManager {
      *
      * @param manager the decorated file system manager.
      */
-    protected FsDecoratingManager(final @NonNull M manager) {
+    protected FsDecoratingManager(final M manager) {
         if (null == manager)
             throw new NullPointerException();
         this.delegate = manager;
