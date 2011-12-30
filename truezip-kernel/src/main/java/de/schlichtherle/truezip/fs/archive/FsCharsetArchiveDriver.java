@@ -98,7 +98,7 @@ extends FsArchiveDriver<E> {
     throws CharConversionException {
         if (!encoder.canEncode(name))
             throw new CharConversionException(name +
-                    " (illegal characters in entry name)");
+                    " (cannot encode all characters to " + getCharset() + ")");
     }
 
     private final ThreadLocalCharsetEncoder
