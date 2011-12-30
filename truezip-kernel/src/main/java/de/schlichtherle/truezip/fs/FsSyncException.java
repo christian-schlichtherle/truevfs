@@ -25,8 +25,8 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class FsSyncException extends SequentialIOException {
     private static final long serialVersionUID = 4893219420357369739L;
 
@@ -55,6 +55,7 @@ public class FsSyncException extends SequentialIOException {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     public final FsSyncException initCause(final @Nullable Throwable cause) {
         //assert super.getCause() instanceof IOException;
         super.initCause((IOException) cause);
