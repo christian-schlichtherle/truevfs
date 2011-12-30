@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -11,7 +11,11 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.*;
+import de.schlichtherle.truezip.util.TaskFactory;
 import java.io.CharConversionException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,53 +52,27 @@ public abstract class FsCharsetArchiveDriverTestSuite {
 
     @Test
     public final void testMultithreading() throws Throwable {
-        final Object ready = new Object();
-        final Object go = new Object();
+        final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
-        class TestThread extends Thread {
-            Throwable throwable; // = null;
-
-            TestThread() {
-                setDaemon(true);
-            }
-
+        class TestTask implements Callable<Void> {
             @Override
-            public void run() {
-                try {
-                    synchronized (go) {
-                        synchronized (ready) {
-                            ready.notify(); // there can be only one waiting thread!
-                        }
-                        go.wait(2000);
-                    }
-                    for (int i = 0; i < 100000; i++)
-                        driver.assertEncodable(TEXT);
-                } catch (Throwable t) {
-                    throwable = t;
-                }
+            public Void call()
+            throws CharConversionException, InterruptedException {
+                start.countDown();
+                start.await();
+                for (int i = 0; i < 100000; i++)
+                    driver.assertEncodable(TEXT);
+                return null;
             }
-        } // class TestThread
+        } // TestTask
 
-        final TestThread[] threads = new TestThread[20];
-        synchronized (ready) {
-            for (int i = 0; i < threads.length; i++) {
-                final TestThread thread = new TestThread();
-                thread.start();
-                threads[i] = thread;
-                ready.wait(100);
+        class TestTaskFactory implements TaskFactory {
+            @Override
+            public Callable<Void> newTask(int threadNum) {
+                return new TestTask();
             }
-        }
+        } // TestTaskFactory
 
-        synchronized (go) {
-            go.notifyAll(); // Peng!
-        }
-
-        for (int i = 0; i < threads.length; i++) {
-            final TestThread thread = threads[i];
-            thread.join();
-            final Throwable throwable = thread.throwable;
-            if (throwable != null)
-                throw throwable;
-        }
+        runConcurrent(new TestTaskFactory(), NUM_IO_THREADS);
     }
 }

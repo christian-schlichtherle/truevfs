@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.file.TestBase;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
@@ -23,6 +22,8 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.*;
+import de.schlichtherle.truezip.util.TaskFactory;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.ByteArrayInputStream;
@@ -1320,7 +1321,7 @@ extends TestBase<D> {
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesReading()
     throws Exception {
-        assertMultithreadedSingleArchiveMultipleEntriesReading(NUM_THREADS, NUM_THREADS);
+        assertMultithreadedSingleArchiveMultipleEntriesReading(NUM_IO_THREADS, NUM_IO_THREADS);
     }
     
     private void assertMultithreadedSingleArchiveMultipleEntriesReading(
@@ -1346,7 +1347,7 @@ extends TestBase<D> {
         } // CheckAllEntriesTaskFactory
 
         try {
-            runParallel(new CheckAllEntriesTaskFactory(), nThreads);
+            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads);
         } finally {
             archive.toFile().rm_r();
         }
@@ -1396,8 +1397,8 @@ extends TestBase<D> {
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesWriting()
     throws Exception {
-        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_THREADS, false);
-        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_THREADS, true);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_IO_THREADS, false);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_IO_THREADS, true);
     }
     
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
@@ -1459,7 +1460,7 @@ extends TestBase<D> {
         } // WritingTaskFactory
 
         try {
-            runParallel(new WritingTaskFactory(), nThreads);
+            runConcurrent(new WritingTaskFactory(), nThreads);
         } finally {
             assertArchiveEntries(archive, nThreads);
             archive.toFile().rm_r();
@@ -1469,8 +1470,8 @@ extends TestBase<D> {
     @Test
     public final void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
-        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_THREADS, false);
-        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_THREADS, true);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_IO_THREADS, false);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_IO_THREADS, true);
     }
 
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
@@ -1526,7 +1527,7 @@ extends TestBase<D> {
             }
         } // WritingTaskFactory
 
-        runParallel(new WritingTaskFactory(), nThreads);
+        runConcurrent(new WritingTaskFactory(), nThreads);
     }
 
     @Test

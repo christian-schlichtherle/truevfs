@@ -10,7 +10,10 @@ package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.util.ArrayHelper;
 import static de.schlichtherle.truezip.zip.Constants.*;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.*;
+import de.schlichtherle.truezip.util.TaskFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.File;
@@ -26,6 +29,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipException;
@@ -356,7 +360,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     @Test
     public final void testMultithreading()
     throws Exception {
-        multithreading(20, 40);
+        multithreading(NUM_IO_THREADS, NUM_IO_THREADS);
     }
 
     /**
@@ -373,80 +377,52 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
         final ZipFile zin = newZipFile(file);
 
-        // Define thread class to check all entries.
-        class CheckAllEntriesThread extends Thread {
-            Throwable failure;
-
-            CheckAllEntriesThread() {
-                setDaemon(true);
-            }
-
+        // Define task to check all entries.
+        class CheckAllEntriesTask implements Callable<Void> {
             @Override
-            public void run() {
-                try {
-                    // Retrieve list of entries and randomize their order.
-                    @SuppressWarnings("unchecked")
-                    final List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) zin.entries());
-                    assert entries.size() == nEntries; // this would be a programming error in the test - not the class under test!
-                    for (int i = 0; i < nEntries; i++) {
-                        final int j = rnd.nextInt(nEntries);
-                        final ZipEntry temp = entries.get(i);
-                        entries.set(i, entries.get(j));
-                        entries.set(j, temp);
-                    }
+            public Void call() throws IOException {
+                // Retrieve list of entries and shuffle their order.
+                @SuppressWarnings("unchecked")
+                final List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) zin.entries());
+                assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
+                Collections.shuffle(entries, rnd);
 
-                    // Now read in the entries in the randomized order.
-                    final byte[] buf = new byte[data.length];
-                    for (final ZipEntry entry : entries) {
-                        // Read full entry and check the contents.
-                        final InputStream in = zin.getInputStream(entry.getName());
-                        try {
-                            int off = 0;
-                            int read;
-                            while (true) {
-                                read = in.read(buf);
-                                if (read < 0)
-                                    break;
-                                assertTrue(read > 0);
-                                assertTrue(de.schlichtherle.truezip.util.ArrayHelper.equals(
-                                        data, off, buf, 0, read));
-                                off += read;
-                            }
-                            assertEquals(-1, read);
-                            assertEquals(off, data.length);
-                            read = in.read(new byte[0]);
-                            assertTrue(0 == read || -1 == read);
-                        } finally {
-                            in.close();
+                // Now read in the entries in the shuffled order.
+                final byte[] buf = new byte[data.length];
+                for (final ZipEntry entry : entries) {
+                    // Read full entry and check the contents.
+                    final InputStream in = zin.getInputStream(entry.getName());
+                    try {
+                        int off = 0;
+                        int read;
+                        while (true) {
+                            read = in.read(buf);
+                            if (read < 0)
+                                break;
+                            assertTrue(read > 0);
+                            assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                            off += read;
                         }
+                        assertEquals(-1, read);
+                        assertEquals(off, data.length);
+                        assertTrue(0 >= in.read(new byte[0]));
+                    } finally {
+                        in.close();
                     }
-                } catch (Throwable t) {
-                    failure = t;
                 }
+                return null;
             }
-        }
+        } // CheckAllEntriesTask
+
+        class CheckAllEntriesTaskFactory implements TaskFactory {
+            @Override
+            public Callable<Void> newTask(int threadNum) {
+                return new CheckAllEntriesTask();
+            }
+        } // CheckAllEntriesTaskFactory
 
         try {
-            // Create and start all threads.
-            final CheckAllEntriesThread[] threads = new CheckAllEntriesThread[nThreads];
-            for (int i = 0; i < nThreads; i++) {
-                final CheckAllEntriesThread thread = new CheckAllEntriesThread();
-                thread.start();
-                threads[i] = thread;
-            }
-
-            // Wait for all threads until done.
-            for (int i = 0; i < nThreads; ) {
-                final CheckAllEntriesThread thread = threads[i];
-                try {
-                    thread.join();
-                } catch (InterruptedException ignored) {
-                    continue;
-                }
-                if (thread.failure != null)
-                    throw new Exception(thread.failure);
-                i++;
-            }
+            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads);
         } finally {
             zin.close();
         }
