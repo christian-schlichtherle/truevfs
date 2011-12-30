@@ -1,23 +1,17 @@
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Random;
 
-public class FileTest extends Thread {
+public class FileTest {
 
     final long start = System.currentTimeMillis();
     long cf = 0, df = 0, cd = 0, dd = 0;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // Don't forget to set the System property java.io.tmpdir!
-        //new FileTest().start(); // doesn't make a difference
-        new FileTest().run();
-    }
-
-    public void run() {
-        try {
-            runIO();
-        } catch (IOException failure) {
-            failure.printStackTrace();
-        }
+        new FileTest().runIO();
     }
 
     public void runIO() throws IOException {
