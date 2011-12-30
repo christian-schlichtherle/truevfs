@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,17 +9,16 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
-import org.junit.After;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
+import static org.hamcrest.CoreMatchers.*;
+import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
@@ -28,15 +27,13 @@ import static org.hamcrest.CoreMatchers.*;
 @DefaultAnnotation(NonNull.class)
 public class FsResourceAccountantTest {
 
-    private static long TIMEOUT_MILLIS = 100;
+    private static final long TIMEOUT_MILLIS = 100;
 
-    private Lock lock;
     private FsResourceAccountant accountant;
 
     @Before
     public void setUp() {
-        this.lock = new ReentrantLock();
-        this.accountant = new FsResourceAccountant(lock);
+        this.accountant = new FsResourceAccountant(new ReentrantLock());
     }
 
     @After
