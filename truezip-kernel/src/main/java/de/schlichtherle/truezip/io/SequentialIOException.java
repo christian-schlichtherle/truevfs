@@ -124,8 +124,7 @@ public class SequentialIOException extends IOException implements Cloneable {
     }
 
     public SequentialIOException(Throwable cause, int priority) {
-        super(null == cause ? null : cause.toString());
-        super.initCause(cause);
+        super(cause);
         this.priority = priority;
     }
 
@@ -143,8 +142,7 @@ public class SequentialIOException extends IOException implements Cloneable {
      *        {@link #sortPriority() priority sorting}.
      */
     public SequentialIOException(String message, Throwable cause, int priority) {
-        super(message);
-        super.initCause(cause);
+        super(message, cause);
         this.priority = priority;
     }
 
