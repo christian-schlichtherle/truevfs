@@ -408,10 +408,11 @@ public final class TConfig implements Closeable {
     /**
      * Sets the default {@link TArchiveDetector} to use for scanning path
      * names for prospective archive files if no {@code TArchiveDetector} has
-     * been explicitly provided to a constructor.
-     * Changing the value of this property affects the scanning of path names
-     * of subsequently constructed {@link TFile} objects only.
-     * Any existing {@code TFile} objects are <em>not</em> affected.
+     * been explicitly provided to a {@link TFile} constructor.
+     * Because the {@code TFile} class is immutable, changing the value of this
+     * property will affect the scanning of path names of subsequently
+     * constructed {@code TFile} objects only - existing {@code TFile} objects
+     * will <em>not</em> be affected.
      *
      * @param detector the default {@link TArchiveDetector} to use for scanning
      *        path names for prospective archive files.
