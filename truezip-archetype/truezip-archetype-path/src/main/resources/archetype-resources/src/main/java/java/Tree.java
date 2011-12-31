@@ -6,7 +6,6 @@ package ${package}.java;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.nio.file.TPath;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import static java.nio.file.Files.*;
