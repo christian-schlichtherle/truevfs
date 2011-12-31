@@ -56,8 +56,9 @@ object Tree extends Application {
       if (!entries.isEmpty) {
         val nextPadding = padding + (
           if (prefix.isEmpty) ""
-          else if (prefix == lastPrefix) lastPadding else defaultPadding)
-        entries.dropRight(1) foreach (graph(_, nextPadding, defaultPrefix))
+          else if (prefix == lastPrefix) lastPadding
+          else defaultPadding)
+        entries.dropRight(1).foreach(graph(_, nextPadding, defaultPrefix))
         graph(entries.last, nextPadding, lastPrefix)
       }
     }
