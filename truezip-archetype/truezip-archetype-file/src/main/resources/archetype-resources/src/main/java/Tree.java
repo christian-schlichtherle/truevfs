@@ -6,7 +6,6 @@ package ${package};
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.File;
-import java.io.PrintStream;
 import java.util.Arrays;
 
 /**
