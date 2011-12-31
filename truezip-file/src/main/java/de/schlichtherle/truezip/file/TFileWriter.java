@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -32,7 +32,7 @@ import net.jcip.annotations.Immutable;
 public final class TFileWriter extends OutputStreamWriter {
 
     public TFileWriter(TFile file) throws FileNotFoundException {
-	super(new TFileOutputStream(file));
+        super(new TFileOutputStream(file));
     }
 
     public TFileWriter(TFile file, boolean append) throws FileNotFoundException {
