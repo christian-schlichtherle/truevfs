@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -301,8 +301,8 @@ extends FsDriver {
 
     /**
      * Called to prepare writing an archive file artifact of this driver to
-     * {@code name} in {@code controller} using {@code options} and
-     * {@code template}.
+     * the entry {@code name} in {@code controller} using {@code options} and
+     * the nullable {@code template}.
      * <p>
      * This method should be overridden in order to modify the given options
      * before forwarding the call to the given controller.
