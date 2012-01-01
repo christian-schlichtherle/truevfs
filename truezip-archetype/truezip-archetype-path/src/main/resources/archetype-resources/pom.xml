@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${groupId}</groupId>
@@ -10,10 +12,11 @@
     <description>TrueZIP Path Application Demo</description>
 
     <properties>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.version>2.8.1</scala.version>
+        <scala.version>2.9.1</scala.version>
         <truezip.version>
             LATEST <!-- TODO: Enter version number to enhance build stability! -->
         </truezip.version>
@@ -72,15 +75,15 @@
 
         <!-- This driver provides access to the following URI schemes:
              http|https: Hyper Text Transport Protocol.
-             You cannot access these schemes via the TrueZIP File* API;
-             you'ld need to use the TrueZIP Kernel API instead.
+             You cannot access these schemes via the TrueZIP File* API,
+             you need to use the TrueZIP Path API instead.
              -->
-        <!--dependency>
+        <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-driver-http</artifactId>
             <version>${truezip.version}</version>
             <scope>runtime</scope>
-        </dependency-->
+        </dependency>
 
         <!-- This driver provides access to the following URI schemes and
              archive file suffixes:
@@ -130,34 +133,49 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <!-- required for NetBeans 7.0.1 -->
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <showDeprecation>true</showDeprecation>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
                 <version>2.15.2</version>
                 <executions>
                     <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
                         <goals>
+                            <goal>add-source</goal>
                             <goal>compile</goal>
-                            <!--goal>testCompile</goal-->
                         </goals>
-                        <configuration>
-                            <args>
-                                <arg>-make:transitive</arg>
-                                <arg>-dependencyfile</arg>
-                                <arg>${project.build.directory}/.scala_dependencies</arg>
-                            </args>
-                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <!--jvmArgs>
+                        <jvmArg>-Xss2m</jvmArg>
+                    </jvmArgs-->
+                    <args>
+                        <!--arg>-g</arg-->
+                        <arg>-unchecked</arg>
+                        <arg>-deprecation</arg>
+                        <arg>-make:transitive</arg>
+                        <arg>-dependencyfile</arg>
+                        <arg>${project.build.directory}/scala-dependencies</arg>
+                    </args>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <!-- For NetBeans. -->
+                    <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
