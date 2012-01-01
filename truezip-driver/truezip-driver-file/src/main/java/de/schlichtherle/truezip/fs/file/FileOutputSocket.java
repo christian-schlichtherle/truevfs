@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Boolean.*;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An output socket for a file entry.
@@ -34,6 +35,7 @@ import static java.lang.Boolean.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
@@ -65,10 +67,15 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         if (options.get(EXCLUSIVE) && (exists = entryFile.exists()))
             throw new IOException(entryFile + " (file exists already)"); // this is obviously not atomic
         if (options.get(CACHE)) {
+            // This is obviously NOT atomic.
             if (TRUE.equals(exists)
-                    || null == exists && (exists = entryFile.exists()))
+                    || null == exists && (exists = entryFile.exists())) {
                 if (!entryFile.canWrite())
-                    throw new FileNotFoundException(entryFile + " (cannot write)"); // this is obviously not atomic
+                    throw new FileNotFoundException(entryFile + " (cannot write)");
+            } else {
+                if (!entryFile.createNewFile())
+                    throw new FileNotFoundException(entryFile + " (already exists)");
+            }
             temp = entry.createTempFile();
         } else {
             temp = entry;

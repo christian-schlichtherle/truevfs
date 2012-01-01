@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -29,6 +29,7 @@ import static java.lang.Boolean.*;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.AccessMode;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
 import static java.nio.file.Files.*;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An output socket for a file entry.
@@ -48,6 +50,7 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
@@ -88,11 +91,16 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         if (options.get(EXCLUSIVE) && (exists = exists(entryFile)))
             throw new FileAlreadyExistsException(entry.toString());
         if (options.get(CACHE)) {
+            // This is obviously NOT atomic.
             if (TRUE.equals(exists)
-                    || null == exists && (exists = exists(entryFile)))
+                    || null == exists && (exists = exists(entryFile))) {
+                //if (!isWritable(entryFile)) throw new IOException(...)
                 entryFile   .getFileSystem()
                             .provider()
                             .checkAccess(entryFile, AccessMode.WRITE);
+            } else {
+                createFile(entryFile);
+            }
             temp = entry.createTempFile();
         } else {
             temp = entry;
