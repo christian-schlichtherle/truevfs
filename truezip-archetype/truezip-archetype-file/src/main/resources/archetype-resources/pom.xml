@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${groupId}</groupId>
@@ -10,6 +12,7 @@
     <description>TrueZIP File* Application Demo</description>
 
     <properties>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -71,8 +74,8 @@
 
         <!-- This driver provides access to the following URI schemes:
              http|https: Hyper Text Transport Protocol.
-             You cannot access these schemes via the TrueZIP File* API;
-             you'ld need to use the TrueZIP Kernel API instead.
+             You cannot access these schemes via the TrueZIP File* API,
+             you need to use the TrueZIP Path API instead.
              -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
@@ -126,9 +129,10 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
+                    <!-- For NetBeans. -->
+                    <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
-                    <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
         </plugins>
