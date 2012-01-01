@@ -14,22 +14,22 @@ Concepts
 
     TrueZIP applies the (in)famous three-tier architecture pattern:
 
-    [[1]] The access tier is a facade for the kernel tier which provides
+    [[1]] The Access Tier is a facade for the Kernel Tier which provides
           convenient-to-use client APIs for TrueZIP applications.
-          No file system state is managed by this tier, which enables a TrueZIP
-          application to work with any API concurrently, too.
-          This tier consists of the client API modules
+          It consists of the client API modules
           {{{./truezip-file/index.html}TrueZIP&#160;File*}}
           and
           {{{./truezip-path/index.html}TrueZIP&#160;Path}}
           (since TrueZIP 7.2).
+          No file system state is managed by this tier, which enables a TrueZIP
+          application to work with any API concurrently, too.
 
-    [[1]] The kernel tier manages all virtual file system state.
+    [[1]] The Kernel Tier manages all virtual file system state.
           It also provides multithreading, multiplexing, caching and buffering
           so that the driver tier does not need to take care of this.
           This tier solely consists of the module TrueZIP Kernel.
 
-    [[1]] The driver tier implements the I/O operations for their respective
+    [[1]] The Driver Tier implements the I/O operations for their respective
           (federated) file system type.
           This tier consists of all file system driver modules like TrueZIP
           Driver FILE, TrueZIP Driver ZIP etc.
