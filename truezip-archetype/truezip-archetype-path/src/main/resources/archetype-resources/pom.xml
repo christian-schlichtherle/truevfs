@@ -24,9 +24,14 @@
 
     <dependencies>
         <!-- A TrueZIP application typically has a compile time dependency on
-             one or more of the modules TrueZIP File*, TrueZIP Path or TrueZIP
-             Kernel.
+             one or more of the modules TrueZIP File* or TrueZIP Path.
+             Note that TrueZIP Path already has a dependency on TrueZIP File.
              -->
+        <!--dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-file</artifactId>
+            <version>${truezip.version}</version>
+        </dependency-->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-path</artifactId>
@@ -34,7 +39,11 @@
         </dependency>
 
         <!-- Extension module for monitoring and management with JMX and
-             java.util.logging. -->
+             java.util.logging.
+             This module is designed for testing purposes only.
+             It should not be used in production environments because of its
+             negative performance impact.
+             -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-extension-jmx-jul</artifactId>
@@ -49,22 +58,20 @@
             <version>${truezip.version}</version>
         </dependency-->
 
-        <!-- An application typically has a dependency on one or more file
-             system driver modules for accessing their respective file system
-             types.
-               When using the TrueZIP File* API, file system drivers get
-             automatically enumerated from the class path by a service locator
+        <!-- A TrueZIP application typically has a dependency on one or more
+             file system driver modules for accessing their respective file
+             system types.
+             When using the client APIs, file system drivers get automatically
+             enumerated on the class path at run time by a service locator
              singleton, so adding a run time dependency is sufficient for
              accessing the respective file system types.
-               When using the TrueZIP Kernel API however, using the service
-             locator singleton is optional, so you may need to promote these
-             run time dependencies to compile time dependencies.
+             These sample applications have some compile time dependencies
+             however because they directly configure and inject some drivers.
              -->
 
         <!-- This driver provides access to the following URI schemes:
-             file: OS file system.
-             This dependency is already added by the modules TrueZIP File* and
-             TrueZIP Path.
+             file: platform file system.
+             This dependency is already added by the modules TrueZIP File*.
              -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
@@ -113,7 +120,7 @@
              archive file suffixes:
              zip: ZIP file format.
              ear|jar|war: JAR file format.
-             odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth: Open Document File format.
+             odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb: Open Document File format.
              exe: Self extracting ZIP file format.
              -->
         <dependency>
