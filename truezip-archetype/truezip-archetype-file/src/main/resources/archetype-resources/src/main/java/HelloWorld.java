@@ -32,8 +32,7 @@ public class HelloWorld extends Application<IOException> {
         // This can be changed by configuring the respective archive driver,
         // see Javadoc for TApplication.setup().
         final Writer writer = new TFileWriter(
-                new TFile("archive.zip/HälloWörld.txt"),
-                Charset.defaultCharset());
+                new TFile("archive.zip/HälloWörld.txt"));
         try {
             writer.write("Hello World!\n");
         } finally {
