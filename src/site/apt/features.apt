@@ -43,7 +43,7 @@ Key Features
         like file or directory tree copying, moving, deleting, traversing etc.
         For example, by using the multi-threaded method
         {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
-        you'll never need to use a naive, slow read-then-write loop again.
+        you'll never need to use a naive read-stop-write-stop-loop again.
 
     [Modular Architecture]
         TrueZIP employs a {{{./concepts.html}three-tier architecture}} with an
