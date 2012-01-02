@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  - Copyright (C) 2011 Schlichtherle IT Services
+  - Copyright (C) 2004-2011 Schlichtherle IT Services
   -
   - All rights reserved. This program and the accompanying materials
   - are made available under the terms of the Eclipse Public License v1.0
@@ -35,23 +35,32 @@
 
     <dependencies>
         <!-- A TrueZIP application typically has a compile time dependency on
-             one or more of the modules TrueZIP File*, TrueZIP Path or TrueZIP
-             Kernel.
+             one or more of the modules TrueZIP File* or TrueZIP Path.
+             Note that TrueZIP Path already has a dependency on TrueZIP File.
              -->
-        <dependency>
+        <!--dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-file</artifactId>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-path</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-kernel</artifactId>
-        </dependency>
 
-        <!-- Currently unused: Provides some nice swing classes. -->
+        <!-- Extension module for monitoring and management with JMX and
+             java.util.logging.
+             This module is designed for testing purposes only.
+             It should not be used in production environments because of its
+             negative performance impact.
+             -->
+        <!--dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-extension-jmx-jul</artifactId>
+            <version>${truezip.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This optional dependency provides some nice swing classes. -->
         <!--dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-swing</artifactId>
@@ -60,34 +69,28 @@
         <!-- A TrueZIP application typically has a dependency on one or more
              file system driver modules for accessing their respective file
              system types.
-               When using the TrueZIP File* API, file system drivers get
-             automatically enumerated on the run time class path by a service
-             locator singleton, so adding a run time dependency is sufficient
-             for accessing the respective file system types.
-               These sample applications have some compile time dependencies
-             however because they configure and inject some drivers directly.
+             When using the client APIs, file system drivers get automatically
+             enumerated on the class path at run time by a service locator
+             singleton, so adding a run time dependency is sufficient for
+             accessing the respective file system types.
+             These sample applications have some compile time dependencies
+             however because they directly configure and inject some drivers.
              -->
 
-        <!-- The file system driver for the file scheme in JSE 6.
-             This driver provides access to the following URI schemes:
+        <!-- This driver provides access to the following URI schemes:
              file: platform file system.
-             -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file</artifactId>
-        </dependency>
-
-        <!-- The file system driver for the file scheme in JSE 7+.
-             This driver provides access to the following URI schemes:
-             file: platform file system.
+             This dependency is already added by the modules TrueZIP File*.
              -->
         <!--dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file-jse7</artifactId>
+            <artifactId>truezip-driver-file</artifactId>
+            <scope>runtime</scope>
         </dependency-->
 
         <!-- This driver provides access to the following URI schemes:
-             http|https: Hyper Text Transport protocol.
+             http|https: Hyper Text Transport Protocol.
+             You cannot access these schemes via the TrueZIP File* API,
+             you need to use the TrueZIP Path API instead.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -99,35 +102,35 @@
              archive file suffixes:
              tar: TAR file format.
              tgz|tar.gz: GZIP compressed TAR file format.
-             tbz|tb2|tar.bz2: BZIP2 compressed TAR file format.
+             tb2|tbz|tar.bz2: BZIP2 compressed TAR file format.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tar</artifactId>
-            <!-- <scope>runtime</scope> -->
+            <!--scope>runtime</scope-->
         </dependency>
 
         <!-- This driver provides access to the following URI schemes and
              archive file suffixes:
              tzp|zip.rae|zip.raes: RAES encrypted ZIP file format.
              -->
-        <dependency>
+            <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-tzp</artifactId>
-            <!-- <scope>runtime</scope> -->
+            <!--scope>runtime</scope-->
         </dependency>
 
         <!-- This driver provides access to the following URI schemes and
              archive file suffixes:
              zip: ZIP file format.
              ear|jar|war: JAR file format.
-             odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth: Open Document File format.
+             odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb: Open Document File format.
              exe: Self extracting ZIP file format.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-driver-zip</artifactId>
-            <!-- <scope>runtime</scope> -->
+            <!--scope>runtime</scope-->
         </dependency>
     </dependencies>
 
