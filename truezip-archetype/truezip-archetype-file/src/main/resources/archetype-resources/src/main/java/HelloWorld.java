@@ -27,7 +27,7 @@ public class HelloWorld extends Application<IOException> {
 
     @Override
     protected int work(String[] args) throws IOException {
-        // By default, ZIP files use character set CP427 to encode entry names
+        // By default, ZIP files use character set IBM437 to encode entry names
         // whereas JAR files use UTF-8.
         // This can be changed by configuring the respective archive driver,
         // see Javadoc for TApplication.setup().
