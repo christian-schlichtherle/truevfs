@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2011 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -19,14 +19,7 @@ import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.*;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -213,6 +206,7 @@ public final class Streams {
             }
         } // ReaderTask
 
+        boolean interrupted = false;
         try {
             final ReaderTask task = new ReaderTask();
             final Future<?> result = executor.submit(task);
@@ -230,8 +224,7 @@ public final class Streams {
                         try {
                             task.wait();
                         } catch (InterruptedException ex) {
-                            Logger  .getLogger(Streams.class.getName())
-                                    .log(Level.FINE, ex.getLocalizedMessage(), ex);
+                            interrupted = true;
                         }
                     }
                     off = task.off;
@@ -264,8 +257,7 @@ public final class Streams {
                         } catch (ExecutionException ex2) {
                             throw new AssertionError(ex2);
                         } catch (InterruptedException ex2) {
-                            Logger  .getLogger(Streams.class.getName())
-                                    .log(Level.FINE, ex2.getLocalizedMessage(), ex2);
+                            interrupted = true;
                         }
                     }
                     throw ex;
@@ -284,6 +276,8 @@ public final class Streams {
                 throw task.exception;
         } finally {
             Buffer.release(buffers);
+            if (interrupted)
+                Thread.currentThread().interrupt();
         }
     }
 
