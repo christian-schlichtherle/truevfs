@@ -314,7 +314,10 @@ public final class Streams {
         /** The byte buffer used for reading and writing. */
         final byte[] buf = new byte[BUFFER_SIZE];
 
-        /** The actual number of bytes read into the buffer. */
+        /**
+         * The actual number of bytes read into the buffer.
+         * -1 represents end-of-file or {@link IOException}.
+         */
         int read;
     } // Buffer
 
