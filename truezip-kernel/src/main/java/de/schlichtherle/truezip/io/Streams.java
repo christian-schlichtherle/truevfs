@@ -220,7 +220,7 @@ public final class Streams {
                 final int off;
                 final Buffer buffer;
                 synchronized (task) {
-                    while (task.size <= 0) {
+                    while (0 >= task.size) {
                         try {
                             task.wait();
                         } catch (InterruptedException ex) {
