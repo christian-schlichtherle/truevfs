@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.util;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -29,7 +28,7 @@ public final class ConcurrencyUtils {
             final TaskFactory factory,
             final int nThreads)
     throws InterruptedException, ExecutionException {
-        final Collection<Callable<Void>> tasks
+        final List<Callable<Void>> tasks
                 = new ArrayList<Callable<Void>>(nThreads);
         for (int i = 0; i < nThreads; i++)
             tasks.add(factory.newTask(i));
