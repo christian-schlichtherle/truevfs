@@ -72,13 +72,11 @@ public class StreamsTest {
         final int numThreads = Runtime.getRuntime().availableProcessors() * 10;
         final int numTasks = 100 * numThreads;
         
-        final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(numTasks);
-        for (int i = 0; i < numTasks; i++)
-            tasks.add(new Task());
-        final List<Future<Void>> results;
+        final List<Future<Void>> results = new ArrayList<Future<Void>>(numTasks);
         final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try {
-            results = executor.invokeAll(tasks);
+            for (int i = 0; i < numTasks; i++)
+                results.add(executor.submit(new Task()));
         } finally {
             executor.shutdown();
         }
