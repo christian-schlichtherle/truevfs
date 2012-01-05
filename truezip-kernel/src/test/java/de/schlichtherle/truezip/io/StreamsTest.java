@@ -11,7 +11,13 @@ package de.schlichtherle.truezip.io;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +40,7 @@ public class StreamsTest {
     }
 
     @Test
-    public void testCat() throws Exception {
+    public void testCat() throws IOException {
         Thread.currentThread().interrupt();
         Streams.cat(in, out);
         assertTrue(Thread.interrupted());
@@ -44,13 +50,40 @@ public class StreamsTest {
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testCopy() throws IOException {
         Thread.currentThread().interrupt();
         Streams.copy(in, out);
         assertTrue(Thread.interrupted());
         assertTrue(in.closed);
         assertTrue(out.closed);
         assertArrayEquals(data, out.toByteArray());
+    }
+
+    @Test
+    public void testPerformance() throws Exception {
+        class Task implements Callable<Void> {
+            @Override
+            public Void call() throws IOException {
+                testCopy();
+                return null;
+            }
+        } // Task
+
+        final int numThreads = Runtime.getRuntime().availableProcessors() * 10;
+        final int numTasks = 100 * numThreads;
+        
+        final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(numTasks);
+        for (int i = 0; i < numTasks; i++)
+            tasks.add(new Task());
+        final List<Future<Void>> results;
+        final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        try {
+            results = executor.invokeAll(tasks);
+        } finally {
+            executor.shutdown();
+        }
+        for (final Future<Void> result : results)
+            result.get(); // check out exception
     }
 
     private static final class TestInputStream extends ByteArrayInputStream {
