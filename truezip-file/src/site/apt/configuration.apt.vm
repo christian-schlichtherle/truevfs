@@ -1,0 +1,324 @@
+    -----------------------
+    Configuring TrueZIP File*
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Configuring TrueZIP File*
+
+    TrueZIP follows the convention-over-configuration principle as much as
+    possible,
+    so there are reasonable defaults for everything in order to relieve you
+    from typical configuration tasks.
+
+    For example, in order to configure the detectable archive file suffixes,
+    you just need to make sure that the JAR artifacts of the respective file
+    system driver modules are present on the class path.
+    At run time, the module
+    {{{../truezip-kernel/index.html}TrueZIP Kernel}}
+    will then enumerate the available file system drivers in order to register
+    their canonical archive file suffixes and make this mapping available for
+    the initial setup of the client API modules
+    {{{./index.html}TrueZIP File*}}
+    and
+    {{{../truezip-path/index.html}TrueZIP Path}}.
+    To see the list of canonical archive file suffixes, please consult the
+    documentation of the respective file system driver module, e.g.
+    {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}.
+
+    If you use Maven, you just need to add the driver modules as dependencies
+    to your POM like this:
+
++--+
+<project>
+  ...
+  <dependencies>
+    ...
+    <dependency>
+      <groupId>de.schlichtherle.truezip</groupId>
+      <artifactId>truezip-driver-zip</artifactId>
+      <version>$project.version</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
+</project>
++--+
+
+    However, if you want to change any of these defaults, then you may need
+    some more insight which is given in this article.
+
+* The class <<<TArchiveDetector>>>
+
+    The task of the class
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
+    is to scan path names for archive file suffixes and map it to the
+    respective
+    {{{./apidocs/de/schlichtherle/truezip/fs/archive/FsArchiveDriver.html}<<<FsArchiveDriver>>>}}
+    class.
+    For example, it could detect the file suffix <<<jar>>> in the path name
+    <<<directory/lib.jar>>> and map it to the class
+    {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}.
+
+    <<<TArchiveDetector>>> provides many options for archive detection:
+
+    * The predefined object 
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#NULL}<<<TArchiveDetector.NULL>>>}}
+    detects no archive file suffixes at all.
+
+    * The predefined object 
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}}
+    detects all archive file suffixes which have been registered
+    in the module {{{./truezip-kernel/index.html}TrueZIP Kernel}}
+    by enumerating the file system drivers on the class path.
+    Please consult the documentation of the individual driver modules for the
+    list of registered archive file suffixes.
+
+    * The constructor 
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String)}<<<TArchiveDetector(String suffixes)>>>}}
+    lets you filter the list of archive file suffixes known by
+    <<<TArchiveDetector.ALL>>>.
+    This enables you to limit the set of all archive file suffixes registered
+    by all file system driver modules on the run time class path.
+
+    * The constructor
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String, de.schlichtherle.truezip.fs.FsDriver)}<<<TArchiveDetector(String suffixes, FsDriver driver)>>>}}
+    lets you define a custom list of archive file suffixes for any archive
+    driver.
+    This enables you to define a custom {{{./usecases/aff.html}application file format}}.
+
+    []
+
+    Please consult the
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}Javadoc}}
+    for even more constructor options.
+
+    The following example would map the file suffixes <<<foo>>> and <<<bar>>>
+    to the archive driver for JAR files in order to define a custom application
+    file format.
+
++--+
+TArchiveDetector ad = new TArchiveDetector(
+    "foo|bar", new JarDriver(IOPoolLocator.SINGLETON));
++--+
+
+* The class <<<TFile>>>
+
+    Whenever an object of the class
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    is constructed, a <<<TArchiveDetector>>> is used to scan its path name for
+    prospective archive files.
+    Because the <<<TFile>>> class is immutable, once an object is created you
+    cannot change its archive detector and hence its behavior.
+
+    The <<<TFile>>> class provides multiple overloaded constructors and
+    constructing methods, e.g.
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}.
+    Almost all of these come in pairs:
+    One variant with and one variant without an additional
+    <<<TArchiveDetector>>> parameter.
+
+    If you <don't> provide a <<<TArchiveDetector>>> parameter to a <<<TFile>>>
+    constructor or constructing method, then the class property called
+    <default archive detector> is used.
+    This class property is initially set to <<<TArchiveDetector.ALL>>>, which
+    is why the following simple code for the standard use case of extracting a
+    ZIP file to a directory works as expected if the JAR of the module TrueZIP
+    Driver ZIP is present on the class path:
+
++--+
+// Use default archive detector, which is initially TArchiveDetector.ALL.
+TFile src = new TFile("archive.zip");
+TFile dst = new TFile("directory");
+src.cp_rp(dst); // copy "archive.zip" as a virtual directory!
++--+
+
+    To get or set the default archive detector, call the static methods
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#getDefaultArchiveDetector()}<<<TFile.getDefaultArchiveDetector()>>>}}
+    or
+    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#setDefaultArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TFile.setDefaultArchiveDetector(TArchiveDetector detector)>>>}}
+    respectively.
+    Mind that a change of the default archive detector affects only
+    subsequently constructed <<<TFile>>> objects.
+    For comparison, in order to temporarily disable archive detection and copy
+    <<<archive.zip>>> as a plain old file, you could call:
+
++--+
+TArchiveDetector ad = TFile.getDefaultArchiveDetector(); // backup
+TFile.setDefaultArchiveDetector(TArchiveDetector.NULL); // change
+try {
+    // Use default archive detector, which is TArchiveDetector.NULL.
+    TFile src = new TFile("archive.zip");
+    TFile dst = new TFile("file");
+    src.cp_rp(dst); // copy "archive.zip" as a plain old file!
+} finally {
+    TFile.setDefaultArchiveDetector(ad); // restore
+}
++--+
+
+    There is one problem with this code, though:
+    Because the default archive detector is a class property, the code is not
+    thread-safe!
+    If the current thread is running the try-block and another thread is
+    concurrently constructing <<<TFile>>> objects, then the change of the
+    default archive detector would affect these objects.
+    To fix this issue, you should avoid changing the default archive detector
+    once your application has been configured and use dependency injection
+    instead:
+
++--+
+TFile src = new TFile("archive.zip", TArchiveDetector.NULL);
+TFile dst = new TFile("file", TArchiveDetector.NULL);
+src.cp_rp(dst); // copy "archive.zip" as a plain old file!
++--+
+
+    Here, the injection of <<<TArchiveDetector.NULL>>> inhibits the detection
+    of file <<<archive.zip>>> as a prospective ZIP file, so it gets treated as
+    a plain old file.
+    For completeness, note that injecting <<<TArchiveDetector.NULL>>> into the
+    <<<dst>>> object seems pointless in this example, because <<<file>>> does
+    not name a suffix at all.
+    However, this is not generally true and so the injection prevents the
+    creation of a destination ZIP file.
+
+* The class <<<TConfig>>>
+
+    With the advent of TrueZIP 7.2, some more options were necessary to control
+    new features.
+    However, injecting them as parameters to each method call would mess up the
+    API and break binary compatibility to applications of older versions.
+    Furthermore, changing options should be thread safe.
+
+    The solution to these requirements is the class
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html}<<<TConfig>>>}}.
+    Each instance of this class is a container for configuration options with
+    either <global> or <inheritable thread local> scope.
+    This may sound scary, but it's really simple to use, so let's look at the
+    following example:
+
++--+
+// Push a new current configuration onto the inheritable thread local stack.
+TConfig config = TConfig.push();
+try {
+    // Change the default archive detector and use it subsequently.
+    config.setArchiveDetector(TArchiveDetector.NULL);
+    //TConfig.get().setArchiveDetector(TArchiveDetector.NULL); // equivalent
+    //TFile.setDefaultArchiveDetector(TArchiveDetector.NULL); // equivalent
+    TFile src = new TFile("archive.zip");
+    TFile dst = new TFile("file");
+    src.cp_rp(dst); // copy "archive.zip" as a plain old file!
+} finally {
+    // Pop the current configuration off the inheritable thread local stack,
+    // thereby reverting to the old default archive detector.
+    config.close();
+}
++--+
+
+    Note the call to
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#close()}<<<TConfig.close()>>>}}
+    in the finally-block:
+    With JSE7, you could use the try-with-resources statement instead to
+    shorten the code to this:
+
++--+
+// Push a new current configuration onto the inheritable thread local stack.
+try (TConfig config = TConfig.push()) {
+    // Change the default archive detector and use it subsequently.
+    config.setArchiveDetector(TArchiveDetector.NULL);
+    //TConfig.get().setArchiveDetector(TArchiveDetector.NULL); // equivalent
+    //TFile.setDefaultArchiveDetector(TArchiveDetector.NULL); // equivalent
+    TFile src = new TFile("archive.zip");
+    TFile dst = new TFile("file");
+    src.cp_rp(dst); // copy "archive.zip" as a plain old file!
+} // config is automatically closed here
++--+
+
+    These examples are very similar to the second example in the previous
+    section.
+    However, these examples are thread-safe!
+
+    To understand why, you first need to know that
+    <<<TFile.getDefaultArchiveDetector()>>>
+    queries the <current configuration> by forwarding the call to
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector()}<<<TConfig.get().getArchiveDetector()>>>}},
+    where
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#get()}<<<TConfig.get()>>>}}
+    returns the current configuration.
+    Similarly, <<<TFile.setDefaultArchiveDetector(TArchiveDetector detector)>>>
+    updates the current configuration by forwarding the call to
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(TArchiveDetector detector)>>>}}.
+
+    Second, the call to
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#push()}<<<TConfig.push()>>>}}
+    copies the current configuration, pushes the copy onto an inheritable
+    thread local stack, thereby installing it as the new current configuration,
+    and finally returns it.
+    Because <<<config>>> is now the current configuration, the subsequent
+    change of its archive detector affects the construction of <<<src>>> and
+    <<<dst>>> so that archive detection is effectively disabled.
+
+    Finally, because the current configuration is now inheritable thread local,
+    this code is thread-safe.
+    The attribute <inheritable> in this context means that when a new thread is
+    started, it inherits the current configuration of its parent thread.
+    However, only the current configuration is inherited, not the entire stack.
+    This implies that the new thread could pop at most one current
+    configuration off the inheritable thread local stack.
+
+    What is the current configuration returned by <<<TConfig.get()>>> if there
+    had been no previous call to <<<TConfig.push()>>>?
+    In this state, the current configuration is the <global configuration>
+    which is shared by all threads.
+    Again, <<<TConfig.get()>>> is called by
+    <<<TFile.get/setDefaultArchiveDetector>>>,
+    so this state can be assumed for the second example of the previous
+    section, too.
+    However, you could not be sure because calls to <<<TConfig.push/close>>>
+    could be nested across the call stack.
+    If this would be the case, then in turn this example would be thread-safe,
+    too.
+
+    You may wonder why should <<<TConfig.get()>>> be used without a
+    <<<TConfig.push()>>> at all?
+    Because <<<TConfig>>> contains some options which may need to get
+    configured with a global scope and which are not otherwise configurable by
+    the client APIs.
+
+* The class <<<TApplication>>>
+
+    The class
+    {{{./apidocs/de/schlichtherle/truezip/file/TApplication.html}<<<TApplication>>>}}
+    is a simple template class which aids you in implementing the typical
+    lifecycle of a TrueZIP application.
+    Consider the following example:
+
++--+
+class MyApplication extends TApplication<IOException> {
+
+    public static void main(String[] args) throws IOException {
+        System.exit(new MyApplication().run(args));
+    }
+
+    @Override
+    protected void setup() {
+        // This should obtain the global configuration.
+        TConfig config = TConfig.get();
+        // Configure custom application file format.
+        config.setArchiveDetector(new TArchiveDetector("aff",
+                new JarDriver(IOPoolLocator.SINGLETON)));
+        // Set FsOutputOption.GROW for appending-to rather than reassembling
+        // existing archive files.
+        config.setOutputPreferences(
+                config.getOutputPreferences.set(FsOutputOption.GROW));
+    }
+
+    ...
+}
++--+
+
+    Here, the current configuration is not only used to change the archive
+    detector, but also to set FsOutputOption.GROW.
+    By overriding
+    {{{./apidocs/de/schlichtherle/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}},
+    it can be safely assumed that there is no enclosing
+    <<<TConfig.push|close()>>> and hence <<<config>>> is indeed the global
+    configuration.

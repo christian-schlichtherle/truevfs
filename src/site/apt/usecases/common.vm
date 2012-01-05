@@ -1,0 +1,107 @@
+## This file contains macros for common use within this directory.
+#macro(leadIn $title $motivation $writing $heading)
+    -----------------------
+    $title
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+$title
+
+* Motivation
+
+    $motivation
+    Then you may need to support at least the following archive types:
+
+    * TAR.GZ
+
+    * TAR.BZ2
+
+    * ZIP
+
+    * JAR
+
+    * WAR
+
+    * EAR
+
+    * ...
+
+    []
+
+    You can easily figure that writing the code to read and write archive
+    files of all these types will be a cumbersome and tedious task because
+    each archive type typically comes with its own API to read and write
+    its archive files.
+  #set($tru="true")
+  #if($tru.equalsIgnoreCase($writing))
+    Furthermore, the algorithms required to manage the state transitions
+    required to support arbitrary modifications to an archive file in a
+    thread-safe manner are very complex.
+  #end
+
+* $heading
+
+    Thanks to the module
+    {{{../truezip-file/index.html}TrueZIP File*}},
+    here's your relief:
+    The
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    class extends the <<<java.io.File>>> class in order to add the
+    required functionality.
+
+#end ## leadIn
+#macro(configuring $suffix $file $modules_need $artifactId)
+* Configuring Archive Detection
+
+    You may wonder how TrueZIP gets configured to treat a file name with a
+    $suffix suffix as a $file file instead of a plain old file.
+    For now let it suffice to say that TrueZIP follows the
+    convention-over-configuration principle as much as possible,
+    so there are reasonable defaults for everything in order to relieve you
+    from typical configuration tasks.
+
+    For the previous examples to work, the JARs of the driver $modules_need
+    to be present on the run time class path.
+    You can achieve this by adding the Maven artifactId $artifactId as a
+    dependency to the POM of your Maven build.
+
+    For more information about configuring the TrueZIP File* API,
+    please refer to the article
+    {{{../truezip-file/configuration.html}Configuring TrueZIP File*}}.
+
+#end ## configuring
+#macro(committing)
+* Committing Changes
+
+    If your application has created or changed one or more archive files,
+    then these changes need to get committed.
+    If your application is only short-running, then there is nothing to do
+    about this because the TrueZIP Kernel initially registers a JVM shutdown
+    hook which will automatically commit all changes - even if the application
+    terminates due to a <<<Throwable>>>.
+    However, if your application needs more control over this operation or if
+    your application is long running, then it should manually commit all
+    changes to archive files whenever this task has been completed.
+    Here's how to do this: 
+
++--+
+TFile.umount();
++--+
+
+    Note that once your application calls this method, the TrueZIP Kernel
+    deregisters the JVM shutdown hook in order to prevent a potential memory
+    leak if it's used in multi-classloader-environments, e.g. JEE.
+    In most cases, the TrueZIP Kernel cannot register the JVM shutdown hook
+    again, so your application must repeat this call everytime it has finished
+    processing some changes to some archive files!
+
+    Take care not to call <<<TFile.umount()>>> in a loop which updates the same
+    set of archive files though, because this would result in a poor
+    performance in the order of <<<O(n*n)>>> instead of just <<<O(n)>>>,
+    where <<<n>>> is the total number of archive entries.
+
+    For more information, please refer to the Javadoc for
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}.
+
+#end ## committing
