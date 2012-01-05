@@ -14,6 +14,11 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.*;
 import net.jcip.annotations.ThreadSafe;
 
@@ -134,9 +139,7 @@ public final class Streams {
         // The FIFO is simply implemented as an array with an offset and a size
         // which is used like a ring buffer.
 
-        final Buffer[] buffers = new Buffer[FIFO_SIZE];
-        for (int i = buffers.length; 0 <= --i; )
-            buffers[i] = new Buffer();
+        final Buffer[] buffers = Buffer.allocate();
 
         /*
          * The task that cycles through the buffers in order to fill them
@@ -272,6 +275,7 @@ public final class Streams {
             if (reader.exception != null)
                 throw reader.exception;
         } finally {
+            Buffer.release(buffers);
             if (interrupted)
                 Thread.currentThread().interrupt();
         }
@@ -279,6 +283,34 @@ public final class Streams {
 
     /** A buffer for I/O. */
     private static final class Buffer {
+        /**
+         * Each entry in this list holds a soft reference to an array
+         * initialized with instances of this class.
+         */
+        static final List<Reference<Buffer[]>> list = new LinkedList<Reference<Buffer[]>>();
+
+        static Buffer[] allocate() {
+            synchronized (Buffer.class) {
+                Buffer[] buffers;
+                final Iterator<Reference<Buffer[]>> i = list.iterator();
+                while (i.hasNext()) {
+                    buffers = i.next().get();
+                    i.remove();
+                    if (null != buffers)
+                        return buffers;
+                }
+            }
+
+            final Buffer[] buffers = new Buffer[FIFO_SIZE];
+            for (int i = buffers.length; --i >= 0; )
+                buffers[i] = new Buffer();
+            return buffers;
+        }
+
+        static synchronized void release(Buffer[] buffers) {
+            list.add(new SoftReference<Buffer[]>(buffers));
+        }
+
         /** The byte buffer used for reading and writing. */
         final byte[] buf = new byte[BUFFER_SIZE];
 
