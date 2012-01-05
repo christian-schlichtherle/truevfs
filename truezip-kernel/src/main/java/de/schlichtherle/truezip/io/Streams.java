@@ -29,8 +29,8 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class Streams {
 
     /**
@@ -50,7 +50,7 @@ public final class Streams {
 
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new ReaderThreadFactory());
-    
+
     /** You cannot instantiate this class. */
     private Streams() {
     }
@@ -189,7 +189,7 @@ public final class Streams {
                     final byte[] buf = buffer.buf;
                     try {
                         read = _in.read(buf, 0, buf.length);
-                    } catch (Throwable ex) {
+                    } catch (IOException ex) {
                         exception = new InputException(ex);
                         read = -1;
                     }
@@ -208,8 +208,8 @@ public final class Streams {
 
         boolean interrupted = false;
         try {
-            final ReaderTask task = new ReaderTask();
-            final Future<?> result = executor.submit(task);
+            final ReaderTask reader = new ReaderTask();
+            final Future<?> result = executor.submit(reader);
 
             // Cache some data for better performance.
             final int buffersLen = buffers.length;
@@ -219,15 +219,15 @@ public final class Streams {
                 // Wait until a buffer is available.
                 final int off;
                 final Buffer buffer;
-                synchronized (task) {
-                    while (0 >= task.size) {
+                synchronized (reader) {
+                    while (0 >= reader.size) {
                         try {
-                            task.wait();
+                            reader.wait();
                         } catch (InterruptedException ex) {
                             interrupted = true;
                         }
                     }
-                    off = task.off;
+                    off = reader.off;
                     buffer = buffers[off];
                 }
 
@@ -264,16 +264,16 @@ public final class Streams {
                 }
 
                 // Advance tail and notify reader.
-                synchronized (task) {
-                    task.off = (off + 1) % buffersLen;
-                    task.size--;
-                    task.notify(); // only the reader could be waiting now!
+                synchronized (reader) {
+                    reader.off = (off + 1) % buffersLen;
+                    reader.size--;
+                    reader.notify(); // only the reader could be waiting now!
                 }
             }
             out.flush();
 
-            if (task.exception != null)
-                throw task.exception;
+            if (reader.exception != null)
+                throw reader.exception;
         } finally {
             Buffer.release(buffers);
             if (interrupted)
