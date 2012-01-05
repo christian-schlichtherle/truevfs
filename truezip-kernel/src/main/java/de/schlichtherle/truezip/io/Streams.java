@@ -14,11 +14,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.*;
 import net.jcip.annotations.ThreadSafe;
 
@@ -29,8 +24,8 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public final class Streams {
 
     /**
@@ -50,7 +45,7 @@ public final class Streams {
 
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new ReaderThreadFactory());
-    
+
     /** You cannot instantiate this class. */
     private Streams() {
     }
@@ -139,7 +134,9 @@ public final class Streams {
         // The FIFO is simply implemented as an array with an offset and a size
         // which is used like a ring buffer.
 
-        final Buffer[] buffers = Buffer.allocate();
+        final Buffer[] buffers = new Buffer[FIFO_SIZE];
+        for (int i = buffers.length; 0 <= --i; )
+            buffers[i] = new Buffer();
 
         /*
          * The task that cycles through the buffers in order to fill them
@@ -189,7 +186,7 @@ public final class Streams {
                     final byte[] buf = buffer.buf;
                     try {
                         read = _in.read(buf, 0, buf.length);
-                    } catch (Throwable ex) {
+                    } catch (IOException ex) {
                         exception = new InputException(ex);
                         read = -1;
                     }
@@ -208,8 +205,8 @@ public final class Streams {
 
         boolean interrupted = false;
         try {
-            final ReaderTask task = new ReaderTask();
-            final Future<?> result = executor.submit(task);
+            final ReaderTask reader = new ReaderTask();
+            final Future<?> result = executor.submit(reader);
 
             // Cache some data for better performance.
             final int buffersLen = buffers.length;
@@ -219,15 +216,15 @@ public final class Streams {
                 // Wait until a buffer is available.
                 final int off;
                 final Buffer buffer;
-                synchronized (task) {
-                    while (0 >= task.size) {
+                synchronized (reader) {
+                    while (0 >= reader.size) {
                         try {
-                            task.wait();
+                            reader.wait();
                         } catch (InterruptedException ex) {
                             interrupted = true;
                         }
                     }
-                    off = task.off;
+                    off = reader.off;
                     buffer = buffers[off];
                 }
 
@@ -264,18 +261,17 @@ public final class Streams {
                 }
 
                 // Advance tail and notify reader.
-                synchronized (task) {
-                    task.off = (off + 1) % buffersLen;
-                    task.size--;
-                    task.notify(); // only the reader could be waiting now!
+                synchronized (reader) {
+                    reader.off = (off + 1) % buffersLen;
+                    reader.size--;
+                    reader.notify(); // only the reader could be waiting now!
                 }
             }
             out.flush();
 
-            if (task.exception != null)
-                throw task.exception;
+            if (reader.exception != null)
+                throw reader.exception;
         } finally {
-            Buffer.release(buffers);
             if (interrupted)
                 Thread.currentThread().interrupt();
         }
@@ -283,34 +279,6 @@ public final class Streams {
 
     /** A buffer for I/O. */
     private static final class Buffer {
-        /**
-         * Each entry in this list holds a soft reference to an array
-         * initialized with instances of this class.
-         */
-        static final List<Reference<Buffer[]>> list = new LinkedList<Reference<Buffer[]>>();
-
-        static Buffer[] allocate() {
-            synchronized (Buffer.class) {
-                Buffer[] buffers;
-                final Iterator<Reference<Buffer[]>> i = list.iterator();
-                while (i.hasNext()) {
-                    buffers = i.next().get();
-                    i.remove();
-                    if (null != buffers)
-                        return buffers;
-                }
-            }
-
-            final Buffer[] buffers = new Buffer[FIFO_SIZE];
-            for (int i = buffers.length; --i >= 0; )
-                buffers[i] = new Buffer();
-            return buffers;
-        }
-
-        static synchronized void release(Buffer[] buffers) {
-            list.add(new SoftReference<Buffer[]>(buffers));
-        }
-
         /** The byte buffer used for reading and writing. */
         final byte[] buf = new byte[BUFFER_SIZE];
 
