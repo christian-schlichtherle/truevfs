@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -11,11 +11,7 @@ package de.schlichtherle.truezip.nio.charset;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 import java.nio.charset.spi.CharsetProvider;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
@@ -24,7 +20,7 @@ import net.jcip.annotations.Immutable;
  * A charset provider that only provides the {@code IBM437} character set,
  * also known as {@code CP437}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
