@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -20,11 +20,7 @@ import java.io.IOException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,13 +9,12 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.key.SafeKeyProvider;
+import static de.schlichtherle.truezip.key.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-
-import static de.schlichtherle.truezip.key.SafeKeyProvider.*;
 
 /**
  * Provides run by beeping using the default toolkit and disabling the
@@ -26,7 +25,7 @@ import static de.schlichtherle.truezip.key.SafeKeyProvider.*;
  * JOptionPane which has the OK button set as its default button.
  * This is to inhibit the use of a GUI robot for exhaustive password searching.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class BasicInvalidKeyFeedback
