@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,8 +9,8 @@
 package de.schlichtherle.truezip.fs.nio.file;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.io.IOExceptionOutputStream;
@@ -18,23 +18,18 @@ import de.schlichtherle.truezip.io.IOExceptionSeekableByteChannel;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import static de.schlichtherle.truezip.util.Maps.*;
+import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
-import static java.lang.Boolean.*;
+import static java.lang.Boolean.TRUE;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.AccessMode;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
 import static java.nio.file.Files.*;
-import java.nio.file.OpenOption;
-import java.nio.file.Path;
-import static java.nio.file.StandardCopyOption.*;
-import java.nio.file.StandardOpenOption;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;

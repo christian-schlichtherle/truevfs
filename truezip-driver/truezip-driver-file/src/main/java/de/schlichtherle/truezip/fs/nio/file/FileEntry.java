@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,11 +9,11 @@
 package de.schlichtherle.truezip.fs.nio.file;
 
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -23,10 +23,11 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import static java.io.File.*;
+import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.newDirectoryStream;
+import static java.nio.file.Files.readAttributes;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
