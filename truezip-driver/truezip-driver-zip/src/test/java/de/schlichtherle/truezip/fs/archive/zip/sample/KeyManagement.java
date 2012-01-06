@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
-import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;

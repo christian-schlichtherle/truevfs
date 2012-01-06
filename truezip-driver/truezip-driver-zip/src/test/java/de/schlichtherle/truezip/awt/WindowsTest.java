@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,15 +8,13 @@
  */
 package de.schlichtherle.truezip.awt;
 
-import de.schlichtherle.truezip.awt.Windows;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle

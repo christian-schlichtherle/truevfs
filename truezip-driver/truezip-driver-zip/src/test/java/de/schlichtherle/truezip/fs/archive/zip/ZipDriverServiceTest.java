@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,14 +8,14 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.SuffixSet;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
