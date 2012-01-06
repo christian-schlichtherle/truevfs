@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,8 +9,8 @@
 package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import static de.schlichtherle.truezip.util.Maps.*;
+import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;

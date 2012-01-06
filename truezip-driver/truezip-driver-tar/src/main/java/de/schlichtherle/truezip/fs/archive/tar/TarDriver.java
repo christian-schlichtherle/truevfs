@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -9,23 +9,14 @@
 package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.COMPRESS;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;

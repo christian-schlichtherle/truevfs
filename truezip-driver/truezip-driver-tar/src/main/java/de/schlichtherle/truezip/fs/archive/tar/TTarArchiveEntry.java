@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,9 +8,11 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool.Releasable;
