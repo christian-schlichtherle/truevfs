@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -20,13 +20,12 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
