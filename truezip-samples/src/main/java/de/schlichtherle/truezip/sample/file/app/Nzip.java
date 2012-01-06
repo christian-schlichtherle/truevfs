@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,11 +8,7 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileComparator;
-import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.file.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;

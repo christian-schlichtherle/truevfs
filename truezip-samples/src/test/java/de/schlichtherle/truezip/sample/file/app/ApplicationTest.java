@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,12 +8,13 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
+import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 import java.io.ByteArrayOutputStream;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * @author  Christian Schlichtherle
