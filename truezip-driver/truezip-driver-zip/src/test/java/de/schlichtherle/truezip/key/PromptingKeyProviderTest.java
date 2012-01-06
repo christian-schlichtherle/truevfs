@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,12 +8,11 @@
  */
 package de.schlichtherle.truezip.key;
 
+import static de.schlichtherle.truezip.key.MockView.Action.*;
 import java.net.URI;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static de.schlichtherle.truezip.key.MockView.Action.*;
-import static org.junit.Assert.*;
 
 /**
  * @author  Christian Schlichtherle
