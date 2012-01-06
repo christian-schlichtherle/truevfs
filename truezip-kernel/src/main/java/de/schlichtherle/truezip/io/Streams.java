@@ -230,8 +230,8 @@ public final class Streams {
                     break; // reader has terminated because of EOF or exception
 
                 // Process buffer.
-                final byte[] buf = buffer.buf;
                 try {
+                    final byte[] buf = buffer.buf;
                     out.write(buf, 0, write);
                 } catch (IOException ex) {
                     // Cancel reader thread synchronously.
