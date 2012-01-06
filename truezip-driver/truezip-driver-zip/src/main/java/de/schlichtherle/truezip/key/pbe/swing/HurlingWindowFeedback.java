@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
+import static de.schlichtherle.truezip.key.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Point;
 import java.awt.Window;
@@ -16,8 +17,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-
-import static de.schlichtherle.truezip.key.SafeKeyProvider.*;
 
 /**
  * Provides run by beeping using the default toolkit, disabling the
