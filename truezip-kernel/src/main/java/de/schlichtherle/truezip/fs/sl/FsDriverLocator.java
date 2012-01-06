@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -12,16 +12,13 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import static de.schlichtherle.truezip.util.Maps.*;
+import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import static java.util.logging.Level.*;
+import java.util.*;
+import static java.util.logging.Level.CONFIG;
+import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
