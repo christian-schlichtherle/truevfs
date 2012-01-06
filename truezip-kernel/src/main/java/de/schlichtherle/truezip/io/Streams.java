@@ -146,7 +146,7 @@ public final class Streams {
                 // Cache some fields for better performance.
                 final InputStream _in = in;
                 final Buffer[] _buffers = buffers;
-                final int _buffersLen = buffers.length;
+                final int _buffersLength = _buffers.length;
 
                 // The writer executor interrupts this executor to signal
                 // that it cannot handle more input because there has been
@@ -158,7 +158,7 @@ public final class Streams {
                     final Buffer buffer;
                     mutex.lock();
                     try {
-                        while (size >= _buffersLen) {
+                        while (size >= _buffersLength) {
                             try {
                                 signal.await();
                             } catch (InterruptedException interrupted) {
@@ -166,7 +166,7 @@ public final class Streams {
                                 return;
                             }
                         }
-                        buffer = _buffers[(off + size) % _buffersLen];
+                        buffer = _buffers[(off + size) % _buffersLength];
                     } finally {
                         mutex.unlock();
                     }
@@ -202,7 +202,7 @@ public final class Streams {
             final Future<?> result = executor.submit(reader);
 
             // Cache some data for better performance.
-            final int buffersLen = buffers.length;
+            final int buffersLength = buffers.length;
 
             int write;
             while (true) {
@@ -259,7 +259,7 @@ public final class Streams {
                 // Advance tail and signal reader.
                 mutex.lock();
                 try {
-                    reader.off = (off + 1) % buffersLen;
+                    reader.off = (off + 1) % buffersLength;
                     reader.size--;
                     signal.signal(); // only the reader could be waiting now!
                 } finally {
