@@ -16,14 +16,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Deque;
+import java.util.Queue;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * Provides static utility methods for {@link InputStream}s and
+ * Provides static copy methods for {@link InputStream}s and
  * {@link OutputStream}s.
  *
  * @author  Christian Schlichtherle
@@ -40,12 +42,9 @@ public final class Streams {
      * The actual number is optimized to compensate for oscillating I/O
      * bandwidths like e.g. with network shares.
      */
-    private static final int FIFO_SIZE = 4;
+    static final int FIFO_SIZE = 4;
 
-    /**
-     * The buffer size used for reading and writing.
-     * Optimized for performance.
-     */
+    /** The buffer size used for reading and writing, which is {@value}. */
     public static final int BUFFER_SIZE = 8 * 1024;
 
     private static final ExecutorService executor
@@ -116,29 +115,16 @@ public final class Streams {
         if (null == in || null == out)
             throw new NullPointerException();
 
-        // Note that we do not use PipedInput/OutputStream because these
-        // classes are slooow. This is partially because they are using
-        // Object.wait()/notify() in a suboptimal way and partially because
-        // they copy data to and from an additional buffer byte array, which
-        // is redundant if the data to be transferred is already held in
-        // another byte array.
-        // As an implication of the latter reason, although the idea of
-        // adopting the pipe concept to threads looks tempting it is actually
-        // bad design: Pipes are a good means of interprocess communication,
-        // where processes cannot access each others data directly without
-        // using an external data structure like the pipe as a commonly shared
-        // FIFO buffer.
-        // However, threads are different: They share the same memory and thus
-        // we can use much more elaborated algorithms for data transfer.
+        // We will use a FIFO to exchange byte buffers between a pooled reader
+        // thread and the current writer thread.
+        // The pooled reader thread will fill the buffers with data from the
+        // input and the current thread will write the filled buffers to the
+        // output.
+        // The FIFO is simply implemented as a cached array or byte buffers
+        // with an offset and a size which is used like a ring buffer.
 
-        // Finally, in this case we will use a FIFO to exchange byte buffers
-        // between an additional reader thread and the current writer thread.
-        // An additionally created reader thread will fill the buffers with
-        // data from the input and the current thread will flush the filled
-        // buffers to the output.
-        // The FIFO is simply implemented as an array with an offset and a size
-        // which is used like a ring buffer.
-
+        final Lock mutex = new ReentrantLock();
+        final Condition signal = mutex.newCondition();
         final Buffer[] buffers = Buffer.allocate();
 
         /*
@@ -170,39 +156,43 @@ public final class Streams {
                 do {
                     // Wait until a buffer is available.
                     final Buffer buffer;
-                    synchronized (ReaderTask.this) {
+                    mutex.lock();
+                    try {
                         while (size >= _buffersLen) {
                             try {
-                                wait();
+                                signal.await();
                             } catch (InterruptedException interrupted) {
                                 // The writer thread wants us to stop reading.
                                 return;
                             }
                         }
                         buffer = _buffers[(off + size) % _buffersLen];
+                    } finally {
+                        mutex.unlock();
                     }
 
                     // Fill buffer until end of file or buffer.
                     // This should normally complete in one loop cycle, but
                     // we do not depend on this as it would be a violation
                     // of InputStream's contract.
-                    final byte[] buf = buffer.buf;
                     try {
+                        final byte[] buf = buffer.buf;
                         read = _in.read(buf, 0, buf.length);
                     } catch (IOException ex) {
                         exception = new InputException(ex);
                         read = -1;
                     }
-                    /*if (Thread.interrupted())
-                        read = -1; // throws away buf - OK in this context*/
                     buffer.read = read;
 
-                    // Advance head and notify writer.
-                    synchronized (ReaderTask.this) {
+                    // Advance head and signal writer.
+                    mutex.lock();
+                    try {
                         size++;
-                        notify(); // only the writer could be waiting now!
+                        signal.signal(); // only the writer could be waiting now!
+                    } finally {
+                        mutex.unlock();
                     }
-                } while (read != -1);
+                } while (0 <= read);
             }
         } // ReaderTask
 
@@ -219,16 +209,19 @@ public final class Streams {
                 // Wait until a buffer is available.
                 final int off;
                 final Buffer buffer;
-                synchronized (reader) {
+                mutex.lock();
+                try {
                     while (0 >= reader.size) {
                         try {
-                            reader.wait();
+                            signal.await();
                         } catch (InterruptedException ex) {
                             interrupted = true;
                         }
                     }
                     off = reader.off;
                     buffer = buffers[off];
+                } finally {
+                    mutex.unlock();
                 }
 
                 // Stop on last buffer.
@@ -263,11 +256,14 @@ public final class Streams {
                     throw ex;
                 }
 
-                // Advance tail and notify reader.
-                synchronized (reader) {
+                // Advance tail and signal reader.
+                mutex.lock();
+                try {
                     reader.off = (off + 1) % buffersLen;
                     reader.size--;
-                    reader.notify(); // only the reader could be waiting now!
+                    signal.signal(); // only the reader could be waiting now!
+                } finally {
+                    mutex.unlock();
                 }
             }
             out.flush();
@@ -284,31 +280,38 @@ public final class Streams {
     /** A buffer for I/O. */
     private static final class Buffer {
         /**
-         * Each entry in this list holds a soft reference to an array
+         * Each entry in this queue holds a soft reference to an array
          * initialized with instances of this class.
+         * <p>
+         * The best choice would be a {@link ConcurrentLinkedDeque} where I
+         * could call {@link Deque#push(Object)} to achieve many garbage
+         * collector pickups of old {@link SoftReference}s further down the
+         * stack, but this class is only available since JSE 7.
+         * A {@link LinkedBlockingDeque} is supposedly not a good choice
+         * because it uses locks, which I would like to abandon.
          */
-        static final List<Reference<Buffer[]>> list = new LinkedList<Reference<Buffer[]>>();
+        static final Queue<Reference<Buffer[]>> queue
+                = new ConcurrentLinkedQueue<Reference<Buffer[]>>();
 
         static Buffer[] allocate() {
-            synchronized (Buffer.class) {
-                Buffer[] buffers;
-                final Iterator<Reference<Buffer[]>> i = list.iterator();
-                while (i.hasNext()) {
-                    buffers = i.next().get();
-                    i.remove();
+            {
+                Reference<Buffer[]> reference;
+                while (null != (reference = queue.poll())) {
+                    final Buffer[] buffers = reference.get();
                     if (null != buffers)
                         return buffers;
                 }
             }
 
             final Buffer[] buffers = new Buffer[FIFO_SIZE];
-            for (int i = buffers.length; --i >= 0; )
+            for (int i = buffers.length; 0 <= --i; )
                 buffers[i] = new Buffer();
             return buffers;
         }
 
-        static synchronized void release(Buffer[] buffers) {
-            list.add(new SoftReference<Buffer[]>(buffers));
+        static void release(Buffer[] buffers) {
+            //queue.push(new SoftReference<Buffer[]>(buffers));
+            queue.add(new SoftReference<Buffer[]>(buffers));
         }
 
         /** The byte buffer used for reading and writing. */
@@ -330,7 +333,7 @@ public final class Streams {
     } // ReaderThreadFactory
 
     /**
-     * A pooled and cached daemon thread which reads input streams.
+     * A pooled and cached daemon thread which runs tasks to read input streams.
      * You cannot use this class outside its package.
      */
     public static final class ReaderThread extends Thread {

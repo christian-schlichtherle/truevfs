@@ -10,16 +10,12 @@ package de.schlichtherle.truezip.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -27,40 +23,66 @@ import org.junit.Test;
  * @version $Id$
  */
 public class StreamsTest {
-    private byte[] data;
-    private TestInputStream in;
-    private TestOutputStream out;
-
-    @Before
-    public void setUp() {
-        data = new byte[3 * Streams.BUFFER_SIZE];
-        new Random().nextBytes(data);
-        in = new TestInputStream(data);
-        out = new TestOutputStream(data.length);
-    }
 
     @Test
     public void testCat() throws IOException {
+        final MockInputStream in = new MockInputStream();
+        final MockOutputStream out = new MockOutputStream(in);
         Thread.currentThread().interrupt();
-        Streams.cat(in, out);
+        try {
+            Streams.cat(in, out);
+            fail();
+        } catch (InputException expected) {
+            assertTrue(expected.getCause() instanceof EOFException);
+        }
         assertTrue(Thread.interrupted());
-        assertFalse(in.closed);
+        assertTrue(out.flushed);
         assertFalse(out.closed);
-        assertArrayEquals(data, out.toByteArray());
+        assertFalse(in.closed);
+        assertArrayEquals(in.buffer, out.toByteArray());
+    }
+
+    @Test
+    public void testOutputException() throws IOException {
+        final MockInputStream in = new MockInputStream();
+        final MockOutputStream out = new MockOutputStream(in) {
+            @Override
+            public void write(byte[] b, int off, int len) throws IOException {
+                throw new EOFException();
+            }
+        };
+        Thread.currentThread().interrupt();
+        try {
+            Streams.cat(in, out);
+            fail();
+        } catch (EOFException expected) {
+        }
+        assertTrue(Thread.interrupted());
+        assertFalse(out.flushed);
+        assertFalse(out.closed);
+        assertFalse(in.closed);
     }
 
     @Test
     public void testCopy() throws IOException {
+        final MockInputStream in = new MockInputStream();
+        final MockOutputStream out = new MockOutputStream(in);
         Thread.currentThread().interrupt();
-        Streams.copy(in, out);
+        try {
+            Streams.copy(in, out);
+            fail();
+        } catch (InputException expected) {
+            assertTrue(expected.getCause() instanceof EOFException);
+        }
         assertTrue(Thread.interrupted());
-        assertTrue(in.closed);
+        assertTrue(out.flushed);
         assertTrue(out.closed);
-        assertArrayEquals(data, out.toByteArray());
+        assertTrue(in.closed);
+        assertArrayEquals(in.buffer, out.toByteArray());
     }
 
     @Test
-    public void testPerformance() throws Exception {
+    public void testMultithreading() throws Exception {
         class Task implements Callable<Void> {
             @Override
             public Void call() throws IOException {
@@ -70,8 +92,8 @@ public class StreamsTest {
         } // Task
 
         final int numThreads = Runtime.getRuntime().availableProcessors() * 10;
-        final int numTasks = 100 * numThreads;
-        
+        final int numTasks = 10 * numThreads;
+
         final List<Future<Void>> results = new ArrayList<Future<Void>>(numTasks);
         final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try {
@@ -84,31 +106,101 @@ public class StreamsTest {
             result.get(); // check out exception
     }
 
-    private static final class TestInputStream extends ByteArrayInputStream {
+    private static class MockInputStream extends DecoratingInputStream {
+        final byte[] buffer;
         boolean closed;
 
-        TestInputStream(final byte[] data) {
-            super(data);
+        MockInputStream() { this(newBuffer()); }
+
+        MockInputStream(final byte[] buffer) {
+            super(new ByteArrayInputStream(buffer));
+            this.buffer = buffer;
+        }
+
+        static byte[] newBuffer() {
+            final byte[] buffer = new byte[2 * Streams.FIFO_SIZE * Streams.BUFFER_SIZE];
+            ThreadLocalRandom.current().nextBytes(buffer);
+            return buffer;
+        }
+
+        @Override
+        public int read() throws IOException {
+            throw new AssertionError();
+        }
+
+        @Override
+        public int read(final byte[] b, final int off, final int len)
+        throws IOException {
+            final int read = delegate.read(b, off, len);
+            if (0 > read)
+                throw new EOFException();
+            return read;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            throw new AssertionError();
+        }
+
+        @Override
+        public int available() throws IOException {
+            throw new AssertionError();
         }
 
         @Override
         public void close() throws IOException {
-            super.close();
+            delegate.close();
             closed = true;
+        }
+
+        @Override
+        public void mark(int readlimit) {
+            throw new AssertionError();
+        }
+
+        @Override
+        public void reset() throws IOException {
+            throw new AssertionError();
+        }
+
+        @Override
+        public boolean markSupported() {
+            throw new AssertionError();
         }
     }
 
-    private static final class TestOutputStream extends ByteArrayOutputStream {
+    private static class MockOutputStream extends DecoratingOutputStream {
         boolean closed;
+        boolean flushed;
 
-        TestOutputStream(final int initialCapacity) {
-            super(initialCapacity);
+        MockOutputStream(final MockInputStream in) {
+            super(new ByteArrayOutputStream(in.buffer.length));
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            throw new AssertionError();
+        }
+
+        /*@Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            delegate.write(b, off, len);
+        }*/
+
+        @Override
+        public void flush() throws IOException {
+            delegate.flush();
+            flushed = true;
         }
 
         @Override
         public void close() throws IOException {
-            super.close();
+            delegate.close();
             closed = true;
+        }
+
+        byte[] toByteArray() {
+            return ((ByteArrayOutputStream) delegate).toByteArray();
         }
     }
 }
