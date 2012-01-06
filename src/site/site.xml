@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2004-2011 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<project    xmlns="http://maven.apache.org/DECORATION/1.1.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd">
+    <bannerRight>
+        <name>Archive files are virtual directories!</name>
+    </bannerRight>
+    <googleAnalyticsAccountId>UA-25500668-1</googleAnalyticsAccountId>
+    <custom>
+        <googleCustomSearchId>003580521944097984334:0t01zxsxy6y</googleCustomSearchId>
+        <paypalButton>
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                <div style="margin: 5px">
+                    <input type="hidden" name="cmd" value="_s-xclick"/>
+                    <input type="hidden" name="hosted_button_id" value="2QSQY9ECYES9E"/>
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" style="border: 0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
+                </div>
+            </form>
+        </paypalButton>
+    </custom>
+    <publishDate position="bottom"/>
+    <version position="none"/>
+    <skin>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>truezip-skin</artifactId>
+        <version>5</version>
+    </skin>
+    <body>
+        <head>
+            <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed" href="http://truezip.schlichtherle.de/category/announcements/feed/"/>
+        </head>
+        <links>
+            <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
+            <item name="Change Log" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
+            <item name="Developer Website" href="http://java.net/projects/truezip"/>
+        </links>
+        <breadcrumbs>
+            <item name="TrueZIP" href="index.html"/>
+        </breadcrumbs>
+        <menu name="Documentation">
+            <item name="About" href="index.html"/>
+            <item name="Key Features" href="features.html"/>
+            <item name="Use Cases" href="usecases/index.html" collapse="true">
+                <item name="Application File Format" href="usecases/aff.html"/>
+                <item name="Encrypted Application File Format" href="usecases/eaff.html"/>
+                <item name="Integrated Development Environment" href="usecases/ide.html"/>
+                <item name="Software Build Tool" href="usecases/sbt.html"/>
+                <item name="Search Engine" href="usecases/se.html"/>
+            </item>
+            <item name="Kick-Start" href="kick-start/index.html" collapse="true">
+                <item name="In Eclipse" href="kick-start/file/eclipse.html"/>
+                <item name="In NetBeans" href="kick-start/file/netbeans.html"/>
+                <item name="In a Shell" href="kick-start/file/shell.html"/>
+                <item name="Without Maven" href="kick-start/no-maven.html"/>
+            </item>
+            <item name="Migration" href="migration.html"/>
+            <item name="Concepts" href="concepts.html"/>
+            <item name="Glossary" href="glossary.html"/>
+            <item name="FAQ" href="faq.html"/>
+            <item name="TrueZIP 6 (Obsolete)" href="6/index.html" collapse="true">
+                <item name="Tutorial" href="6/tutorial.html"/>
+                <item name="News Archive" href="6/news/index.html" collapse="true">
+                    <item name="6.8 Release" href="6/news/20100831.html"/>
+                    <item name="6.7 Release" href="6/news/20100716.html"/>
+                    <item name="6.7 RC1 Release" href="6/news/20091103.html"/>
+                    <item name="6.6 Release" href="6/news/20070403.html"/>
+                    <item name="6.5.4 Release" href="6/news/20070227.html"/>
+                    <item name="6.4 Release" href="6/news/20061221.html"/>
+                    <item name="6.3.1 Release" href="6/news/20061010.html"/>
+                    <item name="6.3 Release" href="6/news/20061006.html"/>
+                    <item name="6.2.1 Release" href="6/news/20060907.html"/>
+                    <item name="6.2 / 5.1.8 Release" href="6/news/20060807.html"/>
+                    <item name="6.1 / 5.1.7 Release" href="6/news/20060710.html"/>
+                    <item name="6.0 / 5.1.6 Release" href="6/news/20060405.html"/>
+                    <item name="6.0 RC1 Release" href="6/news/20060313.html"/>
+                    <item name="5.1.5 Release" href="6/news/20060306-2.html"/>
+                    <item name="6.0 Development" href="6/news/20060306-1.html"/>
+                    <item name="5.1.2 Release" href="6/news/20060224.html"/>
+                    <item name="5.0.1 Release" href="6/news/20060124.html"/>
+                    <item name="5.0 Release" href="6/news/20060120.html"/>
+                    <item name="4.0 Release" href="6/news/20051219.html"/>
+                    <item name="3.3 Release" href="6/news/20051205.html"/>
+                    <item name="3.2 Release" href="6/news/20051022-2.html"/>
+                    <item name="3.1 Release" href="6/news/20051022-1.html"/>
+                </item>
+                <item name="Release Notes Archive" href="6/relnotes/index.html" collapse="true">
+                    <item name="6.8" href="6/relnotes/release-6_8.html"/>
+                    <item name="6.7" href="6/relnotes/release-6_7.html"/>
+                    <item name="6.6" href="6/relnotes/release-6_6.html"/>
+                    <item name="6.5.4" href="6/relnotes/release-6_5_4.html"/>
+                    <item name="6.4" href="6/relnotes/release-6_4.html"/>
+                    <item name="6.3.2" href="6/relnotes/release-6_3_2.html"/>
+                    <item name="6.3" href="6/relnotes/release-6_3.html"/>
+                    <item name="6.2.1" href="6/relnotes/release-6_2_1.html"/>
+                    <item name="6.2" href="6/relnotes/release-6_2.html"/>
+                    <item name="6.1" href="6/relnotes/release-6_1.html"/>
+                    <item name="6.0" href="6/relnotes/release-6_0.html"/>
+                </item>
+            </item>
+        </menu>
+        <menu name="Reports" ref="reports" inherit="bottom"/>
+        <menu name="Sub-Modules" ref="modules" inherit="bottom"/>
+        <menu name="Parent Module" ref="parent" inherit="bottom"/>
+    </body>
+</project>

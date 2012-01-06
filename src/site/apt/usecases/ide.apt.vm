@@ -1,0 +1,53 @@
+#parse("common.vm")
+#leadIn("Integrated Development Environment (IDE)",
+  "Suppose you're writing a plug-in for the next generation IDE
+   which shall show the users the contents of any assembly and allow them to
+   arbitrarily modify it.",
+  "true",
+  "Reading and Writing Archive Files")
+
+    See how easy listing the contents of the top level directory of an archive
+    file can be:
+
++--+
+TFile[] entries = new TFile("archive.jar").listFiles();
++--+
+
+    To create or overwrite an entry in an archive file, you could simply use
+    this:
+
++--+
+Writer writer = new TFileWriter("archive.jar/META-INF/MANIFEST.MF");
+try {
+    ...;
+} finally {
+    writer.close(); // ALWAYS close the resource here!
+}
++--+
+
+    You may be glad to know that this works recursively, too.
+    Here's how to read the manifest of a library JAR within a web
+    application:
+
++--+
+Reader reader = new TFileReader("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF");
+try {
+    ...;
+} finally {
+    reader.close(); // ALWAYS close the resource here!
+}
++--+
+
+    And finally, to delete an entry in an archive file, you could use this:
+
++--+
+new TFile("archive.jar/META-INF/MANIFEST.MF").rm();
++--+
+
+#configuring("<<<jar>>> or <<<war>>>",
+  "JAR or WAR",
+  "module
+   {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+   needs",
+  "<<<truezip-driver-zip>>>")
+#committing()

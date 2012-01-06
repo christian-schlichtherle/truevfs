@@ -1,0 +1,100 @@
+#parse("common.vm")
+    -----------------------
+    Application File Format
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Application File Format
+
+* Motivation
+
+    Suppose you're writing a plug-in for the next generation application
+    which shall use an archive file format with a custom file suffix
+    (extension) as a persistent container for some application data.
+
+    Then, wouldn't it be nice if you wouldn't need to worry about how to read
+    or write archive files using cumbersome archive type specific APIs?
+
+* Accessing Application File Formats
+
+    Thanks to the
+    {{{../truezip-file/index.html}TrueZIP File*}}
+    module, here's your relief:
+    The
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    and
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    classes can read and write entries within an
+    archive file as if they were plain files in regular directories in the file
+    system.
+
+    First, you need to register your custom application file format suffix
+    with an instance of an archive driver class like this:
+
++--+
+TFile.setDefaultArchiveDetector(
+    new TArchiveDetector(
+        "foo|bar",
+        new JarDriver(IOPoolLocator.SINGLETON)));
++--+
+
+    Once this has been called, any new <<<TFile>>> object will recognize the
+    file suffixes <<<foo>>> and <<<bar>>>, whereby case is ignored,
+    and assume the JAR file format to read or write these files.
+
+    Note that TrueZIP automatically recognizes false positive archive files,
+    so it cannot get confused by files with arbitrary content which accidently
+    use the suffix of your custom application file format.
+
+    Please also note the usage of the class
+    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}
+    for accessing the JAR file format.
+    The JAR file format is typically the best choice for custom application
+    file formats because it supports compression, fast access and UTF-8 encoded
+    entry names for maximum interoperability.
+    In particular, the last point makes it superior to the ZIP file format.
+
+    Now you can easily create or overwrite an entry in your custom application
+    file format like this:
+
++--+
+OutputStream out = new TFileOutputStream("file.foo/contents.xml");
+try {
+    ...;
+} finally {
+    out.close(); // ALWAYS close the resource here!
+}
++--+
+
+    Alternatively, you could use a 
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}.
+
+    This is how you could read the entry again:
+
++--+
+InputStream in = new TFileInputStream("file.foo/contents.xml");
+try {
+    ...;
+} finally {
+    in.close(); // ALWAYS close the resource here!
+}
++--+
+
+    Alternatively, you could use a 
+    {{{../apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
+
+    And finally, to delete a virtual directory tree - in this case your custom
+    application file - you could use this:
+
++--+
+new TFile("file.foo").rm_r();
++--+
+
+    Note that calling the method <<<rm_r()>>> is required to recursively delete
+    the application file because the <<<TFile>>> object refers to a virtual
+    directory, which cannot get deleted using similar methods like
+    <<<delete()>>> or <<<rm()>>> unless it's empty.
+
+#committing()

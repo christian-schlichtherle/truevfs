@@ -1,0 +1,164 @@
+    -----------------------
+    Migrating TrueZIP 6 Applications to TrueZIP 7
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Migrating TrueZIP 6 Applications to TrueZIP 7
+
+    This guide outlines the required steps to migrate a TrueZIP 6 application
+    to TrueZIP 7.
+    This guide is <not> complete - additional steps may or may not be required
+    by you!
+
+* Backup Project
+
+    First, <<make a backup of your project files>> or check them into your SCM
+    system:
+    Chances are that you'll screw up your project - you've been warned!
+
+* Initiate Sources
+
+    As the primary option - if you haven't done so already -
+    {{{./kick-start/file/shell.html}initiate a Maven project}}
+    and integrate your sources into its directory tree or - as a secondary
+    option -
+    {{{http://truezip.schlichtherle.de/2011/05/13/no-maven/}download the all-in-one JAR-with-dependencies}}
+    for the module TrueZIP Samples and put it wherever your build script
+    expects it.
+
+* Setup Class Path
+
+    While TrueZIP 6 consists of a single monolithic module, TrueZIP 7 is a
+    multi-module project in order to reduce application dependencies and enable
+    them to apply the convention-over-configuration paradigm for the initial
+    set up of the detectable archive file types.
+
+* Search And Replace
+
+    Next, you'll have to do a couple of search-and-replace operations on all
+    Java files of your project in order to substitute the phrases in the
+    following tables in order.
+    When searching, do it case sensitive, but do <not> limit it to whole
+    words and do <not> use regular expressions!
+
+** Package Names
+
+    Perform the following search-and-replace operations according to the
+    guidelines explained above.
+
+*--*--*--*
+||#||Search||Replace|
+*--+--+--+
+|1.|<<<de.schlichtherle.io>>>|<<<de.schlichtherle.truezip.file>>>|
+*--+--+--+
+|2.|<<<de.schlichtherle.util.zip>>>|<<<de.schlichtherle.truezip.zip>>>|
+*--+--+--+
+
+    Do not yet fix compilation errors.
+
+** Class Names
+
+    Perform the following search-and-replace operations according to the
+    guidelines explained above.
+
+*--*--*--*
+||#||Search||Replace|
+*--+--+--+
+|1.|<<<DefaultArchiveDetector>>>|<<<TArchiveDetector>>>|
+*--+--+--+
+|2.|<<<ArchiveDetector>>>|<<<TArchiveDetector>>>|
+*--+--+--+
+|3.|<<<File>>>|<<<TFile>>>|
+*--+--+--+
+|4.|<<<ArchiveWarningException>>>|<<<FsSyncWarningException>>>|
+*--+--+--+
+|5.|<<<ArchiveException>>>|<<<FsSyncException>>>|
+*--+--+--+
+
+    Do not yet fix compilation errors.
+
+    The substitution of <<<File>>> with <<<TFile>>> will intentionally pick up
+    all uses of <<<(java.io.)?File*>>>, e.g. <<<FileWriter>>> or
+    <<<java.io.FileInputStream>>>.
+    This should be OK - let it happen for now.
+    Once you've configured the archive detection as described
+    {{{Archive_Detection}below}}, your application should be fine with this.
+
+** Method Names
+
+    Perform the following search-and-replace operations according to the
+    guidelines explained above.
+
+*--*--*--*
+||#||Search||Replace|
+*--+--+--+
+|1.|<<<archiveCopyAll>>>|<<<cp_rp>>>|
+*--+--+--+
+|2.|<<<archiveCopy>>>|<<<cp_p>>>|
+*--+--+--+
+|3.|<<<copyAll>>>|<<<cp_r>>>|
+*--+--+--+
+|4.|<<<copy>>>|<<<cp>>>|
+*--+--+--+
+|5.|<<<catFrom>>>|<<<input>>>|
+*--+--+--+
+|6.|<<<catTo>>>|<<<output>>>|
+*--+--+--+
+|7.|<<<renameTo>>>|<<<mv>>>|
+*--+--+--+
+|8.|<<<deleteAll>>>|<<<rm_r>>>|
+*--+--+--+
+|9.|<<<delete>>>|<<<rm>>>|
+*--+--+--+
+
+    Note that replacing <<<renameTo>>> and <<<delete>>> is just optional,
+    but beneficial - see next.
+
+* Fix Compilation Errors
+
+    Now fix compilation errors.
+
+    Mind that the signature of the bulk I/O methods has changed:
+    In TrueZIP 6, bulk I/O methods like <<<archiveCopyAll>>> etc. return a
+    boolean value to indicate success or failure.
+    In TrueZIP 7, their substitutes throw an <<<IOException>>> on failure
+    instead and return <<<void>>> or <<<this>>> in order to enable a fluent
+    coding style.
+
+    The exception class hierarchy has been significantly changed, too.
+    There is no one-to-one mapping for this, so your best option is to catch
+    or declare to throw only <<<IOException>>> objects.
+
+    In case your application is using RAES encrypted ZIP files
+    (alias ZIP.RAES alias TZP) and programmatically sets authentication
+    passwords, you need to migrate the key management part of your
+    application, too.
+    In the documentation of the module TrueZIP Samples, there's an article
+    about
+    {{{./truezip-driver/truezip-driver-tzp/key-management.html}key management}}
+    which demonstrates this.
+
+** Optional: Configure {Archive Detection}
+
+    Once you've set up your run time class path correctly, it should not be
+    necessary to configure archive detection because TrueZIP 7 supports the
+    convention-over-configuration paradigm.
+
+    One notable exception is if you need to detect custom archive file formats.
+    There's a use case article for
+    {{{./usecases/aff.html}application file formats}}
+    which demonstrates this.
+    As you can see in this article, you simply need to pass the
+    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html#SINGLETON}<<<IOPoolLocator.SINGLETON>>>}}
+    to the archive driver constructors now in order to obtain their usual
+    behaviour.
+
+* Build Project
+
+    Now cross fingers and build your project.
+    If it compiles, chances are that it will work straight away because the
+    semantics of the classes and methods of the TrueZIP File* API haven't
+    really changed between TrueZIP 6 and 7:
+    After all, a recursive archive copy operation (once <<<archiveCopyAll>>>)
+    is still a recursive archive copy operation (now <<<cp_rp>>>).
