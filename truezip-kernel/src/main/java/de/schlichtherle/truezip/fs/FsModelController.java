@@ -44,15 +44,15 @@ extends FsController<M>  {
         return model;
     }
 
-    public FsMountPoint getMountPoint() {
+    public final FsMountPoint getMountPoint() {
         return model.getMountPoint();
     }
 
-    public boolean isTouched() {
+    public final boolean isTouched() {
         return model.isTouched();
     }
 
-    protected void setTouched(boolean touched) {
+    protected final void setTouched(boolean touched) {
         model.setTouched(touched);
     }
 }
