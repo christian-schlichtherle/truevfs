@@ -27,7 +27,6 @@
         </paypalButton>
     </custom>
     <publishDate position="bottom"/>
-    <version position="none"/>
     <skin>
         <groupId>${project.groupId}</groupId>
         <artifactId>truezip-skin</artifactId>
