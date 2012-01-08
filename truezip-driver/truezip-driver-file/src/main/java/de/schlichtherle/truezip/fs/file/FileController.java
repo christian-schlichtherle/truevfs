@@ -8,37 +8,31 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.fs.FsModelController;
-import net.jcip.annotations.Immutable;
-import java.util.Map;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
+import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
+import static java.io.File.separatorChar;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 import javax.swing.Icon;
-
-import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static java.io.File.separatorChar;
+import net.jcip.annotations.Immutable;
 
 /**
  * A file system controller with a prospective directory in the platform file
