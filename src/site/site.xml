@@ -31,7 +31,7 @@
     <skin>
         <groupId>${project.groupId}</groupId>
         <artifactId>truezip-skin</artifactId>
-        <version>5</version>
+        <version>6</version>
     </skin>
     <body>
         <head>
