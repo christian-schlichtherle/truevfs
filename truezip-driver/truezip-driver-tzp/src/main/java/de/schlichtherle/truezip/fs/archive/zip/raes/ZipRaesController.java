@@ -11,18 +11,23 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
+import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.FsCovariantEntry;
 import de.schlichtherle.truezip.fs.archive.zip.KeyManagerController;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.util.Map;
+import javax.swing.Icon;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -35,7 +40,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class ZipRaesController
+final class ZipRaesController
 extends KeyManagerController<ZipRaesDriver> {
 
     private static final String ROOT_PATH = ROOT.getPath();
@@ -90,5 +95,80 @@ extends KeyManagerController<ZipRaesDriver> {
             special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
             return special;
         }
+    }
+
+    @Override
+    public <X extends IOException> void sync(BitField<FsSyncOption> options, ExceptionHandler<? super FsSyncException, X> handler) throws X {
+        super.sync(options, handler);
+    }
+
+    @Override
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options) throws IOException {
+        super.unlink(name, options);
+    }
+
+    @Override
+    public Icon getClosedIcon() throws IOException {
+        return delegate.getClosedIcon();
+    }
+
+    @Override
+    public InputSocket<?> getInputSocket(FsEntryName name, BitField<FsInputOption> options) {
+        return delegate.getInputSocket(name, options);
+    }
+
+    @Override
+    public Icon getOpenIcon() throws IOException {
+        return delegate.getOpenIcon();
+    }
+
+    @Override
+    public OutputSocket<?> getOutputSocket(FsEntryName name, BitField<FsOutputOption> options, Entry template) {
+        return delegate.getOutputSocket(name, options, template);
+    }
+
+    @Override
+    public FsController<?> getParent() {
+        return delegate.getParent();
+    }
+
+    @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        return delegate.isExecutable(name);
+    }
+
+    @Override
+    public boolean isReadOnly() throws IOException {
+        return delegate.isReadOnly();
+    }
+
+    @Override
+    public boolean isReadable(FsEntryName name) throws IOException {
+        return delegate.isReadable(name);
+    }
+
+    @Override
+    public boolean isWritable(FsEntryName name) throws IOException {
+        return delegate.isWritable(name);
+    }
+
+    @Override
+    public void mknod(FsEntryName name, Type type, BitField<FsOutputOption> options, Entry template) throws IOException {
+        delegate.mknod(name, type, options, template);
+    }
+
+    @Override
+    public void setReadOnly(FsEntryName name) throws IOException {
+        delegate.setReadOnly(name);
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, Map<Access, Long> times, BitField<FsOutputOption> options) throws IOException {
+        return delegate.setTime(name, times, options);
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, BitField<Access> types, long value, BitField<FsOutputOption> options) throws IOException {
+        return delegate.setTime(name, types, value, options);
     }
 }
