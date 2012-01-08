@@ -26,7 +26,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class ZipController
+final class ZipController
 extends KeyManagerController<ZipDriver> {
 
     /**
