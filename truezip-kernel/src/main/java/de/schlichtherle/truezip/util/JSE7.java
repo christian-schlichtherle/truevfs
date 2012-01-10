@@ -19,15 +19,14 @@ package de.schlichtherle.truezip.util;
 public final class JSE7 {
 
     /**
-     * Is {@code true} if and only if the JSE&nbsp7 API is available for this
+     * Is {@code true} if and only if the JSE&nbsp;7 API is available for this
      * JVM.
      */
     public static final boolean AVAILABLE;
     static {
-        boolean available;
+        boolean available = true;
         try {
             Class.forName("java.nio.file.Path");
-            available = true;
         } catch (ClassNotFoundException notAvailable) {
             available = false;
         }
