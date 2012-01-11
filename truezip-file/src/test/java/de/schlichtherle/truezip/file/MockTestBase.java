@@ -20,12 +20,12 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 public abstract class MockTestBase extends TestBase<MockArchiveDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected final String getSuffixList() {
         return "mok|mok1|mok2";
     }
 
     @Override
-    protected MockArchiveDriver newArchiveDriver() {
+    protected final MockArchiveDriver newArchiveDriver() {
         return new MockArchiveDriver();
     }
 }

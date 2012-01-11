@@ -11,7 +11,6 @@ package de.schlichtherle.truezip.file;
 import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.beans.ExceptionListener;
@@ -33,26 +32,16 @@ import org.junit.Test;
 /**
  * Tests archive type independent features of the {@link TFile} class.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class TFileTest extends TestBase<MockArchiveDriver> {
+public class TFileTest extends MockTestBase {
 
     private static final Logger logger
             = Logger.getLogger(TFileTest.class.getName());
 
     private TFile archive;
-
-    @Override
-    protected String getSuffixList() {
-        return "mok|mok1|mok2";
-    }
-
-    @Override
-    protected MockArchiveDriver newArchiveDriver() {
-        return new MockArchiveDriver();
-    }
 
     @Override
     public void setUp() throws Exception {
