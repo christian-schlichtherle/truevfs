@@ -9,18 +9,19 @@
 package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.MockTestBase;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
-import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
-import static java.io.File.*;
+import static de.schlichtherle.truezip.nio.file.TPathScanner.parent;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import static java.io.File.separatorChar;
 import java.net.URI;
 import java.net.URISyntaxException;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle

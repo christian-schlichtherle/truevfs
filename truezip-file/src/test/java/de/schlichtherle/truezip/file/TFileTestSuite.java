@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsController;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
@@ -18,11 +18,12 @@ import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.*;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import de.schlichtherle.truezip.util.TaskFactory;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import static java.io.File.*;
+import static java.io.File.separatorChar;
 import java.io.*;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -33,7 +34,8 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

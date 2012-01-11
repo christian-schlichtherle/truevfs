@@ -8,21 +8,24 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.file.MockTestBase;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.io.Paths;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import static java.io.File.*;
+import static java.io.File.separatorChar;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 
 /**
