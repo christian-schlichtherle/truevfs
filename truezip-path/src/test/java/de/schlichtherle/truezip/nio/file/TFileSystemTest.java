@@ -9,14 +9,14 @@
 package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.MockTestBase;
-import java.io.IOException;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 /**
