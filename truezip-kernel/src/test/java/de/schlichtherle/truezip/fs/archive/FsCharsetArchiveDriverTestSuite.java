@@ -11,7 +11,8 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.*;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import de.schlichtherle.truezip.util.TaskFactory;
 import java.io.CharConversionException;
 import java.util.concurrent.Callable;
@@ -25,12 +26,6 @@ import org.junit.Test;
  */
 public abstract class FsCharsetArchiveDriverTestSuite {
 
-    private static class ByteArrayIOPoolProvider implements IOPoolProvider {
-        @Override
-        public IOPool<?> get() {
-            return new ByteArrayIOPool(2048);
-        }
-    }
     private static final IOPoolProvider
             POOL_PROVIDER = new ByteArrayIOPoolProvider();
 
@@ -74,5 +69,13 @@ public abstract class FsCharsetArchiveDriverTestSuite {
         } // TestTaskFactory
 
         runConcurrent(new TestTaskFactory(), NUM_IO_THREADS);
+    }
+
+    private static final class ByteArrayIOPoolProvider
+    implements IOPoolProvider {
+        @Override
+        public IOPool<?> get() {
+            return new ByteArrayIOPool(2048);
+        }
     }
 }
