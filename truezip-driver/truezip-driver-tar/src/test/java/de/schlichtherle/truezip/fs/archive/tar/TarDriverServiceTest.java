@@ -8,14 +8,14 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import org.junit.Before;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.SuffixSet;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
@@ -43,7 +43,7 @@ public class TarDriverServiceTest {
         try {
             instance.get().remove(FsScheme.create("tar"));
             fail("put");
-        } catch (UnsupportedOperationException ex) {
+        } catch (UnsupportedOperationException expected) {
         }
     }
 }
