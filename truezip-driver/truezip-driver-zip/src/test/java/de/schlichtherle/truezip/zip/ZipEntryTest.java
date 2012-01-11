@@ -8,11 +8,11 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import java.util.Arrays;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static de.schlichtherle.truezip.zip.ZipEntry.*;
-import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
