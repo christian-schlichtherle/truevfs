@@ -11,14 +11,14 @@ package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import static de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTest.*;
+import static de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTest.roundTripTest;
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.After;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
