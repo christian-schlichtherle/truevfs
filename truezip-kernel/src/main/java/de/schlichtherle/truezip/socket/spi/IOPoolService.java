@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 
 /**
- * An abstract locatable service for an I/O pool.
+ * An abstract locatable service for an I/O buffer pool.
  * Implementations of this abstract class are subject to service location
  * by the class {@link IOPoolLocator}.
  * <p>

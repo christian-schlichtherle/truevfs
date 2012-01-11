@@ -12,13 +12,13 @@ import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 
 /**
- * A pool of I/O entries.
+ * A pool of I/O buffers, which are referred to by {@link IOEntry}s.
  * <p>
  * Implementations must be thread-safe.
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *
- * @param   <E> the type of the I/O entries.
+ * @param   <E> the type of the entries for the I/O buffers.
  * @author  Christian Schlichtherle
  * @version $Id$
  */

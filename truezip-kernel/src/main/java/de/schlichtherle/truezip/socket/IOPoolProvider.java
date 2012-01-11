@@ -12,7 +12,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * A provider for an I/O entry pool.
+ * A provider for an I/O buffer pool.
  * <p>
  * Implementations must be thread-safe.
  *

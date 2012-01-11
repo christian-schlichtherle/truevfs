@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
 /**
- * Locates an I/O pool service of a class with a name which is
+ * Locates an I/O buffer pool service of a class with a name which is
  * resolved by querying a system property or searching the class path,
  * whatever yields a result first.
  * <p>
