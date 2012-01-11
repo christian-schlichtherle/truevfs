@@ -8,14 +8,11 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsInputOptions;
-import static de.schlichtherle.truezip.fs.FsInputOptions.*;
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsInputOptions.INPUT_PREFERENCES_MASK;
+import static de.schlichtherle.truezip.fs.FsInputOptions.NO_INPUT_OPTIONS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsOutputOptions;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
+import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
