@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.ThreadGroups;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,8 +66,8 @@ public final class FsResourceAccountant {
      * The weak hash map allows the garbage collector to pick up a closeable
      * resource if there are no more references to it.
      */
-    private volatile @Nullable Map<Closeable, Account>
-            threads = new WeakHashMap<Closeable, Account>();
+    private final Map<Closeable, Account> threads
+            = new WeakHashMap<Closeable, Account>();
 
     /**
      * Constructs a new resource accountant with the given lock.
@@ -93,12 +92,12 @@ public final class FsResourceAccountant {
      * @param  resource the closeable resource to start accounting for.
      */
     void startAccountingFor(final Closeable resource) {
-        this.lock.lock();
+        lock.lock();
         try {
-            if (!this.threads.containsKey(resource))
-                this.threads.put(resource, new Account(resource));
+            if (!threads.containsKey(resource))
+                threads.put(resource, new Account(resource));
         } finally {
-            this.lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -110,15 +109,15 @@ public final class FsResourceAccountant {
      * @param  resource the closeable resource to stop accounting for.
      */
     void stopAccountingFor(final Closeable resource) {
-        this.lock.lock();
+        lock.lock();
         try {
-            final Account ref = this.threads.remove(resource);
+            final Account ref = threads.remove(resource);
             if (null != ref) {
                 assert !ref.isEnqueued();
-                this.condition.signalAll();
+                condition.signalAll();
             }
         } finally {
-            this.lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -144,28 +143,28 @@ public final class FsResourceAccountant {
      * @return The number of <em>all</em> accounted closeable resources.
      */
     int waitOtherThreads(final long timeout) {
-        this.lock.lock();
+        lock.lock();
         try {
             int size;
             final long start = System.currentTimeMillis();
-            while ((size = this.threads.size()) > threadLocalResources()) {
+            while ((size = threads.size()) > threadLocalResources()) {
                 long toWait;
                 if (timeout > 0) {
                     toWait = timeout - (System.currentTimeMillis() - start);
                     if (toWait <= 0)
                         break;
-                    if (!this.condition.await(toWait, TimeUnit.MILLISECONDS))
-                        return this.threads.size(); // may have changed while waiting!
+                    if (!condition.await(toWait, TimeUnit.MILLISECONDS))
+                        return threads.size(); // may have changed while waiting!
                 } else {
-                    this.condition.await();
+                    condition.await();
                 }
             }
             return size;
         } catch (InterruptedException ex) {
             logger.log(Level.WARNING, "interrupted", ex);
-            return this.threads.size();
+            return threads.size();
         } finally {
-            this.lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -177,7 +176,7 @@ public final class FsResourceAccountant {
     private int threadLocalResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final Account ref : this.threads.values())
+        for (final Account ref : threads.values())
             if (ref.owner.get() == currentThread)
                 n++;
         return n;
@@ -194,23 +193,23 @@ public final class FsResourceAccountant {
     <X extends Exception>
     void closeAllResources(final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        this.lock.lock();
+        lock.lock();
         try {
-            for (final Iterator<Closeable> i = this.threads.keySet().iterator(); i.hasNext(); ) {
+            for (final Iterator<Closeable> i = threads.keySet().iterator(); i.hasNext(); ) {
+                final Closeable c = i.next();
+                i.remove();
                 try {
-                    final Closeable closeable = i.next();
-                    i.remove();
                     // This may trigger another removal, but it should cause no
                     // ConcurrentModificationException because the closeable is no
                     // more present in the map.
-                    closeable.close();
+                    c.close();
                 } catch (IOException ex) {
                     handler.warn(ex);
                 }
             }
-            assert this.threads.isEmpty();
+            assert threads.isEmpty();
         } finally {
-            this.lock.unlock();
+            lock.unlock();
         }
     }
 
@@ -231,11 +230,11 @@ public final class FsResourceAccountant {
          * Mind that this method is called even if accounting for the closeable
          * resource has been properly stopped.
          */
-        void notifyAccountant() {
+        void signalAccountant() {
             final Lock lock = FsResourceAccountant.this.lock;
             lock.lock();
             try {
-                FsResourceAccountant.this.condition.signalAll();
+                condition.signalAll();
             } finally {
                 lock.unlock();
             }
@@ -266,7 +265,7 @@ public final class FsResourceAccountant {
         public void run() {
             while (true) {
                 try {
-                    ((Account) queue.remove()).notifyAccountant();
+                    ((Account) queue.remove()).signalAccountant();
                 } catch (InterruptedException ex) {
                     logger.log(Level.FINE, "interrupted", ex);
                 }
