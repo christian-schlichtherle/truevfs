@@ -67,8 +67,8 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
     @Before
     public void setUp() throws Exception {
         final D driver = newArchiveDriver();
-        final TArchiveDetector detector = new TArchiveDetector(
-                getSuffixList(), driver);
+        final TArchiveDetector detector
+                = new TArchiveDetector(getSuffixList(), driver);
         final Map<String, Object> environment = new HashMap<String, Object>();
         environment.put(ARCHIVE_DETECTOR, detector);
         final TConfig config = TConfig.push();
