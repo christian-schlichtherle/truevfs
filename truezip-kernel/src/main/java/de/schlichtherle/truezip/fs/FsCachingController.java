@@ -420,7 +420,7 @@ extends FsDecoratingConcurrentModelController<
 
         void endOutput() throws IOException {
             assert isWriteLockedByCurrentThread();
-            assert isTouched();
+            //assert isTouched(); // may have been concurrently synced!
             if (null != template)
                 return;
             delegate.mknod(
