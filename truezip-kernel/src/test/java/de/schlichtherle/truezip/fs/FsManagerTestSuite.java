@@ -9,16 +9,18 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.fs.spi.DummyDriverService;
-import java.util.Iterator;
+import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Link.Type;
+import static de.schlichtherle.truezip.util.Link.Type.STRONG;
+import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Iterator;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 
 /**
  * @author  Christian Schlichtherle
@@ -32,22 +34,24 @@ public abstract class FsManagerTestSuite {
 
     @Before
     public void setUp() {
-        manager = newManager();
+        manager = newManager(WEAK);
     }
 
-    protected abstract @NonNull FsManager newManager();
+    protected abstract @NonNull FsManager newManager(Type type);
 
     @Test
     public void testGetControllerWithNull() {
-        try {
-            manager.getController(null, null);
-            fail();
-        } catch (NullPointerException expected) {
+        for (final Type type : BitField.allOf(Type.class)) {
+            try {
+                newManager(type).getController(null, null);
+                fail();
+            } catch (NullPointerException expected) {
+            }
         }
     }
 
     @Test
-    public void testForward() {
+    public void testForward() throws InterruptedException {
         for (final String[] params : new String[][] {
             {
                 //"file:/", // does NOT get mapped!
@@ -81,7 +85,7 @@ public abstract class FsManagerTestSuite {
     }
 
     @Test
-    public void testBackward() {
+    public void testBackward() throws InterruptedException {
         for (final String[] params : new String[][] {
             {
                 "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
@@ -96,6 +100,7 @@ public abstract class FsManagerTestSuite {
                 //"file:/", // does NOT get mapped!
             },
         }) {
+            FsController<?> top = null;
             FsController<?> member = null;
             for (final String param : params) {
                 final FsMountPoint mountPoint
@@ -105,6 +110,8 @@ public abstract class FsManagerTestSuite {
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;
+                if (null == top)
+                    top = controller;
             }
 
             Iterator<FsController<?>> i = manager.iterator();
@@ -118,17 +125,14 @@ public abstract class FsManagerTestSuite {
             assertThat(manager.getSize(), is(params.length));
             member = null;
             i = null;
+            top = null;
             gc();
             assertThat(manager.getSize(), is(0));
         }
     }
 
-    static void gc() {
+    private static void gc() throws InterruptedException {
         System.gc();
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FsManagerTestSuite.class.getName()).log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
-        }
+        Thread.sleep(50);
     }
 }
