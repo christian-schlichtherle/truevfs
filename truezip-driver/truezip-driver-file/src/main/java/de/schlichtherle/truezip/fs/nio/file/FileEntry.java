@@ -84,10 +84,10 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         return null != path ? path : CURRENT_DIRECTORY;
     }
 
-    private @Nullable String getFileName() {
+    private String getFileName() {
         // See http://java.net/jira/browse/TRUEZIP-152
         final Path path = this.path.getFileName();
-        return path == null ? null : path.toString();
+        return null != path ? path.toString() : "";
     }
 
     @Override

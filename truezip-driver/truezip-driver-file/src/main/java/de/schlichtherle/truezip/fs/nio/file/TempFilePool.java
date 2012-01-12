@@ -28,7 +28,7 @@ import net.jcip.annotations.ThreadSafe;
  * However, for best performance you should not rely on this.
  *
  * @since   TrueZIP 7.2
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
@@ -46,7 +46,7 @@ final class TempFilePool implements IOPool<FileEntry> {
     static final TempFilePool INSTANCE = new TempFilePool(null, null);
 
     private final @Nullable Path dir;
-    private final @Nullable String name;
+    private final String name;
 
     /** Constructs a new temp file pool. */
     TempFilePool(
@@ -54,7 +54,7 @@ final class TempFilePool implements IOPool<FileEntry> {
             @CheckForNull String name) {
         this.dir = null != dir ? dir : TEMP_DIR;
         // See http://java.net/jira/browse/TRUEZIP-152
-        name = null == name ? "tzp" : name + ".";
+        name = null != name ? name + "." : "tzp";
         this.name = name;
     }
 
