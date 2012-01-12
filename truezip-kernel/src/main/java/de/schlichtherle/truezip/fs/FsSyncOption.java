@@ -9,18 +9,19 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.InputBusyException;
-import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.InputClosedException;
+import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
 /**
  * Defines the available options for the synchronization of federated file
- * systems via the methods {@link FsController#sync} and
- * {@link FsManager#sync}.
+ * systems via the methods {@link FsController#sync(BitField)} and its many
+ * variants and incarnations in the TrueZIP Kernel and client API modules.
  *
- * @author Christian Schlichtherle
+ * @see     FsSyncOptions
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
@@ -92,7 +93,8 @@ public enum FsSyncOption {
     /**
      * Suppose a controller for a federated file system has cached entry data.
      * Then if this option is set when the file system gets synchronized,
-     * the cached entry data get cleared after flushing it to the file system.
+     * the selectively cached entry data get cleared after flushing it to the
+     * file system.
      */
     CLEAR_CACHE,
 }
