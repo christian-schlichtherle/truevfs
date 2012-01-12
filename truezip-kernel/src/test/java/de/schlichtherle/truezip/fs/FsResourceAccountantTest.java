@@ -75,6 +75,7 @@ public class FsResourceAccountantTest {
             threads[i].start();
             threads[i].join();
             threads[i] = null;
+            System.gc();
             int resources = accountant.waitOtherThreads(NO_TIMEOUT);
             assertThat(resources, is(0));
             final long time = System.currentTimeMillis();
