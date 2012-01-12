@@ -10,21 +10,17 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.IOCache;
 import de.schlichtherle.truezip.socket.IOCache.Strategy;
-import static de.schlichtherle.truezip.socket.IOCache.Strategy.*;
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_BACK;
+import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
@@ -422,7 +418,7 @@ extends FsDecoratingConcurrentModelController<
             assert isTouched();
         }
 
-        void commitOutput() throws IOException {
+        void endOutput() throws IOException {
             assert isWriteLockedByCurrentThread();
             assert isTouched();
             if (null != template)
@@ -515,7 +511,7 @@ extends FsDecoratingConcurrentModelController<
                 try {
                     delegate.close();
                 } finally {
-                    commitOutput();
+                    endOutput();
                 }
             }
         } // EntrySeekableByteChannel
@@ -532,7 +528,7 @@ extends FsDecoratingConcurrentModelController<
                 try {
                     delegate.close();
                 } finally {
-                    commitOutput();
+                    endOutput();
                 }
             }
         } // EntryOutputStream
