@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.util.FilteringIterator;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;

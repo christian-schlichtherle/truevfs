@@ -11,17 +11,13 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Link.Type;
-import static de.schlichtherle.truezip.util.Link.Type.*;
-import de.schlichtherle.truezip.util.Links;
+import static de.schlichtherle.truezip.util.Link.Type.STRONG;
+import static de.schlichtherle.truezip.util.Link.Type.WEAK;
+import static de.schlichtherle.truezip.util.Links.getTarget;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
+import java.util.*;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -44,9 +40,7 @@ public final class FsDefaultManager extends FsManager {
 
     private final Type optionalScheduleType;
 
-    public FsDefaultManager() {
-        this(WEAK);
-    }
+    public FsDefaultManager() { this(WEAK); }
 
     /** Provided for unit testing. */
     FsDefaultManager(final Type optionalScheduleType) {
@@ -71,8 +65,7 @@ public final class FsDefaultManager extends FsManager {
             final FsModel model = new FsDefaultModel(mountPoint, null);
             return driver.newController(model, null);
         }
-        FsFederatingController controller = Links.getTarget(schedulers.get(
-                mountPoint));
+        FsFederatingController controller = getTarget(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
                 parent = getController(mountPoint.getParent(), null, driver);
@@ -147,7 +140,7 @@ public final class FsDefaultManager extends FsManager {
         final Set<FsController<?>> snapshot
                 = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
         for (final Link<FsFederatingController> link : schedulers.values()) {
-            final FsController<?> controller = Links.getTarget(link);
+            final FsController<?> controller = getTarget(link);
             if (null != controller)
                 snapshot.add(controller);
         }
@@ -164,8 +157,8 @@ public final class FsDefaultManager extends FsManager {
                 = new FsControllerComparator();
 
         @Override
-        public int compare( FsController<?> l,
-                            FsController<?> r) {
+        public int compare( final FsController<?> l,
+                            final FsController<?> r) {
             return r.getModel().getMountPoint().toHierarchicalUri()
                     .compareTo(l.getModel().getMountPoint().toHierarchicalUri());
         }
