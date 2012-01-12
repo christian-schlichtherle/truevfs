@@ -76,7 +76,7 @@ public class FsResourceAccountantTest {
             gc();
             final long time = System.currentTimeMillis();
             int resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
-            assertTrue("Timeout waiting for " + clazz.getName(),
+            assertTrue("Timeout waiting for " + clazz.getSimpleName(),
                     System.currentTimeMillis() - time < TIMEOUT_MILLIS);
             assertThat(resources, is(0));
         }
