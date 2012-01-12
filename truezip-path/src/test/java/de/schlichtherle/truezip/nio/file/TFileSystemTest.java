@@ -41,8 +41,10 @@ public class TFileSystemTest extends MockTestBase {
             { "tpath:/foo.mok/bar.mok", "mok:mok:file:/foo.mok!/bar.mok!/" },
         }) {
             final URI uri = URI.create(params[0]);
-            final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
-            final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(uri, getEnvironment());
+            final FsMountPoint mountPoint = FsMountPoint.create(
+                    URI.create(params[1]));
+            final TFileSystem fs = (TFileSystem) FileSystems.newFileSystem(
+                    uri, getEnvironment(), TFileSystemTest.class.getClassLoader());
             fs.close();
             assertThat(fs.isOpen(), is(true));
             assertThat(fs.getMountPoint(), is(mountPoint));
