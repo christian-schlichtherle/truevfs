@@ -31,7 +31,7 @@ public class FsResourceAccountantTest {
     private static final Logger logger
             = Logger.getLogger(FsResourceAccountantTest.class.getName());
 
-    private static final long TIMEOUT_MILLIS = 50;
+    private static final long TIMEOUT_MILLIS = 100;
 
     private FsResourceAccountant accountant;
 
