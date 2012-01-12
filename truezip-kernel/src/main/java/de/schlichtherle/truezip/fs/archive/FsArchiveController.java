@@ -11,28 +11,21 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.entry.DecoratingEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.READ;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.fs.FsConcurrentModelController;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import de.schlichtherle.truezip.fs.FsEntryNotFoundException;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsNotSyncedException;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
+import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
+import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -215,7 +208,7 @@ extends FsConcurrentModelController {
             final FsCovariantEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
                 throw new FsEntryNotFoundException(getModel(),
-                        name, "no such file or directory");
+                        name, "no such entry");
             return entry.getEntry();
         }
 
@@ -223,7 +216,7 @@ extends FsConcurrentModelController {
             final FsArchiveEntry entry = getLocalTarget();
             if (FILE != entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
-                        name, "cannot read directories");
+                        name, "entry type is not a file");
             return FsArchiveController
                     .this
                     .getInputSocket(entry.getName())
@@ -374,7 +367,7 @@ extends FsConcurrentModelController {
                 return;
             }
             throw new FsEntryNotFoundException(getModel(),
-                    name, "directory exists already");
+                    name, "directory entry exists already");
         } else {
             autoMount(options.get(CREATE_PARENTS))
                     .mknod(name, type, options, template)
