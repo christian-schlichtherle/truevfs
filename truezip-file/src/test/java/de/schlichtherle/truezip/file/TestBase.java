@@ -83,4 +83,9 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
     public void tearDown() throws Exception {
         TConfig.pop();
     }
+
+    protected static void gc() throws InterruptedException {
+        System.gc();
+        Thread.sleep(50);
+    }
 }

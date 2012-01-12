@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import static java.io.File.separatorChar;
 import java.io.*;
 import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.Collections;
@@ -129,50 +130,56 @@ extends TestBase<D> {
     @Test
     public void testArchiveControllerStateWithInputStream()
     throws IOException, InterruptedException {
-        final String entry = archive.getPath() + "/entry";
-        archive = null;
-        assertTrue(new TFile(entry).createNewFile());
-        TFile.umount(new TFile(entry).getInnerArchive());
-        InputStream in = new TFileInputStream(entry);
-        Reference<FsController<?>> ref = new WeakReference<FsController<?>>(new TFile(entry).getInnerArchive().getController());
-        gc();
-        assertSame(ref.get(), new TFile(entry).getInnerArchive().getController());
-        in.close();
-        in = null; // leaves file!
-        gc();
-        assertSame(ref.get(), new TFile(entry).getInnerArchive().getController());
-        TFile.umount(new TFile(entry).getInnerArchive());
-        gc();
-        assertNull(ref.get());
+        assertArchiveControllerStateWithResource(
+                new Factory<InputStream, String, IOException>() {
+            @Override
+            public InputStream create(String entry) throws IOException {
+                return new TFileInputStream(entry);
+            }
+        });
     }
 
     @Test
     public void testArchiveControllerStateWithOutputStream()
     throws IOException, InterruptedException {
+        assertArchiveControllerStateWithResource(
+                new Factory<OutputStream, String, IOException>() {
+            @Override
+            public OutputStream create(String entry) throws IOException {
+                return new TFileOutputStream(entry);
+            }
+        });
+    }
+
+    private interface Factory<O, P, E extends Exception> {
+        O create(P param) throws E;
+    }
+
+    private void assertArchiveControllerStateWithResource(
+            final Factory<? extends Closeable, ? super String, ? extends IOException> factory)
+    throws IOException, InterruptedException {
         final String entry = archive.getPath() + "/entry";
         archive = null;
         assertTrue(new TFile(entry).createNewFile());
         TFile.umount(new TFile(entry).getInnerArchive());
-        OutputStream out = new TFileOutputStream(entry);
-        Reference<FsController<?>> ref = new WeakReference<FsController<?>>(new TFile(entry).getInnerArchive().getController());
+        Closeable resource = factory.create(entry);
+        final ReferenceQueue<FsController<?>> queue
+                = new ReferenceQueue<FsController<?>>();
+        final Reference<FsController<?>> ref
+                = new WeakReference<FsController<?>>(
+                    new TFile(entry).getInnerArchive().getController(), queue);
         gc();
+        assertNull(queue.poll());
         assertSame(ref.get(), new TFile(entry).getInnerArchive().getController());
-        out.close();
-        out = null; // leaves file!
+        resource.close();
+        resource = null; // leave now!
         gc();
+        assertNull(queue.poll());
         assertSame(ref.get(), new TFile(entry).getInnerArchive().getController());
         TFile.umount(new TFile(entry).getInnerArchive());
-        gc();
-        assertNull(ref.get());
-    }
-
-    private static void gc() {
         System.gc();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            logger.log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
-        }
+        assertSame(ref, queue.remove());
+        assertNull(ref.get());
     }
 
     @Test
@@ -509,7 +516,7 @@ extends TestBase<D> {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
-    public final void testBusyFileInputStream() throws IOException {
+    public final void testBusyFileInputStream() throws IOException, InterruptedException {
         final TFile file1 = new TFile(archive, "file1");
         final TFile file2 = new TFile(archive, "file2");
 
@@ -579,7 +586,7 @@ extends TestBase<D> {
     }
 
     @Test
-    public final void testBusyFileOutputStream() throws IOException {
+    public final void testBusyFileOutputStream() throws IOException, InterruptedException {
         TFile file1 = new TFile(archive, "file1");
         TFile file2 = new TFile(archive, "file2");
         
