@@ -14,6 +14,7 @@ import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.file.TestBase;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
@@ -22,6 +23,7 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import de.schlichtherle.truezip.util.TaskFactory;
@@ -56,7 +58,13 @@ extends TestBase<D> {
     private static final Logger logger = Logger.getLogger(
             TPathTestSuite.class.getName());
 
-    private static final String TEMP_FILE_PREFIX = "tzp";
+    /**
+     * The prefix for temporary files, which is {@value}.
+     * This value should identify the TrueZIP Path module in order to
+     * ensure that no two temporary files are shared between tests of the
+     * TrueZIP Path API and the TrueZIP File* API.
+     */
+    private static final String TEMP_FILE_PREFIX = "tzp-path";
 
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
@@ -1474,7 +1482,7 @@ extends TestBase<D> {
             final boolean updateIndividually)
     throws Exception {
         assertTrue(TConfig.get().isLenient());
-        
+
         class WritingTask implements Callable<Void> {
             @Override
             public Void call() throws IOException {
@@ -1492,7 +1500,7 @@ extends TestBase<D> {
                         if (updateIndividually)
                             archive.getFileSystem().close();
                         else
-                            TFile.umount(false);
+                            TFile.sync(BitField.noneOf(FsSyncOption.class)); // DON'T flush all caches!
                     } catch (FsSyncException ex) {
                         if (!(ex.getCause() instanceof FileBusyException))
                             throw ex;

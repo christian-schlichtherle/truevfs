@@ -11,6 +11,7 @@ package de.schlichtherle.truezip.file;
 import de.schlichtherle.truezip.fs.FsController;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
@@ -18,6 +19,7 @@ import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import de.schlichtherle.truezip.util.TaskFactory;
@@ -53,7 +55,13 @@ extends TestBase<D> {
     private static final Logger logger = Logger.getLogger(
             TFileTestSuite.class.getName());
 
-    private static final String TEMP_FILE_PREFIX = "tzp";
+    /**
+     * The prefix for temporary files, which is {@value}.
+     * This value should identify the TrueZIP File* module in order to
+     * ensure that no two temporary files are shared between tests of the
+     * TrueZIP Path API and the TrueZIP File* API.
+     */
+    private static final String TEMP_FILE_PREFIX = "tzp-file";
 
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
@@ -154,10 +162,6 @@ extends TestBase<D> {
         gc();
         assertSame(ref.get(), new TFile(entry).getInnerArchive().getController());
         TFile.umount(new TFile(entry).getInnerArchive());
-        gc();
-        gc();
-        gc();
-        gc();
         gc();
         assertNull(ref.get());
     }
@@ -1414,7 +1418,7 @@ extends TestBase<D> {
             final boolean updateIndividually)
     throws Exception {
         assertTrue(TFile.isLenient());
-        
+
         class WritingTask implements Callable<Void> {
             @Override
             public Void call() throws IOException {
@@ -1432,7 +1436,7 @@ extends TestBase<D> {
                         if (updateIndividually)
                             TFile.umount(archive);
                         else
-                            TFile.umount(false);
+                            TFile.sync(BitField.noneOf(FsSyncOption.class)); // DON'T flush all caches!
                     } catch (FsSyncException ex) {
                         if (!(ex.getCause() instanceof FileBusyException))
                             throw ex;
