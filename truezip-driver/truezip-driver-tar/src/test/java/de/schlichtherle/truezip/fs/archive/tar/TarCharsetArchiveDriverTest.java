@@ -15,7 +15,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarCharsetArchiveDriverIT
+public final class TarCharsetArchiveDriverTest
 extends FsCharsetArchiveDriverTestSuite {
 
     @Override

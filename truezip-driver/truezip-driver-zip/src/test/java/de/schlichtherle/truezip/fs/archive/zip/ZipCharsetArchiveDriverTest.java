@@ -15,11 +15,11 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class JarCharsetArchiveDriverIT
+public final class ZipCharsetArchiveDriverTest
 extends FsCharsetArchiveDriverTestSuite {
 
     @Override
-    protected JarDriver newArchiveDriver(IOPoolProvider provider) {
-        return new JarDriver(provider);
+    protected ZipDriver newArchiveDriver(IOPoolProvider provider) {
+        return new ZipDriver(provider);
     }
 }
