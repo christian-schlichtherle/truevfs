@@ -8,25 +8,19 @@
  */
 package de.schlichtherle.truezip.file;
 
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntry;
-import static de.schlichtherle.truezip.fs.FsEntry.*;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import de.schlichtherle.truezip.fs.FsFilteringManager;
-import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
+import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.*;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import static de.schlichtherle.truezip.fs.FsUriModifier.*;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
+import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
@@ -36,26 +30,12 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.ServiceConfigurationError;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 import net.jcip.annotations.Immutable;
@@ -3450,7 +3430,7 @@ public final class TFile extends File {
     /**
      * Copies the input stream {@code in} to this file or entry in an archive
      * file
-     * <em>without</em> closing it.
+     * <em>without</em> closing the stream.
      * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
@@ -3520,7 +3500,7 @@ public final class TFile extends File {
     /**
      * Copies this file or entry in an archive file to the output stream
      * {@code out}
-     * <em>without</em> closing it.
+     * <em>without</em> closing the stream.
      * <p>
      * <table border=1 cellpadding=5 summary="">
      * <thead>
