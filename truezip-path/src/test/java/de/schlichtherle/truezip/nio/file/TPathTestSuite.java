@@ -142,15 +142,6 @@ extends TestBase<D> {
         return path.getNonArchivePath();
     }
 
-    private static void gc() {
-        System.gc();
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException ex) {
-            logger.log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
-        }
-    }
-
     @Test
     public final void testFalsePositives() throws IOException {
         assertFalsePositive(archive);
@@ -509,7 +500,7 @@ extends TestBase<D> {
     }
     
     @Test
-    public final void testBusyFileInputStream() throws IOException {
+    public final void testBusyFileInputStream() throws IOException, InterruptedException {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
@@ -579,7 +570,7 @@ extends TestBase<D> {
     }
 
     @Test
-    public final void testBusyFileOutputStream() throws IOException {
+    public final void testBusyFileOutputStream() throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
         TPath file2 = archive.resolve("file2");
         
