@@ -9,17 +9,17 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
@@ -312,7 +312,6 @@ extends FsDecoratingConcurrentModelController<
             @NonNull final BitField<FsSyncOption> options,
             @NonNull final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        //assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
         try {
             delegate.sync(options, handler);
