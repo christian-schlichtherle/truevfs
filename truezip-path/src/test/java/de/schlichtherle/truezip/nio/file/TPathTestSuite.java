@@ -32,10 +32,7 @@ import java.io.*;
 import static java.nio.file.Files.*;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,12 +58,10 @@ extends TestBase<D> {
 
     private static final String TEMP_FILE_PREFIX = "tzp";
 
-    private static final Random rnd = new Random();
-
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
     static {
-        rnd.nextBytes(DATA);
+        new Random().nextBytes(DATA);
     }
 
     protected static final IOPoolProvider
@@ -86,7 +81,7 @@ extends TestBase<D> {
     }
 
     private Path createTempFile() throws IOException {
-        // TODO: Removing .getCanonicalFile() causes archive.toFile().rm_r() to
+        // TODO: Removing .toRealPath() causes archive.toFile().rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
         return Files.createTempFile(TEMP_FILE_PREFIX, getSuffix()).toRealPath();
     }
@@ -106,16 +101,16 @@ extends TestBase<D> {
     @Override
     public void tearDown() throws Exception {
         try {
-            this.archive = null;
-
             // sync now to delete temps and free memory.
             // This prevents subsequent warnings about left over temporary files
             // and removes cached data from the memory, so it helps to start on a
             // clean sheet of paper with subsequent tests.
             try {
-                TFileSystemProvider.umount();
+                umount();
             } catch (FsSyncException ex) {
                 logger.log(Level.WARNING, ex.toString(), ex);
+            } finally {
+                archive = null;
             }
 
             if (exists(temp)) {
@@ -128,6 +123,11 @@ extends TestBase<D> {
         } finally {
             super.tearDown();
         }
+    }
+
+    private void umount() throws FsSyncException {
+        if (null != archive)
+            archive.getFileSystem().close();
     }
 
     protected static TPath newNonArchivePath(TPath path) {
@@ -447,7 +447,7 @@ extends TestBase<D> {
             fail("directory not empty");
         } catch (IOException expected) {
         }
-        TFileSystemProvider.umount(); // allow external modifications!
+        umount(); // allow external modifications!
         delete(newNonArchivePath(archive)); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
@@ -506,8 +506,8 @@ extends TestBase<D> {
         final TPath file2 = archive.resolve("file2");
 
         // Test open output streams.
-        createFile(file1);
-        TFileSystemProvider.umount(); // ensure file1 is really present in the archive file
+        createFile(file1); // uses FsOutputOption.CACHE!
+        umount(); // ensure file1 is really present in the archive file
         createFile(file2); // uses FsOutputOption.CACHE!
         final InputStream in1 = newInputStream(file1);
         try {
@@ -515,7 +515,7 @@ extends TestBase<D> {
             gc();
 
             // This operation should complete without any exception if the garbage
-            // collector did his job.
+            // collector did its job.
             try {
                 copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
             } catch (FsSyncWarningException ex) {
@@ -524,7 +524,7 @@ extends TestBase<D> {
 
             // in1 is still open!
             try {
-                TFileSystemProvider.umount(); // forces closing of in1
+                umount(); // forces closing of in1
                 fail("Expected warning exception when synchronizing a busy archive file!");
             } catch (FsSyncWarningException ex) {
                 if (!(ex.getCause() instanceof FileBusyException))
@@ -542,9 +542,9 @@ extends TestBase<D> {
             gc();
 
             // This operation should complete without any exception if the garbage
-            // collector did his job.
+            // collector did its job.
             try {
-                TFileSystemProvider.umount(); // allow external modifications!
+                umount(); // allow external modifications!
             } catch (FsSyncWarningException ex) {
                 fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
             }
@@ -593,7 +593,7 @@ extends TestBase<D> {
             out.close();
         }
         
-        TFileSystemProvider.umount(); // ensure two entries in the archive
+        umount(); // ensure two entries in the archive
         
         out = newOutputStream(file1);
         Streams.cat(new ByteArrayInputStream(data), out);
@@ -621,7 +621,7 @@ extends TestBase<D> {
         
         // out is still open!
         try {
-            TFileSystemProvider.umount(); // forces closing of all streams
+            umount(); // forces closing of all streams
             fail("Expected warning exception when synchronizing a busy archive file!");
         } catch (FsSyncWarningException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
@@ -646,7 +646,7 @@ extends TestBase<D> {
         // This update should complete without any exception if the garbage
         // collector did his job.
         try {
-            TFileSystemProvider.umount();
+            umount();
         } catch (FsSyncWarningException ex) {
             fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
         }
@@ -998,7 +998,7 @@ extends TestBase<D> {
         }
         setLastModifiedTime(a, FileTime.fromMillis(time - granularity));
 
-        // Test copy.
+        // Test copy a to b.
         copy(a, b, StandardCopyOption.REPLACE_EXISTING);
         assertThat(size(b), is(size(a)));
         assertThat(getLastModifiedTime(b).toMillis(), not(is(getLastModifiedTime(a).toMillis())));
@@ -1010,7 +1010,7 @@ extends TestBase<D> {
         long blmu = (getLastModifiedTime(b).toMillis() + granularity - 1) / granularity * granularity;
         assertTrue(almd == blmd || almu == blmu);
 
-        // Test copy to.
+        // Test copy b to a.
         copy(b, a, StandardCopyOption.REPLACE_EXISTING);
         assertThat(size(a), is(size(b)));
         assertThat(getLastModifiedTime(a).toMillis(), not(is(getLastModifiedTime(b).toMillis())));
@@ -1066,7 +1066,7 @@ extends TestBase<D> {
             fail("directory not empty");
         } catch (IOException expected) {
         }
-        TFileSystemProvider.umount(); // allow external modifications!
+        umount(); // allow external modifications!
         delete(newNonArchivePath(archive)); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
@@ -1358,24 +1358,28 @@ extends TestBase<D> {
     
     private void assertArchiveEntries(final TPath archive, int nEntries)
     throws IOException {
-        final Path[] entries = listFiles(archive);
-        assertEquals(nEntries, entries.length);
-        final byte[] buf = new byte[4096];
-        for (int i = 0, l = entries.length; i < l; i++) {
-            final TPath entry = (TPath) entries[i];
+        // Retrieve list of entries and shuffle their order.
+        final List<Path> entries = Arrays.asList(listFiles(archive));
+        assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
+        Collections.shuffle(entries, new Random());
+
+        // Now read in the entries in the shuffled order.
+        final byte[] buf = new byte[data.length];
+        for (final Path _entry : entries) {
+            final TPath entry = (TPath) _entry;
+            // Read full entry and check the contents.
             final InputStream in = newInputStream(entry);
             try {
                 int off = 0;
                 int read;
-                do {
+                while (true) {
                     read = in.read(buf);
-                    if (read < 0)
+                    if (0 > read)
                         break;
                     assertTrue(read > 0);
-                    assertTrue(ArrayHelper.equals(
-                            data, off, buf, 0, read));
+                    assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
                     off += read;
-                } while (true);
+                }
                 assertEquals(-1, read);
                 assertEquals(off, data.length);
                 assertTrue(0 >= in.read(new byte[0]));
@@ -1424,7 +1428,7 @@ extends TestBase<D> {
                     out.close();
                 }
                 try {
-                    TFile.umount(wait, false, wait, false);
+                    TFile.umount(archive.toFile(), wait, false, wait, false);
                 } catch (FsSyncException ex) {
                     if (!(ex.getCause() instanceof FileBusyException))
                         throw ex;
@@ -1534,7 +1538,7 @@ extends TestBase<D> {
             write(entry1);
             write(entry2);
 
-            TFileSystemProvider.umount();
+            umount();
             assertTrue(size(path) > 2 * data.length); // two entries plus one central directory
 
             write(entry1);
@@ -1546,7 +1550,7 @@ extends TestBase<D> {
             delete(entry1);
             delete(entry2);
 
-            TFileSystemProvider.umount();
+            umount();
             assertTrue(size(path) > 6 * data.length); // six entries plus two central directories
         } finally {
             config.close();
@@ -1559,7 +1563,7 @@ extends TestBase<D> {
             config.setOutputPreferences(config.getOutputPreferences().set(GROW));
 
             delete(archive);
-            TFileSystemProvider.umount();
+            umount();
         } finally {
             config.close();
         }
