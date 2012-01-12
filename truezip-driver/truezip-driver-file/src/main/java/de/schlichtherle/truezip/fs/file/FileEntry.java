@@ -76,11 +76,9 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         return null != file ? file : CURRENT_DIRECTORY;
     }
 
-    private @Nullable String getFileName() {
+    private String getFileName() {
         // See http://java.net/jira/browse/TRUEZIP-152
-        final String name = this.file.getName();
-        assert !name.isEmpty();
-        return name;
+        return this.file.getName();
     }
 
     @Override
