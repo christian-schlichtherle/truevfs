@@ -9,24 +9,26 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.fs.spi.DummyDriverService;
+import de.schlichtherle.truezip.util.Link.Type;
+import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static de.schlichtherle.truezip.util.Link.Type.*;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class FsFilteringManagerTest extends FsManagerTestSuite {
 
     @Override
-    protected FsManager newManager() {
+    protected FsManager newManager(Type type) {
         return new FsFilteringManager(
-                new FsDefaultManager(),
+                new FsDefaultManager(type),
                 FsMountPoint.create(URI.create("file:/")));
     }
 
