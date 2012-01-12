@@ -145,24 +145,22 @@ public final class FsResourceAccountant {
     int waitOtherThreads(final long timeout) {
         lock.lock();
         try {
-            int size;
             final long start = System.currentTimeMillis();
-            while ((size = threads.size()) > threadLocalResources()) {
-                long toWait;
-                if (timeout > 0) {
-                    toWait = timeout - (System.currentTimeMillis() - start);
-                    if (toWait <= 0)
+            while (threadLocalResources() < allResources()) {
+                if (0 < timeout) {
+                    final long toWait = timeout - (System.currentTimeMillis() - start);
+                    if (0 >= toWait)
                         break;
                     if (!condition.await(toWait, TimeUnit.MILLISECONDS))
-                        return threads.size(); // may have changed while waiting!
+                        return allResources();
                 } else {
                     condition.await();
                 }
             }
-            return size;
+            return allResources();
         } catch (InterruptedException ex) {
             logger.log(Level.WARNING, "interrupted", ex);
-            return threads.size();
+            return allResources();
         } finally {
             lock.unlock();
         }
@@ -183,6 +181,17 @@ public final class FsResourceAccountant {
     }
 
     /**
+     * Returns the number of <em>all</em> accounted closeable resources.
+     * Mind that this value may reduce instantly, even while the lock is held,
+     * so this value should <em>not</em> get cached!
+     * 
+     * @return The number of <em>all</em> accounted closeable resources.
+     */
+    private int allResources() {
+        return threads.size();
+    }
+
+    /**
      * For each accounted closeable resource,
      * stops accounting for it and closes it.
      * <p>
@@ -200,8 +209,8 @@ public final class FsResourceAccountant {
                 i.remove();
                 try {
                     // This may trigger another removal, but it should cause no
-                    // ConcurrentModificationException because the closeable is no
-                    // more present in the map.
+                    // ConcurrentModificationException because the closeable is
+                    // no more present in the map.
                     c.close();
                 } catch (IOException ex) {
                     handler.warn(ex);
