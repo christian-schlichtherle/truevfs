@@ -8,23 +8,18 @@
  */
 package de.schlichtherle.truezip.util;
 
-import java.util.EnumSet;
+import static de.schlichtherle.truezip.util.BitFieldTest.Dummy.*;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.junit.Test;
-
-import static de.schlichtherle.truezip.util.BitFieldTest.Dummy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
