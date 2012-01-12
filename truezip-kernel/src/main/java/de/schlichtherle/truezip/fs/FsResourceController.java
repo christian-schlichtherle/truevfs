@@ -47,6 +47,8 @@ public final class FsResourceController
 extends FsDecoratingConcurrentModelController<
         FsController<? extends FsConcurrentModel>> {
 
+    private static final int WAIT_TIMEOUT = 50;
+
     private static final AccountingSocketFactory
             ACCOUNTING_SOCKET_FACTORY = JSE7.AVAILABLE
                 ? AccountingSocketFactory.NIO2
@@ -123,10 +125,12 @@ extends FsDecoratingConcurrentModelController<
             return;
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
                 || options.get(WAIT_CLOSE_OUTPUT);
-        final int resources = accountant.waitOtherThreads(wait ? 0 : 50);
+        final int resources = accountant.waitOtherThreads(
+                wait ? 0 : WAIT_TIMEOUT);
         if (0 >= resources)
             return;
-        final IOException cause = new OutputBusyException("Number of open entry resources: " + resources);
+        final IOException cause = new OutputBusyException(
+                "Number of open entry resources: " + resources);
         final boolean force = options.get(FORCE_CLOSE_INPUT)
                 || options.get(FORCE_CLOSE_OUTPUT);
         if (!force)
