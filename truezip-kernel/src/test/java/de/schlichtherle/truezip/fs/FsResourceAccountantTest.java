@@ -14,7 +14,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -31,6 +30,9 @@ public class FsResourceAccountantTest {
     private static final Logger logger
             = Logger.getLogger(FsResourceAccountantTest.class.getName());
 
+    private static final long NO_TIMEOUT = 0;
+
+    /** The waiting timeout in milliseconds. */
     private static final long TIMEOUT_MILLIS = 100;
 
     private FsResourceAccountant accountant;
@@ -73,21 +75,13 @@ public class FsResourceAccountantTest {
             threads[i].start();
             threads[i].join();
             threads[i] = null;
-            gc();
+            int resources = accountant.waitOtherThreads(NO_TIMEOUT);
+            assertThat(resources, is(0));
             final long time = System.currentTimeMillis();
-            int resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
+            resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
             assertTrue("Timeout while waiting for " + clazz.getSimpleName(),
                     System.currentTimeMillis() - time < TIMEOUT_MILLIS);
             assertThat(resources, is(0));
-        }
-    }
-
-    private static void gc() {
-        System.gc();
-        try {
-            Thread.sleep(TIMEOUT_MILLIS);
-        } catch (InterruptedException ex) {
-            logger.log(Level.WARNING, "Current thread was interrupted while waiting!", ex);
         }
     }
 
