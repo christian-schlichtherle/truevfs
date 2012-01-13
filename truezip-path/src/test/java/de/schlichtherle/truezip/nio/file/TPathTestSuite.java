@@ -642,7 +642,7 @@ extends TestBase<D> {
         gc();
         
         // This update should complete without any exception if the garbage
-        // collector did his job.
+        // collector did its job.
         try {
             umount();
         } catch (FsSyncWarningException ex) {
