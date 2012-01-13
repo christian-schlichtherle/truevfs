@@ -29,10 +29,10 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * A client application can use {@link #push()} to create a new
  * <i>inheritable thread local configuration</i> by copying the
- * <i>current configuration</i> and pushing the copy on top of an inheritable
+ * <i>current configuration</i> and pushing the copy on top of the inheritable
  * thread local stack.
  * <p>
- * A client application can use {@link #pop()} or {@link #close()} to
+ * Later, the client application can use {@link #pop()} or {@link #close()} to
  * pop the current configuration or {@code this} configuration respectively
  * from the top of the inheritable thread local stack.
  * <p>
@@ -41,22 +41,22 @@ import net.jcip.annotations.ThreadSafe;
  * If no configuration has been pushed on the inheritable thread local stack
  * before, the <i>global configuration</i> is returned.
  * <p>
- * Whenever a child thread is started, it will share the current configuration
+ * Whenever a child thread is started, it shares the current configuration
  * with its parent thread.
  * 
  * <a name="examples"/><h3>Examples</h3>
  *
- * <h4>Changing The Global Configuration</h4>
+ * <a name="global"/><h4>Changing The Global Configuration</h4>
  * <p>
- * If no {@link #push()} without a corresponding {@link #close()} or
- * {@link #pop()} has been called before, then the {@link #get()} method will
- * return the global configuration.
+ * If the thread local configuration stack is empty, i.e. no {@link #push()}
+ * without a corresponding {@link #close()} or {@link #pop()} has been called
+ * before, then the {@link #get()} method will return the global configuration.
  * This feature is intended to get used during the application setup to change
- * some configuration options with a global scope like this:
+ * some configuration options with global scope like this:
  * <pre>{@code
 class MyApplication extends TApplication<IOException> {
 
-    //@Override
+    \@Override
     protected void setup() {
         // This should obtain the global configuration.
         TConfig config = TConfig.get();
@@ -73,7 +73,7 @@ class MyApplication extends TApplication<IOException> {
 }
  * }</pre>
  * 
- * <h4>Setting The Default Archive Detector In The Current Thread</h4>
+ * <a name="local"/><h4>Setting The Default Archive Detector In The Current Thread</h4>
  * <p>
  * If an application needs to change the configuration of just the current
  * thread rather than changing the global configuration, then the
@@ -120,8 +120,43 @@ try (TConfig config = TConfig.push()) {
     ...
 }
  * }</pre>
+ * 
+ * <a name="unit-testing"/><h4>Unit Testing</h4>
+ * <p>
+ * Using the thread local inheritable configuration stack comes in handy when
+ * unit testing, e.g. with JUnit. Consider this pattern:
+ * <pre>{@code
+public class AppTest {
+
+    \@Before
+    public void setUp() {
+        TConfig config = TConfig.push();
+        // Let's just recognize ZIP files.
+        config.setArchiveDetector(new TArchiveDetector("zip"));
+    }
+
+    \@After
+    public void shutDown() {
+        TConfig.pop();
+    }
+
+    \@Test
+    public void testMethod() {
+        // Test accessing some ZIP files here.
+        ...
+    }
+}
+ * }</pre>
+ * <p>
+ * Note that it's not necessary to save the reference to the new pushed
+ * configuration in {@code setUp()}.
+ * {@code shutDown()} will just pop the top configuration off the inheritable
+ * thread local configuration stack.
+ * <p>
+ * The most important feature of this code is that it's thread-safe, which
+ * enables you to run your unit tests in parallel!
  *
- * <h4>Appending To Archive Files In The Current Thread</h4>
+ * <a name="appending"/><h4>Appending To Archive Files In The Current Thread</h4>
  * <p>
  * By default, TrueZIP is configured to produce the smallest possible archive
  * files.
@@ -177,8 +212,8 @@ try {
  * Note that it's specific to the archive file system driver if this output
  * option preference is supported or not.
  * If it's not supported, then it gets silently ignored, thereby falling back
- * to the default strategy of performing an archive update whenever required
- * to avoid writing redundant archive entry data.
+ * to the default strategy of performing a full archive update whenever
+ * required to avoid writing redundant archive entry data.
  * Currently, the situation is like this:
  * <ul>
  * <li>The drivers of the module TrueZIP Driver ZIP fully support this output
