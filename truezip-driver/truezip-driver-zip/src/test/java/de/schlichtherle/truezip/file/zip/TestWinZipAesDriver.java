@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TestWinZipAesDriver extends ZipDriver {
+public final class TestWinZipAesDriver extends ZipDriver {
     private final KeyManagerProvider provider;
 
     public TestWinZipAesDriver(
