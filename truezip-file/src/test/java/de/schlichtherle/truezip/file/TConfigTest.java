@@ -107,7 +107,7 @@ public class TConfigTest {
                 config = TConfig.get();
                 try {
                     TConfig.pop(); // may fail if the current configuration is the global configuration
-                    TConfig.pop(); // must fail
+                    TConfig.pop(); // must fail!
                     fail();
                 } catch (IllegalStateException expected) {
                 }
