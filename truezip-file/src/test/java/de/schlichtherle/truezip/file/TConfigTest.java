@@ -9,15 +9,17 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsInputOption;
+import static de.schlichtherle.truezip.fs.FsInputOptions.NO_INPUT_OPTIONS;
+import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
-import static de.schlichtherle.truezip.fs.FsInputOptions.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.util.BitField;
+import java.util.NoSuchElementException;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author  Christian Schlichtherle
@@ -27,43 +29,72 @@ import static org.hamcrest.CoreMatchers.*;
 public class TConfigTest {
 
     @Test
-    public void testDefaults() {
-        final TConfig config = TConfig.get();
-        assertThat(TConfig.get(), sameInstance(config));
-        final TArchiveDetector detector = config.getArchiveDetector();
+    public void defaults() {
+        final TConfig c = TConfig.get();
+        assertThat(TConfig.get(), sameInstance(c));
+        final TArchiveDetector detector = c.getArchiveDetector();
         assertThat(detector, sameInstance(TArchiveDetector.ALL));
-        assertThat(config.getArchiveDetector(), sameInstance(detector));
-        final boolean lenient = config.isLenient();
+        assertThat(c.getArchiveDetector(), sameInstance(detector));
+        final boolean lenient = c.isLenient();
         assertThat(lenient, is(true));
-        assertThat(config.isLenient(), is(lenient));
-        assertTrue(config.getInputPreferences().isEmpty());
-        assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+        assertThat(c.isLenient(), is(lenient));
+        assertTrue(c.getInputPreferences().isEmpty());
+        assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
     }
 
     @Test
-    public void testPop() {
+    public void pop() {
         try {
             TConfig.pop();
             fail();
-        } catch (IllegalStateException expected) {
+        } catch (IllegalStateException emptyStack) {
+            assertTrue(emptyStack.getCause() instanceof NoSuchElementException);
         }
     }
 
     @Test
-    public void testInheritance() throws InterruptedException {
+    public void close() {
+        final TConfig c1 = TConfig.push();
+        try {
+            final TConfig c2 = TConfig.push();
+            try {
+                c1.close();
+                fail();
+            } catch (IllegalStateException notTopElement) {
+            } finally {
+                c2.close();
+                try {
+                    c2.close();
+                    fail();
+                } catch (IllegalStateException alreadyClosed) {
+                }
+            }
+        } finally {
+            c1.close();
+            try {
+                c1.close();
+                fail();
+            } catch (IllegalStateException emptyStack) {
+                assertTrue(emptyStack.getCause() instanceof NoSuchElementException);
+            }
+        }
+    }
+
+    @Test
+    public void inheritance() throws InterruptedException {
         assertInheritance();
-        final TConfig config1 = TConfig.push();
+        final TConfig c1 = TConfig.push();
         try {
             assertInheritance();
-            final TConfig config2 = TConfig.push();
+            final TConfig c2 = TConfig.push();
             try {
                 assertInheritance();
             } finally {
-                config2.close();
+                c2.close();
             }
             assertInheritance();
         } finally {
-            config1.close();
+            c1.close();
         }
     }
 
@@ -90,140 +121,140 @@ public class TConfigTest {
     }
 
     @Test
-    public void testPreferences() {
-        final TConfig config = TConfig.push();
+    public void preferences() {
+        final TConfig c = TConfig.push();
         try {
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            config.setLenient(false);
+            c.setLenient(false);
 
-            assertFalse(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertTrue(config.getOutputPreferences().isEmpty());
+            assertFalse(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertTrue(c.getOutputPreferences().isEmpty());
 
-            config.setLenient(true);
+            c.setLenient(true);
 
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            config.setInputPreferences(BitField.of(FsInputOption.CACHE));
+            c.setInputPreferences(BitField.of(FsInputOption.CACHE));
 
-            assertTrue(config.isLenient());
-            assertThat(config.getInputPreferences(), is(BitField.of(FsInputOption.CACHE)));
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertThat(c.getInputPreferences(), is(BitField.of(FsInputOption.CACHE)));
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            config.setInputPreferences(NO_INPUT_OPTIONS);
+            c.setInputPreferences(NO_INPUT_OPTIONS);
 
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            config.setOutputPreferences(BitField.of(CACHE));
+            c.setOutputPreferences(BitField.of(CACHE));
 
-            assertFalse(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CACHE)));
+            assertFalse(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CACHE)));
 
-            config.setOutputPreferences(BitField.of(CREATE_PARENTS));
+            c.setOutputPreferences(BitField.of(CREATE_PARENTS));
 
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
             try {
-                config.setOutputPreferences(BitField.of(APPEND));
+                c.setOutputPreferences(BitField.of(APPEND));
                 fail();
             } catch (IllegalArgumentException expected) {
             }
 
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
             try {
-                config.setOutputPreferences(BitField.of(EXCLUSIVE));
+                c.setOutputPreferences(BitField.of(EXCLUSIVE));
                 fail();
             } catch (IllegalArgumentException expected) {
             }
 
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            config.setOutputPreferences(BitField.of(STORE));
+            c.setOutputPreferences(BitField.of(STORE));
 
-            assertFalse(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(STORE)));
+            assertFalse(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(STORE)));
 
-            config.setOutputPreferences(BitField.of(COMPRESS));
+            c.setOutputPreferences(BitField.of(COMPRESS));
 
-            assertFalse(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(COMPRESS)));
+            assertFalse(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(COMPRESS)));
 
-            config.setOutputPreferences(BitField.of(GROW));
+            c.setOutputPreferences(BitField.of(GROW));
 
-            assertFalse(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(GROW)));
+            assertFalse(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(GROW)));
 
-            config.setOutputPreferences(BitField.of(CACHE, CREATE_PARENTS, COMPRESS));
+            c.setOutputPreferences(BitField.of(CACHE, CREATE_PARENTS, COMPRESS));
 
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CACHE, CREATE_PARENTS, COMPRESS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CACHE, CREATE_PARENTS, COMPRESS)));
 
-            config.setOutputPreferences(BitField.of(CREATE_PARENTS));
+            c.setOutputPreferences(BitField.of(CREATE_PARENTS));
 
             try {
-                config.setOutputPreferences(BitField.of(STORE, COMPRESS));
+                c.setOutputPreferences(BitField.of(STORE, COMPRESS));
                 fail();
             } catch (IllegalArgumentException expected) {
             }
 
-            assertTrue(config.isLenient());
-            assertTrue(config.getInputPreferences().isEmpty());
-            assertThat(config.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertTrue(c.isLenient());
+            assertTrue(c.getInputPreferences().isEmpty());
+            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
         } finally {
-            config.close();
+            c.close();
         }
     }
 
     @Test
-    public void runStandardUseCase() {
-        TFile file1 = new TFile("file.mok");
-        assertFalse(file1.isArchive());
+    public void standardUseCase() {
+        TFile f1 = new TFile("file.mok");
+        assertFalse(f1.isArchive());
         // Push a new current configuration on the thread local stack.
-        TConfig config = TConfig.push();
+        TConfig c = TConfig.push();
         try {
             // Change the inheritable thread local configuration.
-            config.setArchiveDetector(new TArchiveDetector("mok", new MockArchiveDriver()));
+            c.setArchiveDetector(new TArchiveDetector("mok", new MockArchiveDriver()));
             // Use the inheritable thread local configuration.
-            TFile file2 = new TFile("file.mok");
-            assertTrue(file2.isArchive());
+            TFile f2 = new TFile("file.mok");
+            assertTrue(f2.isArchive());
             // Do some I/O here.
         } finally {
             // Pop the configuration off the inheritable thread local stack.
-            config.close();
+            c.close();
         }
     }
 
     @Test
-    public void testAdvancedUseCase() {
-        final TConfig config1 = TConfig.get();
-        assertThat(TConfig.get(), sameInstance(config1));
-        final TArchiveDetector detector1 = config1.getArchiveDetector();
-        assertThat(config1.getArchiveDetector(), sameInstance(detector1));
+    public void advancedUseCase() {
+        final TConfig c1 = TConfig.get();
+        assertThat(TConfig.get(), sameInstance(c1));
+        final TArchiveDetector detector1 = c1.getArchiveDetector();
+        assertThat(c1.getArchiveDetector(), sameInstance(detector1));
         final TArchiveDetector detector2 = new TArchiveDetector("mok", new MockArchiveDriver());
-        final TConfig config2 = TConfig.push();
+        final TConfig c2 = TConfig.push();
         try {
-            config2.setArchiveDetector(detector2);
-            assertThat(TConfig.get(), sameInstance(config2));
-            assertThat(config2.getArchiveDetector(), sameInstance(detector2));
+            c2.setArchiveDetector(detector2);
+            assertThat(TConfig.get(), sameInstance(c2));
+            assertThat(c2.getArchiveDetector(), sameInstance(detector2));
             final TArchiveDetector detector3 = new TArchiveDetector("mok", new MockArchiveDriver());
             final TConfig config3 = TConfig.push();
             try {
@@ -233,12 +264,12 @@ public class TConfigTest {
             } finally {
                 config3.close();
             }
-            assertThat(TConfig.get(), sameInstance(config2));
-            assertThat(config2.getArchiveDetector(), sameInstance(detector2));
+            assertThat(TConfig.get(), sameInstance(c2));
+            assertThat(c2.getArchiveDetector(), sameInstance(detector2));
         } finally {
-            config2.close();
+            c2.close();
         }
-        assertThat(TConfig.get(), sameInstance(config1));
-        assertThat(config1.getArchiveDetector(), sameInstance(detector1));
+        assertThat(TConfig.get(), sameInstance(c1));
+        assertThat(c1.getArchiveDetector(), sameInstance(detector1));
     }
 }
