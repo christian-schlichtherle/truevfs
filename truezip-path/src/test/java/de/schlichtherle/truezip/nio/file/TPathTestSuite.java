@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.file.TestBase;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
@@ -23,7 +23,6 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import de.schlichtherle.truezip.util.TaskFactory;
@@ -1491,7 +1490,7 @@ extends TestBase<D> {
                         if (updateIndividually)
                             archive.getFileSystem().close();
                         else
-                            TFile.sync(BitField.noneOf(FsSyncOption.class)); // DON'T flush all caches!
+                            TFile.sync(SYNC); // DON'T flush all caches!
                     } catch (FsSyncException ex) {
                         if (!(ex.getCause() instanceof FileBusyException))
                             throw ex;
