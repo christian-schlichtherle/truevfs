@@ -19,6 +19,7 @@ import java.util.Arrays;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.filechooser.FileSystemView;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Subclasses {@code AbstractComboBoxBrowser} to complete relative and
@@ -33,9 +34,10 @@ import javax.swing.filechooser.FileSystemView;
     box.setEditable(true);
  * </pre>
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
 

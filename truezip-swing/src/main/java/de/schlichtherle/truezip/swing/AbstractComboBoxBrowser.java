@@ -27,6 +27,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * An observer for a {@link JComboBox} which provides auto completion for the
@@ -45,6 +46,7 @@ import javax.swing.text.JTextComponent;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class AbstractComboBoxBrowser<E> implements Serializable {
 
