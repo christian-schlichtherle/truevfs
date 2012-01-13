@@ -257,14 +257,14 @@ public final class FsResourceAccountant {
      * You cannot use this class outside its package.
      */
     public static final class Collector extends Thread {
-        static final ReferenceQueue<Closeable>
+        private static final ReferenceQueue<Closeable>
                 queue = new ReferenceQueue<Closeable>();
 
         static {
             new Collector().start();
         }
 
-        Collector() {
+        private Collector() {
             super(ThreadGroups.getServerThreadGroup(), Collector.class.getName());
             setPriority(MAX_PRIORITY - 2);
             setDaemon(true);
