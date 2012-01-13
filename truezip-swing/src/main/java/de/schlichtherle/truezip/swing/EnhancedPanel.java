@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 /**
  * Provides methods to fire {@link PanelEvent}s.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -41,7 +41,7 @@ public class EnhancedPanel extends JPanel  {
      */
     public EnhancedPanel(LayoutManager layout, boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
-        addHierarchyListener(new EnhancedPanelHierarchyListener());
+        super.addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -52,7 +52,7 @@ public class EnhancedPanel extends JPanel  {
      */
     public EnhancedPanel(LayoutManager layout) {
         super(layout);
-        addHierarchyListener(new EnhancedPanelHierarchyListener());
+        super.addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -67,7 +67,7 @@ public class EnhancedPanel extends JPanel  {
      */
     public EnhancedPanel(boolean isDoubleBuffered) {
         super(isDoubleBuffered);
-        addHierarchyListener(new EnhancedPanelHierarchyListener());
+        super.addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -75,7 +75,7 @@ public class EnhancedPanel extends JPanel  {
      * and a flow layout.
      */
     public EnhancedPanel() {
-        addHierarchyListener(new EnhancedPanelHierarchyListener());
+        super.addHierarchyListener(new EnhancedPanelHierarchyListener());
     }
 
     /**
@@ -230,7 +230,8 @@ public class EnhancedPanel extends JPanel  {
                 ((PanelListener) listeners[i+1]).ancestorWindowHidden(event);
     }
 
-    private class EnhancedPanelHierarchyListener implements HierarchyListener {
+    private final class EnhancedPanelHierarchyListener
+    implements HierarchyListener {
         @Override
         public void hierarchyChanged(final HierarchyEvent e) {
             if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED)
