@@ -77,8 +77,11 @@
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
         <!-- For maven-surefire-plugin and maven-failsafe-plugin. -->
         <argLine>-server</argLine>
-        <!--forkMode>always</forkMode--> <!-- this should not be necessary if the tests are well implemented -->
-        <!--parallel>classes</parallel--> <!-- TODO: Make this work! -->
+        <!-- TODO: Make parallel testing work. -->
+        <!--childDelegation>true</childDelegation>
+        <parallel>methods</parallel>
+        <surefire.useSystemClassLoader>false</surefire.useSystemClassLoader>
+        <failsafe.useSystemClassLoader>false</failsafe.useSystemClassLoader-->
     </properties>
 
     <modules>
@@ -206,7 +209,7 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
-                        <parallel>classes</parallel>
+                        <!--argLine>-server -Djava.security.manager</argLine-->
                         <systemPropertyVariables>
                             <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
@@ -216,7 +219,6 @@
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
-                        <!--parallel>classes</parallel--> <!-- TODO: Make this work! -->
                         <!--threadCount>10</threadCount--> <!-- consider 90% I/O blocking factor -->
                         <systemPropertyVariables>
                             <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
