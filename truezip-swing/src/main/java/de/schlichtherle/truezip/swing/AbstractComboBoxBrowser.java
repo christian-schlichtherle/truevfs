@@ -29,30 +29,30 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 /**
- * An observer for a {@link JComboBox} which provides auto completion
- * for the editable text in the drop down list in order to provide quick
- * browsing capabilities for the user.
- * Subclasses need to implement the {@link #update} method in order to update
- * the combo box model with the actual auto completion data.
+ * An observer for a {@link JComboBox} which provides auto completion for the
+ * editable text in the drop down list in order to provide quick browsing
+ * capabilities for the user. Subclasses need to implement the {@link #update}
+ * method in order to update the combo box model with the actual auto
+ * completion data.
  * <p>
- * This class is designed to be minimal intrusive: It works with any subclass
- * of {@code JComboBox} and doesn't require a special
- * {@link ComboBoxModel}, although its specific behaviour will only show
- * if the {@code JComboBox} is {@code editable} and uses an
- * instance of a {@link MutableComboBoxModel} (which, besides the
- * {@code editable} property being set to {@code true}, is the
- * default for a plain {@code JComboBox}).
+ * This class is designed to be minimal intrusive: It's designed to work with
+ * any {@code JComboBox} and doesn't require a special {@link ComboBoxModel},
+ * although its specific behaviour will only show if the {@code JComboBox} is
+ * {@code editable} and uses a {@link MutableComboBoxModel} (which, besides the
+ * {@code editable} property being set to {@code true}, is the default setup
+ * for a vanilla {@code JComboBox}).
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 public abstract class AbstractComboBoxBrowser<E> implements Serializable {
+
     private static final long serialVersionUID = 1065103960246722893L;
 
     private final Listener listener = new Listener();
-
-    private @CheckForNull JComboBox<E> comboBox;
+    private @CheckForNull
+    JComboBox<E> comboBox;
 
     /**
      * Used to inhibit mutual recursive event firing.
@@ -63,16 +63,15 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
      * Creates a new combo box auto completion browser.
      * {@link #setComboBox} must be called in order to use this object.
      */
-    protected AbstractComboBoxBrowser() {
-    }
+    protected AbstractComboBoxBrowser() { }
 
     /**
-     * Creates a new combo box auto completion browser.
-     * Note that this constructor does <em>not</em> call {@link #update}
-     * and hence the drop down list of the combo box is left unchanged.
+     * Creates a new combo box auto completion browser. Note that this
+     * constructor does <em>not</em> call {@link #update} and hence the drop
+     * down list of the combo box is left unchanged.
      *
      * @param comboBox The combo box to enable browsing for auto completions.
-     *        May be {@code null}.
+     * May be {@code null}.
      */
     protected AbstractComboBoxBrowser(final @CheckForNull JComboBox<E> comboBox) {
         changeComboBox(null, comboBox, false);
@@ -87,9 +86,8 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
     }
 
     /**
-     * Sets the combo box which this object is auto completing and updates
-     * the drop down list with the auto completion for the currently selected
-     * item.
+     * Sets the combo box which this object is auto completing and updates the
+     * drop down list with the auto completion for the currently selected item.
      *
      * @param comboBox The combo box to enable browsing for auto completions.
      *        May be {@code null}.
@@ -99,7 +97,7 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-	private void changeComboBox(
+    private void changeComboBox(
             final @CheckForNull JComboBox<E> oldCB,
             final @CheckForNull JComboBox<E> newCB,
             final boolean update) {
@@ -204,7 +202,7 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
             final ComboBoxEditor cbe = cb.getEditor();
             final JTextComponent tc = (JTextComponent) cbe.getEditorComponent();
             assert cb.isShowing() || !tc.isFocusOwner();
-            if (!tc.isFocusOwner() /*|| !cb.isShowing()*/)
+            if (!tc.isFocusOwner() /* || !cb.isShowing() */)
                 return;
 
             //cb.setPopupVisible(update(tc.getText())); // doesn't work: adjusts popup size!
@@ -227,7 +225,7 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
             final JComboBox<E> cb = getComboBox();
             final JTextComponent tc = (JTextComponent) cbe.getEditorComponent();
             assert cb.isShowing() || !tc.isFocusOwner();
-            if (!tc.isFocusOwner() /*|| !cb.isShowing()*/)
+            if (!tc.isFocusOwner() /* || !cb.isShowing() */)
                 return;
 
             // Compensate for an issue with some look and feels
@@ -248,10 +246,10 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
      * In particular, they should not update the visual appearance of this
      * component.
      * <p>
-     * {@link #getComboBox} is guaranteed to return non-{@code null} if
-     * this method is called from this abstract base class.
+     * {@link #getComboBox} is guaranteed to return non-{@code null} if this
+     * method is called from this abstract base class.
      *
-     * @param initials The text to auto complete. May be {@code null}.
+     * @param  initials The text to auto complete. May be {@code null}.
      * @return Whether or not the combo box should pop up to show the updated
      *         contents of its model.
      */
@@ -281,6 +279,7 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
     }
 
     private class Listener implements DocumentListener, PropertyChangeListener {
+
         @Override
         public void insertUpdate(DocumentEvent e) {
             documentUpdated();
@@ -315,10 +314,10 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
     }
 
     /**
-     * This proxy controls access to the real {@code ComboBoxEditor}
-     * installed by the client application or the pluggable look and feel.
-     * It is used to inhibit mutual recursion caused by modifications to
-     * the list model in the {@code JComboBox}.
+     * This proxy controls access to the real {@code ComboBoxEditor} installed
+     * by the client application or the pluggable look and feel.
+     * It is used to inhibit mutual recursion caused by modifications to the
+     * list model in the {@code JComboBox}.
      */
     private final class DecoratingComboBoxEditor implements ComboBoxEditor {
         private final ComboBoxEditor delegate;
