@@ -42,7 +42,7 @@ public final class RaesIT extends ReadOnlyFileTestSuite {
                         newRaesParameters());
                 Streams.copy(in, out);
                 logger.log(Level.FINE,
-                        "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PBKDFv2.",
+                        "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PKCS#12v1",
                         new Object[]{ plainFile.length(), out.getKeyStrength().getBits() });
                 // Open cipherFile for random access decryption.
             } catch (IOException ex) {
