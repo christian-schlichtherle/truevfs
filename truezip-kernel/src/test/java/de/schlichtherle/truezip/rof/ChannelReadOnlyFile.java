@@ -19,7 +19,7 @@ import net.jcip.annotations.NotThreadSafe;
 /**
  * A {@link ReadOnlyFile} implementation using file channels.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
