@@ -65,25 +65,20 @@ extends FsDecoratingLockModelController<
      *
      * @param controller the decorated file system lock controller.
      */
-    public FsLockController(
-            FsController<? extends FsLockModel> controller) {
+    public FsLockController(FsController<? extends FsLockModel> controller) {
         super(controller);
     }
 
     @Override
     protected ReadLock readLock() {
-        final ReadLock readLock = this.readLock;
-        return null != readLock
-                ? readLock
-                : (this.readLock = getModel().readLock());
+        final ReadLock lock = this.readLock;
+        return null != lock ? lock : (this.readLock = getModel().readLock());
     }
 
     @Override
     protected WriteLock writeLock() {
-        final WriteLock writeLock = this.writeLock;
-        return null != writeLock
-                ? writeLock
-                : (this.writeLock = getModel().writeLock());
+        final WriteLock lock = this.writeLock;
+        return null != lock ? lock : (this.writeLock = getModel().writeLock());
     }
 
     @Override
