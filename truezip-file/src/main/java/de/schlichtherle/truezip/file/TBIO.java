@@ -8,24 +8,23 @@
  */
 package de.schlichtherle.truezip.file;
 
-import java.io.File;
-import de.schlichtherle.truezip.io.Paths;
-import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
+import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.io.Paths;
+import de.schlichtherle.truezip.socket.IOSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.
