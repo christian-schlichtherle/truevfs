@@ -52,9 +52,9 @@ extends FsDriver {
     }
 
     /**
-     * Returns the I/O pool to use for allocating temporary I/O entries.
+     * Returns the pool to use for allocating temporary I/O buffers.
      *
-     * @return The I/O pool to use for allocating temporary I/O entries.
+     * @return The pool to use for allocating temporary I/O buffers.
      */
     protected abstract IOPool<?> getPool();
 
@@ -150,15 +150,15 @@ extends FsDriver {
     public FsController<?>
     newController(final FsModel model, final FsController<?> parent) {
         assert !(model instanceof FsLockModel);
-        final FsLockModel cmodel;
-        cmodel = new FsLockModel(model);
+        final FsLockModel lmodel;
+        lmodel = new FsLockModel(model);
         return  new FsSyncController<FsLockModel>(
                     new FsLockController(
                         new FsCacheController(
                             new FsAccountController(
                                 new FsContextController(
                                     new FsDefaultArchiveController<E>(
-                                            cmodel, parent, this))),
+                                            lmodel, parent, this))),
                             getPool())));
     }
 
