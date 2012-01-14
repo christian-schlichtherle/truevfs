@@ -8,11 +8,11 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
+import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -22,19 +22,14 @@ import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.netbeans.jemmy.JemmyProperties;
-import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class FileComboBoxBrowserIT {
-    static {
-        JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
-    }
 
     private static final Logger logger
             = Logger.getLogger(FileComboBoxBrowserIT.class.getName());
@@ -80,7 +75,7 @@ public final class FileComboBoxBrowserIT {
 
     private void assertAutoCompletion(final File dir) {
         final String[] entries = dir.list();
-        if (null == entries || entries.length == 0) {
+        if (0 == entries.length) {
             logger.warning("Current directory does not contain any files - skipping test!");
             return;
         }
@@ -113,7 +108,7 @@ public final class FileComboBoxBrowserIT {
             final int l = initials.length();
 
             @Override
-			public boolean accept(File dir, String name) {
+            public boolean accept(File dir, String name) {
                 if (name.length() >= l)
                     return initials.equalsIgnoreCase(name.substring(0, l));
                 else
@@ -132,12 +127,10 @@ public final class FileComboBoxBrowserIT {
         return list;
     }
 
-    @Test
     // TODO: Complete this test!
-    public void testGUI() throws InterruptedException, InvocationTargetException {
-        new FileComboBoxPanel(null).run();
-
-        final JFrameOperator frame = new JFrameOperator();
+    @Test
+    public void testGUI() throws InterruptedException {
+        final JFrameOperator frame = showFrameWith(new FileComboBoxPanel(null));
         final JTextComponentOperator tc0 = new JTextComponentOperator(frame, 0);
         final JTextComponentOperator tc1 = new JTextComponentOperator(frame, 1);
 

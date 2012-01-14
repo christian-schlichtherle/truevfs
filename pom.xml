@@ -77,11 +77,7 @@
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
         <!-- For maven-surefire-plugin and maven-failsafe-plugin. -->
         <argLine>-server</argLine>
-        <!-- TODO: Make parallel testing work. -->
-        <!--childDelegation>true</childDelegation>
-        <parallel>methods</parallel>
-        <surefire.useSystemClassLoader>false</surefire.useSystemClassLoader>
-        <failsafe.useSystemClassLoader>false</failsafe.useSystemClassLoader-->
+        <!--parallel>both</parallel--> <!-- TODO: Make this work. -->
     </properties>
 
     <modules>
@@ -125,8 +121,8 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-driver-zip</artifactId>
-                <version>${project.version}</version>
                 <type>test-jar</type>
+                <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -137,8 +133,8 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-file</artifactId>
-                <version>${project.version}</version>
                 <type>test-jar</type>
+                <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -149,8 +145,8 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-kernel</artifactId>
-                <version>${project.version}</version>
                 <type>test-jar</type>
+                <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -161,14 +157,21 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-path</artifactId>
-                <version>${project.version}</version>
                 <type>test-jar</type>
+                <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-swing</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-swing</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>

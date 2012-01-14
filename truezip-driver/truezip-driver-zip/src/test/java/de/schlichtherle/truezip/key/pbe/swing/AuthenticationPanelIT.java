@@ -8,7 +8,9 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
+import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.junit.After;
@@ -24,18 +26,18 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public class AuthenticationPanelIT extends JemmyUtils {
+public class AuthenticationPanelIT {
     private static final String LABEL_TEXT = "Hello World!";
 	
     private JFrameOperator frame;
 	
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         final JPanel passwdPanel = new JPanel();
         passwdPanel.add(new JLabel(LABEL_TEXT));
         final AuthenticationPanel panel = new AuthenticationPanel();
         panel.setPasswdPanel(passwdPanel);
-        frame = showInNewFrame(panel);
+        frame = showFrameWith(panel);
     }
 
     @After

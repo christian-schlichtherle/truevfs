@@ -9,6 +9,7 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
+import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import java.io.File;
 import java.net.URI;
 import org.junit.After;
@@ -17,21 +18,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.ComponentChooser;
 import org.netbeans.jemmy.QueueTool;
-import org.netbeans.jemmy.operators.JButtonOperator;
-import org.netbeans.jemmy.operators.JFileChooserOperator;
-import org.netbeans.jemmy.operators.JFrameOperator;
-import org.netbeans.jemmy.operators.JLabelOperator;
-import org.netbeans.jemmy.operators.JTabbedPaneOperator;
-import org.netbeans.jemmy.operators.JTextComponentOperator;
-import org.netbeans.jemmy.operators.JTextFieldOperator;
+import org.netbeans.jemmy.operators.*;
 import org.netbeans.jemmy.util.NameComponentChooser;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class KeyPanelTestSuite<P extends KeyPanel>
-extends JemmyUtils {
+public abstract class KeyPanelTestSuite<P extends KeyPanel> {
     private static final ComponentChooser
             KEY_FILE_CHOOSER = new NameComponentChooser("keyFileChooser");
 	
@@ -42,7 +36,7 @@ extends JemmyUtils {
     @Before
     public void setUp() throws Exception {
         panel = newKeyPanel();
-        frame = showInNewFrame(panel);
+        frame = showFrameWith(panel);
         error = findErrorLabel(frame);
     }
 

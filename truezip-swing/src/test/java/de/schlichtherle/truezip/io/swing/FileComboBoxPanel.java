@@ -11,18 +11,15 @@ package de.schlichtherle.truezip.io.swing;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.awt.EventQueue;
 import java.io.File;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.WindowConstants;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public class FileComboBoxPanel extends JPanel implements Runnable {
+public class FileComboBoxPanel extends JPanel {
     private static final long serialVersionUID = 1065812374938719922L;
 
     /** Creates new form FileComboBoxPanel */
@@ -98,26 +95,6 @@ public class FileComboBoxPanel extends JPanel implements Runnable {
     private void setDirectory0(@CheckForNull File directory) {
         browser1.setDirectory(directory);
         browser2.setDirectory(directory);
-    }
-
-    @Override
-    public void run() {
-        EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                final JFrame frame = new JFrame("File name auto completion fun");
-                frame.add(FileComboBoxPanel.this);
-                frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
-    }
-
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new FileComboBoxPanel(
-                0 < args.length ? new File(args[0]) : null));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
