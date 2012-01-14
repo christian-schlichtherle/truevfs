@@ -82,7 +82,7 @@ public class EnhancedPanel extends JPanel  {
      * Overridden in order to prevent this component to deliver a
      * {@link PanelEvent} multiple times from the same source.
      *
-     * @deprecated See {@link EnhancedPanel}.
+     * @deprecated See {@link PanelEvent}.
      */
     @Override
     @Deprecated
@@ -110,7 +110,7 @@ public class EnhancedPanel extends JPanel  {
     /**
      * Overridden in order to process {@link PanelEvent}s.
      *
-     * @deprecated See {@link EnhancedPanel}.
+     * @deprecated See {@link PanelEvent}.
      */
     @Override
     @Deprecated
