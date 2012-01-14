@@ -164,21 +164,24 @@ extends TestBase<D> {
         Closeable resource = factory.create(entry);
         final ReferenceQueue<FsController<?>> queue
                 = new ReferenceQueue<FsController<?>>();
-        final Reference<FsController<?>> ref
+        final Reference<FsController<?>> exp
                 = new WeakReference<FsController<?>>(
                     new TFile(entry).getInnerArchive().getController(), queue);
-        gc();
-        assertNull(queue.poll());
-        assertSame(ref.get(), new TFile(entry).getInnerArchive().getController());
+        System.gc();
+        assertNull(queue.remove(TIMEOUT_MILLIS));
+        assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
         resource.close();
         resource = null; // leave now!
-        gc();
-        assertNull(queue.poll());
-        assertSame(ref.get(), new TFile(entry).getInnerArchive().getController());
-        TFile.umount(new TFile(entry).getInnerArchive());
         System.gc();
-        assertSame(ref, queue.remove());
-        assertNull(ref.get());
+        assertNull(queue.remove(TIMEOUT_MILLIS));
+        assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
+        TFile.umount(new TFile(entry).getInnerArchive());
+        Reference<? extends FsController<?>> ref;
+        do {
+            System.gc();
+        } while (null == (ref = queue.remove(TIMEOUT_MILLIS)));
+        assertSame(exp, ref);
+        assertNull(exp.get());
     }
 
     @Test
