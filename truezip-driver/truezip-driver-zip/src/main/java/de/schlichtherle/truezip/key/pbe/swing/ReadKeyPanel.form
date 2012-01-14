@@ -21,7 +21,7 @@
               <ComponentRef name="passwdField"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -45,7 +45,7 @@
   </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
-    <AuxValue name="FormSettings_formBundle" type="java.lang.String" value="de/schlichtherle/truezip/crypto/raes/param/swing/ReadKeyPanel"/>
+    <AuxValue name="FormSettings_formBundle" type="java.lang.String" value="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel"/>
     <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
@@ -64,7 +64,7 @@
           <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/ReadKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -120,7 +120,7 @@
     <Component class="javax.swing.JCheckBox" name="changeKey">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/ReadKeyPanel.properties" key="changeKey" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel.properties" key="changeKey" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
