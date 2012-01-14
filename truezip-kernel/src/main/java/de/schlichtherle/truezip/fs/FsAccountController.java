@@ -47,12 +47,11 @@ public final class FsAccountController
 extends FsDecoratingLockModelController<
         FsController<? extends FsLockModel>> {
 
-    private static final int WAIT_TIMEOUT = 50;
+    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO2
+            : SocketFactory.OIO;
 
-    private static final AccountingSocketFactory
-            ACCOUNTING_SOCKET_FACTORY = JSE7.AVAILABLE
-                ? AccountingSocketFactory.NIO2
-                : AccountingSocketFactory.OIO;
+    private static final int WAIT_TIMEOUT = 50;
 
     private @CheckForNull FsResourceAccountant accountant;
 
@@ -76,7 +75,7 @@ extends FsDecoratingLockModelController<
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return ACCOUNTING_SOCKET_FACTORY.newInputSocket(this,
+        return SOCKET_FACTORY.newInputSocket(this,
                 delegate.getInputSocket(name, options));
     }
 
@@ -84,7 +83,7 @@ extends FsDecoratingLockModelController<
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             Entry template) {
-        return ACCOUNTING_SOCKET_FACTORY.newOutputSocket(this,
+        return SOCKET_FACTORY.newOutputSocket(this,
                 delegate.getOutputSocket(name, options, template));
     }
 
@@ -172,7 +171,7 @@ extends FsDecoratingLockModelController<
     }
 
     @Immutable
-    private enum AccountingSocketFactory {
+    private enum SocketFactory {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
