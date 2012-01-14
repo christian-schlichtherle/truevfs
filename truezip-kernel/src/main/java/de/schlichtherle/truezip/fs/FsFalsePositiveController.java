@@ -17,6 +17,7 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -81,6 +82,7 @@ import net.jcip.annotations.ThreadSafe;
 public final class FsFalsePositiveController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
+    private volatile @CheckForNull FsController<?> parent;
     private volatile @CheckForNull FsPath path;
 
     /**
@@ -90,7 +92,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      */
     FsFalsePositiveController(final FsController<?> controller) {
         super(controller);
-        assert null != getParent();
+        assert null != super.getParent();
+    }
+
+    @Override
+    public FsController<?> getParent() {
+        final FsController<?> parent = this.parent;
+        return null != parent ? parent : (this.parent = delegate.getParent());
     }
 
     private FsEntryName resolveParent(FsEntryName name) {
@@ -189,6 +197,22 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().isWritable(resolveParent(name));
+            } catch (FsException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
+            } catch (IOException discard) {
+                throw ex.getCause();
+            }
+        }
+    }
+
+    @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        try {
+            return delegate.isExecutable(name);
+        } catch (FsFalsePositiveException ex) {
+            try {
+                return getParent().isExecutable(resolveParent(name));
             } catch (FsException ex2) {
                 assert !(ex2 instanceof FsFalsePositiveException);
                 throw ex2;
@@ -308,6 +332,15 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 throw ex.getCause();
             }
         }
+    }
+
+    @Override
+    public <X extends IOException> void
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super FsSyncException, X> handler)
+    throws X {
+        // Mind there's no FsFalsePositiveException in the throws-declaration!
+        delegate.sync(options, handler);
     }
 
     private final class Input extends DecoratingInputSocket<Entry> {

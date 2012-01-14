@@ -9,6 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
@@ -36,6 +37,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -217,6 +219,56 @@ extends FsDecoratingLockModelController<
                 }
             }
         }
+    }
+
+    @Override
+    public Icon getClosedIcon() throws IOException {
+        return delegate.getClosedIcon();
+    }
+
+    @Override
+    public FsEntry getEntry(FsEntryName name) throws IOException {
+        return delegate.getEntry(name);
+    }
+
+    @Override
+    public Icon getOpenIcon() throws IOException {
+        return delegate.getOpenIcon();
+    }
+
+    @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        return delegate.isExecutable(name);
+    }
+
+    @Override
+    public boolean isReadOnly() throws IOException {
+        return delegate.isReadOnly();
+    }
+
+    @Override
+    public boolean isReadable(FsEntryName name) throws IOException {
+        return delegate.isReadable(name);
+    }
+
+    @Override
+    public boolean isWritable(FsEntryName name) throws IOException {
+        return delegate.isWritable(name);
+    }
+
+    @Override
+    public void setReadOnly(FsEntryName name) throws IOException {
+        delegate.setReadOnly(name);
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, Map<Access, Long> times, BitField<FsOutputOption> options) throws IOException {
+        return delegate.setTime(name, times, options);
+    }
+
+    @Override
+    public boolean setTime(FsEntryName name, BitField<Access> types, long value, BitField<FsOutputOption> options) throws IOException {
+        return delegate.setTime(name, types, value, options);
     }
 
     private final class Input
