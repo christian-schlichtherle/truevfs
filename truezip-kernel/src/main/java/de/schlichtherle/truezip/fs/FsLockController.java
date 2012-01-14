@@ -38,9 +38,9 @@ import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A concurrent file system controller which decorates another file system
- * controller in order to provide read/write lock features for multi-threaded
- * access by its clients.
+ * A file system controller which decorates another file system controller
+ * in order to provide read/write locking for multi-threaded access by its
+ * clients.
  * 
  * @see     FsLockModel
  * @see     FsNeedsWriteLockException
@@ -53,18 +53,17 @@ public final class FsLockController
 extends FsDecoratingLockModelController<
         FsController<? extends FsLockModel>> {
 
-    private static final ConcurrentSocketFactory
-            CONCURRENT_SOCKET_FACTORY = JSE7.AVAILABLE
-                ? ConcurrentSocketFactory.NIO2
-                : ConcurrentSocketFactory.OIO;
+    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO2
+            : SocketFactory.OIO;
 
     private volatile @CheckForNull ReadLock readLock;
     private volatile @CheckForNull WriteLock writeLock;
 
     /**
-     * Constructs a new concurrent file system controller.
+     * Constructs a new file system lock controller.
      *
-     * @param controller the decorated concurrent file system controller.
+     * @param controller the decorated file system lock controller.
      */
     public FsLockController(
             FsController<? extends FsLockModel> controller) {
@@ -253,7 +252,7 @@ extends FsDecoratingLockModelController<
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return CONCURRENT_SOCKET_FACTORY.newInputSocket(this,
+        return SOCKET_FACTORY.newInputSocket(this,
                 delegate.getInputSocket(name, options));
     }
 
@@ -261,7 +260,7 @@ extends FsDecoratingLockModelController<
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             Entry template) {
-        return CONCURRENT_SOCKET_FACTORY.newOutputSocket(this,
+        return SOCKET_FACTORY.newOutputSocket(this,
                 delegate.getOutputSocket(name, options, template));
     }
 
@@ -288,19 +287,6 @@ extends FsDecoratingLockModelController<
         writeLock().lock();
         try {
             delegate.unlink(name, options);
-            final FsController<?> parent;
-            if (name.isRoot() && null != (parent = getParent())) {
-                // We have just removed the virtual root directory of a
-                // federated file system, i.e. archive file.
-                // Now unlink the entry for the archive file in the parent file
-                // system.
-                // Note that this code belongs conceptually in
-                // FsFederatedController.
-                // However, then this operation wouldn't be atomic anymore.
-                parent.unlink(
-                        getMountPoint().getPath().resolve(name).getEntryName(),
-                        options);
-            }
         } finally {
             writeLock().unlock();
         }
@@ -321,7 +307,7 @@ extends FsDecoratingLockModelController<
     }
 
     @Immutable
-    private enum ConcurrentSocketFactory {
+    private enum SocketFactory {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
