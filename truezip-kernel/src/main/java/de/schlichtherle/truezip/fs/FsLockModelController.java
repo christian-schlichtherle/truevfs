@@ -17,18 +17,18 @@ import net.jcip.annotations.Immutable;
 
 /**
  * An abstract file system controller which requires an
- * {@link FsConcurrentModel} so that it can forward calls to its additional
+ * {@link FsLockModel} so that it can forward calls to its additional
  * protected methods to this model for the convenience of sub-classes.
  *
- * @see     FsConcurrentModel
+ * @see     FsLockModel
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public abstract class FsConcurrentModelController
-extends FsModelController<FsConcurrentModel>  {
+public abstract class FsLockModelController
+extends FsModelController<FsLockModel>  {
 
     /**
      * Constructs a new file system controller for the given
@@ -36,7 +36,7 @@ extends FsModelController<FsConcurrentModel>  {
      * 
      * @param model the concurrent file system model.
      */
-    protected FsConcurrentModelController(FsConcurrentModel model) {
+    protected FsLockModelController(FsLockModel model) {
         super(model);
     }
 
@@ -53,13 +53,13 @@ extends FsModelController<FsConcurrentModel>  {
     }
 
     protected final void assertWriteLockedByCurrentThread()
-    throws FsNotWriteLockedException {
+    throws FsNeedsWriteLockException {
         getModel().assertWriteLockedByCurrentThread();
     }
 
     protected final void assertNotReadLockedByCurrentThread(
-            @CheckForNull FsNotWriteLockedException ex)
-    throws FsNotWriteLockedException {
+            @CheckForNull FsNeedsWriteLockException ex)
+    throws FsNeedsWriteLockException {
         getModel().assertNotReadLockedByCurrentThread(ex);
     }
 }

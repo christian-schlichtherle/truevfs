@@ -9,41 +9,23 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsException;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsNotSyncedException;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.*;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import static de.schlichtherle.truezip.entry.Entry.Access.READ;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.fs.FsOutputOption.CACHE;
+import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
+import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
+import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
+import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.newEmptyFileSystem;
+import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.newPopulatedFileSystem;
 import de.schlichtherle.truezip.io.InputException;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
-import de.schlichtherle.truezip.socket.SynchronizedInputShop;
-import de.schlichtherle.truezip.socket.SynchronizedOutputShop;
-import de.schlichtherle.truezip.socket.DecoratingInputShop;
-import de.schlichtherle.truezip.socket.DecoratingOutputShop;
-import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
-import de.schlichtherle.truezip.socket.DisconnectingInputShop;
-import de.schlichtherle.truezip.socket.DisconnectingOutputShop;
-import de.schlichtherle.truezip.socket.IOSocket;
-import de.schlichtherle.truezip.socket.InputService;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputService;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
@@ -53,8 +35,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
-import net.jcip.annotations.NotThreadSafe;
 import javax.swing.Icon;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * This archive controller manages I/O to the entry which represents the target
@@ -100,7 +82,7 @@ extends FsFileSystemArchiveController<E> {
      * @param driver the archive driver.
      */
     FsDefaultArchiveController(
-            final FsConcurrentModel model,
+            final FsLockModel model,
             final FsController<?> parent,
             final FsArchiveDriver<E> driver) {
         super(model);
@@ -256,7 +238,7 @@ extends FsFileSystemArchiveController<E> {
     @Override
     void checkAccess(   final FsEntryName name,
                         final @CheckForNull Access intention)
-    throws FsNotSyncedException {
+    throws FsNeedsSyncException {
         // HC SUNT DRACONES!
         final FsArchiveFileSystem<E> f;
         final FsCovariantEntry<E> ce;
@@ -274,7 +256,7 @@ extends FsFileSystemArchiveController<E> {
                 if (!grow
                         || null == intention && !driver.getRedundantMetaDataSupport()
                         || WRITE == intention && !driver.getRedundantContentSupport())
-                    throw new FsNotSyncedException();
+                    throw new FsNeedsSyncException();
             }
         } else {
             aen = null;
@@ -296,7 +278,7 @@ extends FsFileSystemArchiveController<E> {
             iae = null;
         }
         if (READ == intention && (null == iae || iae != oae && oae != null))
-            throw new FsNotSyncedException();
+            throw new FsNeedsSyncException();
     }
 
     @Override

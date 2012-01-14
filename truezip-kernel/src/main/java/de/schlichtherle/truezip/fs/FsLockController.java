@@ -42,16 +42,16 @@ import net.jcip.annotations.ThreadSafe;
  * controller in order to provide read/write lock features for multi-threaded
  * access by its clients.
  * 
- * @see     FsConcurrentModel
- * @see     FsNotWriteLockedException
+ * @see     FsLockModel
+ * @see     FsNeedsWriteLockException
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsConcurrentController
-extends FsDecoratingConcurrentModelController<
-        FsController<? extends FsConcurrentModel>> {
+public final class FsLockController
+extends FsDecoratingLockModelController<
+        FsController<? extends FsLockModel>> {
 
     private static final ConcurrentSocketFactory
             CONCURRENT_SOCKET_FACTORY = JSE7.AVAILABLE
@@ -66,8 +66,8 @@ extends FsDecoratingConcurrentModelController<
      *
      * @param controller the decorated concurrent file system controller.
      */
-    public FsConcurrentController(
-            FsController<? extends FsConcurrentModel> controller) {
+    public FsLockController(
+            FsController<? extends FsLockModel> controller) {
         super(controller);
     }
 
@@ -96,7 +96,7 @@ extends FsDecoratingConcurrentModelController<
             } finally {
                 readLock().unlock();
             }
-        } catch (FsNotWriteLockedException ex) {
+        } catch (FsNeedsWriteLockException ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -116,7 +116,7 @@ extends FsDecoratingConcurrentModelController<
             } finally {
                 readLock().unlock();
             }
-        } catch (FsNotWriteLockedException ex) {
+        } catch (FsNeedsWriteLockException ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -136,7 +136,7 @@ extends FsDecoratingConcurrentModelController<
             } finally {
                 readLock().unlock();
             }
-        } catch (FsNotWriteLockedException ex) {
+        } catch (FsNeedsWriteLockException ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -157,7 +157,7 @@ extends FsDecoratingConcurrentModelController<
             } finally {
                 readLock().unlock();
             }
-        } catch (FsNotWriteLockedException ex) {
+        } catch (FsNeedsWriteLockException ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -177,7 +177,7 @@ extends FsDecoratingConcurrentModelController<
             } finally {
                 readLock().unlock();
             }
-        } catch (FsNotWriteLockedException ex) {
+        } catch (FsNeedsWriteLockException ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -197,7 +197,7 @@ extends FsDecoratingConcurrentModelController<
             } finally {
                 readLock().unlock();
             }
-        } catch (FsNotWriteLockedException ex) {
+        } catch (FsNeedsWriteLockException ex) {
             assertNotReadLockedByCurrentThread(ex);
             writeLock().lock();
             try {
@@ -325,14 +325,14 @@ extends FsDecoratingConcurrentModelController<
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsConcurrentController controller,
+                    FsLockController controller,
                     InputSocket<?> input) {
                 return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsConcurrentController controller,
+                    FsLockController controller,
                     OutputSocket<?> output) {
                 return controller.new Output(output);
             }
@@ -341,25 +341,25 @@ extends FsDecoratingConcurrentModelController<
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsConcurrentController controller,
+                    FsLockController controller,
                     InputSocket<?> input) {
                 return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsConcurrentController controller,
+                    FsLockController controller,
                     OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsConcurrentController controller,
+                FsLockController controller,
                 InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsConcurrentController controller,
+                FsLockController controller,
                 OutputSocket <?> output);
     } // ConcurrentSocketFactory
 
@@ -396,7 +396,7 @@ extends FsDecoratingConcurrentModelController<
                 } finally {
                     readLock().unlock();
                 }
-            } catch (FsNotWriteLockedException ex) {
+            } catch (FsNeedsWriteLockException ex) {
                 assertNotReadLockedByCurrentThread(ex);
                 writeLock().lock();
                 try {

@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.FsConcurrentModel;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.fs.FsLockModel;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -37,7 +37,7 @@ extends FsArchiveController<E> {
     /**
      * Creates a new instance of FsFileSystemArchiveController
      */
-    FsFileSystemArchiveController(FsConcurrentModel model) {
+    FsFileSystemArchiveController(FsLockModel model) {
         super(model);
     }
 

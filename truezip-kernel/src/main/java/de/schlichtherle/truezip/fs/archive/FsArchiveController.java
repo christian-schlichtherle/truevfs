@@ -63,7 +63,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 abstract class FsArchiveController<E extends FsArchiveEntry>
-extends FsConcurrentModelController {
+extends FsLockModelController {
 
     private static final Logger logger = Logger.getLogger(
             FsArchiveController.class.getName(),
@@ -77,7 +77,7 @@ extends FsConcurrentModelController {
      *
      * @param model the non-{@code null} archive model.
      */
-    FsArchiveController(final FsConcurrentModel model) {
+    FsArchiveController(final FsLockModel model) {
         super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();
@@ -405,8 +405,8 @@ extends FsConcurrentModelController {
      *         If {@code null}, then only an update to the archive entry meta
      *         data (i.e. a pure virtual file system operation with no I/O)
      *         is intended.
-     * @throws FsNotSyncedException If a sync operation is required.
+     * @throws FsNeedsSyncException If a sync operation is required.
      */
     abstract void checkAccess(FsEntryName name, @CheckForNull Access intention)
-    throws FsNotSyncedException;
+    throws FsNeedsSyncException;
 }
