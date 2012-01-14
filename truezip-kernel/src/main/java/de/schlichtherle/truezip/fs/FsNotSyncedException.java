@@ -18,10 +18,15 @@ import net.jcip.annotations.ThreadSafe;
  * Indicates that a file system should get
  * {@link FsController#sync(BitField, ExceptionHandler) synced} before a
  * file system operation can commence.
+ * <p>
  * This exception type is reserved for use within the TrueZIP Kernel in order
  * to catch it and sync the file system.
  * Unless there is a bug, an exception of this type <em>never</em> pops up to
  * a TrueZIP application.
+ * <p>
+ * ONLY THE TRUEZIP KERNEL SHOULD THROW AN EXCEPTION OF THIS TYPE!
+ * DO NOT CREATE OR THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB-CLASSES)
+ * ANYWHERE ELSE!
  *
  * @since   TrueZIP 7.3
  * @see     FsSyncController
