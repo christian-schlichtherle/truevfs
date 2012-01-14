@@ -20,8 +20,8 @@ import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
@@ -31,7 +31,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Implements a chain of responsibility in order to resolve
  * {@link FsFalsePositiveException}s thrown by the prospective file system
- * provided to its {@link #FsFederatingController constructor}.
+ * provided to its {@link #FsFalsePositiveController constructor}.
  * <p>
  * Whenever the controller for the prospective file system throws a
  * {@link FsFalsePositiveException}, the method call is delegated to the
@@ -78,7 +78,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsFederatingController
+public final class FsFalsePositiveController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
     private volatile @CheckForNull FsPath path;
@@ -88,7 +88,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      *
      * @param controller the decorated file system controller.
      */
-    FsFederatingController(final FsController<?> controller) {
+    FsFalsePositiveController(final FsController<?> controller) {
         super(controller);
         assert null != getParent();
     }

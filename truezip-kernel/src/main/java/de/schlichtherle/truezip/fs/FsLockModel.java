@@ -25,11 +25,11 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
+public final class FsLockModel extends FsDecoratingModel<FsModel> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FsConcurrentModel(FsModel model) {
+    public FsLockModel(FsModel model) {
         super(model);
     }
 
@@ -59,14 +59,14 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
      * Asserts that the write lock is held by the current thread.
      * Use this method for lock control.
      * 
-     * @throws FsNotWriteLockedException if the <i>write lock</i> is not
+     * @throws FsNeedsWriteLockException if the <i>write lock</i> is not
      *         held by the current thread.
      * @see    #isWriteLockedByCurrentThread()
      */
     public void assertWriteLockedByCurrentThread()
-    throws FsNotWriteLockedException {
+    throws FsNeedsWriteLockException {
         if (!lock.isWriteLockedByCurrentThread())
-            throw new FsNotWriteLockedException();
+            throw new FsNeedsWriteLockException();
     }
 
     /**
@@ -76,13 +76,13 @@ public final class FsConcurrentModel extends FsDecoratingModel<FsModel> {
      * Use this method for lock control.
      * 
      * @param  ex the caught exception.
-     * @throws FsNotWriteLockedException if the <i>read lock</i> is
+     * @throws FsNeedsWriteLockException if the <i>read lock</i> is
      *         held by the current thread.
      */
     void assertNotReadLockedByCurrentThread(
-            @CheckForNull FsNotWriteLockedException ex)
-    throws FsNotWriteLockedException {
+            @CheckForNull FsNeedsWriteLockException ex)
+    throws FsNeedsWriteLockException {
         if (0 < lock.getReadHoldCount())
-            throw new FsNotWriteLockedException(ex);
+            throw new FsNeedsWriteLockException(ex);
     }
 }

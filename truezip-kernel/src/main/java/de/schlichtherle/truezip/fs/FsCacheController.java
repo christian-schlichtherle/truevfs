@@ -67,9 +67,9 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsCachingController
-extends FsDecoratingConcurrentModelController<
-        FsController<? extends FsConcurrentModel>> {
+public final class FsCacheController
+extends FsDecoratingLockModelController<
+        FsController<? extends FsLockModel>> {
 
     private static final BitField<FsSyncOption>
             ABORT_CHANGES_OPTIONS = BitField.of(ABORT_CHANGES);
@@ -91,8 +91,8 @@ extends FsDecoratingConcurrentModelController<
      * @param controller the decorated concurrent file system controller.
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
-    public FsCachingController(
-            final FsController<? extends FsConcurrentModel> controller,
+    public FsCacheController(
+            final FsController<? extends FsLockModel> controller,
             final IOPool<?> pool) {
         super(controller);
         if (null == pool)

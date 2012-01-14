@@ -35,8 +35,8 @@ public final class FsDefaultManager extends FsManager {
      * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private final Map<FsMountPoint, Link<FsFederatingController>> schedulers
-            = new WeakHashMap<FsMountPoint, Link<FsFederatingController>>();
+    private final Map<FsMountPoint, Link<FsFalsePositiveController>> schedulers
+            = new WeakHashMap<FsMountPoint, Link<FsFalsePositiveController>>();
 
     private final Type optionalScheduleType;
 
@@ -65,13 +65,13 @@ public final class FsDefaultManager extends FsManager {
             final FsModel model = new FsDefaultModel(mountPoint, null);
             return driver.newController(model, null);
         }
-        FsFederatingController controller = getTarget(schedulers.get(mountPoint));
+        FsFalsePositiveController controller = getTarget(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
                 parent = getController(mountPoint.getParent(), null, driver);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
-            model.setController(controller = new FsFederatingController(
+            model.setController(controller = new FsFalsePositiveController(
                     driver.newController(model, parent)));
         }
         return controller;
@@ -86,14 +86,14 @@ public final class FsDefaultManager extends FsManager {
      * the alternative observer pattern.
      */
     private final class ScheduledModel extends FsDefaultModel {
-        FsFederatingController controller;
+        FsFalsePositiveController controller;
         volatile boolean touched;
 
         ScheduledModel(FsMountPoint mountPoint, FsModel parent) {
             super(mountPoint, parent);
         }
 
-        void setController(final FsFederatingController controller) {
+        void setController(final FsFalsePositiveController controller) {
             assert null != controller;
             assert !touched;
             this.controller = controller;
@@ -139,7 +139,7 @@ public final class FsDefaultManager extends FsManager {
     private Set<FsController<?>> getControllers() {
         final Set<FsController<?>> snapshot
                 = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
-        for (final Link<FsFederatingController> link : schedulers.values()) {
+        for (final Link<FsFalsePositiveController> link : schedulers.values()) {
             final FsController<?> controller = getTarget(link);
             if (null != controller)
                 snapshot.add(controller);

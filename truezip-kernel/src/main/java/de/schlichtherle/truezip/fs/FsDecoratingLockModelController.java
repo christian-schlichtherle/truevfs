@@ -17,7 +17,7 @@ import net.jcip.annotations.Immutable;
 
 /**
  * An abstract file system controller which requires an
- * {@link FsConcurrentModel} so that it can forward its additional method
+ * {@link FsLockModel} so that it can forward its additional method
  * calls to this model for the convenience of the sub-class.
  *
  * @param   <C> The type of the decorated file system controller.
@@ -27,16 +27,16 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public abstract class FsDecoratingConcurrentModelController<
-        C extends FsController<? extends FsConcurrentModel>>
-extends FsDecoratingController<FsConcurrentModel, C>  {
+public abstract class FsDecoratingLockModelController<
+        C extends FsController<? extends FsLockModel>>
+extends FsDecoratingController<FsLockModel, C>  {
 
     /**
      * Constructs a new decorating file system controller.
      * 
      * @param controller the decorated file system controller.
      */
-    protected FsDecoratingConcurrentModelController(C controller) {
+    protected FsDecoratingLockModelController(C controller) {
         super(controller);
     }
 
@@ -53,13 +53,13 @@ extends FsDecoratingController<FsConcurrentModel, C>  {
     }
 
     protected final void assertWriteLockedByCurrentThread()
-    throws FsNotWriteLockedException {
+    throws FsNeedsWriteLockException {
         getModel().assertWriteLockedByCurrentThread();
     }
 
     protected final void assertNotReadLockedByCurrentThread(
-            @CheckForNull FsNotWriteLockedException ex)
-    throws FsNotWriteLockedException {
+            @CheckForNull FsNeedsWriteLockException ex)
+    throws FsNeedsWriteLockException {
         getModel().assertNotReadLockedByCurrentThread(ex);
     }
 }

@@ -149,13 +149,13 @@ extends FsDriver {
     @Override
     public FsController<?>
     newController(final FsModel model, final FsController<?> parent) {
-        assert !(model instanceof FsConcurrentModel);
-        final FsConcurrentModel cmodel;
-        cmodel = new FsConcurrentModel(model);
-        return  new FsSyncController<FsConcurrentModel>(
-                    new FsConcurrentController(
-                        new FsCachingController(
-                            new FsResourceController(
+        assert !(model instanceof FsLockModel);
+        final FsLockModel cmodel;
+        cmodel = new FsLockModel(model);
+        return  new FsSyncController<FsLockModel>(
+                    new FsLockController(
+                        new FsCacheController(
+                            new FsAccountController(
                                 new FsContextController(
                                     new FsDefaultArchiveController<E>(
                                             cmodel, parent, this))),
