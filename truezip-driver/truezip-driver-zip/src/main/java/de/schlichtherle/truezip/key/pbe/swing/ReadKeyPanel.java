@@ -171,12 +171,10 @@ public class ReadKeyPanel extends KeyPanel {
         error = new javax.swing.JLabel();
 
         passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            @Override
-			public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
                 passwdPanelAncestorWindowShown(evt);
             }
-            @Override
-			public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
             }
         });
         passwdPanel.setLayout(new java.awt.GridBagLayout());

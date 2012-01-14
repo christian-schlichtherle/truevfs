@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.2" maxVersion="1.2" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -42,7 +42,7 @@
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Key file">
                 <Property name="tabTitle" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/AuthenticationPanel.properties" key="tab.keyFile" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/AuthenticationPanel.properties" key="tab.keyFile" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
                 </Property>
               </JTabbedPaneConstraints>
             </Constraint>
@@ -53,13 +53,13 @@
             <Component class="javax.swing.JLabel" name="keyFileLabel">
               <Properties>
                 <Property name="displayedMnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
-                  <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/AuthenticationPanel.properties" key="keyFile" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/AuthenticationPanel.properties" key="keyFile" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
                   <ComponentRef name="keyFile"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/AuthenticationPanel.properties" key="keyFile" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/AuthenticationPanel.properties" key="keyFile" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <AuxValues>
@@ -91,7 +91,7 @@
                   <Connection code="UIManager.getIcon(&quot;FileView.directoryIcon&quot;)" type="code"/>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/AuthenticationPanel.properties" key="selectKeyFile.toolTip" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/AuthenticationPanel.properties" key="selectKeyFile.toolTip" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
                 </Property>
                 <Property name="name" type="java.lang.String" value="keyFileChooser" noResource="true"/>
               </Properties>

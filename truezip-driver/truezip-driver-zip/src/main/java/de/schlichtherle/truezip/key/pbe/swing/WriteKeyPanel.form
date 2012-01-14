@@ -18,7 +18,7 @@
               <ComponentRef name="newPasswd1Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -46,7 +46,7 @@
               <ComponentRef name="newPasswd2Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -88,7 +88,7 @@
           <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/crypto/raes/param/swing/WriteKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/WriteKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
