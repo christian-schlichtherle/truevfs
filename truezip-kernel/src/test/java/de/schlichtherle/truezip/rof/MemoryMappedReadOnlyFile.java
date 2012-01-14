@@ -35,7 +35,7 @@ import net.jcip.annotations.NotThreadSafe;
  * Applications may safely use this class if subsequent access to the file
  * is not required during the life time of the application however.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
