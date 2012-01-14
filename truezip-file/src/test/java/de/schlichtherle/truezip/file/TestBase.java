@@ -29,6 +29,7 @@ import org.junit.Before;
 @DefaultAnnotation(NonNull.class)
 public abstract class TestBase<D extends FsArchiveDriver<?>> {
 
+    protected static final long TIMEOUT_MILLIS = 50;
     protected static final FsMountPoint
             ROOT_DIRECTORY = FsMountPoint.create(URI.create("file:/"));
     protected static final FsMountPoint
@@ -86,6 +87,6 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
 
     protected static void gc() throws InterruptedException {
         System.gc();
-        Thread.sleep(50);
+        Thread.sleep(TIMEOUT_MILLIS);
     }
 }
