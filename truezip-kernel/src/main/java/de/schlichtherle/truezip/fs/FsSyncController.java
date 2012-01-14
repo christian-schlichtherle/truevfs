@@ -49,10 +49,9 @@ import net.jcip.annotations.ThreadSafe;
 public final class FsSyncController<M extends FsModel>
 extends FsDecoratingController<M, FsController<? extends M>> {
 
-    private static final SyncSocketFactory
-            SYNC_SOCKET_FACTORY = JSE7.AVAILABLE
-                ? SyncSocketFactory.NIO2
-                : SyncSocketFactory.OIO;
+    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO2
+            : SocketFactory.OIO;
 
     /**
      * Constructs a new file system sync controller.
@@ -175,7 +174,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return SYNC_SOCKET_FACTORY.newInputSocket(this,
+        return SOCKET_FACTORY.newInputSocket(this,
                 delegate.getInputSocket(name, options));
     }
 
@@ -183,7 +182,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             Entry template) {
-        return SYNC_SOCKET_FACTORY.newOutputSocket(this,
+        return SOCKET_FACTORY.newOutputSocket(this,
                 delegate.getOutputSocket(name, options, template));
     }
 
@@ -218,7 +217,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Immutable
-    private enum SyncSocketFactory {
+    private enum SocketFactory {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
