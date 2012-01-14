@@ -29,29 +29,11 @@ import net.jcip.annotations.Immutable;
 public final class FsSyncOptions {
 
     /**
-     * Waits for other threads to close their input and output resources
-     * (input and output streams etc.) for any file system entries
-     * before synchronizing the virtual file system with its parent file system.
-     * Equivalent to
-     * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT)}.
-     * <p>
-     * These options should be used if a multithreaded application wants to
-     * synchronize all mounted archive files without affecting any I/O to
-     * these archive files by any other thread.
-     * However, a call with the {@link #UMOUNT} options is still required in
-     * order to really clean up <em>all</em> resources, including the
-     * selective entry cache.
-     * 
-     * @since TrueZIP 7.4.4
-     */
-    public static final BitField<FsSyncOption>
-            SYNC = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT);
-
-    /**
      * Forcibly closes all input and output resources
      * (input and output streams etc.) for any file system entries
      * and clears the selective entry cache
-     * before synchronizing the virtual file system with its parent file system.
+     * before synchronizing the federated file system with its parent file
+     * system.
      * Equivalent to
      * {@code BitField.of(FsSyncOption.FORCE_CLOSE_INPUT, FsSyncOption.FORCE_CLOSE_OUTPUT, FsSyncOption.CLEAR_CACHE)}.
      * <p>
@@ -68,6 +50,40 @@ public final class FsSyncOptions {
             UMOUNT = BitField.of(   FORCE_CLOSE_INPUT,
                                     FORCE_CLOSE_OUTPUT,
                                     CLEAR_CACHE);
+
+    /**
+     * Waits for other threads to close their input and output resources
+     * (input and output streams etc.) for any file system entries
+     * before synchronizing the federated file system with its parent file
+     * system.
+     * Equivalent to
+     * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT)}.
+     * <p>
+     * These options should be used if a multithreaded application wants to
+     * synchronize all mounted archive files without affecting any I/O to
+     * these archive files by any other thread.
+     * However, a call with the {@link #UMOUNT} options is still required in
+     * order to really clean up <em>all</em> resources, including the
+     * selective entry cache.
+     * 
+     * @since TrueZIP 7.4.4
+     */
+    public static final BitField<FsSyncOption>
+            SYNC = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT);
+
+    /**
+     * Cancels all pending changes.
+     * This option is only meaningful immediately before the federated file
+     * system itself gets deleted.
+     * Equivalent to
+     * {@code BitField.of(FsSyncOption.ABORT_CHANGES)}.
+     * <p>
+     * These options should not normally be used by applications.
+     * 
+     * @since TrueZIP 7.4.4
+     */
+    public static final BitField<FsSyncOption>
+            CANCEL = BitField.of(ABORT_CHANGES);
 
     /** You cannot instantiate this class. */
     private FsSyncOptions() {

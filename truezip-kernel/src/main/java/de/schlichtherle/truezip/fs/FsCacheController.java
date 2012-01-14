@@ -14,6 +14,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.CANCEL;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -71,13 +72,9 @@ public final class FsCacheController
 extends FsDecoratingLockModelController<
         FsController<? extends FsLockModel>> {
 
-    private static final BitField<FsSyncOption>
-            ABORT_CHANGES_OPTIONS = BitField.of(ABORT_CHANGES);
-
-    private static final EntrySocketFactory
-            ENTRY_SOCKET_FACTORY = JSE7.AVAILABLE
-                ? EntrySocketFactory.NIO2
-                : EntrySocketFactory.OIO;
+    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO2
+            : SocketFactory.OIO;
 
     private static final Strategy STRATEGY = WRITE_BACK;
 
@@ -147,24 +144,22 @@ extends FsDecoratingLockModelController<
             try {
                 unlink0(name, options);
             } catch (FsFalsePositiveException ex) {
+                // Clear the cache anyway.
+                // The only effect of calling sync for a false positive
+                // archive file is that it will reset the mount state so
+                // that the file system can be successfully mounted again
+                // if the target archive file gets subsequently modified to
+                // be a true archive file.
                 try {
-                    // Next, the FsFederatingController will try to unlink the
-                    // target archive file in the parent file system, so we need
-                    // to reset anyway.
-                    // The only effect of calling sync for a false positive
-                    // archive file is that it will reset the mount state so
-                    // that the file system can be successfully mounted again
-                    // if the target archive file is subsequently modified to
-                    // be a regular archive file.
-                    sync(ABORT_CHANGES_OPTIONS);
-                } catch (IOException cannotHappen) {
-                    throw new AssertionError(cannotHappen);
+                    sync(CANCEL);
+                } catch (IOException aFalsePositiveArchiveFileCannotHaveAPopulatedCache) {
+                    throw new AssertionError(aFalsePositiveArchiveFileCannotHaveAPopulatedCache);
                 }
                 // Continue with unlinking the target archive file in the parent
                 // file system.
                 throw ex;
             }
-            sync(ABORT_CHANGES_OPTIONS);
+            sync(CANCEL);
         } else {
             unlink0(name, options);
         }
@@ -333,7 +328,7 @@ extends FsDecoratingLockModelController<
     } // Output
 
     @Immutable
-    private enum EntrySocketFactory {
+    private enum SocketFactory {
         OIO() {
             @Override
             OutputSocket<?> newOutputSocket(
@@ -408,7 +403,7 @@ extends FsDecoratingLockModelController<
             final OutputSocket<?> output = this.output;
             return null != output
                     ? output
-                    : (this.output = ENTRY_SOCKET_FACTORY
+                    : (this.output = SOCKET_FACTORY
                         .newOutputSocket(this, cache.getOutputSocket()));
         }
 
