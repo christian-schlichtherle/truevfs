@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.awt;
 
-import de.schlichtherle.truezip.awt.Windows;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
