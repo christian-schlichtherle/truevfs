@@ -27,7 +27,7 @@ import java.awt.AWTEvent;
  * again, whereby it is ensured that only a single event is fired for each
  * cause. The super class is kept for backwards compatibility only.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
