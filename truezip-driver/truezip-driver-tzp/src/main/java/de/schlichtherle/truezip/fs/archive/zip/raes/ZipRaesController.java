@@ -128,11 +128,6 @@ extends KeyManagerController<ZipRaesDriver> {
     }
 
     @Override
-    public FsController<?> getParent() {
-        return delegate.getParent();
-    }
-
-    @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
         return delegate.isExecutable(name);
     }
