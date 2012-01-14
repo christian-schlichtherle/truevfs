@@ -10,7 +10,6 @@ package de.schlichtherle.truezip.key.pbe.swing;
 
 import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import org.junit.After;
@@ -18,19 +17,18 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.ComponentChooser;
-import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.operators.*;
 import org.netbeans.jemmy.util.NameComponentChooser;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class AuthenticationPanelIT {
     private static final String LABEL_TEXT = "Hello World!";
-	
+
     private JFrameOperator frame;
-	
+
     @Before
     public void setUp() throws InterruptedException {
         final JPanel passwdPanel = new JPanel();
@@ -52,7 +50,7 @@ public class AuthenticationPanelIT {
                 keyFileChooser = new NameComponentChooser("keyFileChooser");
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-        JFileChooserOperator fc = new FileChooserOperator();
+        JFileChooserOperator fc = new FileChooserOperator(frame);
         fc.cancel();
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_PASSWD); // select tab for passwords
         new JLabelOperator(frame, LABEL_TEXT);
@@ -60,12 +58,11 @@ public class AuthenticationPanelIT {
 
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-        fc = new FileChooserOperator();
+        fc = new FileChooserOperator(frame);
         final File file = new File("test");
         fc.setSelectedFile(file);
-        new QueueTool().waitEmpty();
         fc.approve();
-        new QueueTool().waitEmpty();
+        fc.getQueueTool().waitEmpty();
         JTextFieldOperator tf = new JTextFieldOperator(frame);
         assertEquals(file.getPath(), tf.getText());
         fc = null;

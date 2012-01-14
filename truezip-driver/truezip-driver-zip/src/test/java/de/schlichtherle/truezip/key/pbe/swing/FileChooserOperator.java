@@ -11,6 +11,7 @@ package de.schlichtherle.truezip.key.pbe.swing;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import org.netbeans.jemmy.operators.JFileChooserOperator;
+import org.netbeans.jemmy.operators.Operator;
 
 /**
  * A file chooser operator which always uses the cross platform look and feel.
@@ -21,8 +22,9 @@ import org.netbeans.jemmy.operators.JFileChooserOperator;
  */
 final class FileChooserOperator extends JFileChooserOperator {
 
-    FileChooserOperator() {
-        LookAndFeel laf = UIManager.getLookAndFeel();
+    FileChooserOperator(Operator env) {
+        super(env);
+        /*LookAndFeel laf = UIManager.getLookAndFeel();
         if (laf.isNativeLookAndFeel()) {
             try {
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -31,6 +33,6 @@ final class FileChooserOperator extends JFileChooserOperator {
             } catch (Exception ex) {
                 throw new AssertionError(ex);
             }
-        }
+        }*/
     }
 }

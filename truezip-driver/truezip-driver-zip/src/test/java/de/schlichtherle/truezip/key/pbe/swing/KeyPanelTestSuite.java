@@ -81,7 +81,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> {
         assertFalse(isBlank(error.getText()));
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        new FileChooserOperator().chooseFile("file");
+        new FileChooserOperator(frame).chooseFile("file");
         new QueueTool().waitEmpty();
         assertTrue(isBlank(error.getText()));
     }
@@ -97,14 +97,14 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> {
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
 
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        new FileChooserOperator().chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
+        new FileChooserOperator(frame).chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
         new QueueTool().waitEmpty();
         assertTrue(isBlank(error.getText()));
         assertFalse(panel.updateParam(param));
         assertNotNull(error.getText());
 
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        JFileChooserOperator fc = new FileChooserOperator();
+        JFileChooserOperator fc = new FileChooserOperator(frame);
         File[] files = fc.getFiles();
         fc.cancel(); // close file chooser
 
@@ -114,7 +114,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> {
                 continue;
 
             new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-            fc = new FileChooserOperator();
+            fc = new FileChooserOperator(frame);
             fc.setSelectedFile(file);
             fc.approve(); // close file chooser
             new QueueTool().waitEmpty();
