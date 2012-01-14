@@ -18,6 +18,7 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -130,6 +131,17 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        while (true) {
+            try {
+                return delegate.isExecutable(name);
+            } catch (FsNeedsSyncException ex) {
+                delegate.sync(SYNC);
+            }
+        }
+    }
+
+    @Override
     public void setReadOnly(FsEntryName name) throws IOException {
         while (true) {
             try {
@@ -214,6 +226,15 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 delegate.sync(SYNC);
             }
         }
+    }
+
+    @Override
+    public <X extends IOException> void
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super FsSyncException, X> handler)
+    throws X {
+        // No sync for sync, please.
+        delegate.sync(options, handler);
     }
 
     @Immutable

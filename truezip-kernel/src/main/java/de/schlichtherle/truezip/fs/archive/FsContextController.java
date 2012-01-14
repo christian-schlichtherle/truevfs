@@ -138,6 +138,18 @@ extends FsDecoratingLockModelController<FsDefaultArchiveController<?>> {
     }
 
     @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsOperationContext context = delegate.getContext();
+        delegate.setContext(NULL);
+        try {
+            return delegate.isExecutable(name);
+        } finally {
+            delegate.setContext(context);
+        }
+    }
+
+    @Override
     public void setReadOnly(FsEntryName name) throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();

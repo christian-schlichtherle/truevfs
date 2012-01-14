@@ -203,6 +203,26 @@ extends FsDecoratingLockModelController<
     }
 
     @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        try {
+            readLock().lock();
+            try {
+                return delegate.isExecutable(name);
+            } finally {
+                readLock().unlock();
+            }
+        } catch (FsNeedsWriteLockException ex) {
+            assertNotReadLockedByCurrentThread(ex);
+            writeLock().lock();
+            try {
+                return delegate.isExecutable(name);
+            } finally {
+                writeLock().unlock();
+            }
+        }
+    }
+
+    @Override
     public void setReadOnly(FsEntryName name) throws IOException {
         assertNotReadLockedByCurrentThread(null);
         writeLock().lock();
