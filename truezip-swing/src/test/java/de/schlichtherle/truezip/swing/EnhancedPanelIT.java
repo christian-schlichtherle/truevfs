@@ -12,7 +12,6 @@ import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.util.EventListener;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
