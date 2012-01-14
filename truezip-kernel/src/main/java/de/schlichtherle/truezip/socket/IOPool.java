@@ -12,11 +12,15 @@ import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 
 /**
- * A pool of I/O buffers, which are referred to by {@link IOEntry}s.
+ * A pool for allocating I/O buffers, which are used as a volatile storage for
+ * bulk data.
+ * Typical implementations may use temporary files for big data or byte arrays
+ * for small data.
+ * The I/O buffers are referred to by {@link IOEntry}s.
  * <p>
  * Implementations must be thread-safe.
  * However, this does not necessarily apply to the implementation of its
- * managed resources.
+ * managed resources, i.e. the {@code IOEntry}s.
  *
  * @param   <E> the type of the entries for the I/O buffers.
  * @author  Christian Schlichtherle
@@ -27,7 +31,7 @@ extends Pool<IOPool.Entry<E>, IOException> {
 
     /**
      * A releasable I/O entry.
-     * TODO for TrueZIP 8: This should be named "Buffer".
+     * TODO for TrueZIP 8: This should be named "IOBuffer".
      * 
      * @param <E> the type of the I/O entries.
      */
