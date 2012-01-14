@@ -15,10 +15,15 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Indicates that a resource should be write locked by the current thread,
  * but the write lock cannot get acquired for some reason.
+ * <p>
  * This exception type is reserved for use within the TrueZIP Kernel in order
  * to catch it and relock the resource.
  * Unless there is a bug, an exception of this type <em>never</em> pops up to
  * a TrueZIP application.
+ * <p>
+ * ONLY THE TRUEZIP KERNEL SHOULD THROW AN EXCEPTION OF THIS TYPE!
+ * DO NOT CREATE OR THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB-CLASSES)
+ * ANYWHERE ELSE!
  *
  * @see     FsConcurrentController
  * @author  Christian Schlichtherle
