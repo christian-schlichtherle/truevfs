@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2011 Schlichtherle IT Services
+ * Copyright (C) 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,32 +8,26 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import java.awt.Component;
+import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import java.awt.EventQueue;
 import java.awt.Window;
-import java.lang.reflect.InvocationTargetException;
 import java.util.EventListener;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.netbeans.jemmy.JemmyProperties;
-import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.operators.JButtonOperator;
 import org.netbeans.jemmy.operators.JDialogOperator;
-
-import static org.junit.Assert.*;
+import org.netbeans.jemmy.operators.JFrameOperator;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class EnhancedPanelIT {
-    static {
-        JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
-    }
-
     private EnhancedPanel instance;
 
     @Before
@@ -43,47 +37,20 @@ public final class EnhancedPanelIT {
     }
 
     @Test
-    public void testGetAncestorWindow()
-    throws InterruptedException, InvocationTargetException {
-        assertNull(new EnhancedPanel().getAncestorWindow());
+    public void testGetAncestorWindow() throws InterruptedException {
+        assertNull(instance.getAncestorWindow());
 
-        JFrame frame = showInNewFrame(instance);
+        JFrameOperator frame = showFrameWith(instance);
         Window window1 = instance.getAncestorWindow();
-        assertSame(frame, window1);
-        disposeFrame(frame);
+        assertSame(frame.getSource(), window1);
+        frame.dispose();
 
-        frame = showInNewFrame(instance); // change enclosing frame
+        frame = showFrameWith(instance); // change enclosing frame
         Window window2 = instance.getAncestorWindow();
-        assertSame(frame, window2);
-        disposeFrame(frame);
+        assertSame(frame.getSource(), window2);
+        frame.dispose();
 
         assertNotSame(window1, window2);
-    }
-
-    private static JFrame showInNewFrame(final Component component)
-    throws InterruptedException, InvocationTargetException {
-        final JFrame frame = new JFrame();
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                frame.add(component);
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            }
-        });
-        return frame;
-    }
-
-    private static void disposeFrame(final JFrame frame)
-    throws InterruptedException, InvocationTargetException {
-        EventQueue.invokeAndWait(new Runnable() {
-            @Override
-            public void run() {
-                //frame.setVisible(false);
-                frame.dispose();
-            }
-        });
     }
 
     @Test
@@ -98,7 +65,7 @@ public final class EnhancedPanelIT {
 
         try {
             instance.addPanelListener(listener);
-            fail("Previous method call should throw an NPE!");
+            fail();
         } catch (NullPointerException expected) {
         }
         listeners = instance.getPanelListeners();
@@ -106,7 +73,7 @@ public final class EnhancedPanelIT {
 
         try {
             instance.removePanelListener(listener);
-            fail("Previous method call should throw an NPE!");
+            fail();
         } catch (NullPointerException expected) {
         }
         listeners = instance.getPanelListeners();
@@ -135,20 +102,6 @@ public final class EnhancedPanelIT {
         assertEquals(0, listeners.length);
     }
 
-    private static class CountingPanelListener implements PanelListener {
-        public int shown, hidden;
-
-        @Override
-        public void ancestorWindowShown(PanelEvent evt) {
-            shown++;
-        }
-
-        @Override
-        public void ancestorWindowHidden(PanelEvent evt) {
-            hidden++;
-        }
-    }
-
     @Test
     public void testPanelListeners1() {
         PanelListener listener;
@@ -161,7 +114,7 @@ public final class EnhancedPanelIT {
 
         try {
             instance.addPanelListener(listener);
-            fail("Previous method call should throw an NPE!");
+            fail();
         } catch (NullPointerException expected) {
         }
         listeners = instance.getListeners(PanelListener.class);
@@ -169,7 +122,7 @@ public final class EnhancedPanelIT {
 
         try {
             instance.removePanelListener(listener);
-            fail("Previous method call should throw an NPE!");
+            fail();
         } catch (NullPointerException expected) {
         }
         listeners = instance.getListeners(PanelListener.class);
@@ -266,7 +219,7 @@ public final class EnhancedPanelIT {
                 // Depending on the version of the Swing implementation, this may
                 // create multiple PanelEvents with an ID equal to
                 // PanelEvent.ANCESTOR_WINDOW_SHOWN.
-                // However, all these events are coalesced into one.
+                // However, all these events should get coalesced into one.
                 frame.show();
                 frame.setVisible(true);
             }
@@ -284,7 +237,7 @@ public final class EnhancedPanelIT {
                 // Depending on the version of the Swing implementation, this may
                 // create multiple PanelEvents with an ID equal to
                 // PanelEvent.ANCESTOR_WINDOW_HIDDEN.
-                // However, all these events are coalesced into one.
+                // However, all these events should get coalesced into one.
                 frame.setVisible(false);
                 frame.hide();
                 frame.dispose();
@@ -328,17 +281,17 @@ public final class EnhancedPanelIT {
     public void testEvents4JOptionPane() throws Exception {
         final CountingPanelListener l = new CountingPanelListener();
         instance.addPanelListener(l);
-
+        final String title = EnhancedPanelIT.class.getSimpleName();
         final Runnable makeVisible = new Runnable() {
             @Override
             public void run() {
-                JOptionPane.showMessageDialog(null, instance);
+                JOptionPane.showMessageDialog(
+                        null, instance, title, JOptionPane.INFORMATION_MESSAGE);
             }
         };
-
         for (int i = 1; i <= 3; i++) {
             EventQueue.invokeLater(makeVisible);
-            JDialogOperator dialogOp = new JDialogOperator(); // wait for JOptionPane
+            JDialogOperator dialogOp = new JDialogOperator(title); // wait for JOptionPane
             assertEquals(i, l.shown);
             assertEquals(i - 1, l.hidden);
 
@@ -346,6 +299,20 @@ public final class EnhancedPanelIT {
             buttonOp.push();
             assertEquals(i, l.shown);
             assertEquals(i, l.hidden);
+        }
+    }
+
+    private static class CountingPanelListener implements PanelListener {
+        public int shown, hidden;
+
+        @Override
+        public void ancestorWindowShown(PanelEvent evt) {
+            shown++;
+        }
+
+        @Override
+        public void ancestorWindowHidden(PanelEvent evt) {
+            hidden++;
         }
     }
 }

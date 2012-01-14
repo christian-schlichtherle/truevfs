@@ -15,8 +15,8 @@ import org.netbeans.jemmy.operators.JFileChooserOperator;
 /**
  * A file chooser operator which always uses the cross platform look and feel.
  *
- * @author Christian Schlichtherle
- * @author Michael Hall
+ * @author  Christian Schlichtherle
+ * @author  Michael Hall
  * @version $Id$
  */
 final class FileChooserOperator extends JFileChooserOperator {

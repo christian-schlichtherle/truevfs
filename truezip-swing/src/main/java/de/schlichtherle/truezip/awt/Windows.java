@@ -8,6 +8,8 @@
  */
 package de.schlichtherle.truezip.awt;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
@@ -17,18 +19,18 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import javax.swing.JOptionPane;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * A utility class for window management.
  * This class cannot get instantiated.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
+@DefaultAnnotation(NonNull.class)
 public class Windows {
-
-    private Windows() {
-    }
 
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";
 
@@ -37,32 +39,35 @@ public class Windows {
     private static Reference<Window> lastFocusedWindow
             = new WeakReference<Window>(null);
 
-    private static PropertyChangeListener focusListener
+    private static final PropertyChangeListener focusListener
             = new PropertyChangeListener() {
         @Override
-		public void propertyChange(PropertyChangeEvent evt) {
+        public void propertyChange(PropertyChangeEvent evt) {
             setLastFocusedWindow((Window) evt.getNewValue());
         }
     };
 
+    /** You cannot instantiate this class. */
+    private Windows() { }
+
     /**
-     * Returns a suitable parent window, which is the last explicitly set
-     * and still showing parent window or any of its showing parent windows,
-     * the last focused and still showing window or any of its showing parent
-     * windows or any other showing window  - whichever is found first.
+     * Returns a suitable parent window, which is the last explicitly set and
+     * still showing parent window or any of its showing parent windows, the
+     * last focused and still showing window or any of its showing parent
+     * windows or any other showing window - whichever is found first.
      * If no showing window is found, {@link JOptionPane}'s root frame is
      * returned.
      */
-    public static synchronized Window getParentWindow() {
+    public static Window getParentWindow() {
         Window w;
-        if ((w = findFirstShowingWindow(getLastFocusedWindow())) == null)
-            w = getAnyShowingWindow();
-        return w != null ? w : JOptionPane.getRootFrame();
+        if (null == (w = findFirstShowingWindow(getLastFocusedWindow())))
+            if (null == (w = getAnyShowingWindow()))
+                w = JOptionPane.getRootFrame();
+        return w;
     }
 
     /**
-     * Search the containment hierarchy updwards for the first showing
-     * window.
+     * Search the containment hierarchy updwards for the first showing window.
      */
     private static Window findFirstShowingWindow(final Window w) {
         for (Container c = w; c != null; c = c.getParent())
@@ -77,9 +82,9 @@ public class Windows {
      * finalization, {@code null} is returned instead.
      * Note that this is <em>not</em> the same as
      * {@code Windows.getCurrentKeyboardFocusManager().getFocusedWindow()}:
-     * The latter may return {@code null} if no window in this JVM has
-     * the focus, while this method will return the last window in this JVM
-     * which had the focus (unless this is also the first call to this method).
+     * The latter may return {@code null} if no window in this JVM has the
+     * focus, while this method will return the last window in this JVM which
+     * had the focus (unless this is also the first call to this method).
      */
     public static Window getLastFocusedWindow() {
         observeFocusedWindow();
@@ -96,22 +101,18 @@ public class Windows {
                 = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         if (fm == lfm)
             return;
-        if (lfm != null)
+        if (null != lfm)
             lfm.removePropertyChangeListener(
                     PROPERTY_FOCUSED_WINDOW, focusListener);
         fm.addPropertyChangeListener(
                 PROPERTY_FOCUSED_WINDOW, focusListener);
         lastFocusManager = new WeakReference<KeyboardFocusManager>(fm);
-        setLastFocusedWindow0(fm.getFocusedWindow());
+        setLastFocusedWindow(fm.getFocusedWindow());
     }
 
-    private static synchronized void setLastFocusedWindow(Window w) {
-        setLastFocusedWindow0(w);
-    }
-
-    private static void setLastFocusedWindow0(Window w) {
-        if (w == null || !w.isShowing())
-            if ((w = lastFocusedWindow.get()) != null && !w.isShowing())
+    private static void setLastFocusedWindow(Window w) {
+        if (null == w || !w.isShowing())
+            if (null != (w = lastFocusedWindow.get()) && !w.isShowing())
                 w = null;
         lastFocusedWindow = new WeakReference<Window>(w);
     }

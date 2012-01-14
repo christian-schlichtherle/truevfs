@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import static de.schlichtherle.truezip.crypto.param.AesKeyStrength.*;
+import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import org.junit.After;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
@@ -22,14 +23,14 @@ import org.netbeans.jemmy.operators.JFrameOperator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class KeyStrengthPanelIT extends JemmyUtils {
+public final class KeyStrengthPanelIT {
     private KeyStrengthPanel<AesKeyStrength> panel;
     private JFrameOperator frame;
 
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         panel = new KeyStrengthPanel<AesKeyStrength>(AesKeyStrength.values());
-        frame = showInNewFrame(panel);
+        frame = showFrameWith(panel);
     }
 
     @After

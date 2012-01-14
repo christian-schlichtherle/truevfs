@@ -8,16 +8,18 @@
  */
 package de.schlichtherle.truezip.awt;
 
+import de.schlichtherle.truezip.awt.Windows;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class WindowsIT {
@@ -33,6 +35,7 @@ public class WindowsIT {
                 assertFalse(result.isVisible());
 
                 final JFrame frame = new JFrame();
+                frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
