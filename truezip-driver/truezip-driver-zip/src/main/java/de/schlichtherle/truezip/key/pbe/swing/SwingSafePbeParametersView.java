@@ -283,9 +283,6 @@ extends SafePbeParametersView<P> {
      */
     private static void multiplexOnEDT(final Runnable task)
     throws UnknownKeyException {
-        /*if (Thread.interrupted())
-            throw new KeyPromptingInterruptedException();*/
-
         if (EventQueue.isDispatchThread()) {
             task.run();
         } else {
@@ -296,8 +293,6 @@ extends SafePbeParametersView<P> {
                     throw new KeyPromptingInterruptedException(failure);
                 } catch (InvocationTargetException ex) {
                     throw new UnknownKeyException(ex);
-                /*} finally {
-                    Thread.interrupted();*/
                 }
             }
         }
