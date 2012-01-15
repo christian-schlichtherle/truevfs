@@ -34,7 +34,7 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * Later, the client application can use {@link #pop()} or {@link #close()} to
  * pop the current configuration or {@code this} configuration respectively
- * from the top of the inheritable thread local stack.
+ * off the top of the inheritable thread local stack.
  * <p>
  * Finally, a client application can use {@link #get()} to get access to the
  * current configuration.
