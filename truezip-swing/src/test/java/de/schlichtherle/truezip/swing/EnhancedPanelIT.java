@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.util.EventListener;
@@ -26,7 +25,7 @@ import org.netbeans.jemmy.operators.JFrameOperator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class EnhancedPanelIT {
+public final class EnhancedPanelIT extends JemmyUtils {
     private EnhancedPanel instance;
 
     @Before
@@ -289,13 +288,14 @@ public final class EnhancedPanelIT {
             }
         };
         for (int i = 1; i <= 3; i++) {
-            EventQueue.invokeLater(makeVisible);
-            JDialogOperator dialogOp = new JDialogOperator(title); // wait for JOptionPane
+            runOnEdt(makeVisible);
+            final JDialogOperator dialog = new JDialogOperator(title); // wait for JOptionPane
             assertEquals(i, l.shown);
             assertEquals(i - 1, l.hidden);
 
-            JButtonOperator buttonOp = new JButtonOperator(dialogOp);
-            buttonOp.push();
+            final JButtonOperator button = new JButtonOperator(dialog);
+            button.push();
+            button.getQueueTool().waitEmpty(WAIT_EMPTY);
             assertEquals(i, l.shown);
             assertEquals(i, l.hidden);
         }

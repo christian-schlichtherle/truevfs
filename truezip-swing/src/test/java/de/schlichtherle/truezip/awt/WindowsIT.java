@@ -8,9 +8,8 @@
  */
 package de.schlichtherle.truezip.awt;
 
-import java.awt.EventQueue;
+import de.schlichtherle.truezip.swing.JemmyUtils;
 import java.awt.Window;
-import java.lang.reflect.InvocationTargetException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -21,12 +20,11 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class WindowsIT {
+public class WindowsIT extends JemmyUtils {
 
     @Test
-    public void testParentWindow()
-    throws InterruptedException, InvocationTargetException {
-        EventQueue.invokeAndWait(new Runnable() {
+    public void testParentWindow() throws InterruptedException {
+        runOnEdtNow(new Runnable() {
             @Override
             public void run() {
                 Window result = Windows.getParentWindow();
