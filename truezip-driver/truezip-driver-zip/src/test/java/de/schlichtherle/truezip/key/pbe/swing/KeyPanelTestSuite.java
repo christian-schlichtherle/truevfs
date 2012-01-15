@@ -9,15 +9,19 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
-import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
+import de.schlichtherle.truezip.swing.JemmyUtils;
+import java.awt.EventQueue;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.netbeans.jemmy.ComponentChooser;
-import org.netbeans.jemmy.QueueTool;
 import org.netbeans.jemmy.operators.*;
 import org.netbeans.jemmy.util.NameComponentChooser;
 
@@ -25,37 +29,33 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class KeyPanelTestSuite<P extends KeyPanel> {
+public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
     private static final ComponentChooser
             KEY_FILE_CHOOSER = new NameComponentChooser("keyFileChooser");
-	
+
+    private static final String NON_EXISTING_FILE
+            = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
     protected P panel;
     protected JFrameOperator frame;
     protected JLabelOperator error;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws InterruptedException {
         panel = newKeyPanel();
         frame = showFrameWith(panel);
-        error = findErrorLabel(frame);
+        final String text = "error";
+        panel.setError(text);
+        error = new JLabelOperator(frame, text);
+        panel.setError(null);
     }
 
     protected abstract P newKeyPanel();
 
     protected abstract SafePbeParameters<?, ?> newPbeParameters();
 
-    private JLabelOperator findErrorLabel(final JFrameOperator frame) {
-        final String error = "error";
-        panel.setError(error);
-        final JLabelOperator errorLabel = new JLabelOperator(frame, error);
-        frame.pack();
-        new QueueTool().waitEmpty();
-        panel.setError(null);
-        return errorLabel;
-    }
-
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         frame.dispose();
     }
 
@@ -70,19 +70,21 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> {
     }
 
     @Test
-    public void testError() {
+    public void testUpdateErrorLabel() {
         panel.setError("This is a test error message!");
         assertFalse(isBlank(error.getText()));
-        new JTextFieldOperator(frame).typeText("secret");
-        new QueueTool().waitEmpty();
+        final JTextFieldOperator tf = new JTextFieldOperator(frame);
+        tf.setText("secret");
+        //tf.getQueueTool().waitEmpty(WAIT_EMPTY);
         assertTrue(isBlank(error.getText()));
 
         panel.setError("This is a test error message!");
         assertFalse(isBlank(error.getText()));
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        new FileChooserOperator(frame).chooseFile("file");
-        new QueueTool().waitEmpty();
+        final JFileChooserOperator fc = new TFileChooserOperator(frame);
+        fc.chooseFile(NON_EXISTING_FILE);
+        fc.getQueueTool().waitEmpty();
         assertTrue(isBlank(error.getText()));
     }
 
@@ -91,39 +93,55 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> {
     }
 
     @Test
-    public void testKeyFile() {
+    public void testKeyFile() throws InterruptedException {
         final SafePbeParameters<?, ?> param = newPbeParameters();
 
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
-
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        new FileChooserOperator(frame).chooseFile("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"$%&/()=?");
-        new QueueTool().waitEmpty();
+        JFileChooserOperator fc = new TFileChooserOperator(frame);
+        fc.chooseFile(NON_EXISTING_FILE);
+        fc.getQueueTool().waitEmpty();
         assertTrue(isBlank(error.getText()));
-        assertFalse(panel.updateParam(param));
-        assertNotNull(error.getText());
+        assertFalse(updateParam(param));
+        assertFalse(isBlank(error.getText()));
 
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-        JFileChooserOperator fc = new FileChooserOperator(frame);
-        File[] files = fc.getFiles();
-        fc.cancel(); // close file chooser
-
-        for (int i = 0, l = files.length; i < l; i++) {
-            final File file = files[i];
+        fc = new TFileChooserOperator(frame);
+        final List<File> files = Arrays.asList(fc.getFiles());
+        Collections.shuffle(files);
+        for (final File file : files) {
             if (!file.isFile())
                 continue;
-
-            new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
-            fc = new FileChooserOperator(frame);
             fc.setSelectedFile(file);
             fc.approve(); // close file chooser
-            new QueueTool().waitEmpty();
-            if (panel.updateParam(param)) {
+            if (updateParam(param)) {
                 assertNotNull(param.getPassword());
                 assertTrue(isBlank(error.getText()));
             } else {
                 assertFalse(isBlank(error.getText()));
             }
+            return;
         }
+        fc.cancel(); // close file chooser
+    }
+
+    protected final boolean updateParam(final SafePbeParameters<?, ?> param)
+    throws InterruptedException {
+        class Update implements Runnable {
+            boolean result;
+
+            @Override
+            public void run() {
+                result = panel.updateParam(param);
+            }
+        }
+
+        final Update update = new Update();
+        try {
+            EventQueue.invokeAndWait(update);
+        } catch (InvocationTargetException ex) {
+            throw new AssertionError(ex);
+        }
+        return update.result;
     }
 }

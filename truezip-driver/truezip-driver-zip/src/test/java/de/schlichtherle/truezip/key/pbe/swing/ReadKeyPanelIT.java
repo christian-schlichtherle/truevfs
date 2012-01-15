@@ -31,17 +31,17 @@ public final class ReadKeyPanelIT extends KeyPanelTestSuite<ReadKeyPanel> {
     }
 
     @Test
-    public void testPasswd() {
+    public void testPasswd() throws InterruptedException {
         final AesPbeParameters param = newPbeParameters();
 
         // Check default.
-        assertTrue(panel.updateParam(param));
+        assertTrue(updateParam(param));
         assertEquals(0, param.getPassword().length);
         assertTrue(isBlank(error.getText()));
 
         final String passwd = "secret";
         new JPasswordFieldOperator(frame).setText(passwd);
-        assertTrue(panel.updateParam(param));
+        assertTrue(updateParam(param));
         assertEquals(passwd, new String(param.getPassword()));
         assertTrue(isBlank(error.getText()));
     }
