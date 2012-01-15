@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
-import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
+import de.schlichtherle.truezip.swing.JemmyUtils;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -29,7 +29,7 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class FileComboBoxBrowserIT {
+public final class FileComboBoxBrowserIT extends JemmyUtils {
 
     private static final Logger logger
             = Logger.getLogger(FileComboBoxBrowserIT.class.getName());
@@ -136,15 +136,18 @@ public final class FileComboBoxBrowserIT {
 
         // Type a character in tc0, then check that it's appearing in tc1.
         tc0.typeText("?");
+        tc0.getQueueTool().waitEmpty();
         assertEquals("?", tc1.getText());
 
         // Clear character in tc1, then ensure that its cleared in tc0, too.
         tc1.clearText();
+        tc1.getQueueTool().waitEmpty();
         assertEquals("", tc0.getText());
 
         // Select first element in list of tc0 (entry in current directory),
         // if any, and check its appearance in tc1, too.
         tc0.pressKey(KeyEvent.VK_DOWN);
+        tc0.getQueueTool().waitEmpty();
         final String child = tc0.getText();
         assertEquals(child, tc1.getText());
 
