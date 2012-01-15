@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import static de.schlichtherle.truezip.swing.JemmyUtils.showFrameWith;
+import de.schlichtherle.truezip.swing.JemmyUtils;
 import java.io.File;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,7 +24,7 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class AuthenticationPanelIT {
+public class AuthenticationPanelIT extends JemmyUtils {
     private static final String LABEL_TEXT = "Hello World!";
 
     private JFrameOperator frame;
@@ -50,7 +50,7 @@ public class AuthenticationPanelIT {
                 keyFileChooser = new NameComponentChooser("keyFileChooser");
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-        JFileChooserOperator fc = new FileChooserOperator(frame);
+        JFileChooserOperator fc = new TFileChooserOperator(frame);
         fc.cancel();
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_PASSWD); // select tab for passwords
         new JLabelOperator(frame, LABEL_TEXT);
@@ -58,7 +58,7 @@ public class AuthenticationPanelIT {
 
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, keyFileChooser).push(); // open file chooser
-        fc = new FileChooserOperator(frame);
+        fc = new TFileChooserOperator(frame);
         final File file = new File("test");
         fc.setSelectedFile(file);
         fc.approve();

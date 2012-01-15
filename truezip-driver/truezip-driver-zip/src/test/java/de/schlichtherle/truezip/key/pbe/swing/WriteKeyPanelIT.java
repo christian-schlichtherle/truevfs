@@ -33,18 +33,18 @@ public final class WriteKeyPanelIT extends KeyPanelTestSuite<WriteKeyPanel> {
     }
 
     @Test
-    public void testPasswd() {
+    public void testPasswd() throws InterruptedException {
         final AesPbeParameters param = newPbeParameters();
 
         // Check default.
-        assertFalse(panel.updateParam(param));
+        assertFalse(updateParam(param));
         assertNull(param.getPassword());
         assertFalse(isBlank(error.getText()));
 
         // Enter mismatching passwords.
         new JPasswordFieldOperator(frame, 0).setText("foofoofoo");
         new JPasswordFieldOperator(frame, 1).setText("barbarbar");
-        assertFalse(panel.updateParam(param));
+        assertFalse(updateParam(param));
         assertNull(param.getPassword());
         assertFalse(isBlank(error.getText()));
 
@@ -52,7 +52,7 @@ public final class WriteKeyPanelIT extends KeyPanelTestSuite<WriteKeyPanel> {
         String passwd = "secret7"; // 7 chars is too short
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
-        assertFalse(panel.updateParam(param));
+        assertFalse(updateParam(param));
         assertNull(param.getPassword());
         assertFalse(isBlank(error.getText()));
 
@@ -60,7 +60,7 @@ public final class WriteKeyPanelIT extends KeyPanelTestSuite<WriteKeyPanel> {
         passwd = "secret78"; // min 8 chars is OK
         new JPasswordFieldOperator(frame, 0).setText(passwd);
         new JPasswordFieldOperator(frame, 1).setText(passwd);
-        assertTrue(panel.updateParam(param));
+        assertTrue(updateParam(param));
         assertEquals(passwd, new String(param.getPassword()));
         assertTrue(isBlank(error.getText()));
     }
