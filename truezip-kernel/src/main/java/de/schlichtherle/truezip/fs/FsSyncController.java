@@ -282,7 +282,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         abstract OutputSocket<?> newOutputSocket(
                 final FsSyncController<?> controller,
                 final OutputSocket <?> output);
-    } // SyncSocketFactory
+    } // SocketFactory
 
     private final class Nio2Input
     extends Input {
