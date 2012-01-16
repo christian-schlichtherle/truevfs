@@ -25,6 +25,11 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
 
     protected final M delegate;
 
+    /**
+     * Constructs a new decorating file system model.
+     *
+     * @param controller the decorated file system model.
+     */
     protected FsDecoratingModel(final M model) {
         if (null == model)
             throw new NullPointerException();

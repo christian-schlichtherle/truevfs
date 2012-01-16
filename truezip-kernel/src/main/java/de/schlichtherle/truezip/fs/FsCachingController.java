@@ -70,8 +70,8 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsCacheController
-extends FsDecoratingLockModelController<
+public final class FsCachingController
+extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -90,7 +90,7 @@ extends FsDecoratingLockModelController<
      * @param controller the decorated concurrent file system controller.
      * @param pool the pool of temporary entries to hold the copied entry data.
      */
-    public FsCacheController(
+    public FsCachingController(
             final FsController<? extends FsLockModel> controller,
             final IOPool<?> pool) {
         super(controller);

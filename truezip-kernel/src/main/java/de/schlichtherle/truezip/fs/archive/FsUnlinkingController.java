@@ -36,15 +36,15 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-final class FsUnlinkController
+final class FsUnlinkingController
 extends FsDecoratingController<FsLockModel, FsController<? extends FsLockModel>> {
 
     /**
-     * Constructs a new file system unlink controller.
+     * Constructs a new unlink file system controller.
      *
-     * @param controller the decorated file system unlink controller.
+     * @param controller the decorated file system controller.
      */
-    FsUnlinkController(FsController<? extends FsLockModel> controller) {
+    FsUnlinkingController(FsController<? extends FsLockModel> controller) {
         super(controller);
         assert null != super.getParent();
     }

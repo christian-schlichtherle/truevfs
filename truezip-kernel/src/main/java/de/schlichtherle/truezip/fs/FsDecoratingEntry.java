@@ -28,7 +28,7 @@ public abstract class FsDecoratingEntry<E extends Entry> extends FsEntry {
     protected final E delegate;
 
     /**
-     * Constructs a new decorating file system entry.
+     * Constructs a new decorating entry.
      *
      * @param entry the decorated entry.
      */

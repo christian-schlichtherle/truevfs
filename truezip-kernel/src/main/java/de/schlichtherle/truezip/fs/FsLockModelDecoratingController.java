@@ -27,7 +27,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public abstract class FsDecoratingLockModelController<
+public abstract class FsLockModelDecoratingController<
         C extends FsController<? extends FsLockModel>>
 extends FsDecoratingController<FsLockModel, C>  {
 
@@ -36,7 +36,7 @@ extends FsDecoratingController<FsLockModel, C>  {
      * 
      * @param controller the decorated file system controller.
      */
-    protected FsDecoratingLockModelController(C controller) {
+    protected FsLockModelDecoratingController(C controller) {
         super(controller);
     }
 

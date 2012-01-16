@@ -43,7 +43,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class FsContextController
-extends FsDecoratingLockModelController<FsDefaultArchiveController<?>> {
+extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     private static final FsOperationContext
             NULL = new FsOperationContext();
@@ -55,12 +55,11 @@ extends FsDecoratingLockModelController<FsDefaultArchiveController<?>> {
             contexts = new HashMap<BitField<FsOutputOption>, FsOperationContext>();
 
     /**
-     * Constructs a new operation file system controller.
+     * Constructs a new context file system controller.
      *
-     * @param controller the decorated concurrent file system controller.
+     * @param controller the decorated file system controller.
      */
-    FsContextController(
-            FsDefaultArchiveController<?> controller) {
+    FsContextController(FsDefaultArchiveController<?> controller) {
         super(controller);
     }
 
