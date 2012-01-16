@@ -197,8 +197,7 @@ extends FsFileSystemArchiveController<E> {
      * to obtain the output options to use for writing the entry in the parent
      * file system.
      * 
-     * @throws IOException on any I/O error.
-     * @return The output.
+     * @return The output archive.
      */
     private OutputArchive<E> makeOutput() throws IOException {
         OutputArchive<E> oa = getOutputArchive();
@@ -454,7 +453,7 @@ extends FsFileSystemArchiveController<E> {
         public InputSocket<? extends E> getInputSocket(String name) {
             throw new UnsupportedOperationException();
         }
-    } // DummyInputService
+    } // DummyInputArchive
 
     private static final class InputArchive<E extends FsArchiveEntry>
     extends DecoratingInputShop<E, InputShop<E>> {
