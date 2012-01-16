@@ -47,8 +47,8 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsAccountController
-extends FsDecoratingLockModelController<
+public final class FsAccountingController
+extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -64,7 +64,7 @@ extends FsDecoratingLockModelController<
      *
      * @param controller the decorated concurrent file system controller.
      */
-    public FsAccountController(
+    public FsAccountingController(
             FsController<? extends FsLockModel> controller) {
         super(controller);
     }
@@ -239,14 +239,14 @@ extends FsDecoratingLockModelController<
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsAccountController controller,
+                    FsAccountingController controller,
                     InputSocket<?> input) {
                 return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsAccountController controller,
+                    FsAccountingController controller,
                     OutputSocket<?> output) {
                 return controller.new Output(output);
             }
@@ -255,25 +255,25 @@ extends FsDecoratingLockModelController<
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsAccountController controller,
+                    FsAccountingController controller,
                     InputSocket<?> input) {
                 return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsAccountController controller,
+                    FsAccountingController controller,
                     OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsAccountController controller,
+                FsAccountingController controller,
                 InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsAccountController controller,
+                FsAccountingController controller,
                 OutputSocket <?> output);
     } // AccountingSocketFactory
 
