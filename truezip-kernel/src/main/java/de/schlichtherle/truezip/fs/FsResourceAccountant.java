@@ -45,7 +45,7 @@ import net.jcip.annotations.ThreadSafe;
  * In order to stop accounting for a closeable resource,
  * call {@link #stopAccountingFor(Closeable)}.
  *
- * @see     FsResourceController
+ * @see     FsAccountController
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$

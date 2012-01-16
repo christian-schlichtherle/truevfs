@@ -19,7 +19,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * A file system model which supports multiple concurrent reader threads.
  *
- * @see     FsConcurrentController
+ * @see     FsLockController
  * @author  Christian Schlichtherle
  * @version $Id$
  */

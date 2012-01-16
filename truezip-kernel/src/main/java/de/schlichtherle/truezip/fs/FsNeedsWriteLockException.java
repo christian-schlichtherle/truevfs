@@ -27,7 +27,7 @@ import net.jcip.annotations.ThreadSafe;
  * DO NOT CREATE OR THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB-CLASSES)
  * ANYWHERE ELSE!
  *
- * @see     FsConcurrentController
+ * @see     FsLockController
  * @author  Christian Schlichtherle
  * @version $Id$
  */
