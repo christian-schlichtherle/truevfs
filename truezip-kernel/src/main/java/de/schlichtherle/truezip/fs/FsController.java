@@ -153,9 +153,9 @@ public abstract class FsController<M extends FsModel> {
      * @since  TrueZIP 7.2
      */
     public boolean setTime(
-            FsEntryName name,
-            Map<Access, Long> times,
-            BitField<FsOutputOption> options)
+            final FsEntryName name,
+            final Map<Access, Long> times,
+            final BitField<FsOutputOption> options)
     throws IOException {
         boolean ok = true;
         for (Map.Entry<Access, Long> time : times.entrySet())
@@ -291,9 +291,9 @@ public abstract class FsController<M extends FsModel> {
      *         and {@code FORCE_CLOSE_OUTPUT} is set.
      */
     public final void
-    sync(BitField<FsSyncOption> options)
+    sync(final BitField<FsSyncOption> options)
     throws FsSyncException {
-        FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
     }
