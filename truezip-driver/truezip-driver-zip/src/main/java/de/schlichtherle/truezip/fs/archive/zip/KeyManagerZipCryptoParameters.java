@@ -8,25 +8,21 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.zip.ZipParameters;
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.zip.WinZipAesParameters;
-import de.schlichtherle.truezip.zip.ZipCryptoParameters;
-import de.schlichtherle.truezip.zip.ZipParametersProvider;
-import de.schlichtherle.truezip.zip.ZipKeyException;
+import de.schlichtherle.truezip.zip.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.nio.charset.Charset;
 import net.jcip.annotations.ThreadSafe;
 import org.bouncycastle.crypto.PBEParametersGenerator;
-import static org.bouncycastle.crypto.PBEParametersGenerator.*;
+import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToBytes;
 
 /**
  * An adapter which provides {@link ZipCryptoParameters} by using a
