@@ -64,8 +64,8 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
  *     .toUri()
  *     .equals(u);
  * }</pre>
- * These identity productions still apply even if the method {@link #getUri()}
- * is substituted with the method {@link #toUri()}.
+ * These identity productions apply for the method {@link #toUri()} as well as
+ * the method {@link #getUri()}.
  * 
  * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">
  *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
