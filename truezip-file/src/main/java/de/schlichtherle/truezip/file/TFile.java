@@ -976,10 +976,8 @@ public final class TFile extends File {
             throw new IllegalArgumentException(archive + " (not a top level archive file)");
         new FsFilteringManager(
                 TConfig.get().getManager(),
-                archive .getController()
-                        .getModel()
-                        .getMountPoint())
-                    .sync(options);
+                archive.getController().getModel().getMountPoint()
+                ).sync(options);
     }
 
     /**
