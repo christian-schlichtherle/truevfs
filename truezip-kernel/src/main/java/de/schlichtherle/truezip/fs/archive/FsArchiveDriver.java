@@ -386,7 +386,7 @@ extends FsDriver {
      * exception of its name and type.
      * Furthermore, if {@code name} and {@code type} are equal to the name and
      * type of this template, then the returned entry shall be a (deep) clone
-     * of the template which shares no mutable objects with the template.
+     * of the template which shares no mutable state with the template.
      *
      * @param  name an entry name.
      * @param  type an entry type.
