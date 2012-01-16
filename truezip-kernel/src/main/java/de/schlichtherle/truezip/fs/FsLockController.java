@@ -375,7 +375,7 @@ extends FsDecoratingLockModelController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+                return new LockSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
             } finally {
                 writeLock().unlock();
             }
@@ -419,7 +419,7 @@ extends FsDecoratingLockModelController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new ConcurrentReadOnlyFile(getBoundSocket().newReadOnlyFile());
+                return new LockReadOnlyFile(getBoundSocket().newReadOnlyFile());
             } finally {
                 writeLock().unlock();
             }
@@ -430,7 +430,7 @@ extends FsDecoratingLockModelController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new ConcurrentInputStream(getBoundSocket().newInputStream());
+                return new LockInputStream(getBoundSocket().newInputStream());
             } finally {
                 writeLock().unlock();
             }
@@ -448,7 +448,7 @@ extends FsDecoratingLockModelController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new ConcurrentSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+                return new LockSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
             } finally {
                 writeLock().unlock();
             }
@@ -483,16 +483,16 @@ extends FsDecoratingLockModelController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new ConcurrentOutputStream(getBoundSocket().newOutputStream());
+                return new LockOutputStream(getBoundSocket().newOutputStream());
             } finally {
                 writeLock().unlock();
             }
         }
     } // Output
 
-    private final class ConcurrentReadOnlyFile
+    private final class LockReadOnlyFile
     extends DecoratingReadOnlyFile {
-        ConcurrentReadOnlyFile(ReadOnlyFile rof) {
+        LockReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }
 
@@ -508,9 +508,9 @@ extends FsDecoratingLockModelController<
         }
     } // ConcurrentReadOnlyFile
 
-    private final class ConcurrentSeekableByteChannel
+    private final class LockSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        ConcurrentSeekableByteChannel(SeekableByteChannel sbc) {
+        LockSeekableByteChannel(SeekableByteChannel sbc) {
             super(sbc);
         }
 
@@ -526,9 +526,9 @@ extends FsDecoratingLockModelController<
         }
     } // ConcurrentSeekableByteChannel
 
-    private final class ConcurrentInputStream
+    private final class LockInputStream
     extends DecoratingInputStream {
-        ConcurrentInputStream(InputStream in) {
+        LockInputStream(InputStream in) {
             super(in);
         }
 
@@ -544,9 +544,9 @@ extends FsDecoratingLockModelController<
         }
     } // ConcurrentInputStream
 
-    private final class ConcurrentOutputStream
+    private final class LockOutputStream
     extends DecoratingOutputStream {
-        ConcurrentOutputStream(OutputStream out) {
+        LockOutputStream(OutputStream out) {
             super(out);
         }
 
