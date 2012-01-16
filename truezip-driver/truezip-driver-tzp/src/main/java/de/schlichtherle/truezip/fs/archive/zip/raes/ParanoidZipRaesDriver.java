@@ -23,7 +23,7 @@ import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
 
 /**
- * A paranoid archive driver which builds RAES encrypted ZIP files.
+ * A paranoid archive driver for RAES encrypted ZIP files.
  * This driver <em>always</em> checks the cipher text of input archive files
  * using the RAES Message Authentication Code (MAC), which makes it slower than
  * the {@link SafeZipRaesDriver} for archive files larger than 512 KB and

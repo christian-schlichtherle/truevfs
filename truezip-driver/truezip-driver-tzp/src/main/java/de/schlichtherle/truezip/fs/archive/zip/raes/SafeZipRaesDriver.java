@@ -16,7 +16,7 @@ import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
 /**
- * A safe archive driver which builds RAES encrypted ZIP files (ZIP.RAES).
+ * A safe archive driver for RAES encrypted ZIP files (ZIP.RAES).
  * For input archive files up to 512 KB, the cipher text gets authenticated
  * using the RAES provided Message Authentication Code (MAC) <em>before</em>
  * the archive can be accessed by a client application.

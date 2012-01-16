@@ -41,9 +41,8 @@ import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
 
 /**
- * An abstract archive driver which builds RAES encrypted ZIP files
- * and optionally authenticates the cipher data of the input archive files
- * presented to it.
+ * An abstract archive driver for RAES encrypted ZIP files which optionally
+ * authenticates the cipher data of the input archive files presented to it.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -65,7 +64,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @param keyManagerProvider the key manager provider for accessing
      *        protected resources (cryptography).
      */
-    public ZipRaesDriver(   IOPoolProvider ioPoolProvider,
+    public ZipRaesDriver(   final IOPoolProvider ioPoolProvider,
                             final KeyManagerProvider keyManagerProvider) {
         super(ioPoolProvider);
         if (null == keyManagerProvider)
