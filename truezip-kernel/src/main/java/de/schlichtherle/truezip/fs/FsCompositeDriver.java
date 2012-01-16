@@ -32,13 +32,13 @@ public interface FsCompositeDriver {
      * scheme of the mount point of the given file system model with the
      * expression {@code model.getMountPoint().getScheme()}.
      * <p>
-     * When called, the following expression is a precondition:
-     * {@code
-            null == model.getParent()
-                    ? null == parent
-                    : model.getParent().equals(parent.getModel())
-     * }
-     *
+     * When called, you may safely assume the following precondition:
+     * <pre>{@code
+     * assert null == model.getParent()
+     *         ? null == parent
+     *         : model.getParent().equals(parent.getModel())
+     * }</pre>
+     * This precondition
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
