@@ -27,9 +27,10 @@ public interface FsCompositeDriver {
     /**
      * Returns a new thread-safe file system controller for the mount point of
      * the given file system model and parent file system controller.
-     * The file system controller is created by using a file system driver
-     * which is looked up by querying the scheme of the mount point of the
-     * given file system model.
+     * The file system controller is created by using a
+     * {@link FsDriver file system driver} which is looked up by querying the
+     * scheme of the mount point of the given file system model with the
+     * expression {@code model.getMountPoint().getScheme()}.
      * <p>
      * When called, the following expression is a precondition:
      * {@code
