@@ -217,10 +217,7 @@ extends FsLockModelController {
             if (FILE != entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
                         name, "entry type is not a file");
-            return FsArchiveController
-                    .this
-                    .getInputSocket(entry.getName())
-                    .bind(this);
+            return getInputSocket(entry.getName()).bind(this);
         }
 
         @Override
@@ -300,7 +297,7 @@ extends FsLockModelController {
                 final FsArchiveFileSystemOperation<E> mknod = mknod();
                 final E entry = mknod.getTarget().getEntry();
                 final OutputStream out = getOutputSocket(entry)
-                        .bind(null == in ? this : null)
+                        .bind(null == in ? this : null) // do NOT bind when appending!
                         .newOutputStream();
                 try {
                     mknod.run();
