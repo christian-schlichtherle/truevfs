@@ -29,12 +29,12 @@ public abstract class FsDriver {
      * Returns a new thread-safe file system controller for the mount point of
      * the given file system model and parent file system controller.
      * <p>
-     * When called, the following expression is a precondition:
-     * {@code
-            null == model.getParent()
-                    ? null == parent
-                    : model.getParent().equals(parent.getModel())
-     * }
+     * When called, you may safely assume the following precondition:
+     * <pre>{@code
+     * assert null == model.getParent()
+     *         ? null == parent
+     *         : model.getParent().equals(parent.getModel())
+     * }</pre>
      *
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
