@@ -117,7 +117,7 @@ TArchiveDetector ad = new TArchiveDetector(
     One variant with and one variant without an additional
     <<<TArchiveDetector>>> parameter.
 
-    If you <don't> provide a <<<TArchiveDetector>>> parameter to a <<<TFile>>>
+    If you don't provide a <<<TArchiveDetector>>> parameter to a <<<TFile>>>
     constructor or constructing method, then the class property called
     <default archive detector> is used.
     This class property is initially set to <<<TArchiveDetector.ALL>>>, which
@@ -127,7 +127,7 @@ TArchiveDetector ad = new TArchiveDetector(
 
 +--+
 // Use default archive detector, which is initially TArchiveDetector.ALL.
-TFile src = new TFile("archive.zip");
+TFile src = new TFile("archive.zip"); // needs TrueZIP Driver ZIP on class path.
 TFile dst = new TFile("directory");
 src.cp_rp(dst); // copy "archive.zip" as a virtual directory!
 +--+
@@ -139,31 +139,28 @@ src.cp_rp(dst); // copy "archive.zip" as a virtual directory!
     respectively.
     Mind that a change of the default archive detector affects only
     subsequently constructed <<<TFile>>> objects.
-    For comparison, in order to temporarily disable archive detection and copy
+    For comparison, in order to disable the archive detection and copy
     <<<archive.zip>>> as a plain old file, you could call:
 
 +--+
-TArchiveDetector ad = TFile.getDefaultArchiveDetector(); // backup
-TFile.setDefaultArchiveDetector(TArchiveDetector.NULL); // change
-try {
-    // Use default archive detector, which is TArchiveDetector.NULL.
-    TFile src = new TFile("archive.zip");
-    TFile dst = new TFile("file");
-    src.cp_rp(dst); // copy "archive.zip" as a plain old file!
-} finally {
-    TFile.setDefaultArchiveDetector(ad); // restore
-}
+// MIND THAT THIS IS NOT THREAD-SAFE!!!
+TFile.setDefaultArchiveDetector(TArchiveDetector.NULL);
+...
+// Use default archive detector, which is TArchiveDetector.NULL.
+TFile src = new TFile("archive.zip");
+TFile dst = new TFile("file");
+src.cp_rp(dst); // copy "archive.zip" as a plain old file!
 +--+
 
-    There is one problem with this code, though:
+    However, there is one problem with this code:
     Because the default archive detector is a class property, the code is not
     thread-safe!
     If the current thread is running the try-block and another thread is
     concurrently constructing <<<TFile>>> objects, then the change of the
     default archive detector would affect these objects.
     To fix this issue, you should avoid changing the default archive detector
-    once your application has been configured and use dependency injection
-    instead:
+    once your application has been initially configured and instead use the
+    <<<TConfig>>> class (see below) or use dependency injection like this:
 
 +--+
 TFile src = new TFile("archive.zip", TArchiveDetector.NULL);
@@ -232,12 +229,8 @@ try (TConfig config = TConfig.push()) {
 } // config is automatically closed here
 +--+
 
-    These examples are very similar to the second example in the previous
-    section.
-    However, these examples are thread-safe!
-
-    To understand why, you first need to know that
-    <<<TFile.getDefaultArchiveDetector()>>>
+    To understand why these examples are thread-safe, you first need to know
+    that <<<TFile.getDefaultArchiveDetector()>>>
     queries the <current configuration> by forwarding the call to
     {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector()}<<<TConfig.get().getArchiveDetector()>>>}},
     where
@@ -266,7 +259,7 @@ try (TConfig config = TConfig.push()) {
 
     What is the current configuration returned by <<<TConfig.get()>>> if there
     had been no previous call to <<<TConfig.push()>>>?
-    In this state, the current configuration is the <global configuration>
+    In this case, the current configuration is the <global configuration>
     which is shared by all threads.
     Again, <<<TConfig.get()>>> is called by
     <<<TFile.get/setDefaultArchiveDetector>>>,
