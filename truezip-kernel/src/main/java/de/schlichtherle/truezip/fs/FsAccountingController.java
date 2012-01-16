@@ -286,7 +286,7 @@ extends FsLockModelDecoratingController<
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             assert isWriteLockedByCurrentThread();
-            return new AccountedSeekableByteChannel(
+            return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
     } // Nio2Input
@@ -312,14 +312,14 @@ extends FsLockModelDecoratingController<
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             assert isWriteLockedByCurrentThread();
-            return new AccountedReadOnlyFile(
+            return new AccountingReadOnlyFile(
                     getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
             assert isWriteLockedByCurrentThread();
-            return new AccountedInputStream(
+            return new AccountingInputStream(
                     getBoundSocket().newInputStream());
         }
     } // Input
@@ -333,7 +333,7 @@ extends FsLockModelDecoratingController<
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             assert isWriteLockedByCurrentThread();
-            return new AccountedSeekableByteChannel(
+            return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
     } // Nio2Output
@@ -359,15 +359,15 @@ extends FsLockModelDecoratingController<
         @Override
         public OutputStream newOutputStream() throws IOException {
             assert isWriteLockedByCurrentThread();
-            return new AccountedOutputStream(
+            return new AccountingOutputStream(
                     getBoundSocket().newOutputStream());
         }
     } // Output
 
-    private final class AccountedReadOnlyFile
+    private final class AccountingReadOnlyFile
     extends DecoratingReadOnlyFile {
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountedReadOnlyFile(ReadOnlyFile rof) {
+        AccountingReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
             getAccountant().startAccountingFor(this);
         }
@@ -391,10 +391,10 @@ extends FsLockModelDecoratingController<
         }
     } // AccountedReadOnlyFile
 
-    private final class AccountedSeekableByteChannel
+    private final class AccountingSeekableByteChannel
     extends DecoratingSeekableByteChannel {
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountedSeekableByteChannel(SeekableByteChannel sbc) {
+        AccountingSeekableByteChannel(SeekableByteChannel sbc) {
             super(sbc);
             getAccountant().startAccountingFor(this);
         }
@@ -418,10 +418,10 @@ extends FsLockModelDecoratingController<
         }
     } // AccountedSeekableByteChannel
 
-    private final class AccountedInputStream
+    private final class AccountingInputStream
     extends DecoratingInputStream {
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountedInputStream(InputStream in) {
+        AccountingInputStream(InputStream in) {
             super(in);
             getAccountant().startAccountingFor(this);
         }
@@ -445,10 +445,10 @@ extends FsLockModelDecoratingController<
         }
     } // AccountedInputStream
 
-    private final class AccountedOutputStream
+    private final class AccountingOutputStream
     extends DecoratingOutputStream {
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountedOutputStream(OutputStream out) {
+        AccountingOutputStream(OutputStream out) {
             super(out);
             getAccountant().startAccountingFor(this);
         }
