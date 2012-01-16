@@ -17,8 +17,8 @@ import java.io.InputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A decorator which synchronizes all access to an {@link InputStream}
- * via an object provided to its constructor.
+ * A decorator which synchronizes all access to an {@link InputStream} via an
+ * object provided to its constructor.
  *
  * @see     SynchronizedOutputStream
  * @author  Christian Schlichtherle
@@ -56,7 +56,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
-	public int read() throws IOException {
+    public int read() throws IOException {
         synchronized (lock) {
             return delegate.read();
         }
