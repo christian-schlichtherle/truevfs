@@ -8,19 +8,13 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
-import de.schlichtherle.truezip.fs.FsCompositeDriver;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDefaultDriver;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsFilteringManager;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -28,18 +22,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
-import javax.management.JMX;
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanInfo;
-import javax.management.MBeanNotificationInfo;
-import javax.management.MBeanOperationInfo;
-import javax.management.MBeanParameterInfo;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.StandardMBean;
+import javax.management.*;
 
 /**
  * The MXBean implementation for a {@link FsModel file system model}.
