@@ -97,7 +97,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public FsEntry getEntry(FsEntryName name)
+    public FsEntry getEntry(final FsEntryName name)
     throws IOException {
         while (true) {
             try {
@@ -109,7 +109,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
+    public boolean isReadable(final FsEntryName name) throws IOException {
         while (true) {
             try {
                 return delegate.isReadable(name);
@@ -120,7 +120,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
+    public boolean isWritable(final FsEntryName name) throws IOException {
         while (true) {
             try {
                 return delegate.isWritable(name);
@@ -131,7 +131,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
+    public boolean isExecutable(final FsEntryName name) throws IOException {
         while (true) {
             try {
                 return delegate.isExecutable(name);
@@ -142,7 +142,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
+    public void setReadOnly(final FsEntryName name) throws IOException {
         while (true) {
             try {
                 delegate.setReadOnly(name);
@@ -154,9 +154,9 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            Map<Access, Long> times,
-            BitField<FsOutputOption> options)
+            final FsEntryName name,
+            final Map<Access, Long> times,
+            final BitField<FsOutputOption> options)
     throws IOException {
         while (true) {
             try {
@@ -169,10 +169,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            BitField<Access> types,
-            long value,
-            BitField<FsOutputOption> options)
+            final FsEntryName name,
+            final BitField<Access> types,
+            final long value,
+            final BitField<FsOutputOption> options)
     throws IOException {
         while (true) {
             try {
@@ -184,26 +184,28 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<FsInputOption> options) {
+    public InputSocket<?> getInputSocket(
+            final FsEntryName name,
+            final BitField<FsInputOption> options) {
         return SOCKET_FACTORY.newInputSocket(this,
                 delegate.getInputSocket(name, options));
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsOutputOption> options,
-                                            Entry template) {
+    public OutputSocket<?> getOutputSocket(
+            final FsEntryName name,
+            final BitField<FsOutputOption> options,
+            final Entry template) {
         return SOCKET_FACTORY.newOutputSocket(this,
                 delegate.getOutputSocket(name, options, template));
     }
 
     @Override
     public void mknod(
-            @NonNull FsEntryName name,
-            @NonNull Type type,
-            @NonNull BitField<FsOutputOption> options,
-            @CheckForNull Entry template)
+            final @NonNull FsEntryName name,
+            final @NonNull Type type,
+            final @NonNull BitField<FsOutputOption> options,
+            final @CheckForNull Entry template)
     throws IOException {
         while (true) {
             try {
@@ -216,7 +218,9 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink(
+            final FsEntryName name,
+            final BitField<FsOutputOption> options)
     throws IOException {
         while (true) {
             try {
@@ -230,8 +234,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // No sync for sync, please.
         delegate.sync(options, handler);
@@ -242,15 +246,15 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsSyncController<?> controller,
-                    InputSocket<?> input) {
+                    final FsSyncController<?> controller,
+                    final InputSocket<?> input) {
                 return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsSyncController<?> controller,
-                    OutputSocket<?> output) {
+                    final FsSyncController<?> controller,
+                    final OutputSocket<?> output) {
                 return controller.new Output(output);
             }
         },
@@ -258,31 +262,31 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsSyncController<?> controller,
-                    InputSocket<?> input) {
+                    final FsSyncController<?> controller,
+                    final InputSocket<?> input) {
                 return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsSyncController<?> controller,
-                    OutputSocket<?> output) {
+                    final FsSyncController<?> controller,
+                    final OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsSyncController<?> controller,
-                InputSocket <?> input);
+                final FsSyncController<?> controller,
+                final InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsSyncController<?> controller,
-                OutputSocket <?> output);
+                final FsSyncController<?> controller,
+                final OutputSocket <?> output);
     } // SyncSocketFactory
 
     private final class Nio2Input
     extends Input {
-        Nio2Input(InputSocket<?> input) {
+        Nio2Input(final InputSocket<?> input) {
             super(input);
         }
 
@@ -300,7 +304,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private class Input
     extends DecoratingInputSocket<Entry> {
-        Input(InputSocket<?> input) {
+        Input(final InputSocket<?> input) {
             super(input);
         }
 
@@ -346,7 +350,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class Nio2Output
     extends Output {
-        Nio2Output(OutputSocket<?> output) {
+        Nio2Output(final OutputSocket<?> output) {
             super(output);
         }
 
@@ -364,7 +368,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private class Output
     extends DecoratingOutputSocket<Entry> {
-        Output(OutputSocket<?> output) {
+        Output(final OutputSocket<?> output) {
             super(output);
         }
 
