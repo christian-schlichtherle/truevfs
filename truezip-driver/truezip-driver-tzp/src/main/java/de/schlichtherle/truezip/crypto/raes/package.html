@@ -93,9 +93,11 @@
             <li>
                 The encryption scheme is password based according to
                 <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html">PKCS #5</a>
-                V2.0 with key derivation according to
+                V2.0 with the password base key derivation function (PBKDF)
+                according to
                 <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html">PKCS #12</a>
-                V1.0. The latter allows to use Unicode password characters.
+                V1.0.
+                The latter allows to use Unicode password characters.
             </li>
             <li>
                 The cipher algorithm is the Advanced Encryption Standard (AES) with
