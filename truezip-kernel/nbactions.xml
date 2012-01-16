@@ -22,4 +22,11 @@
             <goal>site:run</goal>
         </goals>
     </action>
+    <action>
+        <actionName>CUSTOM-help:effective-pom</actionName>
+        <displayName>help:effective-pom</displayName>
+        <goals>
+            <goal>help:effective-pom</goal>
+        </goals>
+    </action>
 </actions>
