@@ -389,7 +389,7 @@ extends FsLockModelDecoratingController<
                 super.finalize();
             }
         }
-    } // AccountedReadOnlyFile
+    } // AccountingReadOnlyFile
 
     private final class AccountingSeekableByteChannel
     extends DecoratingSeekableByteChannel {
@@ -416,7 +416,7 @@ extends FsLockModelDecoratingController<
                 super.finalize();
             }
         }
-    } // AccountedSeekableByteChannel
+    } // AccountingSeekableByteChannel
 
     private final class AccountingInputStream
     extends DecoratingInputStream {
@@ -443,7 +443,7 @@ extends FsLockModelDecoratingController<
                 super.finalize();
             }
         }
-    } // AccountedInputStream
+    } // AccountingInputStream
 
     private final class AccountingOutputStream
     extends DecoratingOutputStream {
@@ -470,5 +470,5 @@ extends FsLockModelDecoratingController<
                 super.finalize();
             }
         }
-    } // AccountedOutputStream
+    } // AccountingOutputStream
 }
