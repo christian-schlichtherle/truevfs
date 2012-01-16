@@ -362,7 +362,7 @@ extends FsLockModelDecoratingController<
         abstract OutputSocket<?> newOutputSocket(
                 FsLockingController controller,
                 OutputSocket <?> output);
-    } // ConcurrentSocketFactory
+    } // SocketFactory
 
     private final class Nio2Input
     extends Input {
@@ -375,7 +375,7 @@ extends FsLockModelDecoratingController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new LockSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+                return new LockingSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
             } finally {
                 writeLock().unlock();
             }
@@ -419,7 +419,7 @@ extends FsLockModelDecoratingController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new LockReadOnlyFile(getBoundSocket().newReadOnlyFile());
+                return new LockingReadOnlyFile(getBoundSocket().newReadOnlyFile());
             } finally {
                 writeLock().unlock();
             }
@@ -430,7 +430,7 @@ extends FsLockModelDecoratingController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new LockInputStream(getBoundSocket().newInputStream());
+                return new LockingInputStream(getBoundSocket().newInputStream());
             } finally {
                 writeLock().unlock();
             }
@@ -448,7 +448,7 @@ extends FsLockModelDecoratingController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new LockSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
+                return new LockingSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
             } finally {
                 writeLock().unlock();
             }
@@ -483,16 +483,16 @@ extends FsLockModelDecoratingController<
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
-                return new LockOutputStream(getBoundSocket().newOutputStream());
+                return new LockingOutputStream(getBoundSocket().newOutputStream());
             } finally {
                 writeLock().unlock();
             }
         }
     } // Output
 
-    private final class LockReadOnlyFile
+    private final class LockingReadOnlyFile
     extends DecoratingReadOnlyFile {
-        LockReadOnlyFile(ReadOnlyFile rof) {
+        LockingReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }
 
@@ -506,11 +506,11 @@ extends FsLockModelDecoratingController<
                 writeLock().unlock();
             }
         }
-    } // ConcurrentReadOnlyFile
+    } // LockingReadOnlyFile
 
-    private final class LockSeekableByteChannel
+    private final class LockingSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        LockSeekableByteChannel(SeekableByteChannel sbc) {
+        LockingSeekableByteChannel(SeekableByteChannel sbc) {
             super(sbc);
         }
 
@@ -524,11 +524,11 @@ extends FsLockModelDecoratingController<
                 writeLock().unlock();
             }
         }
-    } // ConcurrentSeekableByteChannel
+    } // LockingSeekableByteChannel
 
-    private final class LockInputStream
+    private final class LockingInputStream
     extends DecoratingInputStream {
-        LockInputStream(InputStream in) {
+        LockingInputStream(InputStream in) {
             super(in);
         }
 
@@ -542,11 +542,11 @@ extends FsLockModelDecoratingController<
                 writeLock().unlock();
             }
         }
-    } // ConcurrentInputStream
+    } // LockingInputStream
 
-    private final class LockOutputStream
+    private final class LockingOutputStream
     extends DecoratingOutputStream {
-        LockOutputStream(OutputStream out) {
+        LockingOutputStream(OutputStream out) {
             super(out);
         }
 
@@ -560,5 +560,5 @@ extends FsLockModelDecoratingController<
                 writeLock().unlock();
             }
         }
-    } // ConcurrentInputStream
+    } // LockingOutputStream
 }

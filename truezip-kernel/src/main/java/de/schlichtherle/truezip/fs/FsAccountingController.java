@@ -275,7 +275,7 @@ extends FsLockModelDecoratingController<
         abstract OutputSocket<?> newOutputSocket(
                 FsAccountingController controller,
                 OutputSocket <?> output);
-    } // AccountingSocketFactory
+    } // SocketFactory
 
     private final class Nio2Input
     extends Input {

@@ -402,7 +402,7 @@ extends FsLockModelDecoratingController<
         abstract OutputSocket<?> newOutputSocket(
                 EntryController controller,
                 OutputSocket <?> output);
-    } // EntryOutputFactory
+    } // SocketFactory
 
     /** A cache for the contents of an individual file system entry. */
     private final class EntryController {
