@@ -19,11 +19,12 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * An adapter class to make the {@link ZipEntry} class implement the
- * {@link FsArchiveEntry} interface.
+ * ZIP archive entries apply the date/time conversion rules as defined by
+ * {@link DateTimeConverter#ZIP}.
  *
- * @see ZipDriver
- * @author Christian Schlichtherle
+ * @see     #getDateTimeConverter()
+ * @see     ZipDriver
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -42,6 +43,15 @@ public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
         return isDirectory() ? DIRECTORY : FILE;
     }
 
+    /**
+     * Returns a {@link DateTimeConverter} for the conversion of Java time
+     * to DOS date/time fields and vice versa.
+     * <p>
+     * The implementation in the class {@link ZipArchiveEntry} returns
+     * {@link DateTimeConverter#ZIP}.
+     *
+     * @return {@link DateTimeConverter#ZIP}
+     */
     @Override
     protected DateTimeConverter getDateTimeConverter() {
         return DateTimeConverter.ZIP;

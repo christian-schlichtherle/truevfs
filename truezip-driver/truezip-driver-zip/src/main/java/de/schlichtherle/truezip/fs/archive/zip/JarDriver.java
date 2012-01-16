@@ -9,6 +9,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -16,15 +17,26 @@ import java.nio.charset.Charset;
 import net.jcip.annotations.Immutable;
 
 /**
- * An archive driver which builds Java Archive files (JAR).
- * JAR files use UTF-8 as the character set encoding for entry names and
- * comments.
+ * An archive driver for Java Archive files (JAR).
+ * JAR files use the UTF-8 character set for the encoding of entry
+ * names and comments.
+ * They also apply the date/time conversion rules according to
+ * {@link DateTimeConverter#JAR}.
+ * This configuration makes this driver applicable for all countries.
+ * However, it pretty much constraints the interoperability of this driver to
+ * Java applications and Info-ZIP.
+ * Therefore, while you should <em>not</em> use this driver to access plain old
+ * ZIP files, you should definitely use it for custom application file formats
  * <p>
- * Other than this, JAR files are treated like regular ZIP files.
- * In particular, this class does <em>not</em> check a JAR file for the
- * existance of the <i>META-INF/MANIFEST.MF</i> entry or any other entry.
+ * Other than this, JAR files are treated like plain old ZIP files.
+ * In particular, this class does <em>not</em> check or ensure a certain
+ * directory structure or the existance of certain entries (e.g.
+ * {@code META-INF/MANIFEST.MF}) within a JAR file.
+ * <p>
+ * This driver does <em>not</em> check the CRC value of any entries in existing
+ * archives - use {@link CheckedJarDriver} instead.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
@@ -49,13 +61,26 @@ public class JarDriver extends ZipDriver {
         super(ioPoolProvider, JAR_CHARSET);
     }
 
+    /**
+     * Returns a new JAR archive entry with the given {@code name}.
+     *
+     * @param  name the entry name.
+     * @return {@code new JarArchiveEntry(name)}
+     */
     @Override
-    public ZipArchiveEntry newEntry(String name) {
+    public JarArchiveEntry newEntry(String name) {
         return new JarArchiveEntry(name);
     }
 
+    /**
+     * Returns a new JAR archive entry with the given {@code name} and all
+     * other properties copied from the given template.
+     *
+     * @param  name the entry name.
+     * @return {@code new JarArchiveEntry(name, template)}
+     */
     @Override
-    public ZipArchiveEntry newEntry(String name, ZipEntry template) {
+    public JarArchiveEntry newEntry(String name, ZipEntry template) {
         return new JarArchiveEntry(name, template);
     }
 }

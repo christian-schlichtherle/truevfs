@@ -373,8 +373,7 @@ public class ZipEntry implements Cloneable {
      * The implementation in the class {@link ZipEntry} returns
      * {@link DateTimeConverter#JAR}.
      *
-     * @return A {@link DateTimeConverter} - never {@code null}.
-     * @see DateTimeConverter
+     * @return {@link DateTimeConverter#JAR}
      */
     protected DateTimeConverter getDateTimeConverter() {
         return DateTimeConverter.JAR;
