@@ -24,7 +24,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
- * An archive driver which builds BZIP2 compressed TAR files (TAR.BZIP2).
+ * An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).
  * 
  * @author Christian Schlichtherle
  * @version $Id$
