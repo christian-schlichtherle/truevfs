@@ -30,7 +30,7 @@ import net.jcip.annotations.Immutable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
- * An archive driver which builds Tape Archive files (TAR).
+ * An archive driver for Tape Archive files (TAR).
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
