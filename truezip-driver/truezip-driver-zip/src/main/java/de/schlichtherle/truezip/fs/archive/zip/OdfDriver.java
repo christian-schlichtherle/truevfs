@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
 
 /**
- * An archive driver which supports building archive files according to
- * the Open Document Format (ODF) Specification, V1.0 and later.
+ * An archive driver for application archive files according to the Open
+ * Document Format (ODF) Specification, V1.0 and later.
  * This driver simply ensures that an entry named {@code mimetype}, if present
  * at all, is always written as the very first entry using the method
  * {@code STORED} rather than {@code DEFLATED} in the resulting archive file

@@ -22,7 +22,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-class DefaultZipFileParameters
+final class DefaultZipFileParameters
 extends DefaultZipCharsetParameters
 implements ZipFileParameters<ZipEntry> {
 

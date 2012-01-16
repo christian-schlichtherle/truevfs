@@ -9,35 +9,26 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.zip.ZipCryptoParameters;
-import de.schlichtherle.truezip.zip.ZipEntry;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
-import de.schlichtherle.truezip.zip.ZipFileParameters;
-import de.schlichtherle.truezip.zip.ZipOutputStream;
-import de.schlichtherle.truezip.zip.ZipOutputStreamParameters;
+import de.schlichtherle.truezip.zip.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -52,14 +43,25 @@ import java.util.zip.Deflater;
 import net.jcip.annotations.Immutable;
 
 /**
- * An archive driver which builds ZIP files.
- * Do <em>not</em> use this driver for custom application file formats
- * - use {@link JarDriver} instead.
+ * An archive driver for plain old ZIP files.
+ * By default, ZIP files use the IBM437 character set for the encoding of entry
+ * names and comments (unless the General Purpose Bit 11 is present in
+ * accordance with appendix D of the
+ * <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP File Format Specification</a>).
+ * They also apply the date/time conversion rules according to
+ * {@link DateTimeConverter#ZIP}.
+ * This configuration pretty much constraints the applicability of this driver
+ * to North American and Western European countries.
+ * However, this driver generally provides best interoperability with third
+ * party tools like the Windows Explorer, WinZip, 7-Zip etc.
+ * To some extent this applies even outside these countries.
+ * Therefore, while you should use this driver to access plain old ZIP files,
+ * you should <em>not</em> use it for custom application file formats - use the
+ * {@link JarDriver} instead in this case.
  * <p>
  * This driver does <em>not</em> check the CRC value of any entries in existing
- * archives - use {@link CheckedZipDriver} or {@link CheckedJarDriver} instead.
+ * archives - use {@link CheckedZipDriver} instead.
  *
- * @see     CheckedZipDriver
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -421,11 +423,24 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         return entry;
     }
 
+    /**
+     * Returns a new ZIP archive entry with the given {@code name}.
+     *
+     * @param  name the entry name.
+     * @return {@code new ZipArchiveEntry(name)}
+     */
     @Override
     public ZipArchiveEntry newEntry(String name) {
         return new ZipArchiveEntry(name);
     }
 
+    /**
+     * Returns a new ZIP archive entry with the given {@code name} and all
+     * other properties copied from the given template.
+     *
+     * @param  name the entry name.
+     * @return {@code new ZipArchiveEntry(name, template)}
+     */
     public ZipArchiveEntry newEntry(String name, ZipEntry template) {
         return new ZipArchiveEntry(name, template);
     }

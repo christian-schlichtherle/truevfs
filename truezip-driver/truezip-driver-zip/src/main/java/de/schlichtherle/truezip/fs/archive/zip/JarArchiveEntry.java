@@ -14,10 +14,12 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
- * Respects the different date/time conversion in JAR files.
+ * JAR archive entries apply the date/time conversion rules as defined by
+ * {@link DateTimeConverter#JAR}.
  *
- * @see JarDriver
- * @author Christian Schlichtherle
+ * @see     #getDateTimeConverter()
+ * @see     JarDriver
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
@@ -31,6 +33,15 @@ public class JarArchiveEntry extends ZipArchiveEntry {
         super(name, template);
     }
 
+    /**
+     * Returns a {@link DateTimeConverter} for the conversion of Java time
+     * to DOS date/time fields and vice versa.
+     * <p>
+     * The implementation in the class {@link ZipArchiveEntry} returns
+     * {@link DateTimeConverter#JAR}.
+     *
+     * @return {@link DateTimeConverter#JAR}
+     */
     @Override
     protected DateTimeConverter getDateTimeConverter() {
         return DateTimeConverter.JAR;
