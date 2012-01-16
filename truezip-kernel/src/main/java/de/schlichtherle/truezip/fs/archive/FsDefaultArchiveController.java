@@ -391,6 +391,13 @@ extends FsFileSystemArchiveController<E> {
     /**
      * Discards the file system, closes the input archive and finally the
      * output archive.
+     * Note that this order is critical: The parent file system controller is
+     * expected to replace the entry for the target archive file with the
+     * output archive when it gets closed, so this must be done last.
+     * Using a finally block ensures that this is done even in the unlikely
+     * event of an exception when closing the input archive.
+     * Note that in this case closing the output archive is likely to fail and
+     * override the IOException thrown by this method, too.
      *
      * @param  handler the exception handling strategy for consuming input
      *         {@code FsSyncException}s and/or assembling output
