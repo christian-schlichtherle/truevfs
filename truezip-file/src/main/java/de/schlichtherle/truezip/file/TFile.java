@@ -84,22 +84,25 @@ import net.jcip.annotations.Immutable;
  * not work.
  * This limitation is designed to prevent ambiguous method semantics.
  *
- * <a name="directDataCopying"/><h4>Direct Data Copying (DDC)</h4>
+ * <a name="directDataCopying"/><a name="RDC"/><h4>Raw Data Copying (RDC)</h4>
+ * <p>
+ * <i>[Note that this feature has been renamed from Direct Data Copying (DDC)
+ *    to Raw Data Copying (RDC) in TrueZIP 7.4.4.]</i>
  * <p>
  * If data is copied from an archive file to another archive file of the
- * same type, some of the copy methods support a feature called <i>Direct Data
- * Copying</i> (DDC) to achieve best performance:</a>
- * DDC copies the raw data from the source archive entry to the destination
- * archive entry without the need to temporarily reproduce, copy and process
- * the original data again.
+ * same type, some of the copy methods support a feature called <i>Raw Data
+ * Copying</i> (RDC) to achieve best performance:</a>
+ * With RDC, the raw entry data is copied from the source archive to the
+ * destination archive without the need to temporarily reproduce, copy and
+ * process the original data again.
  * <p>
  * The benefits of this feature are archive driver specific:
- * In case of ZIP compatible files with compressed entries, this avoids the
- * need to inflate the data from the source entry just to deflate it again for
- * the destination entry.
- * In case of TAR compatible files, it avoids the need to create an
- * additional temporary file, but shows no impact otherwise because the TAR
- * file format doesn't support compression.
+ * In case of ZIP files with compressed entries, this avoids the need to
+ * inflate the data from the source entry just to deflate it again for the
+ * destination entry.
+ * In case of TAR files, it avoids the need to create an additional temporary
+ * file, but shows no impact otherwise because the TAR file format doesn't
+ * support compression.
  *
  * <a name="traversal"><h3>Traversing Directory Trees</h3></a>
  * <p>
@@ -2866,7 +2869,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -2924,7 +2927,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>No</td>
      * </tr>
      * <tr>
@@ -2990,7 +2993,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>No</td>
      * </tr>
      * <tr>
@@ -3064,7 +3067,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3154,7 +3157,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3259,7 +3262,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3384,7 +3387,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3455,7 +3458,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3525,7 +3528,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3593,7 +3596,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#directDataCopying">Direct Data Copying (DDC)</a></td>
+     *   <td><a href="#RDC">Raw Data Copying (RDC)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
