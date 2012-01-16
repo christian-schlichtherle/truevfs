@@ -64,7 +64,7 @@ extends IOSocket<E, Entry> {
      * @return {@code this}
      */
     public final OutputSocket<E> bind(@CheckForNull final OutputSocket<?> to) {
-        this.peer = null == to ? null : to.peer;
+        this.peer = null != to ? to.peer : null;
         return this;
     }
 
