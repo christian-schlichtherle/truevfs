@@ -389,7 +389,8 @@ extends FsFileSystemArchiveController<E> {
     }
 
     /**
-     * Discards the file system and closes the output and input archive.
+     * Discards the file system, closes the input archive and finally the
+     * output archive.
      *
      * @param  handler the exception handling strategy for consuming input
      *         {@code FsSyncException}s and/or assembling output
