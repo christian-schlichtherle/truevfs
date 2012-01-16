@@ -8,12 +8,7 @@
  */
 package de.schlichtherle.truezip.fs.sample;
 
-import de.schlichtherle.truezip.fs.FsCompositeDriver;
-import de.schlichtherle.truezip.fs.FsDefaultDriver;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.FsUriModifier;
+import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.io.Streams;
