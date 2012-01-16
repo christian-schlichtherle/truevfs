@@ -8,17 +8,17 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import java.io.CharConversionException;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.io.Paths.*;
 
 /**
  * An abstract base class of an archive driver which provides convenient
