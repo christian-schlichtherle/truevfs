@@ -26,8 +26,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Deprecated
-public class KeyManagementIT {
+public final class KeyManagementIT {
 
     private static final Logger logger = Logger.getLogger(
             KeyManagementIT.class.getName());
