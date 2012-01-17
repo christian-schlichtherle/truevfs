@@ -14,8 +14,12 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.drivers.ButtonDriver;
@@ -44,6 +48,49 @@ public class JemmyUtils {
     protected static final long WAIT_EMPTY = 100;
 
     static {
+        // FIXME: Make pushJemmyProperties() work and remove this static
+        // initializer!
+        setUpJemmyProperties();
+    }
+
+    //@BeforeClass
+    public static void pushJemmyProperties() throws InterruptedException {
+        // FIXME: This causes Operator.getDefaultVerification() to throw an NPE
+        // because the property "Operator.Verification" somehow hasn't been
+        // copied.
+        // Therefore, the JUnit annotation is currently commented out.
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    JemmyProperties.push();
+                    setUpJemmyProperties();
+                }
+            });
+        } catch (InvocationTargetException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    //@AfterClass
+    public static void popJemmyProperties() throws InterruptedException {
+        // FIXME: This causes Operator.getDefaultVerification() to throw an NPE
+        // because the property "Operator.Verification" somehow hasn't been
+        // copied.
+        // Therefore, the JUnit annotation is currently commented out.
+        try {
+            EventQueue.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    JemmyProperties.pop();
+                }
+            });
+        } catch (InvocationTargetException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    public static void setUpJemmyProperties() {
         JemmyProperties.setCurrentOutput(TestOut.getNullOutput()); // shut up!
         // These calls use the pushed properties.
         DriverManager.setButtonDriver(new AtomicButtonDriver());
