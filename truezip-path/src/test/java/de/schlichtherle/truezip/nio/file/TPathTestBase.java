@@ -140,7 +140,7 @@ extends TestBase<D> {
         assertFalsePositive(entry);
         delete(archive);
 
-        createDirectory(newNonArchivePath(archive));
+        createDirectory(archive.getNonArchivePath());
         assertFalsePositive(entry);
         delete(archive);
     }
@@ -190,7 +190,7 @@ extends TestBase<D> {
 
         // Create directory false positive.
 
-        createDirectory(newNonArchivePath(file));
+        createDirectory(file.getNonArchivePath());
         assertTrue(exists(file));
         assertTrue(isDirectory(file));
         assertFalse(isRegularFile(file));
@@ -356,7 +356,7 @@ extends TestBase<D> {
             };
             TPath file = archive;
             for (int i = 0; i <= names.length; i++) {
-                final TPath file2 = newNonArchivePath(file);
+                final TPath file2 = file.getNonArchivePath();
                 createDirectory(file2);
                 assertIllegalDirectoryOperations(file2);
                 delete(file2);
@@ -434,7 +434,7 @@ extends TestBase<D> {
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        delete(newNonArchivePath(archive)); // use plain file to delete instead!
+        delete(archive.getNonArchivePath()); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
@@ -539,7 +539,7 @@ extends TestBase<D> {
                 }
             }
 
-            delete(newNonArchivePath(archive));
+            delete(archive.getNonArchivePath());
         } finally {
             // Closing the invalidated stream explicitly should be OK.
             in1.close();
@@ -924,7 +924,7 @@ extends TestBase<D> {
         assertCopyDelete(archive, names, 0);
         delete(archive);
 
-        createDirectory(newNonArchivePath(archive)); // create false positive archive file
+        createDirectory(archive.getNonArchivePath()); // create false positive archive file
         assertCopyDelete(archive, names, 0);
         delete(archive);
     }
@@ -941,7 +941,7 @@ extends TestBase<D> {
         assertCopyDelete(dir, names, off + 1); // continue recursion
         delete(dir);
 
-        createDirectory(newNonArchivePath(dir)); // create false positive archive file
+        createDirectory(dir.getNonArchivePath()); // create false positive archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
         delete(dir);
@@ -1061,7 +1061,7 @@ extends TestBase<D> {
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        delete(newNonArchivePath(archive)); // use plain file to delete instead!
+        delete(archive.getNonArchivePath()); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
@@ -1150,7 +1150,7 @@ extends TestBase<D> {
             in1.close();
         }
         archive.toFile().rm_r();
-        assertFalse(exists(newNonArchivePath(archive)));
+        assertFalse(exists(archive.getNonArchivePath()));
     }
     
     @Test
@@ -1175,7 +1175,7 @@ extends TestBase<D> {
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final TPath tmp = newNonArchivePath(archive);
+        final TPath tmp = archive.getNonArchivePath();
         final InputStream in = new ByteArrayInputStream(data);
         copy(in, tmp);
         assertRenameArchiveToTemp(archive);
@@ -1190,7 +1190,7 @@ extends TestBase<D> {
         TPath tmp = new TPath(Files.createTempFile(TEMP_FILE_PREFIX, null));
         delete(tmp);
         assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchivePath(tmp)));
+        assertFalse(exists(tmp.getNonArchivePath()));
 
         // Now rename the archive to the temporary path.
         // Depending on the true state of the object "archive", this will
@@ -1198,12 +1198,12 @@ extends TestBase<D> {
         // plain file (iff archive is a false positive).
         archive.toFile().mv(tmp.toFile());
         assertFalse(exists(archive));
-        assertFalse(exists(newNonArchivePath(archive)));
+        assertFalse(exists(archive.getNonArchivePath()));
 
         // Now delete resulting temporary file or directory.
         tmp.toFile().rm_r();
         assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchivePath(tmp)));
+        assertFalse(exists(tmp.getNonArchivePath()));
     }
 
     @Test
@@ -1247,11 +1247,11 @@ extends TestBase<D> {
     private void assertRenameTo(TPath src, TPath dst) throws IOException {
         assertTrue(exists(src));
         assertFalse(exists(dst));
-        assertFalse(exists(newNonArchivePath(dst)));
+        assertFalse(exists(dst.getNonArchivePath()));
         assert TConfig.get().isLenient();
         src.toFile().mv(dst.toFile());
         assertFalse(exists(src));
-        assertFalse(exists(newNonArchivePath(src)));
+        assertFalse(exists(src.getNonArchivePath()));
         assertTrue(exists(dst));
     }
 
@@ -1268,7 +1268,7 @@ extends TestBase<D> {
 
         assertNull(listFiles(dir));
         assertNull(listFiles(dir2));
-        assertNull(listFiles(newNonArchivePath(dir2)));
+        assertNull(listFiles(dir2.getNonArchivePath()));
 
         delete(dir);
 
@@ -1332,7 +1332,7 @@ extends TestBase<D> {
         } // CheckAllEntriesTaskFactory
 
         try {
-            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads);
+            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads).close();
         } finally {
             archive.toFile().rm_r();
         }
@@ -1388,22 +1388,20 @@ extends TestBase<D> {
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesWriting()
     throws Exception {
-        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_IO_THREADS, false);
-        assertMultithreadedSingleArchiveMultipleEntriesWriting(archive, NUM_IO_THREADS, true);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(false);
+        assertMultithreadedSingleArchiveMultipleEntriesWriting(true);
     }
     
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
-            final TPath archive,
-            final int nThreads,
             final boolean wait)
-            throws Exception {
+    throws Exception {
         assertTrue(TConfig.get().isLenient());
         
         class WritingTask implements Callable<Void> {
             final TPath entry;
             
-            WritingTask(final int threadNum) {
-                this.entry = archive.resolve(threadNum + "");
+            WritingTask(final int no) {
+                this.entry = archive.resolve(no + "");
             }
             
             @Override
@@ -1437,9 +1435,9 @@ extends TestBase<D> {
         } // WritingTaskFactory
 
         try {
-            runConcurrent(new WritingTaskFactory(), nThreads);
+            runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
         } finally {
-            assertArchiveEntries(archive, nThreads);
+            assertArchiveEntries(archive, NUM_IO_THREADS);
             archive.toFile().rm_r();
         }
     }
@@ -1447,12 +1445,11 @@ extends TestBase<D> {
     @Test
     public final void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
-        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_IO_THREADS, false);
-        assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_IO_THREADS, true);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(false);
+        assertMultithreadedMultipleArchivesSingleEntryWriting(true);
     }
 
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
-            final int nThreads,
             final boolean updateIndividually)
     throws Exception {
         assertTrue(TConfig.get().isLenient());
@@ -1494,17 +1491,71 @@ extends TestBase<D> {
 
         class WritingTaskFactory implements TaskFactory {
             @Override
-            public Callable<Void> newTask(int threadNum) {
+            public Callable<Void> newTask(int no) {
                 return new WritingTask();
             }
         } // WritingTaskFactory
 
-        runConcurrent(new WritingTaskFactory(), nThreads);
+        runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
+    }
+
+    //@Test
+    public void testMultithreadedMutualArchiveCopying() throws Exception {
+        assertTrue(TConfig.get().isLenient());
+
+        class CopyingTask implements Callable<Void> {
+            final TPath src, dst;
+
+            CopyingTask(final TPath src,
+                        final TPath dst,
+                        final int no) {
+                this.src = src  .resolve(src.getFileName())
+                                .getNonArchivePath()
+                                .resolve(Integer.toString(no));
+                this.dst = dst  .resolve(dst.getFileName())
+                                .getNonArchivePath()
+                                .resolve(Integer.toString(no));
+            }
+
+            @Override
+            public Void call() throws IOException {
+                createTestFile(src);
+                copy(src, dst, StandardCopyOption.REPLACE_EXISTING);
+                return null;
+            }
+        } // CopyingTask
+
+        class CopyingTaskFactory implements TaskFactory {
+            final TPath src, dst;
+
+            CopyingTaskFactory(final TPath src, final TPath dst) {
+                this.src = src;
+                this.dst = dst;
+            }
+
+            @Override
+            public Callable<Void> newTask(final int no) {
+                return new CopyingTask(src, dst, no);
+            }
+        } // CopyingTaskFactory
+
+        final TPath src = archive;
+        final TPath dst = new TPath(createTempFile());
+        delete(dst);
+
+        final AutoCloseable closeable
+                = runConcurrent(new CopyingTaskFactory(src, dst), NUM_IO_THREADS);
+        try {
+            runConcurrent(new CopyingTaskFactory(dst, src), NUM_IO_THREADS)
+                    .close();
+        } finally {
+            closeable.close();
+        }
     }
 
     @Test
     public void testGrowing() throws IOException {
-        final TPath path = newNonArchivePath(archive);
+        final TPath path = archive.getNonArchivePath();
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
 

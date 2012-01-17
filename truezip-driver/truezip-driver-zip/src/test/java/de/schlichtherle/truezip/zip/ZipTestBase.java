@@ -411,7 +411,7 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
         } // CheckAllEntriesTaskFactory
 
         try {
-            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads);
+            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads).close();
         } finally {
             zin.close();
         }

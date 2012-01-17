@@ -68,7 +68,7 @@ public abstract class FsCharsetArchiveDriverTestBase {
             }
         } // TestTaskFactory
 
-        runConcurrent(new TestTaskFactory(), NUM_IO_THREADS);
+        runConcurrent(new TestTaskFactory(), NUM_IO_THREADS).close();
     }
 
     private static final class ByteArrayIOPoolProvider
