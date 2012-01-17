@@ -101,6 +101,16 @@ public class JemmyUtils {
         }
     }
 
+    /**
+     * This driver posts an event for execution on the EDT which will in turn
+     * create a series of AWT events to simulate the respective GUI gesture
+     * (press, release and push).
+     * In multithreaded environments, this will help to prevent mixing of AWT
+     * events when two or more threads are concurrently clicking on some
+     * {@link ComponentOperator}s.
+     * The AWT events must not get mixed because otherwise a component would
+     * not recognize the respective GUI gesture and ignore the AWT events.
+     */
     private static final class AtomicButtonDriver
     extends LightSupportiveDriver
     implements ButtonDriver {
@@ -141,6 +151,12 @@ public class JemmyUtils {
         }
     } // AtomicButtonDriver
 
+    /**
+     * The idea of this driver is conceptually the same as with
+     * {@link AtomicButtonDriver}.
+     * However, using it may dead lock the tests for some reason, so it's
+     * currently unused.
+     */
     private static final class AtomicTextDriver
     extends LightSupportiveDriver
     implements TextDriver {
