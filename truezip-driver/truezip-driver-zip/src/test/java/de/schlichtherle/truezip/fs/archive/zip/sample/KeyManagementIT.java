@@ -25,8 +25,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Deprecated
-public class KeyManagementIT {
+public final class KeyManagementIT {
 
     private static final String PREFIX = "tzp";
     private static final String SUFFIX = "eaff";
