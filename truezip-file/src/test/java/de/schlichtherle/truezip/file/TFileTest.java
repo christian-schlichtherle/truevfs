@@ -44,15 +44,15 @@ public class TFileTest extends MockTestBase {
     private TFile archive;
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         super.setUp();
         archive = new TFile("archive" + getSuffix());
     }
 
     @Override
-    public void tearDown() throws Exception {
+    public void tearDown() throws IOException {
         try {
-            assertFalse(new File("archive" + getSuffix()).exists());
+            assert !new File("archive" + getSuffix()).exists();
         } finally {
             super.tearDown();
         }

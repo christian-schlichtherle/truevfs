@@ -77,7 +77,7 @@ extends TestBase<D> {
     private byte[] data;
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         super.setUp();
         temp = createTempFile();
         TFile.rm(temp);
@@ -96,22 +96,15 @@ extends TestBase<D> {
     }
 
     @Override
-    public void tearDown() throws Exception {
+    public void tearDown() throws IOException {
         try {
-            // sync now to delete temps and free memory.
-            // This prevents subsequent warnings about left over temporary files
-            // and removes cached data from the memory, so it helps to start on a
-            // clean sheet of paper with subsequent tests.
             try {
                 umount();
-            } catch (FsSyncException ex) {
-                logger.log(Level.WARNING, ex.toString(), ex);
             } finally {
                 archive = null;
+                if (temp.exists() && !temp.delete())
+                    throw new IOException(temp + " (could not delete)");
             }
-
-            if (temp.exists() && !temp.delete())
-                logger.log(Level.WARNING, "{0} (could not delete)", temp);
         } finally {
             super.tearDown();
         }
@@ -177,9 +170,9 @@ extends TestBase<D> {
         assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
         TFile.umount(new TFile(entry).getInnerArchive());
         Reference<? extends FsController<?>> ref;
-        do {
+        while (null == (ref = queue.remove(TIMEOUT_MILLIS))) {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
-        } while (null == (ref = queue.remove(TIMEOUT_MILLIS)));
+        }
         assert exp == ref;
         assert null == exp.get();
     }
@@ -556,14 +549,18 @@ extends TestBase<D> {
 
             // Open file1 as stream and let the garbage collection close the stream automatically.
             new TFileInputStream(file1);
-            gc();
 
-            // This operation should complete without any exception if the garbage
-            // collector did its job.
-            try {
-                umount(); // allow external modifications!
-            } catch (FsSyncWarningException ex) {
-                fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
+            while (true) {
+                try {
+                    // This operation should succeed without any exception if
+                    // the garbage collector did its job.
+                    umount(); // allow external modifications!
+                    break;
+                } catch (FsSyncWarningException ex) {
+                    // The garbage collector hasn't been collecting the open
+                    // stream. Let's try to trigger it.
+                    System.gc();
+                }
             }
 
             TFile.rm(newNonArchiveFile(archive));
@@ -660,14 +657,18 @@ extends TestBase<D> {
         // Reopen stream and let the garbage collection close the stream automatically.
         new TFileOutputStream(file1);
         out = null;
-        gc();
         
-        // This update should complete without any exception if the garbage
-        // collector did its job.
-        try {
-            umount();
-        } catch (FsSyncWarningException ex) {
-            fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
+        while (true) {
+            try {
+                // This update should succeed without any exception if the
+                // garbage collector did its job.
+                umount(); // allow external modifications!
+                break;
+            } catch (FsSyncWarningException ex) {
+                // The garbage collector hasn't been collecting the open
+                // stream. Let's try to trigger it.
+                System.gc();
+            }
         }
         
         // Cleanup.
@@ -1357,24 +1358,15 @@ extends TestBase<D> {
         assertTrue(TFile.isLenient());
 
         class WritingTask implements Callable<Void> {
-            final int threadNum;
+            final TFile entry;
 
             WritingTask(final int threadNum) {
-                this.threadNum = threadNum;
+                this.entry = new TFile(archive, threadNum + "");
             }
 
             @Override
             public Void call() throws IOException {
-                final TFile file = new TFile(archive, threadNum + "");
-                OutputStream out;
-                while (true) {
-                    try {
-                        out = new TFileOutputStream(file);
-                        break;
-                    } catch (FileBusyException busy) {
-                        continue;
-                    }
-                }
+                final OutputStream out = new TFileOutputStream(entry);
                 try {
                     out.write(data);
                 } finally {
@@ -1433,9 +1425,9 @@ extends TestBase<D> {
             public Void call() throws IOException {
                 final TFile archive = new TFile(createTempFile());
                 archive.rm();
-                final TFile file = new TFile(archive, "entry");
+                final TFile entry = new TFile(archive, "entry");
                 try {
-                    final OutputStream out = new TFileOutputStream(file);
+                    final OutputStream out = new TFileOutputStream(entry);
                     try {
                         out.write(data);
                     } finally {
@@ -1476,6 +1468,38 @@ extends TestBase<D> {
         } // WritingTaskFactory
 
         runConcurrent(new WritingTaskFactory(), nThreads);
+    }
+
+    //@Test
+    public void testMultithreadedMutualArchiveCopying() {
+        assertTrue(TFile.isLenient());
+
+        class CopyingTask implements Callable<Void> {
+            final TFile entry;
+
+            CopyingTask(final TFile archive, final int threadNum) {
+                this.entry = new TFile(archive, threadNum + "");
+            }
+
+            @Override
+            public Void call() throws IOException {
+                assert false;
+                return null;
+            }
+        } // CopyingTask
+
+        class CopyingTaskFactory implements TaskFactory {
+            final TFile archive;
+
+            CopyingTaskFactory(final TFile archive) {
+                this.archive = archive;
+            }
+
+            @Override
+            public Callable<Void> newTask(final int threadNum) {
+                return new CopyingTask(archive, threadNum);
+            }
+        } // CopyingTaskFactory
     }
 
     @Test

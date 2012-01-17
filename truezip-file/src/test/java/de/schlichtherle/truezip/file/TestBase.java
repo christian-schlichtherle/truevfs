@@ -16,6 +16,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +67,7 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         final D driver = newArchiveDriver();
         final TArchiveDetector detector
                 = new TArchiveDetector(getSuffixList(), driver);
@@ -81,7 +82,7 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() throws IOException {
         TConfig.pop();
     }
 

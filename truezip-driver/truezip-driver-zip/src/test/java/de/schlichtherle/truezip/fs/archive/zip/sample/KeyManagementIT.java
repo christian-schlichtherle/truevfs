@@ -1,41 +1,37 @@
 /*
- * Copyright (C) 2011 Schlichtherle IT Services
+ * Copyright 2004-2012 Schlichtherle IT Services
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
+package de.schlichtherle.truezip.fs.archive.zip.sample;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import static de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTest.roundTripTest;
-import java.io.File;
-import java.io.IOException;
+import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.file.TFileOutputStream;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @deprecated Just because the unit under test has been deprecated.
- * @author     Christian Schlichtherle
- * @version    $Id$
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
 @Deprecated
-public class KeyManagementTest {
-
-    private static final Logger logger = Logger.getLogger(
-            KeyManagementTest.class.getName());
+public class KeyManagementIT {
 
     private static final String PREFIX = "tzp";
     private static final String SUFFIX = "eaff";
     private static final String PASSWORD = "secret";
+    private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
     private static final Random rnd = new Random();
 
@@ -64,18 +60,13 @@ public class KeyManagementTest {
     }
 
     @After
-    public void tearDown() {
-        // sync now to delete temps and free memory.
-        // This prevents subsequent warnings about left over temporary files
-        // and removes cached data from the memory, so it helps to start on a
-        // clean sheet of paper with subsequent tests.
+    public void tearDown() throws IOException {
         try {
             TFile.umount();
-        } catch (FsSyncException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
+        } finally {
+            if (temp.exists() && !temp.delete())
+                throw new IOException(temp + " (could not delete)");
         }
-        if (temp.exists() && !temp.delete())
-            logger.log(Level.WARNING, "{0} (could not delete)", temp);
     }
 
     @Test
@@ -83,7 +74,7 @@ public class KeyManagementTest {
         TArchiveDetector detector = KeyManagement.newArchiveDetector1(
                 TFile.getDefaultArchiveDetector(),
                 SUFFIX,
-                PASSWORD.toCharArray());
+                PASSWORD.getBytes(US_ASCII));
         roundTripTest(new TFile(temp, detector), data);
     }
 
@@ -94,5 +85,24 @@ public class KeyManagementTest {
                 SUFFIX,
                 PASSWORD.toCharArray());
         roundTripTest(new TFile(temp, detector), data);
+    }
+
+    public static void roundTripTest(TFile archive, byte[] data)
+    throws IOException {
+        TFile file = new TFile(archive, "entry");
+        OutputStream out = new TFileOutputStream(file);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
+        }
+        out = new ByteArrayOutputStream(data.length);
+        InputStream in = new TFileInputStream(file);
+        try {
+            TFile.cat(in, out);
+        } finally {
+            in.close();
+        }
+        Arrays.equals(data, ((ByteArrayOutputStream) out).toByteArray());
     }
 }

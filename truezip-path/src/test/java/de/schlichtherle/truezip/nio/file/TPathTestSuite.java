@@ -79,7 +79,7 @@ extends TestBase<D> {
     private byte[] data;
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         super.setUp();
         temp = createTempFile();
         delete(temp);
@@ -106,26 +106,14 @@ extends TestBase<D> {
     }
 
     @Override
-    public void tearDown() throws Exception {
+    public void tearDown() throws IOException {
         try {
-            // sync now to delete temps and free memory.
-            // This prevents subsequent warnings about left over temporary files
-            // and removes cached data from the memory, so it helps to start on a
-            // clean sheet of paper with subsequent tests.
             try {
                 umount();
-            } catch (FsSyncException ex) {
-                logger.log(Level.WARNING, ex.toString(), ex);
             } finally {
                 archive = null;
-            }
-
-            if (exists(temp)) {
-                try {
+                if (exists(temp))
                     delete(temp);                
-                } catch (IOException ex) {
-                    logger.log(Level.WARNING, "{0} (could not delete)", temp);
-                }
             }
         } finally {
             super.tearDown();
@@ -537,14 +525,18 @@ extends TestBase<D> {
 
             // Open file1 as stream and let the garbage collection close the stream automatically.
             newInputStream(file1);
-            gc();
 
-            // This operation should complete without any exception if the garbage
-            // collector did its job.
-            try {
-                umount(); // allow external modifications!
-            } catch (FsSyncWarningException ex) {
-                fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
+            while (true) {
+                try {
+                    // This operation should succeed without any exception if
+                    // the garbage collector did its job.
+                    umount(); // allow external modifications!
+                break;
+                } catch (FsSyncWarningException ex) {
+                    // The garbage collector hasn't been collecting the open
+                    // stream. Let's try to trigger it.
+                    System.gc();
+                }
             }
 
             delete(newNonArchivePath(archive));
@@ -639,14 +631,18 @@ extends TestBase<D> {
         // Reopen stream and let the garbage collection close the stream automatically.
         newOutputStream(file1);
         out = null;
-        gc();
         
-        // This update should complete without any exception if the garbage
-        // collector did its job.
-        try {
-            umount();
-        } catch (FsSyncWarningException ex) {
-            fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
+        while (true) {
+            try {
+                // This operation should succeed without any exception if
+                // the garbage collector did its job.
+                umount(); // allow external modifications!
+                break;
+            } catch (FsSyncWarningException ex) {
+                // The garbage collector hasn't been collecting the open
+                // stream. Let's try to trigger it.
+                System.gc();
+            }
         }
         
         // Cleanup.
@@ -1402,24 +1398,15 @@ extends TestBase<D> {
         assertTrue(TConfig.get().isLenient());
         
         class WritingTask implements Callable<Void> {
-            final int threadNum;
+            final TPath entry;
             
-            WritingTask(int threadNum) {
-                this.threadNum = threadNum;
+            WritingTask(final int threadNum) {
+                this.entry = archive.resolve(threadNum + "");
             }
             
             @Override
             public Void call() throws IOException {
-                final TPath file = archive.resolve(threadNum + "");
-                OutputStream out;
-                while (true) {
-                    try {
-                        out = newOutputStream(file);
-                        break;
-                    } catch (FileBusyException busy) {
-                        continue;
-                    }
-                }
+                final OutputStream out = newOutputStream(entry);
                 try {
                     out.write(data);
                 } finally {
@@ -1478,9 +1465,9 @@ extends TestBase<D> {
             public Void call() throws IOException {
                 final TPath archive = new TPath(createTempFile());
                 delete(archive);
-                final TPath file = archive.resolve("entry");
+                final TPath entry = archive.resolve("entry");
                 try {
-                    final OutputStream out = newOutputStream(file);
+                    final OutputStream out = newOutputStream(entry);
                     try {
                         out.write(data);
                     } finally {
