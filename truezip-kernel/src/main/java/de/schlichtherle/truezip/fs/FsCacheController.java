@@ -70,7 +70,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsCachingController
+public final class FsCacheController
 extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
 
@@ -85,12 +85,12 @@ extends FsLockModelDecoratingController<
             controllers = new HashMap<FsEntryName, EntryController>();
 
     /**
-     * Constructs a new content caching file system controller.
+     * Constructs a new file system cache controller.
      *
-     * @param controller the decorated concurrent file system controller.
-     * @param pool the pool of temporary entries to hold the copied entry data.
+     * @param controller the decorated file system controller.
+     * @param pool the pool of I/O buffers to hold the cached entry contents.
      */
-    public FsCachingController(
+    public FsCacheController(
             final FsController<? extends FsLockModel> controller,
             final IOPool<?> pool) {
         super(controller);

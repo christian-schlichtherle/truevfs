@@ -47,7 +47,7 @@ import net.jcip.annotations.NotThreadSafe;
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsAccountingController
+public final class FsResourceController
 extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
 
@@ -62,9 +62,9 @@ extends FsLockModelDecoratingController<
     /**
      * Constructs a new file system resource controller.
      *
-     * @param controller the decorated concurrent file system controller.
+     * @param controller the decorated file system controller.
      */
-    public FsAccountingController(
+    public FsResourceController(
             FsController<? extends FsLockModel> controller) {
         super(controller);
     }
@@ -239,14 +239,14 @@ extends FsLockModelDecoratingController<
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsAccountingController controller,
+                    FsResourceController controller,
                     InputSocket<?> input) {
                 return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsAccountingController controller,
+                    FsResourceController controller,
                     OutputSocket<?> output) {
                 return controller.new Output(output);
             }
@@ -255,25 +255,25 @@ extends FsLockModelDecoratingController<
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsAccountingController controller,
+                    FsResourceController controller,
                     InputSocket<?> input) {
                 return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsAccountingController controller,
+                    FsResourceController controller,
                     OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsAccountingController controller,
+                FsResourceController controller,
                 InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsAccountingController controller,
+                FsResourceController controller,
                 OutputSocket <?> output);
     } // SocketFactory
 

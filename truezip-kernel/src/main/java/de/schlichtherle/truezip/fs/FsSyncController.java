@@ -55,7 +55,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             : SocketFactory.OIO;
 
     /**
-     * Constructs a new sync file system controller.
+     * Constructs a new file system sync controller.
      *
      * @param controller the decorated file system controller.
      */

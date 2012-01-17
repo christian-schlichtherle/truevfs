@@ -50,7 +50,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsLockingController
+public final class FsLockController
 extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
 
@@ -62,11 +62,11 @@ extends FsLockModelDecoratingController<
     private volatile @CheckForNull WriteLock writeLock;
 
     /**
-     * Constructs a new lock file system controller.
+     * Constructs a new file system lock controller.
      *
      * @param controller the decorated file system controller.
      */
-    public FsLockingController(FsController<? extends FsLockModel> controller) {
+    public FsLockController(FsController<? extends FsLockModel> controller) {
         super(controller);
     }
 
@@ -327,14 +327,14 @@ extends FsLockModelDecoratingController<
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsLockingController controller,
+                    FsLockController controller,
                     InputSocket<?> input) {
                 return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsLockingController controller,
+                    FsLockController controller,
                     OutputSocket<?> output) {
                 return controller.new Output(output);
             }
@@ -343,25 +343,25 @@ extends FsLockModelDecoratingController<
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsLockingController controller,
+                    FsLockController controller,
                     InputSocket<?> input) {
                 return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsLockingController controller,
+                    FsLockController controller,
                     OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsLockingController controller,
+                FsLockController controller,
                 InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsLockingController controller,
+                FsLockController controller,
                 OutputSocket <?> output);
     } // SocketFactory
 
