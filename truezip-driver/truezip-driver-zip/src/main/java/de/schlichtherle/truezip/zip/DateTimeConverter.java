@@ -73,7 +73,8 @@ public enum DateTimeConverter {
         TimeZone newTimeZone() {
             TimeZone tz = TimeZone.getDefault();
             tz = new SimpleTimeZone(
-                    tz.getRawOffset() + tz.getDSTSavings(),
+                    // See http://java.net/jira/browse/TRUEZIP-191 .
+                    tz.getOffset(System.currentTimeMillis()),
                     tz.getID());
             assert !tz.useDaylightTime();
             return tz;
