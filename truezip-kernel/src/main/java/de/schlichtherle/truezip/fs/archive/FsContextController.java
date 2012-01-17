@@ -55,7 +55,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
             contexts = new HashMap<BitField<FsOutputOption>, FsOperationContext>();
 
     /**
-     * Constructs a new context file system controller.
+     * Constructs a new file system context controller.
      *
      * @param controller the decorated file system controller.
      */

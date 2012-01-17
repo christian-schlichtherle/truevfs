@@ -86,7 +86,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     private volatile @CheckForNull FsPath path;
 
     /**
-     * Constructs a new file system federating controller.
+     * Constructs a new false positive file system controller.
      *
      * @param controller the decorated file system controller.
      */

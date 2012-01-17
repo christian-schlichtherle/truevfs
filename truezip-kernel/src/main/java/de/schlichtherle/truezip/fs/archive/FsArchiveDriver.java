@@ -152,10 +152,10 @@ extends FsDriver {
         assert !(model instanceof FsLockModel);
         final FsLockModel lmodel = new FsLockModel(model);
         return  new FsSyncController<FsLockModel>(
-                    new FsLockingController(
-                        new FsUnlinkingController(
-                            new FsCachingController(
-                                new FsAccountingController(
+                    new FsLockController(
+                        new FsUnlinkController(
+                            new FsCacheController(
+                                new FsResourceController(
                                     new FsContextController(
                                         new FsDefaultArchiveController<E>(
                                                 lmodel, parent, this))),
