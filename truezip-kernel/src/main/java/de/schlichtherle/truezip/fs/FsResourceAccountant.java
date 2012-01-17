@@ -149,10 +149,9 @@ public final class FsResourceAccountant {
             while (threadLocalResources() < allResources()) {
                 if (0 < timeout) {
                     final long toWait = timeout - (System.currentTimeMillis() - start);
-                    if (0 >= toWait)
+                    if (0 >= toWait
+                            || !condition.await(toWait, TimeUnit.MILLISECONDS))
                         break;
-                    if (!condition.await(toWait, TimeUnit.MILLISECONDS))
-                        return allResources();
                 } else {
                     condition.await();
                 }
