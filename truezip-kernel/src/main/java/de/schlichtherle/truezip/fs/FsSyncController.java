@@ -146,6 +146,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         while (true) {
             try {
                 delegate.setReadOnly(name);
+                return;
             } catch (FsNeedsSyncException ex) {
                 delegate.sync(SYNC);
             }
