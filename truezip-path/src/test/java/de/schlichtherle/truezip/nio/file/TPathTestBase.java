@@ -1339,17 +1339,19 @@ extends TestBase<D> {
     }
 
     private void createTestArchive(final int nEntries) throws IOException {
-        for (int i = 0; i < nEntries; i++) {
-            final TPath entry = new TPath(archive.toString(), i + "");
-            final OutputStream out = newOutputStream(entry);
-            try {
-                out.write(data);
-            } finally {
-                out.close();
-            }
-        }
+        for (int i = 0; i < nEntries; i++)
+            createTestFile(new TPath(archive.toString(), i + ""));
     }
     
+    private void createTestFile(final TPath path) throws IOException {
+        final OutputStream out = newOutputStream(path);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
+        }
+    }
+
     private void assertArchiveEntries(final TPath archive, int nEntries)
     throws IOException {
         // Retrieve list of entries and shuffle their order.
@@ -1406,12 +1408,7 @@ extends TestBase<D> {
             
             @Override
             public Void call() throws IOException {
-                final OutputStream out = newOutputStream(entry);
-                try {
-                    out.write(data);
-                } finally {
-                    out.close();
-                }
+                createTestFile(entry);
                 try {
                     TFile.umount(archive.toFile(), wait, false, wait, false);
                 } catch (FsSyncException ex) {
@@ -1467,12 +1464,7 @@ extends TestBase<D> {
                 delete(archive);
                 final TPath entry = archive.resolve("entry");
                 try {
-                    final OutputStream out = newOutputStream(entry);
-                    try {
-                        out.write(data);
-                    } finally {
-                        out.close();
-                    }
+                    createTestFile(entry);
                     try {
                         if (updateIndividually)
                             archive.getFileSystem().close();
