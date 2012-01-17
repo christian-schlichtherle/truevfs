@@ -29,7 +29,7 @@ import org.netbeans.jemmy.util.NameComponentChooser;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
+public abstract class KeyPanelTestBase<P extends KeyPanel> extends JemmyUtils {
     private static final ComponentChooser
             KEY_FILE_CHOOSER = new NameComponentChooser("keyFileChooser");
 
@@ -84,7 +84,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
         final JFileChooserOperator fc = new TFileChooserOperator(frame);
         fc.chooseFile(NON_EXISTING_FILE);
-        fc.getQueueTool().waitEmpty();
+        fc.getQueueTool().waitEmpty(WAIT_EMPTY);
         assertTrue(isBlank(error.getText()));
     }
 
@@ -100,7 +100,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
         JFileChooserOperator fc = new TFileChooserOperator(frame);
         fc.chooseFile(NON_EXISTING_FILE);
-        fc.getQueueTool().waitEmpty();
+        fc.getQueueTool().waitEmpty(WAIT_EMPTY);
         assertTrue(isBlank(error.getText()));
         assertFalse(updateParam(param));
         assertFalse(isBlank(error.getText()));

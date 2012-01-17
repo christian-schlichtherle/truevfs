@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.file.zip.raes;
 
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.file.TFileTestBase;
 import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
 import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
+public final class ZipRaesFileIT extends TFileTestBase<TestZipRaesDriver> {
 
     private @Nullable MockView<AesCipherParameters> view;
 

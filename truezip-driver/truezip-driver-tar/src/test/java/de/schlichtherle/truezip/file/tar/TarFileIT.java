@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarFileIT extends TarFileTestSuite<TarDriver> {
+public final class TarFileIT extends TarFileTestBase<TarDriver> {
 
     @Override
     protected String getSuffixList() {

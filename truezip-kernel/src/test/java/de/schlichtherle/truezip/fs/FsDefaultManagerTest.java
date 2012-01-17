@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.util.Link.Type;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FsDefaultManagerTest extends FsManagerTestSuite {
+public class FsDefaultManagerTest extends FsManagerTestBase {
 
     @Override
     protected FsManager newManager(Type type) {

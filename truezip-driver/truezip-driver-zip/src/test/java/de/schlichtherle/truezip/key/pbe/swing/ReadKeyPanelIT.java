@@ -18,7 +18,7 @@ import org.netbeans.jemmy.operators.JPasswordFieldOperator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ReadKeyPanelIT extends KeyPanelTestSuite<ReadKeyPanel> {
+public final class ReadKeyPanelIT extends KeyPanelTestBase<ReadKeyPanel> {
 
     @Override
     protected ReadKeyPanel newKeyPanel() {

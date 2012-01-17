@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.file.TFileTestBase;
 import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
@@ -20,7 +20,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
+public final class WinZipAesFileIT extends TFileTestBase<TestWinZipAesDriver> {
 
     private @Nullable MockView<AesPbeParameters> view;
 

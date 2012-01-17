@@ -9,13 +9,13 @@
 package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import de.schlichtherle.truezip.nio.file.TPathTestBase;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class OdfPathIT extends TPathTestSuite<OdfDriver> {
+public final class OdfPathIT extends TPathTestBase<OdfDriver> {
 
     @Override
     protected String getSuffixList() {
