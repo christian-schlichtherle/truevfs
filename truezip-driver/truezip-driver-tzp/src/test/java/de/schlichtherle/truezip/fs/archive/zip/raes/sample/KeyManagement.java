@@ -35,13 +35,9 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * programmatically instead of prompting the user for a key by means of the
  * default Swing or Console based user interfaces.
  *
- * @deprecated This sample code should <em>not</em> be considered part of the
- *             public API.
- *             If you want to use it, then copy it, don't call it!
- * @author     Christian Schlichtherle
- * @version    $Id$
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
-@Deprecated
 @DefaultAnnotation(NonNull.class)
 public final class KeyManagement {
 

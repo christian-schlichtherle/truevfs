@@ -13,6 +13,7 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,7 +33,7 @@ public class TFileSystemProviderTest extends MockTestBase {
     private TFileSystemProvider provider;
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         super.setUp();
         try {
             provider = TFileSystemProvider.class.newInstance();

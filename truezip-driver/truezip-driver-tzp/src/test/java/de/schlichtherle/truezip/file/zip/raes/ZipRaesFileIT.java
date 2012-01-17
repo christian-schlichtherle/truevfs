@@ -42,7 +42,7 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
     }
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         this.view = new MockView<AesCipherParameters>();
         super.setUp();
         final AesCipherParameters key = new AesCipherParameters();
@@ -52,9 +52,12 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
     }
 
     @Override
-    public void tearDown() throws Exception {
-        view.setAction(ENTER);
-        super.tearDown();
+    public void tearDown() throws IOException {
+        try {
+            view.setAction(ENTER);
+        } finally {
+            super.tearDown();
+        }
     }
 
     @Test

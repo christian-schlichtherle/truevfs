@@ -14,6 +14,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.IOException;
 
 /**
  * @author  Christian Schlichtherle
@@ -34,7 +35,7 @@ public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
     }
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         this.view = new MockView<AesPbeParameters>();
         super.setUp();
         final TConfig config = TConfig.get();
