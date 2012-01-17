@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
+import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -364,8 +365,8 @@ extends FsLockModelDecoratingController<
                 OutputSocket <?> output);
     } // SocketFactory
 
-    private final class Nio2Input
-    extends Input {
+    @NotThreadSafe
+    private final class Nio2Input extends Input {
         Nio2Input(InputSocket<?> input) {
             super(input);
         }
@@ -382,14 +383,24 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Input
 
-    private class Input
-    extends DecoratingInputSocket<Entry> {
+    @NotThreadSafe
+    private class Input extends DecoratingInputSocket<Entry> {
+        Entry local;
+
         Input(InputSocket<?> input) {
             super(input);
         }
 
         @Override
         public Entry getLocalTarget() throws IOException {
+            // Caching the local target prevents a dead lock in complex nested
+            // archive file copying scenarios.
+            // Skip it and run the integration tests concurrently to watch the
+            // effect.
+            return null != local ? local : (local = getLocalTarget0());
+        }
+
+        Entry getLocalTarget0() throws IOException {
             try {
                 readLock().lock();
                 try {
@@ -437,8 +448,8 @@ extends FsLockModelDecoratingController<
         }
     } // Input
 
-    private final class Nio2Output
-    extends Output {
+    @NotThreadSafe
+    private final class Nio2Output extends Output {
         Nio2Output(OutputSocket<?> output) {
             super(output);
         }
@@ -455,14 +466,24 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Output
 
-    private class Output
-    extends DecoratingOutputSocket<Entry> {
+    @NotThreadSafe
+    private class Output extends DecoratingOutputSocket<Entry> {
+        Entry local;
+
         Output(OutputSocket<?> output) {
             super(output);
         }
 
         @Override
         public Entry getLocalTarget() throws IOException {
+            // Caching the local target prevents a dead lock in complex nested
+            // archive file copying scenarios.
+            // Skip it and run the integration tests concurrently to watch the
+            // effect.
+            return null != local ? local : (local = getLocalTarget0());
+        }
+
+        Entry getLocalTarget0() throws IOException {
             assertNotReadLockedByCurrentThread(null);
             writeLock().lock();
             try {
