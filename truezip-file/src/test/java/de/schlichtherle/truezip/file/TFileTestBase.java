@@ -1300,14 +1300,16 @@ extends TestBase<D> {
     }
     
     private void createTestArchive(final int nEntries) throws IOException {
-        for (int i = 0; i < nEntries; i++) {
-            final TFile entry = new TFile(archive, i + "");
-            final OutputStream out = new TFileOutputStream(entry);
-            try {
-                out.write(data);
-            } finally {
-                out.close();
-            }
+        for (int i = 0; i < nEntries; i++)
+            createTestFile(new TFile(archive, i + ""));
+    }
+
+    private void createTestFile(final TFile file) throws IOException {
+        final OutputStream out = new TFileOutputStream(file);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
         }
     }
 
@@ -1366,12 +1368,7 @@ extends TestBase<D> {
 
             @Override
             public Void call() throws IOException {
-                final OutputStream out = new TFileOutputStream(entry);
-                try {
-                    out.write(data);
-                } finally {
-                    out.close();
-                }
+                createTestFile(entry);
                 try {
                     TFile.umount(archive, wait, false, wait, false);
                 } catch (FsSyncException ex) {
@@ -1406,7 +1403,7 @@ extends TestBase<D> {
             TFile.rm_r(archive);
         }
     }
-    
+
     @Test
     public final void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
@@ -1427,12 +1424,7 @@ extends TestBase<D> {
                 archive.rm();
                 final TFile entry = new TFile(archive, "entry");
                 try {
-                    final OutputStream out = new TFileOutputStream(entry);
-                    try {
-                        out.write(data);
-                    } finally {
-                        out.close();
-                    }
+                    createTestFile(entry);
                     try {
                         if (updateIndividually)
                             TFile.umount(archive);
@@ -1483,7 +1475,7 @@ extends TestBase<D> {
 
             @Override
             public Void call() throws IOException {
-                assert false;
+                createTestFile(entry);
                 return null;
             }
         } // CopyingTask
