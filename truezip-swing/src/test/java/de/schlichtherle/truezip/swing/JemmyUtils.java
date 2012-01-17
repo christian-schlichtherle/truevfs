@@ -48,14 +48,14 @@ public class JemmyUtils {
     protected static final long WAIT_EMPTY = 100;
 
     static {
-        // FIXME: Make pushJemmyProperties() work and remove this static
+        // TODO: Make pushJemmyProperties() work and remove this static
         // initializer!
         setUpJemmyProperties();
     }
 
     //@BeforeClass
     public static void pushJemmyProperties() throws InterruptedException {
-        // FIXME: This causes Operator.getDefaultVerification() to throw an NPE
+        // TODO: This causes Operator.getDefaultVerification() to throw an NPE
         // because the property "Operator.Verification" somehow hasn't been
         // copied.
         // Therefore, the JUnit annotation is currently commented out.
@@ -74,7 +74,7 @@ public class JemmyUtils {
 
     //@AfterClass
     public static void popJemmyProperties() throws InterruptedException {
-        // FIXME: This causes Operator.getDefaultVerification() to throw an NPE
+        // TODO: This causes Operator.getDefaultVerification() to throw an NPE
         // because the property "Operator.Verification" somehow hasn't been
         // copied.
         // Therefore, the JUnit annotation is currently commented out.
