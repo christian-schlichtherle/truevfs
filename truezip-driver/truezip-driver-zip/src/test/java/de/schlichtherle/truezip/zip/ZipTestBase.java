@@ -33,10 +33,10 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
+public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
 
     private static final Logger logger
-            = Logger.getLogger(ZipTestSuite.class.getName());
+            = Logger.getLogger(ZipTestBase.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 

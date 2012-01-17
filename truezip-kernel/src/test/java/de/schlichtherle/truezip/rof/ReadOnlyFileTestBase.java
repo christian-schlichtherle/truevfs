@@ -31,10 +31,10 @@ import org.junit.Test;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public abstract class ReadOnlyFileTestSuite {
+public abstract class ReadOnlyFileTestBase {
 
     private static final Logger logger = Logger.getLogger(
-            ReadOnlyFileTestSuite.class.getName());
+            ReadOnlyFileTestBase.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 

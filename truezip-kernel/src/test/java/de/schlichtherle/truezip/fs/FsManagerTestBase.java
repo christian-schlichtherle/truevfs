@@ -11,7 +11,6 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.fs.spi.DummyDriverService;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link.Type;
-import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
@@ -26,7 +25,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsManagerTestSuite {
+public abstract class FsManagerTestBase {
 
     private final FsCompositeDriver driver
             = new FsDefaultDriver(new DummyDriverService("file|zip"));

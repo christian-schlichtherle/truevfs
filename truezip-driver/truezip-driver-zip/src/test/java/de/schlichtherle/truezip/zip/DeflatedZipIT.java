@@ -14,7 +14,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.DEFLATED;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class DeflatedZipIT extends ZipTestSuite {
+public final class DeflatedZipIT extends ZipTestBase {
     @Override
     public ZipEntry newEntry(String name) {
         ZipEntry entry = new ZipEntry(name);

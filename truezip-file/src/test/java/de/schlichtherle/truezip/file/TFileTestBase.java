@@ -6,12 +6,9 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.nio.file;
+package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.file.TestBase;
+import de.schlichtherle.truezip.fs.FsController;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
@@ -19,7 +16,6 @@ import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.OutputClosedException;
-import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
@@ -30,10 +26,13 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import static java.io.File.separatorChar;
 import java.io.*;
-import static java.nio.file.Files.*;
-import java.nio.file.*;
-import java.nio.file.attribute.FileTime;
-import java.util.*;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,26 +43,25 @@ import org.junit.Test;
 
 /**
  * Performs integration testing of a particular {@link FsArchiveDriver}
- * by using the API of the TrueZIP Path module.
+ * by using the API of the TrueZIP File* module.
  *
- * @see     TFileTestSuite Test suite for the TrueZIP File* API.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public abstract class TPathTestSuite<D extends FsArchiveDriver<?>>
+public abstract class TFileTestBase<D extends FsArchiveDriver<?>>
 extends TestBase<D> {
 
     private static final Logger logger = Logger.getLogger(
-            TPathTestSuite.class.getName());
+            TFileTestBase.class.getName());
 
     /**
      * The prefix for temporary files, which is {@value}.
-     * This value should identify the TrueZIP Path module in order to
+     * This value should identify the TrueZIP File* module in order to
      * ensure that no two temporary files are shared between tests of the
      * TrueZIP Path API and the TrueZIP File* API.
      */
-    private static final String TEMP_FILE_PREFIX = "tzp-path";
+    private static final String TEMP_FILE_PREFIX = "tzp-file";
 
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
@@ -74,35 +72,27 @@ extends TestBase<D> {
     protected static final IOPoolProvider
             IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
 
-    private Path temp;
-    private TPath archive;
+    private File temp;
+    private TFile archive;
     private byte[] data;
 
     @Override
     public void setUp() throws IOException {
         super.setUp();
         temp = createTempFile();
-        delete(temp);
-        archive = new TPath(temp);
+        TFile.rm(temp);
+        archive = new TFile(temp);
         data = DATA.clone();
     }
 
-    private Path createTempFile() throws IOException {
-        // TODO: Removing .toRealPath() causes archive.toFile().rm_r() to
+    private File createTempFile() throws IOException {
+        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
-        return Files.createTempFile(TEMP_FILE_PREFIX, getSuffix()).toRealPath();
+        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
-    protected final TPath getArchive() {
+    protected final TFile getArchive() {
         return archive;
-    }
-
-    protected final byte[] getData() {
-        return data.clone();
-    }
-
-    protected final int getDataLength() {
-        return data.length;
     }
 
     @Override
@@ -112,8 +102,8 @@ extends TestBase<D> {
                 umount();
             } finally {
                 archive = null;
-                if (exists(temp))
-                    delete(temp);                
+                if (temp.exists() && !temp.delete())
+                    throw new IOException(temp + " (could not delete)");
             }
         } finally {
             super.tearDown();
@@ -122,11 +112,69 @@ extends TestBase<D> {
 
     private void umount() throws FsSyncException {
         if (null != archive)
-            archive.getFileSystem().close();
+            TFile.umount(archive);
     }
 
-    protected static TPath newNonArchivePath(TPath path) {
-        return path.getNonArchivePath();
+    protected static TFile newNonArchiveFile(TFile file) {
+        return file.getNonArchiveFile();
+    }
+
+    @Test
+    public void testArchiveControllerStateWithInputStream()
+    throws IOException, InterruptedException {
+        assertArchiveControllerStateWithResource(
+                new Factory<InputStream, String, IOException>() {
+            @Override
+            public InputStream create(String entry) throws IOException {
+                return new TFileInputStream(entry);
+            }
+        });
+    }
+
+    @Test
+    public void testArchiveControllerStateWithOutputStream()
+    throws IOException, InterruptedException {
+        assertArchiveControllerStateWithResource(
+                new Factory<OutputStream, String, IOException>() {
+            @Override
+            public OutputStream create(String entry) throws IOException {
+                return new TFileOutputStream(entry);
+            }
+        });
+    }
+
+    private interface Factory<O, P, E extends Exception> {
+        O create(P param) throws E;
+    }
+
+    private void assertArchiveControllerStateWithResource(
+            final Factory<? extends Closeable, ? super String, ? extends IOException> factory)
+    throws IOException, InterruptedException {
+        final String entry = archive.getPath() + "/entry";
+        archive = null;
+        assertTrue(new TFile(entry).createNewFile());
+        TFile.umount(new TFile(entry).getInnerArchive());
+        Closeable resource = factory.create(entry);
+        final ReferenceQueue<FsController<?>> queue
+                = new ReferenceQueue<FsController<?>>();
+        final Reference<FsController<?>> exp
+                = new WeakReference<FsController<?>>(
+                    new TFile(entry).getInnerArchive().getController(), queue);
+        System.gc();
+        assertNull(queue.remove(TIMEOUT_MILLIS));
+        assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
+        resource.close();
+        resource = null; // leave now!
+        System.gc();
+        assertNull(queue.remove(TIMEOUT_MILLIS));
+        assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
+        TFile.umount(new TFile(entry).getInnerArchive());
+        Reference<? extends FsController<?>> ref;
+        while (null == (ref = queue.remove(TIMEOUT_MILLIS))) {
+            System.gc(); // triggering GC in a loop seems to help with concurrency!
+        }
+        assert exp == ref;
+        assert null == exp.get();
     }
 
     @Test
@@ -134,25 +182,25 @@ extends TestBase<D> {
         assertFalsePositive(archive);
 
         // Dito for entry.
-        final TPath entry = archive.resolve("entry" + getSuffix());
+        final TFile entry = new TFile(archive, "entry" + getSuffix());
 
-        createDirectory(archive);
+        assertTrue(archive.mkdir());
         assertFalsePositive(entry);
-        delete(archive);
+        archive.rm();
 
-        createDirectory(newNonArchivePath(archive));
+        assertTrue(newNonArchiveFile(archive).mkdir());
         assertFalsePositive(entry);
-        delete(archive);
+        archive.rm();
     }
 
-    private void assertFalsePositive(final TPath file) throws IOException {
+    private void assertFalsePositive(final TFile file) throws IOException {
         assert file.isArchive();
 
         // Note that file's parent directory may be a directory in the host file system!
 
         // Create file false positive.
         {
-            OutputStream out = newOutputStream(file);
+            OutputStream out = new TFileOutputStream(file);
             try {
                 out.write(data);
             } finally {
@@ -162,7 +210,7 @@ extends TestBase<D> {
 
         // Overwrite.
         {
-            OutputStream out = newOutputStream(file);
+            OutputStream out = new TFileOutputStream(file);
             try {
                 out.write(data);
             } finally {
@@ -170,15 +218,15 @@ extends TestBase<D> {
             }
         }
 
-        assertTrue(exists(file));
-        assertFalse(isDirectory(file));
-        assertTrue(isRegularFile(file));
-        assertEquals(data.length, size(file));
-        assertTrue(getLastModifiedTime(file).toMillis() > 0);
+        assertTrue(file.exists());
+        assertFalse(file.isDirectory());
+        assertTrue(file.isFile());
+        assertEquals(data.length, file.length());
+        assertTrue(file.lastModified() > 0);
 
         // Read back portion
         {
-            InputStream in = newInputStream(file);
+            InputStream in = new TFileInputStream(file);
             try {
                 byte[] buf = new byte[data.length];
                 assertTrue(ArrayHelper.equals(data, 0, buf, 0, in.read(buf)));
@@ -190,72 +238,64 @@ extends TestBase<D> {
 
         // Create directory false positive.
 
-        createDirectory(newNonArchivePath(file));
-        assertTrue(exists(file));
-        assertTrue(isDirectory(file));
-        assertFalse(isRegularFile(file));
+        assertTrue(newNonArchiveFile(file).mkdir());
+        assertTrue(file.exists());
+        assertTrue(file.isDirectory());
+        assertFalse(file.isFile());
         //assertEquals(0, file.getLength());
-        assertTrue(getLastModifiedTime(file).toMillis() > 0);
+        assertTrue(file.lastModified() > 0);
 
         try {
-            newInputStream(archive).close();
+            new TFileInputStream(archive).close();
             if ('\\' == separatorChar)
                 fail();
-        } catch (IOException ex) {
-            if ('\\' != separatorChar && !archive.isArchive())
+        } catch (FileNotFoundException ex) {
+            if ('\\' != separatorChar && !archive.isArchive() && !archive.isEntry())
                 throw ex;
         }
 
         try {
-            newOutputStream(archive).close();
+            new TFileOutputStream(archive).close();
             fail();
-        } catch (IOException expected) {
+        } catch (FileNotFoundException expected) {
         }
 
         assertRm(file);
 
         // Create regular archive file.
 
-        createDirectory(file);
-        assertTrue(exists(file));
-        assertTrue(isDirectory(file));
-        assertFalse(isRegularFile(file));
+        assertTrue(file.mkdir());
+        assertTrue(file.exists());
+        assertTrue(file.isDirectory());
+        assertFalse(file.isFile());
         //assertEquals(0, file.getLength());
-        assertTrue(getLastModifiedTime(file).toMillis() > 0);
+        assertTrue(file.lastModified() > 0);
 
         try {
-            newInputStream(archive).close();
+            new TFileInputStream(archive).close();
             if ('\\' == separatorChar)
                 fail();
-        } catch (IOException ex) {
-            if ('\\' != separatorChar && !archive.isArchive() && !archive.isEntry())
+        } catch (FileNotFoundException ex) {
+            if ('\\' != separatorChar && !archive.isArchive())
                 throw ex;
         }
 
         try {
-            newOutputStream(archive).close();
+            new TFileOutputStream(archive).close();
             fail();
-        } catch (IOException expected) {
+        } catch (FileNotFoundException expected) {
         }
 
         assertRm(file);
     }
 
-    private void assertRm(final TPath file) throws IOException {
-        delete(file);
-        assertFalse(exists(file));
-        assertFalse(isDirectory(file));
-        assertFalse(isRegularFile(file));
-        try {
-            size(file);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
-        try {
-            getLastModifiedTime(file);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
+    private void assertRm(final TFile file) throws IOException {
+        file.rm();
+        assertFalse(file.exists());
+        assertFalse(file.isDirectory());
+        assertFalse(file.isFile());
+        assertEquals(0, file.length());
+        assertFalse(file.lastModified() > 0);
     }
 
     @Test
@@ -266,12 +306,12 @@ extends TestBase<D> {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewPlainFile() throws IOException {
-        final Path archive = createTempFile();
-        delete(archive);
-        final Path file1 = archive.resolve("test.txt");
-        final Path file2 = file1.resolve("test.txt");
+        final File archive = createTempFile();
+        TFile.rm(archive);
+        final File file1 = new File(archive, "test.txt");
+        final File file2 = new File(file1, "test.txt");
         try {
-            createFile(file1);
+            file1.createNewFile();
             fail("Creating a file in a non-existent directory should throw an IOException!");
         } catch (IOException expected) {
         }
@@ -280,13 +320,13 @@ extends TestBase<D> {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewEnhancedFile() throws IOException {
-        final TPath file1 = archive.resolve("test.txt");
-        final TPath file2 = file1.resolve("test.txt");
+        final File file1 = new TFile(archive, "test.txt");
+        final File file2 = new TFile(file1, "test.txt");
         TConfig config = TConfig.push();
         try {
             config.setLenient(false);
             try {
-                createFile(file1);
+                file1.createNewFile();
                 fail("Creating a file in a non-existent directory should throw an IOException!");
             } catch (IOException expected) {
             }
@@ -298,53 +338,45 @@ extends TestBase<D> {
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
-    private void assertCreateNewFile(   final Path dir,
-                                        final Path file1,
-                                        final Path file2)
+    private void assertCreateNewFile(   final File dir,
+                                        final File file1,
+                                        final File file2)
     throws IOException {
-        assertFalse(exists(dir));
+        assertFalse(dir.exists());
         
-        createDirectory(dir);
-        assertTrue(exists(dir));
-        assertTrue(isDirectory(dir));
-        assertFalse(isRegularFile(dir));
-        if (dir instanceof TPath) {
-            final TPath tdir = (TPath) dir;
+        assertTrue(dir.mkdir());
+        assertTrue(dir.exists());
+        assertTrue(dir.isDirectory());
+        assertFalse(dir.isFile());
+        if (dir instanceof TFile) {
+            final TFile tdir = (TFile) dir;
             if (tdir.isArchive() || tdir.isEntry())
-                assertEquals(0, size(dir));
+                assertEquals(0, dir.length());
         }
         
-        createFile(file1);
-        assertTrue(exists(file1));
-        assertFalse(isDirectory(file1));
-        assertTrue(isRegularFile(file1));
-        assertEquals(0, size(file1));
+        assertTrue(file1.createNewFile());
+        assertTrue(file1.exists());
+        assertFalse(file1.isDirectory());
+        assertTrue(file1.isFile());
+        assertEquals(0, file1.length());
         
         try {
-            createFile(file2);
+            file2.createNewFile();
             fail("Creating a file in another file should throw an IOException!");
         } catch (IOException expected) {
         }
         
-        delete(file1); // OK now!
-        assertFalse(exists(file1));
-        assertFalse(isDirectory(file1));
-        assertFalse(isRegularFile(file1));
-        try {
-            size(file1);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
+        TFile.rm(file1); // OK now!
+        assertFalse(file1.exists());
+        assertFalse(file1.isDirectory());
+        assertFalse(file1.isFile());
+        assertEquals(0, file1.length());
         
-        delete(dir);
-        assertFalse(exists(dir));
-        assertFalse(isDirectory(dir));
-        assertFalse(isRegularFile(dir));
-        try {
-            size(dir);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
+        TFile.rm(dir);
+        assertFalse(dir.exists());
+        assertFalse(dir.isDirectory());
+        assertFalse(dir.isFile());
+        assertEquals(0, dir.length());
     }
 
     @Test
@@ -354,69 +386,70 @@ extends TestBase<D> {
                 "inner" + getSuffix(),
                 "dir",
             };
-            TPath file = archive;
+            TFile file = archive;
             for (int i = 0; i <= names.length; i++) {
-                final TPath file2 = newNonArchivePath(file);
-                createDirectory(file2);
+                final TFile file2 = newNonArchiveFile(file);
+                assertTrue(file2.mkdir());
                 assertIllegalDirectoryOperations(file2);
-                delete(file2);
-                createDirectory(file);
+                file2.rm();
+                assertTrue(file.mkdir());
                 assertIllegalDirectoryOperations(file);
                 if (i < names.length)
-                    file = file.resolve(names[i]);
+                    file = new TFile(file, names[i]);
             }
         } finally {
-            archive.toFile().rm_r();
+            archive.rm_r();
         }
     }
 
-    private void assertIllegalDirectoryOperations(final TPath dir)
+    private void assertIllegalDirectoryOperations(final TFile dir)
     throws IOException {
-        assert isDirectory(dir);
+        assert dir.isDirectory();
         try {
-            newInputStream(dir).close();
+            new TFileInputStream(dir).close();
             if ('\\' == separatorChar)
                 fail();
-        } catch (IOException ex) {
+        } catch (FileNotFoundException ex) {
             if ('\\' != separatorChar && !dir.isArchive() && !dir.isEntry())
                 throw ex;
         }
         try {
-            newOutputStream(dir).close();
+            new TFileOutputStream(dir).close();
             fail();
-        } catch (IOException expected) {
+        } catch (FileNotFoundException expected) {
         }
-        Path tmp = Files.createTempFile(TEMP_FILE_PREFIX, null);
+        File tmp = TFile.createTempFile(TEMP_FILE_PREFIX, null);
         try {
             try {
-                copy(tmp, dir);
+                TFile.cp(tmp, dir);
                 fail();
-            } catch (FileAlreadyExistsException expected) {
+            } catch (IOException expected) {
             }
             try {
-                copy(dir, tmp);
+                TFile.cp(dir, tmp);
                 fail();
-            } catch (FileAlreadyExistsException expected) {
+            } catch (IOException expected) {
             }
         } finally {
-            delete(tmp);
+            TFile.rm(tmp);
         }
     }
 
     @Test
     public final void testStrictFileOutputStream() throws IOException {
-        TPath file = archive.resolve("test.txt");
+        TFile file = new TFile(archive, "test.txt");
+
         TConfig config = TConfig.push();
         try {
             config.setLenient(false);
             try {
                 assertFileOutputStream(file);
-                fail("Creating ghost directories should not be allowed when Path.isLenient() is false!");
-            } catch (IOException expected) {
+                fail("Creating ghost directories should not be allowed when File.isLenient() is false!");
+            } catch (FileNotFoundException expected) {
             }
-            createDirectory(archive);
+            assertTrue(archive.mkdir());
             assertFileOutputStream(file);
-            delete(archive);
+            archive.rm();
         } finally {
             config.close();
         }
@@ -424,89 +457,79 @@ extends TestBase<D> {
     
     @Test
     public final void testLenientFileOutputStream() throws IOException {
-        TPath file = archive.resolve("dir/inner" + getSuffix() + "/dir/test.txt");
+        TFile file = new TFile(archive, "dir/inner" + getSuffix() + "/dir/test.txt");
 
         assertFileOutputStream(file);
 
         try {
-            delete(archive);
+            archive.rm();
             fail("directory not empty");
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        delete(newNonArchivePath(archive)); // use plain file to delete instead!
-        assertFalse(exists(archive));
-        assertFalse(isDirectory(archive));
-        assertFalse(isRegularFile(archive));
-        try {
-            size(archive);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
+        TFile.rm(newNonArchiveFile(archive)); // use plain file to delete instead!
+        assertFalse(archive.exists());
+        assertFalse(archive.isDirectory());
+        assertFalse(archive.isFile());
+        assertEquals(0, archive.length());
     }
 
-    private void assertFileOutputStream(final TPath file) throws IOException {
+    private void assertFileOutputStream(final TFile file) throws IOException {
         final byte[] message = "Hello World!\r\n".getBytes();
-        final OutputStream out = newOutputStream(file);
+        
+        final OutputStream out = new TFileOutputStream(file);
         try {
-            assertTrue(exists(file));
-            assertFalse(isDirectory(file));
-            assertTrue(isRegularFile(file));
-            assertEquals(0, size(file));
+            assertTrue(file.exists());
+            assertFalse(file.isDirectory());
+            assertTrue(file.isFile());
+            assertEquals(0, file.length());
             out.write(message);
-            assertEquals(0, size(file));
+            assertEquals(0, file.length());
             out.flush();
-            assertEquals(0, size(file));
+            assertEquals(0, file.length());
         } finally {
             out.close();
         }
-        assertTrue(exists(file));
-        assertFalse(isDirectory(file));
-        assertTrue(isRegularFile(file));
-        assertEquals(message.length, size(file));
+        assertTrue(file.exists());
+        assertFalse(file.isDirectory());
+        assertTrue(file.isFile());
+        assertEquals(message.length, file.length());
         
-        try {
-            createFile(file);
-            fail();
-        } catch (FileAlreadyExistsException expected) {
-        }
-        assertTrue(exists(file));
-        assertFalse(isDirectory(file));
-        assertTrue(isRegularFile(file));
-        assertEquals(message.length, size(file));
+        assertFalse(file.createNewFile());
+        assertTrue(file.exists());
+        assertFalse(file.isDirectory());
+        assertTrue(file.isFile());
+        assertEquals(message.length, file.length());
         
-        delete(file);
-        assertFalse(exists(file));
-        assertFalse(isDirectory(file));
-        assertFalse(isRegularFile(file));
-        try {
-            size(file);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
+        file.rm();
+        assertFalse(file.exists());
+        assertFalse(file.isDirectory());
+        assertFalse(file.isFile());
+        assertEquals(0, file.length());
     }
     
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileInputStream() throws IOException, InterruptedException {
-        final TPath file1 = archive.resolve("file1");
-        final TPath file2 = archive.resolve("file2");
+        final TFile file1 = new TFile(archive, "file1");
+        final TFile file2 = new TFile(archive, "file2");
 
         // Test open output streams.
-        createFile(file1); // uses FsOutputOption.CACHE!
+        assertTrue(file1.createNewFile());
         umount(); // ensure file1 is really present in the archive file
-        createFile(file2); // uses FsOutputOption.CACHE!
-        final InputStream in1 = newInputStream(file1);
+        assertTrue(file2.createNewFile());
+        final InputStream in1 = new TFileInputStream(file1);
         try {
-            newInputStream(file2);
-            gc();
-
-            // This operation should complete without any exception if the garbage
-            // collector did its job.
             try {
-                copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
-            } catch (FsSyncWarningException ex) {
-                fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
+                new TFileInputStream(file2).close();
+                fail("Expected exception when reading an uncommitted entry of a busy archive file!");
+            } catch (FileNotFoundException ex) {
+                if (!(ex.getCause() instanceof FsSyncException)
+                        || !(ex.getCause().getCause() instanceof FileBusyException))
+                    throw ex;
             }
+            file2.input(in1);
 
             // in1 is still open!
             try {
@@ -516,22 +539,23 @@ extends TestBase<D> {
                 if (!(ex.getCause() instanceof FileBusyException))
                     throw ex;
             }
-            assertTrue(isRegularFile(file2));
+            assertTrue(file2.isFile());
             try {
-                copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
+                file2.input(in1);
                 fail("Expected exception when reading from entry input stream of an unmounted archive file!");
             } catch (IOException expected) {
+                assertFalse(file2.exists()); // previous op has removed file2!
             }
 
             // Open file1 as stream and let the garbage collection close the stream automatically.
-            newInputStream(file1);
+            new TFileInputStream(file1);
 
             while (true) {
                 try {
                     // This operation should succeed without any exception if
                     // the garbage collector did its job.
                     umount(); // allow external modifications!
-                break;
+                    break;
                 } catch (FsSyncWarningException ex) {
                     // The garbage collector hasn't been collecting the open
                     // stream. Let's try to trigger it.
@@ -539,7 +563,7 @@ extends TestBase<D> {
                 }
             }
 
-            delete(newNonArchivePath(archive));
+            TFile.rm(newNonArchiveFile(archive));
         } finally {
             // Closing the invalidated stream explicitly should be OK.
             in1.close();
@@ -547,67 +571,69 @@ extends TestBase<D> {
 
         // Cleanup.
         try {
-            delete(file2);
+            file2.rm();
             fail("already deleted externally");
         } catch (IOException expected) {
         }
-        assertFalse(exists(file2));
+        assertFalse(file2.exists());
         try {
-            delete(file1);
+            file1.rm();
             fail("already deleted externally");
         } catch (IOException expected) {
         }
-        assertFalse(exists(file1));
+        assertFalse(file1.exists());
     }
 
     @Test
     public final void testBusyFileOutputStream() throws IOException, InterruptedException {
-        TPath file1 = archive.resolve("file1");
-        TPath file2 = archive.resolve("file2");
+        TFile file1 = new TFile(archive, "file1");
+        TFile file2 = new TFile(archive, "file2");
         
         // Ensure that there are two entries in the archive.
         // This is used later to check whether the update operation knows
         // how to deal with updating an archive for which there is still
         // an open output stream.
-        OutputStream out = newOutputStream(file1);
+        OutputStream out = new TFileOutputStream(file1);
         try {
-            Streams.cat(new ByteArrayInputStream(data), out);
+            TFile.cat(new ByteArrayInputStream(data), out);
         } finally {
             out.close();
         }
         
-        out = newOutputStream(file2);
+        out = new TFileOutputStream(file2);
         try {
-            Streams.cat(new ByteArrayInputStream(data), out);
+            TFile.cat(new ByteArrayInputStream(data), out);
         } finally {
             out.close();
         }
         
         umount(); // ensure two entries in the archive
         
-        out = newOutputStream(file1);
-        Streams.cat(new ByteArrayInputStream(data), out);
+        out = new TFileOutputStream(file1);
+        TFile.cat(new ByteArrayInputStream(data), out);
         
         // out is still open!
         try {
-            newOutputStream(file1).close();
+            new TFileOutputStream(file1).close();
             fail("Expected synchronization exception when overwriting an unsynchronized entry of a busy archive file!");
-        } catch (FsSyncException ex) {
-            if (!(ex.getCause() instanceof FileBusyException))
+        } catch (FileNotFoundException ex) {
+            if (!(ex.getCause() instanceof FsSyncException)
+                    || !(ex.getCause().getCause() instanceof FileBusyException))
                     throw ex;
         }
 
         // out is still open!
         try {
-            newOutputStream(file2).close();
-        } catch (FsSyncException ex) {
-            if (!(ex.getCause() instanceof FileBusyException))
+            new TFileOutputStream(file2).close();
+        } catch (FileNotFoundException ex) {
+            if (!(ex.getCause() instanceof FsSyncException)
+                    || !(ex.getCause().getCause() instanceof FileBusyException))
                     throw ex;
             logger.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
         }
 
         // out is still open!
-        Streams.cat(new ByteArrayInputStream(data), out); // write again
+        TFile.cat(new ByteArrayInputStream(data), out); // write again
         
         // out is still open!
         try {
@@ -619,23 +645,23 @@ extends TestBase<D> {
         }
         
         try {
-            Streams.cat(new ByteArrayInputStream(data), out); // write again
+            TFile.cat(new ByteArrayInputStream(data), out); // write again
             fail("Expected exception when writing to entry output stream of an unmounted archive file!");
         } catch (OutputClosedException expected) {
         }
         
-        // The stream has been forcibly closed by TPath.update().
+        // The stream has been forcibly closed by TFile.update().
         // Another close is OK, though!
         out.close();
         
         // Reopen stream and let the garbage collection close the stream automatically.
-        newOutputStream(file1);
+        new TFileOutputStream(file1);
         out = null;
         
         while (true) {
             try {
-                // This operation should succeed without any exception if
-                // the garbage collector did its job.
+                // This update should succeed without any exception if the
+                // garbage collector did its job.
                 umount(); // allow external modifications!
                 break;
             } catch (FsSyncWarningException ex) {
@@ -646,267 +672,198 @@ extends TestBase<D> {
         }
         
         // Cleanup.
-        delete(file2);
-        assertFalse(exists(file2));
-        delete(file1);
-        assertFalse(exists(file1));
+        file2.rm();
+        assertFalse(file2.exists());
+        file1.rm();
+        assertFalse(file1.exists());
     }
     
     @Test
     public final void testMkdir() throws IOException {
-        final TPath dir1 = archive;
-        final TPath dir2 = dir1.resolve("dir");
-        final TPath dir3 = dir2.resolve("inner" + getSuffix());
-        final TPath dir4 = dir3.resolve("dir");
-        final TPath dir5 = dir4.resolve("nuts" + getSuffix());
-        final TPath dir6 = dir5.resolve("dir");
+        final TFile dir1 = archive;
+        final TFile dir2 = new TFile(dir1, "dir");
+        final TFile dir3 = new TFile(dir2, "inner" + getSuffix());
+        final TFile dir4 = new TFile(dir3, "dir");
+        final TFile dir5 = new TFile(dir4, "nuts" + getSuffix());
+        final TFile dir6 = new TFile(dir5, "dir");
         
-        assert TConfig.get().isLenient();
-
-        createDirectory(dir6); // create all at once! note archive is in current directory!
-
-        try {
-            createDirectory(dir6);
-            fail();
-        } catch (FileAlreadyExistsException expected) {
-        }
-        try {
-            createDirectory(dir5);
-            fail();
-        } catch (FileAlreadyExistsException expected) {
-        }
-        try {
-            createDirectory(dir4);
-            fail();
-        } catch (FileAlreadyExistsException expected) {
-        }
-        try {
-            createDirectory(dir3);
-            fail();
-        } catch (FileAlreadyExistsException expected) {
-        }
-        try {
-            createDirectory(dir2);
-            fail();
-        } catch (FileAlreadyExistsException expected) {
-        }
-        try {
-            createDirectory(dir1);
-            fail();
-        } catch (FileAlreadyExistsException expected) {
-        }
-
-        delete(dir6);
-        delete(dir5);
-        delete(dir4);
-        delete(dir3);
-        delete(dir2);
-        delete(dir1);
+        assert TFile.isLenient();
+        
+        assertTrue(dir6.mkdir()); // create all at once! note archive is in current directory!
+        
+        assertFalse(dir6.mkdir()); // exists already!
+        assertFalse(dir5.mkdir()); // exists already!
+        assertFalse(dir4.mkdir()); // exists already!
+        assertFalse(dir3.mkdir()); // exists already!
+        assertFalse(dir2.mkdir()); // exists already!
+        assertFalse(dir1.mkdir()); // exists already!
+        
+        dir6.rm();
+        dir5.rm();
+        dir4.rm();
+        dir3.rm();
+        dir2.rm();
+        dir1.rm();
 
         final TConfig config = TConfig.push();
         try {
             config.setLenient(false);
 
-            try {
-                createDirectory(dir6);
-                fail();
-            } catch (IOException expected) {
-            }
-            try {
-                createDirectory(dir5);
-                fail();
-            } catch (IOException expected) {
-            }
-            try {
-                createDirectory(dir4);
-                fail();
-            } catch (IOException expected) {
-            }
-            try {
-                createDirectory(dir3);
-                fail();
-            } catch (IOException expected) {
-            }
-            try {
-                createDirectory(dir2);
-                fail();
-            } catch (IOException expected) {
-            }
+            assertFalse(dir6.mkdir());
+            assertFalse(dir5.mkdir());
+            assertFalse(dir4.mkdir());
+            assertFalse(dir3.mkdir());
+            assertFalse(dir2.mkdir());
 
-            createDirectory(dir1);
-            createDirectory(dir2);
-            createDirectory(dir3);
-            createDirectory(dir4);
-            createDirectory(dir5);
-            createDirectory(dir6);
+            assertTrue(dir1.mkdir());
+            assertTrue(dir2.mkdir());
+            assertTrue(dir3.mkdir());
+            assertTrue(dir4.mkdir());
+            assertTrue(dir5.mkdir());
+            assertTrue(dir6.mkdir());
         } finally {
             config.close();
         }
 
-        delete(dir6);
-        delete(dir5);
-        delete(dir4);
-        delete(dir3);
-        delete(dir2);
-        delete(dir1);
+        dir6.rm();
+        dir5.rm();
+        dir4.rm();
+        dir3.rm();
+        dir2.rm();
+        dir1.rm();
     }
-
+    
     @Test
     public final void testDirectoryTree() throws IOException {
         assertDirectoryTree(
-                new TPath(System.getProperty("java.io.tmpdir")), // base directory
-                new TPath("dir/inner" + getSuffix() + "/dir/outer" + getSuffix() + "/" + archive.getFileName())); // this path is reversed!!!
+                new TFile(System.getProperty("java.io.tmpdir")), // base directory
+                new TFile("dir/inner" + getSuffix() + "/dir/outer" + getSuffix() + "/" + archive.getName())); // this path is reversed!!!
     }
 
-    private void assertDirectoryTree(TPath basePath, TPath reversePath)
+    private void assertDirectoryTree(TFile basePath, TFile reversePath)
     throws IOException {
         if (reversePath == null) {
             // We're at the leaf of the directory tree.
-            final TPath test = basePath.resolve("test.txt");
+            final TFile test = new TFile(basePath, "test.txt");
             //testCreateNewFile(basePath, test);
             assertFileOutputStream(test);
             return;
         }
-        final TPath member = basePath.resolve(reversePath.getFileName());
-        boolean created = false;
-        try {
-            createDirectory(member);
-            created = true;
-        } catch (FileAlreadyExistsException ex) {
-        }
-        final TPath children = reversePath.getParent();
+        final TFile member = new TFile(basePath, reversePath.getName());
+        final boolean created = member.mkdir();
+        final TFile children = reversePath.getParentFile();
         assertDirectoryTree(member, children);
-        assertListFiles(basePath, member.getFileName().toString());
-        assertTrue(exists(member));
-        assertTrue(isDirectory(member));
-        assertFalse(isRegularFile(member));
+        assertListFiles(basePath, member.getName());
+        assertTrue(member.exists());
+        assertTrue(member.isDirectory());
+        assertFalse(member.isFile());
         if (member.isArchive())
-            assertEquals(0, size(member));
+            assertEquals(0, member.length());
         if (created) {
-            delete(member);
-            assertFalse(exists(member));
-            assertFalse(isDirectory(member));
-            assertFalse(isRegularFile(member));
-            try {
-                size(member);
-                fail();
-            } catch (NoSuchFileException expected) {
-            }
+            member.rm();
+            assertFalse(member.exists());
+            assertFalse(member.isDirectory());
+            assertFalse(member.isFile());
+            assertEquals(0, member.length());
         }
     }
 
-    private void assertListFiles(final TPath dir, final String entry) throws IOException {
-        final Path[] files = listFiles(dir);
+    private void assertListFiles(final TFile dir, final String entry) {
+        final TFile[] files = dir.listFiles();
         boolean found = false;
-        for (Path file : files)
-            if (file.getFileName().toString().equals(entry))
+        for (TFile file : files)
+            if (file.getName().equals(entry))
                 found = true;
         if (!found)
             fail("No such entry: " + entry);
-    }
-
-    private static Path[] listFiles(final Path dir) throws IOException {
-        try {
-            final DirectoryStream<Path> stream = newDirectoryStream(dir);
-            try {
-                final List<Path> list = new LinkedList<Path>();
-                for (Path path : stream)
-                    list.add(path);
-                return list.toArray(new Path[list.size()]);
-            } finally {
-                stream.close();
-            }
-        } catch (NotDirectoryException ex) {
-            return null;
-        }
     }
 
     @Test
     public final void testInputOutput() throws IOException {
         assertInputOutput(archive);
         
-        final TPath archiveTest = archive.resolve("test");
+        final TFile archiveTest = new TFile(archive, "test");
         assertInputOutput(archiveTest);
         
-        final TPath archive2 = archive.resolve("inner" + getSuffix());
-        final TPath archive2Test = archive2.resolve("test");
+        final TFile archive2 = new TFile(archive, "inner" + getSuffix());
+        final TFile archive2Test = new TFile(archive2, "test");
         assertInputOutput(archive2Test);
-        delete(archive2);
-        delete(archive);
+        archive2.rm();
+        archive.rm();
     }
 
-    private void assertInputOutput(final TPath file) throws IOException {
+    private void assertInputOutput(final TFile file) throws IOException {
         assertInput(file);
         assertOutput(file);
-        delete(file);
+        file.rm();
     }
 
-    private void assertInput(TPath file) throws IOException {
+    private void assertInput(TFile file) throws IOException {
         InputStream in = new ByteArrayInputStream(data);
         try {
-            copy(in, file);
+            file.input(in);
         } finally {
             in.close();
         }
-        assertEquals(data.length, size(file));
+        assertEquals(data.length, file.length());
     }
-    
-    private void assertOutput(TPath file) throws IOException {
+
+    private void assertOutput(TFile file) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
         try {
-            copy(file, out);
-            assertTrue(Arrays.equals(data, out.toByteArray()));
+            file.output(out);
         } finally {
             out.close();
         }
+        assertTrue(Arrays.equals(data, out.toByteArray()));
     }
 
     @Test
     public final void testCopyContainingOrSameFiles() throws IOException {
-        assert !exists(archive);
+        assert !archive.exists();
         
-        final TPath dir = archive.getParent();
+        final TFile dir = archive.getParentFile();
         assertNotNull(dir);
-        final TPath entry = archive.resolve("entry");
+        final TFile entry = new TFile(archive, "entry");
         
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
         
-        copy(new ByteArrayInputStream(data), entry);
+        entry.input(new ByteArrayInputStream(data));
         
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
         
-        archive.toFile().rm_r();
-    }
-
-    private void assertCopyContainingOrSameFiles0(final TPath a, final TPath b)
-    throws IOException {
-        assertCopyContainingOrSameFiles1(a, b);
-        assertCopyContainingOrSameFiles1(a.toRealPath(), b);
-        assertCopyContainingOrSameFiles1(a, b.toRealPath());
-        assertCopyContainingOrSameFiles1(a.toRealPath(), b.toRealPath());
+        TFile.rm_r(archive);
     }
     
-    private void assertCopyContainingOrSameFiles1(final TPath a, final TPath b)
+    private void assertCopyContainingOrSameFiles0(final TFile a, final TFile b)
+    throws IOException {
+        assertCopyContainingOrSameFiles1(a, b);
+        assertCopyContainingOrSameFiles1(a.getCanOrAbsFile(), b);
+        assertCopyContainingOrSameFiles1(a, b.getCanOrAbsFile());
+        assertCopyContainingOrSameFiles1(a.getCanOrAbsFile(), b.getCanOrAbsFile());
+    }
+    
+    private void assertCopyContainingOrSameFiles1(final TFile a, final TFile b)
     throws IOException {
         try {
-            copy(a, a, StandardCopyOption.REPLACE_EXISTING);
+            TFile.cp(a, a);
             fail();
         } catch (IOException expected) {
         }
         try {
-            copy(a, b, StandardCopyOption.REPLACE_EXISTING);
+            TFile.cp(a, b);
             fail();
         } catch (IOException expected) {
         }
         try {
-            copy(b, a, StandardCopyOption.REPLACE_EXISTING);
+            TFile.cp(b, a);
             fail();
         } catch (IOException expected) {
         }
         try {
-            copy(b, b, StandardCopyOption.REPLACE_EXISTING);
+            TFile.cp(b, b);
             fail();
         } catch (IOException expected) {
         }
@@ -920,39 +877,39 @@ extends TestBase<D> {
             //"2" + getSuffix(),
         };
 
-        createDirectory(archive); // create valid archive file
+        assertTrue(archive.mkdir()); // create valid archive file
         assertCopyDelete(archive, names, 0);
-        delete(archive);
+        archive.rm();
 
-        createDirectory(newNonArchivePath(archive)); // create false positive archive file
+        assertTrue(newNonArchiveFile(archive).mkdir()); // create false positive archive file
         assertCopyDelete(archive, names, 0);
-        delete(archive);
+        archive.rm();
     }
 
-    private void assertCopyDelete(final TPath parent, String[] names, int off)
+    private void assertCopyDelete(final TFile parent, String[] names, int off)
     throws IOException {
         if (off >= names.length)
             return;
         
-        final TPath dir = parent.resolve(names[off]);
+        final TFile dir = new TFile(parent, names[off]);
 
-        createDirectory(dir); // create valid archive file
+        assertTrue(dir.mkdir()); // create valid archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
-        delete(dir);
+        dir.rm();
 
-        createDirectory(newNonArchivePath(dir)); // create false positive archive file
+        assertTrue(newNonArchiveFile(dir).mkdir()); // create false positive archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
-        delete(dir);
+        dir.rm();
     }
 
-    private void assertCopyDelete(final TPath parent, final TPath dir)
+    private void assertCopyDelete(final TFile parent, final TFile dir)
     throws IOException {
-        final TPath parentFile = parent.resolve("file");
-        final TPath parentArchive = parent.resolve("archive" + getSuffix());
-        final TPath dirFile = dir.resolve("file");
-        final TPath dirArchive = dir.resolve("archive" + getSuffix());
+        final TFile parentFile = new TFile(parent, "file");
+        final TFile parentArchive = new TFile(parent, "archive" + getSuffix());
+        final TFile dirFile = new TFile(dir, "file");
+        final TFile dirArchive = new TFile(dir, "archive" + getSuffix());
 
         assertCopyDelete0(dirFile, dirArchive);
         assertCopyDelete0(dirFile, parentFile);
@@ -966,7 +923,7 @@ extends TestBase<D> {
         assertCopyDelete0(dirArchive, parentArchive);
     }
 
-    private void assertCopyDelete0(TPath a, TPath b) throws IOException {
+    private void assertCopyDelete0(TFile a, TFile b) throws IOException {
         // This must be the granularity of the tested file system type PLUS
         // the granularity of the parent file system, i.e. the platform file system!
         // Note that older platform file systems and even ext4 (!) have a granularity
@@ -976,153 +933,149 @@ extends TestBase<D> {
         assertCopyDelete0(a, b, 2000 + 2000);
     }
 
-    private void assertCopyDelete0( final TPath a,
-                                    final TPath b,
+    private void assertCopyDelete0( final TFile a,
+                                    final TFile b,
                                     final long granularity)
     throws IOException {
         // Create a file with an old timestamp.
         final long time = System.currentTimeMillis();
         {
-            final OutputStream out = newOutputStream(a);
+            final OutputStream out = new TFileOutputStream(a);
             try {
                 out.write(data);
             } finally {
                 out.close();
             }
+            assertTrue(a.setLastModified(time - granularity));
         }
-        setLastModifiedTime(a, FileTime.fromMillis(time - granularity));
 
         // Test copy a to b.
-        copy(a, b, StandardCopyOption.REPLACE_EXISTING);
-        assertThat(size(b), is(size(a)));
-        assertThat(getLastModifiedTime(b).toMillis(), not(is(getLastModifiedTime(a).toMillis())));
-        copy(a, b, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-        assertThat(size(b), is(size(a)));
-        long almd = getLastModifiedTime(a).toMillis() / granularity * granularity;
-        long blmd = getLastModifiedTime(b).toMillis() / granularity * granularity;
-        long almu = (getLastModifiedTime(a).toMillis() + granularity - 1) / granularity * granularity;
-        long blmu = (getLastModifiedTime(b).toMillis() + granularity - 1) / granularity * granularity;
+        TFile.cp(a, b);
+        assertThat(b.length(), is(a.length()));
+        assertThat(b.lastModified(), not(is(a.lastModified())));
+        TFile.cp_p(a, b);
+        assertThat(b.length(), is(a.length()));
+        long almd = a.lastModified() / granularity * granularity;
+        long blmd = b.lastModified() / granularity * granularity;
+        long almu = (a.lastModified() + granularity - 1) / granularity * granularity;
+        long blmu = (b.lastModified() + granularity - 1) / granularity * granularity;
         assertTrue(almd == blmd || almu == blmu);
 
         // Test copy b to a.
-        copy(b, a, StandardCopyOption.REPLACE_EXISTING);
-        assertThat(size(a), is(size(b)));
-        assertThat(getLastModifiedTime(a).toMillis(), not(is(getLastModifiedTime(b).toMillis())));
-        copy(b, a, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-        assertThat(size(a), is(size(b)));
-        almd = getLastModifiedTime(a).toMillis() / granularity * granularity;
-        blmd = getLastModifiedTime(b).toMillis() / granularity * granularity;
-        almu = (getLastModifiedTime(a).toMillis() + granularity - 1) / granularity * granularity;
-        blmu = (getLastModifiedTime(b).toMillis() + granularity - 1) / granularity * granularity;
+        TFile.cp(b, a);
+        assertThat(a.length(), is(b.length()));
+        assertThat(a.lastModified(), not(is(b.lastModified())));
+        TFile.cp_p(b, a);
+        assertThat(a.length(), is(b.length()));
+        almd = a.lastModified() / granularity * granularity;
+        blmd = b.lastModified() / granularity * granularity;
+        almu = (a.lastModified() + granularity - 1) / granularity * granularity;
+        blmu = (b.lastModified() + granularity - 1) / granularity * granularity;
         assertTrue(almd == blmd || almu == blmu);
 
         // Check result.
         {
             final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
-            copy(a, out);
+            TFile.cp(a, out);
             assertTrue(Arrays.equals(data, out.toByteArray()));
         }
 
         // Cleanup.
-        delete(a);
-        delete(b);
+        a.rm();
+        b.rm();
     }
 
     @Test
     public final void testListPerformance() throws IOException {
-        createDirectory(archive);
+        assertTrue(archive.mkdir());
 
         int i, j;
         long time;
 
         time = System.currentTimeMillis();
         for (i = 0; i < 100; i++) {
-            TPath file = archive.resolve("" + i);
-            createFile(file);
+            TFile file = new TFile(archive, "" + i);
+            assertTrue(file.createNewFile());
         }
         time = System.currentTimeMillis() - time;
         logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{ i, time });
 
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++)
-            listFiles(archive);
+            archive.listFiles((FilenameFilter) null);
         time = System.currentTimeMillis() - time;
         logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{ j, time });
 
         time = System.currentTimeMillis();
         for (j = 0; j < 100; j++)
-            listFiles(archive);
+            archive.listFiles((FileFilter) null);
         time = System.currentTimeMillis() - time;
         logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{ j, time });
 
         try {
-            delete(archive);
+            archive.rm();
             fail("directory not empty");
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        delete(newNonArchivePath(archive)); // use plain file to delete instead!
-        assertFalse(exists(archive));
-        assertFalse(isDirectory(archive));
-        assertFalse(isRegularFile(archive));
-        try {
-            size(archive);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
+        TFile.rm(new File(archive.getPath())); // use plain file to delete instead!
+        assertFalse(archive.exists());
+        assertFalse(archive.isDirectory());
+        assertFalse(archive.isFile());
+        assertEquals(0, archive.length());
     }
-    
+
     @Test
     public final void testIllegalDeleteEntryWithOpenStream()
     throws IOException {
-        final TPath entry1 = archive.resolve("entry1");
-        final TPath entry2 = archive.resolve("entry2");
-        final OutputStream out1 = newOutputStream(entry1);
+        final TFile entry1 = new TFile(archive, "entry1");
+        final TFile entry2 = new TFile(archive, "entry2");
+        final OutputStream out1 = new TFileOutputStream(entry1);
         try {
             try {
-                delete(entry1);
+                entry1.rm();
                 fail();
             } catch (IOException expected) {
             }
             out1.write(data);
             try {
-                archive.toFile().rm_r();
+                archive.rm_r();
                 fail();
             } catch (IOException expected) {
             }
         } finally {
             out1.close();
         }
-        final OutputStream out2 = newOutputStream(entry2);
+        final OutputStream out2 = new TFileOutputStream(entry2);
         try {
             try {
-                delete(entry2);
+                entry2.rm();
                 fail();
             } catch (IOException expected) {
             }
             out2.write(data);
             try {
-                archive.toFile().rm_r();
+                archive.rm_r();
                 fail();
             } catch (IOException expected) {
             }
         } finally {
             out2.close();
         }
-        final InputStream in1 = newInputStream(entry1);
+        final InputStream in1 = new TFileInputStream(entry1); // does an auto update!
         try {
-            final InputStream in2 = newInputStream(entry2);
+            final InputStream in2 = new TFileInputStream(entry2);
             try {
-                delete(entry2);
+                entry2.rm();
                 final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
                 try {
-                    Streams.cat(in2, out);
+                    TFile.cat(in2, out);
                 } finally {
                     out.close();
                 }
                 assertTrue(Arrays.equals(data, out.toByteArray()));
                 try {
-                    archive.toFile().rm_r();
+                    archive.rm_r();
                     fail();
                 } catch (IOException expected) {
                 }
@@ -1130,33 +1083,35 @@ extends TestBase<D> {
                 in2.close();
             }
             try {
-                delete(entry1);
-                fail("deleted within archive.toFile().rm_r()");
+                entry1.rm();
+                fail("deleted within archive.rm_r()");
             } catch (IOException expected) {
             }
             final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
             try {
-                Streams.cat(in1, out);
+                TFile.cat(in1, out);
             } finally {
                 out.close();
             }
             assertTrue(Arrays.equals(data, out.toByteArray()));
             try {
-                archive.toFile().rm_r();
+                archive.rm_r();
                 fail();
             } catch (IOException expected) {
             }
         } finally {
             in1.close();
         }
-        archive.toFile().rm_r();
-        assertFalse(exists(newNonArchivePath(archive)));
+        archive.rm_r();
+        assertFalse(newNonArchiveFile(archive).exists());
     }
     
     @Test
     public final void testRenameValidArchive() throws IOException {
+        // Create a regular archive with a single archive entry which
+        // contains a creative greeting message.
         PrintStream out = new PrintStream(
-                newOutputStream(archive.resolve("entry")));
+                new TFileOutputStream(new TFile(archive, "entry")));
         try {
             out.println("Hello World!");
         } finally {
@@ -1168,57 +1123,57 @@ extends TestBase<D> {
     @Test
     public final void testRenameFalsePositive() throws IOException {
         // Create false positive archive.
-        // Note that archive is a TPath instance which returns isArchive()
-        // == true, so we must create a new TPath instance which is guaranteed
+        // Note that archive is a TFile instance which returns isArchive()
+        // == true, so we must create a new TFile instance which is guaranteed
         // to ignore the archive getSuffix() in the path.
         // Furthermore, data is an array containing random data
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final TPath tmp = newNonArchivePath(archive);
+        final TFile tmp = newNonArchiveFile(archive);
         final InputStream in = new ByteArrayInputStream(data);
-        copy(in, tmp);
+        TFile.cp(in, tmp);
         assertRenameArchiveToTemp(archive);
     }
 
-    private void assertRenameArchiveToTemp(final TPath archive)
+    private void assertRenameArchiveToTemp(final TFile archive)
     throws IOException {
         assert archive.isArchive(); // regular archive or false positive
         assert !archive.isEntry(); // not contained in another archive file
 
         // Create a temporary file.
-        TPath tmp = new TPath(Files.createTempFile(TEMP_FILE_PREFIX, null));
-        delete(tmp);
-        assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchivePath(tmp)));
+        TFile tmp = new TFile(TFile.createTempFile(TEMP_FILE_PREFIX, null));
+        tmp.rm();
+        assertFalse(tmp.exists());
+        assertFalse(newNonArchiveFile(tmp).exists());
 
         // Now rename the archive to the temporary path.
         // Depending on the true state of the object "archive", this will
         // either create a directory (iff archive is a regular archive) or a
         // plain file (iff archive is a false positive).
-        archive.toFile().mv(tmp.toFile());
-        assertFalse(exists(archive));
-        assertFalse(exists(newNonArchivePath(archive)));
+        archive.mv(tmp);
+        assertFalse(archive.exists());
+        assertFalse(newNonArchiveFile(archive).exists());
 
         // Now delete resulting temporary file or directory.
-        tmp.toFile().rm_r();
-        assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchivePath(tmp)));
+        tmp.rm_r();
+        assertFalse(tmp.exists());
+        assertFalse(newNonArchiveFile(tmp).exists());
     }
 
     @Test
     public final void testRenameRecursively() throws IOException {
-        final TPath temp = new TPath(createTempFile());
-        final TPath archive2 = archive.resolve("inner" + getSuffix());
-        final TPath archive3 = archive2.resolve("nuts" + getSuffix());
-        final TPath archive1a = archive.resolve("a");
-        final TPath archive1b = archive.resolve("b");
-        final TPath archive2a = archive2.resolve("a");
-        final TPath archive2b = archive2.resolve("b");
-        final TPath archive3a = archive3.resolve("a");
-        final TPath archive3b = archive3.resolve("b");
+        final TFile temp = new TFile(createTempFile());
+        final TFile archive2 = new TFile(archive, "inner" + getSuffix());
+        final TFile archive3 = new TFile(archive2, "nuts" + getSuffix());
+        final TFile archive1a = new TFile(archive, "a");
+        final TFile archive1b = new TFile(archive, "b");
+        final TFile archive2a = new TFile(archive2, "a");
+        final TFile archive2b = new TFile(archive2, "b");
+        final TFile archive3a = new TFile(archive3, "a");
+        final TFile archive3b = new TFile(archive3, "b");
         
-        delete(temp);
+        temp.rm();
         
         assertInput(archive1a);
         
@@ -1237,22 +1192,22 @@ extends TestBase<D> {
         
         assertRenameTo(archive, temp);
         assertRenameTo(temp, archive);
-        delete(archive3);
-        delete(archive2);
+        archive3.rm();
+        archive2.rm();
         assertOutput(archive1a);
-        delete(archive1a);
-        delete(archive);
+        archive1a.rm();
+        archive.rm();
     }
-
-    private void assertRenameTo(TPath src, TPath dst) throws IOException {
-        assertTrue(exists(src));
-        assertFalse(exists(dst));
-        assertFalse(exists(newNonArchivePath(dst)));
-        assert TConfig.get().isLenient();
-        src.toFile().mv(dst.toFile());
-        assertFalse(exists(src));
-        assertFalse(exists(newNonArchivePath(src)));
-        assertTrue(exists(dst));
+    
+    private void assertRenameTo(TFile src, TFile dst) throws IOException {
+        assertTrue(src.exists());
+        assertFalse(dst.exists());
+        assertFalse(newNonArchiveFile(dst).exists());
+        assert TFile.isLenient();
+        src.mv(dst);
+        assertFalse(src.exists());
+        assertFalse(newNonArchiveFile(src).exists());
+        assertTrue(dst.exists());
     }
 
     private static final String[] MEMBERS = {
@@ -1260,46 +1215,52 @@ extends TestBase<D> {
         "Another directory member",
         "Yet another directory member",
     };
-
+    
     @Test
     public final void testList() throws IOException {
-        final Path dir = createTempFile();
-        final TPath dir2 = new TPath(dir);
+        final File dir = createTempFile();
+        final TFile dir2 = new TFile(dir);
 
-        assertNull(listFiles(dir));
-        assertNull(listFiles(dir2));
-        assertNull(listFiles(newNonArchivePath(dir2)));
+        assertNull(dir.listFiles());
+        assertNull(dir2.listFiles());
+        assertNull(newNonArchiveFile(dir2).listFiles());
 
-        delete(dir);
+        TFile.rm(dir);
 
         // Create regular directory for testing.
-        createDirectory(dir);
+        assertTrue(dir.mkdir());
         for (int i = MEMBERS.length; --i >= 0; )
-            createFile(dir.resolve(MEMBERS[i]));
-        Path[] files = listFiles(dir);
+            assertTrue(new File(dir, MEMBERS[i]).createNewFile());
+        File[] files = dir.listFiles();
         Arrays.sort(files);
         assertList(files, dir2);
-        dir2.toFile().rm_r();
+        TFile.rm_r(dir2);
 
         // Repeat test with regular archive file.
-        createDirectory(dir2);
+        assertTrue(dir2.mkdir());
         for (int i = MEMBERS.length; --i >= 0; )
-            createFile(dir2.resolve(MEMBERS[i]));
+            assertTrue(new TFile(dir2, MEMBERS[i]).createNewFile());
         assertList(files, dir2);
-        dir2.toFile().rm_r();
+        TFile.rm_r(dir2);
     }
 
-    private void assertList(final Path[] refs, final TPath dir)
-    throws IOException {
-        final Path[] files = listFiles(dir);
+    private void assertList(final File[] refs, final TFile dir) {
+        final TFile[] files = dir.listFiles();
         Arrays.sort(files);
         assertEquals(refs.length, files.length);
         for (int i = 0, l = refs.length; i < l; i++) {
-            final Path ref = refs[i];
-            final TPath file = (TPath) files[i];
-            assertTrue(!(ref instanceof TPath));
-            assertEquals(ref.toString(), file.toString());
-            assertNull(listFiles(file));
+            final File ref = refs[i];
+            final TFile file = files[i];
+            assertTrue(!(ref instanceof TFile));
+            assertEquals(ref.getPath(), file.getPath());
+            assertNull(file.list());
+            assertNull(file.list(null));
+            assertNull(file.listFiles());
+            assertNull(file.listFiles(file.getArchiveDetector()));
+            assertNull(file.listFiles((FileFilter) null));
+            assertNull(file.listFiles((FilenameFilter) null));
+            assertNull(file.listFiles((FileFilter) null, file.getArchiveDetector()));
+            assertNull(file.listFiles((FilenameFilter) null, file.getArchiveDetector()));
         }
     }
     
@@ -1308,14 +1269,14 @@ extends TestBase<D> {
     throws Exception {
         assertMultithreadedSingleArchiveMultipleEntriesReading(NUM_IO_THREADS, NUM_IO_THREADS);
     }
-    
+
     private void assertMultithreadedSingleArchiveMultipleEntriesReading(
             final int nEntries,
             final int nThreads)
     throws Exception {
         // Create test archive file.
         createTestArchive(nEntries);
-
+        
         class CheckAllEntriesTask implements Callable<Void> {
             @Override
             public Void call() throws IOException {
@@ -1334,14 +1295,14 @@ extends TestBase<D> {
         try {
             runConcurrent(new CheckAllEntriesTaskFactory(), nThreads);
         } finally {
-            archive.toFile().rm_r();
+            TFile.rm_r(archive);
         }
     }
-
+    
     private void createTestArchive(final int nEntries) throws IOException {
         for (int i = 0; i < nEntries; i++) {
-            final TPath entry = new TPath(archive.toString(), i + "");
-            final OutputStream out = newOutputStream(entry);
+            final TFile entry = new TFile(archive, i + "");
+            final OutputStream out = new TFileOutputStream(entry);
             try {
                 out.write(data);
             } finally {
@@ -1349,20 +1310,19 @@ extends TestBase<D> {
             }
         }
     }
-    
-    private void assertArchiveEntries(final TPath archive, int nEntries)
+
+    private void assertArchiveEntries(final TFile archive, int nEntries)
     throws IOException {
         // Retrieve list of entries and shuffle their order.
-        final List<Path> entries = Arrays.asList(listFiles(archive));
+        final List<TFile> entries = Arrays.asList(archive.listFiles());
         assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
         Collections.shuffle(entries, new Random());
 
         // Now read in the entries in the shuffled order.
         final byte[] buf = new byte[data.length];
-        for (final Path _entry : entries) {
-            final TPath entry = (TPath) _entry;
+        for (final TFile entry : entries) {
             // Read full entry and check the contents.
-            final InputStream in = newInputStream(entry);
+            final InputStream in = new TFileInputStream(entry);
             try {
                 int off = 0;
                 int read;
@@ -1382,7 +1342,7 @@ extends TestBase<D> {
             }
         }
     }
-
+    
     @Test
     public final void testMultithreadedSingleArchiveMultipleEntriesWriting()
     throws Exception {
@@ -1391,29 +1351,29 @@ extends TestBase<D> {
     }
     
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
-            final TPath archive,
+            final TFile archive,
             final int nThreads,
             final boolean wait)
             throws Exception {
-        assertTrue(TConfig.get().isLenient());
-        
+        assertTrue(TFile.isLenient());
+
         class WritingTask implements Callable<Void> {
-            final TPath entry;
-            
+            final TFile entry;
+
             WritingTask(final int threadNum) {
-                this.entry = archive.resolve(threadNum + "");
+                this.entry = new TFile(archive, threadNum + "");
             }
-            
+
             @Override
             public Void call() throws IOException {
-                final OutputStream out = newOutputStream(entry);
+                final OutputStream out = new TFileOutputStream(entry);
                 try {
                     out.write(data);
                 } finally {
                     out.close();
                 }
                 try {
-                    TFile.umount(archive.toFile(), wait, false, wait, false);
+                    TFile.umount(archive, wait, false, wait, false);
                 } catch (FsSyncException ex) {
                     if (!(ex.getCause() instanceof FileBusyException))
                         throw ex;
@@ -1443,31 +1403,31 @@ extends TestBase<D> {
             runConcurrent(new WritingTaskFactory(), nThreads);
         } finally {
             assertArchiveEntries(archive, nThreads);
-            archive.toFile().rm_r();
+            TFile.rm_r(archive);
         }
     }
-
+    
     @Test
     public final void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
         assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_IO_THREADS, false);
         assertMultithreadedMultipleArchivesSingleEntryWriting(NUM_IO_THREADS, true);
     }
-
+    
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
             final int nThreads,
             final boolean updateIndividually)
     throws Exception {
-        assertTrue(TConfig.get().isLenient());
+        assertTrue(TFile.isLenient());
 
         class WritingTask implements Callable<Void> {
             @Override
             public Void call() throws IOException {
-                final TPath archive = new TPath(createTempFile());
-                delete(archive);
-                final TPath entry = archive.resolve("entry");
+                final TFile archive = new TFile(createTempFile());
+                archive.rm();
+                final TFile entry = new TFile(archive, "entry");
                 try {
-                    final OutputStream out = newOutputStream(entry);
+                    final OutputStream out = new TFileOutputStream(entry);
                     try {
                         out.write(data);
                     } finally {
@@ -1475,7 +1435,7 @@ extends TestBase<D> {
                     }
                     try {
                         if (updateIndividually)
-                            archive.getFileSystem().close();
+                            TFile.umount(archive);
                         else
                             TFile.sync(SYNC); // DON'T flush all caches!
                     } catch (FsSyncException ex) {
@@ -1494,7 +1454,7 @@ extends TestBase<D> {
                             throw new AssertionError(ex);
                     }
                 } finally {
-                    archive.toFile().rm_r();
+                    TFile.rm_r(archive);
                 }
                 return null;
             }
@@ -1510,11 +1470,43 @@ extends TestBase<D> {
         runConcurrent(new WritingTaskFactory(), nThreads);
     }
 
+    //@Test
+    public void testMultithreadedMutualArchiveCopying() {
+        assertTrue(TFile.isLenient());
+
+        class CopyingTask implements Callable<Void> {
+            final TFile entry;
+
+            CopyingTask(final TFile archive, final int threadNum) {
+                this.entry = new TFile(archive, threadNum + "");
+            }
+
+            @Override
+            public Void call() throws IOException {
+                assert false;
+                return null;
+            }
+        } // CopyingTask
+
+        class CopyingTaskFactory implements TaskFactory {
+            final TFile archive;
+
+            CopyingTaskFactory(final TFile archive) {
+                this.archive = archive;
+            }
+
+            @Override
+            public Callable<Void> newTask(final int threadNum) {
+                return new CopyingTask(archive, threadNum);
+            }
+        } // CopyingTaskFactory
+    }
+
     @Test
     public void testGrowing() throws IOException {
-        final TPath path = newNonArchivePath(archive);
-        final TPath entry1 = archive.resolve("entry1");
-        final TPath entry2 = archive.resolve("entry2");
+        final TFile file = newNonArchiveFile(archive);
+        final TFile entry1 = new TFile(archive, "entry1");
+        final TFile entry2 = new TFile(archive, "entry2");
 
         TConfig config = TConfig.push();
         try {
@@ -1524,40 +1516,43 @@ extends TestBase<D> {
             write(entry2);
 
             umount();
-            assertTrue(size(path) > 2 * data.length); // two entries plus one central directory
+            assertTrue(file.length() > 2 * data.length); // two entries plus one central directory
 
             write(entry1);
             write(entry2);
             write(entry1);
             write(entry2);
+
+            assertTrue(entry1.setLastModified(System.currentTimeMillis()));
+            assertTrue(entry2.setLastModified(System.currentTimeMillis()));
 
             // See http://java.net/jira/browse/TRUEZIP-144 .
-            delete(entry1);
-            delete(entry2);
+            entry1.rm();
+            entry2.rm();
 
             umount();
-            assertTrue(size(path) > 6 * data.length); // six entries plus two central directories
+            assertTrue(file.length() > 6 * data.length); // six entries plus two central directories
         } finally {
             config.close();
         }
 
-        assertThat(listFiles(archive).length, is(0));
+        assertThat(archive.list().length, is(0));
 
         config = TConfig.push();
         try {
             config.setOutputPreferences(config.getOutputPreferences().set(GROW));
 
-            delete(archive);
+            archive.rm();
             umount();
         } finally {
             config.close();
         }
 
-        assertNull(listFiles(archive));
+        assertNull(archive.list());
     }
 
-    private void write(final TPath entry) throws IOException {
-        final OutputStream out = newOutputStream(entry);
+    private void write(final TFile entry) throws IOException {
+        final OutputStream out = new TFileOutputStream(entry);
         try {
             out.write(data);
         } finally {

@@ -6,17 +6,17 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.nio.file.tar;
+package de.schlichtherle.truezip.file.tar;
 
+import de.schlichtherle.truezip.file.TFileTestBase;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TarPathTestSuite<D extends FsArchiveDriver<?>>
-extends TPathTestSuite<D> {
+public abstract class TarFileTestBase<D extends FsArchiveDriver<?>>
+extends TFileTestBase<D> {
 
     /**
      * Skipped because appending to TAR files is currently not supported.

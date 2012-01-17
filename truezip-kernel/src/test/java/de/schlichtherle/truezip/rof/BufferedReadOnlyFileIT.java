@@ -15,7 +15,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class BufferedReadOnlyFileIT extends ReadOnlyFileTestSuite {
+public final class BufferedReadOnlyFileIT extends ReadOnlyFileTestBase {
 
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {

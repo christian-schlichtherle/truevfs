@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.*;
 import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import de.schlichtherle.truezip.nio.file.TPathTestBase;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import static java.nio.file.Files.*;
@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
+public final class ZipRaesPathIT extends TPathTestBase<TestZipRaesDriver> {
 
     private @Nullable MockView<AesCipherParameters> view;
 
@@ -40,7 +40,7 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
     }
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         this.view = new MockView<AesCipherParameters>();
         super.setUp();
         final AesCipherParameters key = new AesCipherParameters();
@@ -50,7 +50,7 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
     }
 
     @Override
-    public void tearDown() throws Exception {
+    public void tearDown() throws IOException {
         view.setAction(ENTER);
         super.tearDown();
     }

@@ -62,7 +62,7 @@ public class AuthenticationPanelIT extends JemmyUtils {
         final File file = new File("test");
         fc.setSelectedFile(file);
         fc.approve();
-        fc.getQueueTool().waitEmpty();
+        fc.getQueueTool().waitEmpty(WAIT_EMPTY);
         JTextFieldOperator tf = new JTextFieldOperator(frame);
         assertEquals(file.getPath(), tf.getText());
         fc = null;

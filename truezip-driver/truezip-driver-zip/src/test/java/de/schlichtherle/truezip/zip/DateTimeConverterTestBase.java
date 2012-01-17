@@ -8,21 +8,22 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import static de.schlichtherle.truezip.zip.DateTimeConverter.MAX_DOS_TIME;
+import static de.schlichtherle.truezip.zip.DateTimeConverter.MIN_DOS_TIME;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static de.schlichtherle.truezip.zip.DateTimeConverter.*;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DateTimeConverterTestSuite {
+public abstract class DateTimeConverterTestBase {
 
     private DateTimeConverter instance;
     private long minJavaTime, maxJavaTime;

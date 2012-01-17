@@ -13,14 +13,15 @@ import de.schlichtherle.truezip.file.zip.TestWinZipAesDriver;
 import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import de.schlichtherle.truezip.nio.file.TPathTestBase;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.IOException;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WinZipAesPathIT extends TPathTestSuite<TestWinZipAesDriver> {
+public final class WinZipAesPathIT extends TPathTestBase<TestWinZipAesDriver> {
 
     private @Nullable MockView<AesPbeParameters> view;
 
@@ -35,7 +36,7 @@ public final class WinZipAesPathIT extends TPathTestSuite<TestWinZipAesDriver> {
     }
 
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         this.view = new MockView<AesPbeParameters>();
         super.setUp();
         final TConfig config = TConfig.get();
