@@ -1459,6 +1459,9 @@ extends TestBase<D> {
         runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
     }
 
+    /**
+     * Test for http://java.net/jira/browse/TRUEZIP-192 .
+     */
     //@Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
         assertTrue(TFile.isLenient());
@@ -1466,9 +1469,7 @@ extends TestBase<D> {
         class CopyingTask implements Callable<Void> {
             final TFile src, dst;
 
-            CopyingTask(final TFile src,
-                        final TFile dst,
-                        final int no) {
+            CopyingTask(final TFile src, final TFile dst, final int no) {
                 this.src = new TFile(
                         new TFile(src, src.getName(), TArchiveDetector.NULL),
                         Integer.toString(no));

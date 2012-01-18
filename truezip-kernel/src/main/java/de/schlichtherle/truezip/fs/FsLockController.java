@@ -58,6 +58,8 @@ extends FsLockModelDecoratingController<
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
+    private static final LockCounter lockCount = new LockCounter();
+
     private volatile @CheckForNull ReadLock readLock;
     private volatile @CheckForNull WriteLock writeLock;
 
@@ -82,22 +84,48 @@ extends FsLockModelDecoratingController<
         return null != lock ? lock : (this.writeLock = getModel().writeLock());
     }
 
+    private void acquireReadLock() throws FsException {
+        /*if (lockCount.get() > 0) {
+            if (!readLock().tryLock()) {
+                throw new FsNeedsLockRetryException();
+            }
+        } else {
+            readLock().lock();
+        }
+        lockCount.inc();*/
+        readLock().lock();
+    }
+
+    private void releaseReadLock() {
+        //lockCount.dec();
+        readLock().unlock();
+    }
+
+    private void acquireWriteLock(FsNeedsWriteLockException ex)
+    throws FsException {
+        assertNotReadLockedByCurrentThread(ex);
+        writeLock().lock();
+    }
+
+    private void releaseWriteLock() {
+        writeLock().unlock();
+    }
+
     @Override
     public Icon getOpenIcon() throws IOException {
         try {
-            readLock().lock();
+            acquireReadLock();
             try {
                 return delegate.getOpenIcon();
             } finally {
-                readLock().unlock();
+                releaseReadLock();
             }
         } catch (FsNeedsWriteLockException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
+            acquireWriteLock(ex);
             try {
                 return delegate.getOpenIcon();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     }
@@ -105,19 +133,18 @@ extends FsLockModelDecoratingController<
     @Override
     public Icon getClosedIcon() throws IOException {
         try {
-            readLock().lock();
+            acquireReadLock();
             try {
                 return delegate.getClosedIcon();
             } finally {
-                readLock().unlock();
+                releaseReadLock();
             }
         } catch (FsNeedsWriteLockException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
+            acquireWriteLock(ex);
             try {
                 return delegate.getClosedIcon();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     }
@@ -125,19 +152,18 @@ extends FsLockModelDecoratingController<
     @Override
     public boolean isReadOnly() throws IOException {
         try {
-            readLock().lock();
+            acquireReadLock();
             try {
                 return delegate.isReadOnly();
             } finally {
-                readLock().unlock();
+                releaseReadLock();
             }
         } catch (FsNeedsWriteLockException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
+            acquireWriteLock(ex);
             try {
                 return delegate.isReadOnly();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     }
@@ -146,19 +172,18 @@ extends FsLockModelDecoratingController<
     public FsEntry getEntry(FsEntryName name)
     throws IOException {
         try {
-            readLock().lock();
+            acquireReadLock();
             try {
                 return delegate.getEntry(name);
             } finally {
-                readLock().unlock();
+                releaseReadLock();
             }
         } catch (FsNeedsWriteLockException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
+            acquireWriteLock(ex);
             try {
                 return delegate.getEntry(name);
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     }
@@ -166,19 +191,18 @@ extends FsLockModelDecoratingController<
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
         try {
-            readLock().lock();
+            acquireReadLock();
             try {
                 return delegate.isReadable(name);
             } finally {
-                readLock().unlock();
+                releaseReadLock();
             }
         } catch (FsNeedsWriteLockException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
+            acquireWriteLock(ex);
             try {
                 return delegate.isReadable(name);
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     }
@@ -186,19 +210,18 @@ extends FsLockModelDecoratingController<
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
         try {
-            readLock().lock();
+            acquireReadLock();
             try {
                 return delegate.isWritable(name);
             } finally {
-                readLock().unlock();
+                releaseReadLock();
             }
         } catch (FsNeedsWriteLockException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
+            acquireWriteLock(ex);
             try {
                 return delegate.isWritable(name);
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     }
@@ -206,31 +229,29 @@ extends FsLockModelDecoratingController<
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
         try {
-            readLock().lock();
+            acquireReadLock();
             try {
                 return delegate.isExecutable(name);
             } finally {
-                readLock().unlock();
+                releaseReadLock();
             }
         } catch (FsNeedsWriteLockException ex) {
-            assertNotReadLockedByCurrentThread(ex);
-            writeLock().lock();
+            acquireWriteLock(ex);
             try {
                 return delegate.isExecutable(name);
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
+        acquireWriteLock(null);
         try {
             delegate.setReadOnly(name);
         } finally {
-            writeLock().unlock();
+            releaseWriteLock();
         }
     }
 
@@ -240,12 +261,11 @@ extends FsLockModelDecoratingController<
             Map<Access, Long> times,
             BitField<FsOutputOption> options)
     throws IOException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
+        acquireWriteLock(null);
         try {
             return delegate.setTime(name, times, options);
         } finally {
-            writeLock().unlock();
+            releaseWriteLock();
         }
     }
 
@@ -256,12 +276,11 @@ extends FsLockModelDecoratingController<
             long value,
             BitField<FsOutputOption> options)
     throws IOException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
+        acquireWriteLock(null);
         try {
             return delegate.setTime(name, types, value, options);
         } finally {
-            writeLock().unlock();
+            releaseWriteLock();
         }
     }
 
@@ -287,24 +306,22 @@ extends FsLockModelDecoratingController<
             @NonNull BitField<FsOutputOption> options,
             @CheckForNull Entry template)
     throws IOException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
+        acquireWriteLock(null);
         try {
             delegate.mknod(name, type, options, template);
         } finally {
-            writeLock().unlock();
+            releaseWriteLock();
         }
     }
 
     @Override
     public void unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
-        assertNotReadLockedByCurrentThread(null);
-        writeLock().lock();
+        acquireWriteLock(null);
         try {
             delegate.unlink(name, options);
         } finally {
-            writeLock().unlock();
+            releaseWriteLock();
         }
     }
 
@@ -373,12 +390,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 return new LockingSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // Nio2Input
@@ -400,21 +416,20 @@ extends FsLockModelDecoratingController<
             return null != local ? local : (local = getLocalTarget0());
         }
 
-        Entry getLocalTarget0() throws IOException {
+        private Entry getLocalTarget0() throws IOException {
             try {
-                readLock().lock();
+                acquireReadLock();
                 try {
                     return getBoundSocket().getLocalTarget();
                 } finally {
-                    readLock().unlock();
+                    releaseReadLock();
                 }
             } catch (FsNeedsWriteLockException ex) {
-                assertNotReadLockedByCurrentThread(ex);
-                writeLock().lock();
+                acquireWriteLock(ex);
                 try {
                     return getBoundSocket().getLocalTarget();
                 } finally {
-                    writeLock().unlock();
+                    releaseWriteLock();
                 }
             }
         }
@@ -427,23 +442,21 @@ extends FsLockModelDecoratingController<
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 return new LockingReadOnlyFile(getBoundSocket().newReadOnlyFile());
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 return new LockingInputStream(getBoundSocket().newInputStream());
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // Input
@@ -456,12 +469,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 return new LockingSeekableByteChannel(getBoundSocket().newSeekableByteChannel());
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // Nio2Output
@@ -483,13 +495,12 @@ extends FsLockModelDecoratingController<
             return null != local ? local : (local = getLocalTarget0());
         }
 
-        Entry getLocalTarget0() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+        private Entry getLocalTarget0() throws IOException {
+            acquireWriteLock(null);
             try {
                 return getBoundSocket().getLocalTarget();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
 
@@ -501,12 +512,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 return new LockingOutputStream(getBoundSocket().newOutputStream());
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // Output
@@ -519,12 +529,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 delegate.close();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // LockingReadOnlyFile
@@ -537,12 +546,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 delegate.close();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // LockingSeekableByteChannel
@@ -555,12 +563,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 delegate.close();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // LockingInputStream
@@ -573,13 +580,27 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assertNotReadLockedByCurrentThread(null);
-            writeLock().lock();
+            acquireWriteLock(null);
             try {
                 delegate.close();
             } finally {
-                writeLock().unlock();
+                releaseWriteLock();
             }
         }
     } // LockingOutputStream
+
+    private static final class LockCounter extends ThreadLocal<Integer> {
+        @Override
+        public Integer initialValue() {
+            return 0;
+        }
+
+        void inc() {
+            set(get() + 1);
+        }
+
+        void dec() {
+            set(get() - 1);
+        }
+    } // ThreadLocalInteger
 }

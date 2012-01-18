@@ -39,6 +39,7 @@ public final class ConcurrencyUtils {
         final List<Future<Void>> results;
         final ExecutorService executor = Executors.newFixedThreadPool(nThreads);
         try {
+            // FIXME: This is synchronous!!!
             results = executor.invokeAll(tasks);
         } finally {
             executor.shutdown();
