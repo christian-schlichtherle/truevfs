@@ -319,8 +319,8 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void performSync(
-            final ExceptionHandler<? super FsSyncException, X> handler)
+    private <X extends IOException> void
+    performSync(final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
