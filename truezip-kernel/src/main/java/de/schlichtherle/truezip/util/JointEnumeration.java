@@ -8,13 +8,14 @@
  */
 package de.schlichtherle.truezip.util;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Concatenates two enumerations.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
