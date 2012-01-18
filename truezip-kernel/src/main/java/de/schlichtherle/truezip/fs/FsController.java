@@ -25,26 +25,92 @@ import javax.swing.Icon;
 
 /**
  * An abstract class which provides read/write access to a file system.
- * This class may be organized in a chain of responsibility for file system
- * federation.
+ * Objects of this class are typically organized in a chain of responsibility
+ * for file system federation and a decorator chain for implementing different
+ * aspects of the management of the file system state, e.g. locking concurrent
+ * access.
+ * 
+ * <h3>General Properties</h3>
+ * <p>
  * The {@link FsModel#getMountPoint() mount point} of the
  * {@link #getModel() file system model} addresses the file system at the head
  * of this chain of federated file systems.
- * <p>
  * Where the methods of this abstract class accept a
- * {@link FsEntryName file system entry name} as a parameter, this will get
+ * {@link FsEntryName file system entry name} as a parameter, this MUST get
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
  * controller's {@link #getModel() file system model}.
+ * 
+ * <h3>Transactional Support</h3>
  * <p>
- * All implementations must be reentrant on exceptions - so clients may
- * repeatedly call their methods.
- * Whether an implementation must be thread-safe or not depends on the context,
- * i.e. its factory.
- * E.g. the {@link FsManager#getController} method requires all returned file
- * system controllers to be thread-safe.
+ * Even on modern computers, I/O operations are inherently unreliable: They
+ * can fail on hardware errors, network timeouts, third party interactions etc.
+ * In an ideal world, we would like all file system operations to be truly
+ * transactional like some relational database services.
+ * However, file system have to cope with really big data, much more than most
+ * relational databases will ever see.
+ * Its not uncommon these days to store some gigabytes of data in a single
+ * file, for example a video file.
+ * However, buffering gigabytes of data just for an eventual rollback of a
+ * transaction is still not a realistic option and considering the fact that
+ * faster computers have always been used to store even bigger data then its
+ * getting clear that it never will be.
+ * Therefore, the contract of this abstract class strives for only limited
+ * transactional support as follows.
+ * <ol>
+ * <li>
+ * Generally all file system operations may fail with either a
+ * {@link RuntimeException} or an {@link IOException} to respectively indicate
+ * wrong input parameters or a file system operation failure.
+ * Where the following terms consider a failure, the term equally applies to
+ * BOTH exception types.
+ * <li>
+ * With the exception of {@link #sync}, all file system operations MUST be
+ * <i>atomic</i>, that is they either completely succeed or fail as if they had
+ * not been called.
+ * <li>
+ * All file system operations MUST be <i>consistent</i>, that is they MUST
+ * leave their resources in a state so that they can get retried, even after a
+ * failure.
+ * <li>
+ * All file system operations SHOULD be <i>isolated</i> with respect to any
+ * threads which share the same definition of the implementing class, that is
+ * two such threads SHOULD NOT interfere with each other's file system
+ * operations in any other way than the operation's defined side effect on the
+ * stored data.
+ * In general, this simply means that file system operations SHOULD be
+ * thread-safe.
+ * Note that some methods make this a MUST requirement, for example
+ * {@link FsDriver#newController} and {@link FsCompositeDriver#newController}.
+ * <li>
+ * All file system operations SHOULD be <i>durable</i>, that is their side
+ * effect on the stored data SHOULD be permanent in the parent file system or
+ * storage system.
+ * <li>
+ * Once a call to {@link #sync} has succeeded, all previous file system
+ * operations MUST be durable.
+ * Furthermore, any changes to the stored data in the parent file system or
+ * storage system which have been made by third parties up to this point in
+ * time MUST be visible to the users of this class.
+ * This enables file system operations to use I/O buffers most of the time and
+ * eventually synchronize their contents with the parent file system or storage
+ * system upon a call to {@code sync}.
+ * </ol>
+ * 
+ * <h3>Stack Traces</h3>
+ * <p>
+ * Because I/O operations can fail anytime, it's expected that users will be
+ * frequently facing stack traces which include stack frames of many
+ * implementing classes.
+ * Now because of their complex chaining, it is generally recommended that any
+ * implementations go the extra boilerplate mile to make nice readable stack
+ * traces, for example by avoiding to use anonymous inner classes, declaring
+ * methods package private which are called from member classes and even
+ * overriding unchanged methods with exactly the same code as their super class
+ * wherever practical.
  *
  * @param   <M> The type of the file system model.
  * @see     FsManager
+ * @see     <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  * @author  Christian Schlichtherle
  * @version $Id$
  */
