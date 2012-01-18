@@ -919,9 +919,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      */
@@ -963,9 +963,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(BitField)
@@ -1000,9 +1000,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(BitField)
@@ -1035,9 +1035,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. prospective archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(BitField)
@@ -1075,9 +1075,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. prospective archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(BitField)
@@ -1114,9 +1114,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. prospective archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
@@ -1159,9 +1159,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. prospective archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
@@ -1210,9 +1210,9 @@ public final class TFile extends File {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. prospective archive file) in its parent file system.
+     *         updated with constraints, e.g. a failure to set the last
+     *         modification time of the the target archive file in its parent
+     *         file system.
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
