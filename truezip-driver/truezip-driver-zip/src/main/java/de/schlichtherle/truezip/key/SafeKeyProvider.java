@@ -34,7 +34,8 @@ implements KeyProvider<K> {
      * The minimum delay between subsequent attempts to verify a key in
      * milliseconds.
      * More specifically, this is the minimum delay between two calls to
-     * {@link #getReadKey} by the same thread.
+     * {@link #getReadKey} by the same thread if the parameter {@code invalid}
+     * is {@code true}.
      */
     public static final int MIN_KEY_RETRY_DELAY = SuspensionPenalty.MIN_KEY_RETRY_DELAY;
 
@@ -135,9 +136,8 @@ implements KeyProvider<K> {
     }
 
     private void enforceSuspensionPenalty() {
-        // FIXME: This makes this class untestable!
-        //invalidated.set(
-                SuspensionPenalty.enforce(invalidated.get());//);
+        // TODO: This makes this class untestable!
+        SuspensionPenalty.enforce(invalidated.get());
     }
 
     private static final class ThreadLocalLong extends ThreadLocal<Long> {

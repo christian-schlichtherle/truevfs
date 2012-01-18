@@ -39,19 +39,19 @@ public class SuspensionPenalty {
      *         call.
      * @return The new try time.
      */
-    @SuppressWarnings("SleepWhileHoldingLock")
+    @SuppressWarnings("SleepWhileInLoop")
     public static long enforce(final long last) {
         long delay;
-        InterruptedException interrupted = null;
+        boolean interrupted = false;
         while ((delay = System.currentTimeMillis() - last) < MIN_KEY_RETRY_DELAY) {
             try {
                 Thread.sleep(MIN_KEY_RETRY_DELAY - delay);
             } catch (InterruptedException ex) {
-                interrupted = ex;
+                interrupted = true;
             }
         }
-        if (null != interrupted)
+        if (interrupted)
             Thread.currentThread().interrupt();
-        return last + delay;
+        return last + delay; // approximately System.currentTimeMillis()
     }
 }
