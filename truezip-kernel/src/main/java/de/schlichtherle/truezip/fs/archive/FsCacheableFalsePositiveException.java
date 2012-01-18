@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * A cacheable false positive exception.
@@ -30,10 +31,10 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
+@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 @DefaultAnnotation(NonNull.class)
 final class FsCacheableFalsePositiveException extends FsFalsePositiveException {
-    private static final long serialVersionUID = 5436924103910446876L;
-
     FsCacheableFalsePositiveException(IOException cause) {
         super(cause);
     }

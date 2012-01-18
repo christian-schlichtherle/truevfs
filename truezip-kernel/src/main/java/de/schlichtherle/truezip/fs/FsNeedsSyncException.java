@@ -33,10 +33,7 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 @DefaultAnnotation(NonNull.class)
 public final class FsNeedsSyncException extends FsException {
-    private static final long serialVersionUID = 2345952581284762637L;
-
-    public FsNeedsSyncException() {
-    }
 }

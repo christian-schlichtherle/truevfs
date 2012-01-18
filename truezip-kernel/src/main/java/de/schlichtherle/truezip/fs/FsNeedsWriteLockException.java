@@ -14,12 +14,12 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * Thrown by a file system operation to indicate that the file system needs to
- * get write locked by the current thread before the operation can get retried.
+ * get write-locked in order to retry the operation.
  * This exception is typically thrown if the read lock is already acquired,
  * so that updating the lock would just dead lock the current thread.
  * <p>
  * This exception type is reserved for use within the TrueZIP Kernel in order
- * to catch it and relock the resource.
+ * to catch it and re-lock the file system.
  * Unless there is a bug, an exception of this type <em>never</em> pops up to
  * a TrueZIP application.
  * <p>
@@ -32,9 +32,9 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
+@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 @DefaultAnnotation(NonNull.class)
 public final class FsNeedsWriteLockException extends FsException {
-    private static final long serialVersionUID = 2345952581284762637L;
 
     FsNeedsWriteLockException() {
     }

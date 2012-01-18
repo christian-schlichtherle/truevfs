@@ -1499,6 +1499,9 @@ extends TestBase<D> {
         runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
     }
 
+    /**
+     * Test for http://java.net/jira/browse/TRUEZIP-192 .
+     */
     //@Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
         assertTrue(TConfig.get().isLenient());
@@ -1506,9 +1509,7 @@ extends TestBase<D> {
         class CopyingTask implements Callable<Void> {
             final TPath src, dst;
 
-            CopyingTask(final TPath src,
-                        final TPath dst,
-                        final int no) {
+            CopyingTask(final TPath src, final TPath dst, final int no) {
                 this.src = src  .resolve(src.getFileName())
                                 .getNonArchivePath()
                                 .resolve(Integer.toString(no));
@@ -1542,15 +1543,19 @@ extends TestBase<D> {
         final TPath src = archive;
         final TPath dst = new TPath(createTempFile());
         delete(dst);
-
-        final AutoCloseable closeable
-                = runConcurrent(new CopyingTaskFactory(src, dst), NUM_IO_THREADS);
         try {
-            runConcurrent(new CopyingTaskFactory(dst, src), NUM_IO_THREADS)
-                    .close();
+            final AutoCloseable closeable
+                    = runConcurrent(new CopyingTaskFactory(src, dst), NUM_IO_THREADS);
+            try {
+                runConcurrent(new CopyingTaskFactory(dst, src), NUM_IO_THREADS)
+                        .close();
+            } finally {
+                closeable.close();
+            }
         } finally {
-            closeable.close();
+            delete(dst.getNonArchivePath());
         }
+        // src alias archive gets deleted by the test fixture.
     }
 
     @Test
