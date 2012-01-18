@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.io.InputClosedException;
-import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
