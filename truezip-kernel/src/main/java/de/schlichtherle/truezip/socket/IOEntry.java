@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.socket;
 /**
  * An entry which provides I/O sockets.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public interface IOEntry<E extends IOEntry<E>>
