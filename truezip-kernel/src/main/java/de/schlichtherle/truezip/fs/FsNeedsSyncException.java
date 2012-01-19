@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.Immutable;
 
 /**
  * Thrown by a file system operation to indicate that the file system needs to
@@ -32,8 +32,11 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 @DefaultAnnotation(NonNull.class)
 public final class FsNeedsSyncException extends FsException {
+    public FsNeedsSyncException() {
+        super(null);
+    }
 }
