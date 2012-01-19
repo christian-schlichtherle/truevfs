@@ -22,17 +22,17 @@ import net.jcip.annotations.NotThreadSafe;
  * {@link SequentialIOException#sortPriority() priority}.
  *
  * @param   <C> The type of the cause exceptions.
- * @param   <E> The type of the assembled exception.
+ * @param   <X> The type of the assembled exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class SequentialIOExceptionBuilder<  C extends Exception,
-                                            E extends SequentialIOException>
-extends AbstractExceptionBuilder<C, E> {
+                                            X extends SequentialIOException>
+extends AbstractExceptionBuilder<C, X> {
 
-    private final Class<E> clazz;
+    private final Class<X> clazz;
 
     /**
      * Static constructor provided for comforting the most essential use case.
@@ -42,7 +42,7 @@ extends AbstractExceptionBuilder<C, E> {
         return new SequentialIOExceptionBuilder<Exception, SequentialIOException>(Exception.class, SequentialIOException.class);
     }
 
-    public SequentialIOExceptionBuilder(Class<C> c, Class<E> e) {
+    public SequentialIOExceptionBuilder(Class<C> c, Class<X> e) {
         try {
             if (!e.isAssignableFrom(c))
                 e.getConstructor(String.class).newInstance("test"); // fail-fast!
@@ -62,11 +62,11 @@ extends AbstractExceptionBuilder<C, E> {
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected final E update(C cause, E previous) {
-        final E next;
+    protected final X update(C cause, X previous) {
+        final X next;
         try {
             next = clazz.isInstance(cause)
-                    ? ((E) cause)
+                    ? ((X) cause)
                     : clazz.getConstructor(String.class)
                         .newInstance(cause.toString());
         } catch (Exception ex) {
@@ -76,7 +76,7 @@ extends AbstractExceptionBuilder<C, E> {
         if (next != cause)
             next.initCause(cause);
         try {
-            return (E) next.initPredecessor(previous);
+            return (X) next.initPredecessor(previous);
         } catch (IllegalStateException ex) {
             if (previous != null)
                 throw (IllegalStateException) ex.initCause(next);
@@ -93,7 +93,7 @@ extends AbstractExceptionBuilder<C, E> {
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected final E post(E assembly) {
-        return (E) assembly.sortPriority();
+    protected final X post(X assembly) {
+        return (X) assembly.sortPriority();
     }
 }
