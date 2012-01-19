@@ -1511,12 +1511,8 @@ extends TestBase<D> {
             final TPath src, dst;
 
             CopyingTask(final TPath src, final TPath dst, final int no) {
-                this.src = src  .resolve(src.getFileName())
-                                .getNonArchivePath()
-                                .resolve(Integer.toString(no));
-                this.dst = dst  .resolve(dst.getFileName())
-                                .getNonArchivePath()
-                                .resolve(Integer.toString(no));
+                this.src = src.resolve("src/" + no);
+                this.dst = dst.resolve("dst/" + no);
             }
 
             @Override

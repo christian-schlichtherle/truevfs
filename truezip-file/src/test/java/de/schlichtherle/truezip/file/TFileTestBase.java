@@ -1471,12 +1471,8 @@ extends TestBase<D> {
             final TFile src, dst;
 
             CopyingTask(final TFile src, final TFile dst, final int no) {
-                this.src = new TFile(
-                        new TFile(src, src.getName(), TArchiveDetector.NULL),
-                        Integer.toString(no));
-                this.dst = new TFile(
-                        new TFile(dst, dst.getName(), TArchiveDetector.NULL),
-                        Integer.toString(no));
+                this.src = new TFile(src, "src/" + no);
+                this.dst = new TFile(dst, "dst/" + no);
             }
 
             @Override
