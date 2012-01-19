@@ -17,17 +17,17 @@ import java.io.FileNotFoundException;
  * operation successfully as soon as the entry or its container is not busy
  * anymore and unless no other exceptional condition applies.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class FileBusyException extends FileNotFoundException {
     private static final long serialVersionUID = 2056108562576389242L;
 
-    FileBusyException(String message) {
+    public FileBusyException(String message) {
         super(message);
     }
 
-    FileBusyException(Exception cause) {
+    public FileBusyException(Exception cause) {
         super(null == cause ? null : cause.toString());
         super.initCause(cause);
     }
