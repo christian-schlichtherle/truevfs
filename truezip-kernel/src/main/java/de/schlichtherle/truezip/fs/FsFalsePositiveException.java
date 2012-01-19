@@ -11,6 +11,7 @@ package de.schlichtherle.truezip.fs;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -31,27 +32,16 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-@DefaultAnnotation(NonNull.class)
 public class FsFalsePositiveException extends FsException {
 
     public FsFalsePositiveException(IOException cause) {
         super(cause);
-        assert null != cause;
-        assert !(cause instanceof FsException);
     }
 
     @Override
     public @NonNull IOException getCause() {
         return (IOException) super.getCause();
-    }
-
-    @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-    public final FsFalsePositiveException initCause(Throwable cause) {
-        assert super.getCause() instanceof IOException;
-        super.initCause((IOException) cause);
-        return this;
     }
 }
