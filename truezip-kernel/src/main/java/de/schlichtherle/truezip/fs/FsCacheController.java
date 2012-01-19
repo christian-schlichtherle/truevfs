@@ -185,6 +185,7 @@ extends FsLockModelDecoratingController<
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
+        assert isWriteLockedByCurrentThread();
         beforeSync(options, handler);
         // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in the model
         // instead.
@@ -195,7 +196,6 @@ extends FsLockModelDecoratingController<
     beforeSync( final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert isWriteLockedByCurrentThread();
         if (0 >= controllers.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
