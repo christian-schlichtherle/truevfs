@@ -28,7 +28,7 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
     /**
      * Constructs a new decorating file system model.
      *
-     * @param controller the decorated file system model.
+     * @param model the decorated file system model.
      */
     protected FsDecoratingModel(final M model) {
         if (null == model)
