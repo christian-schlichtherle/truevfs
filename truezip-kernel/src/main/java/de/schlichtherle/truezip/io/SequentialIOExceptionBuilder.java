@@ -42,14 +42,14 @@ extends AbstractExceptionBuilder<C, X> {
         return new SequentialIOExceptionBuilder<Exception, SequentialIOException>(Exception.class, SequentialIOException.class);
     }
 
-    public SequentialIOExceptionBuilder(Class<C> c, Class<X> e) {
+    public SequentialIOExceptionBuilder(Class<C> c, Class<X> x) {
         try {
-            if (!e.isAssignableFrom(c))
-                e.getConstructor(String.class).newInstance("test"); // fail-fast!
+            if (!x.isAssignableFrom(c))
+                x.getConstructor(String.class).newInstance("test"); // fail-fast!
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex);
         }
-        this.clazz = e;
+        this.clazz = x;
     }
 
     /**
@@ -67,8 +67,8 @@ extends AbstractExceptionBuilder<C, X> {
         try {
             next = clazz.isInstance(cause)
                     ? ((X) cause)
-                    : clazz.getConstructor(String.class)
-                        .newInstance(cause.toString());
+                    : clazz .getConstructor(String.class)
+                            .newInstance(cause.toString());
         } catch (Exception ex) {
             ex.initCause(cause);
             throw new AssertionError(ex);
@@ -78,7 +78,7 @@ extends AbstractExceptionBuilder<C, X> {
         try {
             return (X) next.initPredecessor(previous);
         } catch (IllegalStateException ex) {
-            if (previous != null)
+            if (null != previous)
                 throw (IllegalStateException) ex.initCause(next);
             return next;
         }
