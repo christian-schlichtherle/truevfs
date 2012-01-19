@@ -8,15 +8,14 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import java.util.Iterator;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
+import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
-
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 
 /**
  * An abstract container which manages the life cycle of controllers for
@@ -71,9 +70,9 @@ implements Iterable<FsController<?>> {
     public abstract Iterator<FsController<?>> iterator();
 
     /**
-     * Equivalent to
-     * {@code BitField.of(FsSyncOption.FORCE_CLOSE_INPUT, FsSyncOption.FORCE_CLOSE_OUTPUT, FsSyncOption.CLEAR_CACHE)}.
+     * @deprecated Use {@link FsSyncOptions#UMOUNT} instead.
      */
+    @Deprecated
     public static final BitField<FsSyncOption> UMOUNT = FsSyncOptions.UMOUNT;
 
     /**
@@ -101,7 +100,7 @@ implements Iterable<FsController<?>> {
      */
     public final void
     sync(BitField<FsSyncOption> options) throws FsSyncException {
-        FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
     }
@@ -163,9 +162,10 @@ implements Iterable<FsController<?>> {
      *         upon the occurence of an {@code IOException}.
      */
     private <X extends IOException> void
-    visit(Visitor visitor, ExceptionHandler<? super IOException, X> handler)
+    visit(  final Visitor visitor,
+            final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        for (FsController<?> controller : this) {
+        for (final FsController<?> controller : this) {
             try {
                 visitor.visit(controller);
             } catch (IOException ex) {
