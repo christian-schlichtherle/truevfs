@@ -123,7 +123,7 @@ public final class FsResourceAccountant {
 
     /**
      * Waits until all closeable resources which have been started accounting
-     * for in <em>other</em> threads get stopped accounting for or a timeout
+     * for by <em>other</em> threads get stopped accounting for or a timeout
      * occurs.
      * If the current thread is interrupted while waiting,
      * then immediately a warning message is logged using
@@ -168,8 +168,9 @@ public final class FsResourceAccountant {
 
     /**
      * Returns the number of closeable resources which have been accounted for
-     * in the <em>current</em> thread.
-     * This method must not get called if the {@link #lock} is not locked!
+     * by the <em>current</em> thread.
+     * <p>
+     * This method must not get called if the {@link #lock} is not acquired!
      */
     private int threadLocalResources() {
         int n = 0;
@@ -184,6 +185,8 @@ public final class FsResourceAccountant {
      * Returns the number of <em>all</em> accounted closeable resources.
      * Mind that this value may reduce instantly, even while the lock is held,
      * so this value should <em>not</em> get cached!
+     * <p>
+     * This method must not get called if the {@link #lock} is not acquired!
      * 
      * @return The number of <em>all</em> accounted closeable resources.
      */
