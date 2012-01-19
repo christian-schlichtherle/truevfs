@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.ConcurrencyUtils.Join;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import de.schlichtherle.truezip.util.TaskFactory;
@@ -547,7 +548,7 @@ extends TestBase<D> {
                 assertFalse(file2.exists()); // previous op has removed file2!
             }
 
-            // Open file1 as stream and let the garbage collection close the stream automatically.
+            // Open file1 as stream and let the garbage collection join the stream automatically.
             new TFileInputStream(file1);
 
             while (true) {
@@ -651,10 +652,10 @@ extends TestBase<D> {
         }
         
         // The stream has been forcibly closed by TFile.update().
-        // Another close is OK, though!
+        // Another join is OK, though!
         out.close();
         
-        // Reopen stream and let the garbage collection close the stream automatically.
+        // Reopen stream and let the garbage collection join the stream automatically.
         new TFileOutputStream(file1);
         out = null;
         
@@ -1115,7 +1116,7 @@ extends TestBase<D> {
         try {
             out.println("Hello World!");
         } finally {
-            out.close(); // ALWAYS close streams!
+            out.close(); // ALWAYS join streams!
         }
         assertRenameArchiveToTemp(archive);
     }
@@ -1293,7 +1294,7 @@ extends TestBase<D> {
         } // CheckAllEntriesTaskFactory
 
         try {
-            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads).close();
+            runConcurrent(nThreads, new CheckAllEntriesTaskFactory()).join();
         } finally {
             TFile.rm_r(archive);
         }
@@ -1395,7 +1396,7 @@ extends TestBase<D> {
         } // WritingTaskFactory
 
         try {
-            runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
+            runConcurrent(NUM_IO_THREADS, new WritingTaskFactory()).join();
         } finally {
             assertArchiveEntries(archive, NUM_IO_THREADS);
             TFile.rm_r(archive);
@@ -1456,13 +1457,13 @@ extends TestBase<D> {
             }
         } // WritingTaskFactory
 
-        runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
+        runConcurrent(NUM_IO_THREADS, new WritingTaskFactory()).join();
     }
 
     /**
      * Test for http://java.net/jira/browse/TRUEZIP-192 .
      */
-    //@Test
+    @Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
         assertTrue(TFile.isLenient());
 
@@ -1501,17 +1502,30 @@ extends TestBase<D> {
         } // CopyingTaskFactory
 
         final TFile src = archive;
-        final TFile dst = new TFile(createTempFile());
-        dst.rm();
-
-        final AutoCloseable closeable
-                = runConcurrent(new CopyingTaskFactory(src, dst), NUM_IO_THREADS);
         try {
-            runConcurrent(new CopyingTaskFactory(dst, src), NUM_IO_THREADS)
-                    .close();
+            final TFile dst = new TFile(createTempFile());
+            dst.rm();
+            try {
+                try {
+                    final Join join = runConcurrent(NUM_IO_THREADS,
+                            new CopyingTaskFactory(src, dst));
+                    try {
+                        runConcurrent(NUM_IO_THREADS,
+                                new CopyingTaskFactory(dst, src)
+                                ).join();
+                    } finally {
+                        join.join();
+                    }
+                } finally {
+                    TFile.umount(dst);
+                }
+            } finally {
+                dst.getNonArchiveFile().rm();
+            }
         } finally {
-            closeable.close();
+            TFile.umount(src);
         }
+        // src alias archive gets deleted by the test fixture.
     }
 
     @Test

@@ -33,7 +33,6 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-@DefaultAnnotation(NonNull.class)
 final class FsCacheableFalsePositiveException extends FsFalsePositiveException {
     FsCacheableFalsePositiveException(IOException cause) {
         super(cause);

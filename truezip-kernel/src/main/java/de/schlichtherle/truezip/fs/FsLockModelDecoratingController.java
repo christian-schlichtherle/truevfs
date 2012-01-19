@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -31,6 +30,8 @@ public abstract class FsLockModelDecoratingController<
         C extends FsController<? extends FsLockModel>>
 extends FsDecoratingController<FsLockModel, C>  {
 
+    protected static final int WAIT_TIMEOUT = 100;
+
     /**
      * Constructs a new decorating file system controller.
      * 
@@ -52,14 +53,13 @@ extends FsDecoratingController<FsLockModel, C>  {
         return getModel().isWriteLockedByCurrentThread();
     }
 
-    protected final void assertWriteLockedByCurrentThread()
+    protected final void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
-        getModel().assertWriteLockedByCurrentThread();
+        getModel().checkWriteLockedByCurrentThread();
     }
 
-    protected final void assertNotReadLockedByCurrentThread(
-            @CheckForNull FsNeedsWriteLockException ex)
+    protected final void checkNotReadLockedByCurrentThread()
     throws FsNeedsWriteLockException {
-        getModel().assertNotReadLockedByCurrentThread(ex);
+        getModel().checkNotReadLockedByCurrentThread();
     }
 }

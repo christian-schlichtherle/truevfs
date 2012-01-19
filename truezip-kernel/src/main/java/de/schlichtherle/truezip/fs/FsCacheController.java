@@ -191,9 +191,9 @@ extends FsLockModelDecoratingController<
         delegate.sync(options/*.clear(CLEAR_CACHE)*/, handler);
     }
 
-    private <X extends IOException> void beforeSync(
-            final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
+    private <X extends IOException> void
+    beforeSync( final BitField<FsSyncOption> options,
+                final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         assert isWriteLockedByCurrentThread();
         if (0 >= controllers.size())
@@ -290,7 +290,7 @@ extends FsLockModelDecoratingController<
             if (null == controller) {
                 if (!options.get(FsInputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
-                assertWriteLockedByCurrentThread();
+                checkWriteLockedByCurrentThread();
                 controller = new EntryController(name);
             }
             return controller.configure(options).getInputSocket().bind(this);

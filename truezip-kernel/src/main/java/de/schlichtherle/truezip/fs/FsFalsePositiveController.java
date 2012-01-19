@@ -79,11 +79,15 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class FsFalsePositiveController
+final class FsFalsePositiveController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
-    private volatile @CheckForNull FsController<?> parent;
-    private volatile @CheckForNull FsPath path;
+    // These fields don't need to be volatile because reads and writes of
+    // references are always atomic.
+    // See The Java Language Specification, Third Edition, section 17.7
+    // "Non-atomic Treatment of double and long".
+    private /*volatile*/ @CheckForNull FsController<?> parent;
+    private /*volatile*/ @CheckForNull FsPath path;
 
     /**
      * Constructs a new false positive file system controller.

@@ -93,7 +93,7 @@ extends FsArchiveController<E> {
         @Override
         FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
         throws IOException {
-            assertWriteLockedByCurrentThread();
+            checkWriteLockedByCurrentThread();
             try {
                 mount(autoCreate);
             } catch (FsCacheableFalsePositiveException ex) {

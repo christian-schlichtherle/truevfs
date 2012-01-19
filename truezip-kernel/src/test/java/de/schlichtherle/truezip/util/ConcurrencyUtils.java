@@ -10,10 +10,7 @@ package de.schlichtherle.truezip.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 
 /**
  * @author  Christian Schlichtherle
@@ -27,29 +24,34 @@ public final class ConcurrencyUtils {
     /** You cannot instantiate this class. */
     private ConcurrencyUtils() { }
 
-    public static AutoCloseable runConcurrent(
-            final TaskFactory factory,
-            final int nThreads)
-    throws InterruptedException {
-        final List<Callable<Void>> tasks
-                = new ArrayList<Callable<Void>>(nThreads);
-        for (int i = 0; i < nThreads; i++)
-            tasks.add(factory.newTask(i));
-
-        final List<Future<Void>> results;
+    public static Join runConcurrent(
+            final int nThreads,
+            final TaskFactory factory) {
+        final List<Future<Void>> results
+                = new ArrayList<Future<Void>>(nThreads);
         final ExecutorService executor = Executors.newFixedThreadPool(nThreads);
         try {
-            // FIXME: This is synchronous!!!
-            results = executor.invokeAll(tasks);
+            for (int i = 0; i < nThreads; i++)
+                results.add(executor.submit(factory.newTask(i)));
         } finally {
             executor.shutdown();
         }
-        return new AutoCloseable() {
+        return new Join() {
             @Override
-            public void close() throws Exception {
-                for (final Future<Void> result : results)
-                    result.get(); // check exception from task
+            public void join() throws InterruptedException, ExecutionException {
+                try {
+                    for (final Future<Void> result : results)
+                        result.get(); // check exception from task
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                } finally {
+                    executor.awaitTermination(0, TimeUnit.DAYS);
+                }
             }
         };
+    }
+
+    public interface Join {
+        public void join() throws InterruptedException, ExecutionException;
     }
 }

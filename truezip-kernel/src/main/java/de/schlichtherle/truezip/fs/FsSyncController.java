@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
+import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
@@ -54,6 +54,9 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
+    private static final BitField<FsSyncOption>
+            SYNC = BitField.noneOf(FsSyncOption.class);
+
     /**
      * Constructs a new file system sync controller.
      *
@@ -63,13 +66,25 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         super(controller);
     }
 
+    private void quickSync() throws FsSyncException {
+        try {
+            // Times out waiting for input and output streams after
+            // FsLockModelDecoratingController.WAIT_TIMEOUT = 100 milliseconds.
+            delegate.sync(SYNC);
+        } catch (FsSyncException ex) {
+            /*final IOException cause = ex.getCause();
+            if (!(cause instanceof FileBusyException))*/
+                throw ex;
+        }
+    }
+
     @Override
     public Icon getOpenIcon() throws IOException {
         while (true) {
             try {
                 return delegate.getOpenIcon();
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -80,7 +95,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.getClosedIcon();
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -91,7 +106,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.isReadOnly();
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -103,7 +118,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.getEntry(name);
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -114,7 +129,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.isReadable(name);
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -125,7 +140,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.isWritable(name);
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -136,7 +151,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.isExecutable(name);
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -148,7 +163,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 delegate.setReadOnly(name);
                 return;
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -163,7 +178,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.setTime(name, times, options);
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -179,7 +194,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 return delegate.setTime(name, types, value, options);
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -213,7 +228,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 delegate.mknod(name, type, options, template);
                 return;
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -228,7 +243,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 delegate.unlink(name, options);
                 return;
             } catch (FsNeedsSyncException ex) {
-                delegate.sync(SYNC);
+                quickSync();
             }
         }
     }
@@ -297,7 +312,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 try {
                     return getBoundSocket().newSeekableByteChannel();
                 } catch (FsNeedsSyncException ex) {
-                    delegate.sync(SYNC);
+                    quickSync();
                 }
             }
         }
@@ -315,7 +330,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 try {
                     return getBoundSocket().getLocalTarget();
                 } catch (FsNeedsSyncException ex) {
-                    delegate.sync(SYNC);
+                    quickSync();
                 }
             }
         }
@@ -332,7 +347,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 try {
                     return getBoundSocket().newReadOnlyFile();
                 } catch (FsNeedsSyncException ex) {
-                    delegate.sync(SYNC);
+                    quickSync();
                 }
             }
         }
@@ -343,7 +358,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 try {
                     return getBoundSocket().newInputStream();
                 } catch (FsNeedsSyncException ex) {
-                    delegate.sync(SYNC);
+                    quickSync();
                 }
             }
         }
@@ -361,7 +376,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 try {
                     return getBoundSocket().newSeekableByteChannel();
                 } catch (FsNeedsSyncException ex) {
-                    delegate.sync(SYNC);
+                    quickSync();
                 }
             }
         }
@@ -379,7 +394,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 try {
                     return getBoundSocket().getLocalTarget();
                 } catch (FsNeedsSyncException ex) {
-                    delegate.sync(SYNC);
+                    quickSync();
                 }
             }
         }
@@ -396,7 +411,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 try {
                     return getBoundSocket().newOutputStream();
                 } catch (FsNeedsSyncException ex) {
-                    delegate.sync(SYNC);
+                    quickSync();
                 }
             }
         }

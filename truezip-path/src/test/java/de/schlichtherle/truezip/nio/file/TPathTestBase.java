@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.ConcurrencyUtils.Join;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import de.schlichtherle.truezip.util.TaskFactory;
@@ -523,7 +524,7 @@ extends TestBase<D> {
             } catch (IOException expected) {
             }
 
-            // Open file1 as stream and let the garbage collection close the stream automatically.
+            // Open file1 as stream and let the garbage collection join the stream automatically.
             newInputStream(file1);
 
             while (true) {
@@ -625,10 +626,10 @@ extends TestBase<D> {
         }
         
         // The stream has been forcibly closed by TPath.update().
-        // Another close is OK, though!
+        // Another join is OK, though!
         out.close();
         
-        // Reopen stream and let the garbage collection close the stream automatically.
+        // Reopen stream and let the garbage collection join the stream automatically.
         newOutputStream(file1);
         out = null;
         
@@ -1160,7 +1161,7 @@ extends TestBase<D> {
         try {
             out.println("Hello World!");
         } finally {
-            out.close(); // ALWAYS close streams!
+            out.close(); // ALWAYS join streams!
         }
         assertRenameArchiveToTemp(archive);
     }
@@ -1332,7 +1333,7 @@ extends TestBase<D> {
         } // CheckAllEntriesTaskFactory
 
         try {
-            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads).close();
+            runConcurrent(nThreads, new CheckAllEntriesTaskFactory()).join();
         } finally {
             archive.toFile().rm_r();
         }
@@ -1435,7 +1436,7 @@ extends TestBase<D> {
         } // WritingTaskFactory
 
         try {
-            runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
+            runConcurrent(NUM_IO_THREADS, new WritingTaskFactory()).join();
         } finally {
             assertArchiveEntries(archive, NUM_IO_THREADS);
             archive.toFile().rm_r();
@@ -1496,13 +1497,13 @@ extends TestBase<D> {
             }
         } // WritingTaskFactory
 
-        runConcurrent(new WritingTaskFactory(), NUM_IO_THREADS).close();
+        runConcurrent(NUM_IO_THREADS, new WritingTaskFactory()).join();
     }
 
     /**
      * Test for http://java.net/jira/browse/TRUEZIP-192 .
      */
-    //@Test
+    @Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
         assertTrue(TConfig.get().isLenient());
 
@@ -1541,19 +1542,28 @@ extends TestBase<D> {
         } // CopyingTaskFactory
 
         final TPath src = archive;
-        final TPath dst = new TPath(createTempFile());
-        delete(dst);
         try {
-            final AutoCloseable closeable
-                    = runConcurrent(new CopyingTaskFactory(src, dst), NUM_IO_THREADS);
+            final TPath dst = new TPath(createTempFile());
+            delete(dst);
             try {
-                runConcurrent(new CopyingTaskFactory(dst, src), NUM_IO_THREADS)
-                        .close();
+                try {
+                    final Join join = runConcurrent(NUM_IO_THREADS,
+                            new CopyingTaskFactory(src, dst));
+                    try {
+                        runConcurrent(NUM_IO_THREADS,
+                                new CopyingTaskFactory(dst, src)
+                                ).join();
+                    } finally {
+                        join.join();
+                    }
+                } finally {
+                    dst.getFileSystem().close();
+                }
             } finally {
-                closeable.close();
+                delete(dst.getNonArchivePath());
             }
         } finally {
-            delete(dst.getNonArchivePath());
+            src.getFileSystem().close();
         }
         // src alias archive gets deleted by the test fixture.
     }
