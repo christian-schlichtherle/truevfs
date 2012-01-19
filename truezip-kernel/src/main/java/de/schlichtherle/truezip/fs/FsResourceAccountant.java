@@ -137,10 +137,11 @@ public final class FsResourceAccountant {
      * share the same lock that has been provided to their constructor!
      *
      * @param  timeout the number of milliseconds to await the closing of
-     *         resources which have been accounted for in <em>other</em>
+     *         resources which have been accounted for by <em>other</em>
+     *         threads once the lock has been acquired.
+     *         If this is non-positive, then there is no timeout for waiting.
+     * @return The number of closeable resources accounted for by <em>all</em>
      *         threads.
-     *         If this is {@code 0}, then there is no timeout for waiting.
-     * @return The number of <em>all</em> accounted closeable resources.
      */
     int waitOtherThreads(final long timeout) {
         lock.lock();
