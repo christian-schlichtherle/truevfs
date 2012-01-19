@@ -146,6 +146,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     void mount(final boolean autoCreate) throws IOException {
+        // HC SUNT DRACONES!
         try {
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property changes
@@ -161,6 +162,7 @@ extends FsFileSystemArchiveController<E> {
                     socket.getLocalTarget(),
                     readOnly));
         } catch (FsException ex) {
+            assert !(ex instanceof FsFalsePositiveException) : ex;
             throw ex;
         } catch (IOException ex) {
             if (!autoCreate) {
@@ -168,7 +170,7 @@ extends FsFileSystemArchiveController<E> {
                 try {
                     parentEntry = parent.getEntry(name);
                 } catch (FsException ex2) {
-                    assert false;
+                    assert !(ex2 instanceof FsFalsePositiveException) : ex2;
                     throw ex2;
                 } catch (IOException ex2) {
                     //ex2.initCause(ex);
