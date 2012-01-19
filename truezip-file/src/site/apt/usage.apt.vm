@@ -227,29 +227,35 @@ Using TrueZIP File*
     archive files which are mounted or have been updated by an application.
     However, processing some of these archive files may fail for any I/O
     related reason.
-    Hence TrueZIP assembles a <sequential I/O exception> chain from any I/O
-    exception which occurs during synchronization of the archive files.
+    Hence the TrueZIP Kernel assembles a <sequential I/O exception> chain from
+    any I/O exception which occurs during synchronization of the archive files.
     Upon finishing the processing, when this chain is not empty, it gets sorted
     according to (1) descending order of priority and (2) ascending order of
     appearance, and finally the head of the resulting exception chain gets
     thrown.
 
-    (Note that sequential I/O exception chaining is a concept which is
+    Note that sequential I/O exception chaining is a concept which is
     completely orthogonal to Java's general exception cause chaining:
     In a sequential I/O exception chain, each exception may still have a
-    chain of other exceptions as its cause.)
+    chain of other exceptions as its cause.
 
     When catching a sequential I/O exception chain, an application could
-    either use it as it is or rearrange this chain in order of appearance.
+    either use it as it is or rearrange this chain striclty in order of
+    appearance.
     The following snippet demonstrates the default priority/appearance sorting
     order if a sequential I/O exception chain is catched and printed:
 
 %{snippet|id=umount1|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/file/sample/Usage.java}
 
-    Rearranging a sequential I/O exception chain in order of appearance
-    is done like this instead:
+    Rearranging a sequential I/O exception chain strictly in order of
+    appearance is done like this instead:
 
 %{snippet|id=umount2|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/file/sample/Usage.java}
+
+    In either case, at most the first three sequential I/O exceptions in the
+    chain get printed by default.
+    You can change this by calling
+    {{{../apidocs/de/schlichtherle/truezip/io/SequentialIOException.html#setMaxPrintExceptions(int)}<<<SequentialIOException.setMaxPrintExceptions(int)>>>}}.
 
     The default priority/appearance sorting order enables applications to
     selectively catch the following sequential I/O exception chain sub-classes:
@@ -278,10 +284,6 @@ Using TrueZIP File*
     some warnings or at least one severe error condition has occured:
 
 %{snippet|id=umount3|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/file/sample/Usage.java}
-
-    Note that the method <<<Throwable.getMessage()>>> (and hence
-    <<<Throwable.printStackTrace()>>> will concatenate the detail messages of
-    the exceptions in a sequential I/O exception chain in the given order.
 
 ** Performance Considerations
 

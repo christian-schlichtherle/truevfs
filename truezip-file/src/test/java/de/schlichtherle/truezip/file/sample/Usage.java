@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.SequentialIOException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -62,9 +61,10 @@ abstract class Usage {
 // START SNIPPET: umount1
         try {
             TFile.umount(); // with or without parameters
-        } catch (SequentialIOException ouch) {
-            // Print the sequential I/O exception chain in order of
-            // descending priority and ascending appearance.
+        } catch (FsSyncException ouch) {
+            // Print the sequential I/O exception chain in order of descending
+            // priority and ascending appearance.
+            // This is the default so you wouldn't have to call sortPriority().
             ouch.sortPriority().printStackTrace();
             //ouch.printStackTrace(); // equivalent
         }
@@ -75,9 +75,9 @@ abstract class Usage {
 // START SNIPPET: umount2
         try {
             TFile.umount(); // with or without parameters
-        } catch (SequentialIOException ouch) {
-            // Print the sequential I/O exception chain in order of
-            // appearance instead.
+        } catch (FsSyncException ouch) {
+            // Print the sequential I/O exception chain strictly in order of
+            // ascending appearance instead.
             ouch.sortAppearance().printStackTrace();
         }
 // END SNIPPET: umount2
