@@ -397,7 +397,7 @@ public class SequentialIOException extends IOException implements Cloneable {
      * @see #printStackTrace(PrintStream)
      * @see #printStackTrace(PrintWriter)
      */
-    public static void setMaxPrintExceptions(int maxPrintExcepions) {
+    public static void setMaxPrintExceptions(final int maxPrintExcepions) {
         SequentialIOException.maxPrintExceptions = maxPrintExcepions;
     }
 }
