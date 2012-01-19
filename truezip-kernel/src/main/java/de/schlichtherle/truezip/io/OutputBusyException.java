@@ -20,7 +20,6 @@ package de.schlichtherle.truezip.io;
  * @version $Id$
  */
 public class OutputBusyException extends FileBusyException {
-
     private static final long serialVersionUID = 962318648273654198L;
     
     public OutputBusyException(String message) {
