@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.awt;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Container;
@@ -69,7 +70,7 @@ public class Windows {
     /**
      * Search the containment hierarchy updwards for the first showing window.
      */
-    private static Window findFirstShowingWindow(final Window w) {
+    private static @CheckForNull Window findFirstShowingWindow(final Window w) {
         for (Container c = w; c != null; c = c.getParent())
             if (c instanceof Window && c.isShowing())
                 return (Window) c;
@@ -117,11 +118,12 @@ public class Windows {
         lastFocusedWindow = new WeakReference<Window>(w);
     }
 
-    private static Window getAnyShowingWindow() {
+    private static @CheckForNull Window getAnyShowingWindow() {
         return getAnyShowingWindow(Frame.getFrames());
     }
 
-    private static Window getAnyShowingWindow(final Window[] windows) {
+    private static @CheckForNull Window getAnyShowingWindow(
+            final Window[] windows) {
         for (int i = 0, l = windows.length; i < l; i++) {
             Window window = windows[i];
             if (window.isShowing())
