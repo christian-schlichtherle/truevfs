@@ -34,7 +34,6 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-@DefaultAnnotation(NonNull.class)
 final class FsNeedsLockRetryException extends FsException {
     FsNeedsLockRetryException() {
         super(null);

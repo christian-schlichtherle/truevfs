@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -27,7 +25,6 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-@DefaultAnnotation(NonNull.class)
 public abstract class FsException extends IOException {
 
     FsException() {
