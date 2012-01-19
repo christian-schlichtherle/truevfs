@@ -47,8 +47,7 @@ extends IOSocket<E, Entry> {
      * {@link #connect}ed to another socket.
      */
     @Override
-    @Nullable
-    public Entry getPeerTarget() throws IOException {
+    public @Nullable Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
 

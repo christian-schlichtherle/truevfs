@@ -73,8 +73,7 @@ public abstract class IOSocket<LT, PT> {
      *
      * @return The peer target for I/O operations.
      */
-    @CheckForNull
-    public abstract PT getPeerTarget() throws IOException;
+    public abstract @CheckForNull PT getPeerTarget() throws IOException;
 
     /**
      * Copies an input stream {@link InputSocket#newInputStream created}
