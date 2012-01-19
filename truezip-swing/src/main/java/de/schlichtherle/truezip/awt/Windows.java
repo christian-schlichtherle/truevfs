@@ -11,6 +11,7 @@ package de.schlichtherle.truezip.awt;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
@@ -87,7 +88,7 @@ public class Windows {
      * focus, while this method will return the last window in this JVM which
      * had the focus (unless this is also the first call to this method).
      */
-    public static Window getLastFocusedWindow() {
+    public static @Nullable Window getLastFocusedWindow() {
         observeFocusedWindow();
         return lastFocusedWindow.get();
     }
