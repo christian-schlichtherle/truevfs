@@ -8,13 +8,7 @@
  */
 package de.schlichtherle.truezip.fs.sample;
 
-import de.schlichtherle.truezip.fs.FsCompositeDriver;
-import de.schlichtherle.truezip.fs.FsDefaultDriver;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsPath;
-import de.schlichtherle.truezip.fs.FsUriModifier;
+import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.IOSocket;
@@ -98,7 +92,7 @@ public final class Copy {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(FsManager.UMOUNT);
+            manager.sync(FsSyncOptions.UMOUNT);
         }
     }
 // END SNIPPET: copy
