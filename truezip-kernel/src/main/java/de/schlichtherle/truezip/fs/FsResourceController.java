@@ -55,8 +55,6 @@ extends FsLockModelDecoratingController<
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
-    private static final int WAIT_TIMEOUT = 50;
-
     private @CheckForNull FsResourceAccountant accountant;
 
     /**

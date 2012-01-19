@@ -52,14 +52,13 @@ extends FsModelController<FsLockModel>  {
         return getModel().isWriteLockedByCurrentThread();
     }
 
-    protected final void assertWriteLockedByCurrentThread()
+    protected final void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
-        getModel().assertWriteLockedByCurrentThread();
+        getModel().checkWriteLockedByCurrentThread();
     }
 
-    protected final void assertNotReadLockedByCurrentThread(
-            @CheckForNull FsNeedsWriteLockException ex)
+    protected final void checkNotReadLockedByCurrentThread()
     throws FsNeedsWriteLockException {
-        getModel().assertNotReadLockedByCurrentThread(ex);
+        getModel().checkNotReadLockedByCurrentThread();
     }
 }

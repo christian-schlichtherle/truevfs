@@ -411,7 +411,7 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
         } // CheckAllEntriesTaskFactory
 
         try {
-            runConcurrent(new CheckAllEntriesTaskFactory(), nThreads).close();
+            runConcurrent(nThreads, new CheckAllEntriesTaskFactory()).join();
         } finally {
             zin.close();
         }
@@ -464,7 +464,7 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
 
         final ZipFile zipIn = newZipFile(file);
 
-        // Open checked input stream and close immediately.
+        // Open checked input stream and join immediately.
         InputStream in = zipIn.getCheckedInputStream(name);
         in.close();
 
@@ -530,7 +530,7 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
                 if (tweakDD ^ tweakCFH)
                     fail("Expected CRC32Exception!");
 
-                // Open checked input stream and close immediately.
+                // Open checked input stream and join immediately.
                 in.close();
 
                 if (tweakDD & tweakCFH)

@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -49,7 +48,7 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
      * 
      * @return {@code true} if and only if the write lock is held by the
      *         current thread.
-     * @see    #assertWriteLockedByCurrentThread()
+     * @see    #checkWriteLockedByCurrentThread()
      */
     public boolean isWriteLockedByCurrentThread() {
         return lock.isWriteLockedByCurrentThread();
@@ -63,7 +62,7 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
      *         held by the current thread.
      * @see    #isWriteLockedByCurrentThread()
      */
-    public void assertWriteLockedByCurrentThread()
+    public void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         if (!lock.isWriteLockedByCurrentThread())
             throw new FsNeedsWriteLockException();
@@ -75,14 +74,12 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
      * locking.
      * Use this method for lock control.
      * 
-     * @param  ex the caught exception.
      * @throws FsNeedsWriteLockException if the <i>read lock</i> is
      *         held by the current thread.
      */
-    void assertNotReadLockedByCurrentThread(
-            @CheckForNull FsNeedsWriteLockException ex)
+    void checkNotReadLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         if (0 < lock.getReadHoldCount())
-            throw new FsNeedsWriteLockException(ex);
+            throw new FsNeedsWriteLockException();
     }
 }
