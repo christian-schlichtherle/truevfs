@@ -34,8 +34,8 @@ import net.jcip.annotations.ThreadSafe;
  * Accounts for {@link Closeable} resources
  * ({@link InputStream}, {@link OutputStream} etc.) which are used in multiple
  * threads.
- * This class is only publicly accessible so that you can easily look up the
- * Javadoc for its member thread class {@link Collector}.
+ * This class is only public so that you can easily look up the Javadoc for its
+ * member thread class {@link Collector}.
  * You cannot instantiate this class outside its package, however.
  * <p>
  * For synchronization, each accountant uses a lock which has to be provided
