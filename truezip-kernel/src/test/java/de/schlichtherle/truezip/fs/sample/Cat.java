@@ -95,7 +95,7 @@ public final class Cat {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(FsManager.UMOUNT);
+            manager.sync(FsSyncOptions.UMOUNT);
         }
     }
 // END SNIPPET: cat
