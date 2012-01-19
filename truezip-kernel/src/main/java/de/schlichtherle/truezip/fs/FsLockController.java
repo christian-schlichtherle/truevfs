@@ -160,7 +160,7 @@ extends FsLockModelDecoratingController<
                 final ExceptionHandler<? super FsNeedsLockRetryException, X> handler)
     throws X {
         final ThreadData thread = threadData.get();
-        if (thread.locked) {
+        if (thread.locking) {
             if (!lock.tryLock())
                 throw handler.fail(new FsNeedsLockRetryException());
             try {
@@ -172,11 +172,11 @@ extends FsLockModelDecoratingController<
             while (true) {
                 try {
                     lock.lock();
-                    thread.locked = true;
+                    thread.locking = true;
                     try {
                         return operation.call();
                     } finally {
-                        thread.locked = false;
+                        thread.locking = false;
                         lock.unlock();
                     }
                 } catch (Exception ex) {
@@ -659,7 +659,7 @@ extends FsLockModelDecoratingController<
 
     @NotThreadSafe
     private static final class ThreadData {
-        boolean locked;
+        boolean locking;
         final Random rnd;
 
         ThreadData(Random rnd) { this.rnd = rnd; }
