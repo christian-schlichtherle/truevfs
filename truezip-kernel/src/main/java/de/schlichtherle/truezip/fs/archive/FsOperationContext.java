@@ -43,7 +43,7 @@ final class FsOperationContext {
      * @see    FsContextController#getOutputSocket(FsEntryName, BitField, Entry)
      * @see    FsContextController#mknod(FsEntryName, Entry.Type, BitField, Entry)
      */
-    BitField<FsOutputOption> getOutputOptions() {
+    @Nullable BitField<FsOutputOption> getOutputOptions() {
         return outputOptions;
     }
 
