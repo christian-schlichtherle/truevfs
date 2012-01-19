@@ -487,6 +487,8 @@ extends TestBase<D> {
         }
     }
     
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileInputStream() throws IOException, InterruptedException {
         final TPath file1 = archive.resolve("file1");
@@ -499,14 +501,18 @@ extends TestBase<D> {
         final InputStream in1 = newInputStream(file1);
         try {
             newInputStream(file2);
-            gc();
 
-            // This operation should complete without any exception if the garbage
-            // collector did its job.
-            try {
-                copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
-            } catch (FsSyncWarningException ex) {
-                fail("The garbage collector hasn't been collecting an open stream. If this is only happening occasionally, you can safely ignore it.");
+            while (true) {
+                try {
+                    // This operation may succeed without any exception if
+                    // the garbage collector did its job.
+                    copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
+                    break;
+                } catch (FsSyncException ex) {
+                    // The garbage collector hasn't been collecting the open
+                    // stream. Let's try to trigger it.
+                    System.gc();
+                }
             }
 
             // in1 is still open!
@@ -527,18 +533,16 @@ extends TestBase<D> {
             // Open file1 as stream and let the garbage collection join the stream automatically.
             newInputStream(file1);
 
-            while (true) {
-                try {
-                    // This operation should succeed without any exception if
-                    // the garbage collector did its job.
-                    umount(); // allow external modifications!
-                break;
-                } catch (FsSyncWarningException ex) {
-                    // The garbage collector hasn't been collecting the open
-                    // stream. Let's try to trigger it.
-                    System.gc();
-                }
+            try {
+                // This operation may succeed without any exception if
+                // the garbage collector did its job.
+                umount(); // allow external modifications!
+            } catch (FsSyncWarningException ex) {
+                // It may fail once if a stream was busy!
+                if (!(ex.getCause() instanceof FileBusyException))
+                    throw ex;
             }
+            umount(); // It must not fail twice for the same reason!
 
             delete(archive.getNonArchivePath());
         } finally {
@@ -561,6 +565,8 @@ extends TestBase<D> {
         assertFalse(exists(file1));
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileOutputStream() throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
@@ -633,18 +639,16 @@ extends TestBase<D> {
         newOutputStream(file1);
         out = null;
         
-        while (true) {
-            try {
-                // This operation should succeed without any exception if
-                // the garbage collector did its job.
-                umount(); // allow external modifications!
-                break;
-            } catch (FsSyncWarningException ex) {
-                // The garbage collector hasn't been collecting the open
-                // stream. Let's try to trigger it.
-                System.gc();
-            }
+        try {
+            // This operation may succeed without any exception if
+            // the garbage collector did its job.
+            umount(); // allow external modifications!
+        } catch (FsSyncWarningException ex) {
+            // It may fail once if a stream was busy!
+            if (!(ex.getCause() instanceof FileBusyException))
+                throw ex;
         }
+        umount(); // It must not fail twice for the same reason!
         
         // Cleanup.
         delete(file2);
@@ -983,14 +987,7 @@ extends TestBase<D> {
     throws IOException {
         // Create a file with an old timestamp.
         final long time = System.currentTimeMillis();
-        {
-            final OutputStream out = newOutputStream(a);
-            try {
-                out.write(data);
-            } finally {
-                out.close();
-            }
-        }
+        createTestFile(a);
         setLastModifiedTime(a, FileTime.fromMillis(time - granularity));
 
         // Test copy a to b.
@@ -1003,7 +1000,7 @@ extends TestBase<D> {
         long blmd = getLastModifiedTime(b).toMillis() / granularity * granularity;
         long almu = (getLastModifiedTime(a).toMillis() + granularity - 1) / granularity * granularity;
         long blmu = (getLastModifiedTime(b).toMillis() + granularity - 1) / granularity * granularity;
-        assertTrue(almd == blmd || almu == blmu);
+        assertTrue("almd == " + almd + ", blmd == " + blmd + ", almu == " + almu + ", blmu == " + blmu, almd == blmd || almu == blmu);
 
         // Test copy b to a.
         copy(b, a, StandardCopyOption.REPLACE_EXISTING);
@@ -1015,7 +1012,7 @@ extends TestBase<D> {
         blmd = getLastModifiedTime(b).toMillis() / granularity * granularity;
         almu = (getLastModifiedTime(a).toMillis() + granularity - 1) / granularity * granularity;
         blmu = (getLastModifiedTime(b).toMillis() + granularity - 1) / granularity * granularity;
-        assertTrue(almd == blmd || almu == blmu);
+        assertTrue("almd == " + almd + ", blmd == " + blmd + ", almu == " + almu + ", blmu == " + blmu, almd == blmd || almu == blmu);
 
         // Check result.
         {

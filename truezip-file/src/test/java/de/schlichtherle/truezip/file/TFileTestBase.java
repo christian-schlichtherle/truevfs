@@ -551,18 +551,16 @@ extends TestBase<D> {
             // Open file1 as stream and let the garbage collection join the stream automatically.
             new TFileInputStream(file1);
 
-            while (true) {
-                try {
-                    // This operation should succeed without any exception if
-                    // the garbage collector did its job.
-                    umount(); // allow external modifications!
-                    break;
-                } catch (FsSyncWarningException ex) {
-                    // The garbage collector hasn't been collecting the open
-                    // stream. Let's try to trigger it.
-                    System.gc();
-                }
+            try {
+                // This operation may succeed without any exception if
+                // the garbage collector did its job.
+                umount(); // allow external modifications!
+            } catch (FsSyncWarningException ex) {
+                // It may fail once if a stream was busy!
+                if (!(ex.getCause() instanceof FileBusyException))
+                    throw ex;
             }
+            umount(); // It must not fail twice for the same reason!
 
             TFile.rm(archive.getNonArchiveFile());
         } finally {
@@ -585,6 +583,8 @@ extends TestBase<D> {
         assertFalse(file1.exists());
     }
 
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
     public final void testBusyFileOutputStream() throws IOException, InterruptedException {
         TFile file1 = new TFile(archive, "file1");
@@ -659,18 +659,16 @@ extends TestBase<D> {
         new TFileOutputStream(file1);
         out = null;
         
-        while (true) {
-            try {
-                // This update should succeed without any exception if the
-                // garbage collector did its job.
-                umount(); // allow external modifications!
-                break;
-            } catch (FsSyncWarningException ex) {
-                // The garbage collector hasn't been collecting the open
-                // stream. Let's try to trigger it.
-                System.gc();
-            }
+        try {
+            // This operation may succeed without any exception if
+            // the garbage collector did its job.
+            umount(); // allow external modifications!
+        } catch (FsSyncWarningException ex) {
+            // It may fail once if a stream was busy!
+            if (!(ex.getCause() instanceof FileBusyException))
+                throw ex;
         }
+        umount(); // It must not fail twice for the same reason!
         
         // Cleanup.
         file2.rm();
@@ -940,15 +938,8 @@ extends TestBase<D> {
     throws IOException {
         // Create a file with an old timestamp.
         final long time = System.currentTimeMillis();
-        {
-            final OutputStream out = new TFileOutputStream(a);
-            try {
-                out.write(data);
-            } finally {
-                out.close();
-            }
-            assertTrue(a.setLastModified(time - granularity));
-        }
+        createTestFile(a);
+        assertTrue(a.setLastModified(time - granularity));
 
         // Test copy a to b.
         TFile.cp(a, b);
@@ -960,7 +951,7 @@ extends TestBase<D> {
         long blmd = b.lastModified() / granularity * granularity;
         long almu = (a.lastModified() + granularity - 1) / granularity * granularity;
         long blmu = (b.lastModified() + granularity - 1) / granularity * granularity;
-        assertTrue(almd == blmd || almu == blmu);
+        assertTrue("almd == " + almd + ", blmd == " + blmd + ", almu == " + almu + ", blmu == " + blmu, almd == blmd || almu == blmu);
 
         // Test copy b to a.
         TFile.cp(b, a);
@@ -972,7 +963,7 @@ extends TestBase<D> {
         blmd = b.lastModified() / granularity * granularity;
         almu = (a.lastModified() + granularity - 1) / granularity * granularity;
         blmu = (b.lastModified() + granularity - 1) / granularity * granularity;
-        assertTrue(almd == blmd || almu == blmu);
+        assertTrue("almd == " + almd + ", blmd == " + blmd + ", almu == " + almu + ", blmu == " + blmu, almd == blmd || almu == blmu);
 
         // Check result.
         {
