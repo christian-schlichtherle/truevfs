@@ -84,13 +84,13 @@ import net.jcip.annotations.NotThreadSafe;
  * thrown by the exception handlers themselves and is freely selectable.
  *
  * @param   <C> The type of the cause exception.
- * @param   <E> The type of the thrown exception.
+ * @param   <X> The type of the thrown exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public interface ExceptionHandler<C extends Exception, E extends Exception> {
+public interface ExceptionHandler<C extends Exception, X extends Exception> {
 
     /**
      * Called to handle an exceptional condition which
@@ -104,7 +104,7 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * @param   cause the exception to handle.
      * @return  The exception to throw.
      */
-    E fail(C cause);
+    X fail(C cause);
 
     /**
      * Called to handle an exceptional condition which
@@ -119,5 +119,5 @@ public interface ExceptionHandler<C extends Exception, E extends Exception> {
      * @throws Exception if the implementation wants the caller to abort its
      *         task.
      */
-    void warn(C cause) throws E;
+    void warn(C cause) throws X;
 }
