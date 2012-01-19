@@ -13,20 +13,18 @@ import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.SequentialIOException;
-import de.schlichtherle.truezip.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * A collection of code snippets to demonstrate the usage of the API in the
  * TrueZIP File* module.
- *
- * @deprecated This class contains code snippets which are useless in
- *             isolation, so it should not get used in applications.
- * @author     Christian Schlichtherle
- * @version    $Id$
+ * Note that these code snippets are useless in isolation, so they should never
+ * get called in application code.
+ * 
+ * @author  Christian Schlichtherle
+ * @version $Id$
  */
-@Deprecated
 @SuppressWarnings("CallToThreadDumpStack")
 abstract class Usage {
 
@@ -38,7 +36,7 @@ abstract class Usage {
 // START SNIPPET: cat1
         InputStream in = new TFileInputStream(path);
         try {
-            Streams.cat(in, System.out);
+            TFile.cat(in, System.out);
         } finally {
             in.close(); // ALWAYS close the stream!
         }
@@ -50,7 +48,7 @@ abstract class Usage {
         try {
             InputStream in = new TFileInputStream(path);
             try {
-                Streams.cat(in, System.out);
+                TFile.cat(in, System.out);
             } finally {
                 in.close(); // ALWAYS close the stream!
             }
