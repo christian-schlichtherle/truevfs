@@ -13,10 +13,11 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
- * Thrown by a file system operation to indicate that the file system needs to
- * get write locked in order to retry the operation.
- * This exception is typically thrown if the read lock is already acquired,
- * so that updating the lock would just dead lock the current thread.
+ * Thrown by a file system operation to indicate that a file system lock must
+ * get released for a small random amount of time before it can get re-acquired
+ * in order to retry the operation.
+ * This exception is typically thrown if the lock is already acquired, but
+ * should get temporarily released in order to prevent a potential dead lock.
  * <p>
  * This exception type is reserved for use within the TrueZIP Kernel in order
  * to catch it and re-lock the file system.
@@ -34,8 +35,8 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 @DefaultAnnotation(NonNull.class)
-public final class FsNeedsWriteLockException extends FsException {
-    FsNeedsWriteLockException() {
+final class FsNeedsLockRetryException extends FsException {
+    FsNeedsLockRetryException() {
         super(null);
     }
 }
