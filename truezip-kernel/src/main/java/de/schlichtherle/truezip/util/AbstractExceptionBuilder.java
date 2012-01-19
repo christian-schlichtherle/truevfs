@@ -19,17 +19,17 @@ import net.jcip.annotations.NotThreadSafe;
  * override {@link #post(Exception)}.
  *
  * @param   <C> The type of the cause exception.
- * @param   <E> The type of the assembled exception.
+ * @param   <X> The type of the assembled exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public abstract class AbstractExceptionBuilder< C extends Exception,
-                                                E extends Exception>
-implements ExceptionBuilder<C, E> {
+                                                X extends Exception>
+implements ExceptionBuilder<C, X> {
 
-    private @CheckForNull E assembly;
+    private @CheckForNull X assembly;
 
     /**
      * This method is called to update the given {@code previous} result of
@@ -42,7 +42,7 @@ implements ExceptionBuilder<C, E> {
      *         last assembly has been checked out.
      * @return The assembled exception. {@code null} is not permitted.
      */
-    protected abstract E update(C cause, @CheckForNull E previous);
+    protected abstract X update(C cause, @CheckForNull X previous);
 
     /**
      * This method is called to post-process the given result of the assembly
@@ -54,7 +54,7 @@ implements ExceptionBuilder<C, E> {
      * @param  assembly The checked out result of the exception assembly.
      * @return The post-processed checked out result of the exception assembly.
      */
-    protected E post(E assembly) {
+    protected X post(X assembly) {
         return assembly;
     }
 
@@ -65,10 +65,10 @@ implements ExceptionBuilder<C, E> {
      * @see #post(Exception)
      */
     @Override
-    public final E fail(C cause) {
+    public final X fail(C cause) {
         if (null == cause)
             throw new NullPointerException();
-        final E assembly = update(cause, this.assembly);
+        final X assembly = update(cause, this.assembly);
         this.assembly = null;
         return post(assembly);
     }
@@ -91,8 +91,8 @@ implements ExceptionBuilder<C, E> {
      * @see #post(Exception)
      */
     @Override
-    public final void check() throws E {
-        final E assembly = this.assembly;
+    public final void check() throws X {
+        final X assembly = this.assembly;
         if (null != assembly) {
             this.assembly = null;
             throw post(assembly);

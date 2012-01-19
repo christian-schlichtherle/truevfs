@@ -24,14 +24,14 @@ import net.jcip.annotations.NotThreadSafe;
  * {@link #check()}.
  *
  * @param   <C> The type of the cause exception.
- * @param   <E> The type of the assembled exception.
+ * @param   <X> The type of the assembled exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public interface ExceptionBuilder<C extends Exception, E extends Exception>
-extends ExceptionHandler<C, E> {
+public interface ExceptionBuilder<C extends Exception, X extends Exception>
+extends ExceptionHandler<C, X> {
 
     /**
      * Adds the {@code cause} exception to the assembly and
@@ -44,7 +44,7 @@ extends ExceptionHandler<C, E> {
      * @return The assembled exception to throw.
      */
     @Override
-    E fail(C cause);
+    X fail(C cause);
 
     /**
      * Adds the {@code cause} exception to the assembly and
@@ -58,7 +58,7 @@ extends ExceptionHandler<C, E> {
      *         the caller to abort its task.
      */
     @Override
-    void warn(C cause) throws E;
+    void warn(C cause) throws X;
 
     /**
      * Either returns or checks out and throws
@@ -68,5 +68,5 @@ extends ExceptionHandler<C, E> {
      * @throws Exception the assembled exception if the implementation wants
      *         the caller to abort its task.
      */
-    void check() throws E;
+    void check() throws X;
 }
