@@ -8,10 +8,10 @@
  */
 package de.schlichtherle.truezip.socket;
 
+import de.schlichtherle.truezip.entry.DecoratingEntry;
+import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.DecoratingEntry;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -21,11 +21,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.Closeable;
-import java.io.Flushable;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
