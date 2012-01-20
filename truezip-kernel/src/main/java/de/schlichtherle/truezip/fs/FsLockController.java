@@ -66,12 +66,8 @@ extends FsLockModelDecoratingController<
             : ThreadLocalToolFactory.OLD
                 ).newThreadLocalTool();
 
-    // These fields don't need to be volatile because reads and writes of
-    // references are always atomic.
-    // See The Java Language Specification, Third Edition, section 17.7
-    // "Non-atomic Treatment of double and long".
-    private /*volatile*/ @CheckForNull ReadLock readLock;
-    private /*volatile*/ @CheckForNull WriteLock writeLock;
+    private final @CheckForNull ReadLock readLock;
+    private final @CheckForNull WriteLock writeLock;
 
     /**
      * Constructs a new file system lock controller.
@@ -80,18 +76,18 @@ extends FsLockModelDecoratingController<
      */
     public FsLockController(FsController<? extends FsLockModel> controller) {
         super(controller);
+        this.readLock = getModel().readLock();
+        this.writeLock = getModel().writeLock();
     }
 
     @Override
     protected ReadLock readLock() {
-        final ReadLock lock = this.readLock;
-        return null != lock ? lock : (this.readLock = getModel().readLock());
+        return this.readLock;
     }
 
     @Override
     protected WriteLock writeLock() {
-        final WriteLock lock = this.writeLock;
-        return null != lock ? lock : (this.writeLock = getModel().writeLock());
+        return this.writeLock;
     }
 
     <T> T callReadOrWriteLocked(IOOperation<T> operation)
