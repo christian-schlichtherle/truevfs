@@ -22,6 +22,10 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
+ * DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
+ * Its global scope makes it available to any other test running in parallel,
+ * if any.
+ * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
