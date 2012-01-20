@@ -474,18 +474,12 @@ extends FsLockModelDecoratingController<
 
     @NotThreadSafe
     private class Input extends DecoratingInputSocket<Entry> {
-        Entry local;
-
         Input(InputSocket<?> input) {
             super(input);
         }
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            return null != local ? local : (local = getLocalTarget0());
-        }
-
-        private Entry getLocalTarget0() throws IOException {
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
@@ -547,18 +541,12 @@ extends FsLockModelDecoratingController<
 
     @NotThreadSafe
     private class Output extends DecoratingOutputSocket<Entry> {
-        Entry local;
-
         Output(OutputSocket<?> output) {
             super(output);
         }
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            return null != local ? local : (local = getLocalTarget0());
-        }
-
-        private Entry getLocalTarget0() throws IOException {
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
