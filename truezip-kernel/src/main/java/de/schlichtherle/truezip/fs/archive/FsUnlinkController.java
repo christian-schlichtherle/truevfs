@@ -28,8 +28,6 @@ import net.jcip.annotations.NotThreadSafe;
  * from the parent file system if and only if the virtual root directory has
  * been successfully unlinked from its federated file system before.
  * 
- * @param   <M> The type of the file system model shared by the decorator chain
- *          of file system controllers.
  * @since   TrueZIP 7.4.4
  * @author  Christian Schlichtherle
  * @version $Id$
