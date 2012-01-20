@@ -161,18 +161,18 @@ extends FsFileSystemArchiveController<E> {
                     ia.getDriverProduct(),
                     socket.getLocalTarget(),
                     readOnly));
-        } catch (FsException ex) {
+        } catch (final FsException ex) {
             assert !(ex instanceof FsFalsePositiveException) : ex;
             throw ex;
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             if (!autoCreate) {
                 final FsEntry parentEntry;
                 try {
                     parentEntry = parent.getEntry(name);
-                } catch (FsException ex2) {
+                } catch (final FsException ex2) {
                     assert !(ex2 instanceof FsFalsePositiveException) : ex2;
                     throw ex2;
-                } catch (IOException ex2) {
+                } catch (final IOException ex2) {
                     //ex2.initCause(ex);
                     throw new FsFalsePositiveException(ex2);
                 }
