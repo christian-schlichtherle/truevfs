@@ -16,7 +16,6 @@ import de.schlichtherle.truezip.file.TConfig;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -60,7 +59,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     private static final URI DEFAULT_ROOT_MOUNT_POINT_URI
             = URI.create(DEFAULT_ROOT_MOUNT_POINT);
-    private static final FsManager manager = FsManagerLocator.SINGLETON.get();
     private static final Map<String, TFileSystemProvider>
             providers = new WeakHashMap<String, TFileSystemProvider>();
 
@@ -139,8 +137,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      */
+    @SuppressWarnings("deprecation")
     public static void umount() throws FsSyncException {
-        manager.sync(UMOUNT);
+        TConfig.getCurrentManager().sync(UMOUNT);
     }
 
     /**

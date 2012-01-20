@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.file.TConfig;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -49,14 +48,14 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public final class TFileSystem extends FileSystem {
 
-    private static final FsManager manager = FsManagerLocator.SINGLETON.get();
-
     private final FsController<?> controller;
     private final TFileSystemProvider provider;
 
+
+    @SuppressWarnings("deprecation")
     TFileSystem(final TPath path) {
         assert null != path;
-        this.controller = manager.getController(
+        this.controller = TConfig.getCurrentManager().getController(
                 path.getMountPoint(),
                 path.getArchiveDetector());
         this.provider = TFileSystemProvider.get(path.getName());
@@ -137,8 +136,10 @@ public final class TFileSystem extends FileSystem {
      *         This implies loss of data!
      * @see    #sync(BitField)
      */
+    @SuppressWarnings("deprecation")
     public void sync(BitField<FsSyncOption> options) throws FsSyncException {
-        new FsFilteringManager(manager, getMountPoint()).sync(options);
+        new FsFilteringManager(TConfig.getCurrentManager(), getMountPoint())
+                .sync(options);
     }
 
     /**
