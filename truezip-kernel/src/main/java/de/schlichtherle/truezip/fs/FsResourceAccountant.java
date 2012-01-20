@@ -76,8 +76,7 @@ public final class FsResourceAccountant {
      *             locked recursively.
      */
     FsResourceAccountant(final Lock lock) {
-        this.condition = lock.newCondition();
-        this.lock = lock;
+        this.condition = (this.lock = lock).newCondition();
     }
 
     /**
