@@ -46,11 +46,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     public void close() throws IOException {
         if (closed)
             return;
-        try {
-            delegate.close();
-        } finally {
-            closed = true;
-        }
+        closed = true;
+        delegate.close();
     }
 
     private void assertNotClosed() throws IOException {
@@ -107,9 +104,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
-            delegate.close();
+            if (!closed)
+                delegate.close();
         }
     } // DisconnectableOutputStream
 }
