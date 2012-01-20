@@ -48,11 +48,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
     public void close() throws IOException {
         if (closed)
             return;
-        try {
-            delegate.close();
-        } finally {
-            closed = true;
-        }
+        closed = true;
+        delegate.close();
     }
 
     private void assertNotClosed() throws IOException {
@@ -134,9 +131,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
-            delegate.close();
+            if (!closed)
+                delegate.close();
         }
     } // DisconnectableReadOnlyFile
 
@@ -189,9 +185,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
-            delegate.close();
+            if (!closed)
+                delegate.close();
         }
     } // DisconnectableInputStream
 }
