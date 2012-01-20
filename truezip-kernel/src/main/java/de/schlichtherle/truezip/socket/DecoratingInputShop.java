@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.DecoratingEntryContainer;
+import de.schlichtherle.truezip.entry.Entry;
 import java.io.IOException;
 
 /**
