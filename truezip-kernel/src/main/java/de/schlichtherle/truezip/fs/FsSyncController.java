@@ -344,7 +344,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
@@ -408,7 +407,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
