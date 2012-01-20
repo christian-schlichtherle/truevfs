@@ -14,6 +14,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -107,6 +108,8 @@ public class StreamsTest {
     }
 
     private static class MockInputStream extends DecoratingInputStream {
+        static final Random rnd = new Random();
+
         final byte[] buffer;
         boolean closed;
 
@@ -119,7 +122,7 @@ public class StreamsTest {
 
         static byte[] newBuffer() {
             final byte[] buffer = new byte[2 * Streams.FIFO_SIZE * Streams.BUFFER_SIZE];
-            ThreadLocalRandom.current().nextBytes(buffer);
+            rnd.nextBytes(buffer);
             return buffer;
         }
 
