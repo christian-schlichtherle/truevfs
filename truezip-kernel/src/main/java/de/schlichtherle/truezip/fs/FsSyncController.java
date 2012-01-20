@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
@@ -60,8 +58,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * Times out waiting for resources after
      * {@link FsLockModelDecoratingController#WAIT_TIMEOUT_MILLIS} milliseconds.
      */
-    private static final BitField<FsSyncOption>
-            QUICK_SYNC = SYNC.clear(WAIT_CLOSE_INPUT).clear(WAIT_CLOSE_OUTPUT);
+    /*private static final BitField<FsSyncOption>
+            QUICK_SYNC = SYNC.clear(WAIT_CLOSE_INPUT).clear(WAIT_CLOSE_OUTPUT);*/
 
     /**
      * Constructs a new file system sync controller.
@@ -74,14 +72,17 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private void sync() throws IOException {
         checkWriteLockedByCurrentThread();
-        try {
+        delegate.sync(SYNC);
+        // This makes the CPU busy waiting.
+        // It's not quite clear if this is required at all.
+        /*try {
             delegate.sync(QUICK_SYNC);
         } catch (final FsSyncException ex) {
             final IOException cause = ex.getCause();
             if (cause instanceof FsThreadsIOBusyException)
                 throw new FsNeedsLockRetryException();
             throw ex;
-        }
+        }*/
     }
 
     @Override
