@@ -26,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -53,10 +51,6 @@ import net.jcip.annotations.ThreadSafe;
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class FsResourceAccountant {
-
-    private static final Logger logger = Logger.getLogger(
-            FsResourceAccountant.class.getName(),
-            FsResourceAccountant.class.getName());
 
     private final Lock lock;
     private final Condition condition;
@@ -124,10 +118,7 @@ public final class FsResourceAccountant {
     /**
      * Waits until all closeable resources which have been started accounting
      * for by <em>other</em> threads get stopped accounting for or a timeout
-     * occurs.
-     * If the current thread is interrupted while waiting,
-     * then immediately a warning message is logged using
-     * {@code java.util.logging} and control is returned to the caller.
+     * occurs or the current thread gets interrupted, whatever happens first.
      * <p>
      * Upon return of this method, threads may immediately start accounting
      * for closeable resources again unless the caller also locks the lock
@@ -146,21 +137,22 @@ public final class FsResourceAccountant {
     int waitOtherThreads(final long timeout) {
         lock.lock();
         try {
-            final long start = System.currentTimeMillis();
-            while (threadLocalResources() < allResources()) {
-                if (0 < timeout) {
-                    final long toWait = timeout - (System.currentTimeMillis() - start);
-                    if (0 >= toWait
-                            || !condition.await(toWait, TimeUnit.MILLISECONDS))
-                        break;
-                } else {
-                    condition.await();
+            try {
+                long toWait = TimeUnit.MILLISECONDS.toNanos(timeout);
+                // Note that local resources may get picked up by the garbage
+                // collector, so we MUST check this on each loop cycle!
+                while (localResources() < totalResources()) {
+                    if (0 < timeout) {
+                        if (0 >= toWait)
+                            break;
+                        toWait = condition.awaitNanos(toWait);
+                    } else {
+                        condition.await();
+                    }
                 }
+            } catch (InterruptedException cancel) {
             }
-            return allResources();
-        } catch (InterruptedException ex) {
-            logger.log(Level.WARNING, "interrupted", ex);
-            return allResources();
+            return totalResources();
         } finally {
             lock.unlock();
         }
@@ -170,9 +162,10 @@ public final class FsResourceAccountant {
      * Returns the number of closeable resources which have been accounted for
      * by the <em>current</em> thread.
      * <p>
-     * This method must not get called if the {@link #lock} is not acquired!
+     * This method <em>must not</em> get called if the {@link #lock} is not
+     * acquired!
      */
-    private int threadLocalResources() {
+    int localResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
         for (final Account ref : threads.values())
@@ -186,11 +179,12 @@ public final class FsResourceAccountant {
      * Mind that this value may reduce instantly, even while the lock is held,
      * so this value should <em>not</em> get cached!
      * <p>
-     * This method must not get called if the {@link #lock} is not acquired!
+     * This method <em>must not</em> get called if the {@link #lock} is not
+     * acquired!
      * 
      * @return The number of <em>all</em> accounted closeable resources.
      */
-    private int allResources() {
+    private int totalResources() {
         return threads.size();
     }
 
@@ -278,8 +272,7 @@ public final class FsResourceAccountant {
             while (true) {
                 try {
                     ((Account) queue.remove()).signalAccountant();
-                } catch (InterruptedException ex) {
-                    logger.log(Level.FINE, "interrupted", ex);
+                } catch (InterruptedException ignored) {
                 }
             }
         }
