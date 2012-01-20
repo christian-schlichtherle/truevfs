@@ -1000,7 +1000,7 @@ extends TestBase<D> {
         long blmd = getLastModifiedTime(b).toMillis() / granularity * granularity;
         long almu = (getLastModifiedTime(a).toMillis() + granularity - 1) / granularity * granularity;
         long blmu = (getLastModifiedTime(b).toMillis() + granularity - 1) / granularity * granularity;
-        assertTrue("almd == " + almd + ", blmd == " + blmd + ", almu == " + almu + ", blmu == " + blmu, almd == blmd || almu == blmu);
+        assertTrue("almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")", almd == blmd || almu == blmu);
 
         // Test copy b to a.
         copy(b, a, StandardCopyOption.REPLACE_EXISTING);
@@ -1012,7 +1012,7 @@ extends TestBase<D> {
         blmd = getLastModifiedTime(b).toMillis() / granularity * granularity;
         almu = (getLastModifiedTime(a).toMillis() + granularity - 1) / granularity * granularity;
         blmu = (getLastModifiedTime(b).toMillis() + granularity - 1) / granularity * granularity;
-        assertTrue("almd == " + almd + ", blmd == " + blmd + ", almu == " + almu + ", blmu == " + blmu, almd == blmd || almu == blmu);
+        assertTrue("almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")", almd == blmd || almu == blmu);
 
         // Check result.
         {
