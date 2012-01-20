@@ -8,6 +8,8 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsDefaultManager;
+import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
@@ -74,6 +76,12 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
         final Map<String, Object> environment = new HashMap<String, Object>();
         environment.put(ARCHIVE_DETECTOR, detector);
         final TConfig config = TConfig.push();
+        // Using a private file system manager violates the third party access
+        // constraints, but may be helpful in identifying isolation issues
+        // during integration tests - see
+        // http://truezip.java.net/truezip-file/usage.html#Third_Party_Access
+        if (Boolean.getBoolean(FsManager.class.getName() + ".isolate"))
+            config.setManager(new FsDefaultManager());
         config.setLenient(true);
         config.setArchiveDetector(detector);
         this.driver = driver;
