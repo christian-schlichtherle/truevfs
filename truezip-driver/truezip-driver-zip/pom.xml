@@ -98,6 +98,8 @@
                                 <!-- Still unreliable when run in parallel.
                                      Run manually when required. -->
                                 <exclude>**/swing/*IT.class</exclude>
+                                <!-- Uncomment for testing with JSE 6 only. -->
+                                <!--exclude>**/nio/file/zip/*IT.class</exclude-->
                             </excludes>
                         </configuration>
                     </plugin>
