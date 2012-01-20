@@ -66,6 +66,7 @@ extends FsLockModelDecoratingController<
     }
 
     private FsResourceAccountant getAccountant() {
+        assert isWriteLockedByCurrentThread();
         final FsResourceAccountant accountant = this.accountant;
         return null != accountant
                 ? accountant
@@ -375,7 +376,6 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -402,7 +402,6 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -429,7 +428,6 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -456,7 +454,6 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
