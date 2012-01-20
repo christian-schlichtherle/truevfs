@@ -203,7 +203,7 @@ extends FsLockModelController {
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
-            getPeerTarget();    // may trigger sync() if in same file system
+            getPeerTarget(); // may trigger sync() if in same file system
             checkAccess(name, READ);
             final FsCovariantEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
