@@ -78,12 +78,14 @@ extends IOSocket<E, Entry> {
     final OutputSocket<E> connect(@CheckForNull final InputSocket<?> newPeer) {
         final InputSocket<?> oldPeer = peer;
         if (oldPeer != newPeer) {
-            peer = null;
-            if (null != oldPeer)
+            if (null != oldPeer) {
+                peer = null;
                 oldPeer.connect(null);
-            peer = newPeer;
-            if (null != newPeer)
+            }
+            if (null != newPeer) {
+                peer = newPeer;
                 newPeer.connect(this);
+            }
         }
         return this;
     }
