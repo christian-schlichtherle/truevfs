@@ -61,10 +61,10 @@ extends FsLockModelDecoratingController<
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
-    private static final ThreadLocal<ThreadData> threadData = (JSE7.AVAILABLE
-            ? ThreadLocalDataFactory.NEW
-            : ThreadLocalDataFactory.OLD
-                ).newThreadLocalData();
+    private static final ThreadLocal<ThreadTool> threadTool = (JSE7.AVAILABLE
+            ? ThreadLocalToolFactory.NEW
+            : ThreadLocalToolFactory.OLD
+                ).newThreadLocalTool();
 
     // These fields don't need to be volatile because reads and writes of
     // references are always atomic.
@@ -154,12 +154,12 @@ extends FsLockModelDecoratingController<
      * @throws X As thrown by the operation.
      */
     @SuppressWarnings("unchecked")
-    private static <T, X extends Exception> T
+    private static <T, X extends IOException> T
     callLocked( final Operation<T, X> operation,
                 final Lock lock,
                 final ExceptionHandler<? super FsNeedsLockRetryException, X> handler)
     throws X {
-        final ThreadData thread = threadData.get();
+        final ThreadTool thread = threadTool.get();
         if (thread.locking) {
             if (!lock.tryLock())
                 throw handler.fail(new FsNeedsLockRetryException());
@@ -179,7 +179,7 @@ extends FsLockModelDecoratingController<
                         thread.locking = false;
                         lock.unlock();
                     }
-                } catch (Exception ex) {
+                } catch (IOException ex) {
                     if (!needsLockRetry(ex))
                         throw (X) ex;
                     thread.pause();
@@ -380,12 +380,20 @@ extends FsLockModelDecoratingController<
         class Sync implements Operation<Void, X> {
             @Override
             public Void call() throws X {
-                delegate.sync(options, handler);
+                try {
+                    final FsSyncExceptionBuilder
+                            builder = new FsSyncExceptionBuilder();
+                    delegate.sync(options, builder);
+                    builder.check();
+                } catch (FsSyncException ex) {
+                    throw handler.fail(ex);
+                }
                 return null;
             }
         } // Sync
 
-        class Handler implements ExceptionHandler<FsNeedsLockRetryException, X> {
+        class NeedsLockRetryExceptionHandler
+        implements ExceptionHandler<FsNeedsLockRetryException, X> {
             @Override
             public X fail(FsNeedsLockRetryException cause) {
                 return handler.fail(new FsSyncException(getModel(), cause));
@@ -395,9 +403,11 @@ extends FsLockModelDecoratingController<
             public void warn(FsNeedsLockRetryException cause) throws X {
                 handler.warn(new FsSyncException(getModel(), cause));
             }
-        } // Handler
+        } // NeedsLockRetryExceptionHandler
 
-        callLocked(new Sync(), writeLock(), new Handler());
+        callLocked( new Sync(),
+                    writeLock(),
+                    new NeedsLockRetryExceptionHandler());
     }
 
     @Immutable
@@ -658,33 +668,35 @@ extends FsLockModelDecoratingController<
     } // LockingOutputStream
 
     @NotThreadSafe
-    private static final class ThreadData {
+    private static final class ThreadTool {
         boolean locking;
         final Random rnd;
 
-        ThreadData(Random rnd) { this.rnd = rnd; }
+        ThreadTool(Random rnd) { this.rnd = rnd; }
 
+        /**
+         * Pauses the current thread for a random time interval between one and
+         * {@link #WAIT_TIMEOUT_MILLIS} milliseconds inclusively.
+         * Interrupting the current thread immediately cancels the pause and
+         * clears the interrupt status of the current thread.
+         */
         void pause () {
-            boolean interrupted = false;
             try {
-                Thread.sleep(rnd.nextInt(WAIT_TIMEOUT));
-            } catch (InterruptedException ex) {
-                interrupted = true;
+                Thread.sleep(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
+            } catch (InterruptedException cancel) {
             }
-            if (interrupted)
-                Thread.currentThread().interrupt();
         }
-    } // ThreadData
+    } // ThreadTool
 
     @Immutable
-    private enum ThreadLocalDataFactory {
+    private enum ThreadLocalToolFactory {
         OLD {
             @Override
-            ThreadLocal<ThreadData> newThreadLocalData() {
-                return new ThreadLocal<ThreadData>() {
+            ThreadLocal<ThreadTool> newThreadLocalTool() {
+                return new ThreadLocal<ThreadTool>() {
                     @Override
-                    public ThreadData initialValue() {
-                        return new ThreadData(new Random());
+                    public ThreadTool initialValue() {
+                        return new ThreadTool(new Random());
                     }
                 };
             }
@@ -692,20 +704,20 @@ extends FsLockModelDecoratingController<
         
         NEW {
             @Override
-            ThreadLocal<ThreadData> newThreadLocalData() {
-                return new ThreadLocal<ThreadData>() {
+            ThreadLocal<ThreadTool> newThreadLocalTool() {
+                return new ThreadLocal<ThreadTool>() {
                     @Override
-                    public ThreadData initialValue() {
-                        return new ThreadData(ThreadLocalRandom.current());
+                    public ThreadTool initialValue() {
+                        return new ThreadTool(ThreadLocalRandom.current());
                     }
                 };
             }
         };
 
-        abstract ThreadLocal<ThreadData> newThreadLocalData();
-    } // ThreadLocalDataFactory
+        abstract ThreadLocal<ThreadTool> newThreadLocalTool();
+    } // ThreadLocalToolFactory
 
-    private interface Operation<T, X extends Exception> extends Callable<T> {
+    private interface Operation<T, X extends IOException> extends Callable<T> {
         @Override T call() throws X;
     } // Operation
 

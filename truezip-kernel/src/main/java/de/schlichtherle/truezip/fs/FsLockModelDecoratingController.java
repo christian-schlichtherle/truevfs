@@ -30,7 +30,7 @@ public abstract class FsLockModelDecoratingController<
         C extends FsController<? extends FsLockModel>>
 extends FsDecoratingController<FsLockModel, C>  {
 
-    protected static final int WAIT_TIMEOUT = 100;
+    protected static final int WAIT_TIMEOUT_MILLIS = 100;
 
     /**
      * Constructs a new decorating file system controller.
