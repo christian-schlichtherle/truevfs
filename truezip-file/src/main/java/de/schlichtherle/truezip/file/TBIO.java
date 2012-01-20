@@ -263,6 +263,7 @@ final class TBIO {
      * @param  options the options for accessing the file.
      * @return An input socket for the given file.
      */
+    @SuppressWarnings("deprecation")
     static InputSocket<?>
     getInputSocket(final File src, final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
@@ -274,9 +275,8 @@ final class TBIO {
                         options);
         }
         final FsPath path = new FsPath(src);
-        return TConfig
-                .get()
-                .getManager()
+        return  TConfig
+                .getCurrentManager()
                 .getController( path.getMountPoint(), getDetector(src))
                 .getInputSocket(path.getEntryName(), options);
     }
@@ -290,6 +290,7 @@ final class TBIO {
      *         get copied.
      * @return An output socket for the given file.
      */
+    @SuppressWarnings("deprecation")
     static OutputSocket<?>
     getOutputSocket(final File dst,
                     final BitField<FsOutputOption> options,
@@ -304,9 +305,8 @@ final class TBIO {
                         template);
         }
         final FsPath path = new FsPath(dst);
-        return TConfig
-                .get()
-                .getManager()
+        return  TConfig
+                .getCurrentManager()
                 .getController(     path.getMountPoint(), getDetector(dst))
                 .getOutputSocket(   path.getEntryName(),
                                     options.clear(CREATE_PARENTS),

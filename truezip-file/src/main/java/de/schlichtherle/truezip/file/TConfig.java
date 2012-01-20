@@ -334,12 +334,25 @@ public final class TConfig implements Closeable {
     }
 
     /**
+     * Returns the file system manager of the current configuration.
+     * 
+     * @return     The file system manager of the current configuration.
+     * @deprecated This public class property is solely intended to be used by
+     *             the TrueZIP&nbsp;Path module and should never be used by
+     *             client applications.
+     */
+    @SuppressWarnings("deprecation")
+    public static FsManager getCurrentManager() {
+        return get().getManager();
+    }
+
+    /**
      * Returns the file system manager.
      * 
      * @return The file system manager.
      */
     FsManager getManager() {
-        return manager;
+        return this.manager;
     }
 
     /**

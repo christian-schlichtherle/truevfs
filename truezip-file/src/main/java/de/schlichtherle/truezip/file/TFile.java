@@ -925,11 +925,13 @@ public final class TFile extends File {
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      */
+    @SuppressWarnings("deprecation")
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
-        TConfig.get().getManager().sync(options);
+        TConfig.getCurrentManager().sync(options);
     }
 
+    
     /**
      * Commits all unsynchronized changes to the contents of the federated file
      * system (i.e. prospective archive files) identified by {@code archive}
@@ -970,6 +972,7 @@ public final class TFile extends File {
      *         This implies loss of data!
      * @see    #sync(BitField)
      */
+    @SuppressWarnings("deprecation")
     public static void sync(
             final TFile archive,
             final BitField<FsSyncOption> options)
@@ -979,7 +982,7 @@ public final class TFile extends File {
         if (null != archive.getEnclArchive())
             throw new IllegalArgumentException(archive + " (not a top level archive file)");
         new FsFilteringManager(
-                TConfig.get().getManager(),
+                TConfig.getCurrentManager(),
                 archive.getController().getModel().getMountPoint()
                 ).sync(options);
     }
@@ -1616,8 +1619,9 @@ public final class TFile extends File {
         return controller = getController(mountPoint);
     }
 
+    @SuppressWarnings("deprecation")
     private FsController<?> getController(FsMountPoint mountPoint) {
-        return TConfig.get().getManager().getController(mountPoint, detector);
+        return TConfig.getCurrentManager().getController(mountPoint, detector);
     }
 
     /**
