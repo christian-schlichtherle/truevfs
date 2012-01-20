@@ -16,7 +16,7 @@ import java.util.concurrent.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ConcurrencyUtils {
+public class ConcurrencyUtils {
 
     public static final int
             NUM_IO_THREADS = 10 * Runtime.getRuntime().availableProcessors();
