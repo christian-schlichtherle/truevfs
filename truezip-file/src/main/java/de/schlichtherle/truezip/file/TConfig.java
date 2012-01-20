@@ -43,6 +43,7 @@ import net.jcip.annotations.ThreadSafe;
  * <p>
  * Whenever a child thread is started, it shares the current configuration
  * with its parent thread.
+ * Mind that access to the global configuration is <em>not</em> synchronized.
  * 
  * <a name="examples"/><h3>Examples</h3>
  *
@@ -214,10 +215,11 @@ try {
  * If it's not supported, then it gets silently ignored, thereby falling back
  * to the default strategy of performing a full archive update whenever
  * required to avoid writing redundant archive entry data.
- * Currently, the situation is like this:
+ * <p>
+ * As of TrueZIP 7.4.4, the support is like this:
  * <ul>
  * <li>The drivers of the module TrueZIP Driver ZIP fully support this output
- *     option preference, so it's available for EAR, JAR, WAR etc.</li>
+ *     option preference, so it's available for EAR, JAR, WAR, ZIP etc.</li>
  * <li>The drivers of the module TrueZIP Driver ZIP.RAES only allow redundant
  *     archive entry contents and meta data.
  *     You cannot append to an existing ZIP.RAES file, however.</li>
@@ -267,10 +269,11 @@ public final class TConfig implements Closeable {
 
     // I don't think these fields should be volatile.
     // This would make a difference if and only if two threads were changing
-    // the GLOBAL configuration concurrently, which they should never do.
-    // Instead, the GLOBAL configurations should only changed once at
+    // the GLOBAL configuration concurrently, which is discouraged.
+    // Instead, the global configuration should only changed once at
     // application startup and then each thread should modify only its thread
     // local configuration which has been obtained by a call to TConfig.push().
+    private FsManager manager;
     private TArchiveDetector detector;
     private BitField<FsInputOption> inputPreferences;
     private BitField<FsOutputOption> outputPreferences;
@@ -316,6 +319,7 @@ public final class TConfig implements Closeable {
 
     /** Default constructor for the global configuration. */
     private TConfig() {
+        this.manager = FsManagerLocator.SINGLETON.get();
         this.detector = TArchiveDetector.ALL;
         this.inputPreferences = DEFAULT_INPUT_PREFERENCES;
         this.outputPreferences = DEFAULT_OUTPUT_PREFERENCES;
@@ -323,21 +327,30 @@ public final class TConfig implements Closeable {
 
     /** Copy constructor for inheritable thread local configurations. */
     private TConfig(final TConfig template) {
+        this.manager = template.getManager();
         this.detector = template.getArchiveDetector();
         this.inputPreferences = template.getInputPreferences();
         this.outputPreferences = template.getOutputPreferences();
     }
 
     /**
-     * Returns the file system manager to use within this package.
-     * Note that the current implementation effectively returns
-     * {@code FsManagerLocator.SINGLETON.get()}, but this is considered to be
-     * an implementation detail which may be subject to change.
+     * Returns the file system manager.
      * 
-     * @return The file system manager to use within this package.
+     * @return The file system manager.
      */
     FsManager getManager() {
-        return FsManagerLocator.SINGLETON.get();
+        return manager;
+    }
+
+    /**
+     * Sets the file system manager.
+     * 
+     * @param manager The file system manager.
+     */
+    void setManager(final FsManager manager) {
+        if (null == manager)
+            throw new NullPointerException();
+        this.manager = manager;
     }
 
     /**
