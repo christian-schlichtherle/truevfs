@@ -24,7 +24,7 @@ public class ConcurrencyUtils {
     /** You cannot instantiate this class. */
     private ConcurrencyUtils() { }
 
-    public static Join runConcurrent(
+    public static TaskJoiner runConcurrent(
             final int nThreads,
             final TaskFactory factory) {
         final List<Future<Void>> results
@@ -36,7 +36,7 @@ public class ConcurrencyUtils {
         } finally {
             executor.shutdown();
         }
-        return new Join() {
+        return new TaskJoiner() {
             @Override
             public void join() throws InterruptedException, ExecutionException {
                 try {
@@ -51,7 +51,11 @@ public class ConcurrencyUtils {
         };
     }
 
-    public interface Join {
+    public interface TaskFactory {
+        Callable<Void> newTask(int threadNum);
+    }
+
+    public interface TaskJoiner {
         public void join() throws InterruptedException, ExecutionException;
     }
 }

@@ -9,12 +9,16 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
+import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
+import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -26,9 +30,6 @@ import org.junit.Test;
  */
 @DefaultAnnotation(NonNull.class)
 public class FsResourceAccountantTest {
-
-    private static final Logger logger
-            = Logger.getLogger(FsResourceAccountantTest.class.getName());
 
     private static final long NO_TIMEOUT = 0;
 
@@ -46,12 +47,29 @@ public class FsResourceAccountantTest {
     public void accounting() throws IOException {
         final Resource resource = new Resource();
         accountant.startAccountingFor(resource);
-        resource.close();
         accountant.startAccountingFor(resource); // redundant
-        resource.close();
         accountant.stopAccountingFor(resource);
-        resource.close();
         accountant.stopAccountingFor(resource); // redundant
+    }
+
+    @Test
+    public void multithreadedAccounting()
+    throws InterruptedException, ExecutionException {
+
+        class ResourceHogFactory implements TaskFactory {
+            @Override
+            public Callable<Void> newTask(int threadNum) {
+                return new ResourceHog();
+            }
+        } // ResourceHogFactory
+
+        final TaskJoiner join = runConcurrent(100, new ResourceHogFactory());
+        try {
+            while (0 < accountant.waitForeignResources(TIMEOUT_MILLIS))
+                System.gc();
+        } finally {
+            join.join();
+        }
     }
 
     @Test
@@ -60,15 +78,15 @@ public class FsResourceAccountantTest {
         accountant.startAccountingFor(resource);
         long time = System.currentTimeMillis();
         int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
-        assertTrue("Expected no timeout!", System.currentTimeMillis() - time <= TIMEOUT_MILLIS);
+        assertTrue("Expected no timeout!", System.currentTimeMillis() - time <= TIMEOUT_MILLIS); // be forgiving!
         assertThat(resources, is(1));
     }
 
     @Test
     public void waitForeignResources() throws InterruptedException {
         final Thread[] threads = new Thread[] {
-            new ResourceHog(),
-            new EvilResourceHog(),
+            new Thread(new ResourceHog()),
+            new Thread(new EvilResourceHog()),
         };
         for (int i = 0; i < threads.length; i++) {
             final Class<?> clazz = threads[i].getClass();
@@ -78,10 +96,10 @@ public class FsResourceAccountantTest {
             System.gc();
             int resources = accountant.waitForeignResources(NO_TIMEOUT);
             assertThat(resources, is(0));
-            final long time = System.currentTimeMillis();
+            final long start = System.currentTimeMillis();
             resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
             assertTrue("Expected no timeout while waiting for " + clazz.getSimpleName(),
-                    System.currentTimeMillis() - time <= TIMEOUT_MILLIS);
+                    System.currentTimeMillis() - start <= TIMEOUT_MILLIS); // be forgiving!
             assertThat(resources, is(0));
         }
     }
@@ -89,23 +107,23 @@ public class FsResourceAccountantTest {
     @Test
     public void closeAll() throws IOException, InterruptedException {
         final Thread[] threads = new Thread[] {
-            new ResourceHog(),
-            new EvilResourceHog(),
+            new Thread(new ResourceHog()),
+            new Thread(new EvilResourceHog()),
         };
         for (Thread thread : threads) {
             thread.start();
             thread.join();
         }
-        long time = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
         int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         assertTrue("Expected timeout!",
-                System.currentTimeMillis() - time > TIMEOUT_MILLIS);
+                System.currentTimeMillis() - start >= TIMEOUT_MILLIS); // be forgiving!
         assertTrue(resources >= 1);
         accountant.closeAllResources(SequentialIOExceptionBuilder.create());
-        time = System.currentTimeMillis();
+        start = System.currentTimeMillis();
         resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         assertTrue("Expected no timeout!",
-                System.currentTimeMillis() - time <= TIMEOUT_MILLIS);
+                System.currentTimeMillis() - start <= TIMEOUT_MILLIS); // be forgiving!
         assertThat(resources, is(0));
     }
 
@@ -115,12 +133,18 @@ public class FsResourceAccountantTest {
      * We want to make sure that the TrueZIP resource collector picks up the
      * stale resource then.
      */
-    private final class ResourceHog extends Thread {
+    private final class ResourceHog implements Runnable, Callable<Void> {
         @Override
         public void run() {
             Resource resource = new Resource();
             accountant.startAccountingFor(resource);
             accountant.startAccountingFor(resource); // redundant call should do no harm
+        }
+
+        @Override
+        public Void call() {
+            run();
+            return null;
         }
     } // ResourceHog
 
@@ -131,13 +155,19 @@ public class FsResourceAccountantTest {
      * We want to make sure that the TrueZIP resource collector picks up the
      * stale resource then.
      */
-    private final class EvilResourceHog extends Thread {
+    private final class EvilResourceHog implements Runnable, Callable<Void> {
         final Resource resource = new Resource();
 
         @Override
         public void run() {
             accountant.startAccountingFor(resource);
             accountant.startAccountingFor(resource); // redundant call should do no harm
+        }
+
+        @Override
+        public Void call() {
+            run();
+            return null;
         }
     } // EvilResourceHog
 

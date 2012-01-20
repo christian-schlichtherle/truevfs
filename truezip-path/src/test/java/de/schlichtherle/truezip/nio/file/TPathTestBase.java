@@ -23,10 +23,10 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import de.schlichtherle.truezip.util.ConcurrencyUtils.Join;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
+import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
+import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import de.schlichtherle.truezip.util.TaskFactory;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import static java.io.File.separatorChar;
@@ -1540,7 +1540,7 @@ extends TestBase<D> {
             delete(dst);
             try {
                 try {
-                    final Join join = runConcurrent(NUM_IO_THREADS,
+                    final TaskJoiner join = runConcurrent(NUM_IO_THREADS,
                             new CopyingTaskFactory(src, dst));
                     try {
                         runConcurrent(NUM_IO_THREADS,
