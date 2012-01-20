@@ -56,7 +56,7 @@ public class SynchronizedOutputStream extends DecoratingOutputStream {
     }
 
     @Override
-	public void write(int b) throws IOException {
+    public void write(int b) throws IOException {
         synchronized (lock) {
             delegate.write(b);
         }
