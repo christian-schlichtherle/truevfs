@@ -185,7 +185,6 @@ extends FsLockModelDecoratingController<
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        assert isWriteLockedByCurrentThread();
         beforeSync(options, handler);
         // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in the model
         // instead.
@@ -196,6 +195,7 @@ extends FsLockModelDecoratingController<
     beforeSync( final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
+        assert isWriteLockedByCurrentThread();
         if (0 >= controllers.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
@@ -285,7 +285,8 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        public InputSocket<?> getBoundSocket() throws IOException {
+        protected InputSocket<?> getBoundSocket() throws IOException {
+            assert isWriteLockedByCurrentThread();
             EntryController controller = controllers.get(name);
             if (null == controller) {
                 if (!options.get(FsInputOption.CACHE))
@@ -344,7 +345,8 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        public OutputSocket<?> getBoundSocket() throws IOException {
+        protected OutputSocket<?> getBoundSocket() throws IOException {
+            assert isWriteLockedByCurrentThread();
             EntryController controller = controllers.get(name);
             if (null == controller) {
                 if (!options.get(FsOutputOption.CACHE))
@@ -460,7 +462,6 @@ extends FsLockModelDecoratingController<
         }
 
         void beginOutput() throws IOException {
-            assert isWriteLockedByCurrentThread();
             delegate.mknod(name, FILE, outputOptions, template);
             assert isTouched();
         }
@@ -510,6 +511,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void close() throws IOException {
+                assert isWriteLockedByCurrentThread();
                 delegate.close();
                 controllers.put(name, EntryController.this);
             }
@@ -523,6 +525,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                assert isWriteLockedByCurrentThread();
                 beginOutput();
                 final SeekableByteChannel sbc = getBoundSocket().newSeekableByteChannel();
                 controllers.put(name, EntryController.this);
@@ -538,6 +541,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public final OutputStream newOutputStream() throws IOException {
+                assert isWriteLockedByCurrentThread();
                 beginOutput();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 controllers.put(name, EntryController.this);
