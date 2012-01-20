@@ -40,7 +40,7 @@ public class FsResourceAccountantTest {
 
     @Before
     public void setUp() {
-        this.accountant = new FsResourceAccountant(new ReentrantLock());
+        accountant = new FsResourceAccountant(new ReentrantLock());
     }
 
     @Test
@@ -65,65 +65,73 @@ public class FsResourceAccountantTest {
 
         final TaskJoiner join = runConcurrent(100, new ResourceHogFactory());
         try {
-            while (0 < accountant.waitForeignResources(TIMEOUT_MILLIS))
-                System.gc();
+            waitAllResources();
         } finally {
             join.join();
         }
+    }
+
+    private void waitAllResources() {
+        do {
+            System.gc(); // triggering GC in a loop seems to help with concurrency!
+        } while (0 < accountant.waitForeignResources(TIMEOUT_MILLIS));
     }
 
     @Test
     public void waitLocalResources() throws InterruptedException {
         final Resource resource = new Resource();
         accountant.startAccountingFor(resource);
-        long time = System.currentTimeMillis();
-        int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
-        assertTrue("Expected no timeout!", System.currentTimeMillis() - time <= TIMEOUT_MILLIS); // be forgiving!
+        final long start = System.currentTimeMillis();
+        final int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
+        final long time = System.currentTimeMillis() - start;
+        assertTrue("Timeout after " + time + " milliseconds!",
+                time <= TIMEOUT_MILLIS); // be forgiving!
         assertThat(resources, is(1));
     }
 
     @Test
     public void waitForeignResources() throws InterruptedException {
         final Thread[] threads = new Thread[] {
-            new Thread(new ResourceHog()),
-            new Thread(new EvilResourceHog()),
+            new ResourceHog(),
+            new EvilResourceHog(),
         };
         for (int i = 0; i < threads.length; i++) {
             final Class<?> clazz = threads[i].getClass();
             threads[i].start();
             threads[i].join();
             threads[i] = null;
-            System.gc();
-            int resources = accountant.waitForeignResources(NO_TIMEOUT);
-            assertThat(resources, is(0));
+            waitAllResources();
             final long start = System.currentTimeMillis();
-            resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
-            assertTrue("Expected no timeout while waiting for " + clazz.getSimpleName(),
-                    System.currentTimeMillis() - start <= TIMEOUT_MILLIS); // be forgiving!
+            int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
+            final long time = System.currentTimeMillis() - start;
+            assertTrue("Timeout while waiting for " + clazz.getSimpleName() + " after " + time + " milliseconds!",
+                    time <= TIMEOUT_MILLIS); // be forgiving!
             assertThat(resources, is(0));
         }
     }
 
     @Test
-    public void closeAll() throws IOException, InterruptedException {
+    public void closeAllResources() throws IOException, InterruptedException {
         final Thread[] threads = new Thread[] {
-            new Thread(new ResourceHog()),
-            new Thread(new EvilResourceHog()),
+            new ResourceHog(),
+            new EvilResourceHog(),
         };
-        for (Thread thread : threads) {
+        for (final Thread thread : threads) {
             thread.start();
             thread.join();
         }
         long start = System.currentTimeMillis();
         int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
-        assertTrue("Expected timeout!",
-                System.currentTimeMillis() - start >= TIMEOUT_MILLIS); // be forgiving!
+        long time = System.currentTimeMillis() - start;
+        assertTrue("Premature return before timeout after " + time + " milliseconds with " + resources + " open resources!",
+                time >= TIMEOUT_MILLIS); // be forgiving!
         assertTrue(resources >= 1);
         accountant.closeAllResources(SequentialIOExceptionBuilder.create());
         start = System.currentTimeMillis();
         resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
-        assertTrue("Expected no timeout!",
-                System.currentTimeMillis() - start <= TIMEOUT_MILLIS); // be forgiving!
+        time = System.currentTimeMillis() - start;
+        assertTrue("Timeout after " + time + " milliseconds!",
+                time <= TIMEOUT_MILLIS); // be forgiving!
         assertThat(resources, is(0));
     }
 
@@ -133,7 +141,7 @@ public class FsResourceAccountantTest {
      * We want to make sure that the TrueZIP resource collector picks up the
      * stale resource then.
      */
-    private final class ResourceHog implements Runnable, Callable<Void> {
+    private final class ResourceHog extends Thread implements Callable<Void> {
         @Override
         public void run() {
             Resource resource = new Resource();
@@ -142,6 +150,7 @@ public class FsResourceAccountantTest {
         }
 
         @Override
+        @SuppressWarnings("CallToThreadRun")
         public Void call() {
             run();
             return null;
@@ -155,7 +164,7 @@ public class FsResourceAccountantTest {
      * We want to make sure that the TrueZIP resource collector picks up the
      * stale resource then.
      */
-    private final class EvilResourceHog implements Runnable, Callable<Void> {
+    private final class EvilResourceHog extends Thread implements Callable<Void> {
         final Resource resource = new Resource();
 
         @Override
@@ -165,6 +174,7 @@ public class FsResourceAccountantTest {
         }
 
         @Override
+        @SuppressWarnings("CallToThreadRun")
         public Void call() {
             run();
             return null;
