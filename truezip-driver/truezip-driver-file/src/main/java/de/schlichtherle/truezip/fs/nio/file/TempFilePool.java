@@ -23,9 +23,6 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.
- * Besides a call to {@link #release}, the {@link Object#finalize()} method of
- * a created {@link FileEntry} will delete the temporary file, too.
- * However, for best performance you should not rely on this.
  *
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
