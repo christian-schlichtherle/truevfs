@@ -301,13 +301,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getLocalTarget();
         }
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
@@ -348,13 +346,11 @@ extends FsLockModelDecoratingController<
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getLocalTarget();
         }
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
