@@ -78,8 +78,7 @@ public abstract class FsManagerTestBase {
 
             assertThat(manager.getSize(), is(params.length));
             parent = null;
-            gc();
-            assertThat(manager.getSize(), is(0));
+            waitAllManagers();
         }
     }
 
@@ -125,13 +124,13 @@ public abstract class FsManagerTestBase {
             member = null;
             i = null;
             top = null;
-            gc();
-            assertThat(manager.getSize(), is(0));
+            waitAllManagers();
         }
     }
 
-    private static void gc() throws InterruptedException {
-        System.gc();
-        Thread.sleep(50);
+    private void waitAllManagers() {
+        do {
+            System.gc(); // triggering GC in a loop seems to help with concurrency!
+        } while (0 < manager.getSize());
     }
 }
