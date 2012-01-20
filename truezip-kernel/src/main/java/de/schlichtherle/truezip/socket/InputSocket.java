@@ -80,12 +80,14 @@ extends IOSocket<E, Entry> {
     final InputSocket<E> connect(@CheckForNull final OutputSocket<?> newPeer) {
         final OutputSocket<?> oldPeer = peer;
         if (oldPeer != newPeer) {
-            peer = null;
-            if (null != oldPeer)
+            if (null != oldPeer) {
+                peer = null;
                 oldPeer.connect(null);
-            peer = newPeer;
-            if (null != newPeer)
+            }
+            if (null != newPeer) {
+                peer = newPeer;
                 newPeer.connect(this);
+            }
         }
         return this;
     }

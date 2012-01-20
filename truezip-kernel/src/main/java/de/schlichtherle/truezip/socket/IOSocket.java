@@ -98,9 +98,9 @@ public abstract class IOSocket<LT, PT> {
         final InputStream in = input.connect(output).newInputStream();
         OutputStream out = null;
         try {
-            // .connect(input) is actually redundant unless .newInputStream()
-            // messed with the connection.
-            out = output.connect(input).newOutputStream();
+            // .connect(input) is redundant unless .newInputStream() messed
+            // with the connection, which is impossible outside this package.
+            out = output/*.connect(input)*/.newOutputStream();
         } finally {
             if (null == out) { // exception?
                 try {
@@ -110,7 +110,12 @@ public abstract class IOSocket<LT, PT> {
                 }
             }
         }
-        Streams.copy(in, out);
+        try {
+            Streams.copy(in, out);
+        } finally {
+            // Disconnect for subsequent use, if any.
+            input.connect(null); // or output.connect(null)
+        }
     }
 
     /**
