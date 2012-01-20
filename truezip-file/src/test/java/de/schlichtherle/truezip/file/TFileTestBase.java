@@ -171,9 +171,9 @@ extends TestBase<D> {
         assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
         TFile.umount(new TFile(entry).getInnerArchive());
         Reference<? extends FsController<?>> ref;
-        while (null == (ref = queue.remove(TIMEOUT_MILLIS))) {
+        do {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
-        }
+        } while (null == (ref = queue.remove(TIMEOUT_MILLIS)));
         assert exp == ref;
         assert null == exp.get();
     }
