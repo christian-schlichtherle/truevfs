@@ -102,7 +102,7 @@ extends FsLockModelDecoratingController<
      * Waits for all entry input and output resources to close or forces
      * them to close, dependending on the {@code options}.
      * Mind that this method deliberately handles entry input and output
-     * streams equally because {@link FsResourceAccountant#waitOtherThreads}
+     * streams equally because {@link FsResourceAccountant#waitForeignResources}
      * WILL NOT WORK if any two resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
@@ -132,7 +132,7 @@ extends FsLockModelDecoratingController<
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
                 || options.get(WAIT_CLOSE_OUTPUT);
-        final int total = accountant.waitOtherThreads(
+        final int total = accountant.waitForeignResources(
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 >= total)
             return;

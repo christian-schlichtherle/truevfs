@@ -55,17 +55,17 @@ public class FsResourceAccountantTest {
     }
 
     @Test
-    public void waitForCurrentThread() throws InterruptedException {
+    public void waitLocalResources() throws InterruptedException {
         final Resource resource = new Resource();
         accountant.startAccountingFor(resource);
         long time = System.currentTimeMillis();
-        int resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
+        int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         assertTrue("Expected no timeout!", System.currentTimeMillis() - time <= TIMEOUT_MILLIS);
         assertThat(resources, is(1));
     }
 
     @Test
-    public void waitForOtherThreads() throws InterruptedException {
+    public void waitForeignResources() throws InterruptedException {
         final Thread[] threads = new Thread[] {
             new ResourceHog(),
             new EvilResourceHog(),
@@ -76,10 +76,10 @@ public class FsResourceAccountantTest {
             threads[i].join();
             threads[i] = null;
             System.gc();
-            int resources = accountant.waitOtherThreads(NO_TIMEOUT);
+            int resources = accountant.waitForeignResources(NO_TIMEOUT);
             assertThat(resources, is(0));
             final long time = System.currentTimeMillis();
-            resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
+            resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
             assertTrue("Expected no timeout while waiting for " + clazz.getSimpleName(),
                     System.currentTimeMillis() - time <= TIMEOUT_MILLIS);
             assertThat(resources, is(0));
@@ -97,13 +97,13 @@ public class FsResourceAccountantTest {
             thread.join();
         }
         long time = System.currentTimeMillis();
-        int resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
+        int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         assertTrue("Expected timeout!",
                 System.currentTimeMillis() - time > TIMEOUT_MILLIS);
         assertTrue(resources >= 1);
         accountant.closeAllResources(SequentialIOExceptionBuilder.create());
         time = System.currentTimeMillis();
-        resources = accountant.waitOtherThreads(TIMEOUT_MILLIS);
+        resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         assertTrue("Expected no timeout!",
                 System.currentTimeMillis() - time <= TIMEOUT_MILLIS);
         assertThat(resources, is(0));

@@ -67,7 +67,7 @@ public final class FsResourceAccountant {
      * Constructs a new resource accountant with the given lock.
      * You MUST MAKE SURE not to use two instances of this class which share
      * the same lock!
-     * Otherwise {@link #waitOtherThreads} will not work as designed!
+     * Otherwise {@link #waitForeignResources} will not work as designed!
      * 
      * @param lock the lock to use for accounting resources.
      *             Though not required by the use in this class, this
@@ -134,7 +134,7 @@ public final class FsResourceAccountant {
      * @return The number of closeable resources accounted for by <em>all</em>
      *         threads.
      */
-    int waitOtherThreads(final long timeout) {
+    int waitForeignResources(final long timeout) {
         lock.lock();
         try {
             try {
