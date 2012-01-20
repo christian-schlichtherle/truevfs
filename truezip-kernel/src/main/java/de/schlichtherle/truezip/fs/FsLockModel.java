@@ -26,8 +26,7 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public final class FsLockModel extends FsDecoratingModel<FsModel> {
 
-    private final ReentrantReadWriteLock
-            lock = new ReentrantReadWriteLock(false);
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     public FsLockModel(FsModel model) {
         super(model);
