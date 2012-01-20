@@ -487,7 +487,7 @@ extends FsLockModelDecoratingController<
                 }
             } // GetLocalTarget
 
-            return callReadOrWriteLocked(new GetLocalTarget());
+            return callWriteLocked(new GetLocalTarget());
         }
 
         @Override
@@ -554,7 +554,7 @@ extends FsLockModelDecoratingController<
                 }
             } // GetLocalTarget
 
-            return callReadOrWriteLocked(new GetLocalTarget());
+            return callWriteLocked(new GetLocalTarget());
         }
 
         @Override
