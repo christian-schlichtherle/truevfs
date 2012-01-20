@@ -52,10 +52,10 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
         channel = new FileInputStream(file).getChannel();
         try {
             window(0);
-        } catch (IOException ioe) {
-            FileNotFoundException fnfe = new FileNotFoundException(ioe.toString());
-            fnfe.initCause(ioe);
-            throw fnfe;
+        } catch (IOException ex) {
+            FileNotFoundException ex2 = new FileNotFoundException(ex.toString());
+            ex2.initCause(ex);
+            throw ex2;
         }
         assert window != null;
         assert windowOff == 0;
@@ -91,19 +91,19 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     }
 
     @Override
-	public long length() throws IOException {
+    public long length() throws IOException {
         assertOpen();
         return channel.size();
     }
 
     @Override
-	public long getFilePointer() throws IOException {
+    public long getFilePointer() throws IOException {
         assertOpen();
         return windowOff + window.position();
     }
 
     @Override
-	public void seek(final long fp) throws IOException {
+    public void seek(final long fp) throws IOException {
         assertOpen();
 
         if (fp < 0)
@@ -118,12 +118,12 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     }
 
     @Override
-	public int read() throws IOException {
+    public int read() throws IOException {
         return available() > 0 ? window.get() & 0xff : -1;
     }
 
     @Override
-	public int read(final byte[] buf, final int off, int len)
+    public int read(final byte[] buf, final int off, int len)
     throws IOException {
         if (len == 0)
             return 0; // be fault-tolerant and compatible to RandomAccessFile
@@ -148,28 +148,12 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_GC")
     @Override
     public void close() throws IOException {
-        // Check state.
+        final FileChannel channel = this.channel;
         if (channel == null)
             return;
-
-        // Order is important here!
-        window = null;
-        try {
-            channel.close();
-        } finally {
-            channel = null;
-            // Workaround for garbage collection issue with memory mapped files.
-            // Note that there's no guarantee that this works: Sometimes it
-            // does, sometimes not!
-            // This may also happen during the integration tests.
-            System.gc();
-            //System.runFinalization();
-            // Thread.interrupted(); // cancel pending interrupt
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException dontCare) {
-            }
-        }
+        this.window = null;
+        this.channel = null;
+        channel.close();
     }
 
     /**

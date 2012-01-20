@@ -16,19 +16,8 @@ import java.io.IOException;
  * @version $Id$
  */
 public final class MemoryMappedReadOnlyFileIT extends ReadOnlyFileTestBase {
-
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {
         return new MemoryMappedReadOnlyFile(file);
-    }
-
-    @Override
-    public void tearDown() throws IOException {
-        try {
-            super.tearDown();
-        } finally {
-            System.gc();
-            System.runFinalization();
-        }
     }
 }
