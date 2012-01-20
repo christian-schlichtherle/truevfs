@@ -204,17 +204,23 @@ public final class FsResourceAccountant {
                 final Closeable c = i.next();
                 i.remove();
                 try {
-                    // This may trigger another removal, but it should cause no
-                    // ConcurrentModificationException because the closeable is
-                    // no more present in the map.
+                    // This should trigger another attempt to remove the
+                    // closeable from the map, but this should cause no
+                    // ConcurrentModificationException because the closeable
+                    // has already been removed.
                     c.close();
                 } catch (IOException ex) {
-                    handler.warn(ex);
+                    handler.warn(ex); // may throw an exception!
                 }
             }
             assert threads.isEmpty();
         } finally {
-            lock.unlock();
+            // Let's be paranoid about try-finally!
+            try {
+                condition.signalAll();
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -226,16 +232,16 @@ public final class FsResourceAccountant {
         final Reference<Thread>
                 owner = new WeakReference<Thread>(Thread.currentThread());
 
-        Account(Closeable resource) {
+        Account(final Closeable resource) {
             super(resource, Collector.queue);
         }
 
         /**
-         * Notifies the resource accountant of this reference.
+         * Notifies all resource accountant waiting threads of this reference.
          * Mind that this method is called even if accounting for the closeable
          * resource has been properly stopped.
          */
-        void signalAccountant() {
+        void signalAll() {
             final Lock lock = FsResourceAccountant.this.lock;
             lock.lock();
             try {
@@ -270,7 +276,7 @@ public final class FsResourceAccountant {
         public void run() {
             while (true) {
                 try {
-                    ((Account) queue.remove()).signalAccountant();
+                    ((Account) queue.remove()).signalAll();
                 } catch (InterruptedException ignored) {
                 }
             }
