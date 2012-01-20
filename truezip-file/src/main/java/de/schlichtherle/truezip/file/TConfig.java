@@ -121,41 +121,6 @@ try (TConfig config = TConfig.push()) {
     ...
 }
  * }</pre>
- * 
- * <a name="unit-testing"/><h4>Unit Testing</h4>
- * <p>
- * Using the thread local inheritable configuration stack comes in handy when
- * unit testing, e.g. with JUnit. Consider this pattern:
- * <pre>{@code
-public class AppTest {
-
-    \@Before
-    public void setUp() {
-        TConfig config = TConfig.push();
-        // Let's just recognize ZIP files.
-        config.setArchiveDetector(new TArchiveDetector("zip"));
-    }
-
-    \@After
-    public void shutDown() {
-        TConfig.pop();
-    }
-
-    \@Test
-    public void testMethod() {
-        // Test accessing some ZIP files here.
-        ...
-    }
-}
- * }</pre>
- * <p>
- * Note that it's not necessary to save the reference to the new pushed
- * configuration in {@code setUp()}.
- * {@code shutDown()} will just pop the top configuration off the inheritable
- * thread local configuration stack.
- * <p>
- * The most important feature of this code is that it's thread-safe, which
- * enables you to run your unit tests in parallel!
  *
  * <a name="appending"/><h4>Appending To Archive Files In The Current Thread</h4>
  * <p>
@@ -227,6 +192,41 @@ try {
  *     archive entry contents.
  *     You cannot append to an existing TAR file, however.</li>
  * </ul>
+ * 
+ * <a name="unit-testing"/><h4>Unit Testing</h4>
+ * <p>
+ * Using the thread local inheritable configuration stack comes in handy when
+ * unit testing, e.g. with JUnit. Consider this pattern:
+ * <pre>{@code
+public class AppTest {
+
+    \@Before
+    public void setUp() {
+        TConfig config = TConfig.push();
+        // Let's just recognize ZIP files.
+        config.setArchiveDetector(new TArchiveDetector("zip"));
+    }
+
+    \@After
+    public void shutDown() {
+        TConfig.pop();
+    }
+
+    \@Test
+    public void testMethod() {
+        // Test accessing some ZIP files here.
+        ...
+    }
+}
+ * }</pre>
+ * <p>
+ * Note that it's not necessary to save the reference to the new pushed
+ * configuration in {@code setUp()}.
+ * {@code shutDown()} will just pop the top configuration off the inheritable
+ * thread local configuration stack.
+ * <p>
+ * The most important feature of this code is that it's thread-safe, which
+ * enables you to run your unit tests in parallel!
  * 
  * @since   TrueZIP 7.2
  * @author  Christian Schlichtherle
