@@ -38,8 +38,6 @@ import net.jcip.annotations.ThreadSafe;
  * file system if and only if any decorated file system controller throws an
  * {@link FsNeedsSyncException}.
  * 
- * @param   <M> The type of the file system model shared by the decorator chain
- *          of file system controllers.
  * @see     FsNeedsSyncException
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
