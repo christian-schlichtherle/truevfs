@@ -14,6 +14,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import net.jcip.annotations.ThreadSafe;
 
@@ -41,15 +42,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         super(output);
     }
 
-    /**
-     * Returns the decorated output shop.
-     * 
-     * @return The decorated output shop.
-     */
-    public OutputShop<E> getDelegate() {
-        return delegate;
-    }
-
     @Override
     public void close() throws IOException {
         synchronized (delegate) {
@@ -73,27 +65,44 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("This method cannot be thread-safe - use getDelegate().iterator() instead!");
+        throw new UnsupportedOperationException("The returned iterator would not be thread-safe!");
     }
 
     @Override
     public final OutputSocket<? extends E> getOutputSocket(final E entry) {
-        if (null == entry)
-            throw new NullPointerException();
-
         class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(SynchronizedOutputShop.super.getOutputSocket(entry));
             }
 
-            // TODO: Implement newSeekableByteChannel()
+            @Override
+            public E getLocalTarget() throws IOException {
+                final OutputShop<E> delegate = SynchronizedOutputShop.this.delegate;
+                synchronized (delegate) {
+                    return getBoundSocket().getLocalTarget();
+                }
+            }
+
+            @Override
+            public Entry getPeerTarget() throws IOException {
+                final OutputShop<E> delegate = SynchronizedOutputShop.this.delegate;
+                synchronized (delegate) {
+                    return getBoundSocket().getPeerTarget();
+                }
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                throw new UnsupportedOperationException("TODO: Implement this!");
+            }
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                synchronized (SynchronizedOutputShop.this.delegate) {
+                final OutputShop<E> delegate = SynchronizedOutputShop.this.delegate;
+                synchronized (delegate) {
                     return new SynchronizedOutputStream(
                             getBoundSocket().newOutputStream(),
-                            SynchronizedOutputShop.this.delegate); // sync on delegate
+                            delegate); // sync on delegate
                 }
             }
         } // Output

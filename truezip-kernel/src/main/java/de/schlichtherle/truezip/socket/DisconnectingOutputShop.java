@@ -15,6 +15,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -50,27 +51,40 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         delegate.close();
     }
 
-    private void assertNotClosed() throws IOException {
+    private void checkOpen() throws IOException {
         if (closed)
             throw new OutputClosedException();
     }
 
     @Override
     public final OutputSocket<? extends E> getOutputSocket(final E entry) {
-        if (null == entry)
-            throw new NullPointerException();
-
         class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(DisconnectingOutputShop.super.getOutputSocket(entry));
             }
 
-            // TODO: Implement newSeekableByteChannel()
+            @Override
+            public E getLocalTarget() throws IOException {
+                checkOpen();
+                return getBoundSocket().getLocalTarget();
+            }
+
+            @Override
+            public Entry getPeerTarget() throws IOException {
+                checkOpen();
+                return getBoundSocket().getPeerTarget();
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                checkOpen();
+                throw new UnsupportedOperationException("TODO: Implement this!");
+            }
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                assertNotClosed();
-                return new DisconnectableOutputStream(
+                checkOpen();
+                return new DisconnectingOutputStream(
                         getBoundSocket().newOutputStream());
             }
         } // Output
@@ -78,21 +92,21 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         return new Output();
     }
 
-    private final class DisconnectableOutputStream
+    private final class DisconnectingOutputStream
     extends DecoratingOutputStream {
-        DisconnectableOutputStream(OutputStream out) {
+        DisconnectingOutputStream(OutputStream out) {
             super(out);
         }
 
         @Override
         public void write(int b) throws IOException {
-            assertNotClosed();
+            checkOpen();
             delegate.write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            assertNotClosed();
+            checkOpen();
             delegate.write(b, off, len);
         }
 
@@ -107,5 +121,5 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             if (!closed)
                 delegate.close();
         }
-    } // DisconnectableOutputStream
+    } // DisconnectingOutputStream
 }
