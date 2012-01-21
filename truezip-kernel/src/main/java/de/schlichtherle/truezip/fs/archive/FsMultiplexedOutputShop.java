@@ -9,21 +9,15 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.entry.Entry.ALL_ACCESS_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputShop;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOSocket;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
@@ -124,9 +118,6 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
 
     @Override
     public OutputSocket<? extends AE> getOutputSocket(final AE entry) {
-        if (null == entry)
-            throw new NullPointerException();
-
         class Output extends DecoratingOutputSocket<AE> {
             Output() {
                 super(FsMultiplexedOutputShop.super.getOutputSocket(entry));
