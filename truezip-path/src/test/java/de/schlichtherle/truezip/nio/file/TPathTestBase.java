@@ -835,10 +835,10 @@ extends TestBase<D> {
         final TPath archiveTest = archive.resolve("test");
         assertInputOutput(archiveTest);
         
-        final TPath archive2 = archive.resolve("inner" + getSuffix());
-        final TPath archive2Test = archive2.resolve("test");
-        assertInputOutput(archive2Test);
-        delete(archive2);
+        final TPath archiveInner = archive.resolve("inner" + getSuffix());
+        final TPath archiveInnerTest = archiveInner.resolve("test");
+        assertInputOutput(archiveInnerTest);
+        delete(archiveInner);
         delete(archive);
     }
 
@@ -848,8 +848,8 @@ extends TestBase<D> {
         delete(file);
     }
 
-    private void assertInput(TPath file) throws IOException {
-        InputStream in = new ByteArrayInputStream(data);
+    private void assertInput(final TPath file) throws IOException {
+        final InputStream in = new ByteArrayInputStream(data);
         try {
             copy(in, file);
         } finally {
@@ -858,14 +858,14 @@ extends TestBase<D> {
         assertEquals(data.length, size(file));
     }
     
-    private void assertOutput(TPath file) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+    private void assertOutput(final TPath file) throws IOException {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
         try {
             copy(file, out);
-            assertTrue(Arrays.equals(data, out.toByteArray()));
         } finally {
             out.close();
         }
+        assertTrue(Arrays.equals(data, out.toByteArray()));
     }
 
     @Test

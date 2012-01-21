@@ -786,10 +786,10 @@ extends TestBase<D> {
         final TFile archiveTest = new TFile(archive, "test");
         assertInputOutput(archiveTest);
         
-        final TFile archive2 = new TFile(archive, "inner" + getSuffix());
-        final TFile archive2Test = new TFile(archive2, "test");
-        assertInputOutput(archive2Test);
-        archive2.rm();
+        final TFile archiveInner = new TFile(archive, "inner" + getSuffix());
+        final TFile archiveInnerTest = new TFile(archiveInner, "test");
+        assertInputOutput(archiveInnerTest);
+        archiveInner.rm();
         archive.rm();
     }
 
@@ -799,8 +799,8 @@ extends TestBase<D> {
         file.rm();
     }
 
-    private void assertInput(TFile file) throws IOException {
-        InputStream in = new ByteArrayInputStream(data);
+    private void assertInput(final TFile file) throws IOException {
+        final InputStream in = new ByteArrayInputStream(data);
         try {
             file.input(in);
         } finally {
@@ -809,8 +809,8 @@ extends TestBase<D> {
         assertEquals(data.length, file.length());
     }
 
-    private void assertOutput(TFile file) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+    private void assertOutput(final TFile file) throws IOException {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
         try {
             file.output(out);
         } finally {
