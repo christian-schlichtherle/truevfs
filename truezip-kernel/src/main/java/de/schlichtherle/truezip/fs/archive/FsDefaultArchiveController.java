@@ -290,20 +290,36 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         try {
-            if (!options.get(ABORT_CHANGES))
-                performSync(handler);
+            commenceSync();
         } finally {
             try {
-                commitSync(handler);
+                if (!options.get(ABORT_CHANGES))
+                    performSync(handler);
             } finally {
-                assert null == getFileSystem();
-                assert null == getInputArchive();
-                assert null == getOutputArchive();
-                // TODO: Remove a condition and clear a flag in the model
-                // instead.
-                if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-                    setTouched(false);
+                try {
+                    commitSync(handler);
+                } finally {
+                    assert null == getFileSystem();
+                    assert null == getInputArchive();
+                    assert null == getOutputArchive();
+                    // TODO: Remove a condition and clear a flag in the model
+                    // instead.
+                    if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+                        setTouched(false);
+                }
             }
+        }
+    }
+
+    private void commenceSync() {
+        try {
+            final InputArchive<E> ia = getInputArchive();
+            if (null != ia)
+                ia.disconnect();
+        } finally {
+            final OutputArchive<E> oa = getOutputArchive();
+            if (null != oa)
+                oa.disconnect();
         }
     }
 
@@ -416,7 +432,7 @@ extends FsFileSystemArchiveController<E> {
             setInputArchive(null);
             if (null != ia) {
                 try {
-                    ia.close();
+                    ia.getDriverProduct().close();
                 } catch (IOException ex) {
                     handler.warn(new FsSyncWarningException(getModel(), ex));
                 }
@@ -426,7 +442,7 @@ extends FsFileSystemArchiveController<E> {
             setOutputArchive(null);
             if (null != oa) {
                 try {
-                    oa.close();
+                    oa.getDriverProduct().close();
                 } catch (IOException ex) {
                     throw handler.fail(new FsSyncException(getModel(), ex));
                 }
@@ -464,13 +480,20 @@ extends FsFileSystemArchiveController<E> {
     } // DummyInputArchive
 
     private static final class InputArchive<E extends FsArchiveEntry>
-    extends DecoratingInputShop<E, InputShop<E>> {
+    extends SynchronizedInputShop<E> {
         final InputShop<E> driverProduct;
 
-        InputArchive(final InputShop<E> driverProduct) {
-            super(new SynchronizedInputShop<E>(
-                    new DisconnectingInputShop<E>(driverProduct)));
-            this.driverProduct = driverProduct;
+        InputArchive(final InputShop<E> input) {
+            super(new DisconnectingInputShop<E>(input));
+            this.driverProduct = input;
+        }
+
+        boolean disconnect() {
+            final DisconnectingInputShop<?>
+                    disc = (DisconnectingInputShop<?>) delegate;
+            synchronized (disc) {
+                return disc.disconnect();
+            }
         }
 
         /**
@@ -483,13 +506,20 @@ extends FsFileSystemArchiveController<E> {
     } // InputArchive
 
     private static final class OutputArchive<E extends FsArchiveEntry>
-    extends DecoratingOutputShop<E, OutputShop<E>> {
+    extends SynchronizedOutputShop<E> {
         final OutputShop<E> driverProduct;
 
-        OutputArchive(final OutputShop<E> driverProduct) {
-            super(new SynchronizedOutputShop<E>(
-                    new DisconnectingOutputShop<E>(driverProduct)));
-            this.driverProduct = driverProduct;
+        OutputArchive(final OutputShop<E> output) {
+            super(new DisconnectingOutputShop<E>(output));
+            this.driverProduct = output;
+        }
+
+        boolean disconnect() {
+            final DisconnectingOutputShop<?>
+                    disc = (DisconnectingOutputShop<?>) delegate;
+            synchronized (disc) {
+                return disc.disconnect();
+            }
         }
 
         /**
