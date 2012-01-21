@@ -16,11 +16,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -43,7 +39,9 @@ import net.jcip.annotations.ThreadSafe;
  * correctly.
  * Note that it's impossible to inhibit ZIP64 extensions.
  * <p>
- * This class is thread-safe.
+ * This class provides some limited support for multithreading: You can read
+ * its properties from multiple threads, but obviously you cannot concurrently
+ * write multiple entries at the same time by different threads.
  *
  * @see     ZipFile
  * @author  Christian Schlichtherle

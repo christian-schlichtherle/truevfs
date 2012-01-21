@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
+import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
