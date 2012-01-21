@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.socket.OutputShop;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -28,7 +29,7 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class SynchronizedOutputStream extends DecoratingOutputStream {
 
-    /** The object to synchronize on - never {@code null}. */
+    /** The object to synchronize on. */
     protected final Object lock;
 
     /**
@@ -36,6 +37,9 @@ public class SynchronizedOutputStream extends DecoratingOutputStream {
      * This object will synchronize on itself.
      *
      * @param out the output stream to wrap in this decorator.
+     * @deprecated This class exists to control concurrent access to a
+     *             protected resource, e.g. an {@link OutputShop}.
+     *             So the lock should never be this object itself.
      */
     public SynchronizedOutputStream(@Nullable OutputStream out) {
     	this(out, null);

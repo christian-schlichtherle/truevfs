@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import de.schlichtherle.truezip.socket.InputShop;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -17,8 +18,8 @@ import java.io.InputStream;
 import net.jcip.annotations.ThreadSafe;
 
 /**
- * A decorator which synchronizes all access to an {@link InputStream} via an
- * object provided to its constructor.
+ * A decorator which synchronizes all access to an {@link InputStream}
+ * via an object provided to its constructor.
  *
  * @see     SynchronizedOutputStream
  * @author  Christian Schlichtherle
@@ -28,7 +29,7 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class SynchronizedInputStream extends DecoratingInputStream {
 
-    /** The object to synchronize on - never {@code null}. */
+    /** The object to synchronize on. */
     protected final Object lock;
 
     /**
@@ -36,6 +37,10 @@ public class SynchronizedInputStream extends DecoratingInputStream {
      * This object will synchronize on itself.
      *
      * @param in the input stream to wrap in this decorator.
+     * @deprecated This class exists to control concurrent access to a
+     *             protected resource, e.g. an {@link InputShop}.
+     *             So the lock should never be this object itself.
+     *             
      */
     public SynchronizedInputStream(@Nullable InputStream in) {
         this(in, null);
