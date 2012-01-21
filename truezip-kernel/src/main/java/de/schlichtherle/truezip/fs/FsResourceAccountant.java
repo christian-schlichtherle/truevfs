@@ -106,7 +106,8 @@ public final class FsResourceAccountant {
         try {
             final Account ref = threads.remove(resource);
             if (null != ref) {
-                assert !ref.isEnqueued();
+                ref.clear();
+                ref.enqueue();
                 condition.signalAll();
             }
         } finally {
@@ -231,9 +232,20 @@ public final class FsResourceAccountant {
     private final class Account extends WeakReference<Closeable> {
         final Reference<Thread>
                 owner = new WeakReference<Thread>(Thread.currentThread());
+        volatile boolean enqueued;
 
         Account(final Closeable resource) {
             super(resource, Collector.queue);
+        }
+
+        @Override
+        public boolean enqueue() {
+            // Mind the desired side effect!
+            return super.enqueue() && (this.enqueued = true);
+        }
+
+        boolean isEnqueuedByGC() {
+            return super.isEnqueued() && !this.enqueued;
         }
 
         /**
@@ -276,8 +288,14 @@ public final class FsResourceAccountant {
         public void run() {
             while (true) {
                 try {
-                    ((Account) queue.remove()).signalAll();
-                } catch (InterruptedException ignored) {
+                    final Account account = (Account) queue.remove();
+                    try {
+                        if (account.isEnqueuedByGC())
+                            System.runFinalization();
+                    } finally {
+                        account.signalAll();
+                    }
+                } catch (Exception discard) {
                 }
             }
         }
