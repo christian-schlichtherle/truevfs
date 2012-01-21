@@ -26,7 +26,7 @@ import net.jcip.annotations.ThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
 
-    /** The object to synchronize on - never {@code null}. */
+    /** The object to synchronize on. */
     protected final Object lock;
 
     /**
@@ -34,6 +34,9 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
      * This object will synchronize on itself.
      *
      * @param rof the read only file to wrap in this decorator.
+     * @deprecated This class exists to control concurrent access to a
+     *             protected resource, e.g. an {@link InputShop}.
+     *             So the lock should never be this object itself.
      */
     public SynchronizedReadOnlyFile(final @Nullable ReadOnlyFile rof) {
         this(rof, null);
@@ -75,7 +78,7 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
     }
 
     @Override
-	public int read() throws IOException {
+    public int read() throws IOException {
         synchronized (lock) {
             return delegate.read();
         }
