@@ -8,8 +8,10 @@
  */
 package de.schlichtherle.truezip.entry;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
-import net.jcip.annotations.ThreadSafe;
 
 /**
  * An abstract decorator for an entry container.
@@ -18,7 +20,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@DefaultAnnotation(NonNull.class)
 public abstract class DecoratingEntryContainer<
         E extends Entry,
         C extends EntryContainer<E>>
@@ -50,7 +52,7 @@ implements EntryContainer<E> {
     }
 
     @Override
-    public E getEntry(String name) {
+    public @CheckForNull E getEntry(String name) {
         return delegate.getEntry(name);
     }
 
