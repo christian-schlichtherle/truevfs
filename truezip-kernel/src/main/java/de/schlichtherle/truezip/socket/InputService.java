@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.EntryContainer;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
