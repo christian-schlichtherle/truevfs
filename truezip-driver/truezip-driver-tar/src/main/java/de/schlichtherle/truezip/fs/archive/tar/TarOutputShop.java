@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -89,7 +90,7 @@ implements OutputShop<TTarArchiveEntry> {
     }
 
     @Override
-    public TTarArchiveEntry getEntry(String name) {
+    public @CheckForNull TTarArchiveEntry getEntry(String name) {
         return entries.get(name);
     }
 
