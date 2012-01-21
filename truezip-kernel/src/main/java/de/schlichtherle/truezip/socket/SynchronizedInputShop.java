@@ -33,7 +33,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class SynchronizedInputShop<E extends Entry>
+public class SynchronizedInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
     /**
