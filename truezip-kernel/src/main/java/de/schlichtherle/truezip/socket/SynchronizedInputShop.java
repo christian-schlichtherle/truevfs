@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.SynchronizedReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class SynchronizedInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
     /**
-     * Constructs a concurrent input shop.
+     * Constructs a synchronized input shop.
      *
      * @param input the shop to decorate.
      */
@@ -65,7 +66,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     @Override
-    public E getEntry(String name) {
+    public @CheckForNull E getEntry(String name) {
         synchronized (delegate) {
             return delegate.getEntry(name);
         }

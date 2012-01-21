@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.SynchronizedOutputStream;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class SynchronizedOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
 
     /**
-     * Constructs a concurrent output shop.
+     * Constructs a synchronized output shop.
      * 
      * @param output the shop to decorate.
      */
@@ -62,7 +63,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     @Override
-    public E getEntry(String name) {
+    public @CheckForNull E getEntry(String name) {
         synchronized (delegate) {
             return delegate.getEntry(name);
         }
