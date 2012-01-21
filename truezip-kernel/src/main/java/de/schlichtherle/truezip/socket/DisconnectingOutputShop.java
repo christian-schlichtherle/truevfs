@@ -43,6 +43,21 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         super(output);
     }
 
+    /**
+     * Disconnects this shop from its decorated shop.
+     * All subsequent calls will behave as if this shop had been closed,
+     * although this is not happening in this method.
+     * 
+     * @return {@code true} if the shop has been successfully disconnected or
+     *         {@code false} if it was already disconnected or closed.
+     *         
+     */
+    public boolean disconnect() {
+        final boolean closed = this.closed;
+        this.closed = true;
+        return !closed;
+    }
+
     @Override
     public void close() throws IOException {
         if (closed)
