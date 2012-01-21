@@ -30,7 +30,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public final class SynchronizedOutputShop<E extends Entry>
+public class SynchronizedOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
 
     /**
