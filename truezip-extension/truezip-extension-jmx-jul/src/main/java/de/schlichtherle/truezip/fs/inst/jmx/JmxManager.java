@@ -40,7 +40,8 @@ final class JmxManager extends InstrumentingManager {
      * {@inheritDoc}
      * <p>
      * After the synchronization, this implementation creates a new statistics
-     * object to be returned by a subsequent call to {@link JmxDirector#getKernelIOStatistics}.
+     * object which can get accessed by calling
+     * {@link JmxDirector#getKernelIOStatistics}.
      */
     @Override
     public <X extends IOException> void
