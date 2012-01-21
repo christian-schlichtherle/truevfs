@@ -42,6 +42,18 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         super(output);
     }
 
+    /**
+     * Returns the decorated output shop.
+     * 
+     * @return     The decorated output shop.
+     * @deprecated This method is not synchronized and enables access to the
+     *             decorated unsynchronized resource, which is inherently
+     *             unsafe.
+     */
+    public OutputShop<E> getDelegate() {
+        return delegate;
+    }
+
     @Override
     public void close() throws IOException {
         synchronized (delegate) {
