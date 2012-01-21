@@ -32,13 +32,13 @@ import net.jcip.annotations.NotThreadSafe;
 @DefaultAnnotation(NonNull.class)
 public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
 
-    private final long start;
+    private final long offset;
     private final long length;
     private final boolean exclusive;
 
     /**
      * The virtual file pointer in the file data.
-     * This is relative to {@link #start}.
+     * This is relative to {@link #offset}.
      */
     private long fp;
 
@@ -70,15 +70,15 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      * pointer in the decorated read only file before each read operation!
      *
      * @param rof the read only file to decorate.
-     * @param start the start of the interval.
+     * @param offset the start of the interval.
      * @param length the length of the interval.
      */
     public IntervalReadOnlyFile(
             final @Nullable ReadOnlyFile rof,
-            final long start,
+            final long offset,
             final long length)
     throws IOException {
-        this(rof, start, length, false);
+        this(rof, offset, length, false);
     }
     
     /**
@@ -86,7 +86,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      * of the file pointer in the given decorated read only file.
      *
      * @param rof the read only file to decorate.
-     * @param start the start of the interval.
+     * @param offset the start of the interval.
      * @param length the length of the interval.
      * @param exclusive whether this decorating read only file may assume it
      *        has exclusive access to the decorated read only file or not.
@@ -97,14 +97,14 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      */
     private IntervalReadOnlyFile(
             final @Nullable ReadOnlyFile rof,
-            final long start,
+            final long offset,
             final long length,
             final boolean exclusive)
     throws IOException {
         super(rof);
-        if (start < 0 || length < 0 || rof.length() < start + length)
+        if (offset < 0 || length < 0 || rof.length() < offset + length)
             throw new IllegalArgumentException();
-        this.start = start;
+        this.offset = offset;
         this.length = length;
         this.exclusive = exclusive;
     }
@@ -113,7 +113,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
     public long length() throws IOException {
         // Check state.
         final long length = this.length;
-        if (this.delegate.length() < this.start + length)
+        if (this.delegate.length() < this.offset + length)
             throw new IOException("Read Only File has been changed!");
 
         return length;
@@ -140,7 +140,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
                     + ") is larger than file length (" + length + ")!");
 
         // Operate.
-        this.delegate.seek(fp + this.start);
+        this.delegate.seek(fp + this.offset);
         this.fp = fp;
     }
 
@@ -154,7 +154,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Operate.
         if (!this.exclusive)
-            this.delegate.seek(fp + this.start);
+            this.delegate.seek(fp + this.offset);
         final int read = this.delegate.read();
 
         // Update state.
@@ -181,7 +181,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Operate.
         if (!this.exclusive)
-            this.delegate.seek(fp + this.start);
+            this.delegate.seek(fp + this.offset);
         final int read = this.delegate.read(buf, off, len);
 
         // Post-check state.
