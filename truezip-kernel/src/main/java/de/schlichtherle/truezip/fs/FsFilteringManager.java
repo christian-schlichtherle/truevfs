@@ -40,8 +40,8 @@ extends FsDecoratingManager<FsManager> {
      *        file systems of the decorated file system manager.
      */
     public FsFilteringManager(
-            @NonNull final FsManager manager,
-            @NonNull final FsMountPoint prefix) {
+            final FsManager manager,
+            final FsMountPoint prefix) {
         super(manager);
         this.prefix = prefix.toHierarchicalUri();
     }
