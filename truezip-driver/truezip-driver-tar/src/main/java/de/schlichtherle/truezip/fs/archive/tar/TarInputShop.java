@@ -18,6 +18,7 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.*;
@@ -202,7 +203,7 @@ implements InputShop<TTarArchiveEntry> {
     }
 
     @Override
-    public final TTarArchiveEntry getEntry(String name) {
+    public final @CheckForNull TTarArchiveEntry getEntry(String name) {
         return entries.get(name);
     }
 
