@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -52,34 +53,47 @@ extends DecoratingInputShop<E, InputShop<E>> {
         delegate.close();
     }
 
-    private void assertNotClosed() throws IOException {
+    private void checkOpen() throws IOException {
         if (closed)
             throw new InputClosedException();
     }
 
     @Override
     public InputSocket<? extends E> getInputSocket(final String name) {
-        if (null == name)
-            throw new NullPointerException();
-
         class Input extends DecoratingInputSocket<E> {
             Input() {
                 super(DisconnectingInputShop.super.getInputSocket(name));
             }
 
             @Override
+            public E getLocalTarget() throws IOException {
+                checkOpen();
+                return getBoundSocket().getLocalTarget();
+            }
+
+            @Override
+            public Entry getPeerTarget() throws IOException {
+                checkOpen();
+                return getBoundSocket().getPeerTarget();
+            }
+
+            @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                assertNotClosed();
-                return new DisconnectableReadOnlyFile(
+                checkOpen();
+                return new DisconnectingReadOnlyFile(
                         getBoundSocket().newReadOnlyFile());
             }
 
-            // TODO: Implement newSeekableByteChannel()
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                checkOpen();
+                throw new UnsupportedOperationException("TODO: Implement this!");
+            }
 
             @Override
             public InputStream newInputStream() throws IOException {
-                assertNotClosed();
-                return new DisconnectableInputStream(
+                checkOpen();
+                return new DisconnectingInputStream(
                         getBoundSocket().newInputStream());
             }
         } // Input
@@ -87,39 +101,39 @@ extends DecoratingInputShop<E, InputShop<E>> {
         return new Input();
     }
 
-    private final class DisconnectableReadOnlyFile
+    private final class DisconnectingReadOnlyFile
     extends DecoratingReadOnlyFile {
-        DisconnectableReadOnlyFile(ReadOnlyFile rof) {
+        DisconnectingReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }
 
         @Override
         public long length() throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.length();
         }
 
         @Override
         public long getFilePointer() throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.getFilePointer();
         }
 
         @Override
         public void seek(long pos) throws IOException {
-            assertNotClosed();
+            checkOpen();
             delegate.seek(pos);
         }
 
         @Override
         public int read() throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.read(b, off, len);
         }
 
@@ -134,35 +148,35 @@ extends DecoratingInputShop<E, InputShop<E>> {
             if (!closed)
                 delegate.close();
         }
-    } // DisconnectableReadOnlyFile
+    } // DisconnectingReadOnlyFile
 
-    private final class DisconnectableInputStream
+    private final class DisconnectingInputStream
     extends DecoratingInputStream {
-        DisconnectableInputStream(InputStream in) {
+        DisconnectingInputStream(InputStream in) {
             super(in);
         }
 
         @Override
         public int read() throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.skip(n);
         }
 
         @Override
         public int available() throws IOException {
-            assertNotClosed();
+            checkOpen();
             return delegate.available();
         }
 
@@ -174,7 +188,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public void reset() throws IOException {
-            assertNotClosed();
+            checkOpen();
             delegate.reset();
         }
 
@@ -188,5 +202,5 @@ extends DecoratingInputShop<E, InputShop<E>> {
             if (!closed)
                 delegate.close();
         }
-    } // DisconnectableInputStream
+    } // DisconnectingInputStream
 }
