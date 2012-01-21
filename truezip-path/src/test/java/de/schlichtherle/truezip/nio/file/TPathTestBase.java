@@ -490,7 +490,8 @@ extends TestBase<D> {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
-    public final void testBusyFileInputStream() throws IOException, InterruptedException {
+    public final void testBusyFileInputStream()
+    throws IOException, InterruptedException {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
@@ -568,7 +569,8 @@ extends TestBase<D> {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
-    public final void testBusyFileOutputStream() throws IOException, InterruptedException {
+    public final void testBusyFileOutputStream()
+    throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
         TPath file2 = archive.resolve("file2");
         
