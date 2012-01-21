@@ -45,6 +45,18 @@ extends DecoratingInputShop<E, InputShop<E>> {
         super(input);
     }
 
+    /**
+     * Returns the decorated input shop.
+     * 
+     * @return     The decorated input shop.
+     * @deprecated This method is not synchronized and enables access to the
+     *             decorated unsynchronized resource, which is inherently
+     *             unsafe.
+     */
+    public InputShop<E> getDelegate() {
+        return delegate;
+    }
+
     @Override
     public void close() throws IOException {
         synchronized (delegate) {
