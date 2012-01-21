@@ -53,13 +53,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             : SocketFactory.OIO;
 
     /**
-     * Times out waiting for resources after
-     * {@link FsLockModelDecoratingController#WAIT_TIMEOUT_MILLIS} milliseconds.
-     */
-    /*private static final BitField<FsSyncOption>
-            QUICK_SYNC = SYNC.clear(WAIT_CLOSE_INPUT).clear(WAIT_CLOSE_OUTPUT);*/
-
-    /**
      * Constructs a new file system sync controller.
      *
      * @param controller the decorated file system controller.
@@ -71,16 +64,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     private void sync() throws IOException {
         checkWriteLockedByCurrentThread();
         delegate.sync(SYNC);
-        // This makes the CPU busy waiting.
-        // It's not quite clear if this is required at all.
-        /*try {
-            delegate.sync(QUICK_SYNC);
-        } catch (final FsSyncException ex) {
-            final IOException cause = ex.getCause();
-            if (cause instanceof FsThreadsIOBusyException)
-                throw new FsNeedsLockRetryException();
-            throw ex;
-        }*/
     }
 
     @Override
