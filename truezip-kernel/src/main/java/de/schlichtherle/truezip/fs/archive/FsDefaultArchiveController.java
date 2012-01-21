@@ -469,7 +469,7 @@ extends FsFileSystemArchiveController<E> {
         }
 
         @Override
-        public E getEntry(String name) {
+        public @CheckForNull E getEntry(String name) {
             return null;
         }
 
