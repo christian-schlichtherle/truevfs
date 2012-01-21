@@ -87,7 +87,7 @@ public final class FsDefaultManager extends FsManager {
      */
     private final class ScheduledModel extends FsDefaultModel {
         FsFalsePositiveController controller;
-        volatile boolean touched;
+        boolean touched;
 
         ScheduledModel(FsMountPoint mountPoint, FsModel parent) {
             super(mountPoint, parent);
@@ -132,11 +132,11 @@ public final class FsDefaultManager extends FsManager {
     }
 
     @Override
-    public synchronized Iterator<FsController<?>> iterator() {
+    public Iterator<FsController<?>> iterator() {
         return getControllers().iterator();
     }
 
-    private Set<FsController<?>> getControllers() {
+    private synchronized Set<FsController<?>> getControllers() {
         final Set<FsController<?>> snapshot
                 = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
         for (final Link<FsFalsePositiveController> link : schedulers.values()) {
