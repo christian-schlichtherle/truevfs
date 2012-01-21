@@ -56,14 +56,16 @@ implements Iterable<FsController<?>> {
     public abstract int getSize();
 
     /**
-     * Returns an iterator for the controller of all federated file systems
+     * Returns an iterator over the controllers of all federated file systems
      * managed by this instance.
      * <p>
-     * <strong>Important:</strong> The iterated file system controllers must be
-     * ordered so that all file systems appear before any of their parent file
-     * systems.
+     * Note that the iterated file system controllers must be ordered so that
+     * all file systems appear before any of their parent file systems.
+     * <p>
+     * Last, but not least: The iterator must be consistent in multithreaded
+     * environments!
      *
-     * @return An iterator for the controller of all federated file systems
+     * @return An iterator over the controllers of all federated file systems
      *         managed by this instance.
      */
     @Override
@@ -138,33 +140,13 @@ implements Iterable<FsController<?>> {
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
 
-        class Sync implements Visitor {
-            @Override
-            public void
-            visit(FsController<?> controller) throws IOException {
+        class Sync {
+            public void visit(FsController<?> controller) throws IOException {
                 controller.sync(options, handler);
             }
-        } // class Sync
+        } // Sync
 
-        visit(new Sync(), handler);
-    }
-
-    /**
-     * Visits the controller of all federated file systems managed by this
-     * instance.
-     *
-     * @param  visitor the visitor.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code IOException}s and/or assembling output {@code IOException}.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@code IOException}.
-     */
-    private <X extends IOException> void
-    visit(  final Visitor visitor,
-            final ExceptionHandler<? super IOException, X> handler)
-    throws X {
+        final Sync visitor = new Sync();
         for (final FsController<?> controller : this) {
             try {
                 visitor.visit(controller);
@@ -172,15 +154,6 @@ implements Iterable<FsController<?>> {
                 handler.warn(ex);
             }
         }
-    }
-
-    /**
-     * A visitor for file system controllers.
-     *
-     * @see #visit(Visitor, ExceptionHandler)
-     */
-    private interface Visitor {
-        void visit(FsController<?> controller) throws IOException;
     }
 
     /**
