@@ -35,6 +35,8 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.swing.Icon;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -213,9 +215,7 @@ extends FsFileSystemArchiveController<E> {
                 parent, name, options, null);
         final InputArchive<E> ia = getInputArchive();
         oa = new OutputArchive<E>(driver.newOutputShop(
-                getModel(),
-                socket,
-                null == ia ? null : ia.getDriverProduct()));
+                getModel(), socket, null == ia ? null : ia.getDriverProduct()));
         setOutputArchive(oa);
         return oa;
     }
@@ -480,19 +480,26 @@ extends FsFileSystemArchiveController<E> {
     } // DummyInputArchive
 
     private static final class InputArchive<E extends FsArchiveEntry>
-    extends SynchronizedInputShop<E> {
+    extends ConcurrentInputShop<E> {
         final InputShop<E> driverProduct;
+        final Lock lock;
 
         InputArchive(final InputShop<E> input) {
-            super(new DisconnectingInputShop<E>(input));
+            this(input, new ReentrantLock());
+        }
+
+        InputArchive(final InputShop<E> input, final Lock lock) {
+            super(new DisconnectingInputShop<E>(input), lock);
             this.driverProduct = input;
+            this.lock = lock;
         }
 
         boolean disconnect() {
-            final DisconnectingInputShop<?>
-                    disc = (DisconnectingInputShop<?>) delegate;
-            synchronized (disc) {
-                return disc.disconnect();
+            lock.lock();
+            try {
+                return ((DisconnectingInputShop<?>) delegate).disconnect();
+            } finally {
+                lock.unlock();
             }
         }
 
@@ -506,19 +513,26 @@ extends FsFileSystemArchiveController<E> {
     } // InputArchive
 
     private static final class OutputArchive<E extends FsArchiveEntry>
-    extends SynchronizedOutputShop<E> {
+    extends ConcurrentOutputShop<E> {
         final OutputShop<E> driverProduct;
+        final Lock lock;
 
         OutputArchive(final OutputShop<E> output) {
-            super(new DisconnectingOutputShop<E>(output));
+            this(output, new ReentrantLock());
+        }
+
+        OutputArchive(final OutputShop<E> output, final Lock lock) {
+            super(new DisconnectingOutputShop<E>(output), lock);
             this.driverProduct = output;
+            this.lock = lock;
         }
 
         boolean disconnect() {
-            final DisconnectingOutputShop<?>
-                    disc = (DisconnectingOutputShop<?>) delegate;
-            synchronized (disc) {
-                return disc.disconnect();
+            lock.lock();
+            try {
+                return ((DisconnectingOutputShop<?>) delegate).disconnect();
+            } finally {
+                lock.unlock();
             }
         }
 
