@@ -221,17 +221,15 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    InputSocket<?> getInputSocket(final String name) {
-        final InputArchive<E> ia = getInputArchive();
-        assert null != ia; // make FindBugs happy
-        return ia.getInputSocket(name);
+    InputSocket<? extends E> getInputSocket(final String name) {
+        return getInputArchive().getInputSocket(name);
     }
 
     @Override
-    OutputSocket<?> getOutputSocket(final E entry) {
-        class Output extends DelegatingOutputSocket<Entry> {
+    OutputSocket<? extends E> getOutputSocket(final E entry) {
+        class Output extends DelegatingOutputSocket<E> {
             @Override
-            protected OutputSocket<? extends Entry> getDelegate()
+            protected OutputSocket<? extends E> getDelegate()
             throws IOException {
                 return makeOutput().getOutputSocket(entry);
             }
@@ -470,8 +468,8 @@ extends FsFileSystemArchiveController<E> {
         final InputShop<E> driverProduct;
 
         InputArchive(final InputShop<E> driverProduct) {
-            super(new DisconnectingInputShop<E>(
-                    new SynchronizedInputShop<E>(driverProduct)));
+            super(new SynchronizedInputShop<E>(
+                    new DisconnectingInputShop<E>(driverProduct)));
             this.driverProduct = driverProduct;
         }
 
@@ -489,8 +487,8 @@ extends FsFileSystemArchiveController<E> {
         final OutputShop<E> driverProduct;
 
         OutputArchive(final OutputShop<E> driverProduct) {
-            super(new DisconnectingOutputShop<E>(
-                    new SynchronizedOutputShop<E>(driverProduct)));
+            super(new SynchronizedOutputShop<E>(
+                    new DisconnectingOutputShop<E>(driverProduct)));
             this.driverProduct = driverProduct;
         }
 
