@@ -236,7 +236,7 @@ extends FsLockModelController {
         }
     } // Input
 
-    abstract InputSocket<?> getInputSocket(String name);
+    abstract InputSocket<? extends E> getInputSocket(String name);
 
     @Override
     public final OutputSocket<?> getOutputSocket(
@@ -343,7 +343,7 @@ extends FsLockModelController {
         }
     } // ProxyEntry
 
-    abstract OutputSocket<?> getOutputSocket(E entry);
+    abstract OutputSocket<? extends E> getOutputSocket(E entry);
 
     @Override
     public final void mknod(
