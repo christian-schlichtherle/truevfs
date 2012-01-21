@@ -91,10 +91,11 @@ public enum FsSyncOption {
     ABORT_CHANGES,
 
     /**
-     * Suppose a controller for a federated file system has cached entry data.
+     * Suppose a controller for a federated file system has selectively cached
+     * entry contents.
      * Then if this option is set when the file system gets synchronized,
-     * the selectively cached entry data get cleared after flushing it to the
-     * file system.
+     * the entry contents get flushed to the file system and finally the cache
+     * gets cleared.
      */
     CLEAR_CACHE,
 }
