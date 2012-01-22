@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.file.swing;
 
-import de.schlichtherle.truezip.file.TFileComparator;
 import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileComparator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -590,9 +590,8 @@ public final class TFileTree extends JTree {
     public void setSelectionNodes(final TFile[] nodes) {
         final TFileTreeModel ftm = getModel();
         final java.util.List<TreePath> list = new LinkedList<TreePath>();
-        TreePath lastPath = null;
         for (int i = 0, l = nodes.length; i < l; i++) {
-            lastPath = ftm.newTreePath(nodes[i]);
+            final TreePath lastPath = ftm.newTreePath(nodes[i]);
             if (lastPath != null)
                 list.add(lastPath);
         }
