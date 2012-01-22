@@ -15,16 +15,10 @@ import net.jcip.annotations.Immutable;
 /**
  * Indicates that a file system is a false positive file system.
  * <p>
- * This exception type is reserved for use within the TrueZIP Kernel in order
- * to reroute file system operations to the parent file system of a false
- * positive federated file system, i.e. a false positive archive file.
- * Unless there is a bug, an exception of this type <em>never</em> pops up to
- * a TrueZIP application and is <em>always</em> associated with another
- * {@link IOException} as its {@link #getCause()}.
- * <p>
- * ONLY THE TRUEZIP KERNEL SHOULD THROW AN EXCEPTION OF THIS TYPE!
- * DO NOT CREATE OR THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB-CLASSES)
- * ANYWHERE ELSE!
+ * This exception type is reserved for use by
+ * {@link FsController file system controllers} in order to reroute file system
+ * operations to the parent file system of a false positive federated (archive)
+ * file system.
  *
  * @see     FsFalsePositiveController
  * @author  Christian Schlichtherle
@@ -32,7 +26,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public class FsFalsePositiveException extends FsException {
+public class FsFalsePositiveException extends FsControllerException {
     public FsFalsePositiveException(IOException cause) {
         super(cause);
     }

@@ -12,13 +12,13 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
 import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.*;
+import java.io.CharConversionException;
+import java.io.IOException;
 import javax.swing.Icon;
 import net.jcip.annotations.Immutable;
 
@@ -215,72 +215,6 @@ extends FsDriver {
     throws IOException;
 
     /**
-     * Returns a read only file obtained from the given socket and wraps a
-     * plain {@link IOException} in a {@link FileNotFoundException} unless
-     * it's an {@link FsException}.
-     * This method is useful for driver implementations to ensure that an
-     * expection from opening a socket is <em>not</em> recognized as a false
-     * positive archive file.
-     * 
-     * @param  model the file system model.
-     * @param  input the input socket
-     * @return A new read only file obtained from the socket.
-     * @throws FsException at the discretion of the socket.
-     * @throws FileNotFoundException on any I/O error.
-     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
-     *             should not get called in order to inhibit the redundant
-     *             wrapping of an {@link IOException} in a
-     *             {@link FileNotFoundException}.
-     */
-    @Deprecated
-    protected static ReadOnlyFile newReadOnlyFile(FsModel model, InputSocket<?> input)
-    throws FsException, FileNotFoundException {
-        try {
-            return input.newReadOnlyFile();
-        } catch (FsException ex) {
-            throw ex;
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString()).initCause(ex);
-        }
-    }
-
-    /**
-     * Returns an input stream obtained from the given socket and wraps a
-     * plain {@link IOException} in a {@link FileNotFoundException} unless
-     * it's an {@link FsException}.
-     * This method is useful for driver implementations to ensure that an
-     * expection from opening a socket is <em>not</em> recognized as a false
-     * positive archive file.
-     * 
-     * @param  model the file system model.
-     * @param  input the input socket
-     * @return A new input stream obtained from the socket.
-     * @throws FsException at the discretion of the socket.
-     * @throws FileNotFoundException on any I/O error.
-     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
-     *             should not get called in order to inhibit the redundant
-     *             wrapping of an {@link IOException} in a
-     *             {@link FileNotFoundException}.
-     */
-    @Deprecated
-    protected static InputStream newInputStream(FsModel model, InputSocket<?> input)
-    throws FsException, FileNotFoundException {
-        try {
-            return input.newInputStream();
-        } catch (FsException ex) {
-            throw ex;
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString()).initCause(ex);
-        }
-    }
-
-    /**
      * Called to prepare writing an archive file artifact of this driver to
      * the entry {@code name} in {@code controller} using {@code options} and
      * the nullable {@code template}.
@@ -332,39 +266,6 @@ extends FsDriver {
                     OutputSocket<?> output,
                     @CheckForNull InputShop<E> source)
     throws IOException;
-
-    /**
-     * Returns an output stream obtained from the given socket and wraps a
-     * plain {@link IOException} in a {@link FileNotFoundException} unless
-     * it's an {@link FsException}.
-     * This method is useful for driver implementations to ensure that an
-     * expection from opening a socket is <em>not</em> recognized as a false
-     * positive archive file.
-     * 
-     * @param  model the file system model.
-     * @param  output the output socket
-     * @return A new output stream obtained from the socket.
-     * @throws FsException at the discretion of the socket.
-     * @throws FileNotFoundException on any I/O error.
-     * @deprecated Since TrueZIP 7.3, this method is not required anymore and
-     *             should not get called in order to inhibit the redundant
-     *             wrapping of an {@link IOException} in a
-     *             {@link FileNotFoundException}.
-     */
-    @Deprecated
-    protected static OutputStream newOutputStream(FsModel model, OutputSocket<?> output)
-    throws FsException, FileNotFoundException {
-        try {
-            return output.newOutputStream();
-        } catch (FsException ex) {
-            throw ex;
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(
-                    model.getMountPoint().toString()).initCause(ex);
-        }
-    }
 
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.entry.Entry.Type, de.schlichtherle.truezip.entry.Entry, de.schlichtherle.truezip.util.BitField)

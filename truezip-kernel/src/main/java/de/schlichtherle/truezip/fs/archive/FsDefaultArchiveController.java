@@ -163,17 +163,11 @@ extends FsFileSystemArchiveController<E> {
                     ia.getDriverProduct(),
                     socket.getLocalTarget(),
                     readOnly));
-        } catch (final FsException ex) {
-            assert !(ex instanceof FsFalsePositiveException) : ex;
-            throw ex;
         } catch (final IOException ex) {
             if (!autoCreate) {
                 final FsEntry parentEntry;
                 try {
                     parentEntry = parent.getEntry(name);
-                } catch (final FsException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException) : ex2;
-                    throw ex2;
                 } catch (final IOException ex2) {
                     //ex2.initCause(ex);
                     throw new FsFalsePositiveException(ex2);
