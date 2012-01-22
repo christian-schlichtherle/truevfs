@@ -8,19 +8,18 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.EntryName;
+import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
+import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.ENTRY_NAME;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import de.schlichtherle.truezip.entry.EntryName;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.fs.FsUriModifier.*;
-import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses an entry in a file system relative to its
