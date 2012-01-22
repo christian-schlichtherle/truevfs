@@ -8,23 +8,18 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
+import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.MOUNT_POINT;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.InvalidObjectException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.fs.FsUriModifier.*;
-import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.*;
 
 /**
  * Addresses the mount point of a file system.
