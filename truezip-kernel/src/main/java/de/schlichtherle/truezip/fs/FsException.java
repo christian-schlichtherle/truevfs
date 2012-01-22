@@ -26,7 +26,6 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public abstract class FsException extends IOException {
-
     FsException() {
         this(null);
     }
