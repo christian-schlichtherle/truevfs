@@ -55,12 +55,15 @@ import net.jcip.annotations.ThreadSafe;
  * example by protecting all access to the decorated controller with a
  * try-finally block:
  * <pre>{@code
+ * @Override
+ * public FsEntry getEntry(FsEntryName name) throws IOException {
  *     prepareMyResources();
  *     try {
- *         return delegate.getEntry(); // may throw FsControllerException!
+ *         return delegate.getEntry(); // may throw FsControllerException, too!
  *     } finally {
  *         cleanUpMyResources();
  *     }
+ * }
  * }</pre>
  * 
  * <h3>Stack Traces</h3>
