@@ -13,7 +13,8 @@ import net.jcip.annotations.Immutable;
 
 /**
  * Indicates that the file system needs to get
- * {@link FsController#sync(BitField) synced} before the operation can proceed.
+ * {@linkplain FsController#sync(BitField) synced} before the operation can
+ * proceed.
  *
  * @since   TrueZIP 7.3
  * @see     FsSyncController

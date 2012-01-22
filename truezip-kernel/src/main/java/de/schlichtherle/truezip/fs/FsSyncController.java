@@ -66,6 +66,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         while (true) {
             try {
@@ -77,6 +78,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         while (true) {
             try {

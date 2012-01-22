@@ -179,9 +179,11 @@ extends FsLockModelDecoratingController<
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         class GetOpenIcon implements IOOperation<Icon> {
             @Override
+            @SuppressWarnings("deprecation")
             public Icon call() throws IOException {
                 return delegate.getOpenIcon();
             }
@@ -191,9 +193,11 @@ extends FsLockModelDecoratingController<
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         class GetClosedIcon implements IOOperation<Icon> {
             @Override
+            @SuppressWarnings("deprecation")
             public Icon call() throws IOException {
                 return delegate.getClosedIcon();
             }

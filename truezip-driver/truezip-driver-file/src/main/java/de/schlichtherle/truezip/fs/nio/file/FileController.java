@@ -74,11 +74,13 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         return null;
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         return null;
     }

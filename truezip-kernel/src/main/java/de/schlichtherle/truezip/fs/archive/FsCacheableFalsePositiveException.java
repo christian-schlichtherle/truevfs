@@ -15,7 +15,7 @@ import net.jcip.annotations.ThreadSafe;
 /**
  * Indicates that a file system is a false positive file system and that this
  * exception may get cached until the federated (archive) file system gets
- * {@link FsController#sync(BitField) synced} again.
+ * {@linkplain FsController#sync(BitField) synced} again.
  * <p>
  * This exception type is reserved for use by a
  * {@link FsController file system controller} in order to reroute file system

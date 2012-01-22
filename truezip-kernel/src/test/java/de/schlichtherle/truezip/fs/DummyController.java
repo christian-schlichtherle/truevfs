@@ -51,11 +51,13 @@ public class DummyController<M extends FsModel> extends FsController<M> {
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         return null;
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         return null;
     }

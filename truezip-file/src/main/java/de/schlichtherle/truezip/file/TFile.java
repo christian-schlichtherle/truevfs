@@ -2107,7 +2107,9 @@ public final class TFile extends File {
      * Otherwise, null is returned.
      * 
      * @return An icon or {@code null}.
+     * @deprecated GUI features will be removed from this class in TrueZIP 8.
      */
+    @Deprecated
     public @CheckForNull Icon getOpenIcon() {
         if (this == innerArchive) {
             try {
@@ -2124,7 +2126,9 @@ public final class TFile extends File {
      * Otherwise, null is returned.
      * 
      * @return An icon or {@code null}.
+     * @deprecated GUI features will be removed from this class in TrueZIP 8.
      */
+    @Deprecated
     public @CheckForNull Icon getClosedIcon() {
         if (this == innerArchive) {
             try {
