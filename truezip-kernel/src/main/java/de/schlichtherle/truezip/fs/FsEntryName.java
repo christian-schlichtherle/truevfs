@@ -201,6 +201,7 @@ public final class FsEntryName extends EntryName {
     }
 
     /** Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}. */
+    @SuppressWarnings("deprecation")
     public static FsEntryName
     create(URI uri) {
         return create(uri, NULL);
