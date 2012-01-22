@@ -61,6 +61,7 @@ public class EntryNameTest {
             { "/..", },
             { "/../", },
         }) {
+            @SuppressWarnings("deprecation")
             final EntryName original = EntryName.create(URI.create(params[0]));
 
             {
@@ -101,7 +102,7 @@ public class EntryNameTest {
     }
 
     @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
+    @SuppressWarnings({"ResultOfObjectAllocationIgnored", "deprecation"})
     public void testConstructorWithInvalidUri() {
         for (final String param : new String[] {
             "scheme:defined",
@@ -125,6 +126,7 @@ public class EntryNameTest {
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
             //{ $parent, $member, $result },
