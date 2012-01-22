@@ -100,12 +100,12 @@ extends FsLockModelDecoratingController<
     }
 
     <T> T callReadLocked(IOOperation<T> operation) throws IOException {
-        return callLocked(operation, readLock(), IOExceptionHandler.INSTANCE);
+        return callLocked(operation, readLock(), IOExceptionHandler.THROW);
     }
 
     <T> T callWriteLocked(IOOperation<T> operation) throws IOException {
         checkNotReadLockedByCurrentThread();
-        return callLocked(operation, writeLock(), IOExceptionHandler.INSTANCE);
+        return callLocked(operation, writeLock(), IOExceptionHandler.THROW);
     }
 
     /**
@@ -711,7 +711,7 @@ extends FsLockModelDecoratingController<
     @Immutable
     private static final class IOExceptionHandler
     implements ExceptionHandler<IOException, IOException> {
-        static final IOExceptionHandler INSTANCE = new IOExceptionHandler();
+        static final IOExceptionHandler THROW = new IOExceptionHandler();
 
         @Override
         public IOException fail(IOException cause) {
@@ -723,4 +723,12 @@ extends FsLockModelDecoratingController<
             throw cause;
         }
     } // IOExceptionHandler
+
+    @Immutable
+    @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+    private static final class FsNeedsLockRetryException extends FsException {
+        FsNeedsLockRetryException() {
+            super(null);
+        }
+    }
 }
