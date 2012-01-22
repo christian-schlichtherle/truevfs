@@ -109,6 +109,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         try {
             return delegate.getOpenIcon();
@@ -122,6 +123,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         try {
             return delegate.getClosedIcon();

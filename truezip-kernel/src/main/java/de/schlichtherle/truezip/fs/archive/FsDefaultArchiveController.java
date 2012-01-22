@@ -135,12 +135,14 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         autoMount(); // detect false positives!
         return driver.getOpenIcon(getModel());
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         autoMount(); // detect false positives!
         return driver.getClosedIcon(getModel());

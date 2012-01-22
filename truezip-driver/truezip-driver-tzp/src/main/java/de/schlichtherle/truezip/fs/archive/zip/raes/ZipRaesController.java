@@ -96,11 +96,13 @@ extends KeyManagerController<ZipRaesDriver> {
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         return delegate.getOpenIcon();
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         return delegate.getClosedIcon();
     }

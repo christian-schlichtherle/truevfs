@@ -64,6 +64,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
+    @Deprecated
     public Icon getOpenIcon() throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -76,6 +77,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
+    @Deprecated
     public Icon getClosedIcon() throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
