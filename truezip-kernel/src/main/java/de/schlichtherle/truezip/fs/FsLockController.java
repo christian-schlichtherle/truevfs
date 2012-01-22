@@ -171,7 +171,7 @@ extends FsLockModelDecoratingController<
                         thread.locking = false;
                         lock.unlock();
                     }
-                } catch (NeedsLockRetryException ex) {
+                } catch (NeedsLockRetryException discard) {
                     thread.pause();
                 }
             }
