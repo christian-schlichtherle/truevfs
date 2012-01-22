@@ -13,11 +13,7 @@ import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
@@ -108,6 +104,10 @@ import net.jcip.annotations.Immutable;
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
+ * <p>
+ * TODO: This class is solely used for extension by the class
+ * {@code de.schlichtherle.truezip.fs.FsEntryName} and should be removed in
+ * TrueZIP 8.
  *
  * @see     Entry#getName()
  * @author  Christian Schlichtherle
@@ -175,7 +175,9 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for entry names.
      * @return A new entry name.
+     * @deprecated This class should get removed in TrueZIP 8.
      */
+    @Deprecated
     public static EntryName
     create(URI uri) {
         try {
