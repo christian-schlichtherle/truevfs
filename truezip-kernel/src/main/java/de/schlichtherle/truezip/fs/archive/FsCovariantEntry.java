@@ -8,17 +8,13 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import de.schlichtherle.truezip.fs.FsEntry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
