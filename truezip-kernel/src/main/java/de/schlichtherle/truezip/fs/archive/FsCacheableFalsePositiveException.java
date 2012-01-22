@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
