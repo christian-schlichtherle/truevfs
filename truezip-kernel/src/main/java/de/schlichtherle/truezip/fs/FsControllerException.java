@@ -14,7 +14,7 @@ import net.jcip.annotations.Immutable;
  * Indicates an <em>internal</em> exception in a decorator chain of
  * {@linkplain FsController file system controllers}.
  * <p>
- * Exceptions of this type are exclusively reserved for long distance flow
+ * Exceptions of this type are exclusively reserved for non-local flow
  * control in a decorator chain of file system controllers, e.g. to deal with
  * false positive archive files, require write locks, prevent dead locks,
  * automatically synchronize federated (archive) file systems etc.
@@ -23,6 +23,7 @@ import net.jcip.annotations.Immutable;
  * application!
  *
  * @see     FsController
+ * @since   TrueZIP 7.4.4 (renamed from FsException and changed super type)
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -30,7 +31,6 @@ import net.jcip.annotations.Immutable;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public abstract class FsControllerException extends RuntimeException {
     FsControllerException() {
-        this(null);
     }
 
     FsControllerException(Throwable cause) {
