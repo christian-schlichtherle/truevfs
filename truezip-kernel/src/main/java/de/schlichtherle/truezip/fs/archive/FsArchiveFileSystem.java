@@ -9,32 +9,32 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.*;
-import static de.schlichtherle.truezip.io.Paths.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
+import de.schlichtherle.truezip.io.Paths.Normalizer;
+import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
+import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
-import static de.schlichtherle.truezip.util.Maps.*;
+import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
