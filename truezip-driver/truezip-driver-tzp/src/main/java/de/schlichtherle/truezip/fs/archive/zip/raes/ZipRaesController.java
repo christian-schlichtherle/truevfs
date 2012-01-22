@@ -98,38 +98,13 @@ extends KeyManagerController<ZipRaesDriver> {
     }
 
     @Override
-    public <X extends IOException> void sync(BitField<FsSyncOption> options, ExceptionHandler<? super FsSyncException, X> handler) throws X {
-        super.sync(options, handler);
-    }
-
-    @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options) throws IOException {
-        super.unlink(name, options);
-    }
-
-    @Override
-    public Icon getClosedIcon() throws IOException {
-        return delegate.getClosedIcon();
-    }
-
-    @Override
-    public InputSocket<?> getInputSocket(FsEntryName name, BitField<FsInputOption> options) {
-        return delegate.getInputSocket(name, options);
-    }
-
-    @Override
     public Icon getOpenIcon() throws IOException {
         return delegate.getOpenIcon();
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(FsEntryName name, BitField<FsOutputOption> options, Entry template) {
-        return delegate.getOutputSocket(name, options, template);
-    }
-
-    @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
-        return delegate.isExecutable(name);
+    public Icon getClosedIcon() throws IOException {
+        return delegate.getClosedIcon();
     }
 
     @Override
@@ -148,8 +123,8 @@ extends KeyManagerController<ZipRaesDriver> {
     }
 
     @Override
-    public void mknod(FsEntryName name, Type type, BitField<FsOutputOption> options, Entry template) throws IOException {
-        delegate.mknod(name, type, options, template);
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        return delegate.isExecutable(name);
     }
 
     @Override
@@ -158,12 +133,60 @@ extends KeyManagerController<ZipRaesDriver> {
     }
 
     @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times, BitField<FsOutputOption> options) throws IOException {
+    public boolean setTime(
+            FsEntryName name,
+            Map<Entry.Access, Long> times,
+            BitField<FsOutputOption> options)
+    throws IOException {
         return delegate.setTime(name, times, options);
     }
 
     @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value, BitField<FsOutputOption> options) throws IOException {
+    public boolean setTime(
+            FsEntryName name,
+            BitField<Entry.Access> types,
+            long value,
+            BitField<FsOutputOption> options)
+    throws IOException {
         return delegate.setTime(name, types, value, options);
+    }
+
+    @Override
+    public InputSocket<?>
+    getInputSocket( FsEntryName name,
+                    BitField<FsInputOption> options) {
+        return delegate.getInputSocket(name, options);
+    }
+
+    @Override
+    public OutputSocket<?>
+    getOutputSocket(    FsEntryName name,
+                        BitField<FsOutputOption> options,
+                        Entry template) {
+        return delegate.getOutputSocket(name, options, template);
+    }
+
+    @Override
+    public void
+    mknod(  FsEntryName name,
+            Entry.Type type,
+            BitField<FsOutputOption> options,
+            Entry template)
+    throws IOException {
+        delegate.mknod(name, type, options, template);
+    }
+
+    @Override
+    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    throws IOException {
+        super.unlink(name, options);
+    }
+
+    @Override
+    public <X extends IOException> void
+    sync(   BitField<FsSyncOption> options,
+            ExceptionHandler<? super FsSyncException, X> handler)
+    throws X {
+        super.sync(options, handler);
     }
 }
