@@ -24,47 +24,9 @@ import net.jcip.annotations.ThreadSafe;
 
 /**
  * An abstract decorator for a file system controller.
- *
- * <a name="FsControllerException"/><h3>File System Controller Exceptions</h3>
- * <p>
- * File system controllers are typically arranged in a decorator and
- * chain-of-responsibility pattern.
- * Unfortunately, some aspects of file system management make it necessary to
- * use exceptions for non-local flow control in these chains.
- * For example, a file system controller may throw an exception to indicate a
- * false positive federated (archive) file system.
- * Some other file system controller further up the chain is then expected to
- * catch this exception in order to route the file system operation to the
- * parent file system controller instead.
- * For this particular purpose, the exception type {@link FsControllerException}
- * has been created as a sub-class of {@link RuntimeException}.
- * <p>
- * If you are only using a file system controller, for example by calling
- * {@link FsManager#getController(FsMountPoint, FsCompositeDriver)}, then you
- * don't need to be concerned about file system controller exceptions at all
- * because they are never thrown to client applications (this would be a bug).
- * <p>
- * As an implementor of a file system controller however, for example when
- * writing a custom controller for an archive file system driver by extending
- * this class, then you need to be aware that you may receive file system
- * controller exceptions whenever you call a method on the decorated file
- * system controller.
- * Unless you have special requirements, you don't need to catch such an
- * exception.
- * Just make sure to always leave your controller in a consistent state, for
- * example by protecting all access to the decorated controller with a
- * try-finally block:
- * <pre>{@code
- * @Override
- * public FsEntry getEntry(FsEntryName name) throws IOException {
- *     prepareMyResources();
- *     try {
- *         return delegate.getEntry(); // may throw FsControllerException, too!
- *     } finally {
- *         cleanUpMyResources();
- *     }
- * }
- * }</pre>
+ * Note that any of the methods which are declared to throw an
+ * {@link IOException} in the super-class are declared to also throw an
+ * {@link FsControllerException} in this sub-class.
  * 
  * <h3>Stack Traces</h3>
  * <p>
@@ -80,6 +42,7 @@ import net.jcip.annotations.ThreadSafe;
  *
  * @param   <M> The type of the file system model.
  * @param   <C> The type of the decorated file system controller.
+ * @see     FsControllerException
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -111,7 +74,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     @Deprecated
@@ -122,7 +86,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     @Deprecated
@@ -133,7 +98,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public boolean isReadOnly() throws IOException {
@@ -143,7 +109,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public FsEntry getEntry(FsEntryName name)
@@ -154,7 +121,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
@@ -164,7 +132,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
@@ -174,7 +143,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
@@ -184,7 +154,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
@@ -194,7 +165,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public boolean setTime(
@@ -208,7 +180,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public boolean setTime(
@@ -225,7 +198,8 @@ extends FsModelController<M> {
      * <p>
      * Note that the returned input socket may throw
      * {@link FsControllerException}s from any of its methods which are
-     * declared to throw an {@link IOException}, too.
+     * declared to throw an {@link IOException} for non-local flow control
+     * within a decorator chain, too.
      * 
      * @see <a href="#FsControllerException">File System Controller Exceptions</a>
      */
@@ -239,9 +213,10 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * <p>
-     * Note that the returned input socket may throw
+     * Note that the returned output socket may throw
      * {@link FsControllerException}s from any of its methods which are
-     * declared to throw an {@link IOException}, too.
+     * declared to throw an {@link IOException} for non-local flow control
+     * within a decorator chain, too.
      * 
      * @see <a href="#FsControllerException">File System Controller Exceptions</a>
      */
@@ -256,7 +231,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public void
@@ -271,7 +247,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public void unlink(FsEntryName name, BitField<FsOutputOption> options)
@@ -282,7 +259,8 @@ extends FsModelController<M> {
     /**
      * {@inheritDoc}
      * 
-     * @throws FsControllerException See <a href="#FsControllerException">File System Controller Exceptions</a>.
+     * @throws FsControllerException For non-local flow control within a
+     *         decorator chain.
      */
     @Override
     public <X extends IOException> void
