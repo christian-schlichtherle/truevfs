@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs;
 import net.jcip.annotations.Immutable;
 
 /**
- * @since   TrueZIP 7.4.4
+ * @since   TrueZIP 7.5
  * @see     FsResourceController
  * @author  Christian Schlichtherle
  * @version $Id$

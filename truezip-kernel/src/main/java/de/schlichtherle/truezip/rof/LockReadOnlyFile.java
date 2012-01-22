@@ -20,7 +20,7 @@ import net.jcip.annotations.ThreadSafe;
  * A decorator which protects all access to a shared resource, e.g. an
  * {@link InputShop}, via a {@link Lock} object.
  *
- * @since   TrueZIP 7.4.4
+ * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  * @version $Id$
  */

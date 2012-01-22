@@ -26,7 +26,7 @@ import net.jcip.annotations.ThreadSafe;
  *
  * @see     SynchronizedInputShop
  * @param   <E> The type of the entries.
- * @since   TrueZIP 7.4.4
+ * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  * @version $Id$
  */
