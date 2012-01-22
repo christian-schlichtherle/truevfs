@@ -12,18 +12,8 @@ import de.schlichtherle.truezip.util.BitField;
 import net.jcip.annotations.Immutable;
 
 /**
- * Thrown by a file system operation to indicate that the file system needs to
- * get {@link FsController#sync(BitField) synced} before the operation can get
- * retried.
- * <p>
- * This exception type is reserved for use within the TrueZIP Kernel in order
- * to catch it and sync the file system.
- * Unless there is a bug, an exception of this type <em>never</em> pops up to
- * a TrueZIP application.
- * <p>
- * ONLY THE TRUEZIP KERNEL SHOULD THROW AN EXCEPTION OF THIS TYPE!
- * DO NOT CREATE OR THROW AN EXCEPTION OF THIS TYPE (INCLUDING SUB-CLASSES)
- * ANYWHERE ELSE!
+ * Indicates that the file system needs to get
+ * {@link FsController#sync(BitField) synced} before the operation can proceed.
  *
  * @since   TrueZIP 7.3
  * @see     FsSyncController
@@ -32,7 +22,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class FsNeedsSyncException extends FsException {
+public final class FsNeedsSyncException extends FsControllerException {
     public FsNeedsSyncException() {
         super(null);
     }

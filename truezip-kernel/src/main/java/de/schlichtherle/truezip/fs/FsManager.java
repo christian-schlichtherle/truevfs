@@ -140,16 +140,9 @@ implements Iterable<FsController<?>> {
                 || options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
 
-        class Sync {
-            public void visit(FsController<?> controller) throws IOException {
-                controller.sync(options, handler);
-            }
-        } // Sync
-
-        final Sync visitor = new Sync();
         for (final FsController<?> controller : this) {
             try {
-                visitor.visit(controller);
+                controller.sync(options, handler);
             } catch (IOException ex) {
                 handler.warn(ex);
             }

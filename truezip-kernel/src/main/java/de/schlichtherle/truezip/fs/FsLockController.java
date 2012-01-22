@@ -100,12 +100,12 @@ extends FsLockModelDecoratingController<
     }
 
     <T> T callReadLocked(IOOperation<T> operation) throws IOException {
-        return callLocked(operation, readLock(), IOExceptionHandler.THROW);
+        return callLocked(operation, readLock());
     }
 
     <T> T callWriteLocked(IOOperation<T> operation) throws IOException {
         checkNotReadLockedByCurrentThread();
-        return callLocked(operation, writeLock(), IOExceptionHandler.THROW);
+        return callLocked(operation, writeLock());
     }
 
     /**
@@ -115,8 +115,8 @@ extends FsLockModelDecoratingController<
      * If this is the first execution of this method on the call stack of the
      * current thread, then the lock gets acquired using {@link Lock#lock()}.
      * Once the lock has been acquired the operation gets called.
-     * If this fails for some reason and the thrown exception chain contains an
-     * {@link FsNeedsLockRetryException}, then the lock gets temporarily
+     * If this fails for some reason and the thrown exception chain contains a
+     * {@link NeedsLockRetryException}, then the lock gets temporarily
      * released and the current thread gets paused for a small random time
      * interval before this procedure starts over again.
      * Otherwise, the exception chain gets just passed on to the caller.
@@ -143,22 +143,18 @@ extends FsLockModelDecoratingController<
      * @param  <X> The exception type of the operation.
      * @param  operation The atomic operation.
      * @param  lock The lock to hold while calling the operation.
-     * @param  handler The exception handler to deal with an
-     *         {@link FsNeedsLockRetryException} which may result from a
-     *         failing {@link Lock#tryLock()}.
      * @return The result of the operation.
      * @throws X As thrown by the operation.
+     * @throws NeedsLockRetryException See above.
      */
     @SuppressWarnings("unchecked")
     private static <T, X extends IOException> T
-    callLocked( final Operation<T, X> operation,
-                final Lock lock,
-                final ExceptionHandler<? super FsNeedsLockRetryException, X> handler)
+    callLocked(final Operation<T, X> operation, final Lock lock)
     throws X {
         final ThreadTool thread = threadTool.get();
         if (thread.locking) {
             if (!lock.tryLock())
-                throw handler.fail(new FsNeedsLockRetryException());
+                throw new NeedsLockRetryException();
             try {
                 return operation.call();
             } finally {
@@ -175,18 +171,11 @@ extends FsLockModelDecoratingController<
                         thread.locking = false;
                         lock.unlock();
                     }
-                } catch (IOException ex) {
-                    if (!needsLockRetry(ex))
-                        throw (X) ex;
+                } catch (NeedsLockRetryException ex) {
                     thread.pause();
                 }
             }
         }
-    }
-
-    private static boolean needsLockRetry(final Throwable t) {
-        return t instanceof FsNeedsLockRetryException
-                || null != t && needsLockRetry(t.getCause());
     }
 
     @Override
@@ -376,34 +365,12 @@ extends FsLockModelDecoratingController<
         class Sync implements Operation<Void, X> {
             @Override
             public Void call() throws X {
-                try {
-                    final FsSyncExceptionBuilder
-                            builder = new FsSyncExceptionBuilder();
-                    delegate.sync(options, builder);
-                    builder.check();
-                } catch (FsSyncException ex) {
-                    throw handler.fail(ex);
-                }
+                delegate.sync(options, handler);
                 return null;
             }
         } // Sync
 
-        class NeedsLockRetryExceptionHandler
-        implements ExceptionHandler<FsNeedsLockRetryException, X> {
-            @Override
-            public X fail(FsNeedsLockRetryException cause) {
-                return handler.fail(new FsSyncException(getModel(), cause));
-            }
-
-            @Override
-            public void warn(FsNeedsLockRetryException cause) throws X {
-                handler.warn(new FsSyncException(getModel(), cause));
-            }
-        } // NeedsLockRetryExceptionHandler
-
-        callLocked( new Sync(),
-                    writeLock(),
-                    new NeedsLockRetryExceptionHandler());
+        callLocked(new Sync(), writeLock());
     }
 
     @Immutable
@@ -709,25 +676,10 @@ extends FsLockModelDecoratingController<
     } // IOOperation
 
     @Immutable
-    private static final class IOExceptionHandler
-    implements ExceptionHandler<IOException, IOException> {
-        static final IOExceptionHandler THROW = new IOExceptionHandler();
-
-        @Override
-        public IOException fail(IOException cause) {
-            return cause;
-        }
-
-        @Override
-        public void warn(IOException cause) throws IOException {
-            throw cause;
-        }
-    } // IOExceptionHandler
-
-    @Immutable
     @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-    private static final class FsNeedsLockRetryException extends FsException {
-        FsNeedsLockRetryException() {
+    private static final class NeedsLockRetryException
+    extends FsControllerException {
+        NeedsLockRetryException() {
             super(null);
         }
     }
