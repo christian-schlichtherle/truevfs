@@ -22,7 +22,7 @@ import net.jcip.annotations.ThreadSafe;
  * {@link InputShop}, via a {@link Lock} object.
  *
  * @see     LockOutputStream
- * @since   TrueZIP 7.4.4
+ * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  * @version $Id$
  */

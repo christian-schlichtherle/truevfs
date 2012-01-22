@@ -99,7 +99,7 @@ import net.jcip.annotations.Immutable;
  * </ol>
  * 
  * @see     FsDecoratingController
- * @since   TrueZIP 7.4.4 (renamed from {@code FsException} and changed super
+ * @since   TrueZIP 7.5 (renamed from {@code FsException} and changed super
  *          type from {@code IOException} to {@code RuntimeException})
  * @author  Christian Schlichtherle
  * @version $Id$

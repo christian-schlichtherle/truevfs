@@ -66,7 +66,7 @@ public final class FsSyncOptions {
      * order to really clean up <em>all</em> resources, including the
      * selective entry cache.
      * 
-     * @since TrueZIP 7.4.4
+     * @since TrueZIP 7.5
      */
     public static final BitField<FsSyncOption>
             SYNC = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT);
@@ -80,7 +80,7 @@ public final class FsSyncOptions {
      * <p>
      * These options should not normally be used by applications.
      * 
-     * @since TrueZIP 7.4.4
+     * @since TrueZIP 7.5
      */
     public static final BitField<FsSyncOption>
             CANCEL = BitField.of(ABORT_CHANGES);

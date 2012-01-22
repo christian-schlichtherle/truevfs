@@ -28,7 +28,7 @@ import net.jcip.annotations.NotThreadSafe;
  * from the parent file system if and only if the virtual root directory has
  * been successfully unlinked from its federated file system before.
  * 
- * @since   TrueZIP 7.4.4
+ * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  * @version $Id$
  */
