@@ -22,6 +22,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import javax.swing.Icon;
+import javax.swing.JTree;
 
 /**
  * An abstract class which provides read/write access to a file system.
@@ -96,18 +97,6 @@ import javax.swing.Icon;
  * system upon a call to {@code sync}.
  * </ol>
  * 
- * <h3>Stack Traces</h3>
- * <p>
- * Because I/O operations can fail anytime, it's expected that users will be
- * frequently facing stack traces which include stack frames of many
- * implementing classes.
- * Now because of their complex chaining, it is generally recommended that any
- * implementations go the extra boilerplate mile to make nice readable stack
- * traces, for example by avoiding to use anonymous inner classes, declaring
- * methods package private which are called from member classes and even
- * overriding unchanged methods with exactly the same code as their super class
- * wherever practical.
- *
  * @param   <M> The type of the file system model.
  * @see     FsManager
  * @see     <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
@@ -136,12 +125,11 @@ public abstract class FsController<M extends FsModel> {
     public abstract @Nullable FsController<?> getParent();
 
     /**
-     * Returns the nullable icon representing the "open" state when
-     * displaying the (federated) file system represented by this controller in
-     * a GUI tree, e.g. a JTree.
+     * Returns a nullable icon representing the "open" state when displaying
+     * the (federated) file system represented by this controller in a GUI,
+     * e.g. a {@link JTree}.
      * 
      * @return The nullable icon.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      * @deprecated GUI features will be removed from this class in TrueZIP 8.
      */
     @Deprecated
@@ -149,12 +137,11 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     /**
-     * Returns the nullable icon representing the "closed" state when
-     * displaying the (federated) file system represented by this controller in
-     * a GUI tree, e.g. a JTree.
+     * Returns a nullable icon representing the "closed" state when displaying
+     * the (federated) file system represented by this controller in a GUI,
+     * e.g. a {@link JTree}.
      * 
      * @return The nullable icon.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      * @deprecated GUI features will be removed from this class in TrueZIP 8.
      */
     @Deprecated
@@ -165,7 +152,6 @@ public abstract class FsController<M extends FsModel> {
      * Returns {@code true} if and only if the file system is read-only.
      * 
      * @return {@code true} if and only if the file system is read-only.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract boolean isReadOnly()
     throws IOException;
@@ -180,7 +166,6 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @return A file system entry or {@code null} if no file system entry
      *         exists for the given name.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract @Nullable FsEntry getEntry(FsEntryName name)
     throws IOException;
@@ -190,7 +175,6 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not readable.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract boolean isReadable(FsEntryName name) throws IOException;
 
@@ -199,7 +183,6 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not writable.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract boolean isWritable(FsEntryName name) throws IOException;
 
@@ -212,7 +195,6 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not executable.
      * @since  TrueZIP 7.2.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public boolean isExecutable(FsEntryName name) throws IOException {
         return false;
@@ -245,7 +227,6 @@ public abstract class FsController<M extends FsModel> {
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
      * @since  TrueZIP 7.2
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public boolean setTime(
             final FsEntryName name,
@@ -275,7 +256,6 @@ public abstract class FsController<M extends FsModel> {
      * @param  value the last access time.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code types} succeeded.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract boolean setTime(
             FsEntryName name,
@@ -291,7 +271,6 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the file system entry name.
      * @param  options the input options.
      * @return An {@code InputSocket}.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract InputSocket<?>
     getInputSocket( FsEntryName name,
@@ -309,7 +288,6 @@ public abstract class FsController<M extends FsModel> {
      * @param  template a nullable template for the properties of the output
      *         entry.
      * @return An {@code OutputSocket}.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract OutputSocket<?>
     getOutputSocket(FsEntryName name,
@@ -344,7 +322,6 @@ public abstract class FsController<M extends FsModel> {
      *         <li>A parent entry is missing and {@code createParents} is
      *             {@code false}.
      *         </ul>
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract void
     mknod(  FsEntryName name,
@@ -359,7 +336,6 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the file system entry name.
      * @param  options output options for this operation.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract void
     unlink(FsEntryName name, BitField<FsOutputOption> options)
@@ -387,7 +363,6 @@ public abstract class FsController<M extends FsModel> {
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
      *         and {@code FORCE_CLOSE_OUTPUT} is set.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public final void
     sync(final BitField<FsSyncOption> options)
@@ -421,7 +396,6 @@ public abstract class FsController<M extends FsModel> {
      *         options is illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set.
-     * @throws FsControllerException See <a href="#Exception_Handling">Exception Handling</a>.
      */
     public abstract <X extends IOException> void
     sync(   BitField<FsSyncOption> options,
