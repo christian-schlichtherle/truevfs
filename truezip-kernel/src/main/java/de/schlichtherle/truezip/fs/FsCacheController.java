@@ -81,6 +81,9 @@ extends FsLockModelDecoratingController<
     private static final Strategy STRATEGY = WRITE_BACK;
 
     private final IOPool<?> pool;
+
+    // TODO: Consider using a ConcurrentMap to support concurrent access just
+    // protected by a read lock.
     private final Map<FsEntryName, EntryController>
             controllers = new HashMap<FsEntryName, EntryController>();
 
