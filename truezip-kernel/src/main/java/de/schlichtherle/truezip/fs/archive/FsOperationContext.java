@@ -14,23 +14,28 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import net.jcip.annotations.NotThreadSafe;
+import net.jcip.annotations.Immutable;
 
 /**
- * A JavaBean which represents the original values of selected parameters
- * for the {@link FsContextController} operation in progress.
+ * Represents the original output options for the
+ * {@linkplain FsContextController file system controller} operation in
+ * progress.
  *
  * @see     FsContextController
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@NotThreadSafe
+@Immutable
 @DefaultAnnotation(NonNull.class)
 final class FsOperationContext {
 
-    private @Nullable BitField<FsOutputOption> outputOptions;
+    private final BitField<FsOutputOption> outputOptions;
+
+    FsOperationContext(final BitField<FsOutputOption> outputOptions) {
+        assert null != outputOptions;
+        this.outputOptions = outputOptions;
+    }
 
     /**
      * Returns the options for the output operation in progress.
@@ -43,18 +48,8 @@ final class FsOperationContext {
      * @see    FsContextController#getOutputSocket(FsEntryName, BitField, Entry)
      * @see    FsContextController#mknod(FsEntryName, Entry.Type, BitField, Entry)
      */
-    @Nullable BitField<FsOutputOption> getOutputOptions() {
+    BitField<FsOutputOption> getOutputOptions() {
         return outputOptions;
-    }
-
-    /**
-     * Sets the options for the output operation in progress.
-     *
-     * @param outputOptions the options for the output operation in progress.
-     * @see   #getOutputOptions()
-     */
-    void setOutputOptions(final @Nullable BitField<FsOutputOption> outputOptions) {
-        this.outputOptions = outputOptions;
     }
 
     /**
@@ -62,7 +57,7 @@ final class FsOperationContext {
      *
      * @param option The output option to test.
      */
-    boolean get(FsOutputOption option) {
+    boolean get(final FsOutputOption option) {
         return outputOptions.get(option);
     }
 

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.util.HashMap;
 import java.util.Map;
 import javax.swing.Icon;
 import net.jcip.annotations.NotThreadSafe;
@@ -46,13 +45,8 @@ final class FsContextController
 extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     private static final FsOperationContext
-            NULL = new FsOperationContext();
-    static {
-        NULL.setOutputOptions(FsOutputOptions.NO_OUTPUT_OPTIONS);
-    }
-
-    private static final Map<BitField<FsOutputOption>, FsOperationContext>
-            contexts = new HashMap<BitField<FsOutputOption>, FsOperationContext>();
+            NULL = new FsOperationContext(
+                FsOutputOptions.NO_OUTPUT_OPTIONS);
 
     /**
      * Constructs a new file system context controller.
@@ -260,24 +254,13 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     /**
      * Returns an operation context holding the given output options.
-     * <p>
-     * TODO: Consider reusing the created object by mapping it.
      * 
      * @param  options the options for the output operation in progress.
      * @return An operation context holding the given output options.
      */
     private static FsOperationContext makeContext(
             final BitField<FsOutputOption> options) {
-        FsOperationContext context;
-        synchronized (FsContextController.class) {
-            context = contexts.get(options);
-            if (null == context) {
-                context = new FsOperationContext();
-                context.setOutputOptions(options);
-                contexts.put(options, context);
-            }
-        }
-        return context;
+        return new FsOperationContext(options);
     }
 
     private final class Input extends DecoratingInputSocket<Entry> {
@@ -347,12 +330,10 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     private final class Output extends DecoratingOutputSocket<Entry> {
         final FsOperationContext operation;
 
-        Output(
-                OutputSocket<?> output,
+        Output( OutputSocket<?> output,
                 BitField<FsOutputOption> options) {
             super(output);
             this.operation = makeContext(options);
-            
         }
 
         @Override
