@@ -26,7 +26,8 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
     protected final FsCompositeDriver delegate;
     protected final InstrumentingDirector director;
 
-    public InstrumentingCompositeDriver(final FsCompositeDriver driver, final InstrumentingDirector director) {
+    public InstrumentingCompositeDriver(final FsCompositeDriver driver,
+                                        final InstrumentingDirector director) {
         if (null == driver)
             throw new NullPointerException();
         this.director = director.check();
@@ -34,7 +35,8 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
     }
 
     @Override
-    public FsController<?> newController(FsModel model, FsController<?> parent) {
+    public FsController<?> newController(   final FsModel model,
+                                            final FsController<?> parent) {
         return director.instrument(delegate.newController(director.instrument(model, this), parent), this);
     }
 }
