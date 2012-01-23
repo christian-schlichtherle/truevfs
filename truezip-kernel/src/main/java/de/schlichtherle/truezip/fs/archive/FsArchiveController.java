@@ -29,6 +29,7 @@ import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,7 +94,7 @@ extends FsLockModelController {
      *         parameters for the {@link FsContextController} operation in
      *         progress.
      */
-    final FsOperationContext getContext() {
+    final @Nullable FsOperationContext getContext() {
         return context.get();
     }
 
