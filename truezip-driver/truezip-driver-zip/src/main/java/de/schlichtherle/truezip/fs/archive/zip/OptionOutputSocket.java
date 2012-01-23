@@ -40,25 +40,21 @@ extends DecoratingOutputSocket<Entry> {
 
     @Override
     public Entry getLocalTarget() throws IOException {
-        // Same implementation as super class, but makes stack trace nicer.
         return getBoundSocket().getLocalTarget();
     }
 
     @Override
     public Entry getPeerTarget() throws IOException {
-        // Same implementation as super class, but makes stack trace nicer.
         return getBoundSocket().getPeerTarget();
     }
 
     @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        // Same implementation as super class, but makes stack trace nicer.
         return getBoundSocket().newSeekableByteChannel();
     }
 
     @Override
     public OutputStream newOutputStream() throws IOException {
-        // Same implementation as super class, but makes stack trace nicer.
         return getBoundSocket().newOutputStream();
     }
 }
