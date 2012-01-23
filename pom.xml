@@ -77,10 +77,7 @@
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
         <!-- For maven-surefire-plugin and maven-failsafe-plugin. -->
         <argLine>-server</argLine>
-        <!-- FIXME: This should be "both", but some tests still seem to
-             temporarily change global state so that racing conditions apply.
-             -->
-        <!--parallel>methods</parallel-->
+        <parallel>both</parallel>
     </properties>
 
     <modules>
@@ -215,9 +212,7 @@
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
-                        <!--argLine>-server -Djava.security.manager</argLine-->
                         <systemPropertyVariables>
-                            <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
@@ -225,8 +220,14 @@
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
-                        <threadCount>10</threadCount> <!-- consider 90% I/O blocking factor -->
+                        <!-- Consider 90% blocking factor for I/O. -->
+                        <threadCount>10</threadCount>
                         <systemPropertyVariables>
+                            <!-- FIXME: Setting this property to "true" is just
+                                 a workaround to easily isolate the tests when
+                                 running in parallel!
+                                 -->
+                            <de.schlichtherle.truezip.fs.FsManager.isolate>false</de.schlichtherle.truezip.fs.FsManager.isolate>
                             <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
