@@ -152,24 +152,10 @@ extends TestBase<D> {
         // Note that file's parent directory may be a directory in the host file system!
 
         // Create file false positive.
-        {
-            OutputStream out = newOutputStream(file);
-            try {
-                out.write(data);
-            } finally {
-                out.close();
-            }
-        }
+        createTestFile(file);
 
         // Overwrite.
-        {
-            OutputStream out = newOutputStream(file);
-            try {
-                out.write(data);
-            } finally {
-                out.close();
-            }
-        }
+        createTestFile(file);
 
         assertTrue(exists(file));
         assertFalse(isDirectory(file));
