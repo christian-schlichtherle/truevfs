@@ -53,5 +53,4 @@ extends DecoratingSeekableByteChannel {
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }
-    
 }
