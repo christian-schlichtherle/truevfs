@@ -341,7 +341,7 @@ public final class TConfig implements Closeable {
      *             the TrueZIP&nbsp;Path module and should never be used by
      *             client applications.
      */
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static FsManager getCurrentManager() {
         return get().getManager();
     }
