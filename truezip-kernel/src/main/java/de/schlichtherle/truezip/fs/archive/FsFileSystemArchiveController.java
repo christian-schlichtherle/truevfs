@@ -129,7 +129,7 @@ extends FsArchiveController<E> {
         private final FsArchiveFileSystem<E> fileSystem;
 
         MountedFileSystem(final FsArchiveFileSystem<E> fileSystem) {
-            if (fileSystem == null)
+            if (null == fileSystem)
                 throw new NullPointerException();
             this.fileSystem = fileSystem;
         }
@@ -146,7 +146,7 @@ extends FsArchiveController<E> {
 
         @Override
         void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
-            if (fileSystem != null)
+            if (null != fileSystem)
                 throw new IllegalArgumentException("File system already mounted!");
             mountState = new ResetFileSystem();
         }
@@ -156,7 +156,7 @@ extends FsArchiveController<E> {
         private FsCacheableFalsePositiveException exception;
 
         private FalsePositiveFileSystem(final FsCacheableFalsePositiveException exception) {
-            if (exception == null)
+            if (null == exception)
                 throw new NullPointerException();
             this.exception = exception;
         }

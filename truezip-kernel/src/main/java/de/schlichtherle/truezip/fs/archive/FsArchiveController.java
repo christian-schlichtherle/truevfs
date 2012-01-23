@@ -126,15 +126,9 @@ extends FsLockModelController {
      * Returns the (virtual) archive file system mounted from the target
      * archive file. This method is reentrant with respect to any exceptions
      * it may throw.
-     * <p>
-     * <b>Warning:</b> Either the read or the write lock of this controller
-     * must be acquired while this method is called!
-     * If only a read lock is acquired, but a write lock is required, this
-     * method will temporarily release all locks, so any preconditions must be
-     * checked again upon return to protect against concurrent modifications!
      *
-     * @param  autoCreate If the archive file does not exist and this is
-     *         {@code true}, a new archvie file system with only a (virtual)
+     * @param  autoCreate If this is {@code true} and the archive file does not
+     *         exist, then a new archive file system with only a (virtual)
      *         root directory is created with its last modification time set
      *         to the system's current time.
      * @return An archive file system.
@@ -373,7 +367,8 @@ extends FsLockModelController {
     }
 
     @Override
-    public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink( final FsEntryName name,
+                        final BitField<FsOutputOption> options)
     throws IOException {
         checkAccess(name, null);
         final FsArchiveFileSystem<E> fileSystem = autoMount();
