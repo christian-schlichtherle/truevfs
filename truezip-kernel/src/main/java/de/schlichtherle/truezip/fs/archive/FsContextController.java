@@ -102,7 +102,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
-    public FsEntry getEntry(FsEntryName name)
+    public FsEntry getEntry(final FsEntryName name)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -115,7 +115,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
+    public boolean isReadable(final FsEntryName name) throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
@@ -127,7 +127,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
+    public boolean isWritable(final FsEntryName name) throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
@@ -139,7 +139,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
+    public boolean isExecutable(final FsEntryName name) throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
@@ -151,7 +151,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
+    public void setReadOnly(final FsEntryName name) throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
@@ -164,9 +164,9 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            Map<Access, Long> times,
-            BitField<FsOutputOption> options)
+            final FsEntryName name,
+            final Map<Access, Long> times,
+            final BitField<FsOutputOption> options)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -180,10 +180,10 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            BitField<Access> types,
-            long value,
-            BitField<FsOutputOption> options)
+            final FsEntryName name,
+            final BitField<Access> types,
+            final long value,
+            final BitField<FsOutputOption> options)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -196,15 +196,17 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<FsInputOption> options) {
+    public InputSocket<?> getInputSocket(
+            final FsEntryName name,
+            final BitField<FsInputOption> options) {
         return new Input(delegate.getInputSocket(name, options));
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsOutputOption> options,
-                                            Entry template) {
+    public OutputSocket<?> getOutputSocket(
+            final FsEntryName name,
+            final BitField<FsOutputOption> options,
+            final Entry template) {
         return new Output(
                 delegate.getOutputSocket(name, options, template),
                 options);
@@ -212,10 +214,10 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public void mknod(
-            FsEntryName name,
-            Type type,
-            BitField<FsOutputOption> options,
-            @CheckForNull Entry template)
+            final FsEntryName name,
+            final Type type,
+            final BitField<FsOutputOption> options,
+            final @CheckForNull Entry template)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -228,7 +230,8 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink( final FsEntryName name,
+                        final BitField<FsOutputOption> options)
     throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -242,9 +245,8 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public <X extends IOException>
-    void sync(
-            final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
+    void sync(  final BitField<FsSyncOption> options,
+                final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -264,7 +266,8 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
      * @param  options the options for the output operation in progress.
      * @return An operation context holding the given output options.
      */
-    private static FsOperationContext makeContext(BitField<FsOutputOption> options) {
+    private static FsOperationContext makeContext(
+            final BitField<FsOutputOption> options) {
         FsOperationContext context;
         synchronized (FsContextController.class) {
             context = contexts.get(options);

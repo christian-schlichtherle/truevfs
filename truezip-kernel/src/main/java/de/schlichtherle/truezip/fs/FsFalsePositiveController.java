@@ -150,7 +150,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public FsEntry getEntry(FsEntryName name) throws IOException {
+    public FsEntry getEntry(final FsEntryName name) throws IOException {
         try {
             return delegate.getEntry(name);
         } catch (FsFalsePositiveException ex) {
@@ -163,7 +163,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
+    public boolean isReadable(final FsEntryName name) throws IOException {
         try {
             return delegate.isReadable(name);
         } catch (FsFalsePositiveException ex) {
@@ -176,7 +176,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
+    public boolean isWritable(final FsEntryName name) throws IOException {
         try {
             return delegate.isWritable(name);
         } catch (FsFalsePositiveException ex) {
@@ -189,7 +189,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
+    public boolean isExecutable(final FsEntryName name) throws IOException {
         try {
             return delegate.isExecutable(name);
         } catch (FsFalsePositiveException ex) {
@@ -202,7 +202,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
+    public void setReadOnly(final FsEntryName name) throws IOException {
         try {
             delegate.setReadOnly(name);
         } catch (FsFalsePositiveException ex) {
@@ -216,9 +216,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            Map<Access, Long> times,
-            BitField<FsOutputOption> options)
+            final FsEntryName name,
+            final Map<Access, Long> times,
+            final BitField<FsOutputOption> options)
     throws IOException {
         try {
             return delegate.setTime(name, times, options);
@@ -233,10 +233,10 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            BitField<Access> types,
-            long value,
-            BitField<FsOutputOption> options)
+            final FsEntryName name,
+            final BitField<Access> types,
+            final long value,
+            final BitField<FsOutputOption> options)
     throws IOException {
         try {
             return delegate.setTime(name, types, value, options);
@@ -259,19 +259,19 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            FsEntryName name,
-            BitField<FsOutputOption> options,
-            @CheckForNull Entry template) {
+            final FsEntryName name,
+            final BitField<FsOutputOption> options,
+            final @CheckForNull Entry template) {
         return new Output(  delegate.getOutputSocket(name, options, template),
                             name, options, template);
     }
 
     @Override
     public void mknod(
-            FsEntryName name,
-            Type type,
-            BitField<FsOutputOption> options,
-            @CheckForNull Entry template)
+            final FsEntryName name,
+            final Type type,
+            final BitField<FsOutputOption> options,
+            final @CheckForNull Entry template)
     throws IOException {
         try {
             delegate.mknod(name, type, options, template);
@@ -285,7 +285,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink( final FsEntryName name,
+                        final BitField<FsOutputOption> options)
     throws IOException {
         try {
             delegate.unlink(name, options);
@@ -300,8 +301,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // Mind there's no FsFalsePositiveException in the throws-declaration!
         delegate.sync(options, handler);

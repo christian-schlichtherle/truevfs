@@ -141,7 +141,8 @@ extends FsLockModelDecoratingController<
     }
 
     @Override
-    public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink( final FsEntryName name,
+                        final BitField<FsOutputOption> options)
     throws IOException {
         assert isWriteLockedByCurrentThread();
 
@@ -170,7 +171,8 @@ extends FsLockModelDecoratingController<
         }
     }
 
-    private void unlink0(final FsEntryName name, BitField<FsOutputOption> options)
+    private void unlink0(   final FsEntryName name,
+                            final BitField<FsOutputOption> options)
     throws IOException {
         final EntryController controller = controllers.get(name);
         if (null != controller) {
@@ -203,6 +205,7 @@ extends FsLockModelDecoratingController<
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
         final boolean clear = !flush || options.get(CLEAR_CACHE);
+        assert flush || clear;
         final Iterator<EntryController> i = controllers.values().iterator();
         while (i.hasNext()) {
             final EntryController controller = i.next();
@@ -415,10 +418,10 @@ extends FsLockModelDecoratingController<
     private final class EntryController {
         final FsEntryName name;
         final IOCache cache;
-        volatile @CheckForNull InputSocket<?> input;
-        volatile @CheckForNull OutputSocket<?> output;
-        volatile @Nullable BitField<FsOutputOption> outputOptions;
-        volatile @CheckForNull Entry template;
+        @CheckForNull InputSocket<?> input;
+        @CheckForNull OutputSocket<?> output;
+        @Nullable BitField<FsOutputOption> outputOptions;
+        @CheckForNull Entry template;
 
         EntryController(final FsEntryName name) {
             this.name = name;
