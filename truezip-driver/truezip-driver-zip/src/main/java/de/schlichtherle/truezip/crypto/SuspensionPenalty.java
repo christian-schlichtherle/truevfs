@@ -32,6 +32,7 @@ public class SuspensionPenalty {
      * Call this method in a key verification loop in order to enforce a
      * suspension penalty for providing a wrong key of at least
      * {@link #MIN_KEY_RETRY_DELAY} milliseconds.
+     * Interrupting the current thread does not show any effect on this method.
      * 
      * @param  last the last try time.
      *         This should be zero upon the first call.
@@ -51,7 +52,7 @@ public class SuspensionPenalty {
             }
         }
         if (interrupted)
-            Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt(); // restore
         return last + delay; // approximately System.currentTimeMillis()
     }
 }
