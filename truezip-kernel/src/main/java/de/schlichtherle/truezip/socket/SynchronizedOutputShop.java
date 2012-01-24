@@ -91,10 +91,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
             @Override
             public E getLocalTarget() throws IOException {
-                final OutputShop<E> delegate = SynchronizedOutputShop.this.delegate;
-                synchronized (delegate) {
-                    return getBoundSocket().getLocalTarget();
-                }
+                return entry;
             }
 
             @Override

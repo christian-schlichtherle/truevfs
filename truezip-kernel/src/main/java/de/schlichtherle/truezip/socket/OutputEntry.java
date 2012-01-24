@@ -27,5 +27,6 @@ public interface OutputEntry<E extends OutputEntry<E>> extends Entry {
      *
      * @return An output socket for writing this entry.
      */
+    // TODO: Declare to return OutputSocket<? extends E>
     @NonNull OutputSocket<E> getOutputSocket();
 }

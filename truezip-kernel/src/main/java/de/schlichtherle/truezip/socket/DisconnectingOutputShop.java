@@ -81,7 +81,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             @Override
             public E getLocalTarget() throws IOException {
                 checkOpen();
-                return getBoundSocket().getLocalTarget();
+                return entry;
             }
 
             @Override

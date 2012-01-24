@@ -55,6 +55,11 @@ public class OdfOutputShop extends FsMultiplexedOutputShop<ZipArchiveEntry> {
             }
 
             @Override
+            public ZipArchiveEntry getLocalTarget() throws IOException {
+                return entry;
+            }
+
+            @Override
             public OutputStream newOutputStream() throws IOException {
                 if (MIMETYPE.equals(entry.getName())) {
                     mimetype = true;

@@ -27,5 +27,6 @@ public interface InputEntry<E extends InputEntry<E>> extends Entry {
      *
      * @return An input socket for reading this entry.
      */
+    // TODO: Declare to return InputSocket<? extends E>
     @NonNull InputSocket<E> getInputSocket();
 }

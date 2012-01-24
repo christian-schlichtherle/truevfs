@@ -40,14 +40,14 @@ import net.jcip.annotations.NotThreadSafe;
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
- * @param   <AE> The type of the archive entries.
+ * @param   E The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class FsMultiplexedOutputShop<AE extends FsArchiveEntry>
-extends DecoratingOutputShop<AE, OutputShop<AE>> {
+public class FsMultiplexedOutputShop<E extends FsArchiveEntry>
+extends DecoratingOutputShop<E, OutputShop<E>> {
 
     private final IOPool<?> pool;
 
@@ -68,7 +68,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
      * @param pool the pool for buffering entry data.
      */
     public FsMultiplexedOutputShop(
-            final OutputShop<AE> output,
+            final OutputShop<E> output,
             final IOPool<?> pool) {
         super(output);
         if (null == pool)
@@ -82,13 +82,13 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public Iterator<AE> iterator() {
-        return new JointIterator<AE>(
+    public Iterator<E> iterator() {
+        return new JointIterator<E>(
                 delegate.iterator(),
                 new BufferedEntriesIterator());
     }
 
-    private class BufferedEntriesIterator implements Iterator<AE> {
+    private class BufferedEntriesIterator implements Iterator<E> {
         final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
 
         @Override
@@ -97,7 +97,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
         }
 
         @Override
-        public AE next() {
+        public E next() {
             return i.next().getTarget();
         }
 
@@ -108,8 +108,8 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public @CheckForNull AE getEntry(String name) {
-        final AE entry = delegate.getEntry(name);
+    public @CheckForNull E getEntry(String name) {
+        final E entry = delegate.getEntry(name);
         if (null != entry)
             return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
@@ -117,10 +117,15 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
     }
 
     @Override
-    public OutputSocket<? extends AE> getOutputSocket(final AE entry) {
-        class Output extends DecoratingOutputSocket<AE> {
+    public OutputSocket<? extends E> getOutputSocket(final E entry) {
+        class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(FsMultiplexedOutputShop.super.getOutputSocket(entry));
+            }
+
+            @Override
+            public E getLocalTarget() throws IOException {
+                return entry;
             }
 
             @Override
@@ -187,15 +192,15 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
      */
     private class BufferedEntryOutputStream extends DecoratingOutputStream {
         final IOPool.Entry<?> temp;
-        final OutputSocket<? extends AE> output;
-        final AE local;
+        final OutputSocket<? extends E> output;
+        final E local;
         final InputSocket<Entry> input;
         boolean closed;
 
         @SuppressWarnings("LeakingThisInConstructor")
         BufferedEntryOutputStream(
                 final IOPool.Entry<?> temp,
-                final OutputSocket<? extends AE> output)
+                final OutputSocket<? extends E> output)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream());
             this.output = output;
@@ -219,7 +224,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
                 old.store(true);
         }
 
-        AE getTarget() {
+        E getTarget() {
             return local;
         }
 
@@ -233,7 +238,7 @@ extends DecoratingOutputShop<AE, OutputShop<AE>> {
             } finally {
                 try {
                     final Entry src = input.getLocalTarget();
-                    final AE dst = getTarget();
+                    final E dst = getTarget();
                     // Never copy anything but the DATA size!
                     if (UNKNOWN == dst.getSize(DATA))
                         dst.setSize(DATA, src.getSize(DATA));

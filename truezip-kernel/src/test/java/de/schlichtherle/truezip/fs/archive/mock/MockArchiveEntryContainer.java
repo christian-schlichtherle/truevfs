@@ -8,17 +8,13 @@
  */
 package de.schlichtherle.truezip.fs.archive.mock;
 
-import static de.schlichtherle.truezip.entry.Entry.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
+import static de.schlichtherle.truezip.entry.Entry.ALL_ACCESS_SET;
+import de.schlichtherle.truezip.entry.Entry.Access;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
@@ -57,7 +53,7 @@ implements EntryContainer<MockArchiveEntry> {
         return map.get(name);
     }
 
-    public final class Input
+    public final class InputArchive
     extends MockArchiveEntryContainer
     implements InputShop<MockArchiveEntry> {
         private boolean closed;
@@ -68,7 +64,7 @@ implements EntryContainer<MockArchiveEntry> {
             if (null == name)
                 throw new NullPointerException();
 
-            class Socket extends InputSocket<MockArchiveEntry> {
+            class Input extends InputSocket<MockArchiveEntry> {
                 @Override
                 public MockArchiveEntry getLocalTarget() throws IOException {
                     final MockArchiveEntry entry = map.get(name);
@@ -96,18 +92,18 @@ implements EntryContainer<MockArchiveEntry> {
                             .getInputSocket()
                             .newInputStream();
                 }
-            } // class Socket
+            } // Input
 
-            return new Socket();
+            return new Input();
         }
 
         @Override
         public void close() {
             closed = true;
         }
-    } // class Input
+    } // class InputArchive
 
-    public final class Output
+    public final class OutputArchive
     extends MockArchiveEntryContainer
     implements OutputShop<MockArchiveEntry> {
         private boolean closed;
@@ -118,7 +114,7 @@ implements EntryContainer<MockArchiveEntry> {
             if (null == entry)
                 throw new NullPointerException();
 
-            class Socket extends OutputSocket<MockArchiveEntry> {
+            class Output extends OutputSocket<MockArchiveEntry> {
                 @Override
                 public MockArchiveEntry getLocalTarget() {
                     return entry;
@@ -153,18 +149,18 @@ implements EntryContainer<MockArchiveEntry> {
                                     entry.setTime(type, io.getTime(type));
                             }
                         }
-                    } // class Stream
+                    } // Stream
 
                     return new Stream();
                 }
-            } // class Socket
+            } // Output
 
-            return new Socket();
+            return new Output();
         }
 
         @Override
         public void close() {
             closed = true;
         }
-    } // class Output
+    } // class OutputArchive
 }
