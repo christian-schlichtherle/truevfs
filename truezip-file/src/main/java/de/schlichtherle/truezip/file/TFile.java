@@ -971,6 +971,7 @@ public final class TFile extends File {
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(BitField)
+     * @see    #getTopLevelArchive()
      */
     @SuppressWarnings("deprecation")
     public static void sync(
@@ -1129,6 +1130,7 @@ public final class TFile extends File {
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
+     * @see    #getTopLevelArchive()
      */
     public static void umount(TFile archive)
     throws FsSyncException {
@@ -1170,6 +1172,7 @@ public final class TFile extends File {
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
+     * @see    #getTopLevelArchive()
      */
     public static void umount(TFile archive, boolean forceCloseInputAndOutput)
     throws FsSyncException {
@@ -1220,6 +1223,7 @@ public final class TFile extends File {
      * @throws FsSyncException if any error conditions occur.
      *         This implies loss of data!
      * @see    #sync(TFile, BitField)
+     * @see    #getTopLevelArchive()
      */
     public static void umount(TFile archive,
             boolean waitCloseInput, boolean forceCloseInput,
