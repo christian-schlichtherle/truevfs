@@ -50,8 +50,8 @@ final class TempFilePool implements IOPool<FileEntry> {
     }
 
     @Override
-    public TempEntry allocate() throws IOException {
-        return new TempEntry(createTempFile(name, null, dir), this);
+    public TempFileBuffer allocate() throws IOException {
+        return new TempFileBuffer(createTempFile(name, null, dir), this);
     }
 
     @Override
@@ -61,11 +61,11 @@ final class TempFilePool implements IOPool<FileEntry> {
 
     /** A temp file pool entry. */
     @NotThreadSafe
-    private static final class TempEntry
+    private static final class TempFileBuffer
     extends FileEntry
     implements Entry<FileEntry> {
 
-        TempEntry(File file, final TempFilePool pool) {
+        TempFileBuffer(File file, final TempFilePool pool) {
             super(file);
             assert null != file;
             assert null != pool;
