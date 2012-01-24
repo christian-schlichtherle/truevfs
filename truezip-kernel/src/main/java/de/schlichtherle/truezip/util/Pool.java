@@ -22,7 +22,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public interface Pool<R, E extends Exception> {
+public interface Pool<R, X extends Exception> {
 
     /**
      * Allocates a resource from this pool.
@@ -33,7 +33,7 @@ public interface Pool<R, E extends Exception> {
      * @return A resource.
      * @throws Exception if allocating the resource failed for any reason.
      */
-    R allocate() throws E;
+    R allocate() throws X;
 
     /**
      * Releases a previously allocated resource to this pool.
@@ -46,14 +46,14 @@ public interface Pool<R, E extends Exception> {
      *         implementation cannot tolerate this.
      * @throws Exception if releasing the resource failed for any other reason.
      */
-    void release(R resource) throws E;
+    void release(R resource) throws X;
 
     /**
      * This interface is designed to be used with Pools which enable their
      * resources to release itself.
      * TODO for TrueZIP 8: This should be named "Resource".
      */
-    interface Releasable<E extends Exception> {
+    interface Releasable<X extends Exception> {
 
         /**
          * Releases this resource to its pool.
@@ -64,6 +64,6 @@ public interface Pool<R, E extends Exception> {
          *         released to its pool and the implementation cannot tolerate
          *         this.
          */
-        void release() throws E;
+        void release() throws X;
     }
 }
