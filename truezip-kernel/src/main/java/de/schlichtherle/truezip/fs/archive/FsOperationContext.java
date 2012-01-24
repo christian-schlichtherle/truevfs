@@ -17,7 +17,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
- * Represents the original output options for the
+ * Represents the original values of selected parameters for the
  * {@linkplain FsContextController file system controller} operation in
  * progress.
  *
