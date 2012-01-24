@@ -140,60 +140,60 @@ implements OutputShop<ZipArchiveEntry> {
     }
 
     @Override
-    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry lt) { // local target
-        if (null == lt)
+    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry entry) { // local target
+        if (null == entry)
             throw new NullPointerException();
 
         class Output extends OutputSocket<ZipArchiveEntry> {
             @Override
             public ZipArchiveEntry getLocalTarget() {
-                return lt;
+                return entry;
             }
 
             @Override
             public OutputStream newOutputStream()
             throws IOException {
                 if (isBusy())
-                    throw new OutputBusyException(lt.getName());
-                final Entry pt;
+                    throw new OutputBusyException(entry.getName());
+                final Entry peer;
                 final long size;
                 boolean process = true;
-                if (lt.isDirectory()) {
-                    lt.setMethod(STORED);
-                    lt.setCrc(0);
-                    lt.setCompressedSize(0);
-                    lt.setSize(0);
-                    return new EntryOutputStream(lt, true);
-                } else if (null != (pt = getPeerTarget())
-                        && UNKNOWN != (size = pt.getSize(DATA))) {
-                    lt.setSize(size);
-                    if (pt instanceof ZipArchiveEntry) {
+                if (entry.isDirectory()) {
+                    entry.setMethod(STORED);
+                    entry.setCrc(0);
+                    entry.setCompressedSize(0);
+                    entry.setSize(0);
+                    return new EntryOutputStream(entry, true);
+                } else if (null != (peer = getPeerTarget())
+                        && UNKNOWN != (size = peer.getSize(DATA))) {
+                    entry.setSize(size);
+                    if (peer instanceof ZipArchiveEntry) {
                         // Set up entry attributes for Direct Data Copying (DDC).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
-                        final ZipArchiveEntry zpt = (ZipArchiveEntry) pt;
-                        process = driver.process(ZipOutputShop.this, lt, zpt);
+                        final ZipArchiveEntry zpt = (ZipArchiveEntry) peer;
+                        process = driver.process(ZipOutputShop.this, entry, zpt);
                         if (!process) {
-                            lt.setPlatform(zpt.getPlatform());
-                            lt.setEncrypted(zpt.isEncrypted());
-                            lt.setMethod(zpt.getMethod());
-                            lt.setCompressedSize(zpt.getCompressedSize());
-                            lt.setCrc(zpt.getCrc());
-                            lt.setExtra(zpt.getExtra());
+                            entry.setPlatform(zpt.getPlatform());
+                            entry.setEncrypted(zpt.isEncrypted());
+                            entry.setMethod(zpt.getMethod());
+                            entry.setCompressedSize(zpt.getCompressedSize());
+                            entry.setCrc(zpt.getCrc());
+                            entry.setExtra(zpt.getExtra());
                         }
                     }
                 }
-                if (STORED == lt.getMethod()) {
-                    if (       UNKNOWN == lt.getCrc()
-                            || UNKNOWN == lt.getCompressedSize()
-                            || UNKNOWN == lt.getSize()) {
+                if (STORED == entry.getMethod()) {
+                    if (       UNKNOWN == entry.getCrc()
+                            || UNKNOWN == entry.getCompressedSize()
+                            || UNKNOWN == entry.getSize()) {
                         assert process : "The CRC-32, compressed size and size properties should be set in the peer target!";
                         return new BufferedEntryOutputStream(
-                                getPool().allocate(), lt, process);
+                                getPool().allocate(), entry, process);
                     }
                 }
-                return new EntryOutputStream(lt, process);
+                return new EntryOutputStream(entry, process);
             }
         } // Output
 
