@@ -318,12 +318,14 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public synchronized InputStream getPreambleInputStream() throws IOException {
         return new SynchronizedInputStream(super.getPreambleInputStream(),
                 this);
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public synchronized InputStream getPostambleInputStream() throws IOException {
         return new SynchronizedInputStream(super.getPostambleInputStream(),
                 this);
@@ -352,6 +354,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected synchronized InputStream getInputStream(
             String name, Boolean check, boolean process)
     throws  IOException {

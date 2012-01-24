@@ -20,9 +20,11 @@ import net.jcip.annotations.ThreadSafe;
  * A decorator which synchronizes all access to a {@link ReadOnlyFile}
  * via an object provided to its constructor.
  *
+ * @deprecated Use {@link LockReadOnlyFile} instead.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Deprecated
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
