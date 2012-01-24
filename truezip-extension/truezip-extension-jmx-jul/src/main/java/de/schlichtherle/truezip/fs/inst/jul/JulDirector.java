@@ -10,15 +10,14 @@ package de.schlichtherle.truezip.fs.inst.jul;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.inst.InstrumentingCompositeDriver;
 import de.schlichtherle.truezip.fs.inst.InstrumentingController;
 import de.schlichtherle.truezip.fs.inst.InstrumentingDirector;
 import de.schlichtherle.truezip.fs.inst.InstrumentingManager;
-import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
@@ -29,7 +28,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public final class JulDirector extends InstrumentingDirector {
+public final class JulDirector extends InstrumentingDirector<JulDirector> {
     public static final JulDirector SINGLETON = new JulDirector();
 
     private static final SocketFactory FACTORY = JSE7.AVAILABLE
@@ -45,13 +44,13 @@ public final class JulDirector extends InstrumentingDirector {
     }
 
     @Override
-    public <M extends FsModel> FsController<M> instrument(FsController<M> controller, InstrumentingManager context) {
+    public FsController<?> instrument(FsController<?> controller, InstrumentingManager context) {
         return controller;
     }
 
     @Override
-    public <M extends FsModel> FsController<M> instrument(FsController<M> controller, InstrumentingCompositeDriver context) {
-        return new InstrumentingController<M>(controller, this);
+    public FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context) {
+        return new InstrumentingController<JulDirector>(controller, this);
     }
 
     @Override

@@ -9,19 +9,16 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.inst.InstrumentingController;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-abstract class JmxController<M extends FsModel>
-extends InstrumentingController<M> {
+abstract class JmxController
+extends InstrumentingController<JmxDirector> {
 
-    JmxController(
-            FsController<? extends M> controller,
-            JmxDirector director) {
+    JmxController(FsController<?> controller, JmxDirector director) {
         super(controller, director);
     }
 

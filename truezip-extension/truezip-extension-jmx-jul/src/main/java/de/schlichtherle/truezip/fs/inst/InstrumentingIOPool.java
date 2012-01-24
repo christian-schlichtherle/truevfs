@@ -30,9 +30,9 @@ public class InstrumentingIOPool<E extends Entry<E>> implements IOPool<E> {
     protected final IOPool<E> delegate;
 
     public InstrumentingIOPool(final IOPool<E> pool, final InstrumentingDirector director) {
-        if (null == pool)
+        if (null == pool || null == director)
             throw new NullPointerException();
-        this.director = director.check();
+        this.director = director;
         this.delegate = pool;
     }
 

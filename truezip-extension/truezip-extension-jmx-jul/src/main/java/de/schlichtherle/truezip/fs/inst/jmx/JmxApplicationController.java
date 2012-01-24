@@ -9,23 +9,19 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsModel;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-final class JmxApplicationController<M extends FsModel>
-extends JmxController<M> {
+final class JmxApplicationController extends JmxController {
 
-    JmxApplicationController(
-            FsController<? extends M> controller,
-            JmxDirector director) {
+    JmxApplicationController(FsController<?> controller, JmxDirector director) {
         super(controller, director);
     }
 
     @Override
     JmxIOStatistics getIOStatistics() {
-        return ((JmxDirector) director).getApplicationIOStatistics();
+        return director.getApplicationIOStatistics();
     }
 }

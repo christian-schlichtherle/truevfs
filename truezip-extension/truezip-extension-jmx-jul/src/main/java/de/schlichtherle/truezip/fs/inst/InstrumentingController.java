@@ -23,16 +23,18 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public class InstrumentingController<M extends FsModel>
-extends FsDecoratingController<M, FsController<? extends M>> {
+public class InstrumentingController<D extends InstrumentingDirector<D>>
+extends FsDecoratingController<FsModel, FsController<?>> {
 
-    protected final InstrumentingDirector director;
+    protected final D director;
 
     public InstrumentingController(
-            final FsController<? extends M> controller,
-            final InstrumentingDirector director) {
+            final FsController<?> controller,
+            final D director) {
         super(controller);
-        this.director = director.check();
+        if (null == director)
+            throw new NullPointerException();
+        this.director = director;
     }
 
     @Override

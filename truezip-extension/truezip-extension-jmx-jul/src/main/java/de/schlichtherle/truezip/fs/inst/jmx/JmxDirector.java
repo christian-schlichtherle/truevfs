@@ -12,11 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.inst.InstrumentingCompositeDriver;
-import de.schlichtherle.truezip.fs.inst.InstrumentingController;
-import de.schlichtherle.truezip.fs.inst.InstrumentingDirector;
-import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
-import de.schlichtherle.truezip.fs.inst.InstrumentingManager;
+import de.schlichtherle.truezip.fs.inst.*;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -24,12 +20,7 @@ import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.management.ManagementFactory;
-import javax.management.InstanceNotFoundException;
-import javax.management.JMX;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
+import javax.management.*;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -38,7 +29,7 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
-public class JmxDirector extends InstrumentingDirector {
+public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private static final String APPLICATION_IO_STATISTICS = "ApplicationIOStatistics";
     private static final String KERNEL_IO_STATISTICS = "KernelIOStatistics";
@@ -139,13 +130,13 @@ public class JmxDirector extends InstrumentingDirector {
     }
 
     @Override
-    public <M extends FsModel> FsController<M> instrument(FsController<M> controller, InstrumentingManager context) {
-        return new JmxApplicationController<M>(controller, this);
+    public FsController<?> instrument(FsController<?> controller, InstrumentingManager context) {
+        return new JmxApplicationController(controller, this);
     }
 
     @Override
-    public <M extends FsModel> FsController<M> instrument(FsController<M> controller, InstrumentingCompositeDriver context) {
-        return new JmxKernelController<M>(controller, this);
+    public FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context) {
+        return new JmxKernelController(controller, this);
     }
 
     @Override
@@ -153,9 +144,8 @@ public class JmxDirector extends InstrumentingDirector {
         return new JmxInputSocket<E>(input, this, temp);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     @Override
-    public <E extends Entry, M extends FsModel> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<M> context) {
+    public <E extends Entry> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<JmxDirector> context) {
         return new JmxInputSocket<E>(input, this, ((JmxController) context).getIOStatistics());
     }
 
@@ -164,9 +154,8 @@ public class JmxDirector extends InstrumentingDirector {
         return new JmxOutputSocket<E>(output, this, temp);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     @Override
-    public <E extends Entry, M extends FsModel> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<M> context) {
+    public <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<JmxDirector> context) {
         return new JmxOutputSocket<E>(output, this, ((JmxController) context).getIOStatistics());
     }
 
@@ -176,9 +165,8 @@ public class JmxDirector extends InstrumentingDirector {
             return new JmxNio2InputSocket<E>(input, this, super.temp);
         }
 
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
         @Override
-        public <E extends Entry, M extends FsModel> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<M> context) {
+        public <E extends Entry> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<JmxDirector> context) {
             return new JmxNio2InputSocket<E>(input, this, ((JmxController) context).getIOStatistics());
         }
 
@@ -187,9 +175,8 @@ public class JmxDirector extends InstrumentingDirector {
             return new JmxNio2OutputSocket<E>(output, this, super.temp);
         }
 
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
         @Override
-        public <E extends Entry, M extends FsModel> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<M> context) {
+        public <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<JmxDirector> context) {
             return new JmxNio2OutputSocket<E>(output, this, ((JmxController) context).getIOStatistics());
         }
     }
