@@ -244,7 +244,7 @@ extends FsFileSystemArchiveController<E> {
             return;
         Boolean grow = null;
         String aen; // archive entry name
-        final OutputArchive<E> oa = getOutputArchive(); // output archive
+        final OutputArchive<E> oa = getOutputArchive();
         final E oae; // output archive entry
         if (null != oa) {
             aen = ce.getEntry().getName();
@@ -260,7 +260,7 @@ extends FsFileSystemArchiveController<E> {
             aen = null;
             oae = null;
         }
-        final InputArchive<E> ia = getInputArchive(); // input archive
+        final InputArchive<E> ia = getInputArchive();
         final E iae; // input archive entry
         if (null != ia) {
             if (null == aen)
@@ -269,8 +269,10 @@ extends FsFileSystemArchiveController<E> {
             if (null != iae) {
                 if (null == grow)
                     grow = getContext().get(GROW);
-                if (!grow)
+                if (!grow) {
+                    assert null == oae;
                     return;
+                }
             }
         } else {
             iae = null;
