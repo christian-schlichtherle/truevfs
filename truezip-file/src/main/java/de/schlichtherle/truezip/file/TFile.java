@@ -957,8 +957,8 @@ public final class TFile extends File {
      *         archive file.
      * @param  options a bit field of synchronization options.
      * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated file system or the combination of synchronization
-     *         options is illegal, e.g. if
+     *         federated (archive) file system or the combination of
+     *         synchronization options is illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
      *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
@@ -1075,6 +1075,10 @@ public final class TFile extends File {
      * @param  forceCloseInput see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
      * @param  waitCloseOutput see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
      * @param  forceCloseOutput see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
+     * @throws IllegalArgumentException if the combination of synchronization
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1114,6 +1118,8 @@ public final class TFile extends File {
      *
      * @param  archive a top level federated file system, i.e. a prospective
      *         archive file.
+     * @throws IllegalArgumentException if {@code archive} is not a top level
+     *         federated (archive) file system.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1154,11 +1160,7 @@ public final class TFile extends File {
      *         {@link FsSyncOption#FORCE_CLOSE_INPUT} and
      *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated file system or the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         federated (archive) file system.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
@@ -1205,11 +1207,10 @@ public final class TFile extends File {
      * @param  waitCloseOutput see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
      * @param  forceCloseOutput see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
      * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated file system or the combination of synchronization
-     *         options is illegal, e.g. if
+     *         federated (archive) file system or the combination of
+     *         synchronization options is illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
