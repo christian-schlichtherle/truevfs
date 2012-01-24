@@ -30,5 +30,6 @@ public interface InputService<E extends Entry> extends EntryContainer<E> {
      * @param  name an {@link Entry#getName() entry name}.
      * @return An input socket for reading from the entry with the given name.
      */
+    // TODO: This should return InputSocket<E>.
     InputSocket<? extends E> getInputSocket(String name);
 }

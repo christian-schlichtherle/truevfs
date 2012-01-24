@@ -127,7 +127,7 @@ implements OutputShop<TTarArchiveEntry> {
                         pool.allocate(),
                         entry);
             }
-        } // class Output
+        } // Output
 
         return new Output();
     }

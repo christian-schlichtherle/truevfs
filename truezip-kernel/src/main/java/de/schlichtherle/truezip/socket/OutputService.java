@@ -36,5 +36,6 @@ public interface OutputService<E extends Entry> extends EntryContainer<E> {
      *         output socket.
      * @return An output socket for writing to the given entry.
      */
+    // TODO: This should return OutputSocket<E>.
     OutputSocket<? extends E> getOutputSocket(E entry);
 }

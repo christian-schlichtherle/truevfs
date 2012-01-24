@@ -9,9 +9,11 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
+import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer;
@@ -120,7 +122,7 @@ public class FsArchiveFileSystemTest {
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
             final MockArchiveEntry ae = driver.newEntry(aen, type, null);
             assertEquals(aen, ae.getName());
-            container   .new Output()
+            container   .new OutputArchive()
                         .getOutputSocket(ae)
                         .newOutputStream()
                         .close();
