@@ -24,7 +24,7 @@ import net.jcip.annotations.ThreadSafe;
  * Decorates another output shop to allow concurrent access which is
  * synchronized by a {@link Lock} object provided to its constructor.
  *
- * @see     SynchronizedInputShop
+ * @see     ConcurrentInputShop
  * @param   <E> The type of the entries.
  * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
