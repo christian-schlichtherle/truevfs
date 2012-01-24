@@ -22,7 +22,8 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-final class JmxIOPool<E extends Entry<E>> extends InstrumentingIOPool<E> {
+final class JmxIOPool<E extends Entry<E>>
+extends InstrumentingIOPool<E, JmxDirector> {
 
     JmxIOPool(IOPool<E> model, JmxDirector director) {
         super(model, director);
@@ -30,16 +31,15 @@ final class JmxIOPool<E extends Entry<E>> extends InstrumentingIOPool<E> {
 
     @Override
     public Entry<E> allocate() throws IOException {
-        return new JmxEntry(delegate.allocate());
+        return new JmxIOBuffer(delegate.allocate());
     }
 
-    private final class JmxEntry
-    extends InstrumentingEntry {
+    private final class JmxIOBuffer extends IOBuffer {
 
         @SuppressWarnings("LeakingThisInConstructor")
-        JmxEntry(Entry<E> model) {
+        JmxIOBuffer(Entry<E> model) {
             super(model);
-            JmxEntryView.register(this);
+            JmxIOBufferView.register(this);
         }
 
         @Override
@@ -47,7 +47,7 @@ final class JmxIOPool<E extends Entry<E>> extends InstrumentingIOPool<E> {
             try {
                 delegate.release();
             } finally {
-                JmxEntryView.unregister(this);
+                JmxIOBufferView.unregister(this);
             }
         }
     }

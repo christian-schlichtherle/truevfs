@@ -36,24 +36,24 @@ import javax.management.StandardMBean;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-final class JmxEntryView
+final class JmxIOBufferView
 extends StandardMBean
-implements JmxEntryViewMXBean {
+implements JmxIOBufferViewMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
     private final Entry<?> model;
 
-    static JmxEntryViewMXBean register(final Entry<?> model) {
+    static JmxIOBufferViewMXBean register(final Entry<?> model) {
         final ObjectName name = getObjectName(model);
-        final JmxEntryViewMXBean view = new JmxEntryView(model);
+        final JmxIOBufferViewMXBean view = new JmxIOBufferView(model);
         try {
             try {
                 mbs.registerMBean(view, name);
                 return view;
             } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxEntryViewMXBean.class);
+                return JMX.newMXBeanProxy(mbs, name, JmxIOBufferViewMXBean.class);
             }
         } catch (RuntimeException ex) {
             throw ex;
@@ -87,8 +87,8 @@ implements JmxEntryViewMXBean {
         }
     }
 
-    private JmxEntryView(Entry<?> model) {
-        super(JmxEntryViewMXBean.class, true);
+    private JmxIOBufferView(Entry<?> model) {
+        super(JmxIOBufferViewMXBean.class, true);
         this.model = model;
     }
 
