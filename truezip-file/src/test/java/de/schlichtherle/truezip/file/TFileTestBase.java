@@ -154,7 +154,7 @@ extends TestBase<D> {
         final String entry = archive.getPath() + "/entry";
         archive = null;
         assertTrue(new TFile(entry).createNewFile());
-        TFile.umount(new TFile(entry).getInnerArchive());
+        TFile.umount(new TFile(entry).getTopLevelArchive());
         Closeable resource = factory.create(entry);
         final ReferenceQueue<FsController<?>> queue
                 = new ReferenceQueue<FsController<?>>();
@@ -169,7 +169,7 @@ extends TestBase<D> {
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
         assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
-        TFile.umount(new TFile(entry).getInnerArchive());
+        TFile.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController<?>> ref;
         do {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
