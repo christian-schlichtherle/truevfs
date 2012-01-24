@@ -15,7 +15,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>epl10-oss-parent</artifactId>
-        <version>15</version>
+        <version>16</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -127,6 +127,11 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-extension-jmx-jul</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-file</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -227,7 +232,7 @@
                                  a workaround to easily isolate the tests when
                                  running in parallel!
                                  -->
-                            <de.schlichtherle.truezip.fs.FsManager.isolate>false</de.schlichtherle.truezip.fs.FsManager.isolate>
+                            <de.schlichtherle.truezip.fs.FsManager.isolate>true</de.schlichtherle.truezip.fs.FsManager.isolate>
                             <!--de.schlichtherle.truezip.zip.forceZip64Ext>true</de.schlichtherle.truezip.zip.forceZip64Ext-->
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
@@ -237,7 +242,6 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <configuration>
                         <links>
-                            <link>http://download.oracle.com/javase/7/docs/api/</link>
                             <link>http://www.bouncycastle.org/docs/docs1.6/</link>
                             <link>http://commons.apache.org/compress/apidocs/</link>
                             <link>http://findbugs.sourceforge.net/api/</link>
@@ -256,7 +260,6 @@
                                 <artifactId>maven-javadoc-plugin</artifactId>
                                 <configuration>
                                     <links>
-                                        <link>http://download.oracle.com/javase/7/docs/api/</link>
                                         <link>http://www.bouncycastle.org/docs/docs1.6/</link>
                                         <link>http://commons.apache.org/compress/apidocs/</link>
                                         <link>http://findbugs.sourceforge.net/api/</link>
