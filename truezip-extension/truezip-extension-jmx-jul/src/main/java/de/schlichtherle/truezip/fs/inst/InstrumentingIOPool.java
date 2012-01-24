@@ -24,12 +24,15 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public class InstrumentingIOPool<E extends Entry<E>> implements IOPool<E> {
+public class InstrumentingIOPool<
+        E extends Entry<E>,
+        D extends InstrumentingDirector<D>>
+implements IOPool<E> {
 
-    protected final InstrumentingDirector director;
+    protected final D director;
     protected final IOPool<E> delegate;
 
-    public InstrumentingIOPool(final IOPool<E> pool, final InstrumentingDirector director) {
+    public InstrumentingIOPool(final IOPool<E> pool, final D director) {
         if (null == pool || null == director)
             throw new NullPointerException();
         this.director = director;
@@ -38,7 +41,7 @@ public class InstrumentingIOPool<E extends Entry<E>> implements IOPool<E> {
 
     @Override
     public Entry<E> allocate() throws IOException {
-        return new InstrumentingEntry(delegate.allocate());
+        return new IOBuffer(delegate.allocate());
     }
 
     @Override
@@ -46,11 +49,11 @@ public class InstrumentingIOPool<E extends Entry<E>> implements IOPool<E> {
         resource.release();
     }
 
-    public class InstrumentingEntry
+    public class IOBuffer
     extends DecoratingEntry<Entry<E>>
     implements Entry<E> {
 
-        protected InstrumentingEntry(Entry<E> delegate) {
+        protected IOBuffer(Entry<E> delegate) {
             super(delegate);
         }
 

@@ -35,8 +35,7 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
             ? SocketFactory.NIO
             : SocketFactory.OIO;
 
-    private JulDirector() {
-    }
+    private JulDirector() { }
 
     @Override
     public <E extends IOPool.Entry<E>> IOPool<E> instrument(IOPool<E> pool) {

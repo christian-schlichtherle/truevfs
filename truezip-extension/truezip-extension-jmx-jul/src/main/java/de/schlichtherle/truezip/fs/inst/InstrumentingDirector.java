@@ -28,9 +28,7 @@ import net.jcip.annotations.Immutable;
 @DefaultAnnotation(NonNull.class)
 public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> {
 
-    public <E extends IOPool.Entry<E>> IOPool<E> instrument(IOPool<E> pool) {
-        return new InstrumentingIOPool<E>(pool, this);
-    }
+    public abstract <E extends IOPool.Entry<E>> IOPool<E> instrument(IOPool<E> pool);
 
     public FsManager instrument(FsManager manager) {
         return new InstrumentingManager(manager, this);
@@ -48,7 +46,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
 
     public abstract FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context);
 
-    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E>.InstrumentingEntry context) {
+    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, D>.IOBuffer context) {
         return instrument(input);
     }
 
@@ -60,7 +58,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
         return input; //new InstrumentingInputSocket<E>(input, this);
     }
 
-    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E>.InstrumentingEntry context) {
+    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, D>.IOBuffer context) {
         return instrument(output);
     }
 

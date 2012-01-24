@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import static java.util.logging.Level.*;
+import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
@@ -24,7 +24,8 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-final class JulIOPool<E extends Entry<E>> extends InstrumentingIOPool<E> {
+final class JulIOPool<E extends Entry<E>>
+extends InstrumentingIOPool<E, JulDirector> {
 
     private static final Logger
             logger = Logger.getLogger(JulIOPool.class.getName());
@@ -35,13 +36,12 @@ final class JulIOPool<E extends Entry<E>> extends InstrumentingIOPool<E> {
 
     @Override
     public Entry<E> allocate() throws IOException {
-        return new LogEntry(delegate.allocate());
+        return new JulIOBuffer(delegate.allocate());
     }
 
-    private final class LogEntry
-    extends InstrumentingEntry {
+    private final class JulIOBuffer extends IOBuffer {
 
-        LogEntry(Entry<E> model) {
+        JulIOBuffer(Entry<E> model) {
             super(model);
             logger.log(FINE, "Allocated " + delegate, new NeverThrowable());
         }

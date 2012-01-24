@@ -20,7 +20,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
-public interface JmxEntryViewMXBean {
+public interface JmxIOBufferViewMXBean {
     String getName();
     long getSizeOfData();
     long getSizeOfStorage();

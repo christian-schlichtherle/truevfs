@@ -140,7 +140,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E>.InstrumentingEntry context) {
+    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
         return new JmxInputSocket<E>(input, this, temp);
     }
 
@@ -150,7 +150,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E>.InstrumentingEntry context) {
+    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
         return new JmxOutputSocket<E>(output, this, temp);
     }
 
@@ -161,7 +161,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private static final class JmxNio2Director extends JmxDirector {
         @Override
-        public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E>.InstrumentingEntry context) {
+        public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
             return new JmxNio2InputSocket<E>(input, this, super.temp);
         }
 
@@ -171,7 +171,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
         }
 
         @Override
-        public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E>.InstrumentingEntry context) {
+        public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
             return new JmxNio2OutputSocket<E>(output, this, super.temp);
         }
 
