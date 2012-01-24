@@ -144,44 +144,11 @@ extends FsLockModelDecoratingController<
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        assert isWriteLockedByCurrentThread();
-
-        if (name.isRoot()) {
-            try {
-                unlink0(name, options);
-            } catch (FsFalsePositiveException ex) {
-                // Clear the cache anyway.
-                // The only effect of calling sync for a false positive
-                // archive file is that it will reset the mount state so
-                // that the file system can be successfully mounted again
-                // if the target archive file gets subsequently modified to
-                // be a true archive file.
-                try {
-                    sync(CANCEL);
-                } catch (IOException aFalsePositiveArchiveFileCannotHaveAPopulatedCache) {
-                    throw new AssertionError(aFalsePositiveArchiveFileCannotHaveAPopulatedCache);
-                }
-                // Continue with unlinking the target archive file in the parent
-                // file system.
-                throw ex;
-            }
-            sync(CANCEL);
-        } else {
-            unlink0(name, options);
-        }
-    }
-
-    private void unlink0(   final FsEntryName name,
-                            final BitField<FsOutputOption> options)
-    throws IOException {
         final EntryController controller = controllers.get(name);
+        delegate.unlink(name, options);
         if (null != controller) {
-            //cache.flush(); // redundant
-            delegate.unlink(name, options);
             controllers.remove(name);
             controller.clear();
-        } else {
-            delegate.unlink(name, options);
         }
     }
 
