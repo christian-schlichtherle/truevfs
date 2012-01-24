@@ -23,6 +23,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 
@@ -60,7 +62,7 @@ public final class IOCache implements Flushable, Closeable {
             ? BufferSocketFactory.NIO2
             : BufferSocketFactory.OIO;
 
-    private final Lock lock = new Lock();
+    private final Lock lock;
     private final Strategy strategy;
     private final IOPool<?> pool;
     private volatile @Nullable InputSocket<?> input;
@@ -70,8 +72,9 @@ public final class IOCache implements Flushable, Closeable {
     private volatile @CheckForNull Buffer buffer;
 
     /**
-     * Constructs a new cache which applies the given caching strategy
-     * and uses the given pool to allocate and release temporary I/O entries.
+     * Constructs a new cache which applies the given caching strategy,
+     * uses the given pool to allocate and release temporary I/O entries
+     * and the given lock for locking out concurrent access.
      * <p>
      * Note that you need to call {@link #configure(InputSocket)} before
      * you can do any input.
@@ -80,13 +83,16 @@ public final class IOCache implements Flushable, Closeable {
      *
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
+     * @param lock the lock for concurrent access control.
      */
     private IOCache(final Strategy strategy,
-                    final IOPool<?> pool) {
-        if (null == strategy || null == pool)
+                    final IOPool<?> pool,
+                    final Lock lock) {
+        if (null == strategy || null == pool || null == lock)
             throw new NullPointerException();
         this.strategy = strategy;
         this.pool = pool;
+        this.lock = lock;
     }
 
     /**
@@ -140,10 +146,14 @@ public final class IOCache implements Flushable, Closeable {
     public void flush() throws IOException {
         if (null == getBuffer()) // DCL does work with volatile fields since JSE 5!
             return;
-        synchronized (lock) {
+        lock.lock();
+        try {
             final Buffer buffer = getBuffer();
-            if (null != buffer)
+            if (null != buffer) {
                 getOutputBufferPool().release(buffer);
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -151,8 +161,11 @@ public final class IOCache implements Flushable, Closeable {
      * Discards the entry data in this buffer.
      */
     public void clear() throws IOException {
-        synchronized (lock) {
+        lock.lock();
+        try {
             setBuffer(null);
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -161,14 +174,18 @@ public final class IOCache implements Flushable, Closeable {
      */
     @Override
     public void close() throws IOException {
-        synchronized (lock) {
+        lock.lock();
+        try {
             try {
                 final Buffer buffer = getBuffer();
-                if (null != buffer)
+                if (null != buffer) {
                     getOutputBufferPool().release(buffer);
+                }
             } finally {
                 setBuffer(null);
             }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -234,8 +251,8 @@ public final class IOCache implements Flushable, Closeable {
          * {@link NullPointerException}.
          */
         READ_ONLY {
-            @Override IOCache.OutputBufferPool
-            newOutputBufferPool(IOCache cache) {
+            @Override
+            IOCache.OutputBufferPool newOutputBufferPool(IOCache cache) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -245,8 +262,8 @@ public final class IOCache implements Flushable, Closeable {
          * output stream created by {@link #getOutputSocket} gets closed.
          */
         WRITE_THROUGH {
-            @Override IOCache.OutputBufferPool
-            newOutputBufferPool(IOCache cache) {
+            @Override
+            IOCache.OutputBufferPool newOutputBufferPool(IOCache cache) {
                 return cache.new WriteThroughOutputBufferPool();
             }
         },
@@ -256,33 +273,41 @@ public final class IOCache implements Flushable, Closeable {
          * explicitly {@link #flush flushed}.
          */
         WRITE_BACK {
-            @Override IOCache.OutputBufferPool
-            newOutputBufferPool(IOCache cache) {
+            @Override
+            IOCache.OutputBufferPool newOutputBufferPool(IOCache cache) {
                 return cache.new WriteBackOutputBufferPool();
             }
         };
 
         /**
-         * Returns a new cache.
+         * Returns a new cache which uses a private {@link ReentrantLock}
+         * for locking out concurrent access.
          *
          * @param  pool the pool of temporary entries to cache the entry data.
          * @return A new cache.
          */
-        public IOCache
-        newCache(IOPool<?> pool) {
-            return new IOCache(this, pool);
+        public IOCache newCache(IOPool<?> pool) {
+            return new IOCache(this, pool, new ReentrantLock());
         }
 
-        IOCache.InputBufferPool
-        newInputBufferPool(IOCache cache) {
+        /**
+         * Returns a new cache which uses the given lock
+         * for locking out concurrent access.
+         *
+         * @param  pool the pool of temporary entries to cache the entry data.
+         * @param  lock the lock for concurrent access control.
+         * @return A new cache.
+         */
+        IOCache newCache(IOPool<?> pool, Lock lock) {
+            return new IOCache(this, pool, lock);
+        }
+
+        IOCache.InputBufferPool newInputBufferPool(IOCache cache) {
             return cache.new InputBufferPool();
         }
 
-        abstract IOCache.OutputBufferPool
-        newOutputBufferPool(IOCache cache);
+        abstract IOCache.OutputBufferPool newOutputBufferPool(IOCache cache);
     } // Strategy
-
-    private static final class Lock { }
 
     private final class Input extends DelegatingInputSocket<Entry> {
         volatile @CheckForNull Buffer buffer;
@@ -384,7 +409,8 @@ public final class IOCache implements Flushable, Closeable {
     private final class InputBufferPool implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            synchronized (lock) {
+            lock.lock();
+            try {
                 Buffer buffer = getBuffer();
                 if (null == buffer) {
                     buffer = new Buffer();
@@ -399,15 +425,21 @@ public final class IOCache implements Flushable, Closeable {
                 assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
                 buffer.readers++;
                 return buffer;
+            } finally {
+                lock.unlock();
             }
         }
 
         @Override
         public void release(final Buffer buffer) throws IOException {
-            synchronized (lock) {
+            lock.lock();
+            try {
                 assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
-                if (0 == --buffer.readers && 0 == buffer.writers && getBuffer() != buffer)
+                if (0 == --buffer.readers && 0 == buffer.writers && getBuffer() != buffer) {
                     buffer.release();
+                }
+            } finally {
+                lock.unlock();
             }
         }
     } // InputBufferPool
@@ -441,10 +473,13 @@ public final class IOCache implements Flushable, Closeable {
         public void release(Buffer buffer) throws IOException {
             if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
                 return;
-            synchronized (lock) {
+            lock.lock();
+            try {
                 if (0 == buffer.writers)
                     return;
                 super.release(buffer);
+            } finally {
+                lock.unlock();
             }
         }
     } // WriteThroughOutputBufferPool
@@ -455,7 +490,8 @@ public final class IOCache implements Flushable, Closeable {
         public void release(final Buffer buffer) throws IOException {
             if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
                 return;
-            synchronized (lock) {
+            lock.lock();
+            try {
                 if (0 == buffer.writers)
                     return;
                 if (getBuffer() != buffer) {
@@ -463,6 +499,8 @@ public final class IOCache implements Flushable, Closeable {
                 } else {
                     super.release(buffer);
                 }
+            } finally {
+                lock.unlock();
             }
         }
     } // WriteBackOutputBufferPool
