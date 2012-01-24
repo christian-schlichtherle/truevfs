@@ -9,9 +9,7 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.SynchronizedReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -27,11 +25,13 @@ import net.jcip.annotations.ThreadSafe;
  * environment.
  * Mind that all synchronization is performed on the decorated input shop!
  *
- * @see     SynchronizedOutputShop
- * @param   <E> The type of the entries.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see        SynchronizedOutputShop
+ * @param      <E> The type of the entries.
+ * @deprecated Use {@link ConcurrentInputShop} instead.
+ * @author     Christian Schlichtherle
+ * @version    $Id$
  */
+@Deprecated
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class SynchronizedInputShop<E extends Entry>
@@ -111,7 +111,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 final InputShop<E> delegate = SynchronizedInputShop.this.delegate;
                 synchronized (delegate) {
-                    return new SynchronizedReadOnlyFile(
+                    return new de.schlichtherle.truezip.rof.SynchronizedReadOnlyFile(
                             getBoundSocket().newReadOnlyFile(),
                             delegate); // sync on delegate
                 }
@@ -126,7 +126,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
             public InputStream newInputStream() throws IOException {
                 final InputShop<E> delegate = SynchronizedInputShop.this.delegate;
                 synchronized (delegate) {
-                    return new SynchronizedInputStream(
+                    return new de.schlichtherle.truezip.io.SynchronizedInputStream(
                             getBoundSocket().newInputStream(),
                             delegate); // sync on delegate
                 }

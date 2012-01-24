@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.SynchronizedOutputStream;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -24,11 +23,13 @@ import net.jcip.annotations.ThreadSafe;
  * created by the decorated output shop in a multithreaded environment.
  * Mind that all synchronization is performed on the decorated output shop!
  *
- * @see     SynchronizedInputShop
- * @param   <E> The type of the entries.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see        SynchronizedInputShop
+ * @param      <E> The type of the entries.
+ * @deprecated Use {@link ConcurrentOutputShop} instead.
+ * @author     Christian Schlichtherle
+ * @version    $Id$
  */
+@Deprecated
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class SynchronizedOutputShop<E extends Entry>
@@ -113,7 +114,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             public OutputStream newOutputStream() throws IOException {
                 final OutputShop<E> delegate = SynchronizedOutputShop.this.delegate;
                 synchronized (delegate) {
-                    return new SynchronizedOutputStream(
+                    return new de.schlichtherle.truezip.io.SynchronizedOutputStream(
                             getBoundSocket().newOutputStream(),
                             delegate); // sync on delegate
                 }

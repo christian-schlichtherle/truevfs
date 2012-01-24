@@ -22,9 +22,11 @@ import net.jcip.annotations.ThreadSafe;
  * via an object provided to its constructor.
  *
  * @see     SynchronizedOutputStream
+ * @deprecated Use {@link LockInputStream} instead.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Deprecated
 @ThreadSafe
 @DefaultAnnotation(NonNull.class)
 public class SynchronizedInputStream extends DecoratingInputStream {
