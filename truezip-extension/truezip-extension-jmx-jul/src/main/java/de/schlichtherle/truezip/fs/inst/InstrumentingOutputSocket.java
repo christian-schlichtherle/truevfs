@@ -30,6 +30,8 @@ extends DecoratingOutputSocket<E> {
             final OutputSocket<? extends E> delegate,
             final InstrumentingDirector director) {
         super(delegate);
-        this.director = director.check();
+        if (null == director)
+            throw new NullPointerException();
+        this.director = director;
     }
 }

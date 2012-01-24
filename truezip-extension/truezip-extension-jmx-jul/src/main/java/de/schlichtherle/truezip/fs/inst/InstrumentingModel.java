@@ -27,6 +27,8 @@ public abstract class InstrumentingModel extends FsDecoratingModel<FsModel> {
     @SuppressWarnings("LeakingThisInConstructor")
     protected InstrumentingModel(FsModel model, InstrumentingDirector director) {
         super(model);
-        this.director = director.check();
+        if (null == director)
+            throw new NullPointerException();
+        this.director = director;
     }
 }

@@ -8,11 +8,7 @@
  */
 package de.schlichtherle.truezip.fs.inst;
 
-import de.schlichtherle.truezip.fs.FsCompositeDriver;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDecoratingManager;
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.*;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
@@ -30,7 +26,9 @@ extends FsDecoratingManager<FsManager> {
 
     public InstrumentingManager(final FsManager manager, final InstrumentingDirector director) {
         super(manager);
-        this.director = director.check();
+        if (null == director)
+            throw new NullPointerException();
+        this.director = director;
     }
 
     @Override

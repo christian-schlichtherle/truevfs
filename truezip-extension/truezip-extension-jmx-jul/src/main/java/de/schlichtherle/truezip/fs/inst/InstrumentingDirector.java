@@ -26,16 +26,7 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @DefaultAnnotation(NonNull.class)
-public abstract class InstrumentingDirector {
-
-    /**
-     * Call this method to make a convenient null pointer check.
-     *
-     * @return this;
-     */
-    public final InstrumentingDirector check() {
-        return this;
-    }
+public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> {
 
     public <E extends IOPool.Entry<E>> IOPool<E> instrument(IOPool<E> pool) {
         return new InstrumentingIOPool<E>(pool, this);
@@ -53,15 +44,15 @@ public abstract class InstrumentingDirector {
         return model; //new InstrumentingModel(model, this);
     }
 
-    public abstract <M extends FsModel> FsController<M> instrument(FsController<M> controller, InstrumentingManager context);
+    public abstract FsController<?> instrument(FsController<?> controller, InstrumentingManager context);
 
-    public abstract <M extends FsModel> FsController<M> instrument(FsController<M> controller, InstrumentingCompositeDriver context);
+    public abstract FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context);
 
     public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E>.InstrumentingEntry context) {
         return instrument(input);
     }
 
-    public <E extends Entry, M extends FsModel> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<M> context) {
+    public <E extends Entry> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<D> context) {
         return instrument(input);
     }
 
@@ -73,7 +64,7 @@ public abstract class InstrumentingDirector {
         return instrument(output);
     }
 
-    public <E extends Entry, M extends FsModel> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<M> context) {
+    public <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<D> context) {
         return instrument(output);
     }
 

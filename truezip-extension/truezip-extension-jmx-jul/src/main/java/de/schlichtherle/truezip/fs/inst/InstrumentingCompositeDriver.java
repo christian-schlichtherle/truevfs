@@ -28,9 +28,9 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
 
     public InstrumentingCompositeDriver(final FsCompositeDriver driver,
                                         final InstrumentingDirector director) {
-        if (null == driver)
+        if (null == driver || null == director)
             throw new NullPointerException();
-        this.director = director.check();
+        this.director = director;
         this.delegate = driver;
     }
 
