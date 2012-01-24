@@ -202,6 +202,7 @@
             <groupId>findbugs</groupId>
             <artifactId>annotations</artifactId>
             <version>1.0.0</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
