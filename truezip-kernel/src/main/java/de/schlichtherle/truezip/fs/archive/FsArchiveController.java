@@ -85,14 +85,15 @@ extends FsLockModelController {
     }
 
     /**
-     * Returns a JavaBean which represents the original values of selected
-     * parameters for the {@link FsContextController} operation in progress.
+     * Returns a context with the original values of selected parameters for
+     * the {@linkplain FsContextController file system controller}
+     * operation in progress.
      * <p>
      * Note that this is a thread-local property!
      * 
-     * @return A JavaBean which represents the original values of selected
-     *         parameters for the {@link FsContextController} operation in
-     *         progress.
+     * @return A context with the original values of selected parameters for
+     *         the {@linkplain FsContextController file system controller}
+     *         operation in progress.
      */
     final @Nullable FsOperationContext getContext() {
         return context.get();
@@ -191,15 +192,23 @@ extends FsLockModelController {
 
     private final class Input extends InputSocket<FsArchiveEntry> {
         final FsEntryName name;
+        boolean accessCleared;
 
         Input(final FsEntryName name) {
             this.name = name;
         }
 
+        void checkAccess() throws IOException {
+            if (accessCleared)
+                return;
+            FsArchiveController.this.checkAccess(name, READ);
+            getPeerTarget(); // may sync() if in same target archive file!
+            accessCleared = true;
+        }
+
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
-            getPeerTarget(); // may trigger sync() if in same file system
-            checkAccess(name, READ);
+            checkAccess();
             final FsCovariantEntry<E> entry = autoMount().getEntry(name);
             if (null == entry)
                 throw new FsEntryNotFoundException(getModel(),
@@ -208,6 +217,7 @@ extends FsLockModelController {
         }
 
         InputSocket<?> getBoundSocket() throws IOException {
+            accessCleared = false;
             final FsArchiveEntry entry = getLocalTarget();
             if (FILE != entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
@@ -243,21 +253,27 @@ extends FsLockModelController {
 
     private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
-        final boolean append;
+        final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
+        boolean accessCleared;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
             this.name = name;
-            this.append = options.get(APPEND);
+            this.options = options;
             this.template = template;
         }
 
+        void checkAccess() throws IOException {
+            if (accessCleared)
+                return;
+            FsArchiveController.this.checkAccess(name, WRITE);
+            accessCleared = true;
+        }
+
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
-            checkAccess(name, WRITE);
-            final BitField<FsOutputOption> options = getContext()
-                    .getOutputOptions();
+            checkAccess();
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
             return autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
@@ -267,7 +283,7 @@ extends FsLockModelController {
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
             final E entry = mknod().getTarget().getEntry();
-            if (append) {
+            if (options.get(APPEND)) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
                 // change the contents of the transferred data accordingly.
@@ -279,8 +295,11 @@ extends FsLockModelController {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
+            accessCleared = false;
+            final FsArchiveFileSystemOperation<E> mknod = mknod();
+            final E entry = mknod.getTarget().getEntry();
             InputStream in = null;
-            if (append) {
+            if (options.get(APPEND)) {
                 try {
                     in = new Input(name).newInputStream();
                 } catch (IOException ex) {
@@ -289,8 +308,6 @@ extends FsLockModelController {
                 }
             }
             try {
-                final FsArchiveFileSystemOperation<E> mknod = mknod();
-                final E entry = mknod.getTarget().getEntry();
                 final OutputStream out = getOutputSocket(entry)
                         .bind(null == in ? this : null) // do NOT bind when appending!
                         .newOutputStream();
@@ -347,8 +364,7 @@ extends FsLockModelController {
             final BitField<FsOutputOption> options,
             final Entry template)
     throws IOException {
-        assert options.equals(getContext().getOutputOptions());
-        checkAccess(name, null); // TODO: Explain why this is redundant!
+        checkAccess(name, null);
         if (name.isRoot()) {
             try {
                 autoMount(); // detect false positives!
@@ -400,6 +416,5 @@ extends FsLockModelController {
      *         is intended.
      * @throws FsNeedsSyncException If a sync operation is required.
      */
-    abstract void checkAccess(FsEntryName name, @CheckForNull Access intention)
-    throws FsNeedsSyncException;
+    abstract void checkAccess(FsEntryName name, @CheckForNull Access intention);
 }
