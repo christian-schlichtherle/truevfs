@@ -307,31 +307,26 @@ extends FsLockModelDecoratingController<
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getLocalTarget();
         }
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newReadOnlyFile();
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newInputStream();
         }
     } // Input
@@ -366,25 +361,21 @@ extends FsLockModelDecoratingController<
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getLocalTarget();
         }
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newOutputStream();
         }
     } // Output
