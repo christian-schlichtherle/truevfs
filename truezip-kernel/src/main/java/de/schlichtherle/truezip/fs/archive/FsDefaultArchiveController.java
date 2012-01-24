@@ -236,8 +236,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     void checkAccess(   final FsEntryName name,
-                        final @CheckForNull Access intention)
-    throws FsNeedsSyncException {
+                        final @CheckForNull Access intention) {
         // HC SUNT DRACONES!
         final FsArchiveFileSystem<E> f;
         final FsCovariantEntry<E> ce;
