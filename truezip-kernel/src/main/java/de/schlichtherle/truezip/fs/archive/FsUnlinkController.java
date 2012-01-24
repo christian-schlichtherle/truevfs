@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.CANCEL;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -35,7 +36,7 @@ import net.jcip.annotations.NotThreadSafe;
 @NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 final class FsUnlinkController
-extends FsDecoratingController<FsLockModel, FsController<? extends FsLockModel>> {
+extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     /**
      * Constructs a new file system unlink controller.
@@ -51,14 +52,28 @@ extends FsDecoratingController<FsLockModel, FsController<? extends FsLockModel>>
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        delegate.unlink(name, options);
+        assert isWriteLockedByCurrentThread();
+
         if (name.isRoot()) {
+            try {
+                delegate.unlink(name, options);
+            } finally {
+                // Always clear the cache!
+                // The only effect of calling sync for a false positive
+                // archive file is that it will reset the mount state so
+                // that the file system can be successfully mounted again
+                // if the target archive file gets subsequently modified to
+                // be a true archive file.
+                sync(CANCEL);
+            }
             // We have just removed the virtual root directory of a
             // federated file system, i.e. an archive file.
             // Now unlink the target archive file from the parent file system.
             getParent().unlink(
                     getMountPoint().getPath().resolve(name).getEntryName(),
                     options);
+        } else {
+            delegate.unlink(name, options);
         }
     }
 
