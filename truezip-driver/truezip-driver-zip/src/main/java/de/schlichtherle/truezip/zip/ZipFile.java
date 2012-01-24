@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.io.SynchronizedInputStream;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
@@ -320,14 +319,14 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     @Override
     @SuppressWarnings("deprecation")
     public synchronized InputStream getPreambleInputStream() throws IOException {
-        return new SynchronizedInputStream(super.getPreambleInputStream(),
+        return new de.schlichtherle.truezip.io.SynchronizedInputStream(super.getPreambleInputStream(),
                 this);
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public synchronized InputStream getPostambleInputStream() throws IOException {
-        return new SynchronizedInputStream(super.getPostambleInputStream(),
+        return new de.schlichtherle.truezip.io.SynchronizedInputStream(super.getPostambleInputStream(),
                 this);
     }
 
@@ -359,7 +358,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             String name, Boolean check, boolean process)
     throws  IOException {
         final InputStream in = super.getInputStream(name, check, process);
-        return in == null ? null : new SynchronizedInputStream(in, this);
+        return in == null ? null : new de.schlichtherle.truezip.io.SynchronizedInputStream(in, this);
     }
 
     @Override
