@@ -127,15 +127,11 @@ extends FsLockModelDecoratingController<
                         final Entry template)
     throws IOException {
         assert isWriteLockedByCurrentThread();
-
         final EntryController controller = controllers.get(name);
+        delegate.mknod(name, type, options, template);
         if (null != controller) {
-            //cache.flush(); // redundant
-            delegate.mknod(name, type, options, template);
             controllers.remove(name);
             controller.clear();
-        } else {
-            delegate.mknod(name, type, options, template);
         }
     }
 
@@ -143,6 +139,7 @@ extends FsLockModelDecoratingController<
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
+        assert isWriteLockedByCurrentThread();
         final EntryController controller = controllers.get(name);
         delegate.unlink(name, options);
         if (null != controller) {
