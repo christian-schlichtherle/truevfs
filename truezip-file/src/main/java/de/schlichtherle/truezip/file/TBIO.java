@@ -233,8 +233,7 @@ final class TBIO {
         if (node.isDirectory())
             for (final String member : node.list())
                 rm_r(new TFile(node, member, detector), detector);
-        if (!node.delete())
-            throw new IOException(node + " (cannot delete)");
+        TFile.rm(node);
     }
 
     /**
