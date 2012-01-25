@@ -843,7 +843,7 @@ extends TestBase<D> {
         }
         assertEquals(data.length, size(file));
     }
-    
+
     private void assertOutput(final TPath file) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
         try {
