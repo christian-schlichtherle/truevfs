@@ -32,16 +32,6 @@ extends InstrumentingOutputSocket<E> {
 
     @Override
     public final OutputStream newOutputStream() throws IOException {
-        final OutputStream out = getBoundSocket().newOutputStream();
-        try {
-            return new JulOutputStream<E>(out, this);
-        } catch (IOException ex) {
-            try {
-                out.close();
-            } catch (IOException ex2) {
-                throw (IOException) ex2.initCause(ex);
-            }
-            throw ex;
-        }
+        return new JulOutputStream<E>(getBoundSocket());
     }
 }
