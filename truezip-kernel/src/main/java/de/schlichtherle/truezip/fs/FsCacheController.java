@@ -77,8 +77,6 @@ extends FsLockModelDecoratingController<
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
-    private static final Strategy STRATEGY = WRITE_BACK;
-
     private final IOPool<?> pool;
 
     // TODO: Consider using a ConcurrentMap to support concurrent access just
@@ -103,8 +101,8 @@ extends FsLockModelDecoratingController<
 
     @Override
     public InputSocket<?> getInputSocket(
-            FsEntryName name,
-            BitField<FsInputOption> options) {
+            final FsEntryName name,
+            final BitField<FsInputOption> options) {
         return new Input(
                 delegate.getInputSocket(name, options),
                 name, options);
@@ -112,9 +110,9 @@ extends FsLockModelDecoratingController<
 
     @Override
     public OutputSocket<?> getOutputSocket(
-            FsEntryName name,
-            BitField<FsOutputOption> options,
-            Entry template) {
+            final FsEntryName name,
+            final BitField<FsOutputOption> options,
+            final Entry template) {
         return new Output(
                 delegate.getOutputSocket(name, options, template),
                 name, options, template);
@@ -379,7 +377,7 @@ extends FsLockModelDecoratingController<
 
         EntryController(final FsEntryName name) {
             this.name = name;
-            this.cache = STRATEGY.newCache(pool);
+            this.cache = WRITE_BACK.newCache(pool);
         }
 
         EntryController configure(BitField<FsInputOption> options) {
@@ -424,6 +422,7 @@ extends FsLockModelDecoratingController<
         }
 
         void beginOutput() throws IOException {
+            assert isWriteLockedByCurrentThread();
             delegate.mknod(name, FILE, outputOptions, template);
             assert isTouched();
         }
@@ -487,7 +486,6 @@ extends FsLockModelDecoratingController<
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                assert isWriteLockedByCurrentThread();
                 beginOutput();
                 final SeekableByteChannel sbc = getBoundSocket().newSeekableByteChannel();
                 controllers.put(name, EntryController.this);
@@ -503,7 +501,6 @@ extends FsLockModelDecoratingController<
 
             @Override
             public final OutputStream newOutputStream() throws IOException {
-                assert isWriteLockedByCurrentThread();
                 beginOutput();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 controllers.put(name, EntryController.this);
