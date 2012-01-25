@@ -95,7 +95,12 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
             @Override
             public E getLocalTarget() throws IOException {
-                return entry;
+                lock.lock();
+                try {
+                    return entry;
+                } finally {
+                    lock.unlock();
+                }
             }
 
             @Override
