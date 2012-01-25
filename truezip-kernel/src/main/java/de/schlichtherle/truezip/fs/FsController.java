@@ -65,8 +65,8 @@ import javax.swing.JTree;
  * Where the following terms consider a failure, the term equally applies to
  * BOTH exception types.
  * <li>
- * With the exception of {@link #sync}, all file system operations MUST be
- * <i>atomic</i>, that is they either completely succeed or fail as if they had
+ * With the exception of {@link #sync}, all file system operations SHOULD be
+ * <i>atomic</i>, that is they either succeed or fail completely as if they had
  * not been called.
  * <li>
  * All file system operations MUST be <i>consistent</i>, that is they MUST
@@ -80,7 +80,8 @@ import javax.swing.JTree;
  * stored data.
  * In general, this simply means that file system operations SHOULD be
  * thread-safe.
- * Note that some methods make this a MUST requirement, for example
+ * Note that some factory methods declare this as a MUST requirement for their
+ * generated file system controllers, for example
  * {@link FsDriver#newController} and {@link FsCompositeDriver#newController}.
  * <li>
  * All file system operations SHOULD be <i>durable</i>, that is their side
