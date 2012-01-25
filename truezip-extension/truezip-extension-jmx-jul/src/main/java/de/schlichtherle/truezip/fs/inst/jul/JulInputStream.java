@@ -11,10 +11,10 @@ package de.schlichtherle.truezip.fs.inst.jul;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
@@ -30,15 +30,16 @@ extends DecoratingInputStream {
     private static final Logger
             logger = Logger.getLogger(JulInputStream.class.getName());
 
-    private final JulInputSocket<E> socket;
+    private final Entry target;
 
-    JulInputStream(final InputStream model, final JulInputSocket<E> socket)
+    JulInputStream(final InputSocket<?> socket) throws IOException {
+        this(socket, socket.getLocalTarget());
+    }
+
+    private JulInputStream(final InputSocket<?> socket, final Entry target)
     throws IOException {
-        super(model);
-        if (null == model)
-            throw new NullPointerException();
-        this.socket = socket;
-        E target = socket.getLocalTarget();
+        super(socket.newInputStream());
+        this.target = target;
         Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
         logger.log(level, "Stream reading " + target, new NeverThrowable());
     }
@@ -48,10 +49,8 @@ extends DecoratingInputStream {
         try {
             delegate.close();
         } finally {
-            E target = socket.getLocalTarget();
             Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }
-    
 }

@@ -33,31 +33,11 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public final ReadOnlyFile newReadOnlyFile() throws IOException {
-        final ReadOnlyFile rof = getBoundSocket().newReadOnlyFile();
-        try {
-            return new JulReadOnlyFile<E>(rof, this);
-        } catch (IOException ex) {
-            try {
-                rof.close();
-            } catch (IOException ex2) {
-                throw (IOException) ex2.initCause(ex);
-            }
-            throw ex;
-        }
+        return new JulReadOnlyFile<E>(getBoundSocket());
     }
 
     @Override
     public final InputStream newInputStream() throws IOException {
-        final InputStream in = getBoundSocket().newInputStream();
-        try {
-            return new JulInputStream<E>(in, this);
-        } catch (IOException ex) {
-            try {
-                in.close();
-            } catch (IOException ex2) {
-                throw (IOException) ex2.initCause(ex);
-            }
-            throw ex;
-        }
+        return new JulInputStream<E>(getBoundSocket());
     }
 }
