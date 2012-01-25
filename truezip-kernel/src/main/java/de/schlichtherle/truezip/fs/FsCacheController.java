@@ -15,7 +15,6 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.CANCEL;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
