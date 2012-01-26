@@ -185,9 +185,12 @@ implements OutputShop<ZipArchiveEntry> {
                     }
                 }
                 if (STORED == entry.getMethod()) {
-                    if (       UNKNOWN == entry.getCrc()
+                    if (0 == entry.getSize()) {
+                        entry.setCompressedSize(0);
+                        entry.setCrc(0);
+                    } else if (UNKNOWN == entry.getSize()
                             || UNKNOWN == entry.getCompressedSize()
-                            || UNKNOWN == entry.getSize()) {
+                            || UNKNOWN == entry.getCrc()) {
                         assert process : "The CRC-32, compressed size and size properties should be set in the peer target!";
                         return new BufferedEntryOutputStream(
                                 getPool().allocate(), entry, process);
