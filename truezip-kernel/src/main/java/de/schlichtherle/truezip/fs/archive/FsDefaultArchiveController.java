@@ -9,9 +9,12 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.READ;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import de.schlichtherle.truezip.entry.Entry.Size;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
@@ -282,8 +285,8 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    public <X extends IOException> void sync(
-            final BitField<FsSyncOption> options,
+    public <X extends IOException> void
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         try {
@@ -365,8 +368,8 @@ extends FsFileSystemArchiveController<E> {
                 new FilterExceptionHandler());
     }
 
-    private static <E extends FsArchiveEntry, X extends IOException> void copy(
-            final FsArchiveFileSystem<E> fileSystem,
+    private static <E extends FsArchiveEntry, X extends IOException> void
+    copy(   final FsArchiveFileSystem<E> fileSystem,
             final InputService<E> input,
             final OutputService<E> output,
             final ExceptionHandler<? super IOException, X> handler)
@@ -378,11 +381,9 @@ extends FsFileSystemArchiveController<E> {
                     continue; // we have already written this entry
                 try {
                     if (DIRECTORY == ae.getType()) {
-                        if (isRoot(ce.getName()))
-                            continue; // never write the root directory, but preserve covariant root files
-                        if (UNKNOWN == ae.getTime(Access.WRITE))
-                            continue; // never write ghost directories
-                        output.getOutputSocket(ae).newOutputStream().close();
+                        if (!isRoot(ce.getName())) // never write the root directory!
+                            if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
+                                output.getOutputSocket(ae).newOutputStream().close();
                     } else if (null != input.getEntry(aen)) {
                         IOSocket.copy(  input.getInputSocket(aen),
                                         output.getOutputSocket(ae));
@@ -391,7 +392,10 @@ extends FsFileSystemArchiveController<E> {
                         // entry which hasn't received any content yet.
                         // Write an empty file system entry now as a marker in
                         // order to recreate the file system entry when the file
-                        // system gets remounted from the container archive file.
+                        // system gets remounted from the target archive file.
+                        for (final Size size : ALL_SIZE_SET)
+                            ae.setSize(size, UNKNOWN);
+                        ae.setSize(DATA, 0);
                         output.getOutputSocket(ae).newOutputStream().close();
                     }
                 } catch (IOException ex) {
@@ -420,8 +424,8 @@ extends FsFileSystemArchiveController<E> {
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void commitSync(
-            final ExceptionHandler<? super FsSyncException, X> handler)
+    private <X extends IOException> void
+    commitSync(final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         setFileSystem(null);
         try {
