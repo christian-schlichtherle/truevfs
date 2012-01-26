@@ -429,13 +429,11 @@ extends FsLockModelDecoratingController<
         void endOutput() throws IOException {
             assert isWriteLockedByCurrentThread();
             //assert isTouched(); // may have been concurrently synced!
-            if (null != template)
-                return;
             delegate.mknod(
                     name,
                     FILE,
                     outputOptions.clear(EXCLUSIVE),
-                    cache.getEntry());
+                    null != template ? template : cache.getEntry());
         }
 
         /** An input socket proxy. */
