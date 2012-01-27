@@ -92,23 +92,23 @@ extends FsLockModelDecoratingController<
     }
 
     private <T, X extends IOException> T
-    callReadOrWriteLocked(Operation<T, X> operation)
+    readOrWriteLocked(Operation<T, X> operation)
     throws X {
         try {
-            return callReadLocked(operation);
+            return readLocked(operation);
         } catch (FsNeedsWriteLockException ex) {
-            return callWriteLocked(operation);
+            return writeLocked(operation);
         }
     }
 
     private <T, X extends IOException> T
-    callReadLocked(Operation<T, X> operation)
+    readLocked(Operation<T, X> operation)
     throws X {
         return callLocked(operation, readLock());
     }
 
     private <T, X extends IOException> T
-    callWriteLocked(Operation<T, X> operation)
+    writeLocked(Operation<T, X> operation)
     throws X {
         checkNotReadLockedByCurrentThread();
         return callLocked(operation, writeLock());
@@ -195,7 +195,7 @@ extends FsLockModelDecoratingController<
             }
         } // GetOpenIcon
 
-        return callReadOrWriteLocked(new GetOpenIcon());
+        return readOrWriteLocked(new GetOpenIcon());
     }
 
     @Override
@@ -209,7 +209,7 @@ extends FsLockModelDecoratingController<
             }
         } // GetClosedIcon
 
-        return callReadOrWriteLocked(new GetClosedIcon());
+        return readOrWriteLocked(new GetClosedIcon());
     }
 
     @Override
@@ -221,7 +221,7 @@ extends FsLockModelDecoratingController<
             }
         } // IsReadOnly
 
-        return callReadOrWriteLocked(new IsReadOnly());
+        return readOrWriteLocked(new IsReadOnly());
     }
 
     @Override
@@ -233,7 +233,7 @@ extends FsLockModelDecoratingController<
             }
         } // GetEntry
 
-        return callReadOrWriteLocked(new GetEntry());
+        return readOrWriteLocked(new GetEntry());
     }
 
     @Override
@@ -245,7 +245,7 @@ extends FsLockModelDecoratingController<
             }
         } // IsReadable
 
-        return callReadOrWriteLocked(new IsReadable());
+        return readOrWriteLocked(new IsReadable());
     }
 
     @Override
@@ -257,7 +257,7 @@ extends FsLockModelDecoratingController<
             }
         } // IsWritable
 
-        return callReadOrWriteLocked(new IsWritable());
+        return readOrWriteLocked(new IsWritable());
     }
 
     @Override
@@ -269,7 +269,7 @@ extends FsLockModelDecoratingController<
             }
         } // IsExecutable
 
-        return callReadOrWriteLocked(new IsExecutable());
+        return readOrWriteLocked(new IsExecutable());
     }
 
     @Override
@@ -282,7 +282,7 @@ extends FsLockModelDecoratingController<
             }
         } // SetReadOnly
 
-        callWriteLocked(new SetReadOnly());
+        writeLocked(new SetReadOnly());
     }
 
     @Override
@@ -298,7 +298,7 @@ extends FsLockModelDecoratingController<
             }
         } // class SetTime
 
-        return callWriteLocked(new SetTime());
+        return writeLocked(new SetTime());
     }
 
     @Override
@@ -315,7 +315,7 @@ extends FsLockModelDecoratingController<
             }
         } // class SetTime
 
-        return callWriteLocked(new SetTime());
+        return writeLocked(new SetTime());
     }
 
     @Override
@@ -348,7 +348,7 @@ extends FsLockModelDecoratingController<
             }
         } // Mknod
 
-        callWriteLocked(new Mknod());
+        writeLocked(new Mknod());
     }
 
     @Override
@@ -364,7 +364,7 @@ extends FsLockModelDecoratingController<
             }
         } // Unlink
 
-        callWriteLocked(new Unlink());
+        writeLocked(new Unlink());
     }
 
     @Override
@@ -380,7 +380,7 @@ extends FsLockModelDecoratingController<
             }
         } // Sync
 
-        callWriteLocked(new Sync());
+        writeLocked(new Sync());
     }
 
     private void closeWriteLocked(final Closeable closeable)
@@ -393,7 +393,7 @@ extends FsLockModelDecoratingController<
             }
         } // Close
 
-        callWriteLocked(new Close());
+        writeLocked(new Close());
     }
 
     @Immutable
@@ -455,7 +455,7 @@ extends FsLockModelDecoratingController<
                 }
             } // NewSeekableByteChannel
 
-            return callWriteLocked(new NewSeekableByteChannel());
+            return writeLocked(new NewSeekableByteChannel());
         }
     } // Nio2Input
 
@@ -474,7 +474,7 @@ extends FsLockModelDecoratingController<
                 }
             } // GetLocalTarget
 
-            return callWriteLocked(new GetLocalTarget());
+            return writeLocked(new GetLocalTarget());
         }
 
         @Override
@@ -491,7 +491,7 @@ extends FsLockModelDecoratingController<
                 }
             } // NewReadOnlyFile
 
-            return callWriteLocked(new NewReadOnlyFile());
+            return writeLocked(new NewReadOnlyFile());
         }
 
         @Override
@@ -504,7 +504,7 @@ extends FsLockModelDecoratingController<
                 }
             } // NewInputStream
 
-            return callWriteLocked(new NewInputStream());
+            return writeLocked(new NewInputStream());
         }
     } // Input
 
@@ -524,7 +524,7 @@ extends FsLockModelDecoratingController<
                 }
             } // NewSeekableByteChannel
 
-            return callWriteLocked(new NewSeekableByteChannel());
+            return writeLocked(new NewSeekableByteChannel());
         }
     } // Nio2Output
 
@@ -543,7 +543,7 @@ extends FsLockModelDecoratingController<
                 }
             } // GetLocalTarget
 
-            return callWriteLocked(new GetLocalTarget());
+            return writeLocked(new GetLocalTarget());
         }
 
         @Override
@@ -561,7 +561,7 @@ extends FsLockModelDecoratingController<
                 }
             } // NewOutputStream
 
-            return callWriteLocked(new NewOutputStream());
+            return writeLocked(new NewOutputStream());
         }
     } // Output
 
