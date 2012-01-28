@@ -262,7 +262,7 @@ extends FsLockModelDecoratingController<
             if (null == controller) {
                 if (!options.get(FsInputOption.CACHE))
                     return super.getBoundSocket(); // don't cache
-                checkWriteLockedByCurrentThread();
+                //checkWriteLockedByCurrentThread();
                 controller = new EntryController(name);
             }
             return controller.configure(options).getInputSocket().bind(this);
