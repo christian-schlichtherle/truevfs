@@ -487,7 +487,8 @@ extends FsLockModelDecoratingController<
             class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
-                    return new LockingReadOnlyFile(getBoundSocket().newReadOnlyFile());
+                    return new LockingReadOnlyFile(
+                            getBoundSocket().newReadOnlyFile());
                 }
             } // NewReadOnlyFile
 
