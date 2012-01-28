@@ -177,7 +177,7 @@ extends FsLockModelDecoratingController<
                         throw handler.fail(new FsSyncException(getModel(), ex));
                     }
                 }
-            } finally  {
+            } finally {
                 if (clear) {
                     i.remove();
                     try {
