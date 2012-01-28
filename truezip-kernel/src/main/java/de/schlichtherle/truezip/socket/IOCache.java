@@ -149,9 +149,8 @@ public final class IOCache implements Flushable, Closeable {
         lock.lock();
         try {
             final Buffer buffer = getBuffer();
-            if (null != buffer) {
+            if (null != buffer)
                 getOutputBufferPool().release(buffer);
-            }
         } finally {
             lock.unlock();
         }
