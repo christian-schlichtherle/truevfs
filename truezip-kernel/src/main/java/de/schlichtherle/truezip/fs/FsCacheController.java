@@ -390,8 +390,8 @@ extends FsLockModelDecoratingController<
             return this;
         }
 
-        EntryController configure(   BitField<FsOutputOption> options,
-                                final @CheckForNull Entry template) {
+        EntryController configure(  BitField<FsOutputOption> options,
+                                    final @CheckForNull Entry template) {
             // Consume FsOutputOption.CACHE.
             this.outputOptions = options = options.clear(FsOutputOption.CACHE); // consume
             cache.configure(delegate.getOutputSocket(
