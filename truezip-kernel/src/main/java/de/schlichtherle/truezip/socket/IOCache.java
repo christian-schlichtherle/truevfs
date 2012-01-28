@@ -319,7 +319,6 @@ public final class IOCache implements Flushable, Closeable {
 
         @Override
         protected InputSocket<? extends Entry> getBoundSocket() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getDelegate().bind(this);
         }
 
@@ -333,25 +332,21 @@ public final class IOCache implements Flushable, Closeable {
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newReadOnlyFile();
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newInputStream();
         }
     } // Input
@@ -366,7 +361,6 @@ public final class IOCache implements Flushable, Closeable {
 
         @Override
         protected OutputSocket<? extends Entry> getBoundSocket() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getDelegate().bind(this);
         }
 
@@ -380,19 +374,16 @@ public final class IOCache implements Flushable, Closeable {
 
         @Override
         public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().getPeerTarget();
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newSeekableByteChannel();
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
             return getBoundSocket().newOutputStream();
         }
     } // Output
