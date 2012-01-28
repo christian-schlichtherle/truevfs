@@ -170,18 +170,21 @@ extends FsLockModelDecoratingController<
         while (i.hasNext()) {
             final EntryController controller = i.next();
             try {
-                if (flush)
-                    controller.flush();
-            } catch (IOException ex) {
-                throw handler.fail(new FsSyncException(getModel(), ex));
-            } finally  {
-                try {
-                    if (clear) {
-                        i.remove();
-                        controller.clear();
+                if (flush) {
+                    try {
+                        controller.flush();
+                    } catch (IOException ex) {
+                        throw handler.fail(new FsSyncException(getModel(), ex));
                     }
-                } catch (IOException ex) {
-                    handler.warn(new FsSyncWarningException(getModel(), ex));
+                }
+            } finally  {
+                if (clear) {
+                    i.remove();
+                    try {
+                        controller.clear();
+                    } catch (IOException ex) {
+                        handler.warn(new FsSyncWarningException(getModel(), ex));
+                    }
                 }
             }
         }
