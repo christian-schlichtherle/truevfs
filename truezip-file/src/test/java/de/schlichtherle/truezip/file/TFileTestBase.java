@@ -53,8 +53,8 @@ import org.junit.Test;
 public abstract class TFileTestBase<D extends FsArchiveDriver<?>>
 extends TestBase<D> {
 
-    private static final Logger logger = Logger.getLogger(
-            TFileTestBase.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(TFileTestBase.class.getName());
 
     /**
      * The prefix for temporary files, which is {@value}.
@@ -92,10 +92,6 @@ extends TestBase<D> {
         return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
-    protected final TFile getArchive() {
-        return archive;
-    }
-
     @Override
     public void tearDown() throws IOException {
         try {
@@ -114,6 +110,19 @@ extends TestBase<D> {
     private void umount() throws FsSyncException {
         if (null != archive)
             TFile.umount(archive);
+    }
+
+    private void createTestFile(final TFile file) throws IOException {
+        final OutputStream out = new TFileOutputStream(file);
+        try {
+            out.write(data);
+        } finally {
+            out.close();
+        }
+    }
+
+    protected final TFile getArchive() {
+        return archive;
     }
 
     protected static TFile newNonArchiveFile(TFile file) {
@@ -189,7 +198,7 @@ extends TestBase<D> {
         assertFalsePositive(entry);
         archive.rm();
 
-        assertTrue(archive.getNonArchiveFile().mkdir());
+        assertTrue(newNonArchiveFile(archive).mkdir());
         assertFalsePositive(entry);
         archive.rm();
     }
@@ -225,7 +234,7 @@ extends TestBase<D> {
 
         // Create directory false positive.
 
-        assertTrue(file.getNonArchiveFile().mkdir());
+        assertTrue(newNonArchiveFile(file).mkdir());
         assertTrue(file.exists());
         assertTrue(file.isDirectory());
         assertFalse(file.isFile());
@@ -375,7 +384,7 @@ extends TestBase<D> {
             };
             TFile file = archive;
             for (int i = 0; i <= names.length; i++) {
-                final TFile file2 = file.getNonArchiveFile();
+                final TFile file2 = newNonArchiveFile(file);
                 assertTrue(file2.mkdir());
                 assertIllegalDirectoryOperations(file2);
                 file2.rm();
@@ -454,7 +463,7 @@ extends TestBase<D> {
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        TFile.rm(archive.getNonArchiveFile()); // use plain file to delete instead!
+        TFile.rm(newNonArchiveFile(archive)); // use plain file to delete instead!
         assertFalse(archive.exists());
         assertFalse(archive.isDirectory());
         assertFalse(archive.isFile());
@@ -549,7 +558,7 @@ extends TestBase<D> {
             }
             umount(); // It must not fail twice for the same reason!
 
-            TFile.rm(archive.getNonArchiveFile());
+            TFile.rm(newNonArchiveFile(archive));
         } finally {
             // Closing the invalidated stream explicitly should be OK.
             in1.close();
@@ -868,7 +877,7 @@ extends TestBase<D> {
         assertCopyDelete(archive, names, 0);
         archive.rm();
 
-        assertTrue(archive.getNonArchiveFile().mkdir()); // create false positive archive file
+        assertTrue(newNonArchiveFile(archive).mkdir()); // create false positive archive file
         assertCopyDelete(archive, names, 0);
         archive.rm();
     }
@@ -885,7 +894,7 @@ extends TestBase<D> {
         assertCopyDelete(dir, names, off + 1); // continue recursion
         dir.rm();
 
-        assertTrue(dir.getNonArchiveFile().mkdir()); // create false positive archive file
+        assertTrue(newNonArchiveFile(dir).mkdir()); // create false positive archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
         dir.rm();
@@ -1083,7 +1092,7 @@ extends TestBase<D> {
             in1.close();
         }
         archive.rm_r();
-        assertFalse(archive.getNonArchiveFile().exists());
+        assertFalse(newNonArchiveFile(archive).exists());
     }
     
     @Test
@@ -1110,7 +1119,7 @@ extends TestBase<D> {
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final TFile tmp = archive.getNonArchiveFile();
+        final TFile tmp = newNonArchiveFile(archive);
         final InputStream in = new ByteArrayInputStream(data);
         TFile.cp(in, tmp);
         assertRenameArchiveToTemp(archive);
@@ -1125,7 +1134,7 @@ extends TestBase<D> {
         TFile tmp = new TFile(TFile.createTempFile(TEMP_FILE_PREFIX, null));
         tmp.rm();
         assertFalse(tmp.exists());
-        assertFalse(tmp.getNonArchiveFile().exists());
+        assertFalse(newNonArchiveFile(tmp).exists());
 
         // Now rename the archive to the temporary path.
         // Depending on the true state of the object "archive", this will
@@ -1133,12 +1142,12 @@ extends TestBase<D> {
         // plain file (iff archive is a false positive).
         archive.mv(tmp);
         assertFalse(archive.exists());
-        assertFalse(archive.getNonArchiveFile().exists());
+        assertFalse(newNonArchiveFile(archive).exists());
 
         // Now delete resulting temporary file or directory.
         tmp.rm_r();
         assertFalse(tmp.exists());
-        assertFalse(tmp.getNonArchiveFile().exists());
+        assertFalse(newNonArchiveFile(tmp).exists());
     }
 
     @Test
@@ -1182,11 +1191,11 @@ extends TestBase<D> {
     private void assertRenameTo(TFile src, TFile dst) throws IOException {
         assertTrue(src.exists());
         assertFalse(dst.exists());
-        assertFalse(dst.getNonArchiveFile().exists());
+        assertFalse(newNonArchiveFile(dst).exists());
         assert TFile.isLenient();
         src.mv(dst);
         assertFalse(src.exists());
-        assertFalse(src.getNonArchiveFile().exists());
+        assertFalse(newNonArchiveFile(src).exists());
         assertTrue(dst.exists());
     }
 
@@ -1203,7 +1212,7 @@ extends TestBase<D> {
 
         assertNull(dir.listFiles());
         assertNull(dir2.listFiles());
-        assertNull(dir2.getNonArchiveFile().listFiles());
+        assertNull(newNonArchiveFile(dir2).listFiles());
 
         TFile.rm(dir);
 
@@ -1282,15 +1291,6 @@ extends TestBase<D> {
     private void createTestArchive(final int nEntries) throws IOException {
         for (int i = 0; i < nEntries; i++)
             createTestFile(new TFile(archive, i + ""));
-    }
-
-    private void createTestFile(final TFile file) throws IOException {
-        final OutputStream out = new TFileOutputStream(file);
-        try {
-            out.write(data);
-        } finally {
-            out.close();
-        }
     }
 
     private void assertArchiveEntries(final TFile archive, int nEntries)
@@ -1495,7 +1495,7 @@ extends TestBase<D> {
                     TFile.umount(dst);
                 }
             } finally {
-                dst.getNonArchiveFile().rm();
+                newNonArchiveFile(dst).rm();
             }
         } finally {
             TFile.umount(src);
@@ -1505,7 +1505,7 @@ extends TestBase<D> {
 
     @Test
     public void testGrowing() throws IOException {
-        final TFile file = archive.getNonArchiveFile();
+        final TFile file = newNonArchiveFile(archive);
         final TFile entry1 = new TFile(archive, "entry1");
         final TFile entry2 = new TFile(archive, "entry2");
 
@@ -1513,16 +1513,16 @@ extends TestBase<D> {
         try {
             config.setOutputPreferences(config.getOutputPreferences().set(GROW));
 
-            write(entry1);
-            write(entry2);
+            createTestFile(entry1);
+            createTestFile(entry2);
 
             umount();
             assertTrue(file.length() > 2 * data.length); // two entries plus one central directory
 
-            write(entry1);
-            write(entry2);
-            write(entry1);
-            write(entry2);
+            createTestFile(entry1);
+            createTestFile(entry2);
+            createTestFile(entry1);
+            createTestFile(entry2);
 
             assertTrue(entry1.setLastModified(System.currentTimeMillis()));
             assertTrue(entry2.setLastModified(System.currentTimeMillis()));
@@ -1550,14 +1550,5 @@ extends TestBase<D> {
         }
 
         assertNull(archive.list());
-    }
-
-    private void write(final TFile entry) throws IOException {
-        final OutputStream out = new TFileOutputStream(entry);
-        try {
-            out.write(data);
-        } finally {
-            out.close();
-        }
     }
 }
