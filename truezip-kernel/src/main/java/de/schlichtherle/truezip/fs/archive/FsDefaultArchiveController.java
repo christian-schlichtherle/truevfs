@@ -168,11 +168,17 @@ extends FsFileSystemArchiveController<E> {
                     ia.getDriverProduct(),
                     socket.getLocalTarget(),
                     readOnly));
+        } catch (FsControllerException ex) {
+            assert !(ex instanceof FsFalsePositiveException);
+            throw ex;
         } catch (final IOException ex) {
             if (!autoCreate) {
                 final FsEntry parentEntry;
                 try {
                     parentEntry = parent.getEntry(name);
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (final IOException ex2) {
                     //ex2.initCause(ex);
                     throw new FsFalsePositiveException(ex2);
@@ -239,7 +245,8 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     void checkAccess(   final FsEntryName name,
-                        final @CheckForNull Access intention) {
+                        final @CheckForNull Access intention)
+    throws FsNeedsSyncException {
         // HC SUNT DRACONES!
         final FsArchiveFileSystem<E> f;
         final FsCovariantEntry<E> ce;
