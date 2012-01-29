@@ -38,9 +38,12 @@ import net.jcip.annotations.ThreadSafe;
  * {@link FsFalsePositiveException}, the method call is delegated to the
  * controller for its parent file system in order to resolve the requested
  * operation.
- * If this method call fails with another exception, then the
+ * If this method call fails with a second exception, then the
  * {@link IOException} which is associated as the cause of the first exception
- * gets rethrown.
+ * gets rethrown unless the second exception is an
+ * {@link FsControllerException}.
+ * In this case the {@link FsControllerException} gets rethrown as is in order
+ * to enable the caller to resolve it.
  * <p>
  * This algorithm effectively achieves the following objectives:
  * <ol>
@@ -52,6 +55,10 @@ import net.jcip.annotations.ThreadSafe;
  *     the file system driver for the false positive archive file takes its
  *     place in order to provide the caller with a good indication of what went
  *     wrong in the first place.
+ * <li>Exceptions which are thrown by the TrueZIP Kernel itself identify
+ *     themselves by the type {@link FsControllerException}.
+ *     They are excempt from this masquerade in order to support resolving them
+ *     by a more competent caller.
  * </ol>
  * <p>
  * As an example consider the case of accessing a RAES encrypted ZIP file.
@@ -116,6 +123,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().getOpenIcon();
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -130,6 +140,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().getClosedIcon();
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -143,6 +156,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().isReadOnly();
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -156,6 +172,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().getEntry(resolveParent(name));
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -169,6 +188,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().isReadable(resolveParent(name));
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -182,6 +204,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().isWritable(resolveParent(name));
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -195,6 +220,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().isExecutable(resolveParent(name));
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -208,6 +236,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 getParent().setReadOnly(resolveParent(name));
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -225,6 +256,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().setTime(resolveParent(name), times, options);
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -243,6 +277,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 return getParent().setTime(resolveParent(name), types, value, options);
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -278,6 +315,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 getParent().mknod(resolveParent(name), type, options, template);
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -293,6 +333,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             try {
                 getParent().unlink(resolveParent(name), options);
+            } catch (FsControllerException ex2) {
+                assert !(ex2 instanceof FsFalsePositiveException);
+                throw ex2;
             } catch (IOException discard) {
                 throw ex.getCause();
             }
@@ -330,6 +373,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .getInputSocket(resolveParent(name), options)
                             .bind(this)
                             .getLocalTarget();
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (IOException discard) {
                     throw ex.getCause();
                 }
@@ -351,6 +397,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .getInputSocket(resolveParent(name), options)
                             .bind(this)
                             .newReadOnlyFile();
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (IOException discard) {
                     throw ex.getCause();
                 }
@@ -367,6 +416,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .getInputSocket(resolveParent(name), options)
                             .bind(this)
                             .newSeekableByteChannel();
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (IOException discard) {
                     throw ex.getCause();
                 }
@@ -383,6 +435,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .getInputSocket(resolveParent(name), options)
                             .bind(this)
                             .newInputStream();
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (IOException discard) {
                     throw ex.getCause();
                 }
@@ -415,6 +470,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .getOutputSocket(resolveParent(name), options, template)
                             .bind(this)
                             .getLocalTarget();
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (IOException discard) {
                     throw ex.getCause();
                 }
@@ -436,6 +494,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .getOutputSocket(resolveParent(name), options, template)
                             .bind(this)
                             .newSeekableByteChannel();
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (IOException discard) {
                     throw ex.getCause();
                 }
@@ -452,6 +513,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .getOutputSocket(resolveParent(name), options, template)
                             .bind(this)
                             .newOutputStream();
+                } catch (FsControllerException ex2) {
+                    assert !(ex2 instanceof FsFalsePositiveException);
+                    throw ex2;
                 } catch (IOException discard) {
                     throw ex.getCause();
                 }
