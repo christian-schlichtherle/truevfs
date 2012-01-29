@@ -416,5 +416,6 @@ extends FsLockModelController {
      *         is intended.
      * @throws FsNeedsSyncException If a sync operation is required.
      */
-    abstract void checkAccess(FsEntryName name, @CheckForNull Access intention);
+    abstract void checkAccess(FsEntryName name, @CheckForNull Access intention)
+    throws FsNeedsSyncException;
 }
