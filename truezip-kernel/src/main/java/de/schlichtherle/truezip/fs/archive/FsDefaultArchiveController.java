@@ -297,36 +297,14 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         try {
-            commenceSync();
+            if (!options.get(ABORT_CHANGES))
+                performSync(handler);
         } finally {
-            try {
-                if (!options.get(ABORT_CHANGES))
-                    performSync(handler);
-            } finally {
-                try {
-                    commitSync(handler);
-                } finally {
-                    assert null == getFileSystem();
-                    assert null == getInputArchive();
-                    assert null == getOutputArchive();
-                    // TODO: Remove a condition and clear a flag in the model
-                    // instead.
-                    if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-                        setTouched(false);
-                }
-            }
-        }
-    }
-
-    private void commenceSync() {
-        try {
-            final InputArchive<E> ia = getInputArchive();
-            if (null != ia)
-                ia.disconnect();
-        } finally {
-            final OutputArchive<E> oa = getOutputArchive();
-            if (null != oa)
-                oa.disconnect();
+            commitSync(handler);
+            // TODO: Remove a condition and clear a flag in the model
+            // instead.
+            if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+                setTouched(false);
         }
     }
 
@@ -434,28 +412,28 @@ extends FsFileSystemArchiveController<E> {
     private <X extends IOException> void
     commitSync(final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        setFileSystem(null);
         try {
             final InputArchive<E> ia = getInputArchive();
-            setInputArchive(null);
             if (null != ia) {
                 try {
-                    ia.getDriverProduct().close();
+                    ia.close();
                 } catch (IOException ex) {
                     handler.warn(new FsSyncWarningException(getModel(), ex));
                 }
             }
+            setInputArchive(null);
         } finally {
             final OutputArchive<E> oa = getOutputArchive();
-            setOutputArchive(null);
             if (null != oa) {
                 try {
-                    oa.getDriverProduct().close();
+                    oa.close();
                 } catch (IOException ex) {
                     throw handler.fail(new FsSyncException(getModel(), ex));
                 }
             }
+            setOutputArchive(null);
         }
+        setFileSystem(null);
     }
 
     /**
