@@ -64,7 +64,6 @@ implements ExceptionBuilder<C, X> {
      * @see #update(Exception, Exception)
      * @see #post(Exception)
      */
-    // TODO: Make this non-final.
     @Override
     public final X fail(C cause) {
         if (null == cause)
@@ -79,7 +78,6 @@ implements ExceptionBuilder<C, X> {
      *
      * @see #update(Exception, Exception)
      */
-    // TODO: Make this non-final.
     @Override
     public final void warn(C cause) {
         if (null == cause)
@@ -92,7 +90,6 @@ implements ExceptionBuilder<C, X> {
      *
      * @see #post(Exception)
      */
-    // TODO: Make this non-final.
     @Override
     public final void check() throws X {
         final X assembly = this.assembly;
