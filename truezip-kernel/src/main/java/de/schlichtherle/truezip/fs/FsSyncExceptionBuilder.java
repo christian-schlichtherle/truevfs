@@ -29,4 +29,8 @@ extends SequentialIOExceptionBuilder<IOException, FsSyncException> {
     public FsSyncExceptionBuilder() {
         super(IOException.class, FsSyncException.class);
     }
+
+    // TODO: Override warn and fail in order to automatically wrap a plain
+    // IOException in an FsSyncWarningException and FsSyncException,
+    // respectively.
 }
