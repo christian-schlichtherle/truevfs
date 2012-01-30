@@ -91,9 +91,8 @@ extends FsLockModelDecoratingController<
         return this.writeLock;
     }
 
-    private <T, X extends IOException> T
-    readOrWriteLocked(Operation<T, X> operation)
-    throws X {
+    private <T> T
+    readOrWriteLocked(IOOperation<T> operation) throws IOException {
         try {
             return readLocked(operation);
         } catch (FsNeedsWriteLockException ex) {
@@ -101,17 +100,15 @@ extends FsLockModelDecoratingController<
         }
     }
 
-    private <T, X extends IOException> T
-    readLocked(Operation<T, X> operation)
-    throws X {
-        return callLocked(operation, readLock());
+    private <T> T
+    readLocked(IOOperation<T> operation) throws IOException {
+        return locked(operation, readLock());
     }
 
-    private <T, X extends IOException> T
-    writeLocked(Operation<T, X> operation)
-    throws X {
+    private <T> T
+    writeLocked(IOOperation<T> operation) throws IOException {
         checkNotReadLockedByCurrentThread();
-        return callLocked(operation, writeLock());
+        return locked(operation, writeLock());
     }
 
     /**
@@ -146,17 +143,15 @@ extends FsLockModelDecoratingController<
      * Mind that this is standard requirement for any {@link FsController}.
      * 
      * @param  <T> The return type of the operation.
-     * @param  <X> The exception type of the operation.
      * @param  operation The atomic operation.
      * @param  lock The lock to hold while calling the operation.
      * @return The result of the operation.
-     * @throws X As thrown by the operation.
+     * @throws IOException As thrown by the operation.
      * @throws NeedsLockRetryException See above.
      */
     @SuppressWarnings("unchecked")
-    private static <T, X extends IOException> T
-    callLocked(final Operation<T, X> operation, final Lock lock)
-    throws X {
+    private static <T> T
+    locked(final IOOperation<T> operation, final Lock lock) throws IOException {
         final ThreadTool thread = threadTool.get();
         if (thread.locking) {
             if (!lock.tryLock())
@@ -368,19 +363,26 @@ extends FsLockModelDecoratingController<
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        class Sync implements Operation<Void, X> {
+        class Sync implements IOOperation<Void> {
             @Override
-            public Void call() throws X {
+            public Void call() throws IOException {
                 delegate.sync(options, handler);
                 return null;
             }
         } // Sync
 
-        writeLocked(new Sync());
+        try {
+            writeLocked(new Sync());
+        } catch (NeedsLockRetryException ex) {
+            throw new AssertionError(ex);
+        } catch (IOException ex) {
+            throw (X) ex;
+        }
     }
 
     private void closeWriteLocked(final Closeable closeable)
@@ -664,11 +666,8 @@ extends FsLockModelDecoratingController<
         abstract ThreadLocal<ThreadTool> newThreadLocalTool();
     } // ThreadLocalToolFactory
 
-    private interface Operation<T, X extends IOException> extends Callable<T> {
-        @Override T call() throws X;
-    } // Operation
-
-    private interface IOOperation<T> extends Operation<T, IOException> {
+    private interface IOOperation<T> extends Callable<T> {
+        @Override T call() throws IOException;
     } // IOOperation
 
     @Immutable
