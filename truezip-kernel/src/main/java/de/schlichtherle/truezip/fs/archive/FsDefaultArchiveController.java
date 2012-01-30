@@ -512,7 +512,7 @@ extends FsFileSystemArchiveController<E> {
         }
 
         /**
-         * Exposes the product of the archive driver this input archive is
+         * Publishes the product of the archive driver this input archive is
          * decorating.
          */
         InputShop<E> getDriverProduct() {
@@ -545,7 +545,7 @@ extends FsFileSystemArchiveController<E> {
         }
 
         /**
-         * Exposes the product of the archive driver this output archive is
+         * Publishes the product of the archive driver this output archive is
          * decorating.
          */
         OutputShop<E> getDriverProduct() {
