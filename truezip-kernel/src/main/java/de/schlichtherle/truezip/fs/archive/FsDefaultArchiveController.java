@@ -480,15 +480,6 @@ extends FsFileSystemArchiveController<E> {
             this.lock = lock;
         }
 
-        boolean disconnect() {
-            lock.lock();
-            try {
-                return ((DisconnectingInputShop<?>) delegate).disconnect();
-            } finally {
-                lock.unlock();
-            }
-        }
-
         /**
          * Publishes the product of the archive driver this input archive is
          * decorating.
@@ -511,15 +502,6 @@ extends FsFileSystemArchiveController<E> {
             super(new DisconnectingOutputShop<E>(output), lock);
             this.driverProduct = output;
             this.lock = lock;
-        }
-
-        boolean disconnect() {
-            lock.lock();
-            try {
-                return ((DisconnectingOutputShop<?>) delegate).disconnect();
-            } finally {
-                lock.unlock();
-            }
         }
 
         /**
