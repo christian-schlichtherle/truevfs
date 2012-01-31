@@ -9,6 +9,7 @@
 package de.schlichtherle.truezip.socket;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
@@ -24,8 +25,8 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOEntry> {
     private static final String MOCK_ENTRY_NAME = "mock";
 
     private final int initialCapacity;
-    private volatile int total;
-    private volatile int active;
+    private final AtomicInteger total = new AtomicInteger();
+    private final AtomicInteger active = new AtomicInteger();
 
     /** Equivalent to {@link #ByteArrayIOPool(int) new ByteArrayIOPool(32)}. */
     public ByteArrayIOPool() {
@@ -45,9 +46,10 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOEntry> {
     }
 
     @Override
-    public synchronized Entry allocate() {
-        Entry entry = new Entry(total++);
-        active++;
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("VO_VOLATILE_INCREMENT")
+    public Entry allocate() {
+        Entry entry = new Entry(total.getAndIncrement());
+        active.getAndIncrement();
         return entry;
     }
 
@@ -64,7 +66,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOEntry> {
      *         this pool.
      */
     public int getSize() {
-        return active;
+        return active.get();
     }
 
     @NotThreadSafe
@@ -82,9 +84,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOEntry> {
             if (released)
                 throw new IllegalStateException("entry has already been released!");
             released = true;
-            synchronized (ByteArrayIOPool.this) {
-                active--;
-            }
+            active.getAndDecrement();
             setData(null);
         }
     }
