@@ -144,6 +144,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
         return new JmxInputSocket<E>(input, this, temp);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     @Override
     public <E extends Entry> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<JmxDirector> context) {
         return new JmxInputSocket<E>(input, this, ((JmxController) context).getIOStatistics());
@@ -154,6 +155,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
         return new JmxOutputSocket<E>(output, this, temp);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     @Override
     public <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<JmxDirector> context) {
         return new JmxOutputSocket<E>(output, this, ((JmxController) context).getIOStatistics());
@@ -165,6 +167,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
             return new JmxNio2InputSocket<E>(input, this, super.temp);
         }
 
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
         @Override
         public <E extends Entry> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<JmxDirector> context) {
             return new JmxNio2InputSocket<E>(input, this, ((JmxController) context).getIOStatistics());
@@ -175,6 +178,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
             return new JmxNio2OutputSocket<E>(output, this, super.temp);
         }
 
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
         @Override
         public <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<JmxDirector> context) {
             return new JmxNio2OutputSocket<E>(output, this, ((JmxController) context).getIOStatistics());
