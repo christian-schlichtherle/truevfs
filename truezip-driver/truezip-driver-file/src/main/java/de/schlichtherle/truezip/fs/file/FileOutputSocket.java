@@ -145,6 +145,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
+        @SuppressWarnings("deprecation")
         class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
             boolean closed;
 
