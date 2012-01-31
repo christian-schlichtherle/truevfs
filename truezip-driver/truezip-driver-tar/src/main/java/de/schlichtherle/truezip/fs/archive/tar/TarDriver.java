@@ -180,7 +180,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
     }
 
     protected TarOutputShop newTarOutputShop(
-            FsModel model, OutputStream out, TarInputShop source)
+            FsModel model, OutputStream out, @CheckForNull TarInputShop source)
     throws IOException {
         return new TarOutputShop(this, out);
     }
