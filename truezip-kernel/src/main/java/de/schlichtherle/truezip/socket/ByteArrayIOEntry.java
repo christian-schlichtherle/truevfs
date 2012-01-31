@@ -89,6 +89,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
      *
      * @return The byte array for input from this I/O entry.
      */
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("EI_EXPOSE_REP")
     public @CheckForNull byte[] getData() {
         return data;
@@ -101,6 +102,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
      *
      * @param data the byte array for input from this I/O entry.
      */
+    @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("EI_EXPOSE_REP2")
     public void setData(final @CheckForNull byte[] data) {
         this.data = data;
