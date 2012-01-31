@@ -23,10 +23,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.NotThreadSafe;
 
 /**
  * Provides temporary caching services for input and output sockets with the
@@ -47,14 +45,12 @@ import net.jcip.annotations.ThreadSafe;
  *     clients, allowing it to create, read, update or delete the entry data
  *     while some clients are still busy on reading or writing the cached
  *     entry data.
- * <li>When a cache gets picked up by the finalizer thread of the JVM, it gets
- *     cleared (this class is not a persistence service).
  * </ul>
  *
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@NotThreadSafe
 @DefaultAnnotation(NonNull.class)
 public final class IOCache implements Flushable, Closeable {
 
@@ -62,14 +58,13 @@ public final class IOCache implements Flushable, Closeable {
             ? BufferSocketFactory.NIO2
             : BufferSocketFactory.OIO;
 
-    private final Lock lock;
     private final Strategy strategy;
     private final IOPool<?> pool;
-    private volatile @Nullable InputSocket<?> input;
-    private volatile @Nullable OutputSocket<?> output;
-    private volatile @CheckForNull InputBufferPool inputBufferPool;
-    private volatile @CheckForNull OutputBufferPool outputBufferPool;
-    private volatile @CheckForNull Buffer buffer;
+    private @Nullable InputSocket<?> input;
+    private @Nullable OutputSocket<?> output;
+    private @CheckForNull InputBufferPool inputBufferPool;
+    private @CheckForNull OutputBufferPool outputBufferPool;
+    private @CheckForNull Buffer buffer;
 
     /**
      * Constructs a new cache which applies the given caching strategy,
@@ -86,13 +81,11 @@ public final class IOCache implements Flushable, Closeable {
      * @param lock the lock for concurrent access control.
      */
     private IOCache(final Strategy strategy,
-                    final IOPool<?> pool,
-                    final Lock lock) {
-        if (null == strategy || null == pool || null == lock)
+                    final IOPool<?> pool) {
+        if (null == strategy || null == pool)
             throw new NullPointerException();
         this.strategy = strategy;
         this.pool = pool;
-        this.lock = lock;
     }
 
     /**
@@ -144,26 +137,16 @@ public final class IOCache implements Flushable, Closeable {
      */
     @Override
     public void flush() throws IOException {
-        lock.lock();
-        try {
-            final Buffer buffer = getBuffer();
-            if (null != buffer)
-                getOutputBufferPool().release(buffer);
-        } finally {
-            lock.unlock();
-        }
+        final Buffer buffer = getBuffer();
+        if (null != buffer)
+            getOutputBufferPool().release(buffer);
     }
 
     /**
      * Discards the entry data in this buffer.
      */
     public void clear() throws IOException {
-        lock.lock();
-        try {
-            setBuffer(null);
-        } finally {
-            lock.unlock();
-        }
+        setBuffer(null);
     }
 
     /**
@@ -171,18 +154,13 @@ public final class IOCache implements Flushable, Closeable {
      */
     @Override
     public void close() throws IOException {
-        lock.lock();
         try {
-            try {
-                final Buffer buffer = getBuffer();
-                if (null != buffer) {
-                    getOutputBufferPool().release(buffer);
-                }
-            } finally {
-                setBuffer(null);
+            final Buffer buffer = getBuffer();
+            if (null != buffer) {
+                getOutputBufferPool().release(buffer);
             }
         } finally {
-            lock.unlock();
+            setBuffer(null);
         }
     }
 
@@ -229,18 +207,13 @@ public final class IOCache implements Flushable, Closeable {
 
     private void setBuffer(final @CheckForNull Buffer newBuffer)
     throws IOException {
-        lock.lock();
-        try {
-            final Buffer oldBuffer = this.buffer;
-            if (oldBuffer != newBuffer) {
-                this.buffer = newBuffer;
-                if (null != oldBuffer
-                        && 0 == oldBuffer.writers
-                        && 0 == oldBuffer.readers)
-                    oldBuffer.release();
-            }
-        } finally {
-            lock.unlock();
+        final Buffer oldBuffer = this.buffer;
+        if (oldBuffer != newBuffer) {
+            this.buffer = newBuffer;
+            if (null != oldBuffer
+                    && 0 == oldBuffer.writers
+                    && 0 == oldBuffer.readers)
+                oldBuffer.release();
         }
     }
 
@@ -282,26 +255,13 @@ public final class IOCache implements Flushable, Closeable {
         };
 
         /**
-         * Returns a new cache which uses a private {@link ReentrantLock}
-         * for locking out concurrent access.
+         * Returns a new cache.
          *
          * @param  pool the pool of temporary entries to cache the entry data.
          * @return A new cache.
          */
         public IOCache newCache(IOPool<?> pool) {
-            return new IOCache(this, pool, new ReentrantLock());
-        }
-
-        /**
-         * Returns a new cache which uses the given lock
-         * for locking out concurrent access.
-         *
-         * @param  pool the pool of temporary entries to cache the entry data.
-         * @param  lock the lock for concurrent access control.
-         * @return A new cache.
-         */
-        IOCache newCache(IOPool<?> pool, Lock lock) {
-            return new IOCache(this, pool, lock);
+            return new IOCache(this, pool);
         }
 
         IOCache.InputBufferPool newInputBufferPool(IOCache cache) {
@@ -403,37 +363,27 @@ public final class IOCache implements Flushable, Closeable {
     implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            lock.lock();
-            try {
-                Buffer buffer = getBuffer();
-                if (null == buffer) {
-                    buffer = new Buffer();
-                    try {
-                        IOSocket.copy(input, buffer.data.getOutputSocket());
-                    } catch (IOException ex) {
-                        buffer.release();
-                        throw ex;
-                    }
-                    setBuffer(buffer);
+            Buffer buffer = getBuffer();
+            if (null == buffer) {
+                buffer = new Buffer();
+                try {
+                    IOSocket.copy(input, buffer.data.getOutputSocket());
+                } catch (IOException ex) {
+                    buffer.release();
+                    throw ex;
                 }
-                assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
-                buffer.readers++;
-                return buffer;
-            } finally {
-                lock.unlock();
+                setBuffer(buffer);
             }
+            assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
+            buffer.readers++;
+            return buffer;
         }
 
         @Override
         public void release(final Buffer buffer) throws IOException {
-            lock.lock();
-            try {
-                assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
-                if (0 == --buffer.readers && 0 == buffer.writers && getBuffer() != buffer) {
-                    buffer.release();
-                }
-            } finally {
-                lock.unlock();
+            assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
+            if (0 == --buffer.readers && 0 == buffer.writers && getBuffer() != buffer) {
+                buffer.release();
             }
         }
     } // InputBufferPool
@@ -443,30 +393,20 @@ public final class IOCache implements Flushable, Closeable {
     implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            lock.lock();
-            try {
-                final Buffer buffer = new Buffer();
-                assert 0 == buffer.readers;
-                buffer.writers = 1;
-                return buffer;
-            } finally {
-                lock.unlock();
-            }
+            final Buffer buffer = new Buffer();
+            assert 0 == buffer.readers;
+            buffer.writers = 1;
+            return buffer;
         }
 
         @Override
         public void release(final Buffer buffer) throws IOException {
-            lock.lock();
+            assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
+            buffer.writers = 0;
             try {
-                assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
-                buffer.writers = 0;
-                try {
-                    IOSocket.copy(buffer.data.getInputSocket(), output);
-                } finally {
-                    setBuffer(buffer);
-                }
+                IOSocket.copy(buffer.data.getInputSocket(), output);
             } finally {
-                lock.unlock();
+                setBuffer(buffer);
             }
         }
     } // OutputBufferPool
@@ -475,13 +415,8 @@ public final class IOCache implements Flushable, Closeable {
     private final class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(Buffer buffer) throws IOException {
-            lock.lock();
-            try {
-                if (0 != buffer.writers)
-                    super.release(buffer);
-            } finally {
-                lock.unlock();
-            }
+            if (0 != buffer.writers)
+                super.release(buffer);
         }
     } // WriteThroughOutputBufferPool
 
@@ -489,17 +424,12 @@ public final class IOCache implements Flushable, Closeable {
     private final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
-            lock.lock();
-            try {
-                if (0 != buffer.writers) {
-                    if (getBuffer() != buffer) {
-                        setBuffer(buffer);
-                    } else {
-                        super.release(buffer);
-                    }
+            if (0 != buffer.writers) {
+                if (getBuffer() != buffer) {
+                    setBuffer(buffer);
+                } else {
+                    super.release(buffer);
                 }
-            } finally {
-                lock.unlock();
             }
         }
     } // WriteBackOutputBufferPool
