@@ -144,8 +144,6 @@ public final class IOCache implements Flushable, Closeable {
      */
     @Override
     public void flush() throws IOException {
-        if (null == getBuffer()) // DCL does work with volatile fields since JSE 5!
-            return;
         lock.lock();
         try {
             final Buffer buffer = getBuffer();
@@ -231,13 +229,18 @@ public final class IOCache implements Flushable, Closeable {
 
     private void setBuffer(final @CheckForNull Buffer newBuffer)
     throws IOException {
-        final Buffer oldBuffer = this.buffer;
-        if (oldBuffer != newBuffer) {
-            this.buffer = newBuffer;
-            if (null != oldBuffer
-                    && oldBuffer.writers == 0
-                    && oldBuffer.readers == 0)
-                oldBuffer.release();
+        lock.lock();
+        try {
+            final Buffer oldBuffer = this.buffer;
+            if (oldBuffer != newBuffer) {
+                this.buffer = newBuffer;
+                if (null != oldBuffer
+                        && 0 == oldBuffer.writers
+                        && 0 == oldBuffer.readers)
+                    oldBuffer.release();
+            }
+        } finally {
+            lock.unlock();
         }
     }
 
@@ -396,7 +399,8 @@ public final class IOCache implements Flushable, Closeable {
     } // CacheEntry
 
     @Immutable
-    private final class InputBufferPool implements Pool<Buffer, IOException> {
+    private final class InputBufferPool
+    implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
             lock.lock();
@@ -439,20 +443,30 @@ public final class IOCache implements Flushable, Closeable {
     implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            final Buffer buffer = new Buffer();
-            assert 0 == buffer.readers;
-            buffer.writers = 1;
-            return buffer;
+            lock.lock();
+            try {
+                final Buffer buffer = new Buffer();
+                assert 0 == buffer.readers;
+                buffer.writers = 1;
+                return buffer;
+            } finally {
+                lock.unlock();
+            }
         }
 
         @Override
         public void release(final Buffer buffer) throws IOException {
-            assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
-            buffer.writers = 0;
+            lock.lock();
             try {
-                IOSocket.copy(buffer.data.getInputSocket(), output);
+                assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
+                buffer.writers = 0;
+                try {
+                    IOSocket.copy(buffer.data.getInputSocket(), output);
+                } finally {
+                    setBuffer(buffer);
+                }
             } finally {
-                setBuffer(buffer);
+                lock.unlock();
             }
         }
     } // OutputBufferPool
@@ -461,13 +475,10 @@ public final class IOCache implements Flushable, Closeable {
     private final class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(Buffer buffer) throws IOException {
-            if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
-                return;
             lock.lock();
             try {
-                if (0 == buffer.writers)
-                    return;
-                super.release(buffer);
+                if (0 != buffer.writers)
+                    super.release(buffer);
             } finally {
                 lock.unlock();
             }
@@ -478,16 +489,14 @@ public final class IOCache implements Flushable, Closeable {
     private final class WriteBackOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(final Buffer buffer) throws IOException {
-            if (0 == buffer.writers) // DCL does work with volatile fields since JSE 5!
-                return;
             lock.lock();
             try {
-                if (0 == buffer.writers)
-                    return;
-                if (getBuffer() != buffer) {
-                    setBuffer(buffer);
-                } else {
-                    super.release(buffer);
+                if (0 != buffer.writers) {
+                    if (getBuffer() != buffer) {
+                        setBuffer(buffer);
+                    } else {
+                        super.release(buffer);
+                    }
                 }
             } finally {
                 lock.unlock();
@@ -528,7 +537,7 @@ public final class IOCache implements Flushable, Closeable {
     private final class Buffer {
         final IOPool.Entry<?> data;
 
-        volatile int readers, writers; // max one writer!
+        int readers, writers; // max one writer!
 
         Buffer() throws IOException {
             data = pool.allocate();
