@@ -37,8 +37,9 @@ public abstract class ConsoleSafePbeParametersView<
         P extends SafePbeParameters<S, P>>
 extends SafePbeParametersView<P> {
 
-    private static final ResourceBundle resources
-            = ResourceBundle.getBundle(ConsoleSafePbeParametersView.class.getName());
+    private static final ResourceBundle
+            resources = ResourceBundle.getBundle(
+                ConsoleSafePbeParametersView.class.getName());
 
     /**
      * Used to lock out prompting by multiple threads.
@@ -52,6 +53,7 @@ extends SafePbeParametersView<P> {
      * The last resource ID used when prompting.
      * Initialized to the empty string.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     private static URI lastResource = URI.create(""); // NOI18N
     
     private static final String YES = resources.getString("yes");

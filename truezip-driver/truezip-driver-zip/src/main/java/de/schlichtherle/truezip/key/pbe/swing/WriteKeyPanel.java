@@ -82,6 +82,7 @@ public class WriteKeyPanel extends KeyPanel {
     }
     
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void setResource(final URI resource) {
         final URI lastResource = SwingSafePbeParametersView.lastResource;
         if (!lastResource.equals(resource)
