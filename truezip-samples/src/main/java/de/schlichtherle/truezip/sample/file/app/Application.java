@@ -13,7 +13,6 @@ import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
@@ -50,9 +49,10 @@ abstract class Application extends TApplication<RuntimeException> {
      *        then they are wrapped in a new {@code PrintStream} with
      *        this value as the additional constructor parameter.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
     protected Application(
-            final @Nullable OutputStream out,
-            final @Nullable OutputStream err,
+            final OutputStream out,
+            final OutputStream err,
             final boolean autoFlush) {
         this.out = out instanceof PrintStream
                 ? (PrintStream) out
