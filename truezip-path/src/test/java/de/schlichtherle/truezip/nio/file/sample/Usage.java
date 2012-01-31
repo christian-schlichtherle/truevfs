@@ -14,6 +14,8 @@ import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -30,6 +32,7 @@ import java.nio.file.Path;
  */
 @Deprecated
 @SuppressWarnings("CallToThreadDumpStack")
+@DefaultAnnotation(NonNull.class)
 abstract class Usage {
 
     /** Nope! */
