@@ -13,6 +13,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import net.jcip.annotations.Immutable;
 
@@ -30,10 +31,39 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class TFileReader extends InputStreamReader {
 
+    /**
+     * Constructs a new {@code TFile} reader.
+     * This reader will use the default character set for decoding bytes to
+     * characters.
+     * 
+     * @param  file a file to read.
+     * @throws FileNotFoundException on any I/O failure.
+     */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
     public TFileReader(TFile file) throws FileNotFoundException {
 	super(new TFileInputStream(file));
     }
 
+    /**
+     * Constructs a new {@code TFile} reader.
+     * 
+     * @param  file a file to read.
+     * @param  charset a character set for decoding bytes to characters.
+     * @throws FileNotFoundException on any I/O failure.
+     * @since  TrueZIP 7.5
+     */
+    public TFileReader(TFile file, Charset charset)
+    throws FileNotFoundException {
+	super(new TFileInputStream(file), charset);
+    }
+
+    /**
+     * Constructs a new {@code TFile} reader.
+     * 
+     * @param  file a file to read.
+     * @param  decoder a decoder for decoding bytes to characters.
+     * @throws FileNotFoundException on any I/O failure.
+     */
     public TFileReader(TFile file, CharsetDecoder decoder)
     throws FileNotFoundException {
 	super(new TFileInputStream(file), decoder);
