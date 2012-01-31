@@ -88,12 +88,12 @@ public interface Link<T> {
         };
 
         /** Returns a new typed link to the given nullable target. */
-        public <T> Link<T> newLink(@CheckForNull T target) {
+        public <T> Link<T> newLink(T target) {
             return newLink(target, null);
         }
 
         /** Returns a new typed link to the given nullable target. */
-        abstract <T> Link<T> newLink(@CheckForNull T target, @CheckForNull ReferenceQueue<? super T> queue);
+        abstract <T> Link<T> newLink(T target, @CheckForNull ReferenceQueue<? super T> queue);
 
         /** A strong reference. */
         private static final class Strong<T> implements Link<T> {
