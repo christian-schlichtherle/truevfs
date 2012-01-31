@@ -182,10 +182,10 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         final FileEntry temp = begin();
 
-        @SuppressWarnings("deprecation")
         class SeekableByteChannel extends de.schlichtherle.truezip.io.IOExceptionSeekableByteChannel {
             boolean closed;
 
@@ -216,10 +216,10 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        @SuppressWarnings("deprecation")
         class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
             boolean closed;
 

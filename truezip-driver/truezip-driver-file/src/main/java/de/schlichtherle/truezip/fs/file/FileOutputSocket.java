@@ -142,10 +142,10 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        @SuppressWarnings("deprecation")
         class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
             boolean closed;
 
