@@ -21,12 +21,14 @@ import java.io.OutputStream;
  *
  * @since   TrueZIP 7.3.2
  * @author  Christian Schlichtherle
+ * @deprecated This class will be removed in TrueZIP 8.
  * @version $Id$
  */
 @DefaultAnnotation(NonNull.class)
 public class IOExceptionOutputStream extends DecoratingOutputStream {
 
     /** The nullable last I/O exception. */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     protected @CheckForNull IOException exception;
 
     /**
