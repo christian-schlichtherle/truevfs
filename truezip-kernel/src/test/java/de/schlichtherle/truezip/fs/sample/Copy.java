@@ -15,6 +15,8 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -33,6 +35,7 @@ import java.net.URI;
  * @author     Christian Schlichtherle
  * @version    $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public final class Copy {
 
     /** You cannot instantiate this class. */

@@ -14,6 +14,8 @@ import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +37,7 @@ import java.net.URISyntaxException;
  * @author     Christian Schlichtherle
  * @version    $Id$
  */
+@DefaultAnnotation(NonNull.class)
 public final class Cat {
 
     /** You cannot instantiate this class. */
