@@ -92,7 +92,7 @@ extends FsLockModelDecoratingController<
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         assert isWriteLockedByCurrentThread();
         waitIdle(options, handler);
         closeAll(handler);
@@ -167,6 +167,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void warn(IOException cause) throws X {
+                assert !(cause instanceof FsControllerException);
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
         } // FilterExceptionHandler

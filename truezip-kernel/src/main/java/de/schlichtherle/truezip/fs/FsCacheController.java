@@ -149,7 +149,7 @@ extends FsLockModelDecoratingController<
     public <X extends IOException> void sync(
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         beforeSync(options, handler);
         // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in the model
         // instead.
@@ -159,7 +159,7 @@ extends FsLockModelDecoratingController<
     private <X extends IOException> void
     beforeSync( final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws FsControllerException, X {
         assert isWriteLockedByCurrentThread();
         if (0 >= controllers.size())
             return;
@@ -173,6 +173,8 @@ extends FsLockModelDecoratingController<
                 if (flush) {
                     try {
                         controller.flush();
+                    } catch (FsControllerException ex) {
+                        throw ex;
                     } catch (IOException ex) {
                         throw handler.fail(new FsSyncException(getModel(), ex));
                     }
@@ -182,6 +184,8 @@ extends FsLockModelDecoratingController<
                     i.remove();
                     try {
                         controller.clear();
+                    } catch (FsControllerException ex) {
+                        throw ex;
                     } catch (IOException ex) {
                         handler.warn(new FsSyncWarningException(getModel(), ex));
                     }
