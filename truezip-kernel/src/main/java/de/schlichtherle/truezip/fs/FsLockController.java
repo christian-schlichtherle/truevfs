@@ -462,7 +462,7 @@ extends FsLockModelDecoratingController<
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockingSeekableByteChannel(
+                    return new LockSeekableByteChannel(
                             getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
@@ -499,7 +499,7 @@ extends FsLockModelDecoratingController<
             class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
-                    return new LockingReadOnlyFile(
+                    return new LockReadOnlyFile(
                             getBoundSocket().newReadOnlyFile());
                 }
             } // NewReadOnlyFile
@@ -512,7 +512,7 @@ extends FsLockModelDecoratingController<
             class NewInputStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
-                    return new LockingInputStream(
+                    return new LockInputStream(
                             getBoundSocket().newInputStream());
                 }
             } // NewInputStream
@@ -532,7 +532,7 @@ extends FsLockModelDecoratingController<
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockingSeekableByteChannel(
+                    return new LockSeekableByteChannel(
                             getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
@@ -569,7 +569,7 @@ extends FsLockModelDecoratingController<
             class NewOutputStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
-                    return new LockingOutputStream(
+                    return new LockOutputStream(
                             getBoundSocket().newOutputStream());
                 }
             } // NewOutputStream
@@ -578,9 +578,9 @@ extends FsLockModelDecoratingController<
         }
     } // Output
 
-    private final class LockingReadOnlyFile
+    private final class LockReadOnlyFile
     extends DecoratingReadOnlyFile {
-        LockingReadOnlyFile(ReadOnlyFile rof) {
+        LockReadOnlyFile(ReadOnlyFile rof) {
             super(rof);
         }
 
@@ -590,9 +590,9 @@ extends FsLockModelDecoratingController<
         }
     } // LockingReadOnlyFile
 
-    private final class LockingSeekableByteChannel
+    private final class LockSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        LockingSeekableByteChannel(SeekableByteChannel sbc) {
+        LockSeekableByteChannel(SeekableByteChannel sbc) {
             super(sbc);
         }
 
@@ -602,9 +602,9 @@ extends FsLockModelDecoratingController<
         }
     } // LockingSeekableByteChannel
 
-    private final class LockingInputStream
+    private final class LockInputStream
     extends DecoratingInputStream {
-        LockingInputStream(InputStream in) {
+        LockInputStream(InputStream in) {
             super(in);
         }
 
@@ -614,9 +614,9 @@ extends FsLockModelDecoratingController<
         }
     } // LockingInputStream
 
-    private final class LockingOutputStream
+    private final class LockOutputStream
     extends DecoratingOutputStream {
-        LockingOutputStream(OutputStream out) {
+        LockOutputStream(OutputStream out) {
             super(out);
         }
 
