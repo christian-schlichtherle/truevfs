@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.io.IOExceptionOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
@@ -146,7 +145,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        class OutputStream extends IOExceptionOutputStream {
+        class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
             boolean closed;
 
             OutputStream() throws FileNotFoundException {

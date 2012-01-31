@@ -13,8 +13,6 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.io.IOExceptionOutputStream;
-import de.schlichtherle.truezip.io.IOExceptionSeekableByteChannel;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -188,7 +186,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final FileEntry temp = begin();
 
         @SuppressWarnings("deprecation")
-        class SeekableByteChannel extends IOExceptionSeekableByteChannel {
+        class SeekableByteChannel extends de.schlichtherle.truezip.io.IOExceptionSeekableByteChannel {
             boolean closed;
 
             SeekableByteChannel() throws IOException {
@@ -222,7 +220,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final FileEntry temp = begin();
 
         @SuppressWarnings("deprecation")
-        class OutputStream extends IOExceptionOutputStream {
+        class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
             boolean closed;
 
             OutputStream() throws IOException {
