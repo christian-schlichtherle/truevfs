@@ -34,7 +34,7 @@ public final class TFileWriter extends OutputStreamWriter {
 
     /**
      * Constructs a new {@code TFile} writer.
-     * This writer will use the default character set for encoding characters
+     * This writer uses the default character set for encoding characters
      * to bytes.
      * 
      * @param  file a file to write.
@@ -47,7 +47,7 @@ public final class TFileWriter extends OutputStreamWriter {
 
     /**
      * Constructs a new {@code TFile} writer.
-     * This writer will use the default character set for encoding characters
+     * This writer uses the default character set for encoding characters
      * to bytes.
      * 
      * @param  file a file to write.
@@ -55,6 +55,7 @@ public final class TFileWriter extends OutputStreamWriter {
      *         given file.
      * @throws FileNotFoundException on any I/O failure.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
     public TFileWriter(TFile file, boolean append) throws FileNotFoundException {
         super(new TFileOutputStream(file, append));
     }

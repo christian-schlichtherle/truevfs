@@ -33,7 +33,7 @@ public final class TFileReader extends InputStreamReader {
 
     /**
      * Constructs a new {@code TFile} reader.
-     * This reader will use the default character set for decoding bytes to
+     * This reader uses the default character set for decoding bytes to
      * characters.
      * 
      * @param  file a file to read.
