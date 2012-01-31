@@ -295,7 +295,7 @@ public final class FsResourceAccountant {
                     } finally {
                         account.signalAll();
                     }
-                } catch (Exception discard) {
+                } catch (InterruptedException ignore) {
                 }
             }
         }
