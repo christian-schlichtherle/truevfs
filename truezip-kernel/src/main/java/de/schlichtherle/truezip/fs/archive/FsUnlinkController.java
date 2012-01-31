@@ -147,7 +147,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    public <X extends IOException> void sync(BitField<FsSyncOption> options, ExceptionHandler<? super FsSyncException, X> handler) throws X {
+    public <X extends IOException> void sync(BitField<FsSyncOption> options, ExceptionHandler<? super FsSyncException, X> handler) throws IOException {
         delegate.sync(options, handler);
     }
 }

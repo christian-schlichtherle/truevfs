@@ -241,7 +241,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     public <X extends IOException>
     void sync(  final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         final FsDefaultArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);

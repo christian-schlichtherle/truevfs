@@ -346,9 +346,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        // Mind there's no FsFalsePositiveException in the throws-declaration!
-        delegate.sync(options, handler);
+    throws IOException {
+        try {
+            delegate.sync(options, handler);
+        } catch (FsFalsePositiveException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private final class Input extends DecoratingInputSocket<Entry> {

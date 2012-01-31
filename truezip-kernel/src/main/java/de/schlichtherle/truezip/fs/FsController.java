@@ -41,7 +41,7 @@ import javax.swing.JTree;
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
  * controller's {@link #getModel() file system model}.
  * 
- * <h3>Transactional Support</h3>
+ * <h3>Transaction Support</h3>
  * <p>
  * Even on modern computers, I/O operations are inherently unreliable: They
  * can fail on hardware errors, network timeouts, third party interactions etc.
@@ -360,14 +360,13 @@ public abstract class FsController<M extends FsModel> {
      * method is called to check out any {@link FsSyncWarningException}, too.
      *
      * @param  options the synchronization options.
-     * @throws FsSyncException if committing the changes fails for any reason.
-     * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
-     *         and {@code FORCE_CLOSE_OUTPUT} is set.
+     * @throws FsSyncException if committing the changes fails because of any
+     *         I/O related failure.
+     * @throws IOException on any other (not necessarily I/O related) failure.
      */
     public final void
     sync(final BitField<FsSyncOption> options)
-    throws FsSyncException {
+    throws IOException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
@@ -387,21 +386,18 @@ public abstract class FsController<M extends FsModel> {
      *
      * @param  options a bit field of synchronization options.
      * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
+     *         {@code FsSyncException}s and mapping them to output
      *         {@code IOException}s.
      * @param  <X> The type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
-     * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set.
+     * @throws X at the discretion of the exception {@code handler}
+     *         upon the occurence of any {@link FsSyncException}.
+     * @throws IOException on any other (not necessarily I/O related) failure.
      */
     public abstract <X extends IOException> void
     sync(   BitField<FsSyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
-    throws X;
+    throws IOException;
 
     /**
      * Two file system controllers are considered equal if and only if they

@@ -241,7 +241,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         // No sync for sync required.
         delegate.sync(options, handler);
     }

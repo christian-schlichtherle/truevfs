@@ -90,7 +90,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         delegate.sync(options, handler);
         final KeyManager<?> manager = getKeyManager();
         final URI resource = driver.mountPointUri(getModel());

@@ -67,8 +67,8 @@ extends FsLockModelDecoratingController<
             : ThreadLocalToolFactory.OLD
                 ).newThreadLocalTool();
 
-    private final @CheckForNull ReadLock readLock;
-    private final @CheckForNull WriteLock writeLock;
+    private final ReadLock readLock;
+    private final WriteLock writeLock;
 
     /**
      * Constructs a new file system lock controller.
@@ -172,11 +172,21 @@ extends FsLockModelDecoratingController<
                         thread.locking = false;
                         lock.unlock();
                     }
-                } catch (NeedsLockRetryException discard) {
+                } catch (IOException ex) {
+                    if (!needsLockRetry(ex))
+                        throw ex;
                     thread.pause();
                 }
             }
         }
+    }
+
+    private static boolean needsLockRetry(Throwable t) {
+        do {
+            if (t instanceof NeedsLockRetryException)
+                return true;
+        } while (null != (t = t.getCause()));
+        return false;
     }
 
     @Override
@@ -367,7 +377,7 @@ extends FsLockModelDecoratingController<
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         class Sync implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
@@ -378,8 +388,8 @@ extends FsLockModelDecoratingController<
 
         try {
             writeLocked(new Sync());
-        } catch (NeedsLockRetryException ex) {
-            throw new AssertionError(ex);
+        } catch (FsControllerException ex) {
+            throw ex;
         } catch (IOException ex) {
             throw (X) ex;
         }

@@ -117,6 +117,7 @@ extends FsFileSystemArchiveController<E> {
     }
 
     private void setInputArchive(final @CheckForNull InputArchive<E> inputArchive) {
+        assert null == inputArchive || null == this.inputArchive;
         this.inputArchive = inputArchive;
         if (null != inputArchive)
             setTouched(true);
@@ -127,6 +128,7 @@ extends FsFileSystemArchiveController<E> {
     }
 
     private void setOutputArchive(final @CheckForNull OutputArchive<E> outputArchive) {
+        assert null == outputArchive || null == this.outputArchive;
         this.outputArchive = outputArchive;
         if (null != outputArchive)
             setTouched(true);
@@ -154,6 +156,7 @@ extends FsFileSystemArchiveController<E> {
     @Override
     void mount(final boolean autoCreate) throws IOException {
         // HC SUNT DRACONES!
+        FsArchiveFileSystem<E> fs;
         try {
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property changes
@@ -161,13 +164,12 @@ extends FsFileSystemArchiveController<E> {
             final boolean readOnly = !parent.isWritable(name);
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, name, MOUNT_INPUT_OPTIONS);
+            final Entry rootTemplate = socket.getLocalTarget();
             final InputArchive<E> ia = new InputArchive<E>(
                     driver.newInputShop(getModel(), socket));
             setInputArchive(ia);
-            setFileSystem(newPopulatedFileSystem(driver,
-                    ia.getDriverProduct(),
-                    socket.getLocalTarget(),
-                    readOnly));
+            fs = newPopulatedFileSystem(
+                    driver, ia.getDriverProduct(), rootTemplate, readOnly);
         } catch (FsControllerException ex) {
             assert !(ex instanceof FsFalsePositiveException);
             throw ex;
@@ -194,9 +196,10 @@ extends FsFileSystemArchiveController<E> {
             // This may fail if the container file is an RAES encrypted ZIP
             // file and the user cancels password prompting.
             makeOutput();
-            setFileSystem(newEmptyFileSystem(driver));
+            fs = newEmptyFileSystem(driver);
         }
-        getFileSystem().addFsArchiveFileSystemTouchListener(touchListener);
+        fs.addFsArchiveFileSystemTouchListener(touchListener);
+        setFileSystem(fs);
     }
 
     /**
@@ -295,16 +298,11 @@ extends FsFileSystemArchiveController<E> {
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         try {
-            if (!options.get(ABORT_CHANGES))
-                performSync(handler);
+            copy(options, handler);
         } finally {
-            commitSync(handler);
-            // TODO: Remove a condition and clear a flag in the model
-            // instead.
-            if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-                setTouched(false);
+            commit(options, handler);
         }
     }
 
@@ -321,7 +319,8 @@ extends FsFileSystemArchiveController<E> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    performSync(final ExceptionHandler<? super FsSyncException, X> handler)
+    copy(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         class FilterExceptionHandler
         implements ExceptionHandler<IOException, X> {
@@ -330,12 +329,15 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public X fail(final IOException cause) {
                 assert false : "should not get used by copy()";
+                assert null != cause;
+                assert !(cause instanceof FsControllerException);
                 return handler.fail(new FsSyncException(getModel(), cause));
             }
 
             @Override
             public void warn(final IOException cause) throws X {
                 assert null != cause;
+                assert !(cause instanceof FsControllerException);
                 if (null != warning || !(cause instanceof InputException))
                     throw handler.fail(new FsSyncException(getModel(), cause));
                 warning = cause;
@@ -343,12 +345,14 @@ extends FsFileSystemArchiveController<E> {
             }
         } // FilterExceptionHandler
 
+        if (options.get(ABORT_CHANGES))
+            return;
         final OutputArchive<E> oa = getOutputArchive();
         if (null == oa)
             return;
         final InputArchive<E> ia = getInputArchive();
         copy(   getFileSystem(),
-                null == ia ? new DummyInputArchive<E>() : ia.getDriverProduct(),
+                null != ia ? ia.getDriverProduct() : new DummyInputArchive<E>(),
                 oa.getDriverProduct(),
                 new FilterExceptionHandler());
     }
@@ -410,30 +414,36 @@ extends FsFileSystemArchiveController<E> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    commitSync(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        try {
-            final InputArchive<E> ia = getInputArchive();
-            if (null != ia) {
-                try {
-                    ia.close();
-                } catch (IOException ex) {
-                    handler.warn(new FsSyncWarningException(getModel(), ex));
-                }
+    commit( final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
+    throws FsControllerException, X {
+        final InputArchive<E> ia = getInputArchive();
+        if (null != ia) {
+            try {
+                ia.close();
+                setInputArchive(null);
+            } catch (FsControllerException ex) {
+                throw ex;
+            } catch (IOException ex) {
+                handler.warn(new FsSyncWarningException(getModel(), ex));
             }
-            setInputArchive(null);
-        } finally {
-            final OutputArchive<E> oa = getOutputArchive();
-            if (null != oa) {
-                try {
-                    oa.close();
-                } catch (IOException ex) {
-                    throw handler.fail(new FsSyncException(getModel(), ex));
-                }
+        }
+        final OutputArchive<E> oa = getOutputArchive();
+        if (null != oa) {
+            try {
+                oa.close();
+                setOutputArchive(null);
+            } catch (FsControllerException ex) {
+                throw ex;
+            } catch (IOException ex) {
+                throw handler.fail(new FsSyncException(getModel(), ex));
             }
-            setOutputArchive(null);
         }
         setFileSystem(null);
+        // TODO: Remove a condition and clear a flag in the model
+        // instead.
+        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+            setTouched(false);
     }
 
     /**
@@ -448,10 +458,9 @@ extends FsFileSystemArchiveController<E> {
             return 0;
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
         @Override
         public Iterator<E> iterator() {
-            return (Iterator) Collections.emptyList().iterator();
+            return Collections.<E>emptyList().iterator();
         }
 
         @Override
