@@ -96,9 +96,10 @@ implements Iterable<FsController<?>> {
      * @param  options a bit field of synchronization options.
      * @throws FsSyncException if committing the changes fails for any reason.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FORCE_CLOSE_INPUT} is cleared
-     *         and {@code FORCE_CLOSE_OUTPUT} is set or if the synchronization
-     *         option {@code ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if
+     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} is cleared and
+     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT} is set or if the
+     *         synchronization option {@link FsSyncOption#ABORT_CHANGES} is set.
      */
     public final void
     sync(BitField<FsSyncOption> options) throws FsSyncException {
@@ -120,17 +121,17 @@ implements Iterable<FsController<?>> {
      *
      * @param  options a bit field of synchronization options.
      * @param  handler the exception handling strategy for consuming input
-     *         {@code IOException}s and/or assembling output
+     *         {@code IOException}s and mapping them to output
      *         {@code IOException}s.
      * @param  <X> The type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@code IOException}.
+     * @throws X at the discretion of the exception {@code handler}
+     *         upon the occurence of any {@code IOException}.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} is cleared and
+     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT} is set or if the
+     *         synchronization option {@link FsSyncOption#ABORT_CHANGES} is set.
      */
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
