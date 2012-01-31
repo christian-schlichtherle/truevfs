@@ -81,7 +81,7 @@ public final class TFileWriter extends OutputStreamWriter {
      * @param  file a file to write.
      * @param  append iff {@code true}, then this writer appends the data to the
      *         given file.
-     * @param  encode an encoder for encoding characters to bytes.
+     * @param  encoder an encoder for encoding characters to bytes.
      * @throws FileNotFoundException on any I/O failure.
      */
     public TFileWriter(TFile file, boolean append, CharsetEncoder encoder)
