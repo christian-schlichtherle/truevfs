@@ -340,6 +340,7 @@ public final class TConfig implements Closeable {
      * @deprecated This public class property is solely intended to be used by
      *             the TrueZIP&nbsp;Path module and should never be used by
      *             client applications.
+     * @since      TrueZIP 7.5
      */
     @Deprecated
     public static FsManager getCurrentManager() {
