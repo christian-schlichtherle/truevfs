@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -27,7 +28,7 @@ public class RaesKeyException extends RaesParametersException {
      * 
      * @param msg the detail message.
      */
-    public RaesKeyException(String msg) {
+    public RaesKeyException(@CheckForNull String msg) {
         super(msg);
     }
 
@@ -37,7 +38,7 @@ public class RaesKeyException extends RaesParametersException {
      * 
      * @param cause the cause for this exception to get thrown.
      */
-    public RaesKeyException(Throwable cause) {
+    public RaesKeyException(@CheckForNull Throwable cause) {
         super(cause);
     }
 }

@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.crypto.raes.param;
 
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -21,7 +19,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class AesCipherParameters
 extends SafePbeParameters<KeyStrength, AesCipherParameters> {
 

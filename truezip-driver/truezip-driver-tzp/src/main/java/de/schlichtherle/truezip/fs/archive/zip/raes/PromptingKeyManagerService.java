@@ -13,8 +13,6 @@ import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.PromptingKeyManager;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.GraphicsEnvironment;
 import java.util.Map;
 import net.jcip.annotations.Immutable;
@@ -27,7 +25,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public final class PromptingKeyManagerService extends KeyManagerService {
 
     private final Map<Class<?>, KeyManager<?>> managers;

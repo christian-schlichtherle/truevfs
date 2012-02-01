@@ -29,8 +29,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +42,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public abstract class ZipRaesDriver extends JarDriver {
 
     /**

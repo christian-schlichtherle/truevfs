@@ -8,25 +8,21 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import net.jcip.annotations.NotThreadSafe;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.*;
+import net.jcip.annotations.NotThreadSafe;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class MockType0RaesParameters implements Type0RaesParameters {
 
-    private static final Logger logger = Logger.getLogger(
-            MockType0RaesParameters.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(MockType0RaesParameters.class.getName());
     private static final String PASSWD = "secret";
     private static final KeyStrength[] keyStrengths = KeyStrength.values();
 
@@ -61,7 +57,9 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
     }
 
     @Override
-    public void setKeyStrength(KeyStrength keyStrength) {
-        assertTrue(null == this.keyStrength || this.keyStrength == keyStrength);
+    public void setKeyStrength(final KeyStrength keyStrength) {
+        assertTrue(
+                "null != this.keyStrength(" + this.keyStrength + ") && this.keyStrength != keyStrength(" + keyStrength + ")",
+                null == this.keyStrength || this.keyStrength == keyStrength);
     }
 }

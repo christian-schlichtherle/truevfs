@@ -15,8 +15,6 @@ import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -63,7 +61,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
 
     RaesReadOnlyFile(@CheckForNull ReadOnlyFile rof) {

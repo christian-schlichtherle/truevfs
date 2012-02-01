@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * These {@link RaesParameters} delegate to some other instance of a
@@ -24,7 +22,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface RaesParametersProvider extends RaesParameters {
 
     /**

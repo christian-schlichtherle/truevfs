@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.crypto.raes;
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
@@ -28,7 +26,6 @@ import org.bouncycastle.crypto.Mac;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class RaesOutputStream extends CipherOutputStream {
 
     /**

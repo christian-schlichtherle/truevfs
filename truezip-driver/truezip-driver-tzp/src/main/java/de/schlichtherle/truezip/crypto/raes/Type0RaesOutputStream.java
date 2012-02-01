@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
 import static de.schlichtherle.truezip.crypto.raes.Constants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
@@ -39,7 +37,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class Type0RaesOutputStream extends RaesOutputStream {
 
     /**
