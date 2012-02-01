@@ -31,8 +31,8 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 
 /**
- * Provides static utility methods to set passwords for RAES encrypted ZIP
- * files programmatically.
+ * Provides static utility methods to set passwords for WinZip AES encrypted
+ * ZIP entries programmatically.
  * Use whatever approach fits your needs best when you want to set the password
  * programmatically instead of prompting the user for a key by means of the
  * default Swing or Console based user interfaces.
