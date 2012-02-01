@@ -79,7 +79,7 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
     }
 
     @After
-    public void tearDown() throws IOException {
+    public void tearDown() {
         if (file.exists() && !file.delete())
             logger.log(Level.WARNING, "{0} (could not delete)", file);
     }
