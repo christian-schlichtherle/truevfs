@@ -32,7 +32,8 @@ public final class ZipRaesIT extends ZipTestBase {
     /** Cipher text shorter than this gets authenticated. */
     private static int AUTHENTICATION_TRIGGER = 512 * 1024;
     
-    private static final RaesParameters raesParameters = new MockType0RaesParameters();
+    // Must not be static to enable parallel testing!
+    private final RaesParameters raesParameters = new MockType0RaesParameters();
 
     @Override
     protected ZipOutputStream newZipOutputStream(final OutputStream out)
