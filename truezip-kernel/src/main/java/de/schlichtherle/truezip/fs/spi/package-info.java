@@ -7,8 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Provides an abstract class for locatable file system driver service
- * providers and a locatable file system manager service provider.
+ * Provides abstract classes for locatable service providers for a file system
+ * manager and file system providers.
  * <p>
  * Note that the TrueZIP Kernel module has no dependency on this package
  * - so using it is entirely optional.
