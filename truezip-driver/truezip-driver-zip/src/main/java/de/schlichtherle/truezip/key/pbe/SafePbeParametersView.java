@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.key.pbe;
 
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -22,7 +20,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class SafePbeParametersView<P extends SafePbeParameters<?, P>>
 implements View<P> {
 

@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -24,7 +25,7 @@ public class ZipAuthenticationException extends ZipCryptoException {
     /**
      * Constructs a ZIP authentication exception with the given detail message.
      */
-    public ZipAuthenticationException(String msg) {
+    public ZipAuthenticationException(@CheckForNull String msg) {
         super(msg);
     }
 }

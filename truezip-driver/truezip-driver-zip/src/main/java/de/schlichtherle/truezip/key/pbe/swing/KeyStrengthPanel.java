@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ResourceBundle;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -24,7 +22,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 @SuppressWarnings("UseOfObsoleteCollectionType")
 public class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
     private static final long serialVersionUID = 5629581723148235643L;

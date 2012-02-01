@@ -15,8 +15,6 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * ZIP archive entries apply the date/time conversion rules as defined by
@@ -27,7 +25,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
 
     public ZipArchiveEntry(String name) {

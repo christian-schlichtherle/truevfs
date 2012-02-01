@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -31,7 +29,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public class CheckedJarDriver extends JarDriver {
 
     public CheckedJarDriver(IOPoolProvider ioPoolProvider) {

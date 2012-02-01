@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.io.swing.FileComboBoxBrowser;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
@@ -32,7 +30,6 @@ import javax.swing.text.JTextComponent;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class AuthenticationPanel extends JPanel {
 
     private static final long serialVersionUID = 3876515923659236921L;

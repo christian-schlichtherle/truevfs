@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -25,7 +26,7 @@ public class KeyPromptingInterruptedException extends UnknownKeyException  {
         super("Key prompting has been interrupted!");
     }
 
-    public KeyPromptingInterruptedException(Throwable cause) {
+    public KeyPromptingInterruptedException(@CheckForNull Throwable cause) {
         super("Key prompting has been interrupted!");
         super.initCause(cause);
     }

@@ -25,8 +25,6 @@ import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,7 +45,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class ZipOutputShop
 extends RawZipOutputStream<ZipArchiveEntry>
 implements OutputShop<ZipArchiveEntry> {

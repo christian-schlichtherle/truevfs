@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.key.pbe;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.key.SafeKey;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
 import net.jcip.annotations.NotThreadSafe;
@@ -26,7 +24,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class SafePbeParameters<
         S extends KeyStrength,
         P extends SafePbeParameters<S, P>>

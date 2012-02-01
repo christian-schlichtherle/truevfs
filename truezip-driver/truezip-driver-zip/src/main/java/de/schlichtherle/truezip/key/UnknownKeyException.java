@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.security.GeneralSecurityException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -26,11 +27,11 @@ public class UnknownKeyException extends GeneralSecurityException {
     UnknownKeyException() {
     }
 
-    protected UnknownKeyException(String msg) {
+    protected UnknownKeyException(@CheckForNull String msg) {
         super(msg);
     }
 
-    public UnknownKeyException(Throwable cause) {
+    public UnknownKeyException(@CheckForNull Throwable cause) {
         super(cause);
     }
 }

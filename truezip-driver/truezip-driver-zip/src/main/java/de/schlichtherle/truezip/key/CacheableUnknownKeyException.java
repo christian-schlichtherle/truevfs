@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -25,7 +26,7 @@ public class CacheableUnknownKeyException extends UnknownKeyException {
     CacheableUnknownKeyException() {
     }
 
-    CacheableUnknownKeyException(String message) {
+    CacheableUnknownKeyException(@CheckForNull String message) {
         super(message);
     }
 }

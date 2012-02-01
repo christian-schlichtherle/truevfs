@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.key;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 import java.util.HashMap;
@@ -23,7 +21,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class SafeKeyManager<K extends SafeKey<K>, P extends SafeKeyProvider<K>>
 implements KeyManager<K> {
 

@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.security.GeneralSecurityException;
 
 /**
@@ -20,9 +21,9 @@ public class WeakKeyException extends GeneralSecurityException {
     private static final long serialVersionUID = 2946387652018652745L;
 
     /**
-     * Creates a new {@code WeakKeyException} with the given localized message.
+     * Creates a new {@code WeakKeyException} with the given message.
      */
-    public WeakKeyException(String localizedMessage) {
-        super(localizedMessage);
+    public WeakKeyException(@CheckForNull String message) {
+        super(message);
     }
 }

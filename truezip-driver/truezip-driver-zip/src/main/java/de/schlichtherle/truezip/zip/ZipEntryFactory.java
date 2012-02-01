@@ -8,9 +8,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
-
 /**
  * A factory for {@link ZipEntry}s.
  *
@@ -18,7 +15,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface ZipEntryFactory<E extends ZipEntry> extends ZipParameters {
 
     /**

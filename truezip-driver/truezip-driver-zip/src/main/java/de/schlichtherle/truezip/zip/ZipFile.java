@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,7 +47,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class ZipFile extends RawZipFile<ZipEntry> {
 
     private @CheckForNull ZipCryptoParameters cryptoParameters;

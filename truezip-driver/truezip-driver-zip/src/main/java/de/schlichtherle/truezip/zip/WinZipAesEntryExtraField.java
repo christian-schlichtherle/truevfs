@@ -9,10 +9,9 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
-import static de.schlichtherle.truezip.crypto.param.AesKeyStrength.*;
-import static de.schlichtherle.truezip.zip.LittleEndian.*;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import static de.schlichtherle.truezip.crypto.param.AesKeyStrength.BITS_128;
+import static de.schlichtherle.truezip.zip.LittleEndian.readUShort;
+import static de.schlichtherle.truezip.zip.LittleEndian.writeShort;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -26,7 +25,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class WinZipAesEntryExtraField extends ExtraField {
 
     private static final int DATA_SIZE = 7;

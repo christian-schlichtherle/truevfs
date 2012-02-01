@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.zip;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
@@ -26,7 +24,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class Crc32OutputStream extends CheckedOutputStream {
     Crc32OutputStream(@CheckForNull OutputStream out) {
         super(out, new CRC32());

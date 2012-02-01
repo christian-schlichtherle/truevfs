@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.key.AbstractKeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +26,6 @@ import java.util.Map;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class KeyManagerService extends AbstractKeyManagerProvider {
 
     /**

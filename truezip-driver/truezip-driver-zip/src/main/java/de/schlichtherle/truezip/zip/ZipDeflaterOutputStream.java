@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.util.JSE7;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
-import static java.util.zip.Deflater.*;
+import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
 import java.util.zip.DeflaterOutputStream;
 
 /**

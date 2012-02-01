@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -25,7 +26,7 @@ public class KeyPromptingTimeoutException extends UnknownKeyException {
         super("Key prompting has timed out!");
     }
 
-    public KeyPromptingTimeoutException(Throwable cause) {
+    public KeyPromptingTimeoutException(@CheckForNull Throwable cause) {
         super("Key prompting has timed out!");
         super.initCause(cause);
     }
