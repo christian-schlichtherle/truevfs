@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.fs.inst.jul;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.socket.IOPool;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.util.logging.Level;
@@ -24,7 +22,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 final class JulInputByteChannel<E extends Entry>
 extends DecoratingSeekableByteChannel {
     private static final Logger logger = Logger

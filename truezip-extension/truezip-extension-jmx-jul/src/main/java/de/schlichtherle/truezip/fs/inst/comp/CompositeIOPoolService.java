@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.fs.inst.jmx.JmxDirector;
 import de.schlichtherle.truezip.fs.inst.jul.JulDirector;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -21,7 +19,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public final class CompositeIOPoolService extends IOPoolService {
 
     private static final IOPoolService SERVICE;

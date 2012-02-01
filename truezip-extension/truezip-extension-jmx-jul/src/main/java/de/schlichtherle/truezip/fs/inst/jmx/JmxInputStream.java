@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import net.jcip.annotations.NotThreadSafe;
@@ -20,7 +18,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class JmxInputStream extends DecoratingInputStream {
     private final JmxIOStatistics stats;
 

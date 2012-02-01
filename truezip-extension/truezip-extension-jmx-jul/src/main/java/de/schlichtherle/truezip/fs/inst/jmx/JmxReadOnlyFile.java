@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -20,7 +18,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class JmxReadOnlyFile extends DecoratingReadOnlyFile {
     private final JmxIOStatistics stats;
 
