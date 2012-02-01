@@ -7,7 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Provides a singleton to locate an I/O pool service provider.
+ * Provides a singleton to locate an I/O buffer pool service provider on the
+ * class path.
  * <p>
  * Note that the TrueZIP Kernel module has no dependency on this package
  * - so using it is entirely optional.

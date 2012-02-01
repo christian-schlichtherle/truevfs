@@ -7,7 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * Provides an abstract class for a locatable I/O pool service provider.
+ * Provides an abstract class for a locatable service provider for an
+ * I/O buffer pool.
  * <p>
  * Note that the TrueZIP Kernel module has no dependency on this package
  * - so using it is entirely optional.
