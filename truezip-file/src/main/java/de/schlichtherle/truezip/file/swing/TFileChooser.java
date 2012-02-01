@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +24,8 @@ import javax.swing.filechooser.FileSystemView;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class TFileChooser extends JFileChooser {
     private static final long serialVersionUID = 936528972682036204L;
-
-    //private transient volatile short paintingDisabled; // = false;
 
     public TFileChooser() {
         this(null, null);
