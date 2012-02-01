@@ -52,7 +52,7 @@ public final class ZipRaesFileIT extends TFileTestBase<TestZipRaesDriver> {
     }
 
     @Override
-    public void tearDown() throws IOException {
+    public void tearDown() {
         try {
             view.setAction(ENTER);
         } finally {
