@@ -27,8 +27,6 @@ import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import static java.io.File.separator;
@@ -108,7 +106,6 @@ import net.jcip.annotations.Immutable;
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-@DefaultAnnotation(NonNull.class)
 public final class TPath implements Path {
 
     private static final TPathComparator COMPARATOR = '\\' == separatorChar

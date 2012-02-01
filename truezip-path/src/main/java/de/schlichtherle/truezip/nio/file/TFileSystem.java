@@ -23,8 +23,6 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +33,7 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.util.*;
+import net.jcip.annotations.NotThreadSafe;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -45,7 +44,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class TFileSystem extends FileSystem {
 
     private final FsController<?> controller;
@@ -317,9 +315,10 @@ public final class TFileSystem extends FileSystem {
         if (null == entry || null == (set = entry.getMembers()))
             throw new NotDirectoryException(path.toString());
 
+        @NotThreadSafe
         class Adapter implements Iterator<Path> {
             final Iterator<String> i = set.iterator();
-            Path next;
+            @CheckForNull Path next;
 
             @Override
             public boolean hasNext() {
@@ -496,8 +495,7 @@ public final class TFileSystem extends FileSystem {
         private final FsEntry entry;
 
         FsEntryAttributes(final TPath path) throws IOException {
-            if (null == (entry = getController().getEntry(
-                    path.getEntryName())))
+            if (null == (entry = getController().getEntry(path.getEntryName())))
                 throw new NoSuchFileException(path.toString());
         }
 
