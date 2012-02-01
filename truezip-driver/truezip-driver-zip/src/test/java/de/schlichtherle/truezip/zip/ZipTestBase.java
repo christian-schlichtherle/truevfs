@@ -35,8 +35,8 @@ import org.junit.Test;
  */
 public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
 
-    private static final Logger logger
-            = Logger.getLogger(ZipTestBase.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(ZipTestBase.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -46,9 +46,8 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
     private static final byte[] DATA;
     static {
         final String text = "This is a truly compressible text!\n";
-        final int count = 1024 / text.length();
-        final int length = count * text.length(); // rounded down
-        StringBuilder buf = new StringBuilder(length);
+        final int count = 1024 / text.length(); // round down
+        final StringBuilder buf = new StringBuilder(count * text.length());
         for (int i = 0; i < count; i++)
             buf.append(text);
         DATA = buf.toString().getBytes();
