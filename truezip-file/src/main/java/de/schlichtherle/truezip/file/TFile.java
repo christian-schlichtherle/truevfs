@@ -27,8 +27,6 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -327,9 +325,7 @@ import net.jcip.annotations.Immutable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @Immutable
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TFile extends File {
 
     private static final long serialVersionUID = 3617072259051821745L;
@@ -358,9 +354,9 @@ public final class TFile extends File {
     private transient File delegate;
 
     private transient TArchiveDetector detector;
-    private transient @Nullable TFile innerArchive;
-    private transient @Nullable TFile enclArchive;
-    private transient @Nullable FsEntryName enclEntryName;
+    private transient @CheckForNull TFile innerArchive;
+    private transient @CheckForNull TFile enclArchive;
+    private transient @CheckForNull FsEntryName enclEntryName;
 
     /**
      * This refers to the file system controller if and only if this file
@@ -369,7 +365,8 @@ public final class TFile extends File {
      *
      * @see #readObject
      */
-    private transient volatile @Nullable FsController<?> controller;
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    private transient volatile @CheckForNull FsController<?> controller;
 
     /**
      * Copy constructor.
@@ -773,7 +770,7 @@ public final class TFile extends File {
             final StringBuilder enclEntryNameBuf,
             final Splitter splitter) {
         if (path == null) {
-            assert enclArchive == null;
+            assert null == enclArchive;
             enclEntryNameBuf.setLength(0);
             return;
         }
@@ -803,6 +800,7 @@ public final class TFile extends File {
                     enclArchive = ancestor.innerArchive;
                     if (!ancestor.isArchive()) {
                         if (ancestor.isEntry()) {
+                            assert null != ancestor.enclEntryName;
                             if (0 < enclEntryNameBuf.length()) {
                                 enclEntryNameBuf.insert(0, '/');
                                 enclEntryNameBuf.insert(0, ancestor.enclEntryName.getPath());
@@ -812,7 +810,7 @@ public final class TFile extends File {
                                 enclEntryNameBuf.append(ancestor.enclEntryName.getPath());
                             }
                         } else {
-                            assert enclArchive == null;
+                            assert null == enclArchive;
                             enclEntryNameBuf.setLength(0);
                         }
                     } else if (0 >= enclEntryNameBuf.length()) { // TODO: Simplify this!
@@ -883,6 +881,12 @@ public final class TFile extends File {
      * @return {@code true}
      */
     private boolean invariants() {
+        // Thread-safe caching
+        final File delegate = this.delegate;
+        final TFile innerArchive = this.innerArchive;
+        final TFile enclArchive = this.enclArchive;
+        final FsEntryName enclEntryName = this.enclEntryName;
+
         assert null != delegate;
         assert !(delegate instanceof TFile);
         assert delegate.getPath().equals(super.getPath());
@@ -1612,6 +1616,7 @@ public final class TFile extends File {
                     + "\"! Check run-time class path configuration.");
         final FsMountPoint mountPoint;
         try {
+            assert (null != enclArchive) == (null != enclEntryName);
             mountPoint = new FsMountPoint(scheme, null == enclArchive
                     ? new FsPath(   delegate)
                     : new FsPath(   enclArchive .getController()
@@ -1818,7 +1823,7 @@ public final class TFile extends File {
      * part of the path which actually may (but does not need to) exist
      * as a plain file in the platform file system.
      */
-    public TFile getTopLevelArchive() {
+    public @Nullable TFile getTopLevelArchive() {
         final TFile enclArchive = this.enclArchive;
         return null != enclArchive
                 ? enclArchive.getTopLevelArchive()
@@ -1904,6 +1909,7 @@ public final class TFile extends File {
             if (this == innerArchive) {
                 final FsScheme scheme = getScheme();
                 if (null != enclArchive) {
+                    assert null != enclEntryName;
                     return new FsMountPoint(
                             scheme,
                             new FsPath(
@@ -1913,6 +1919,7 @@ public final class TFile extends File {
                     return new FsMountPoint(scheme, new FsPath(delegate)).toUri();
                 }
             } else if (null != enclArchive) {
+                assert null != enclEntryName;
                 return new FsPath(
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName).toUri();
@@ -1936,6 +1943,7 @@ public final class TFile extends File {
             if (this == innerArchive) {
                 final FsScheme scheme = getScheme();
                 if (null != enclArchive) {
+                    assert null != enclEntryName;
                     return new FsPath(
                             new FsMountPoint(
                                 scheme,
@@ -1949,6 +1957,7 @@ public final class TFile extends File {
                             ROOT);
                 }
             } else if (null != enclArchive) {
+                assert null != enclEntryName;
                 return new FsPath(
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName);
@@ -1963,6 +1972,7 @@ public final class TFile extends File {
     private @Nullable FsScheme getScheme() {
         if (this != innerArchive)
             return null;
+        final FsController controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
         return detector.getScheme(delegate.getPath());
@@ -2612,6 +2622,7 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      */
     public TFile mkdir(final boolean recursive) throws IOException {
+        final TFile innerArchive = this.innerArchive;
         if (null != innerArchive) {
             if (recursive) {
                 final TFile parent = getParentFile();
