@@ -15,6 +15,5 @@ package de.schlichtherle.truezip.key.pbe.swing;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@SuppressWarnings("MarkerInterface")
 public interface UnknownKeyFeedback extends Feedback {
 }
