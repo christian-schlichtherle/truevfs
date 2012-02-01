@@ -8,18 +8,12 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Component;
 import java.awt.EventQueue;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.netbeans.jemmy.JemmyProperties;
 import org.netbeans.jemmy.TestOut;
 import org.netbeans.jemmy.drivers.ButtonDriver;
@@ -42,7 +36,6 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class JemmyUtils {
 
     protected static final long WAIT_EMPTY = 100;

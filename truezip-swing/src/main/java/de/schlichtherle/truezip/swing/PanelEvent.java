@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.AWTEvent;
 
 /**
@@ -30,7 +28,6 @@ import java.awt.AWTEvent;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class PanelEvent extends AWTEvent {
 
     private static final long serialVersionUID = -7614118389065035365L;

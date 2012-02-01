@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.swing;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
@@ -47,7 +45,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class AbstractComboBoxBrowser<E> implements Serializable {
 
     private static final long serialVersionUID = 1065103960246722893L;
