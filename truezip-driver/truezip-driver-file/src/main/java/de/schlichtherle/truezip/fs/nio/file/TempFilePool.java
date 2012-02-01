@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.fs.nio.file;
 
 import de.schlichtherle.truezip.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import static java.nio.file.Files.createTempFile;
@@ -29,7 +27,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class TempFilePool implements IOPool<FileEntry> {
 
     private static final Path TEMP_DIR
