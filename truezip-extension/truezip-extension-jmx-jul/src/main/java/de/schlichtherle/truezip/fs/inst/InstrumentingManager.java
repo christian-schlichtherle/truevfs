@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.fs.inst;
 
 import de.schlichtherle.truezip.fs.*;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -18,7 +16,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public class InstrumentingManager
 extends FsDecoratingManager<FsManager> {
 

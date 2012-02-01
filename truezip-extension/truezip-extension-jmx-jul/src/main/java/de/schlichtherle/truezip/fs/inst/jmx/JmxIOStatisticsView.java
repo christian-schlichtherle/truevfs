@@ -9,12 +9,9 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.fs.FsManager;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Hashtable;
 import javax.management.*;
 import net.jcip.annotations.ThreadSafe;
 
@@ -26,7 +23,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class JmxIOStatisticsView
 extends StandardMBean
 implements JmxIOStatisticsMXBean {
@@ -73,7 +69,8 @@ implements JmxIOStatisticsMXBean {
             throw new NullPointerException();
         final long time = model.getTimeCreatedMillis();
         @SuppressWarnings("UseOfObsoleteCollectionType")
-        final Hashtable<String, String> table = new Hashtable<String, String>(2 * 4 / 3 + 1);
+        final java.util.Hashtable<String, String>
+                table = new java.util.Hashtable<String, String>(2 * 4 / 3 + 1);
         table.put("type", type);
         //table.put("id", "" + time);
         table.put("name", ObjectName.quote(format(time)));

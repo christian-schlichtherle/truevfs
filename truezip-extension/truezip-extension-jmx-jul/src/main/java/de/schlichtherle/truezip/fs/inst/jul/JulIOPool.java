@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.fs.inst.jul;
 import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
@@ -23,7 +21,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 final class JulIOPool<E extends Entry<E>>
 extends InstrumentingIOPool<E, JulDirector> {
 

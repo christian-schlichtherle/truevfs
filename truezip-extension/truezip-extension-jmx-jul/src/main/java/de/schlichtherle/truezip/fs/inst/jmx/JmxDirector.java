@@ -17,8 +17,6 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.lang.management.ManagementFactory;
 import javax.management.*;
 import net.jcip.annotations.ThreadSafe;
@@ -28,7 +26,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private static final String APPLICATION_IO_STATISTICS = "ApplicationIOStatistics";

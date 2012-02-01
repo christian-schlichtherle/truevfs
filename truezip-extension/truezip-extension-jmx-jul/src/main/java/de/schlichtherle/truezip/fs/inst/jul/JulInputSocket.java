@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.inst.InstrumentingInputSocket;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import net.jcip.annotations.Immutable;
@@ -23,7 +21,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 class JulInputSocket<E extends Entry>
 extends InstrumentingInputSocket<E> {
 

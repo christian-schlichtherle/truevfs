@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +22,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 final class JulOutputStream<E extends Entry>
 extends DecoratingOutputStream {
     private static final Logger

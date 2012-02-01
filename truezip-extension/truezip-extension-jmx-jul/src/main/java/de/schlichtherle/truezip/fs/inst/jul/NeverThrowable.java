@@ -13,8 +13,7 @@ package de.schlichtherle.truezip.fs.inst.jul;
  * @version $Id$
  */
 public final class NeverThrowable extends Throwable {
-
-    private static final long serialVersionUID = 8475247249857263463L; // make lint happy
+    private static final long serialVersionUID = 8475247249857263463L;
 
     public NeverThrowable() {
         super("Relax, this throwable has just been created for the following stack trace and is never thrown:");

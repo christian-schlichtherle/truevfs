@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.fs.inst.jul;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.inst.InstrumentingOutputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.Immutable;
@@ -22,7 +20,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 class JulOutputSocket<E extends Entry>
 extends InstrumentingOutputSocket<E> {
 

@@ -13,8 +13,6 @@ import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.inst.InstrumentingManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -23,7 +21,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 final class JmxManager extends InstrumentingManager {
 
     @SuppressWarnings("LeakingThisInConstructor")

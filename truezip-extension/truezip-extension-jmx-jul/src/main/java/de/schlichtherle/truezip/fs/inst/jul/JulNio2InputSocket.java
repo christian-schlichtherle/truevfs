@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.fs.inst.jul;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.InputSocket;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -20,7 +18,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 final class JulNio2InputSocket<E extends Entry>
 extends JulInputSocket<E> {
 

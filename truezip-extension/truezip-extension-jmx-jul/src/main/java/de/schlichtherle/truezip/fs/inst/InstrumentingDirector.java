@@ -16,8 +16,6 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -25,7 +23,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> {
 
     public abstract <E extends IOPool.Entry<E>> IOPool<E> instrument(IOPool<E> pool);

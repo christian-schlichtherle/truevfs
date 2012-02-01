@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -21,7 +19,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 final class JmxIOPool<E extends Entry<E>>
 extends InstrumentingIOPool<E, JmxDirector> {
 
