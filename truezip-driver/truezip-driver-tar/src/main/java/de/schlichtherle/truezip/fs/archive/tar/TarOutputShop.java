@@ -52,7 +52,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class TarOutputShop
 extends TarArchiveOutputStream
 implements OutputShop<TTarArchiveEntry> {
