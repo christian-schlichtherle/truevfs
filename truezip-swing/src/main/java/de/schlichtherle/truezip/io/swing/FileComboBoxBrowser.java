@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.io.swing;
 
 import de.schlichtherle.truezip.swing.AbstractComboBoxBrowser;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.Collator;
@@ -38,7 +36,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
 
     private static final long serialVersionUID = -6878885832542209810L;

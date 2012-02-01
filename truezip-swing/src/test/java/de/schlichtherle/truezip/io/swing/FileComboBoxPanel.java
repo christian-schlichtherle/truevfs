@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.io.swing;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import javax.swing.JPanel;
 
@@ -18,7 +16,6 @@ import javax.swing.JPanel;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class FileComboBoxPanel extends JPanel {
     private static final long serialVersionUID = 1065812374938719922L;
 

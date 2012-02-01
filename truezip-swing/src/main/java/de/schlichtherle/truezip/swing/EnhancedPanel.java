@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.AWTEvent;
 import java.awt.Component;
@@ -25,7 +23,6 @@ import javax.swing.JPanel;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class EnhancedPanel extends JPanel  {
 
     private static final long serialVersionUID = 6984576810262891640L;
