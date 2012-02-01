@@ -13,8 +13,6 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
 import static de.schlichtherle.truezip.nio.file.TPathScanner.parent;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,7 +25,6 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class TPathScannerTest extends MockTestBase {
 
     @Test

@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.nio.file;
 import de.schlichtherle.truezip.file.MockTestBase;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
@@ -27,7 +25,6 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class TFileSystemProviderTest extends MockTestBase {
 
     private TFileSystemProvider provider;
