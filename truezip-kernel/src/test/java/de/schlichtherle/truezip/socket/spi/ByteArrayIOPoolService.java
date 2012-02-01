@@ -14,9 +14,9 @@ import de.schlichtherle.truezip.socket.IOPool;
 import net.jcip.annotations.Immutable;
 
 /**
- * An immutable container of a {@link ByteArrayIOPool byte array I/O pool}.
+ * An immutable locatable container of a {@link ByteArrayIOPool byte array I/O buffer pool}.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
