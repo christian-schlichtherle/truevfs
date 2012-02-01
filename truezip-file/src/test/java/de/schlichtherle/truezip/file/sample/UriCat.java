@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.file.sample;
 
 import de.schlichtherle.truezip.file.TApplication;
 import de.schlichtherle.truezip.file.TFile;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,7 +27,6 @@ import java.net.URISyntaxException;
  * @version    $Id$
  */
 @Deprecated
-@DefaultAnnotation(NonNull.class)
 public final class UriCat extends TApplication<Exception> {
 
     /** Equivalent to {@code System.exit(new CatPath().run(args));}. */
