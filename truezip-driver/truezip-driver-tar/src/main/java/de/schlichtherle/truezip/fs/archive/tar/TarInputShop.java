@@ -19,8 +19,6 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.*;
 import java.util.*;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -44,7 +42,6 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class TarInputShop
 implements InputShop<TTarArchiveEntry> {
 

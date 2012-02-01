@@ -17,8 +17,6 @@ import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool.Releasable;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.Date;
@@ -31,7 +29,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class TTarArchiveEntry
 extends TarArchiveEntry
 implements FsArchiveEntry, Releasable<IOException> {
