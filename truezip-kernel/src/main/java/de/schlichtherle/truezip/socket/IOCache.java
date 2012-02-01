@@ -269,7 +269,7 @@ public final class IOCache implements Flushable, Closeable {
     } // Strategy
 
     private final class Input extends DelegatingInputSocket<Entry> {
-        volatile @CheckForNull Buffer buffer;
+        @CheckForNull Buffer buffer;
 
         @Override
         protected InputSocket<? extends Entry> getDelegate() throws IOException {
@@ -311,7 +311,7 @@ public final class IOCache implements Flushable, Closeable {
     } // Input
 
     private final class Output extends DelegatingOutputSocket<Entry> {
-        volatile @CheckForNull Buffer buffer;
+        @CheckForNull Buffer buffer;
 
         @Override
         protected OutputSocket<? extends Entry> getDelegate() throws IOException {
