@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.fs.nio.file;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
 import de.schlichtherle.truezip.util.JSE7;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.Immutable;
 
 /**
@@ -23,7 +21,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public final class TempFilePoolService extends IOPoolService {
 
     @Override
