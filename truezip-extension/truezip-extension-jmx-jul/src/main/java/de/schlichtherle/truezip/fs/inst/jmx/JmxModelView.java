@@ -17,8 +17,6 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
@@ -30,7 +28,6 @@ import javax.management.*;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 final class JmxModelView
 extends StandardMBean
 implements JmxModelViewMXBean {
