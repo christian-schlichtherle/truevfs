@@ -25,8 +25,6 @@ import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP
@@ -38,7 +36,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class KeyManagement {
 
     /** You cannot instantiate this class. */
