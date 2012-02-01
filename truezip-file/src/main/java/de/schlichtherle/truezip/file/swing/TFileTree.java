@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.file.swing;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileComparator;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.Toolkit;
 import java.io.IOException;
@@ -41,7 +39,6 @@ import javax.swing.tree.TreePath;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class TFileTree extends JTree {
 
     private static final long serialVersionUID = 1064787562479927601L;

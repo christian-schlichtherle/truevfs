@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.awt.Component;
 import javax.swing.Icon;
@@ -25,7 +23,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 final class TFileTreeCellRenderer extends DefaultTreeCellRenderer {
     private static final long serialVersionUID = 1045639746091876245L;
 

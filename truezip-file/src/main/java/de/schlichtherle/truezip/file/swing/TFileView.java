@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.util.ResourceBundle;
@@ -35,7 +33,6 @@ import javax.swing.filechooser.FileView;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class TFileView extends TDecoratingFileView {
 
     private static final String CLASS_NAME = TFileView.class.getName();

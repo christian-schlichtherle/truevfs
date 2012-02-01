@@ -8,6 +8,8 @@
  */
 package de.schlichtherle.truezip.file;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.beans.*;
 
 /**
@@ -17,6 +19,7 @@ import java.beans.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@DefaultAnnotation(Nullable.class)
 public class TFileBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
