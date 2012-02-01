@@ -50,7 +50,7 @@ public class TFileTest extends MockTestBase {
     }
 
     @Override
-    public void tearDown() throws IOException {
+    public void tearDown() {
         try {
             assert !new File("archive" + getSuffix()).exists();
         } finally {

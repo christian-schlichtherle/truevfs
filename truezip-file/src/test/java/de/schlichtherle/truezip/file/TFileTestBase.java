@@ -93,7 +93,7 @@ extends TestBase<D> {
     }
 
     @Override
-    public void tearDown() throws IOException {
+    public void tearDown() {
         try {
             try {
                 umount();
@@ -102,6 +102,8 @@ extends TestBase<D> {
                 if (temp.exists() && !temp.delete())
                     throw new IOException(temp + " (could not delete)");
             }
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, ex.toString(), ex);
         } finally {
             super.tearDown();
         }
@@ -948,7 +950,9 @@ extends TestBase<D> {
         long blmd = b.lastModified() / granularity * granularity;
         long almu = (a.lastModified() + granularity - 1) / granularity * granularity;
         long blmu = (b.lastModified() + granularity - 1) / granularity * granularity;
-        assertTrue("almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")", almd == blmd || almu == blmu);
+        assertTrue(
+                "almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")",
+                almd == blmd || almu == blmu);
 
         // Test copy b to a.
         TFile.cp(b, a);
@@ -960,7 +964,9 @@ extends TestBase<D> {
         blmd = b.lastModified() / granularity * granularity;
         almu = (a.lastModified() + granularity - 1) / granularity * granularity;
         blmu = (b.lastModified() + granularity - 1) / granularity * granularity;
-        assertTrue("almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")", almd == blmd || almu == blmu);
+        assertTrue(
+                "almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")",
+                almd == blmd || almu == blmu);
 
         // Check result.
         {
