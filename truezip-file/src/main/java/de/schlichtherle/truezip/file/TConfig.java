@@ -15,8 +15,6 @@ import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -233,7 +231,6 @@ public class AppTest {
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class TConfig implements Closeable {
 
     /**
@@ -270,7 +267,7 @@ public final class TConfig implements Closeable {
     // I don't think these fields should be volatile.
     // This would make a difference if and only if two threads were changing
     // the GLOBAL configuration concurrently, which is discouraged.
-    // Instead, the global configuration should only changed once at
+    // Instead, the global configuration should only get changed once at
     // application startup and then each thread should modify only its thread
     // local configuration which has been obtained by a call to TConfig.push().
     private FsManager manager;
