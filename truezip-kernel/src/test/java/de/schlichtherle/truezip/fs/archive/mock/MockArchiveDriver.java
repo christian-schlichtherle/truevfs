@@ -13,16 +13,9 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.InputShop;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputShop;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -31,7 +24,6 @@ import java.nio.charset.Charset;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class MockArchiveDriver
 extends FsCharsetArchiveDriver<MockArchiveEntry> {
 
@@ -46,7 +38,9 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
     @Override
     protected IOPool<?> getPool() {
         final IOPoolProvider provider = this.provider;
-        return (null != provider ? provider : (this.provider = new ByteArrayIOPoolService(2048))).get();
+        return (null != provider
+                ? provider
+                : (this.provider = new ByteArrayIOPoolService(2048))).get();
     }
 
     @Override
