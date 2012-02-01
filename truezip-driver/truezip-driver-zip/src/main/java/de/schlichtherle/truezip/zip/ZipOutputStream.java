@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,7 +46,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
     /**

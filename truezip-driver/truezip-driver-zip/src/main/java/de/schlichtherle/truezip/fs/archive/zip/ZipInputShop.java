@@ -15,8 +15,6 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.RawZipFile;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +28,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class ZipInputShop
 extends RawZipFile<ZipArchiveEntry>
 implements InputShop<ZipArchiveEntry> {

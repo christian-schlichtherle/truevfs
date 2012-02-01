@@ -81,7 +81,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public interface KeyProvider<K> {
 
     /**

@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.util.zip.ZipException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -36,7 +37,7 @@ public class ZipCryptoException extends ZipException {
      *
      * @param msg the detail message.
      */
-    public ZipCryptoException(String msg) {
+    public ZipCryptoException(@CheckForNull String msg) {
         super(msg);
     }
 
@@ -47,7 +48,7 @@ public class ZipCryptoException extends ZipException {
      * @param msg the detail message.
      * @param cause the cause for this exception to be thrown.
      */
-    public ZipCryptoException(String msg, Throwable cause) {
+    public ZipCryptoException(@CheckForNull String msg, @CheckForNull Throwable cause) {
         super(msg);
         super.initCause(cause);
     }
@@ -58,7 +59,8 @@ public class ZipCryptoException extends ZipException {
      *
      * @param cause the cause for this exception to get thrown.
      */
-    public ZipCryptoException(Throwable cause) {
+    public ZipCryptoException(@CheckForNull Throwable cause) {
+        super(null != cause ? cause.toString() : null);
         super.initCause(cause);
     }
 }

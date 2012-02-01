@@ -20,7 +20,6 @@ import java.util.ServiceConfigurationError;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface KeyManagerProvider {
 
     /**

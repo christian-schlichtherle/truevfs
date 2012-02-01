@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.security.SecureRandom;
 import net.jcip.annotations.NotThreadSafe;
@@ -39,7 +37,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class WinZipAesEntryOutputStream extends CipherOutputStream {
 
     /**

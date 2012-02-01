@@ -8,9 +8,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
-
 /**
  * Provides parameters for reading ZIP files.
  * <p>
@@ -22,7 +19,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface ZipFileParameters<E extends ZipEntry>
 extends ZipCharsetParameters, ZipEntryFactory<E> {
 

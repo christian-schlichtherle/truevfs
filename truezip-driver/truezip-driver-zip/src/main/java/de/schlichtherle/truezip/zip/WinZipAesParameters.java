@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * The parameters of this interface are used with WinZip AES encrypted entries.
@@ -21,7 +19,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface WinZipAesParameters extends ZipCryptoParameters {
 
     /**

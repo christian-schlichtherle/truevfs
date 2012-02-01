@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.crypto.param;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ResourceBundle;
 import net.jcip.annotations.ThreadSafe;
 
@@ -20,7 +18,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public enum AesKeyStrength implements KeyStrength {
     /** Enum identifier for a 128 bit AES cipher key. */
     BITS_128,

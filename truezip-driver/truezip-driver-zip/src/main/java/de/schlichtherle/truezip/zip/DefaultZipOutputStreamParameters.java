@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import net.jcip.annotations.ThreadSafe;
@@ -22,7 +20,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 class DefaultZipOutputStreamParameters
 extends DefaultZipCharsetParameters
 implements ZipOutputStreamParameters {

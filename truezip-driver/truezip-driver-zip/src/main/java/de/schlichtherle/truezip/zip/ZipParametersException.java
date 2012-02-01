@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.util.zip.ZipException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -29,7 +30,7 @@ public class ZipParametersException extends ZipException {
      *
      * @param msg the detail message.
      */
-    public ZipParametersException(String msg) {
+    public ZipParametersException(@CheckForNull String msg) {
         super(msg);
     }
 
@@ -39,7 +40,8 @@ public class ZipParametersException extends ZipException {
      *
      * @param cause the cause for this exception to get thrown.
      */
-    public ZipParametersException(Throwable cause) {
+    public ZipParametersException(@CheckForNull Throwable cause) {
+        super(null != cause ? cause.toString() : null);
         super.initCause(cause);
     }
 }

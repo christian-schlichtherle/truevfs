@@ -14,8 +14,6 @@ import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.*;
 import static java.util.logging.Level.CONFIG;
 import static java.util.logging.Level.WARNING;
@@ -23,7 +21,7 @@ import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
 /**
- * Locates all key managers found on the class path.
+ * Locates all key managers on the class path.
  * The map of key managers is populated by instantiating all classes
  * which are named in the resource files with the name
  * {@code "META-INF/services/de.schlichtherle.truezip.key.spi.KeyManagerService"}
@@ -34,7 +32,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public final class KeyManagerLocator extends AbstractKeyManagerProvider {
 
     /** The singleton instance of this class. */

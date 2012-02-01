@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -36,7 +34,6 @@ import javax.swing.event.DocumentListener;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class WriteKeyPanel extends KeyPanel {
 
     private static final long serialVersionUID = 6416529465492387235L;

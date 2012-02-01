@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.key;
 
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
@@ -24,7 +22,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class PromptingKeyManager<K extends SafeKey<K>>
 extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 

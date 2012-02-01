@@ -28,7 +28,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public class ReadOnlySfxDriver extends ZipDriver {
 
     /**

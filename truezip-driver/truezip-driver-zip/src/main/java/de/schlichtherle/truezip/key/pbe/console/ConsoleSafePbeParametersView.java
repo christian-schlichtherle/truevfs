@@ -13,8 +13,6 @@ import de.schlichtherle.truezip.key.KeyPromptingDisabledException;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import de.schlichtherle.truezip.key.pbe.SafePbeParametersView;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Console;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -31,7 +29,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class ConsoleSafePbeParametersView<
         S extends KeyStrength,
         P extends SafePbeParameters<S, P>>

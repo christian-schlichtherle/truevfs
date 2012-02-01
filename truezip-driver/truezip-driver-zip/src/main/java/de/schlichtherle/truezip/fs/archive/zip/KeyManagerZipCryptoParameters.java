@@ -16,8 +16,6 @@ import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.zip.*;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.nio.charset.Charset;
 import net.jcip.annotations.ThreadSafe;
@@ -35,7 +33,6 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToByte
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class KeyManagerZipCryptoParameters
 implements ZipParametersProvider, ZipCryptoParameters {
 

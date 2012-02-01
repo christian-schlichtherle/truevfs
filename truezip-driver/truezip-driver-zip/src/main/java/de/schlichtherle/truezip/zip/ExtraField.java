@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.zip;
 
 import static de.schlichtherle.truezip.zip.Constants.*;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
@@ -25,7 +23,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 abstract class ExtraField {
 
     private static final Map<Integer, Class<? extends ExtraField>> registry

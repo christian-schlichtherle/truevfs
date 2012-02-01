@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.key;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -27,7 +28,7 @@ public class KeyPromptingDisabledException extends CacheableUnknownKeyException 
         super("Key prompting has been disabled!");
     }
 
-    public KeyPromptingDisabledException(Throwable cause) {
+    public KeyPromptingDisabledException(@CheckForNull Throwable cause) {
         super("Key prompting has been disabled!");
         super.initCause(cause);
     }

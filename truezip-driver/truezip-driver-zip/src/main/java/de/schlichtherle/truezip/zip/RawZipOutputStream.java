@@ -20,8 +20,6 @@ import static de.schlichtherle.truezip.zip.WinZipAesUtils.overhead;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static de.schlichtherle.truezip.zip.ZipParametersUtils.parameters;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +42,6 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class RawZipOutputStream<E extends ZipEntry>
 extends DecoratingOutputStream
 implements Iterable<E> {

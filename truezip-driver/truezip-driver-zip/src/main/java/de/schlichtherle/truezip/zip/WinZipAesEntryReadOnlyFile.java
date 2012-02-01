@@ -16,8 +16,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryOutputStream.*;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.EOFException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
@@ -42,7 +40,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
 
     private final byte[] authenticationCode;

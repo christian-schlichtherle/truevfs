@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 
 /**
@@ -19,7 +17,6 @@ import java.nio.charset.Charset;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface ZipCharsetParameters extends ZipParameters {
 
     /**

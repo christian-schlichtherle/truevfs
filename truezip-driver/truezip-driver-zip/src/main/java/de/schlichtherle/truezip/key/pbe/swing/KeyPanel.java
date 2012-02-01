@@ -13,8 +13,6 @@ import de.schlichtherle.truezip.swing.EnhancedPanel;
 import de.schlichtherle.truezip.swing.PanelEvent;
 import de.schlichtherle.truezip.swing.PanelListener;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 
 /**
@@ -23,7 +21,6 @@ import java.net.URI;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class KeyPanel extends EnhancedPanel {
 
     private static final long serialVersionUID = 2762934728646652873L;

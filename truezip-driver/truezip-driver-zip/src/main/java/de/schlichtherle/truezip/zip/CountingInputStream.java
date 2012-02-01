@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +21,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class CountingInputStream extends DecoratingInputStream {
 
     /** The number of bytes read. */

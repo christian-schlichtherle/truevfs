@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 import net.jcip.annotations.ThreadSafe;
 
@@ -21,7 +19,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class DefaultZipFileParameters
 extends DefaultZipCharsetParameters
 implements ZipFileParameters<ZipEntry> {

@@ -12,8 +12,6 @@ import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.ExtraField.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -36,7 +34,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class ZipEntry implements Cloneable {
 
     // Bit masks for initialized fields.

@@ -8,11 +8,10 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import static de.schlichtherle.truezip.zip.Constants.*;
-import static de.schlichtherle.truezip.zip.LittleEndian.*;
+import static de.schlichtherle.truezip.zip.Constants.EMPTY;
+import static de.schlichtherle.truezip.zip.LittleEndian.readUShort;
+import static de.schlichtherle.truezip.zip.LittleEndian.writeShort;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Map;
 import java.util.TreeMap;
@@ -26,7 +25,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class ExtraFields implements Cloneable {
 
     /**

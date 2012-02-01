@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * JAR archive entries apply the date/time conversion rules as defined by
@@ -22,7 +20,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class JarArchiveEntry extends ZipArchiveEntry {
 
     public JarArchiveEntry(String name) {

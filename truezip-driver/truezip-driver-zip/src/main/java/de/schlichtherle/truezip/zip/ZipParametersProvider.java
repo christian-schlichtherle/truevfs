@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.zip;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * A provider of {@link ZipParameters} for a given type.
@@ -21,7 +19,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface ZipParametersProvider extends ZipParameters {
 
     /**
