@@ -18,7 +18,7 @@ About TrueZIP Path
 
     This is the primary API for JSE&#160;7 compliant TrueZIP applications:
     Like the API of the module {{{../truezip-file/index.html}TrueZIP File*}},
-    this API is a facade for the module
+    this API is just a facade for the module
     {{{../truezip-kernel/index.html}TrueZIP Kernel}}.
     In contrast to the TrueZIP File* API however, this API can access
     any (virtual) file system, not just the platform file system and
