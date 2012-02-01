@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
@@ -22,7 +20,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class DefaultReadOnlyFile
 extends RandomAccessFile
 implements ReadOnlyFile {

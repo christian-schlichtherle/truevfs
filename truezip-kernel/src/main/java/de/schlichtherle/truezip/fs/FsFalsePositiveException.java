@@ -29,10 +29,11 @@ import net.jcip.annotations.Immutable;
 public class FsFalsePositiveException extends FsControllerException {
     public FsFalsePositiveException(IOException cause) {
         super(cause);
+        assert null != cause;
     }
 
     @Override
-    public @NonNull IOException getCause() {
+    public IOException getCause() {
         return (IOException) super.getCause();
     }
 }

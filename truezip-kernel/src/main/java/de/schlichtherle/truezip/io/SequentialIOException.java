@@ -8,10 +8,13 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Comparator;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Represents a chain of subsequently occured {@code IOException}s which have
@@ -43,6 +46,7 @@ import java.util.Comparator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class SequentialIOException extends IOException implements Cloneable {
 
     private static final long serialVersionUID = 2203967634187324928L;
@@ -84,7 +88,7 @@ public class SequentialIOException extends IOException implements Cloneable {
      * {@link #initPredecessor(SequentialIOException)} initialized yet or
      * {@code null} if there are no more exceptions in this chain.
      */
-    private SequentialIOException predecessor = this;
+    private @CheckForNull SequentialIOException predecessor = this;
 
     private final int priority;
 
@@ -97,20 +101,18 @@ public class SequentialIOException extends IOException implements Cloneable {
         priority = 0;
     }
 
-    public SequentialIOException(String message) {
+    public SequentialIOException(@CheckForNull String message) {
         super(message);
         priority = 0;
     }
 
-    public SequentialIOException(Throwable cause) {
-        super(null == cause ? null : cause.toString());
-        super.initCause(cause);
+    public SequentialIOException(@CheckForNull Throwable cause) {
+        super(cause);
         priority = 0;
     }
 
-    public SequentialIOException(String message, Throwable cause) {
-        super(message);
-        super.initCause(cause);
+    public SequentialIOException(@CheckForNull String message, @CheckForNull Throwable cause) {
+        super(message, cause);
         priority = 0;
     }
 
@@ -118,12 +120,12 @@ public class SequentialIOException extends IOException implements Cloneable {
         this.priority = priority;
     }
 
-    public SequentialIOException(String message, int priority) {
+    public SequentialIOException(@CheckForNull String message, int priority) {
         super(message);
         this.priority = priority;
     }
 
-    public SequentialIOException(Throwable cause, int priority) {
+    public SequentialIOException(@CheckForNull Throwable cause, int priority) {
         super(cause);
         this.priority = priority;
     }
@@ -141,7 +143,7 @@ public class SequentialIOException extends IOException implements Cloneable {
      * @param priority The priority of this exception to be used for
      *        {@link #sortPriority() priority sorting}.
      */
-    public SequentialIOException(String message, Throwable cause, int priority) {
+    public SequentialIOException(@CheckForNull String message, @CheckForNull Throwable cause, int priority) {
         super(message, cause);
         this.priority = priority;
     }
@@ -178,7 +180,7 @@ public class SequentialIOException extends IOException implements Cloneable {
      *         itself.
      */
     public final synchronized SequentialIOException initPredecessor(
-            SequentialIOException predecessor) {
+            @CheckForNull SequentialIOException predecessor) {
         setPredecessor(predecessor);
         predecessor = getPredecessor();
         if (predecessor != null)
@@ -187,7 +189,7 @@ public class SequentialIOException extends IOException implements Cloneable {
     }
 
     private void setPredecessor(
-            final SequentialIOException predecessor) {
+            final @CheckForNull SequentialIOException predecessor) {
         if (this.predecessor != this) {
             if (this.predecessor == predecessor)
                 return;
@@ -206,7 +208,7 @@ public class SequentialIOException extends IOException implements Cloneable {
      * hasn't been
      * {@link #initPredecessor(SequentialIOException) initialized} yet.
      */
-    public final synchronized SequentialIOException getPredecessor() {
+    public final synchronized @Nullable SequentialIOException getPredecessor() {
         return this == predecessor ? null : predecessor;
     }
 
@@ -250,7 +252,7 @@ public class SequentialIOException extends IOException implements Cloneable {
     private SequentialIOException sort(
             final Comparator<SequentialIOException> cmp) {
         final SequentialIOException predecessor = getPredecessor();
-        if (predecessor == null)
+        if (null == predecessor)
             return this;
         final SequentialIOException tail = predecessor.sort(cmp);
         if (tail == predecessor && cmp.compare(this, tail) >= 0)
@@ -373,8 +375,8 @@ public class SequentialIOException extends IOException implements Cloneable {
         maxExceptions--;
 
         final SequentialIOException predecessor = getPredecessor();
-        if (predecessor != null) {
-            if (maxExceptions > 0) {
+        if (null != predecessor) {
+            if (0 < maxExceptions) {
                 predecessor.printStackTrace(s, maxExceptions);
                 s.println("\nFollowed, but not caused by:");
             } else {

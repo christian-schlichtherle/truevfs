@@ -13,8 +13,6 @@ import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
@@ -34,7 +32,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public abstract class FsCharsetArchiveDriver<E extends FsArchiveEntry>
 extends FsArchiveDriver<E> {
 

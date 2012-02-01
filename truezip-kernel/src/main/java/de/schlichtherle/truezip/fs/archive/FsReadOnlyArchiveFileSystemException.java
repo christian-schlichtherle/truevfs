@@ -21,6 +21,6 @@ extends FsArchiveFileSystemException {
     private static final long serialVersionUID = 987645923519873262L;
 
     FsReadOnlyArchiveFileSystemException() {
-        super(null, "This is a read-only archive file system!");
+        super((String) null, "This is a read-only archive file system!");
     }
 }

@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -76,9 +77,10 @@ import net.jcip.annotations.Immutable;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public abstract class FsControllerException extends IOException {
     FsControllerException() {
+        this(null);
     }
 
-    FsControllerException(Throwable cause) {
+    FsControllerException(@CheckForNull Throwable cause) {
         super(cause);
     }
 }

@@ -8,9 +8,8 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import net.jcip.annotations.NotThreadSafe;
@@ -25,7 +24,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public interface ReadOnlyFile extends Closeable {
 
     /**

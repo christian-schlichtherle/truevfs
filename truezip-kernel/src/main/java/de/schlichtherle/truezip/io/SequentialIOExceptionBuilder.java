@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -27,7 +25,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class SequentialIOExceptionBuilder<  C extends Exception,
                                             X extends SequentialIOException>
 extends AbstractExceptionBuilder<C, X> {

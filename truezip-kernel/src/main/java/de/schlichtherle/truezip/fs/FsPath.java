@@ -140,14 +140,13 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private static final long serialVersionUID = 5798435461242930648L;
 
     private static final URI DOT = URI.create(".");
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     private transient @Nullable FsMountPoint mountPoint;

@@ -9,8 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.SequentialIOException;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -26,7 +25,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class FsSyncException extends SequentialIOException {
     private static final long serialVersionUID = 4893219420357369739L;
 
@@ -41,11 +39,11 @@ public class FsSyncException extends SequentialIOException {
         super(message);
     }
 
-    public FsSyncException(FsModel model, @Nullable IOException cause) {
+    public FsSyncException(FsModel model, IOException cause) {
         super(model.getMountPoint().toString(), cause);
     }
 
-    FsSyncException(FsModel model, @Nullable IOException cause, int priority) {
+    FsSyncException(FsModel model, IOException cause, int priority) {
         super(model.getMountPoint().toString(), cause, priority);
     }
 
@@ -56,7 +54,7 @@ public class FsSyncException extends SequentialIOException {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-    public final FsSyncException initCause(final @Nullable Throwable cause) {
+    public final FsSyncException initCause(final @CheckForNull Throwable cause) {
         //assert super.getCause() instanceof IOException;
         super.initCause((IOException) cause);
         return this;

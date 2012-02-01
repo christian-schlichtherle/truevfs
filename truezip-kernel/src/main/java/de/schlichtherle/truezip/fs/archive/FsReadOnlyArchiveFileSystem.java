@@ -15,8 +15,6 @@ import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Map;
 import net.jcip.annotations.NotThreadSafe;
 
@@ -30,7 +28,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class FsReadOnlyArchiveFileSystem<E extends FsArchiveEntry>
 extends FsArchiveFileSystem<E> {
 

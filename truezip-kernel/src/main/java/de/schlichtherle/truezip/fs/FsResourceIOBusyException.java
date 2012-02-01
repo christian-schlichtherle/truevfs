@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import net.jcip.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * @since   TrueZIP 7.5
@@ -17,7 +17,7 @@ import net.jcip.annotations.Immutable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@Immutable
+@ThreadSafe
 public abstract class FsResourceIOBusyException extends FileBusyException {
     private static final long serialVersionUID = 1L;
 

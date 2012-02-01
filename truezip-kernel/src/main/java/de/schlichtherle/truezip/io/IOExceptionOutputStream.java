@@ -24,7 +24,6 @@ import java.io.OutputStream;
  * @deprecated This class will be removed in TrueZIP 8.
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class IOExceptionOutputStream extends DecoratingOutputStream {
 
     /** The nullable last I/O exception. */

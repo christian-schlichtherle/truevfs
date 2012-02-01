@@ -14,8 +14,6 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsManagerProvider;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Iterator;
 import static java.util.logging.Level.CONFIG;
 import java.util.logging.Logger;
@@ -48,7 +46,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public final class FsManagerLocator implements FsManagerProvider {
 
     /** The singleton instance of this class. */

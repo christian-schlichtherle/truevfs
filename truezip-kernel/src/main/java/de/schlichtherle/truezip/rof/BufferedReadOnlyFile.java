@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.io.Streams;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,7 +46,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The default buffer length of the window to the file. */

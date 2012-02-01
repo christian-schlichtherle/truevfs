@@ -136,8 +136,7 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings({ "JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS", "SE_TRANSIENT_FIELD_NOT_RESTORED" })
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
 public final class FsMountPoint implements Serializable, Comparable<FsMountPoint> {
 
     private static final long serialVersionUID = 5723957985634276648L;
@@ -150,6 +149,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      */
     public static final String SEPARATOR = "!" + FsEntryName.SEPARATOR;
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     private transient @Nullable FsPath path;

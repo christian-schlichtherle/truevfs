@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.socket.OutputShop;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,7 +26,6 @@ import net.jcip.annotations.ThreadSafe;
  */
 @Deprecated
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class SynchronizedOutputStream extends DecoratingOutputStream {
 
     /** The object to synchronize on. */

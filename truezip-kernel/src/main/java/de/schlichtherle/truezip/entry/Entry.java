@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.entry;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -32,7 +30,6 @@ import java.util.Set;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface Entry {
 
     /** The unknown value for numeric properties, which is {@value}. */

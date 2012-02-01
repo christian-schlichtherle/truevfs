@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
@@ -27,7 +25,7 @@ import java.lang.ref.WeakReference;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
+
 public interface Link<T> {
 
     /**

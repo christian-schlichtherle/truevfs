@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;

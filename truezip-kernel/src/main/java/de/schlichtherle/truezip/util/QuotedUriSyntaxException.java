@@ -8,9 +8,8 @@
  */
 package de.schlichtherle.truezip.util;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URISyntaxException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Quotes the input string before passing it to the super class constructor.
@@ -18,7 +17,7 @@ import java.net.URISyntaxException;
  * @version $Id$
  * @author  Christian Schlichtherle
  */
-@DefaultAnnotation(NonNull.class)
+@ThreadSafe
 public class QuotedUriSyntaxException extends URISyntaxException {
     private static final long serialVersionUID = 2452323414521345231L;
 

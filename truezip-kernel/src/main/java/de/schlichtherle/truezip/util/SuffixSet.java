@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
@@ -61,7 +59,6 @@ import java.util.regex.Pattern;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class SuffixSet extends CanonicalStringSet {
 
     /** A canonicalizer for file suffixes. */

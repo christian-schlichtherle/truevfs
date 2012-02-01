@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -27,7 +28,7 @@ public class OutputClosedException extends IOException {
         super("Output resource has been closed!");
     }
 
-    public OutputClosedException(Throwable cause) {
+    public OutputClosedException(@CheckForNull Throwable cause) {
         super("Output resource has been closed!", cause);
     }
 }

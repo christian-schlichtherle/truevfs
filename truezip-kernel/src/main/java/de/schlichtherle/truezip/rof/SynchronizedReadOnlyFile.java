@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.socket.InputShop;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -26,7 +24,6 @@ import net.jcip.annotations.ThreadSafe;
  */
 @Deprecated
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The object to synchronize on. */

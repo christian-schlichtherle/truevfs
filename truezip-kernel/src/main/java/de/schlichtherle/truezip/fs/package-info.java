@@ -11,4 +11,8 @@
  * This package is the nexus between file system applications and file system
  * drivers.
  */
+@DefaultAnnotation(NonNull.class)
 package de.schlichtherle.truezip.fs;
+
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.NonNull;
