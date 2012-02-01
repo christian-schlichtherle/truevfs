@@ -15,8 +15,6 @@ import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
 import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import static org.junit.Assert.*;
@@ -26,7 +24,6 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class ZipRaesFileIT extends TFileTestBase<TestZipRaesDriver> {
 
     private @Nullable MockView<AesCipherParameters> view;
