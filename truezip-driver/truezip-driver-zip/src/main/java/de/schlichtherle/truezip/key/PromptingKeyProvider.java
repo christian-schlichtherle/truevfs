@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.key;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.net.URI;
 import net.jcip.annotations.NotThreadSafe;
@@ -29,7 +27,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class PromptingKeyProvider<K extends SafeKey<K>>
 extends SafeKeyProvider<K> {
 
@@ -161,7 +158,6 @@ extends SafeKeyProvider<K> {
 
     /** Implements the behavior strategy of its enclosing class. */
     @ThreadSafe
-    @DefaultAnnotation(NonNull.class)
     private enum State {
         RESET {
             @Override
@@ -321,7 +317,6 @@ extends SafeKeyProvider<K> {
      * Implementations of this interface must be thread safe
      * and should have no side effects!
      */
-    @DefaultAnnotation(NonNull.class)
     public interface View<K extends SafeKey<K>> {
 
         /**
@@ -384,7 +379,6 @@ extends SafeKeyProvider<K> {
 
     /** Proxies access to the key for {@link View} implementations. */
     @NotThreadSafe
-    @DefaultAnnotation(NonNull.class)
     public interface Controller<K extends SafeKey<K>> {
 
         /**
@@ -430,7 +424,6 @@ extends SafeKeyProvider<K> {
 
     /** Proxies access to the secret key for {@link View} implementations. */
     @NotThreadSafe
-    @DefaultAnnotation(NonNull.class)
     private abstract class BaseController implements Controller<K>, Closeable {
         private @CheckForNull State state;
 
@@ -479,7 +472,6 @@ extends SafeKeyProvider<K> {
      * protected resource.
      */
     @NotThreadSafe
-    @DefaultAnnotation(NonNull.class)
     private final class WriteController extends BaseController {
         WriteController(State state) {
             super(state);
@@ -496,7 +488,6 @@ extends SafeKeyProvider<K> {
      * protected resource.
      */
     @NotThreadSafe
-    @DefaultAnnotation(NonNull.class)
     private final class ReadController extends BaseController {
         ReadController(State state) {
             super(state);
