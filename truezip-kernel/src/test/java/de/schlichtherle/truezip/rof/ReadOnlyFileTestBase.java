@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.util.ArrayHelper;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,7 +28,6 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class ReadOnlyFileTestBase {
 
     private static final Logger logger = Logger.getLogger(
