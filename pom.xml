@@ -74,10 +74,30 @@
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
+
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
-        <!-- For maven-surefire-plugin and maven-failsafe-plugin. -->
+
+        <!-- maven-surefire-plugin && maven-failsafe-plugin -->
         <argLine>-server</argLine>
         <parallel>both</parallel>
+
+        <!-- maven-javadoc-plugin -->
+        <google.analytics.accountId>UA-25500668-1</google.analytics.accountId>
+        <header>
+            <!-- Google Analytics -->
+            &lt;script type="text/javascript"&gt;
+                var _gaq = _gaq || [];
+                _gaq.push(['_setAccount', '${google.analytics.accountId}']);
+                _gaq.push(['_trackPageview']);
+                (function() {
+                    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                })();
+            &lt;/script&gt;
+            <!-- Header text -->
+            &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
+        </header>
     </properties>
 
     <modules>
