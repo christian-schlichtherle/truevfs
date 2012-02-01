@@ -13,8 +13,6 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.MOUNT_POINT;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.*;
 import java.net.URI;
@@ -444,9 +442,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @since  TrueZIP 7.1.1
      */
     public URI toHierarchicalUri() {
+        final URI hierarchical = this.hierarchical;
         return null != hierarchical
                 ? hierarchical
-                : (hierarchical = uri.isOpaque()
+                : (this.hierarchical = uri.isOpaque()
                     ? path.toHierarchicalUri()
                     : uri);
     }
@@ -466,7 +465,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @return The scheme component.
      */
     public FsScheme getScheme() {
-        return null != scheme ? scheme : (scheme = FsScheme.create(uri.getScheme()));
+        final FsScheme scheme = this.scheme;
+        return null != scheme
+                ? scheme
+                : (this.scheme = FsScheme.create(uri.getScheme()));
     }
 
     /**
