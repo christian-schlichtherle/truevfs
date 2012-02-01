@@ -13,8 +13,6 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.util.Locale;
@@ -28,7 +26,6 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class TArchiveDetectorTest {
 
     private FsArchiveDriver<?> driver;

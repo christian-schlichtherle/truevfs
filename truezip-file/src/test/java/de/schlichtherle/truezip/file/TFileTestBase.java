@@ -23,8 +23,6 @@ import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import static java.io.File.separatorChar;
 import java.io.*;
 import java.lang.ref.Reference;
@@ -49,7 +47,6 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class TFileTestBase<D extends FsArchiveDriver<?>>
 extends TestBase<D> {
 
