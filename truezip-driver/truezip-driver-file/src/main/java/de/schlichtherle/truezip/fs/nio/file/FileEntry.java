@@ -20,8 +20,6 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Pool.Releasable;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import static java.io.File.separatorChar;
 import java.io.IOException;
@@ -44,8 +42,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 class FileEntry
 extends FsEntry
 implements IOEntry<FileEntry>, Releasable<IOException> {
@@ -54,6 +50,8 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     private final Path path;
     private final String name;
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     volatile @CheckForNull TempFilePool pool;
 
     FileEntry(final Path path) {
@@ -75,7 +73,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
-            this.pool = pool = new TempFilePool(getParent(), getFileName());
+            pool = this.pool = new TempFilePool(getParent(), getFileName());
         return pool.allocate();
     }
 
