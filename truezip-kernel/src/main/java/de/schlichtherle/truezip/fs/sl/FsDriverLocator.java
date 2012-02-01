@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 import net.jcip.annotations.Immutable;
 
 /**
- * Locates all file system drivers found on the class path.
+ * Locates all file system drivers on the class path.
  * The map of file system drivers is populated by instantiating all classes
  * which are named in the resource files with the name
  * {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsDriverService"}
