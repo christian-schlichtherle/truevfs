@@ -90,7 +90,7 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
     }
 
     @After
-    public void tearDown() throws IOException {
+    public void tearDown() {
         TConfig.pop();
     }
 }

@@ -50,9 +50,12 @@ public final class ZipRaesPathIT extends TPathTestBase<TestZipRaesDriver> {
     }
 
     @Override
-    public void tearDown() throws IOException {
-        view.setAction(ENTER);
-        super.tearDown();
+    public void tearDown() {
+        try {
+            view.setAction(ENTER);
+        } finally {
+            super.tearDown();
+        }
     }
 
     @Test
