@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.io;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -25,7 +23,6 @@ import java.nio.channels.SeekableByteChannel;
  * @deprecated This class will be removed in TrueZIP 8.
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class IOExceptionSeekableByteChannel
 extends DecoratingSeekableByteChannel {
 

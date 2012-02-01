@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.Immutable;
 
 /**
  * Indicates that a file system is a false positive file system and that this
@@ -27,7 +27,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 final class FsCacheableFalsePositiveException extends FsFalsePositiveException {
     FsCacheableFalsePositiveException(IOException cause) {

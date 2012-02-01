@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -23,7 +21,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class FilteringIterator<T> implements Iterator<T> {
     private final Iterator<T> iterator;
     private @CheckForNull Boolean hasNext;

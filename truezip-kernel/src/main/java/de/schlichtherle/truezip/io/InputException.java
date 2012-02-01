@@ -8,10 +8,11 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import net.jcip.annotations.ThreadSafe;
+import net.jcip.annotations.Immutable;
 
 /**
  * Thrown if an error happened on the input side rather than the output side
@@ -21,7 +22,7 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@ThreadSafe
+@Immutable
 public class InputException extends IOException {
     private static final long serialVersionUID = 1287654325546872424L;
 
@@ -30,7 +31,7 @@ public class InputException extends IOException {
      *
      * @param cause the cause for this exception to get thrown.
      */
-    public InputException(final Throwable cause) {
+    public InputException(@CheckForNull Throwable cause) {
         super(cause);
     }
 }

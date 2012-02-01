@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.ServiceConfigurationError;
 
@@ -21,7 +19,6 @@ import java.util.ServiceConfigurationError;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface FsCompositeDriver {
 
     /**

@@ -8,6 +8,9 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Indicates that a file system entry could not get written
  * because the entry or its container is busy.
@@ -19,14 +22,15 @@ package de.schlichtherle.truezip.io;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class OutputBusyException extends FileBusyException {
     private static final long serialVersionUID = 962318648273654198L;
     
-    public OutputBusyException(String message) {
+    public OutputBusyException(@CheckForNull String message) {
         super(message);
     }
 
-    public OutputBusyException(Exception cause) {
+    public OutputBusyException(@CheckForNull Throwable cause) {
         super(cause);
     }
 }

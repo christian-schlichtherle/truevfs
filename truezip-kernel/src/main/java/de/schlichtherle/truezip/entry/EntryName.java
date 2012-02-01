@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.entry;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -114,8 +112,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-@DefaultAnnotation(NonNull.class)
 public class EntryName implements Serializable, Comparable<EntryName> {
 
     private static final long serialVersionUID = 2927354934726235478L;
@@ -136,6 +132,7 @@ public class EntryName implements Serializable, Comparable<EntryName> {
      */
     public static final char SEPARATOR_CHAR = '/';
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     /**

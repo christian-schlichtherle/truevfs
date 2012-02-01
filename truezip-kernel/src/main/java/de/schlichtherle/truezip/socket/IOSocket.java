@@ -39,7 +39,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class IOSocket<LT, PT> {
 
     /** You cannot instantiate this class outside its package. */

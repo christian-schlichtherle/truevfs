@@ -8,15 +8,12 @@
  */
 package de.schlichtherle.truezip.util;
 
+import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.CharBuffer;
 import net.jcip.annotations.NotThreadSafe;
-
-import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
 
 /**
  * A mutable JavaBean for composing URIs according to
@@ -75,7 +72,6 @@ import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @NotThreadSafe
 public final class UriBuilder {
 

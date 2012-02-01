@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -27,7 +28,7 @@ public class InputClosedException extends IOException {
         super("Input resource has been closed!");
     }
 
-    public InputClosedException(Throwable cause) {
+    public InputClosedException(@CheckForNull Throwable cause) {
         super("Input resource has been closed!", cause);
     }
 }

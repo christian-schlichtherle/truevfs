@@ -8,6 +8,8 @@
  */
 package de.schlichtherle.truezip.util;
 
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.beans.*;
 
 /**
@@ -18,6 +20,7 @@ import java.beans.*;
  * @version $Id$
  */
 @SuppressWarnings("StaticNonFinalUsedInInitialization")
+@DefaultAnnotation(Nullable.class)
 public class BitFieldBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor

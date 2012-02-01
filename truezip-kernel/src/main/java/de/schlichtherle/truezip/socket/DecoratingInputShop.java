@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.DecoratingEntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 
 /**
@@ -22,7 +20,6 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class DecoratingInputShop<E extends Entry, I extends InputShop<E>>
 extends DecoratingEntryContainer<E, I>
 implements InputShop<E> {

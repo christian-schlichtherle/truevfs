@@ -8,9 +8,6 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
-
 /**
  * A provider for an I/O buffer pool.
  * <p>
@@ -19,7 +16,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface IOPoolProvider {
 
     /**

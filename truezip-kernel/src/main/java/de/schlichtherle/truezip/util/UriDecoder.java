@@ -9,17 +9,15 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import static java.nio.charset.CoderResult.OVERFLOW;
+import static java.nio.charset.CoderResult.UNDERFLOW;
 import net.jcip.annotations.NotThreadSafe;
-
-import static java.nio.charset.CoderResult.*;
 
 /**
  * Decodes quoted characters in URI components according to
@@ -36,7 +34,6 @@ import static java.nio.charset.CoderResult.*;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @NotThreadSafe
 public final class UriDecoder {
 

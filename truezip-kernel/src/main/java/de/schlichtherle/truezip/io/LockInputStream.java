@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.socket.InputShop;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +25,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class LockInputStream extends DecoratingInputStream {
 
     /** The object to synchronize on. */

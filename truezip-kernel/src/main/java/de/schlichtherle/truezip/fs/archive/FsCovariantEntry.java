@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.fs.archive;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import de.schlichtherle.truezip.fs.FsEntry;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.CharConversionException;
 import java.util.*;
@@ -29,7 +27,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class FsCovariantEntry<E extends FsArchiveEntry>
 extends FsEntry
 implements Cloneable {

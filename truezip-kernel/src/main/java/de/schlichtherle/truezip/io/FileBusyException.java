@@ -8,7 +8,9 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.FileNotFoundException;
+import net.jcip.annotations.ThreadSafe;
 
 /**
  * Indicates that a file system entry could not get read or written
@@ -20,14 +22,15 @@ import java.io.FileNotFoundException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class FileBusyException extends FileNotFoundException {
     private static final long serialVersionUID = 2056108562576389242L;
 
-    public FileBusyException(String message) {
+    public FileBusyException(@CheckForNull String message) {
         super(message);
     }
 
-    public FileBusyException(Exception cause) {
+    public FileBusyException(@CheckForNull Throwable cause) {
         super(null == cause ? null : cause.toString());
         super.initCause(cause);
     }

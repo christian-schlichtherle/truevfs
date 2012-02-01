@@ -8,6 +8,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
+import de.schlichtherle.truezip.fs.FsEntryName;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
 
@@ -16,33 +18,40 @@ import net.jcip.annotations.ThreadSafe;
  */
 @ThreadSafe
 public class FsArchiveFileSystemException extends IOException {
-
     private static final long serialVersionUID = 4652084652223428651L;
 
-    /** The entry's path name. */
-    private final String path;
+    /** The nullable entry path name. */
+    private final @CheckForNull String path;
 
-    FsArchiveFileSystemException(String path, String message) {
+    /** @since TrueZIP 7.5 */
+    FsArchiveFileSystemException(FsEntryName name, String message) {
+        this(name.toString(), message);
+    }
+
+    FsArchiveFileSystemException(@CheckForNull String path, String message) {
         super(message);
         this.path = path;
     }
 
     FsArchiveFileSystemException(String path, IOException cause) {
-        super(cause != null ? cause.toString() : null);
+        super(cause);
         this.path = path;
-        super.initCause(cause);
     }
 
-    FsArchiveFileSystemException(String path, String message, IOException cause) {
-        super(message);
+    FsArchiveFileSystemException(@CheckForNull String path, String message, IOException cause) {
+        super(message, cause);
         this.path = path;
-        super.initCause(cause);
     }
 
     @Override
-    public String getLocalizedMessage() {
-        if (path != null)
-            return new StringBuilder(path).append(" (").append(getMessage()).append(")").toString();
-        return getMessage();
+    public String getMessage() {
+        final String m = super.getMessage();
+        return null != path ?
+                new StringBuilder(path)
+                    .append(" (")
+                    .append(m)
+                    .append(")")
+                    .toString()
+                : m;
     }
 }

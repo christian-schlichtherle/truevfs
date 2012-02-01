@@ -8,6 +8,9 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import net.jcip.annotations.ThreadSafe;
+
 /**
  * Indicates that a file system entry could not get read
  * because the entry or its container is busy.
@@ -19,14 +22,15 @@ package de.schlichtherle.truezip.io;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public class InputBusyException extends FileBusyException {
     private static final long serialVersionUID = 1983745618753823654L;
 
-    public InputBusyException(String message) {
+    public InputBusyException(@CheckForNull String message) {
         super(message);
     }
 
-    public InputBusyException(Exception cause) {
+    public InputBusyException(@CheckForNull Throwable cause) {
         super(cause);
     }
 }

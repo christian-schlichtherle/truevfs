@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.util;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,7 +28,6 @@ import net.jcip.annotations.Immutable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @Immutable
 public final class BitField<E extends Enum<E>>
 implements Iterable<E>, Serializable {

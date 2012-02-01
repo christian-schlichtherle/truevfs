@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.entry.EntryName;
 import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.ENTRY_NAME;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
@@ -139,7 +137,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public final class FsEntryName extends EntryName {
     private static final long serialVersionUID = 2212342253466752478L;
 

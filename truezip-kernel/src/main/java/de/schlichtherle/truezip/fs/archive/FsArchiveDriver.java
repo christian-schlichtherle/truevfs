@@ -15,8 +15,6 @@ import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import javax.swing.Icon;
@@ -35,7 +33,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 

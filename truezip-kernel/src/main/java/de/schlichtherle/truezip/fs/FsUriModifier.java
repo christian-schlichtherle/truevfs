@@ -8,15 +8,13 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.jcip.annotations.Immutable;
-
-import static de.schlichtherle.truezip.fs.FsEntryName.*;
 
 /**
  * Modifies a URI when parsing an {@link FsPath}, an {@link FsMountPoint} or an
@@ -26,7 +24,6 @@ import static de.schlichtherle.truezip.fs.FsEntryName.*;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public enum FsUriModifier {
 
     /**

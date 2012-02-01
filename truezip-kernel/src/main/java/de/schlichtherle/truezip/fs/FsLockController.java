@@ -23,9 +23,8 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +53,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class FsLockController
 extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
@@ -339,11 +337,12 @@ extends FsLockModelDecoratingController<
     }
 
     @Override
-    public void mknod(
-            final @NonNull FsEntryName name,
-            final @NonNull Type type,
-            final @NonNull BitField<FsOutputOption> options,
-            final @CheckForNull Entry template)
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
+    public void
+    mknod(  final FsEntryName name,
+            final Type type,
+            final BitField<FsOutputOption> options,
+            final Entry template)
     throws IOException {
         class Mknod implements IOOperation<Void> {
             @Override
@@ -682,10 +681,8 @@ extends FsLockModelDecoratingController<
 
     @Immutable
     @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+    @DefaultAnnotation(Nullable.class)
     private static final class NeedsLockRetryException
     extends FsControllerException {
-        NeedsLockRetryException() {
-            super(null);
-        }
     }
 }

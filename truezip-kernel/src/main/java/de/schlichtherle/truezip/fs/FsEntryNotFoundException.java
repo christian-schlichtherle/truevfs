@@ -8,6 +8,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import net.jcip.annotations.ThreadSafe;
@@ -27,7 +29,7 @@ public final class FsEntryNotFoundException extends FileNotFoundException {
     public FsEntryNotFoundException(
             final FsModel model,
             final FsEntryName name,
-            final String msg) {
+            final @CheckForNull String msg) {
         super(msg);
         this.path = model.getMountPoint().resolve(name);
     }
@@ -35,16 +37,16 @@ public final class FsEntryNotFoundException extends FileNotFoundException {
     public FsEntryNotFoundException(
             final FsModel model,
             final FsEntryName name,
-            final IOException cause) {
-        super(cause == null ? null : cause.toString());
+            final @CheckForNull IOException cause) {
+        super(null != cause ? cause.toString() : null);
         super.initCause(cause);
         this.path = model.getMountPoint().resolve(name);
     }
 
     @Override
-    public String getMessage() {
+    public @Nullable String getMessage() {
         final String msg = super.getMessage();
-        return msg != null
+        return null != msg
                 ? new StringBuilder(path.toString()).append(" (").append(msg).append(")").toString()
                 : path.toString();
     }

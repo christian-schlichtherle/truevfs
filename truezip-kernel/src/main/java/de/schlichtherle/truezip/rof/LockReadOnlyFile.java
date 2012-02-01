@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.socket.InputShop;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
@@ -25,7 +23,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class LockReadOnlyFile extends DecoratingReadOnlyFile {
 
     /** The object to synchronize on. */
