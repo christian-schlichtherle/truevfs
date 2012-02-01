@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
@@ -52,7 +50,6 @@ import org.bouncycastle.crypto.Mac;
 // actually decrypt it, which is redundant.
 //
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
     /**
