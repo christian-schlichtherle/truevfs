@@ -26,8 +26,6 @@ import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import de.schlichtherle.truezip.zip.WinZipAesParameters;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipKeyException;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 
 /**
@@ -40,7 +38,6 @@ import java.nio.charset.Charset;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class KeyManagement {
 
     /** You cannot instantiate this class. */

@@ -9,8 +9,6 @@
 package de.schlichtherle.truezip.key;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 
 /**
@@ -18,7 +16,6 @@ import net.jcip.annotations.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class DummyKey implements SafeKey<DummyKey>, Cloneable {
 
     private static volatile int count;
