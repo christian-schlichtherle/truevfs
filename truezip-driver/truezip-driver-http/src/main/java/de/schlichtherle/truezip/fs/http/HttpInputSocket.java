@@ -16,8 +16,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,7 +29,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class HttpInputSocket extends InputSocket<HttpEntry> {
 
     private final HttpEntry entry;

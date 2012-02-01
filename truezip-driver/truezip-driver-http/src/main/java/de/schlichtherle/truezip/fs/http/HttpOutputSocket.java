@@ -13,8 +13,6 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.ThreadSafe;
@@ -28,7 +26,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public class HttpOutputSocket extends OutputSocket<HttpEntry> {
 
     private final HttpEntry entry;

@@ -14,8 +14,6 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 import org.apache.http.HttpResponse;
@@ -31,11 +29,11 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public class HttpDriver extends FsDriver {
 
     private final IOPoolProvider provider;
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private volatile @CheckForNull HttpClient client;
 
     public HttpDriver(final IOPoolProvider provider) {
