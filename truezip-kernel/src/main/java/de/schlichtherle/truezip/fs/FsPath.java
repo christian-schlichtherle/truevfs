@@ -14,8 +14,6 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.PATH;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.*;
 import java.net.URI;
@@ -450,13 +448,14 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @since  TrueZIP 7.1.1
      */
     public URI toHierarchicalUri() {
+        final URI hierarchical = this.hierarchical;
         if (null != hierarchical)
             return hierarchical;
         if (uri.isOpaque()) {
             final URI mpu = mountPoint.toHierarchicalUri();
             final URI enu = entryName.toUri();
             try {
-                return hierarchical = enu.toString().isEmpty()
+                return this.hierarchical = enu.toString().isEmpty()
                         ? mpu
                         : new UriBuilder(mpu, true)
                             .path(mpu.getRawPath() + FsEntryName.SEPARATOR)
@@ -466,7 +465,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                 throw new AssertionError(ex);
             }
         } else {
-            return hierarchical = uri;
+            return this.hierarchical = uri;
         }
     }
 
