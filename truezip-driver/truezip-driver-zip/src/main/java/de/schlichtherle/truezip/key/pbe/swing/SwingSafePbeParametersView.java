@@ -16,8 +16,6 @@ import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import de.schlichtherle.truezip.key.pbe.SafePbeParametersView;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.EOFException;
@@ -40,7 +38,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class SwingSafePbeParametersView<
         S extends KeyStrength,
         P extends SafePbeParameters<S, P>>
@@ -95,11 +92,12 @@ extends SafePbeParametersView<P> {
     }
 
     UnknownKeyFeedback getUnknownKeyFeedback() {
-        if (unknownKeyFeedback == null)
-            unknownKeyFeedback = serviceLocator.getService(
+        final UnknownKeyFeedback uckf = this.unknownKeyFeedback;
+        return null != uckf
+                ? uckf
+                : (this.unknownKeyFeedback = serviceLocator.getService(
                     UnknownKeyFeedback.class,
-                    BasicUnknownKeyFeedback.class);
-        return unknownKeyFeedback;
+                    BasicUnknownKeyFeedback.class));
     }
 
     void setUnkownKeyFeedback(final UnknownKeyFeedback uckf) {
@@ -107,11 +105,12 @@ extends SafePbeParametersView<P> {
     }
 
     InvalidKeyFeedback getInvalidKeyFeedback() {
-        if (invalidKeyFeedback == null)
-            invalidKeyFeedback = serviceLocator.getService(
+        final InvalidKeyFeedback ickf = this.invalidKeyFeedback;
+        return null != ickf
+                ? ickf
+                : (this.invalidKeyFeedback = serviceLocator.getService(
                     InvalidKeyFeedback.class,
-                    BasicInvalidKeyFeedback.class);
-        return invalidKeyFeedback;
+                    BasicInvalidKeyFeedback.class));
     }
 
     void setInvalidKeyFeedback(final InvalidKeyFeedback ickf) {
