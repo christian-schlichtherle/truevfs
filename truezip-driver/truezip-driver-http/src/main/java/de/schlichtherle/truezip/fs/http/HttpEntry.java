@@ -24,8 +24,6 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -50,11 +48,9 @@ import org.apache.http.client.methods.HttpUriRequest;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
-    private HttpController controller;
+    private final HttpController controller;
     private final String name;
     protected final URI uri;
 
