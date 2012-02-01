@@ -15,8 +15,6 @@ import static de.schlichtherle.truezip.crypto.raes.Constants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.EOFException;
 import java.io.IOException;
 import net.jcip.annotations.NotThreadSafe;
@@ -37,7 +35,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @version $Id$
  */
 @NotThreadSafe
-@DefaultAnnotation(NonNull.class)
 final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
     /** The key strength. */

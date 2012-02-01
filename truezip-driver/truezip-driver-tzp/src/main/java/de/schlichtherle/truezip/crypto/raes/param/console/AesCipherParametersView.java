@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.crypto.raes.param.console;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.key.pbe.console.ConsoleSafePbeParametersView;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import net.jcip.annotations.ThreadSafe;
 
 /**
@@ -22,7 +20,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class AesCipherParametersView
 extends ConsoleSafePbeParametersView<KeyStrength, AesCipherParameters> {
     @Override

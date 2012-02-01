@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ResourceBundle;
 import net.jcip.annotations.ThreadSafe;
 
@@ -25,7 +23,6 @@ import net.jcip.annotations.ThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public interface Type0RaesParameters extends RaesParameters {
 
     /**

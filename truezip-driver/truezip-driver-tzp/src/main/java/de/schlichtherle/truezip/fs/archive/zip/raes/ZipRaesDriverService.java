@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
-//import de.schlichtherle.truezip.socket.ByteArrayIOPoolProvider;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import java.util.Map;
 import net.jcip.annotations.Immutable;

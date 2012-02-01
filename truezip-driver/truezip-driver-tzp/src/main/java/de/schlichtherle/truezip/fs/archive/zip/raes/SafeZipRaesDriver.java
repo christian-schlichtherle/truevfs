@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import net.jcip.annotations.Immutable;
 
@@ -40,7 +38,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public class SafeZipRaesDriver extends ZipRaesDriver {
 
     public SafeZipRaesDriver(   IOPoolProvider ioPoolProvider,
