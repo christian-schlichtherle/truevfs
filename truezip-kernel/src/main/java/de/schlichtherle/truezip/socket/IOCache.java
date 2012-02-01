@@ -65,8 +65,7 @@ public final class IOCache implements Flushable, Closeable {
 
     /**
      * Constructs a new cache which applies the given caching strategy,
-     * uses the given pool to allocate and release temporary I/O entries
-     * and the given lock for locking out concurrent access.
+     * uses the given pool to allocate and release temporary I/O entries.
      * <p>
      * Note that you need to call {@link #configure(InputSocket)} before
      * you can do any input.
@@ -75,7 +74,6 @@ public final class IOCache implements Flushable, Closeable {
      *
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
-     * @param lock the lock for concurrent access control.
      */
     private IOCache(final Strategy strategy,
                     final IOPool<?> pool) {
