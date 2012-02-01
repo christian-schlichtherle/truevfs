@@ -12,8 +12,6 @@ import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.util.Random;
 import net.jcip.annotations.ThreadSafe;
@@ -26,7 +24,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public final class MockView<K extends SafeKey<K>> implements View<K> {
     private volatile @CheckForNull URI resource;
     private volatile @CheckForNull K key;
