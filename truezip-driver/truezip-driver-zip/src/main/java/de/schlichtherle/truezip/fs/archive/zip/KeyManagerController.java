@@ -14,8 +14,6 @@ import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.SafeKeyManager;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.net.URI;
 import net.jcip.annotations.ThreadSafe;
@@ -28,7 +26,6 @@ import net.jcip.annotations.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-@DefaultAnnotation(NonNull.class)
 public abstract class KeyManagerController<D extends ZipDriver>
 extends FsDecoratingController<FsModel, FsController<?>> {
 
@@ -56,11 +53,11 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     protected abstract Class<? extends IOException> getKeyExceptionType();
 
     private KeyManager<?> getKeyManager() {
-        KeyManager<?> manager = this.manager;
-        if (null == manager)
-            this.manager = manager = driver.getKeyManagerProvider().get(
-                    getKeyType());
-        return manager;
+        final KeyManager<?> manager = this.manager;
+        return null != manager
+                ? manager
+                : (this.manager = driver.getKeyManagerProvider()
+                    .get(getKeyType()));
     }
 
     @Override
