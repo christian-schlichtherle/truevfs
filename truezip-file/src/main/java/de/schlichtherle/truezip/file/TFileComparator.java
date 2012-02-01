@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.text.Collator;
 import java.util.Comparator;
+import net.jcip.annotations.Immutable;
 
 /**
  * Compares two files by their status and path name so that directories
@@ -20,6 +21,7 @@ import java.util.Comparator;
  * @author Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public final class TFileComparator implements Comparator<File>, Serializable {
 
     private static final long serialVersionUID = 1234567890123456789L;

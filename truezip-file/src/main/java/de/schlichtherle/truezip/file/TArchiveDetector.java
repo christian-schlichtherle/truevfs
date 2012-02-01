@@ -17,8 +17,6 @@ import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.SuffixSet;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -62,7 +60,6 @@ import net.jcip.annotations.Immutable;
  * @version $Id$
  */
 @Immutable
-@DefaultAnnotation(NonNull.class)
 public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**

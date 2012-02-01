@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.file.swing;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.FileFilter;
@@ -47,7 +45,6 @@ import javax.swing.filechooser.FileSystemView;
 // For many methods in this class, we need to pass in the delegate to the
 // superclass implementation in order for the JFileChooser to work as expected.
 //
-@DefaultAnnotation(NonNull.class)
 public class TFileSystemView extends TDecoratingFileSystemView {
 
     /** Maybe null - uses default then. **/

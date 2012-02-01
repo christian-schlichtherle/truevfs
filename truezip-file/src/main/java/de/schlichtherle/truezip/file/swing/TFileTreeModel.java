@@ -11,8 +11,6 @@ package de.schlichtherle.truezip.file.swing;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -32,7 +30,6 @@ import javax.swing.tree.TreePath;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class TFileTreeModel implements TreeModel {
 
     /**

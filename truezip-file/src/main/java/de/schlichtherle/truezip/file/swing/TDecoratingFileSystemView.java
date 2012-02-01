@@ -8,12 +8,10 @@
  */
 package de.schlichtherle.truezip.file.swing;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.Icon;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * A decorator for a file system view.
@@ -21,7 +19,6 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class TDecoratingFileSystemView extends FileSystemView {
 
     /** The decorated file system view. */

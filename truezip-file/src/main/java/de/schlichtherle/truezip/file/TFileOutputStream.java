@@ -10,8 +10,6 @@ package de.schlichtherle.truezip.file;
 
 import java.io.InputStream;
 import net.jcip.annotations.Immutable;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -75,7 +73,6 @@ import java.io.OutputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 @Immutable
 public final class TFileOutputStream extends DecoratingOutputStream {
 

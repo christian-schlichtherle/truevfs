@@ -8,12 +8,10 @@
  */
 package de.schlichtherle.truezip.file.swing;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
-import javax.swing.filechooser.FileView;
 import javax.swing.Icon;
+import javax.swing.filechooser.FileView;
 
 /**
  * A decorator for a file view.
@@ -21,7 +19,6 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public abstract class TDecoratingFileView extends FileView {
 
     /** The decorated file view. */
