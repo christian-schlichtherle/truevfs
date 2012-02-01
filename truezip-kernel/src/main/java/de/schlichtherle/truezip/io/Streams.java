@@ -265,7 +265,7 @@ public final class Streams {
             }
             out.flush();
 
-            if (reader.exception != null)
+            if (null != reader.exception)
                 throw reader.exception;
         } finally {
             Buffer.release(buffers);
