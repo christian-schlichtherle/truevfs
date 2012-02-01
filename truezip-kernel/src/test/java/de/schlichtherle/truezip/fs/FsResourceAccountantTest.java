@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.Callable;
@@ -28,7 +26,6 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public class FsResourceAccountantTest {
 
     private static final long NO_TIMEOUT = 0;

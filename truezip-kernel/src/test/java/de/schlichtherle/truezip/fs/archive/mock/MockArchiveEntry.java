@@ -12,8 +12,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.EnumMap;
 
@@ -21,7 +19,6 @@ import java.util.EnumMap;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-@DefaultAnnotation(NonNull.class)
 public final class MockArchiveEntry implements FsArchiveEntry {
 
     private final String name;
