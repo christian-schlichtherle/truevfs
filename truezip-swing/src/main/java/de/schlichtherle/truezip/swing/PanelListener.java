@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.EventListener;
 
 /**
@@ -24,11 +23,11 @@ public interface PanelListener extends EventListener {
      * Invoked when the ancestor window of an
      * {@link de.schlichtherle.truezip.swing.EnhancedPanel} is shown.
      */
-    void ancestorWindowShown(@NonNull PanelEvent evt);
+    void ancestorWindowShown(PanelEvent evt);
 
     /**
      * Invoked when the ancestor window of an
      * {@link de.schlichtherle.truezip.swing.EnhancedPanel} is hidden.
      */
-    void ancestorWindowHidden(@NonNull PanelEvent evt);
+    void ancestorWindowHidden(PanelEvent evt);
 }
