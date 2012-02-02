@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -50,7 +49,7 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
      *         the syntax constraints for URI schemes.
      * @return A new scheme.
      */
-    public static @NonNull FsScheme create(String scheme) {
+    public static FsScheme create(String scheme) {
         try {
             return new FsScheme(scheme);
         } catch (URISyntaxException ex) {
@@ -65,7 +64,7 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
      * @throws URISyntaxException if {@code scheme} does not conform to the
      *         syntax constraints for URI schemes.
      */
-    public FsScheme(final @NonNull String scheme) throws URISyntaxException {
+    public FsScheme(final String scheme) throws URISyntaxException {
         UriBuilder.validateScheme(scheme);
         this.scheme = scheme;
     }
