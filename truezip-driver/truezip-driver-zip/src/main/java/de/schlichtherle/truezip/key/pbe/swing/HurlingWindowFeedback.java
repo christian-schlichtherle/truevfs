@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.key.pbe.swing;
 
 import static de.schlichtherle.truezip.key.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -69,7 +68,7 @@ public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
     }
 
     @Override
-    public void run(@NonNull JPanel panel) {
+    public void run(JPanel panel) {
         final Window window = SwingUtilities.getWindowAncestor(panel);
         super.run(panel); // temporarily disable default button
         if (null == window)
