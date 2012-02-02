@@ -17,8 +17,6 @@ import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
