@@ -62,7 +62,7 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
     public void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         if (!lock.isWriteLockedByCurrentThread())
-            throw new FsNeedsWriteLockException();
+            throw FsNeedsWriteLockException.SINGLETON;
     }
 
     /**
@@ -77,6 +77,6 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
     void checkNotReadLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         if (0 < lock.getReadHoldCount())
-            throw new FsNeedsWriteLockException();
+            throw FsNeedsWriteLockException.SINGLETON;
     }
 }

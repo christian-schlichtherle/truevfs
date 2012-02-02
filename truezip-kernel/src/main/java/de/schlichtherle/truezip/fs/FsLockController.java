@@ -153,7 +153,7 @@ extends FsLockModelDecoratingController<
         final ThreadTool thread = threadTool.get();
         if (thread.locking) {
             if (!lock.tryLock())
-                throw new NeedsLockRetryException();
+                throw NeedsLockRetryException.SINGLETON;
             try {
                 return operation.call();
             } finally {
@@ -170,7 +170,7 @@ extends FsLockModelDecoratingController<
                         thread.locking = false;
                         lock.unlock();
                     }
-                } catch (IOException ex) {
+                } catch (final IOException ex) {
                     if (!needsLockRetry(ex))
                         throw ex;
                     thread.pause();
@@ -684,5 +684,7 @@ extends FsLockModelDecoratingController<
     @DefaultAnnotation(Nullable.class)
     private static final class NeedsLockRetryException
     extends FsControllerException {
+        static final NeedsLockRetryException
+                SINGLETON = new NeedsLockRetryException();
     }
 }
