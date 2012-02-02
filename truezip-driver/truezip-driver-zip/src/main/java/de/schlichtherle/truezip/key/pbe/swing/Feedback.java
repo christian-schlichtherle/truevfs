@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.swing.JPanel;
 
 /**
@@ -36,5 +35,5 @@ public interface Feedback {
      *
      * @param panel the panel to provide visual/audible run to.
      */
-    void run(@NonNull JPanel panel);
+    void run(JPanel panel);
 }
