@@ -359,7 +359,7 @@ Note that at run time, only JSE 6 is required.
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <url>${de.schlichtherle.truezip.site.url}</url>
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
         </site>
     </distributionManagement>
 </project>
