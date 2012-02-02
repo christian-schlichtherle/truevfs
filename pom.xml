@@ -15,7 +15,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>epl10-oss-parent</artifactId>
-        <version>18</version>
+        <version>19</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -334,7 +334,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.0.3</version>
+                                    <version>3.0.4</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>1.7</version>
@@ -351,7 +351,7 @@
         <site>
             <id>truezip-website</id>
             <name>TrueZIP Website</name>
-            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
+            <url>${de.schlichtherle.truezip.site.url}</url>
         </site>
     </distributionManagement>
 </project>
