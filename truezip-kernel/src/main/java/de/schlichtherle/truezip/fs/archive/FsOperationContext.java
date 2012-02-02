@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Represents the original values of selected parameters for the

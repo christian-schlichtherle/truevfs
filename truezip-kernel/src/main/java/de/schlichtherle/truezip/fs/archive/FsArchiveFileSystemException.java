@@ -9,9 +9,9 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsEntryName;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate an exceptional condition in an {@link FsArchiveFileSystem}.

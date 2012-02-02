@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
-import net.jcip.annotations.Immutable;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract factory for components required to access a file system.

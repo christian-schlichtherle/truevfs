@@ -18,7 +18,7 @@ import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An input shop for reading ZIP files.

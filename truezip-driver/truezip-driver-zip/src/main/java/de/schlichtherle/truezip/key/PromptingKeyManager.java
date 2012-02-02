@@ -9,9 +9,9 @@
 package de.schlichtherle.truezip.key;
 
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.net.URI;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A key manager which prompts the user for a key if required.

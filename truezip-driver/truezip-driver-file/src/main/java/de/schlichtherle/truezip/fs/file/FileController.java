@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.File;
 import static java.io.File.separatorChar;
 import java.io.FileNotFoundException;
@@ -30,7 +30,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import javax.swing.Icon;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A file system controller with a prospective directory in the platform file

@@ -9,10 +9,10 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.socket.InputShop;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A decorator which protects all access to a shared resource, e.g. an

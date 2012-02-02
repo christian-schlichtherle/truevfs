@@ -9,11 +9,11 @@
 package de.schlichtherle.truezip.util;
 
 import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.CharBuffer;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A mutable JavaBean for composing URIs according to

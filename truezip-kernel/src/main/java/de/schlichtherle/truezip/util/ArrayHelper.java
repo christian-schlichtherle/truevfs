@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.util;
 
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides static utility methods for arrays.

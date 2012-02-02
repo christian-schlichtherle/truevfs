@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.AbstractExceptionBuilder;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Assembles a {@link SequentialIOException} from one or more

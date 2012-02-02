@@ -24,8 +24,8 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -34,8 +34,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import javax.swing.Icon;
-import net.jcip.annotations.Immutable;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A content caching file system controller implements a combined caching and

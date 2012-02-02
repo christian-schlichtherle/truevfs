@@ -18,7 +18,7 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

@@ -8,13 +8,13 @@
  */
 package de.schlichtherle.truezip.util;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A type-safe, immutable set of enums which emulates the concept of a bit

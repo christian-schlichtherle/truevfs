@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.io;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An output stream to write data in Little Endian (LE) format.

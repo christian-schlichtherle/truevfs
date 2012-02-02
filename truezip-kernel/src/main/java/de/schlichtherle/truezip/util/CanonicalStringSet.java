@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.util;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;

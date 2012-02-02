@@ -16,10 +16,10 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.*;
 import static java.lang.Boolean.TRUE;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An output socket for a file entry.

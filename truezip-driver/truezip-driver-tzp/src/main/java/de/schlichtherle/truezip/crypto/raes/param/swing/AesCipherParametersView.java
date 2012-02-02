@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.crypto.raes.param.swing;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.key.pbe.swing.SwingSafePbeParametersView;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.

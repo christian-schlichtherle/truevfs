@@ -18,7 +18,7 @@ import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import java.net.URI;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An adapter which provides {@link RaesParameters} by using a

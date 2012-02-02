@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -25,7 +25,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An observer for a {@link JComboBox} which provides auto completion for the

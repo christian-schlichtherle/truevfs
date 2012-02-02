@@ -9,15 +9,15 @@
 package de.schlichtherle.truezip.fs.nio.file;
 
 import de.schlichtherle.truezip.socket.IOPool;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.deleteIfExists;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.

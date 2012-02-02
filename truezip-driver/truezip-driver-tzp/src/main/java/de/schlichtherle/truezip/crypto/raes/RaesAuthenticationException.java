@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that a RAES file has been tampered with.

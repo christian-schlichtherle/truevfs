@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.util.UriBuilder;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Represents a {@link java.net.URI} scheme according to the syntax constraints

@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A lazy output socket provides proxy output streams which acquire their

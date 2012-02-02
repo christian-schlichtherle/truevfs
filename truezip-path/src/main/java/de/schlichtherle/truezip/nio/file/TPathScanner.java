@@ -22,10 +22,10 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Scans hierarchical {@link URI}s for prospective archive files with the help

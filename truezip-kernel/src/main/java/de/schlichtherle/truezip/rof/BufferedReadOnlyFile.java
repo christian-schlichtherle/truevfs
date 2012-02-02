@@ -9,11 +9,11 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.io.Streams;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A {@link ReadOnlyFile} implementation which provides buffered random read

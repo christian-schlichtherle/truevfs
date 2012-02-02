@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.crypto.raes.param;
 
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A JavaBean which holds AES cipher parameters.

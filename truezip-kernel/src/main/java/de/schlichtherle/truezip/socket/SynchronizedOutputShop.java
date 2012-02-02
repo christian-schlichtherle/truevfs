@@ -9,12 +9,12 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Decorates another output shop to add synchronization for all output streams

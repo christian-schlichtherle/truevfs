@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.util;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An exception builder is an exception handler which assembles an exception

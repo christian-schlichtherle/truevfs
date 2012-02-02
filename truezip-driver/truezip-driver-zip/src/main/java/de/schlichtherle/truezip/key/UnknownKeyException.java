@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.key;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.security.GeneralSecurityException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that the retrieval of the key to open or create a

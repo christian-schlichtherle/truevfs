@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import java.util.EventObject;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An archive file system event.

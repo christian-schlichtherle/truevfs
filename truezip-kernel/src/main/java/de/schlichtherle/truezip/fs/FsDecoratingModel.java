@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract decorator for a file system model.

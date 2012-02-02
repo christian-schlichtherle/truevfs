@@ -9,11 +9,11 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Delegates all methods to another output socket.

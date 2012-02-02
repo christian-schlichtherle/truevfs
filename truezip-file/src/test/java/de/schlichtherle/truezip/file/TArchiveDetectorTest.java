@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;

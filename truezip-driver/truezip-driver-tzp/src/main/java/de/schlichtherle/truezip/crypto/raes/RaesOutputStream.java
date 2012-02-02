@@ -10,10 +10,10 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 

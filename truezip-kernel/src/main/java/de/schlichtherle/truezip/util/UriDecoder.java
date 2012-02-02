@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.util;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -17,7 +17,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import static java.nio.charset.CoderResult.OVERFLOW;
 import static java.nio.charset.CoderResult.UNDERFLOW;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Decodes quoted characters in URI components according to

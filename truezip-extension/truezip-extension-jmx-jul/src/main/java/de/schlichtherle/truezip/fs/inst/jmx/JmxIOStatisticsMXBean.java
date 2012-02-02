@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides statistics for the federated file systems managed by a file system

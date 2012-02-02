@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
 import de.schlichtherle.truezip.swing.EnhancedPanel;
 import de.schlichtherle.truezip.swing.PanelEvent;
 import de.schlichtherle.truezip.swing.PanelListener;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.net.URI;
 
 /**

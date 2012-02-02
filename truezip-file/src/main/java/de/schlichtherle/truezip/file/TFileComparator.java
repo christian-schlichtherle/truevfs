@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.text.Collator;
 import java.util.Comparator;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Compares two files by their status and path name so that directories

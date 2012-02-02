@@ -18,13 +18,13 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**

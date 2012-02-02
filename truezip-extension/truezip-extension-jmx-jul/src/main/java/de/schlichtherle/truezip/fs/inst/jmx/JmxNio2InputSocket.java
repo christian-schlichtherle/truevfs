@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.InputSocket;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

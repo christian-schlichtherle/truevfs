@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.io;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;

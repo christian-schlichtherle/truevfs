@@ -8,11 +8,11 @@
  */
 package de.schlichtherle.truezip.key;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.Closeable;
 import java.net.URI;
-import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A "safe" key provider which prompts the user for a key for its protected

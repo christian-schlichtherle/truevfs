@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import java.lang.management.ManagementFactory;
 import javax.management.*;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @author  Christian Schlichtherle

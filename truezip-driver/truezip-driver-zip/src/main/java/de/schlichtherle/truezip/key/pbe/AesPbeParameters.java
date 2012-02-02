@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.key.pbe;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A JavaBean which holds password based encryption parameters for use with the

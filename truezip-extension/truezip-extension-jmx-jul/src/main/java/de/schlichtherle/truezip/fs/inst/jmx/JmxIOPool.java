@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

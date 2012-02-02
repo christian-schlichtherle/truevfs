@@ -15,7 +15,7 @@ import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
 import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import static org.junit.Assert.*;
 import org.junit.Test;

@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.util;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;

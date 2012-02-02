@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import java.util.ServiceConfigurationError;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract composite driver.

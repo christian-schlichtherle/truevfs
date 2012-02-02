@@ -8,13 +8,13 @@
  */
 package de.schlichtherle.truezip.io;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Comparator;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Represents a chain of subsequently occured {@code IOException}s which have

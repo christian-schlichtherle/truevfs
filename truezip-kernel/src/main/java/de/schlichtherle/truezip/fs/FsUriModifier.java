@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Modifies a URI when parsing an {@link FsPath}, an {@link FsMountPoint} or an

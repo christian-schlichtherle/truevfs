@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.key.pbe;
 
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A user interface to prompt for parameters for safe password based encryption.

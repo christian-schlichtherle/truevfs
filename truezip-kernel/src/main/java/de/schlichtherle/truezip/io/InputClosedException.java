@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.io;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates that an input resource (input stream etc.) for an entry has been

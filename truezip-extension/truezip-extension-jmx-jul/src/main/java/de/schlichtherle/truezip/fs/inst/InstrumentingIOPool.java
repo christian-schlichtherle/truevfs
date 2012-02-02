@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Christian Schlichtherle

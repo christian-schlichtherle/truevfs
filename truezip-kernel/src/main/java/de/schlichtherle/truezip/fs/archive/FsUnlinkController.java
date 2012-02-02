@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
 import javax.swing.Icon;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A decorating file system controller which unlinks the target archive file

@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An archive driver for JAR files which checks the CRC-32 value for all ZIP

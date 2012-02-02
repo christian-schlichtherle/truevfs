@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
 import java.nio.channels.SeekableByteChannel;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Adapts a byte buffer to a seekable byte channel.

@@ -18,7 +18,7 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.*;
 import java.util.*;
 import org.apache.commons.compress.archivers.ArchiveEntry;

@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An output shop for writing ZIP files.

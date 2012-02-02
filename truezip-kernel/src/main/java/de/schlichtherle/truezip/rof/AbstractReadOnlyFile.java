@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.rof;
 
 import java.io.EOFException;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An abstract read only file which implements the common boilerplate.

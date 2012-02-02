@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * @author  Christian Schlichtherle

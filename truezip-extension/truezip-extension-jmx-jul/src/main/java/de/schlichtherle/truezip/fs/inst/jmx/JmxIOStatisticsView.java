@@ -13,7 +13,7 @@ import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.util.Date;
 import javax.management.*;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides statistics for the federated file systems managed by a single file

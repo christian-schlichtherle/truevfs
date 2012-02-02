@@ -18,11 +18,11 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.

@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An abstract decorator for a read only file.

@@ -17,7 +17,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import java.io.EOFException;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;

@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.inst.InstrumentingModel;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

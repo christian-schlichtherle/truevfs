@@ -10,11 +10,11 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract class for objects to do some I/O on a

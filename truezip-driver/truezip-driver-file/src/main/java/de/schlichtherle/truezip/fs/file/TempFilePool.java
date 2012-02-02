@@ -9,13 +9,13 @@
 package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.socket.IOPool;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.File;
 import static java.io.File.createTempFile;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.

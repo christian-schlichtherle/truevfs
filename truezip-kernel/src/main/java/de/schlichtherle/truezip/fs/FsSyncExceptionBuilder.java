@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Assembles a {@link FsSyncException} from one or more {@link IOException}s by

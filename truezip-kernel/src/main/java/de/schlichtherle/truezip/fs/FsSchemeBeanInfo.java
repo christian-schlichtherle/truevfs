@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.beans.*;
 
 /**

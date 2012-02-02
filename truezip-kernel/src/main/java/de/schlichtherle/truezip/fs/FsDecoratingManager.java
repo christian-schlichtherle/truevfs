@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import java.util.Iterator;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract decorator for a file system manager.

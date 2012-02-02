@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.zip;
 
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Default implementation of {@link ZipOutputStreamParameters}.

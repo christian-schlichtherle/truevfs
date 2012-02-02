@@ -16,7 +16,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of

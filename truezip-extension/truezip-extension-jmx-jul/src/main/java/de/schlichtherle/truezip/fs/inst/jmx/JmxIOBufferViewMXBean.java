@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.socket.IOPool.Entry;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * The MXBean interface for an {@link Entry I/O pool entry}.

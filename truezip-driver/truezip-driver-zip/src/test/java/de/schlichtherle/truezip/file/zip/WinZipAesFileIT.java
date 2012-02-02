@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.file.TFileTestBase;
 import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 /**

@@ -11,11 +11,11 @@ package de.schlichtherle.truezip.zip;
 import static de.schlichtherle.truezip.zip.Constants.EMPTY;
 import static de.schlichtherle.truezip.zip.LittleEndian.readUShort;
 import static de.schlichtherle.truezip.zip.LittleEndian.writeShort;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.TreeMap;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Represents a collection of {@link ExtraField Extra Fields} as they may

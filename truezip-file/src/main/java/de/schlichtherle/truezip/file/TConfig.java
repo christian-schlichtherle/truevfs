@@ -19,7 +19,7 @@ import java.io.Closeable;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A container for configuration options with global or inheritable thread

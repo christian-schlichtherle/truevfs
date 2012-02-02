@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

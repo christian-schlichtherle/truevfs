@@ -10,8 +10,8 @@ package de.schlichtherle.truezip.socket;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A pool of byte array I/O entries.

@@ -13,7 +13,7 @@ import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A replacement for the class {@link FileWriter} for writing plain old files

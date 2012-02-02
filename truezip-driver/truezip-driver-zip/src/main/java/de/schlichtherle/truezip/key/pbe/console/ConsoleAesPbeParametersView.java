@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.key.pbe.console;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A console based user interface to prompt for passwords.

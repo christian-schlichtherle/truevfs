@@ -9,8 +9,8 @@
 package de.schlichtherle.truezip.key;
 
 import de.schlichtherle.truezip.crypto.SuspensionPenalty;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides the base functionality required to implement a "safe" key provider.

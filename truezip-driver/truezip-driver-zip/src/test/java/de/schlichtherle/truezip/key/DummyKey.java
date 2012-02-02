@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.key;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * @author  Christian Schlichtherle

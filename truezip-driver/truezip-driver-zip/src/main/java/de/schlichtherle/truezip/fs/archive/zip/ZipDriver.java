@@ -29,7 +29,7 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.*;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An archive driver for plain old ZIP files.

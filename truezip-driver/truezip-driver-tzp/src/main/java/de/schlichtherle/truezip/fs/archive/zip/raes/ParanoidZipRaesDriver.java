@@ -15,10 +15,10 @@ import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputShop;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A paranoid archive driver for RAES encrypted ZIP files.

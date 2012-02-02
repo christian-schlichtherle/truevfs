@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.FileBusyException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @since   TrueZIP 7.5

@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

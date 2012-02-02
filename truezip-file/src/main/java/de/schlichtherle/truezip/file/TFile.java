@@ -26,8 +26,8 @@ import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -36,7 +36,7 @@ import java.net.URL;
 import java.util.*;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A replacement for the class {@link File} which provides transparent

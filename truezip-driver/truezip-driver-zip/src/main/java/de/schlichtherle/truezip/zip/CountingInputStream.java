@@ -9,10 +9,10 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A decorating input stream which counts the number of bytes read.

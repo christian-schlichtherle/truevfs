@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.crypto.param;
 
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Defines the key strengths for a cipher.

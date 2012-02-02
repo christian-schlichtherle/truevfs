@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.security.GeneralSecurityException;
 
 /**

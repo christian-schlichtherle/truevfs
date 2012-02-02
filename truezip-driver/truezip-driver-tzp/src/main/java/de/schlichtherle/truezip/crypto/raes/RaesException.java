@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown if there is an issue when reading or writing a RAES file which is

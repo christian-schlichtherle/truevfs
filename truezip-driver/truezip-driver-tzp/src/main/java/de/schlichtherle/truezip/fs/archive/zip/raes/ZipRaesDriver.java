@@ -28,11 +28,11 @@ import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally

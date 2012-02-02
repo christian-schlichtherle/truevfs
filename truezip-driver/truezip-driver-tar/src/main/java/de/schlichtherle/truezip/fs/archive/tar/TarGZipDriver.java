@@ -17,13 +17,13 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.STORE;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).

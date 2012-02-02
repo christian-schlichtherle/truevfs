@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import static java.util.logging.Level.CONFIG;
 import java.util.logging.Logger;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A {@link FileSystemProvider} implementation

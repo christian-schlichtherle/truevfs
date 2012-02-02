@@ -26,8 +26,8 @@ import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.File;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
@@ -45,7 +45,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.*;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A {@link Path} implementation

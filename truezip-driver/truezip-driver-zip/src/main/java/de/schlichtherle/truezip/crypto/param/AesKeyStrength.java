@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.crypto.param;
 
 import java.util.ResourceBundle;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Enumerates the AES cipher key strenghts.

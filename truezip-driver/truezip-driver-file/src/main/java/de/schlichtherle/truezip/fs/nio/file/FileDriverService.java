@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import java.util.Map;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An immutable container of a map with a driver for accessing the {@code file}

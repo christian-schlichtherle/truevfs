@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates an <em>internal</em> exception in a decorator chain of

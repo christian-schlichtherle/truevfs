@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.io.swing;
 
 import de.schlichtherle.truezip.swing.AbstractComboBoxBrowser;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.Collator;
@@ -17,7 +17,7 @@ import java.util.Arrays;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.filechooser.FileSystemView;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Subclasses {@code AbstractComboBoxBrowser} to complete relative and

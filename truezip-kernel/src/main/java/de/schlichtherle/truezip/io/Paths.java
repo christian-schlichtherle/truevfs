@@ -8,12 +8,12 @@
  */
 package de.schlichtherle.truezip.io;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Locale;
-import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides static utility methods for path names.

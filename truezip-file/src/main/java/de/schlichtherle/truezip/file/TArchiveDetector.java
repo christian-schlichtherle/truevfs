@@ -16,14 +16,14 @@ import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.SuffixSet;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Detects a <em>prospective</em> archive file and declares its file system

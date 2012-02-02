@@ -28,12 +28,12 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.*;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A read/write virtual file system for archive entries.

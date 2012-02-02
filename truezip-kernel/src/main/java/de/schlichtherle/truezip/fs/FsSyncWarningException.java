@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import java.io.IOException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a

@@ -11,8 +11,8 @@ package de.schlichtherle.truezip.fs.file;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import net.jcip.annotations.Immutable;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A file system driver for the FILE scheme.

@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.zip;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A method for writing a ZIP entry.

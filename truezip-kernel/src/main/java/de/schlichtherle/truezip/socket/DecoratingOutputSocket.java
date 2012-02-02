@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An abstract decorator for an output socket.

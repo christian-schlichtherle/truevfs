@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * An entry which provides output sockets.
@@ -28,5 +27,5 @@ public interface OutputEntry<E extends OutputEntry<E>> extends Entry {
      * @return An output socket for writing this entry.
      */
     // TODO: Declare to return OutputSocket<? extends E>
-    @NonNull OutputSocket<E> getOutputSocket();
+    OutputSocket<E> getOutputSocket();
 }

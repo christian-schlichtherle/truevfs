@@ -13,7 +13,7 @@ import java.nio.charset.spi.CharsetProvider;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A charset provider that only provides the {@code IBM437} character set,

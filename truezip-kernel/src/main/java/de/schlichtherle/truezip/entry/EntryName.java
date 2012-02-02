@@ -10,11 +10,11 @@ package de.schlichtherle.truezip.entry;
 
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Addresses an entry in an entry container.

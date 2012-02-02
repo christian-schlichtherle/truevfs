@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An input socket for a file entry.

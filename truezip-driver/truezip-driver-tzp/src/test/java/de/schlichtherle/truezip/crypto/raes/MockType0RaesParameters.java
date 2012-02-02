@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.crypto.raes;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import static org.junit.Assert.assertTrue;
 
 /**

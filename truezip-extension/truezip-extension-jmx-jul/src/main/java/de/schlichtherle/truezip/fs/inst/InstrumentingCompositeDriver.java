@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs.inst;
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsModel;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle
