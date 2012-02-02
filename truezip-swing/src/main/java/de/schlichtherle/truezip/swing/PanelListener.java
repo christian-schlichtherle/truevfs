@@ -22,12 +22,16 @@ public interface PanelListener extends EventListener {
     /**
      * Invoked when the ancestor window of an
      * {@link de.schlichtherle.truezip.swing.EnhancedPanel} is shown.
+     * 
+     * @param evt A panel event.
      */
     void ancestorWindowShown(PanelEvent evt);
 
     /**
      * Invoked when the ancestor window of an
      * {@link de.schlichtherle.truezip.swing.EnhancedPanel} is hidden.
+     * 
+     * @param evt A panel event.
      */
     void ancestorWindowHidden(PanelEvent evt);
 }
