@@ -9,8 +9,5 @@
 /**
  * Provides interfaces and implementations for general cryptography parameters.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.crypto.param;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;

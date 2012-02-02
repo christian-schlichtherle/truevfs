@@ -48,8 +48,5 @@
  * You have to use a {@code TFile(In|Out)putStream} or a
  * {@code TFile(Reader|Writer)} instead.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.file;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;

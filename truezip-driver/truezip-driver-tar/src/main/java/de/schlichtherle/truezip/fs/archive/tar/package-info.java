@@ -9,8 +9,5 @@
 /**
  * The archive driver family for TAR files.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.fs.archive.tar;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;

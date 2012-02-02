@@ -9,8 +9,5 @@
 /**
  * Demonstrates key management for RAES encrypted ZIP files.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;

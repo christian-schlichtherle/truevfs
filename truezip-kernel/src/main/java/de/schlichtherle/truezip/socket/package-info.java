@@ -20,8 +20,5 @@
  * If initializing I/O is required, it should be done in any of the methods
  * provided by the socket instead.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.socket;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;

@@ -114,8 +114,5 @@
  * minimum number of compressed bytes for the first 512 bytes of a key file
  * should be no less than 2 * 256 / 8 = 64 bytes.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.crypto.raes;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
