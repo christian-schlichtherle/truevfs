@@ -21,7 +21,10 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public final class FsNeedsWriteLockException extends FsControllerException {
-    FsNeedsWriteLockException() {
+    static final FsNeedsWriteLockException
+            SINGLETON = new FsNeedsWriteLockException();
+
+    private FsNeedsWriteLockException() {
         super(null);
     }
 }

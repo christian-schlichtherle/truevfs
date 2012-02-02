@@ -264,7 +264,7 @@ extends FsFileSystemArchiveController<E> {
                 if (!grow
                         || null == intention && !driver.getRedundantMetaDataSupport()
                         || WRITE == intention && !driver.getRedundantContentSupport())
-                    throw new FsNeedsSyncException();
+                    throw FsNeedsSyncException.SINGLETON;
             }
         } else {
             aen = null;
@@ -288,7 +288,7 @@ extends FsFileSystemArchiveController<E> {
             iae = null;
         }
         if (READ == intention && (null == iae || iae != oae && oae != null))
-            throw new FsNeedsSyncException();
+            throw FsNeedsSyncException.SINGLETON;
     }
 
     @Override

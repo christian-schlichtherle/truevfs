@@ -43,7 +43,7 @@ import net.jcip.annotations.Immutable;
  * If you are only using a file system controller, for example by calling
  * {@link FsManager#getController(FsMountPoint, FsCompositeDriver)}, then you
  * don't need to be concerned about file system controller exceptions at all
- * because they are never thrown to client applications (this would be a bug).
+ * because they shall never pass to client applications (this would be a bug).
  * <p>
  * As an implementor of a file system controller however, for example when
  * writing a custom controller for an archive file system driver by extending
@@ -76,11 +76,29 @@ import net.jcip.annotations.Immutable;
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public abstract class FsControllerException extends IOException {
+
+    private static final StackTraceElement[]
+            EMPTY_STACK = new StackTraceElement[0];
+
     FsControllerException() {
         this(null);
     }
 
     FsControllerException(@CheckForNull Throwable cause) {
         super(cause);
+    }
+
+    /**
+     * Fills in an empty stack trace for optimum performance.
+     * <em>Warning:</em> This method is called from the constructors in the
+     * super class {@code Throwable}!
+     * 
+     * @return {@code this}
+     * @see <a href="http://blogs.oracle.com/jrose/entry/longjumps_considered_inexpensive">Longjumps Considered Inexpensive</a>
+     */
+    @Override
+    public synchronized FsControllerException fillInStackTrace() {
+        super.setStackTrace(EMPTY_STACK);
+        return this;
     }
 }
