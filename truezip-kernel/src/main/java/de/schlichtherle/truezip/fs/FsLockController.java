@@ -23,8 +23,6 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -681,7 +679,6 @@ extends FsLockModelDecoratingController<
 
     @Immutable
     @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-    @DefaultAnnotation(Nullable.class)
     private static final class NeedsLockRetryException
     extends FsControllerException {
         static final NeedsLockRetryException
