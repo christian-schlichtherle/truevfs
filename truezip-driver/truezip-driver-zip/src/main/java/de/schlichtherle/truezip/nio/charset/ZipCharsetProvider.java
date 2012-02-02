@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.nio.charset;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.nio.charset.Charset;
 import java.nio.charset.spi.CharsetProvider;
 import java.util.*;
@@ -26,7 +25,7 @@ import net.jcip.annotations.Immutable;
 @Immutable
 public final class ZipCharsetProvider extends CharsetProvider {
 
-    private static final @NonNull Map<String, Charset> CHARSETS;
+    private static final Map<String, Charset> CHARSETS;
     static {
         Logger logger = Logger.getLogger(   ZipCharsetProvider.class.getName(),
                                             ZipCharsetProvider.class.getName());
@@ -43,7 +42,7 @@ public final class ZipCharsetProvider extends CharsetProvider {
         CHARSETS = Collections.unmodifiableMap(charsets);
     }
 
-    private static @NonNull String lowerCase(@NonNull String s) {
+    private static String lowerCase(String s) {
         return s.toLowerCase(Locale.ENGLISH);
     }
 
