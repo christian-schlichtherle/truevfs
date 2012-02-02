@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.fs.spi.DummyDriverService;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link.Type;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.net.URI;
 import java.util.Iterator;
 import static org.hamcrest.CoreMatchers.*;
@@ -36,7 +35,7 @@ public abstract class FsManagerTestBase {
         manager = newManager(WEAK);
     }
 
-    protected abstract @NonNull FsManager newManager(Type type);
+    protected abstract FsManager newManager(Type type);
 
     @Test
     public void testGetControllerWithNull() {
