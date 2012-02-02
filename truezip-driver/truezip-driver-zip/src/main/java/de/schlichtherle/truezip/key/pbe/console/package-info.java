@@ -10,8 +10,5 @@
  * Provides the console I/O based implementation of the interface
  * {@link de.schlichtherle.truezip.key.PromptingKeyProvider.View}.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.key.pbe.console;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;

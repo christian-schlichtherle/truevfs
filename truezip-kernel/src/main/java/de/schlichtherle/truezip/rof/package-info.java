@@ -10,8 +10,5 @@
  * Provides random <em>read-only</em> access to files (as opposed to the random
  * <em>read/write</em> access provided by {@link java.io.RandomAccessFile}).
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.rof;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;

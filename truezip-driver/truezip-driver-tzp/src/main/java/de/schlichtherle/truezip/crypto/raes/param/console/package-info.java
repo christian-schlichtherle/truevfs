@@ -7,12 +7,8 @@
  * http://www.eclipse.org/legal/epl-v10.html
  */
 /**
- * T
  * Provides the console I/O based implementation of the interface
  * {@link de.schlichtherle.truezip.key.PromptingKeyProvider.View}.
  */
-@DefaultAnnotation(NonNull.class)
+@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.schlichtherle.truezip.crypto.raes.param.console;
-
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import edu.umd.cs.findbugs.annotations.NonNull;
