@@ -10,7 +10,6 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import net.jcip.annotations.NotThreadSafe;
@@ -28,7 +27,7 @@ import net.jcip.annotations.NotThreadSafe;
 public final class LazyOutputSocket<E extends Entry>
 extends DecoratingOutputSocket<E> {
 
-    public LazyOutputSocket(@NonNull OutputSocket<? extends E> output) {
+    public LazyOutputSocket(OutputSocket<? extends E> output) {
         super(output);
     }
 

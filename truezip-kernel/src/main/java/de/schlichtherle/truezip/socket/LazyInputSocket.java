@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.InputStream;
 import net.jcip.annotations.NotThreadSafe;
@@ -30,7 +29,7 @@ import net.jcip.annotations.NotThreadSafe;
 public final class LazyInputSocket<E extends Entry>
 extends DecoratingInputSocket<E> {
 
-    public LazyInputSocket(@NonNull InputSocket<? extends E> input) {
+    public LazyInputSocket(InputSocket<? extends E> input) {
         super(input);
     }
 
