@@ -20,16 +20,15 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.swing.Icon;
-import net.jcip.annotations.Immutable;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A decorating file system controller which performs a
@@ -205,9 +204,9 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public void mknod(
-            final @NonNull FsEntryName name,
-            final @NonNull Type type,
-            final @NonNull BitField<FsOutputOption> options,
+            final FsEntryName name,
+            final Type type,
+            final BitField<FsOutputOption> options,
             final @CheckForNull Entry template)
     throws IOException {
         while (true) {

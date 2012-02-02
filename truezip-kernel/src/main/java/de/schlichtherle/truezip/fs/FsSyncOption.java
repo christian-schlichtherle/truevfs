@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Defines the available options for the synchronization of federated file

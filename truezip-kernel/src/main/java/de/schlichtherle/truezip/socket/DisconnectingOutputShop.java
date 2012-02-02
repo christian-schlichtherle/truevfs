@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.io.OutputClosedException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Decorates another output shop in order to disconnect any entry resources

@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.util;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Abstract implementation of an exception builder.

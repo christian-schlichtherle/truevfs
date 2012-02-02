@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.file;
 
 import java.io.InputStream;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;

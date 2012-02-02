@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.swing.EnhancedPanel;
 import java.util.ResourceBundle;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A panel which allows the user to select the key strength for a cipher.

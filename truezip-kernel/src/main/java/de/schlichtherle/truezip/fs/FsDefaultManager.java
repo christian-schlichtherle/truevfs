@@ -14,9 +14,9 @@ import de.schlichtherle.truezip.util.Link.Type;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 import static de.schlichtherle.truezip.util.Links.getTarget;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.util.*;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * The default implementation of a file system manager.

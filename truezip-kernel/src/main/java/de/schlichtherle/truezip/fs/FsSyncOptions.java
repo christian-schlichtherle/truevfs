@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.fs;
 
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.util.BitField;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A static utility class which holds common options for use with

@@ -16,7 +16,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Decorates another input shop in order to disconnect any entry resources

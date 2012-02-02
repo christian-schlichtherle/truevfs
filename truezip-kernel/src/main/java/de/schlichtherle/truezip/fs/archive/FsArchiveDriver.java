@@ -14,11 +14,11 @@ import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import javax.swing.Icon;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract factory for components required for accessing a federated file

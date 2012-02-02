@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 import java.util.ServiceConfigurationError;
 import static java.util.logging.Level.CONFIG;
 import java.util.logging.Logger;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Locates an I/O buffer pool service of a class with a name which is

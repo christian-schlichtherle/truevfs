@@ -10,10 +10,10 @@ package de.schlichtherle.truezip.fs.archive;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import de.schlichtherle.truezip.fs.FsEntry;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.CharConversionException;
 import java.util.*;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A covariant file system entry maintains a map of

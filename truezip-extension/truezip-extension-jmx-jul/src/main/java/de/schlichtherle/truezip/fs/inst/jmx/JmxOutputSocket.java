@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.fs.inst.InstrumentingOutputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

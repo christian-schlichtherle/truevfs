@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.util;
 
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Concatenates two enumerations.

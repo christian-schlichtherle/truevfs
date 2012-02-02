@@ -21,8 +21,8 @@ import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.overhead;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static de.schlichtherle.truezip.zip.ZipParametersUtils.parameters;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**

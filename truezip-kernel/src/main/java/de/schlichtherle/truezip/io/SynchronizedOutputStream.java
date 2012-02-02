@@ -9,11 +9,11 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.socket.OutputShop;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A decorator which synchronizes all access to an {@link OutputStream}

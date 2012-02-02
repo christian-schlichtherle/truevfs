@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import javax.swing.JOptionPane;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.

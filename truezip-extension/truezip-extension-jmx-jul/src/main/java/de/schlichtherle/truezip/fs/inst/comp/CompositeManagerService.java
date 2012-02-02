@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.inst.jmx.JmxDirector;
 import de.schlichtherle.truezip.fs.inst.jul.JulDirector;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

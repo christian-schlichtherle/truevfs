@@ -12,12 +12,12 @@ import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.MOUNT_POINT;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Addresses the mount point of a file system.

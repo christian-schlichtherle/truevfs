@@ -17,7 +17,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Addresses an entry in a file system relative to its

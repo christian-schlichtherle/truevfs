@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * The parameters of this interface are used with WinZip AES encrypted entries.

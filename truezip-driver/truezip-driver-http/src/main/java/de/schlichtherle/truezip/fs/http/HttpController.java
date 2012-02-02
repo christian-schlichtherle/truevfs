@@ -18,10 +18,10 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import javax.swing.Icon;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 import org.apache.http.HttpResponse;
 
 /**

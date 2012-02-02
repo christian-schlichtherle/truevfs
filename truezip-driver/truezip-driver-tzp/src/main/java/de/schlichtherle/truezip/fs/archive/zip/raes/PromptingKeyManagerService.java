@@ -15,7 +15,7 @@ import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
 import java.awt.GraphicsEnvironment;
 import java.util.Map;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A container for a prompting key manager implementation for

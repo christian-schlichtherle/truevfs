@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Iterator;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract container which manages the life cycle of controllers for

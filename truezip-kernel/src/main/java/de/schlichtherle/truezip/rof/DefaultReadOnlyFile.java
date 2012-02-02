@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.rof;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A {@link ReadOnlyFile} implementation derived from {@link RandomAccessFile}.

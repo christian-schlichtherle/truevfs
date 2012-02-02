@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.BitField;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates that the file system needs to get

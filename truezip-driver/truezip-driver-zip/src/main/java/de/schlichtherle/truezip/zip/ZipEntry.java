@@ -11,9 +11,9 @@ package de.schlichtherle.truezip.zip;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.ExtraField.*;
 import static de.schlichtherle.truezip.zip.LittleEndian.*;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Drop-in replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.

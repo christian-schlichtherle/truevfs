@@ -8,11 +8,11 @@
  */
 package de.schlichtherle.truezip.key;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Uses a map to hold the safe key providers managed by this instance.

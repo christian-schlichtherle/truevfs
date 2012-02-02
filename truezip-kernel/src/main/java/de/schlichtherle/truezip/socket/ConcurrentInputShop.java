@@ -12,13 +12,13 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.LockInputStream;
 import de.schlichtherle.truezip.rof.LockReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Decorates another input shop to allow concurrent access which is

@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.crypto.raes;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 
 /**
  * These {@link RaesParameters} delegate to some other instance of a

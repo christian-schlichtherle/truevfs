@@ -19,15 +19,15 @@ import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.overhead;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static de.schlichtherle.truezip.zip.ZipParametersUtils.parameters;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**

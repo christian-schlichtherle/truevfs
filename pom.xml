@@ -219,16 +219,24 @@
 
     <dependencies>
         <dependency>
-            <groupId>findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>1.0.0</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>2.0.0</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- Should get removed if there is a replacement for
+             @DefaultAnnotation in the final JSR-305. -->
+        <dependency>
+            <groupId>findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>1.0.0</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.awt;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
@@ -19,7 +19,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import javax.swing.JOptionPane;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A utility class for window management.

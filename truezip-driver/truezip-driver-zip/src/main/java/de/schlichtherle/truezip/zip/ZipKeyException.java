@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that retrieving a key to encrypt or decrypt or

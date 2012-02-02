@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.util.ServiceConfigurationError;
 
 /**

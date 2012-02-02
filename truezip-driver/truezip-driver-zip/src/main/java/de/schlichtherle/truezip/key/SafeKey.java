@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.key;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A safe secret key for the encryption and decryption of protected resources.

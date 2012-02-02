@@ -19,7 +19,7 @@ import de.schlichtherle.truezip.zip.ZipKeyException;
 import java.io.IOException;
 import java.util.Map;
 import javax.swing.Icon;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * This file system controller decorates another file system controller in

@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.File;
 import javax.swing.JPanel;
 

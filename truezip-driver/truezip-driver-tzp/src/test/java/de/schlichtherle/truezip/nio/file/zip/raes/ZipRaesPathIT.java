@@ -15,7 +15,7 @@ import static de.schlichtherle.truezip.key.MockView.Action.*;
 import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.nio.file.TPathTestBase;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import static org.junit.Assert.*;

@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.key;
 
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that the retrieval of the key to open or create a

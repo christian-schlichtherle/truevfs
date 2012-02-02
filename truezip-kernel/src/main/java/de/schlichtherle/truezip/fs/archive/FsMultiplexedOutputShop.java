@@ -19,13 +19,13 @@ import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.JointIterator;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Decorates annother output shop to support a virtually unlimited number of

@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.key;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Manages the life cycle of a generic secret key for reading and writing

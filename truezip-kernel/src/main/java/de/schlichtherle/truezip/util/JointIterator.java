@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An iterator which concatenates the elements of two other iterators.

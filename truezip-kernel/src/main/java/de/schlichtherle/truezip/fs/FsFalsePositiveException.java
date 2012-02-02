@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates that a file system is a false positive file system.

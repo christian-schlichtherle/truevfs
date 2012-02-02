@@ -18,7 +18,7 @@ import java.util.*;
 import static java.util.logging.Level.CONFIG;
 import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Locates all file system drivers on the class path.

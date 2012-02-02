@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.spi.IOPoolService;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Contains {@link TempFilePool#INSTANCE}.

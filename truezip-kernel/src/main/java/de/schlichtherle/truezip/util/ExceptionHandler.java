@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.util;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A generic callback interface designed to be implemented by <i>client

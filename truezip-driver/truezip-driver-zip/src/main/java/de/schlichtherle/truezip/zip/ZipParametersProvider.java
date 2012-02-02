@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 
 /**
  * A provider of {@link ZipParameters} for a given type.

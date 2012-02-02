@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import java.util.ResourceBundle;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.

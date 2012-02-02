@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.zip;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import java.util.HashMap;
 import java.util.Map;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Abstract base class for an Extra Field in a Local or Central Header of a

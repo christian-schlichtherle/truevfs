@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.util;
 
 import java.net.URISyntaxException;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Quotes the input string before passing it to the super class constructor.

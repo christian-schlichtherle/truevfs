@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Defines the common properties of a file system.

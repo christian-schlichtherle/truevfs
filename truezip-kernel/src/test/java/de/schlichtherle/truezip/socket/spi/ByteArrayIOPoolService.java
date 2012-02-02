@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.socket.spi;
 import de.schlichtherle.truezip.socket.ByteArrayIOEntry;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An immutable locatable container of a {@link ByteArrayIOPool byte array I/O buffer pool}.

@@ -16,7 +16,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract base class of an archive driver which provides convenient

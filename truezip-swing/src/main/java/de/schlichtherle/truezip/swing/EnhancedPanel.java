@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.swing;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.LayoutManager;

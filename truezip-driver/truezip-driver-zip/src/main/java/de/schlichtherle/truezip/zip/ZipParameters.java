@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A marker interface for ZIP parameters.

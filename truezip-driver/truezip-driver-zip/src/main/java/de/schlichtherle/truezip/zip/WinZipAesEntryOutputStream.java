@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.crypto.param.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;

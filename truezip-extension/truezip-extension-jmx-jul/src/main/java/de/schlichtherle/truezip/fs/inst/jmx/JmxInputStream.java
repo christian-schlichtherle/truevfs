@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * @author  Christian Schlichtherle

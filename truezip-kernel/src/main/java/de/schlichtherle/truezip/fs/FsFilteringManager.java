@@ -12,7 +12,7 @@ import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.util.FilteringIterator;
 import java.net.URI;
 import java.util.Iterator;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Filters the list of federated file systems managed by the decorated file

@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs.archive;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import java.io.IOException;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates that a file system is a false positive file system and that this

@@ -11,10 +11,10 @@ package de.schlichtherle.truezip.key;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
+import javax.annotation.CheckForNull;
 import java.net.URI;
 import java.util.Random;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A view implementation which uses its properties for providing a key whenever

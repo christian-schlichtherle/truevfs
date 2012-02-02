@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import java.nio.charset.Charset;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An archive driver for Java Archive files (JAR).

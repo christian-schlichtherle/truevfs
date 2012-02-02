@@ -11,8 +11,8 @@ package de.schlichtherle.truezip.fs.archive.mock;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 
 /**

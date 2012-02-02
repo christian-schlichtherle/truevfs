@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.file.swing;
 
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.Nullable;
 import java.io.File;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileView;

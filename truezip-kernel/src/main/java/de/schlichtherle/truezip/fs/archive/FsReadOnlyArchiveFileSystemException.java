@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that an operation was trying to modify a read-only

@@ -17,8 +17,8 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Boolean.TRUE;
@@ -31,7 +31,7 @@ import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An output socket for a file entry.

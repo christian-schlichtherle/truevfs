@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides static utility methods for ZIP parameters.

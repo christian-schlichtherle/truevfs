@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.charset;
 
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * The {@code IBM437} character set, also known as {@code CP437}.

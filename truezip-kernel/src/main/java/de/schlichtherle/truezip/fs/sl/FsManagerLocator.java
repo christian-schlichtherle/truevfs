@@ -17,7 +17,7 @@ import de.schlichtherle.truezip.util.ServiceLocator;
 import java.util.Iterator;
 import static java.util.logging.Level.CONFIG;
 import java.util.logging.Logger;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Locates a file system manager service of a class with a name which is

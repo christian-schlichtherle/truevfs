@@ -18,7 +18,7 @@ import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryOutputStream.*;
 import java.io.EOFException;
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA1Digest;

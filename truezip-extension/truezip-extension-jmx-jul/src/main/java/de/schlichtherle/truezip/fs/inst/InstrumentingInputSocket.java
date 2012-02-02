@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.fs.inst;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

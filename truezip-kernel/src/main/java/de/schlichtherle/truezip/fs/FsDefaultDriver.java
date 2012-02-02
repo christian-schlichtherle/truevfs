@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs;
 
 import java.util.Map;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Uses a given file system driver service to lookup the appropriate driver

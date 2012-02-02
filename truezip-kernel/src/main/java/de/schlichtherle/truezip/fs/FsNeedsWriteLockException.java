@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates that the file system needs to get write locked before the

@@ -11,7 +11,7 @@ package de.schlichtherle.truezip.crypto.raes.param.console;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.key.pbe.console.ConsoleSafePbeParametersView;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A console based user interface to prompt for passwords.

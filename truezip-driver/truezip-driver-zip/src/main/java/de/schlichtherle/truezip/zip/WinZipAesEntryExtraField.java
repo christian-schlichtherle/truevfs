@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import static de.schlichtherle.truezip.crypto.param.AesKeyStrength.BITS_128;
 import static de.schlichtherle.truezip.zip.LittleEndian.readUShort;
 import static de.schlichtherle.truezip.zip.LittleEndian.writeShort;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * WinZip AES Extra Field.

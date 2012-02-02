@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}

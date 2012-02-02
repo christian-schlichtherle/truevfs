@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.zip;
 
 import java.nio.charset.Charset;
-import net.jcip.annotations.ThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Default implementation of {@link ZipCharsetParameters}.

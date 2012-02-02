@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
 import java.util.Map;
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An immutable container of a map of drivers for the ZIP.RAES file format.

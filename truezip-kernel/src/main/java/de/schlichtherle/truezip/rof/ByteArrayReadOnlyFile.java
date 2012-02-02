@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.rof;
 
 import java.io.IOException;
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A read only file which reads from a byte array provided to its constructor.
