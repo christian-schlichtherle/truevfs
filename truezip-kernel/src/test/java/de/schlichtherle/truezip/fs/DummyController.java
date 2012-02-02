@@ -16,7 +16,6 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.Map;
@@ -28,10 +27,10 @@ import javax.swing.Icon;
  */
 public class DummyController<M extends FsModel> extends FsController<M> {
 
-    private final @NonNull M model;
+    private final M model;
     private final @Nullable FsController<?> parent;
 
-    public DummyController( final @NonNull M model,
+    public DummyController( final M model,
                             final @CheckForNull FsController<?> parent) {
         assert null == model.getParent()
                 ? null == parent
