@@ -26,17 +26,19 @@ import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.UriBuilder;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillClose;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * A replacement for the class {@link File} which provides transparent
@@ -1972,7 +1974,7 @@ public final class TFile extends File {
     private @Nullable FsScheme getScheme() {
         if (this != innerArchive)
             return null;
-        final FsController controller = this.controller;
+        final FsController<?> controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
         return detector.getScheme(delegate.getPath());
@@ -2918,7 +2920,8 @@ public final class TFile extends File {
      * @see    #cat(InputStream, OutputStream)
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void cp(InputStream in, OutputStream out)
+    public static void cp(  final @WillClose InputStream in,
+                            final @WillClose OutputStream out)
     throws IOException {
         Streams.copy(in, out);
     }
@@ -2978,11 +2981,17 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void cp(final InputStream in, final File dst)
+    public static void cp(final @WillClose InputStream in, final File dst)
     throws IOException {
-        final OutputStream out = new TFileOutputStream(dst);
+        final OutputStream out;
         try {
-            cp(in, out); // always closes in and out
+            out = new TFileOutputStream(dst);
+        } catch (final IOException ex) {
+            in.close();
+            throw ex;
+        }
+        try {
+            cp(in, out);
         } catch (IOException ex) {
             if (!dst.delete())
                 throw new IOException(dst + " (cannot delete)", ex);
@@ -3044,9 +3053,16 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void cp(File src, OutputStream out)
+    public static void cp(final File src, final @WillClose OutputStream out)
     throws IOException {
-        cp(new TFileInputStream(src), out); // always closes in and out
+        final InputStream in;
+        try {
+            in = new TFileInputStream(src);
+        } catch (final IOException ex) {
+            out.close();
+            throw ex;
+        }
+        cp(in, out);
     }
 
     /**
@@ -3505,19 +3521,18 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public void input(final InputStream in) throws IOException {
+    public void input(final @WillNotClose InputStream in) throws IOException {
         try {
-            final OutputStream out = new TFileOutputStream(this, false);
+            final OutputStream out = new TFileOutputStream(this);
             try {
                 Streams.cat(in, out);
             } finally {
                 out.close();
             }
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             try {
                 rm();
-            } catch (IOException discard) {
-                throw ex;
+            } catch (IOException ignored) {
             }
             throw ex;
         }
@@ -3575,7 +3590,7 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public void output(final OutputStream out) throws IOException {
+    public void output(final @WillNotClose OutputStream out) throws IOException {
         final InputStream in = new TFileInputStream(this);
         try {
             Streams.cat(in, out);
@@ -3645,7 +3660,8 @@ public final class TFile extends File {
      * @see    #cp(InputStream, OutputStream)
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void cat(final InputStream in, final OutputStream out)
+    public static void cat( final @WillNotClose InputStream in,
+                            final @WillNotClose OutputStream out)
     throws IOException {
         Streams.cat(in, out);
     }
