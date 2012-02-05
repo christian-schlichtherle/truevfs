@@ -13,9 +13,11 @@ import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -38,7 +40,9 @@ extends DecoratingInputShop<E, InputShop<E>> {
      *
      * @param input the shop to decorate.
      */
-    public DisconnectingInputShop(InputShop<E> input) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public DisconnectingInputShop(@WillCloseWhenClosed InputShop<E> input) {
         super(input);
     }
 
@@ -115,7 +119,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
     private final class DisconnectingReadOnlyFile
     extends DecoratingReadOnlyFile {
-        DisconnectingReadOnlyFile(ReadOnlyFile rof) {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DisconnectingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
         }
 
@@ -164,7 +169,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
     private final class DisconnectingInputStream
     extends DecoratingInputStream {
-        DisconnectingInputStream(InputStream in) {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DisconnectingInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 

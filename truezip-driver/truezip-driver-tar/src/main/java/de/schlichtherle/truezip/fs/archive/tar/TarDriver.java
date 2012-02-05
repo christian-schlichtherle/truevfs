@@ -18,12 +18,14 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
@@ -142,7 +144,9 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
         }
     }
 
-    protected TarInputShop newTarInputShop(FsModel model, InputStream in)
+    protected TarInputShop newTarInputShop(
+            FsModel model,
+            @WillCloseWhenClosed InputStream in)
     throws IOException {
         return new TarInputShop(this, in);
     }
@@ -177,7 +181,9 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
     }
 
     protected TarOutputShop newTarOutputShop(
-            FsModel model, OutputStream out, @CheckForNull TarInputShop source)
+            FsModel model,
+            OutputStream out,
+            @CheckForNull @WillNotClose TarInputShop source)
     throws IOException {
         return new TarOutputShop(this, out);
     }

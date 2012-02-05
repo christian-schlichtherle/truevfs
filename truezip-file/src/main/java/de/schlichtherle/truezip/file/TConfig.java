@@ -15,6 +15,9 @@ import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -231,6 +234,7 @@ public class AppTest {
  * @version $Id$
  */
 @ThreadSafe
+@CleanupObligation
 public final class TConfig implements Closeable {
 
     /**
@@ -297,6 +301,7 @@ public final class TConfig implements Closeable {
      * @return The new current configuration.
      * @see    #get()
      */
+    @CreatesObligation
     public static TConfig push() {
         final TConfig config = new TConfig(get());
         configs.get().push(config);
@@ -520,6 +525,7 @@ public final class TConfig implements Closeable {
      *         element of the inheritable thread local stack.
      */
     @Override
+    @DischargesObligation
     public void close() {
         final InheritableThreadLocalConfigStack configs = TConfig.configs;
         final Deque<TConfig> stack = configs.get();

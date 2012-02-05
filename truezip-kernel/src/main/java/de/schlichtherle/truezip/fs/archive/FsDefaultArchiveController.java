@@ -31,15 +31,17 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.swing.Icon;
 
 /**
  * This archive controller manages I/O to the entry which represents the target
@@ -151,6 +153,7 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     void mount(final boolean autoCreate) throws IOException {
         // HC SUNT DRACONES!
         FsArchiveFileSystem<E> fs;
@@ -476,11 +479,15 @@ extends FsFileSystemArchiveController<E> {
         final InputShop<E> driverProduct;
         final Lock lock;
 
-        InputArchive(final InputShop<E> input) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        InputArchive(final @WillCloseWhenClosed InputShop<E> input) {
             this(input, new ReentrantLock());
         }
 
-        InputArchive(final InputShop<E> input, final Lock lock) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        InputArchive(final @WillCloseWhenClosed InputShop<E> input, final Lock lock) {
             super(new DisconnectingInputShop<E>(input), lock);
             this.driverProduct = input;
             this.lock = lock;
@@ -500,11 +507,15 @@ extends FsFileSystemArchiveController<E> {
         final OutputShop<E> driverProduct;
         final Lock lock;
 
-        OutputArchive(final OutputShop<E> output) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        OutputArchive(final @WillCloseWhenClosed OutputShop<E> output) {
             this(output, new ReentrantLock());
         }
 
-        OutputArchive(final OutputShop<E> output, final Lock lock) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        OutputArchive(final @WillCloseWhenClosed OutputShop<E> output, final Lock lock) {
             super(new DisconnectingOutputShop<E>(output), lock);
             this.driverProduct = output;
             this.lock = lock;

@@ -9,10 +9,13 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.socket.OutputShop;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -36,8 +39,10 @@ public class LockOutputStream extends DecoratingOutputStream {
      * @param out the output stream to wrap in this decorator.
      * @param lock the object to synchronize on.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public LockOutputStream(
-            final @Nullable OutputStream out,
+            final @Nullable @WillCloseWhenClosed OutputStream out,
             final Lock lock) {
         super(out);
         if (null == lock)
@@ -46,6 +51,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public void write(int b) throws IOException {
         lock.lock();
         try {
@@ -56,6 +62,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public void write(byte[] b, int off, int len) throws IOException {
         lock.lock();
         try {
@@ -66,6 +73,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public void flush() throws IOException {
         lock.lock();
         try {
@@ -76,6 +84,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public void close() throws IOException {
         lock.lock();
         try {

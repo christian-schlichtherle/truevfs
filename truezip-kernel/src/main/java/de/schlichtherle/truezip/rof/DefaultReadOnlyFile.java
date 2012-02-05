@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
@@ -24,6 +25,7 @@ public class DefaultReadOnlyFile
 extends RandomAccessFile
 implements ReadOnlyFile {
 
+    @CreatesObligation
     public DefaultReadOnlyFile(File file) throws FileNotFoundException {
         super(file, "r");
     }

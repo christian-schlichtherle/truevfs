@@ -25,10 +25,10 @@ extends DelegatingOutputSocket<E> {
 
     private final OutputSocket<? extends E> delegate;
 
-    protected DecoratingOutputSocket(final OutputSocket<? extends E> output) {
-        if (null == output)
+    protected DecoratingOutputSocket(final OutputSocket<? extends E> delegate) {
+        if (null == delegate)
             throw new NullPointerException();
-        this.delegate = output;
+        this.delegate = delegate;
     }
 
     @Override
@@ -42,10 +42,12 @@ extends DelegatingOutputSocket<E> {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String d = delegate.toString();
+        return new StringBuilder(n.length() + "[delegate=".length() + d.length() + 1)
+                .append(n)
                 .append("[delegate=")
-                .append(getDelegate())
+                .append(d)
                 .append(']')
                 .toString();
     }

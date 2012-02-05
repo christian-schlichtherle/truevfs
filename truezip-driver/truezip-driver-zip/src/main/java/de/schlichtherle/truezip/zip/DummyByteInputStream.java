@@ -10,7 +10,9 @@ package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * A read only file input stream which adds a dummy zero byte to the end of
@@ -22,7 +24,9 @@ import java.io.IOException;
 final class DummyByteInputStream extends ReadOnlyFileInputStream {
     private boolean added;
 
-    DummyByteInputStream(ReadOnlyFile rof) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    DummyByteInputStream(@WillCloseWhenClosed ReadOnlyFile rof) {
         super(rof);
     }
 

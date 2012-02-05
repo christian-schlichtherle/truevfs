@@ -9,10 +9,12 @@
 package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
@@ -63,8 +65,11 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * @param cipher The cipher to use for encryption or decryption.
      *        Maybe {@code null} for subsequent initialization by a sub-class.
      */
-    public CipherOutputStream(  @CheckForNull OutputStream out,
-                                final @CheckForNull BufferedBlockCipher cipher) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public CipherOutputStream(
+            final @CheckForNull @WillCloseWhenClosed OutputStream out,
+            final @CheckForNull BufferedBlockCipher cipher) {
         super(out);
         this.cipher = cipher;
     }

@@ -10,11 +10,13 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -39,7 +41,9 @@ extends DecoratingInputShop<E, InputShop<E>> {
      *
      * @param input the shop to decorate.
      */
-    public SynchronizedInputShop(InputShop<E> input) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public SynchronizedInputShop(@WillCloseWhenClosed InputShop<E> input) {
         super(input);
     }
 
@@ -47,9 +51,8 @@ extends DecoratingInputShop<E, InputShop<E>> {
      * Returns the decorated input shop.
      * 
      * @return     The decorated input shop.
-     * @deprecated This method is not synchronized and enables access to the
-     *             decorated unsynchronized resource, which is inherently
-     *             unsafe.
+     * @deprecated This method enables unsynchronized access to the decorated
+     *             resource, which is inherently unsafe.
      */
     public InputShop<E> getDelegate() {
         return delegate;

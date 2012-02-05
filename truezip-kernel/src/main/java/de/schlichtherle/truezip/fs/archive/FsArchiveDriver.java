@@ -14,11 +14,13 @@ import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import javax.swing.Icon;
 
 /**
  * An abstract factory for components required for accessing a federated file
@@ -206,6 +208,7 @@ extends FsDriver {
      *         <em>preliminary false positive</em> archive file and does not
      *         get cached.
      */
+    @CreatesObligation
     public abstract InputShop<E>
     newInputShop(   FsModel model,
                     InputSocket<?> input)
@@ -258,10 +261,11 @@ extends FsDriver {
      * @return A new output shop.
      * @throws IOException on any I/O error.
      */
+    @CreatesObligation
     public abstract OutputShop<E>
     newOutputShop(  FsModel model,
                     OutputSocket<?> output,
-                    @CheckForNull InputShop<E> source)
+                    @CheckForNull @WillNotClose InputShop<E> source)
     throws IOException;
 
     /**

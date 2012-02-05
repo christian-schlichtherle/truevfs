@@ -8,13 +8,14 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import javax.annotation.CheckForNull;
 import java.util.Iterator;
+import javax.annotation.CheckForNull;
 
 /**
  * An abstract decorator for an entry container.
  *
- * @param   <E> The type of the entries.
+ * @param   <E> The type of the entries in the container.
+ * @param   <C> The type of the entry container.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -29,13 +30,12 @@ implements EntryContainer<E> {
     /**
      * Constructs a new filter entry container.
      *
-     * @param  container the non-{@code null} container to be decorated.
-     * @throws NullPointerException iff {@code container} is {@code null}.
+     * @param  delegate the entry container to decorate.
      */
-    protected DecoratingEntryContainer(final C container) {
-        if (null == container)
+    protected DecoratingEntryContainer(final C delegate) {
+        if (null == delegate)
             throw new NullPointerException();
-        this.delegate = container;
+        this.delegate = delegate;
     }
 
     @Override
@@ -59,10 +59,12 @@ implements EntryContainer<E> {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String d = delegate.toString();
+        return new StringBuilder(n.length() + "[delegate=".length() + d.length() + 1)
+                .append(n)
                 .append("[delegate=")
-                .append(delegate)
+                .append(d)
                 .append(']')
                 .toString();
     }

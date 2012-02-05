@@ -8,11 +8,15 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -24,6 +28,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@CleanupObligation
 public class ReadOnlyFileInputStream extends InputStream {
 
     /**
@@ -46,7 +51,9 @@ public class ReadOnlyFileInputStream extends InputStream {
      *        {@code null}, but must be initialized before any method
      *        of this class can be used.
      */
-    public ReadOnlyFileInputStream(@Nullable ReadOnlyFile rof) {
+    @CreatesObligation
+    public ReadOnlyFileInputStream(
+            final @Nullable @WillCloseWhenClosed ReadOnlyFile rof) {
         this.rof = rof;
     }
 
@@ -86,6 +93,7 @@ public class ReadOnlyFileInputStream extends InputStream {
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         rof.close();
     }

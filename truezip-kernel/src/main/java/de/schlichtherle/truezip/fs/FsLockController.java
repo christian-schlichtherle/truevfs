@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,6 +36,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import javax.annotation.WillCloseWhenClosed;
 import javax.swing.Icon;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -577,7 +579,9 @@ extends FsLockModelDecoratingController<
 
     private final class LockReadOnlyFile
     extends DecoratingReadOnlyFile {
-        LockReadOnlyFile(ReadOnlyFile rof) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        LockReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
         }
 
@@ -589,7 +593,9 @@ extends FsLockModelDecoratingController<
 
     private final class LockSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        LockSeekableByteChannel(SeekableByteChannel sbc) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        LockSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
@@ -601,7 +607,9 @@ extends FsLockModelDecoratingController<
 
     private final class LockInputStream
     extends DecoratingInputStream {
-        LockInputStream(InputStream in) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        LockInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 
@@ -613,7 +621,9 @@ extends FsLockModelDecoratingController<
 
     private final class LockOutputStream
     extends DecoratingOutputStream {
-        LockOutputStream(OutputStream out) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        LockOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 

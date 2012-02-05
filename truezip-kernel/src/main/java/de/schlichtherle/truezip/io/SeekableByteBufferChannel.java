@@ -8,6 +8,9 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
@@ -21,6 +24,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@CleanupObligation
 public class SeekableByteBufferChannel implements SeekableByteChannel {
 
     private ByteBuffer buffer;
@@ -38,6 +42,7 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
      *         relative bulk {@link ByteBuffer#get(byte[], int, int) get}
      *         and {@link ByteBuffer#put(byte[], int, int) put} methods.
      */
+    @CreatesObligation
     public SeekableByteBufferChannel(final ByteBuffer buffer) {
         if (!buffer.hasArray())
             throw new IllegalArgumentException();
@@ -138,6 +143,7 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
 
     /** A no-op. */
     @Override
+    @DischargesObligation
     public void close() throws IOException {
     }
 }

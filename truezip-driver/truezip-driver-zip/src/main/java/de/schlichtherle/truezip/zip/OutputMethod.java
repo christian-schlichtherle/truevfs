@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -43,6 +44,7 @@ interface OutputMethod {
      * 
      * @throws IOException on any I/O error.
      */
+    @CreatesObligation
     OutputStream start() throws IOException;
 
     /**

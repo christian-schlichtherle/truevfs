@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.util;
 
-import javax.annotation.CheckForNull;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -17,6 +16,7 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import static java.nio.charset.CoderResult.OVERFLOW;
 import static java.nio.charset.CoderResult.UNDERFLOW;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**

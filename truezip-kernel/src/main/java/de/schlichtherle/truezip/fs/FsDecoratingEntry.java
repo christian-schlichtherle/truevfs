@@ -27,12 +27,12 @@ public abstract class FsDecoratingEntry<E extends Entry> extends FsEntry {
     /**
      * Constructs a new decorating entry.
      *
-     * @param entry the decorated entry.
+     * @param delegate the entry to decorate.
      */
-    protected FsDecoratingEntry(final E entry) {
-        if (null == entry)
+    protected FsDecoratingEntry(final E delegate) {
+        if (null == delegate)
             throw new NullPointerException();
-        this.delegate = entry;
+        this.delegate = delegate;
     }
 
     @Override

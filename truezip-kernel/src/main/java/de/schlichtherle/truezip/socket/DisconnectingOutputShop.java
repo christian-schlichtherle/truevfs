@@ -11,9 +11,11 @@ package de.schlichtherle.truezip.socket;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputClosedException;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -36,7 +38,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * 
      * @param output the shop to decorate.
      */
-    public DisconnectingOutputShop(OutputShop<E> output) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public DisconnectingOutputShop(@WillCloseWhenClosed OutputShop<E> output) {
         super(output);
     }
 
@@ -106,7 +110,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
     private final class DisconnectingOutputStream
     extends DecoratingOutputStream {
-        DisconnectingOutputStream(OutputStream out) {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DisconnectingOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 

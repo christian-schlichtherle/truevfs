@@ -10,12 +10,15 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.DecoratingEntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * An abstract decorator for an input shop.
  *
- * @param   <E> The type of the entries.
+ * @param   <E> The type of the entries served by the decorated input shop.
+ * @param   <I> The type of the decorated input shop.
  * @see     DecoratingOutputShop
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -24,8 +27,9 @@ public abstract class DecoratingInputShop<E extends Entry, I extends InputShop<E
 extends DecoratingEntryContainer<E, I>
 implements InputShop<E> {
 
-    protected DecoratingInputShop(final I input) {
-        super(input);
+    @CreatesObligation
+    protected DecoratingInputShop(final @WillCloseWhenClosed I delegate) {
+        super(delegate);
     }
 
     @Override

@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -39,12 +40,14 @@ extends DecoratingOutputSocket<E> {
      *         stream upon the first write access.
      */
     @Override
-    public OutputStream newOutputStream() throws IOException {
+    public OutputStream newOutputStream() {
         return new ProxyOutputStream();
     }
 
     @NotThreadSafe
     private class ProxyOutputStream extends DecoratingOutputStream {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         ProxyOutputStream() {
             super(null);
         }

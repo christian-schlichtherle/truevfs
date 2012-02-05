@@ -24,7 +24,9 @@ import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import static de.schlichtherle.truezip.zip.ZipEntry.UNKNOWN;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +34,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -55,10 +60,12 @@ implements OutputShop<ZipArchiveEntry> {
     private @CheckForNull ZipArchiveEntry tempEntry;
     private ZipCryptoParameters param;
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputShop(   final ZipDriver driver,
                             final FsModel model,
-                            final OutputStream out,
-                            final @CheckForNull ZipInputShop source)
+                            final @WillCloseWhenClosed OutputStream out,
+                            final @CheckForNull @WillNotClose ZipInputShop source)
     throws IOException {
         super(  out,
                 null != source && source.isAppendee() ? source : null,
@@ -203,6 +210,9 @@ implements OutputShop<ZipArchiveEntry> {
     /**
      * Returns whether this output archive is busy writing an archive entry
      * or not.
+     * 
+     * @return Whether this output archive is busy writing an archive entry
+     *         or not.
      */
     @Override
     public final boolean isBusy() {
@@ -214,35 +224,33 @@ implements OutputShop<ZipArchiveEntry> {
      */
     @Override
     public void close() throws IOException {
-        try {
-            final IOPool.Entry<?> postamble = this.postamble;
-            if (null != postamble) {
-                this.postamble = null;
+        super.finish();
+        final IOPool.Entry<?> postamble = this.postamble;
+        if (null != postamble) {
+            try {
+                final InputSocket<?> input = postamble.getInputSocket();
+                final InputStream in = input.newInputStream();
                 try {
-                    final InputSocket<?> input = postamble.getInputSocket();
-                    final InputStream in = input.newInputStream();
-                    try {
-                    // Second, if the output ZIP compatible file differs in length from
-                    // the input ZIP compatible file pad the output to the next four byte
-                    // boundary before appending the postamble.
-                    // This might be required for self extracting files on some platforms
-                    // (e.g. Wintel).
+                    // If the output ZIP file differs in length from the
+                    // input ZIP file then pad the output to the next four
+                    // byte boundary before appending the postamble.
+                    // This might be required for self extracting files on
+                    // some platforms, e.g. Windows x86.
                     final long ol = length();
                     final long ipl = input.getLocalTarget().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
 
-                        Streams.cat(in, this);
-                    } finally {
-                        in.close();
-                    }
+                    Streams.cat(in, this);
                 } finally {
-                    postamble.release();
+                    in.close();
                 }
+            } finally {
+                this.postamble = null;
+                postamble.release();
             }
-        } finally {
-            super.close();
         }
+        super.close();
     }
 
     /**
@@ -254,6 +262,9 @@ implements OutputShop<ZipArchiveEntry> {
      * {@link #getOutputSocket(ZipArchiveEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
+
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(ZipArchiveEntry entry, boolean process)
         throws IOException {
             super(ZipOutputShop.this);
@@ -272,11 +283,13 @@ implements OutputShop<ZipArchiveEntry> {
      * When the stream gets closed, the I/O pool entry is then copied to this
      * output shop and finally deleted.
      */
+    @CleanupObligation
     private final class BufferedEntryOutputStream extends CheckedOutputStream {
         final IOPool.Entry<?> temp;
         final boolean process;
         boolean closed;
 
+        @CreatesObligation
         BufferedEntryOutputStream(
                 final IOPool.Entry<?> temp,
                 final ZipArchiveEntry entry,
@@ -290,23 +303,21 @@ implements OutputShop<ZipArchiveEntry> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (closed)
                 return;
+            super.close();
             closed = true;
             try {
-                try {
-                    super.close();
-                } finally {
-                    final long length = temp.getSize(DATA);
-                    final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
-                    assert null != tempEntry;
-                    assert STORED == tempEntry.getMethod();
-                    tempEntry.setCrc(getChecksum().getValue());
-                    tempEntry.setCompressedSize(length);
-                    tempEntry.setSize(length);
-                    store();
-                }
+                final long length = temp.getSize(DATA);
+                final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
+                assert null != tempEntry;
+                assert STORED == tempEntry.getMethod();
+                tempEntry.setCrc(getChecksum().getValue());
+                tempEntry.setCompressedSize(length);
+                tempEntry.setSize(length);
+                store();
             } finally {
                 ZipOutputShop.this.tempEntry = null;
             }

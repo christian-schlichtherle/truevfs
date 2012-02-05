@@ -8,10 +8,14 @@
  */
 package de.schlichtherle.truezip.io;
 
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * An abstract decorator for a seekable byte channel.
@@ -22,6 +26,7 @@ import java.nio.channels.SeekableByteChannel;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@CleanupObligation
 public abstract class DecoratingSeekableByteChannel
 implements SeekableByteChannel {
 
@@ -31,11 +36,12 @@ implements SeekableByteChannel {
     /**
      * Constructs a new decorating seekable byte channel.
      *
-     * @param channel the nullable seekable byte channel to decorate.
+     * @param delegate the nullable seekable byte channel to decorate.
      */
+    @CreatesObligation
     protected DecoratingSeekableByteChannel(
-            final @Nullable SeekableByteChannel channel) {
-        this.delegate = channel;
+            final @Nullable @WillCloseWhenClosed SeekableByteChannel delegate) {
+        this.delegate = delegate;
     }
 
     @Override
@@ -76,6 +82,7 @@ implements SeekableByteChannel {
     }
     
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         delegate.close();
     }
@@ -86,10 +93,12 @@ implements SeekableByteChannel {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String d = delegate.toString();
+        return new StringBuilder(n.length() + "[delegate=".length() + d.length() + 1)
+                .append(n)
                 .append("[delegate=")
-                .append(delegate)
+                .append(d)
                 .append(']')
                 .toString();
     }

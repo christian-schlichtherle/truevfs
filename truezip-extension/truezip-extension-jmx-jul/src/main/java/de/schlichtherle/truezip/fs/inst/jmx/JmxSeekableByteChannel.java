@@ -9,9 +9,11 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -22,7 +24,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class JmxSeekableByteChannel extends DecoratingSeekableByteChannel {
     private final JmxIOStatistics stats;
 
-    JmxSeekableByteChannel(SeekableByteChannel sbc, JmxIOStatistics stats) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    JmxSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc, JmxIOStatistics stats) {
         super(sbc);
         assert null != stats;
         this.stats = stats;

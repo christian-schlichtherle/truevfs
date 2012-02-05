@@ -9,9 +9,13 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.util.JSE7;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * An inflater input stream which uses a custom {@link Inflater} and provides
@@ -20,13 +24,15 @@ import java.util.zip.InflaterInputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@CleanupObligation
 final class ZipInflaterInputStream extends InflaterInputStream {
 
     private static final InflaterFactory factory = JSE7.AVAILABLE
                         ? new InflaterFactory()        // JDK 7 is OK
                         : new Jdk6InflaterFactory();   // JDK 6 needs fixing
 
-    ZipInflaterInputStream(DummyByteInputStream in, int size) {
+    @CreatesObligation
+    ZipInflaterInputStream(@WillCloseWhenClosed DummyByteInputStream in, int size) {
         super(in, factory.newInflater(), size);
     }
 
@@ -35,9 +41,10 @@ final class ZipInflaterInputStream extends InflaterInputStream {
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
-        inf.end();
         super.close();
+        inf.end();
     }
 
     /** A factory for {@link Inflater} objects. */

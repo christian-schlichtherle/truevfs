@@ -9,10 +9,13 @@
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.socket.InputShop;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -41,7 +44,9 @@ public class SynchronizedInputStream extends DecoratingInputStream {
      *             So the lock should never be this object itself.
      *             
      */
-    public SynchronizedInputStream(@Nullable InputStream in) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public SynchronizedInputStream(@Nullable @WillCloseWhenClosed InputStream in) {
         this(in, null);
     }
 
@@ -52,14 +57,17 @@ public class SynchronizedInputStream extends DecoratingInputStream {
      * @param lock the object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public SynchronizedInputStream(
-            final @Nullable InputStream in,
+            final @Nullable @WillCloseWhenClosed InputStream in,
             final @CheckForNull Object lock) {
         super(in);
         this.lock = null != lock ? lock : this;
     }
 
     @Override
+    @GuardedBy("lock")
     public int read() throws IOException {
         synchronized (lock) {
             return delegate.read();
@@ -67,6 +75,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public int read(byte[] b, int off, int len) throws IOException {
         synchronized (lock) {
             return delegate.read(b, off, len);
@@ -74,6 +83,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public long skip(long n) throws IOException {
         synchronized (lock) {
             return delegate.skip(n);
@@ -81,6 +91,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public int available() throws IOException {
         synchronized (lock) {
             return delegate.available();
@@ -88,6 +99,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public void close() throws IOException {
         synchronized (lock) {
             delegate.close();
@@ -95,6 +107,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public void mark(int readlimit) {
         synchronized (lock) {
             delegate.mark(readlimit);
@@ -102,6 +115,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public void reset() throws IOException {
         synchronized (lock) {
             delegate.reset();
@@ -109,6 +123,7 @@ public class SynchronizedInputStream extends DecoratingInputStream {
     }
 
     @Override
+    @GuardedBy("lock")
     public boolean markSupported() {
         synchronized (lock) {
             return delegate.markSupported();

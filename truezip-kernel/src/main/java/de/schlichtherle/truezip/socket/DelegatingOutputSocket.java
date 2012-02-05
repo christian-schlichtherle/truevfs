@@ -9,10 +9,10 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -32,6 +32,7 @@ extends OutputSocket<E> {
      * Returns the delegate socket.
      * 
      * @return The delegate socket.
+     * @throws IOException On any I/O failure. 
      */
     protected abstract OutputSocket<? extends E> getDelegate()
     throws IOException;
@@ -40,6 +41,7 @@ extends OutputSocket<E> {
      * Binds the delegate socket to this socket and returns it.
      *
      * @return The bound decorated socket.
+     * @throws IOException On any I/O failure. 
      */
     protected OutputSocket<? extends E> getBoundSocket() throws IOException {
         return getDelegate().bind(this);

@@ -16,6 +16,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -73,6 +74,8 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
         class TempReadOnlyFile extends DecoratingReadOnlyFile {
             boolean closed;
 
+            @CreatesObligation
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             TempReadOnlyFile() throws IOException {
                 super(temp.getInputSocket().newReadOnlyFile()); // bind(*) is considered redundant for IOPool.Entry
             }
@@ -81,12 +84,9 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
             public void close() throws IOException {
                 if (closed)
                     return;
+                super.close();
                 closed = true;
-                try {
-                    super.close();
-                } finally {
-                    temp.release();
-                }
+                temp.release();
             }
         } // TempReadOnlyFile
 

@@ -2981,20 +2981,25 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void cp(final @WillClose InputStream in, final File dst)
     throws IOException {
-        final OutputStream out;
+        if (null == in)
+            throw new NullPointerException();
+
+        @WillClose TFileOutputStream out = null;
         try {
             out = new TFileOutputStream(dst);
-        } catch (final IOException ex) {
-            in.close();
-            throw ex;
+        } finally {
+            if (null == out) // exception?
+                in.close();
         }
+
         try {
             cp(in, out);
-        } catch (IOException ex) {
-            if (!dst.delete())
-                throw new IOException(dst + " (cannot delete)", ex);
+        } catch (final IOException ex) {
+            rm(dst);
+            throw ex;
         }
     }
 
@@ -3055,12 +3060,15 @@ public final class TFile extends File {
      */
     public static void cp(final File src, final @WillClose OutputStream out)
     throws IOException {
-        final InputStream in;
+        if (null == out)
+            throw new NullPointerException();
+
+        @WillClose TFileInputStream in = null;
         try {
             in = new TFileInputStream(src);
-        } catch (final IOException ex) {
-            out.close();
-            throw ex;
+        } finally {
+            if (null == in) // exception?
+                out.close();
         }
         cp(in, out);
     }
@@ -3380,8 +3388,7 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void cp_rp(File src, File dst,
-                             TArchiveDetector detector)
+    public static void cp_rp(File src, File dst, TArchiveDetector detector)
     throws IOException {
         TBIO.cp_r(true, src, dst, detector, detector);
     }
@@ -3522,18 +3529,18 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public void input(final @WillNotClose InputStream in) throws IOException {
+        if (null == in)
+            throw new NullPointerException();
+
         try {
-            final OutputStream out = new TFileOutputStream(this);
+            final @WillClose TFileOutputStream out = new TFileOutputStream(this);
             try {
-                Streams.cat(in, out);
+                cat(in, out);
             } finally {
                 out.close();
             }
         } catch (final IOException ex) {
-            try {
-                rm();
-            } catch (IOException ignored) {
-            }
+            rm(this);
             throw ex;
         }
     }
@@ -3591,9 +3598,12 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public void output(final @WillNotClose OutputStream out) throws IOException {
-        final InputStream in = new TFileInputStream(this);
+        if (null == out)
+            throw new NullPointerException();
+
+        final @WillClose TFileInputStream in = new TFileInputStream(this);
         try {
-            Streams.cat(in, out);
+            cat(in, out);
         } finally {
             in.close();
         }

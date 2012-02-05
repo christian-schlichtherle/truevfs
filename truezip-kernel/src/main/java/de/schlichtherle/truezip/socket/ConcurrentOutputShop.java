@@ -10,12 +10,15 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.LockOutputStream;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -38,9 +41,12 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * Constructs a concurrent output shop.
      * 
      * @param output the shop to decorate.
+     * @param lock The lock to use. 
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ConcurrentOutputShop(
-            final OutputShop<E> output,
+            final @WillCloseWhenClosed OutputShop<E> output,
             final Lock lock) {
         super(output);
         if (null == lock)
@@ -49,6 +55,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     @Override
+    @GuardedBy("lock")
     public void close() throws IOException {
         lock.lock();
         try {
@@ -59,6 +66,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     @Override
+    @GuardedBy("lock")
     public @CheckForNull E getEntry(String name) {
         lock.lock();
         try {
@@ -69,6 +77,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     @Override
+    @GuardedBy("lock")
     public int getSize() {
         lock.lock();
         try {
@@ -91,6 +100,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
+            @GuardedBy("lock")
             public E getLocalTarget() throws IOException {
                 lock.lock();
                 try {
@@ -101,6 +111,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
+            @GuardedBy("lock")
             public Entry getPeerTarget() throws IOException {
                 lock.lock();
                 try {
@@ -116,6 +127,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
+            @GuardedBy("lock")
             public OutputStream newOutputStream() throws IOException {
                 final OutputStream out;
                 lock.lock();

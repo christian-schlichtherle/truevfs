@@ -9,12 +9,14 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.*;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -78,7 +80,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * 
      * @param  out The output stream to write the ZIP file to.
      */
-    public ZipOutputStream(OutputStream out) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public ZipOutputStream(@WillCloseWhenClosed OutputStream out) {
         super(out, null, DEFAULT_PARAM);
     }
 
@@ -89,7 +93,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * @param  out The output stream to write the ZIP file to.
      * @param  charset the character set to use.
      */
-    public ZipOutputStream(OutputStream out, Charset charset) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset) {
         super(out, null, new DefaultZipOutputStreamParameters(charset));
     }
 
@@ -104,7 +110,9 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * @param  appendee the ZIP file to append to.
      *         This may already be closed.
      */
-    public ZipOutputStream(OutputStream out, ZipFile appendee) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public ZipOutputStream(@WillCloseWhenClosed OutputStream out, ZipFile appendee) {
         super(out, appendee, DEFAULT_PARAM);
         if (null == appendee)
             throw new NullPointerException();

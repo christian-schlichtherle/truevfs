@@ -9,9 +9,11 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.socket.InputShop;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -34,8 +36,10 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
      * @param rof the input stream to wrap in this decorator.
      * @param lock the object to synchronize on.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public LockReadOnlyFile(
-            final @Nullable ReadOnlyFile rof,
+            final @Nullable @WillCloseWhenClosed ReadOnlyFile rof,
             final Lock lock) {
         super(rof);
         if (null == lock)

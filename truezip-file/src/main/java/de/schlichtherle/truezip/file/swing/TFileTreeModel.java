@@ -10,12 +10,13 @@ package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillClose;
 import javax.swing.event.EventListenerList;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -200,7 +201,7 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public boolean createNewFile(final TFile node)
     throws IOException {
@@ -217,7 +218,7 @@ public final class TFileTreeModel implements TreeModel {
      *
      * @param  recursive whether or not any missing ancestor directories shall
      *         get created if required.
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void mkdir(final TFile node, final boolean recursive)
     throws IOException {
@@ -231,9 +232,10 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the given stream is <em>always</em> closed and
      * that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
-    public void cp(final InputStream in, final TFile node) throws IOException {
+    public void cp(final @WillClose InputStream in, final TFile node)
+    throws IOException {
         TFile.cp(in, node);
         nodeInsertedOrStructureChanged(node);
     }
@@ -243,7 +245,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void cp(final TFile oldNode, final TFile node) throws IOException {
         TFile.cp(oldNode, node);
@@ -255,7 +257,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void cp_r(final TFile oldNode, final TFile node) throws IOException {
         try {
@@ -271,7 +273,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void cp_p(final TFile oldNode, final TFile node) throws IOException {
         TFile.cp_p(oldNode, node);
@@ -284,7 +286,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void cp_rp(final TFile oldNode, final TFile node) throws IOException {
         try {
@@ -299,7 +301,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void mv(TFile oldNode, TFile node) throws IOException {
         oldNode.mv(node);
@@ -312,7 +314,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void rm(TFile node) throws IOException {
         TFile.rm(node);
@@ -324,7 +326,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException if any I/O error occurs.
+     * @throws IOException On any I/O failure.
      */
     public void rm_r(TFile node) throws IOException {
         TFile.rm_r(node);
@@ -478,7 +480,7 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    protected void fireTreeNodesChanged(final TreeModelEvent evt) {
+    void fireTreeNodesChanged(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeNodesChanged(evt);
@@ -489,7 +491,7 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    protected void fireTreeNodesInserted(final TreeModelEvent evt) {
+    void fireTreeNodesInserted(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeNodesInserted(evt);
@@ -500,7 +502,7 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    protected void fireTreeNodesRemoved(final TreeModelEvent evt) {
+    void fireTreeNodesRemoved(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeNodesRemoved(evt);
@@ -511,7 +513,7 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    protected void fireTreeStructureChanged(final TreeModelEvent evt) {
+    void fireTreeStructureChanged(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeStructureChanged(evt);

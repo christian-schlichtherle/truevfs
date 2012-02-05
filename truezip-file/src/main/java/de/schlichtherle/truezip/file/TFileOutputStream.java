@@ -8,17 +8,13 @@
  */
 package de.schlichtherle.truezip.file;
 
-import java.io.InputStream;
-import javax.annotation.concurrent.Immutable;
 import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.*;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
@@ -89,6 +85,8 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(String path)
     throws FileNotFoundException {
         super(newOutputStream(new TFile(path), false));
@@ -109,6 +107,8 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(String path, boolean append)
     throws FileNotFoundException {
         super(newOutputStream(new TFile(path), append));
@@ -124,6 +124,8 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(File file)
     throws FileNotFoundException {
         super(newOutputStream(file, false));
@@ -141,11 +143,14 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(File file, boolean append)
     throws FileNotFoundException {
         super(newOutputStream(file, append));
     }
 
+    @CreatesObligation
     private static OutputStream newOutputStream(final File dst,
                                                 final boolean append)
     throws FileNotFoundException {

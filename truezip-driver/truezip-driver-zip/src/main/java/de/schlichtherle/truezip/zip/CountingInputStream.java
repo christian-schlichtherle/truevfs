@@ -9,9 +9,11 @@
 package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -31,7 +33,9 @@ final class CountingInputStream extends DecoratingInputStream {
      *
      * @param in the decorated input stream.
      */
-    CountingInputStream(@Nullable InputStream in) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    CountingInputStream(@Nullable @WillCloseWhenClosed InputStream in) {
         super(in);
     }
 

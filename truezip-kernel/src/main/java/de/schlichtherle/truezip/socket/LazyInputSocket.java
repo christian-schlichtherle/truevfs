@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -45,8 +46,22 @@ extends DecoratingInputSocket<E> {
         return new ProxyReadOnlyFile();
     }
 
+    /**
+     * Returns a proxy input stream which acquires its underlying input
+     * stream upon the first read access.
+     *
+     * @return A proxy input stream which acquires its underlying input
+     *         stream upon the first read access.
+     */
+    @Override
+    public InputStream newInputStream() {
+        return new ProxyInputStream();
+    }
+
     @NotThreadSafe
     private class ProxyReadOnlyFile extends DecoratingReadOnlyFile {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         ProxyReadOnlyFile() {
             super(null);
         }
@@ -89,20 +104,10 @@ extends DecoratingInputSocket<E> {
         }
     } // ProxyReadOnlyFile
 
-    /**
-     * Returns a proxy input stream which acquires its underlying input
-     * stream upon the first read access.
-     *
-     * @return A proxy input stream which acquires its underlying input
-     *         stream upon the first read access.
-     */
-    @Override
-    public InputStream newInputStream() {
-        return new ProxyInputStream();
-    }
-
     @NotThreadSafe
     private class ProxyInputStream extends DecoratingInputStream {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         ProxyInputStream() {
             super(null);
         }

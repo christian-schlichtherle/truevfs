@@ -20,13 +20,14 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.CheckForNull;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
@@ -120,7 +121,7 @@ implements OutputShop<TTarArchiveEntry> {
                 // to the destination entry.
                 // So we need to buffer the output in a temporary file and
                 // write it upon close().
-                return new TempEntryOutputStream(
+                return new BufferedEntryOutputStream(
                         pool.allocate(),
                         entry);
             }
@@ -144,9 +145,11 @@ implements OutputShop<TTarArchiveEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #getOutputSocket(TTarArchiveEntry)}.
      */
-    private class EntryOutputStream extends DecoratingOutputStream {
-        private boolean closed;
+    private final class EntryOutputStream extends DecoratingOutputStream {
+        boolean closed;
 
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final TTarArchiveEntry entry)
         throws IOException {
             super(TarOutputShop.this);
@@ -164,25 +167,27 @@ implements OutputShop<TTarArchiveEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-
-            // Order is important here!
+            closeArchiveEntry();
             closed = true;
             busy = false;
-            closeArchiveEntry();
         }
-    } // class EntryOutputStream
+    } // EntryOutputStream
 
     /**
      * This entry output stream writes the entry to a temporary file.
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    private class TempEntryOutputStream extends DecoratingOutputStream {
-        private final IOPool.Entry<?> temp;
-        private final TTarArchiveEntry entry;
-        private boolean closed;
+    private final class BufferedEntryOutputStream extends DecoratingOutputStream {
+        final IOPool.Entry<?> temp;
+        final TTarArchiveEntry entry;
+        boolean closed;
 
-        TempEntryOutputStream(final IOPool.Entry<?> temp, final TTarArchiveEntry entry)
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        BufferedEntryOutputStream(
+                final IOPool.Entry<?> temp,
+                final TTarArchiveEntry entry)
         throws IOException {
             super(temp.getOutputSocket().newOutputStream());
             this.temp = temp;
@@ -195,16 +200,11 @@ implements OutputShop<TTarArchiveEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-
-            // Order is important here!
+            super.close();
             closed = true;
             busy = false;
-            try {
-                super.close();
-            } finally {
-                entry.setSize(temp.getSize(DATA));
-                store();
-            }
+            entry.setSize(temp.getSize(DATA));
+            store();
         }
 
         void store() throws IOException {
@@ -224,5 +224,5 @@ implements OutputShop<TTarArchiveEntry> {
                 temp.release();
             }
         }
-    } // class TempEntryOutputStream
+    } // BufferedEntryOutputStream
 }

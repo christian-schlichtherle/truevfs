@@ -14,10 +14,12 @@ import de.schlichtherle.truezip.crypto.SuspensionPenalty;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.*;
+import static de.schlichtherle.truezip.zip.ExtraField.WINZIP_AES_ID;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryOutputStream.*;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
@@ -52,8 +54,10 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
 
     private final ZipEntry entry;
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     WinZipAesEntryReadOnlyFile(
-            final ReadOnlyFile rof,
+            final @WillCloseWhenClosed ReadOnlyFile rof,
             final WinZipAesEntryParameters param)
     throws IOException {
         super(rof);

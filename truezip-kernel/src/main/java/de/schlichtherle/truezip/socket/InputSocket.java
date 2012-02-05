@@ -11,11 +11,12 @@ package de.schlichtherle.truezip.socket;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -44,6 +45,8 @@ extends IOSocket<E, Entry> {
      * <p>
      * The peer target is {@code null} if and only if this socket is not
      * {@link #connect}ed to another socket.
+     * 
+     * @throws IOException On any I/O failure.
      */
     @Override
     public @Nullable Entry getPeerTarget() throws IOException {
@@ -98,11 +101,12 @@ extends IOSocket<E, Entry> {
      * Furthermore, the returned read only file should <em>not</em> be buffered.
      * Buffering should be addressed by client applications instead.
      *
+     * @return A new read only file.
+     * @throws IOException On any I/O failure.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
-     * @throws IOException on any I/O error.
-     * @return A new read only file.
      */
+    @CreatesObligation
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 
     /**
@@ -115,11 +119,13 @@ extends IOSocket<E, Entry> {
      * buffered.
      * Buffering should be addressed by client applications instead.
      * 
+     * @return A new seekable byte channel.
+     * @throws IOException On any I/O failure.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
-     * @throws IOException on any I/O error.
      * @since  TrueZIP 7.2
      */
+    @CreatesObligation
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -140,9 +146,10 @@ extends IOSocket<E, Entry> {
      * {@link #newReadOnlyFile()} is allowed to throw an
      * {@link UnsupportedOperationException} while this method is not!
      *
-     * @throws IOException on any I/O error.
      * @return A new input stream.
+     * @throws IOException On any I/O failure.
      */
+    @CreatesObligation
     public InputStream newInputStream() throws IOException {
         return new ReadOnlyFileInputStream(newReadOnlyFile());
     }

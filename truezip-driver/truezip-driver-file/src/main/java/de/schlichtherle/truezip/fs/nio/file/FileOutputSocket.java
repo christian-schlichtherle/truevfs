@@ -17,8 +17,7 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Boolean.TRUE;
@@ -31,6 +30,8 @@ import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -220,6 +221,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
             boolean closed;
 
+            @CreatesObligation
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             OutputStream() throws IOException {
                 super(newOutputStream(temp.getPath(), optionArray()));
             }
@@ -228,12 +231,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             public void close() throws IOException {
                 if (closed)
                     return;
+                super.close();
                 closed = true;
-                try {
-                    super.close();
-                } finally {
-                    close(temp, null == exception);
-                }
+                close(temp, null == exception);
             }
         } // OutputStream
 

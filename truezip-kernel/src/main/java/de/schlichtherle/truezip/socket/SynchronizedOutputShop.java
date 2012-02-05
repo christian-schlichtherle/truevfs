@@ -9,11 +9,14 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -37,7 +40,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * 
      * @param output the shop to decorate.
      */
-    public SynchronizedOutputShop(OutputShop<E> output) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public SynchronizedOutputShop(@WillCloseWhenClosed OutputShop<E> output) {
         super(output);
     }
 
@@ -45,15 +50,15 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * Returns the decorated output shop.
      * 
      * @return     The decorated output shop.
-     * @deprecated This method is not synchronized and enables access to the
-     *             decorated unsynchronized resource, which is inherently
-     *             unsafe.
+     * @deprecated This method enables unsynchronized access to the decorated
+     *             resource, which is inherently unsafe.
      */
     public OutputShop<E> getDelegate() {
         return delegate;
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         synchronized (delegate) {
             delegate.close();

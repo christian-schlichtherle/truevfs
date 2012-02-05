@@ -8,12 +8,12 @@
  */
 package de.schlichtherle.truezip.io;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Comparator;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -98,36 +98,37 @@ public class SequentialIOException extends IOException implements Cloneable {
     int maxIndex; // effectively final
 
     public SequentialIOException() {
-        priority = 0;
+        this(null, null, 0);
     }
 
-    public SequentialIOException(@CheckForNull String message) {
-        super(message);
-        priority = 0;
+    public SequentialIOException(final @CheckForNull String message) {
+        this(message, null, 0);
     }
 
-    public SequentialIOException(@CheckForNull Throwable cause) {
-        super(cause);
-        priority = 0;
+    public SequentialIOException(final @CheckForNull Throwable cause) {
+        this(null, cause, 0);
     }
 
-    public SequentialIOException(@CheckForNull String message, @CheckForNull Throwable cause) {
-        super(message, cause);
-        priority = 0;
+    public SequentialIOException(
+            final @CheckForNull String message,
+            final @CheckForNull Throwable cause) {
+        this(message, cause, 0);
     }
 
-    public SequentialIOException(int priority) {
-        this.priority = priority;
+    public SequentialIOException(final int priority) {
+        this(null, null, priority);
     }
 
-    public SequentialIOException(@CheckForNull String message, int priority) {
-        super(message);
-        this.priority = priority;
+    public SequentialIOException(
+            final @CheckForNull String message,
+            final int priority) {
+        this(message, null, priority);
     }
 
-    public SequentialIOException(@CheckForNull Throwable cause, int priority) {
-        super(cause);
-        this.priority = priority;
+    public SequentialIOException(
+            final @CheckForNull Throwable cause,
+            final int priority) {
+        this(null, cause, priority);
     }
 
     /**
@@ -143,7 +144,10 @@ public class SequentialIOException extends IOException implements Cloneable {
      * @param priority The priority of this exception to be used for
      *        {@link #sortPriority() priority sorting}.
      */
-    public SequentialIOException(@CheckForNull String message, @CheckForNull Throwable cause, int priority) {
+    public SequentialIOException(
+            final @CheckForNull String message,
+            final @CheckForNull Throwable cause,
+            final int priority) {
         super(message, cause);
         this.priority = priority;
     }

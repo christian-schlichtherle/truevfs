@@ -8,8 +8,10 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -34,10 +36,12 @@ public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
     /**
      * Constructs a new decorating read only file.
      *
-     * @param rof the nullable read only file to decorate.
+     * @param delegate the nullable read only file to decorate.
      */
-    protected DecoratingReadOnlyFile(final @Nullable ReadOnlyFile rof) {
-        this.delegate = rof;
+    @CreatesObligation
+    protected DecoratingReadOnlyFile(
+            final @Nullable @WillCloseWhenClosed ReadOnlyFile delegate) {
+        this.delegate = delegate;
     }
 
     @Override
@@ -76,10 +80,12 @@ public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String d = delegate.toString();
+        return new StringBuilder(n.length() + "[delegate=".length() + d.length() + 1)
+                .append(n)
                 .append("[delegate=")
-                .append(delegate)
+                .append(d)
                 .append(']')
                 .toString();
     }

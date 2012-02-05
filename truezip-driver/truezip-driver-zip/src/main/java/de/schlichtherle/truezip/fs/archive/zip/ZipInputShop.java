@@ -15,9 +15,11 @@ import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.RawZipFile;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -37,10 +39,12 @@ implements InputShop<ZipArchiveEntry> {
     private boolean appendee;
     private ZipCryptoParameters param;
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipInputShop(
             final ZipDriver driver,
             final FsModel model,
-            final ReadOnlyFile rof)
+            final @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
         super(rof, driver);
         this.driver = driver;

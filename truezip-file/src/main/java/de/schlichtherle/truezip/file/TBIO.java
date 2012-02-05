@@ -18,10 +18,10 @@ import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -111,10 +111,14 @@ final class TBIO {
      * Recursively copies the source directory tree or file to the destination
      * directory tree or file.
      *
-     * @param  preserve if an elementary cp operation shall cp as much
-     *         properties of the source file to the destination file, too.
-     *         Currently, only the last modification time is preserved.
-     *         Note that this property set may get extended over time.
+     * @param preserve If {@code true}, then a best effort approach is used to
+     *        copy as much properties of any source files to the destination
+     *        files as possible.
+     *        With JSE&npsb;6, only the last modification time is copied.
+     *        With JSE&nbsp;7, the last access time and the creation time is
+     *        copied, too.
+     *        Note that this property set may get extended over time as the
+     *        underlying Java APIs improve.
      * @param  src the source directory tree or file.
      *         This file system entity needs to exist.
      * @param  dst the destination directory tree or file.
@@ -125,7 +129,7 @@ final class TBIO {
      * @param  dstDetector the object used to detect any archive files in the
      *         destination path.
      * @throws IOException if the source path contains the destination path
-     *         or an elementary operation fails for any reason.
+     *         or any I/O failure.
      */
     public static void
     cp_r(   final boolean preserve,

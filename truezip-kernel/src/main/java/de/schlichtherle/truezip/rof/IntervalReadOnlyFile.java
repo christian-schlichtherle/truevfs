@@ -8,8 +8,11 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -50,9 +53,12 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      *
      * @param rof the read only file to decorate.
      * @param length the length of the interval.
+     * @throws IOException On any I/O failure.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public IntervalReadOnlyFile(
-            final ReadOnlyFile rof,
+            final @WillCloseWhenClosed ReadOnlyFile rof,
             final long length)
     throws IOException {
         this(rof, rof.getFilePointer(), length, true);
@@ -69,9 +75,11 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      * @param rof the read only file to decorate.
      * @param offset the start of the interval.
      * @param length the length of the interval.
+     * @throws IOException On any I/O failure.
      */
+    @CreatesObligation
     public IntervalReadOnlyFile(
-            final @Nullable ReadOnlyFile rof,
+            final @Nullable @WillNotClose ReadOnlyFile rof,
             final long offset,
             final long length)
     throws IOException {
@@ -91,7 +99,10 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      *        in the decorated read only file must be {@code start}!
      *        If this is {@code false}, then the file pointer in the decorated
      *        read only file gets positioned before each read operation.
+     * @throws IOException On any I/O failure.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private IntervalReadOnlyFile(
             final @Nullable ReadOnlyFile rof,
             final long offset,
