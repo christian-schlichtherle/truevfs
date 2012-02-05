@@ -11,12 +11,15 @@ package de.schlichtherle.truezip.crypto.raes;
 import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
 import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
 import de.schlichtherle.truezip.crypto.SuspensionPenalty;
-import static de.schlichtherle.truezip.crypto.raes.Constants.*;
+import static de.schlichtherle.truezip.crypto.raes.Constants.AES_BLOCK_SIZE_BITS;
+import static de.schlichtherle.truezip.crypto.raes.Constants.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
@@ -51,8 +54,10 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
      */
     private final byte[] footer;
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     Type0RaesReadOnlyFile(
-            final ReadOnlyFile rof,
+            final @WillCloseWhenClosed ReadOnlyFile rof,
             final Type0RaesParameters param)
     throws IOException {
         super(rof);

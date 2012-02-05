@@ -9,10 +9,12 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.io.Streams;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -51,12 +53,20 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     /** The default buffer length of the window to the file. */
     public static final int WINDOW_LEN = Streams.BUFFER_SIZE;
 
-    /** Returns the smaller parameter. */
+    /**
+     * Returns the smaller parameter.
+     * 
+     * @deprecated Use {@link Math#min(long, long) instead.
+     */
     protected static long min(long a, long b) {
         return a < b ? a : b;
     }
 
-    /** Returns the greater parameter. */
+    /**
+     * Returns the greater parameter.
+     * 
+     * @deprecated Use {@link Math#max(long, long) instead.
+     */
     protected static long max(long a, long b) {
         return a < b ? b : a;
     }
@@ -85,6 +95,8 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyFile(File file) throws IOException {
         this(null, file, WINDOW_LEN);
     }
@@ -97,6 +109,8 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyFile(
             final File file,
             final int windowLen)
@@ -111,8 +125,9 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
-    public BufferedReadOnlyFile(
-            final ReadOnlyFile rof)
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public BufferedReadOnlyFile(final @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
         this(rof, null, WINDOW_LEN);
     }
@@ -125,36 +140,45 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      * @throws FileNotFoundException If the file cannot get opened for reading.
      * @throws IOException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyFile(
-            final ReadOnlyFile rof,
+            final @WillCloseWhenClosed ReadOnlyFile rof,
             final int windowLen)
     throws IOException {
         this(rof, null, windowLen);
     }
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private BufferedReadOnlyFile(
-            @CheckForNull ReadOnlyFile rof,
+            final @CheckForNull @WillCloseWhenClosed ReadOnlyFile rof,
             final @CheckForNull File file,
             final int windowLen)
     throws IOException {
-        super(rof);
+        super(check(rof, file, windowLen));
 
-        // Check parameters (fail fast).
-        if (null == rof) {
-            rof = new DefaultReadOnlyFile(file);
-        } else { // null != rof
-            assert null == file;
-        }
-        if (windowLen <= 0)
-            throw new IllegalArgumentException();
-
-        super.delegate = rof;
-        //this.length = rof.length();
-        this.fp = rof.getFilePointer();
+        this.fp = delegate.getFilePointer();
         this.window = new byte[windowLen];
         invalidateWindow();
 
         assert 0 < this.window.length;
+    }
+
+    /** Check constructor parameters (fail fast). */
+    private static ReadOnlyFile check(
+            final @CheckForNull @WillCloseWhenClosed ReadOnlyFile rof,
+            final @CheckForNull File file,
+            final int windowLen)
+    throws FileNotFoundException {
+        if (0 >= windowLen)
+            throw new IllegalArgumentException();
+        if (null != rof) {
+            assert null == file;
+            return rof;
+        } else {
+            return new DefaultReadOnlyFile(file);
+        }
     }
 
     /**
@@ -244,8 +268,8 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
             if (o != 0) {
                 // The file pointer is not on a window boundary.
                 positionWindow();
-                read = (int) min(len, windowLen - o);
-                read = (int) min(read, length - fp);
+                read = Math.min(len, windowLen - o);
+                read = (int) Math.min(read, length - fp);
                 System.arraycopy(window, o, buf, off, read);
                 fp += read;
             }
@@ -266,7 +290,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         if (read < len && fp < length) {
             // The file pointer is not on a window boundary.
             positionWindow();
-            final int n = (int) min(len - read, length - fp);
+            final int n = (int) Math.min(len - read, length - fp);
             System.arraycopy(window, 0, buf, off + read, n);
             read += n;
             fp += n;
@@ -289,11 +313,8 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         // Order is important here!
         if (null == delegate)
             return;
-        try {
-            delegate.close();
-        } finally {
-            delegate = null;
-        }
+        delegate.close();
+        delegate = null;
     }
 
     //

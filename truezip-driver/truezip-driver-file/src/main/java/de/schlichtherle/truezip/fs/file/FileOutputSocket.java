@@ -16,9 +16,10 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import static java.lang.Boolean.TRUE;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -142,6 +143,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
             boolean closed;
 
+            @CreatesObligation
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             OutputStream() throws FileNotFoundException {
                 super(new FileOutputStream(temp.getFile(), options.get(APPEND))); // Do NOT extend FileOutputStream: It implements finalize(), which may cause deadlocks!
             }
@@ -150,12 +153,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             public void close() throws IOException {
                 if (closed)
                     return;
+                super.close();
                 closed = true;
-                try {
-                    super.close();
-                } finally {
-                    close(temp, null == exception);
-                }
+                close(temp, null == exception);
             }
         } // OutputStream
 

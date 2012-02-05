@@ -20,6 +20,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.WillClose;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -68,14 +70,15 @@ public final class Streams {
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output stream</em>.
      */
-    public static void copy(final InputStream in, final OutputStream out)
+    public static void copy(final @WillClose InputStream in,
+                            final @WillClose OutputStream out)
     throws IOException {
         try {
             Streams.cat(in, out);
         } finally {
             try {
                 in.close();
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 throw new InputException(ex);
             } finally {
                 out.close();
@@ -107,7 +110,8 @@ public final class Streams {
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} in the <em>output stream</em>.
      */
-    public static void cat(final InputStream in, final OutputStream out)
+    public static void cat( final @WillNotClose InputStream in,
+                            final @WillNotClose OutputStream out)
     throws IOException {
         if (null == in || null == out)
             throw new NullPointerException();
@@ -265,8 +269,9 @@ public final class Streams {
             }
             out.flush();
 
-            if (null != reader.exception)
-                throw reader.exception;
+            final InputException ex = reader.exception;
+            if (null != ex)
+                throw ex;
         } finally {
             Buffer.release(buffers);
             if (interrupted)
@@ -333,6 +338,7 @@ public final class Streams {
      * A pooled and cached daemon thread which runs tasks to read input streams.
      * You cannot use this class outside its package.
      */
+    @SuppressWarnings("PublicInnerClass")
     public static final class ReaderThread extends Thread {
         ReaderThread(Runnable r) {
             super(ThreadGroups.getServerThreadGroup(), r, ReaderThread.class.getName());

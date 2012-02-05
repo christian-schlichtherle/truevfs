@@ -17,10 +17,14 @@ import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.Pool;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -49,6 +53,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@CleanupObligation
+@edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
 public final class IOCache implements Flushable, Closeable {
 
     private static final BufferSocketFactory FACTORY = JSE7.AVAILABLE
@@ -75,6 +81,7 @@ public final class IOCache implements Flushable, Closeable {
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
+    @CreatesObligation
     private IOCache(final Strategy strategy,
                     final IOPool<?> pool) {
         if (null == strategy || null == pool)
@@ -139,23 +146,24 @@ public final class IOCache implements Flushable, Closeable {
 
     /**
      * Discards the entry data in this buffer.
+     * 
+     * @throws IOException On any I/O failure.
      */
     public void clear() throws IOException {
         setBuffer(null);
     }
 
     /**
-     * {@link #flush() Flushes} and finally {@link #clear() clears} this cache.
+     * {@linkplain #flush() Flushes} and finally {@linkplain #clear() clears}
+     * this cache.
      */
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         try {
-            final Buffer buffer = getBuffer();
-            if (null != buffer) {
-                getOutputBufferPool().release(buffer);
-            }
+            flush();
         } finally {
-            setBuffer(null);
+            clear();
         }
     }
 
@@ -214,6 +222,7 @@ public final class IOCache implements Flushable, Closeable {
 
     /** Provides different cache strategies. */
     @Immutable
+    @SuppressWarnings("PublicInnerClass")
     public enum Strategy {
 
         /**
@@ -255,6 +264,7 @@ public final class IOCache implements Flushable, Closeable {
          * @param  pool the pool of temporary entries to cache the entry data.
          * @return A new cache.
          */
+        @CreatesObligation
         public IOCache newCache(IOPool<?> pool) {
             return new IOCache(this, pool);
         }
@@ -510,7 +520,9 @@ public final class IOCache implements Flushable, Closeable {
         final class BufferInputChannel extends DecoratingSeekableByteChannel {
             boolean closed;
 
-            BufferInputChannel(SeekableByteChannel sbc) {
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            @CreatesObligation
+            BufferInputChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
                 super(sbc);
             }
 
@@ -518,9 +530,9 @@ public final class IOCache implements Flushable, Closeable {
             public void close() throws IOException {
                 if (closed)
                     return;
-                closed = true;
                 try {
                     delegate.close();
+                    closed = true;
                 } finally {
                     getInputBufferPool().release(Buffer.this);
                 }
@@ -530,7 +542,9 @@ public final class IOCache implements Flushable, Closeable {
         final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
             boolean closed;
 
-            BufferReadOnlyFile(ReadOnlyFile rof) {
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            @CreatesObligation
+            BufferReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
                 super(rof);
             }
 
@@ -538,9 +552,9 @@ public final class IOCache implements Flushable, Closeable {
             public void close() throws IOException {
                 if (closed)
                     return;
-                closed = true;
                 try {
                     delegate.close();
+                    closed = true;
                 } finally {
                     getInputBufferPool().release(Buffer.this);
                 }
@@ -550,7 +564,9 @@ public final class IOCache implements Flushable, Closeable {
         final class BufferInputStream extends DecoratingInputStream {
             boolean closed;
 
-            BufferInputStream(InputStream in) {
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            @CreatesObligation
+            BufferInputStream(@WillCloseWhenClosed InputStream in) {
                 super(in);
             }
 
@@ -558,9 +574,9 @@ public final class IOCache implements Flushable, Closeable {
             public void close() throws IOException {
                 if (closed)
                     return;
-                closed = true;
                 try {
                     delegate.close();
+                    closed = true;
                 } finally {
                     getInputBufferPool().release(Buffer.this);
                 }
@@ -590,7 +606,9 @@ public final class IOCache implements Flushable, Closeable {
         final class BufferOutputChannel extends DecoratingSeekableByteChannel {
             boolean closed;
 
-            BufferOutputChannel(SeekableByteChannel sbc) {
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            @CreatesObligation
+            BufferOutputChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
                 super(sbc);
             }
 
@@ -598,9 +616,9 @@ public final class IOCache implements Flushable, Closeable {
             public void close() throws IOException {
                 if (closed)
                     return;
-                closed = true;
                 try {
                     delegate.close();
+                    closed = true;
                 } finally {
                     getOutputBufferPool().release(Buffer.this);
                 }
@@ -610,7 +628,9 @@ public final class IOCache implements Flushable, Closeable {
         final class BufferOutputStream extends DecoratingOutputStream {
             boolean closed;
 
-            BufferOutputStream(OutputStream out) {
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            @CreatesObligation
+            BufferOutputStream(@WillCloseWhenClosed OutputStream out) {
                 super(out);
             }
 
@@ -618,9 +638,9 @@ public final class IOCache implements Flushable, Closeable {
             public void close() throws IOException {
                 if (closed)
                     return;
-                closed = true;
                 try {
                     delegate.close();
+                    closed = true;
                 } finally {
                     getOutputBufferPool().release(Buffer.this);
                 }

@@ -14,7 +14,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * A pool of byte array I/O entries.
+ * A pool of byte array I/O buffers.
  *
  * @author Christian Schlichtherle
  * @version $Id$

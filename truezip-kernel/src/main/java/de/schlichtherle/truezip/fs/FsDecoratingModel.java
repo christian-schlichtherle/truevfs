@@ -20,17 +20,18 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
 
+    /** The decorated file system model. */
     protected final M delegate;
 
     /**
      * Constructs a new decorating file system model.
      *
-     * @param model the decorated file system model.
+     * @param delegate the file system model to decorate.
      */
-    protected FsDecoratingModel(final M model) {
-        if (null == model)
+    protected FsDecoratingModel(final M delegate) {
+        if (null == delegate)
             throw new NullPointerException();
-        this.delegate = model;
+        this.delegate = delegate;
     }
 
     @Override

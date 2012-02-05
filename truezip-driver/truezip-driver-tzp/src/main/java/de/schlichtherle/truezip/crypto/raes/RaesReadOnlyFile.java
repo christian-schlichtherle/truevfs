@@ -9,16 +9,19 @@
 package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.CipherReadOnlyFile;
-import static de.schlichtherle.truezip.crypto.raes.Constants.*;
+import static de.schlichtherle.truezip.crypto.raes.Constants.LEAD_IN_LENGTH;
+import static de.schlichtherle.truezip.crypto.raes.Constants.SIGNATURE;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -63,7 +66,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
 
-    RaesReadOnlyFile(@CheckForNull ReadOnlyFile rof) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    RaesReadOnlyFile(@CheckForNull @WillCloseWhenClosed ReadOnlyFile rof) {
         super(rof);
     }
 
@@ -105,6 +110,7 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      * @throws RaesException If the file is not RAES compatible.
      * @throws IOException on any I/O error.
      */
+    @CreatesObligation
     public static RaesReadOnlyFile getInstance(
             final File file,
             final @Nullable RaesParameters param)
@@ -136,8 +142,9 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
      * @throws RaesException If the file is not RAES compatible.
      * @throws IOException on any I/O error.
      */
+    @CreatesObligation
     public static RaesReadOnlyFile getInstance(
-            final ReadOnlyFile rof,
+            final @WillCloseWhenClosed ReadOnlyFile rof,
             @CheckForNull RaesParameters param)
     throws IOException {
         // Load header data.

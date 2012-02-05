@@ -9,9 +9,9 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.io.SequentialIOException;
+import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -40,11 +40,12 @@ public class FsSyncException extends SequentialIOException {
     }
 
     public FsSyncException(FsModel model, IOException cause) {
-        super(model.getMountPoint().toString(), cause);
+        this(model, cause, 0);
     }
 
     FsSyncException(FsModel model, IOException cause, int priority) {
         super(model.getMountPoint().toString(), cause, priority);
+        assert !(cause instanceof FsControllerException) : cause;
     }
 
     @Override

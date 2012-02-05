@@ -10,9 +10,11 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.crypto.CipherOutputStream;
 import de.schlichtherle.truezip.crypto.param.KeyStrength;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
@@ -66,8 +68,9 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      *         no suitable RAES parameters can be found.
      * @throws IOException on any I/O error.
      */
+    @CreatesObligation
     public static RaesOutputStream getInstance(
-            final OutputStream out,
+            final @WillCloseWhenClosed OutputStream out,
             @CheckForNull RaesParameters param)
     throws IOException {
         if (null == out)
@@ -87,7 +90,9 @@ public abstract class RaesOutputStream extends CipherOutputStream {
         throw new RaesParametersException("No suitable RAES parameters available!");
     }
 
-    RaesOutputStream(   @CheckForNull OutputStream out,
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    RaesOutputStream(   @CheckForNull @WillCloseWhenClosed OutputStream out,
                         @CheckForNull BufferedBlockCipher cipher) {
         super(out, cipher);
     }

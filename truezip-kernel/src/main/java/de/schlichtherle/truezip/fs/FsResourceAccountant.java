@@ -24,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -57,6 +60,7 @@ public final class FsResourceAccountant {
      * The weak hash map allows the garbage collector to pick up a closeable
      * resource if there are no more references to it.
      */
+    @GuardedBy("lock")
     private final Map<Closeable, Account> threads
             = new WeakHashMap<Closeable, Account>();
 
@@ -81,7 +85,7 @@ public final class FsResourceAccountant {
      * 
      * @param  resource the closeable resource to start accounting for.
      */
-    void startAccountingFor(final Closeable resource) {
+    void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
         lock.lock();
         try {
             if (!threads.containsKey(resource))
@@ -98,7 +102,7 @@ public final class FsResourceAccountant {
      * 
      * @param  resource the closeable resource to stop accounting for.
      */
-    void stopAccountingFor(final Closeable resource) {
+    void stopAccountingFor(final @WillNotClose Closeable resource) {
         lock.lock();
         try {
             final Account ref = threads.remove(resource);
@@ -267,6 +271,7 @@ public final class FsResourceAccountant {
      * collector and notify their respective resource accountant.
      * You cannot use this class outside its package.
      */
+    @SuppressWarnings("PublicInnerClass")
     public static final class Collector extends Thread {
         private static final ReferenceQueue<Closeable>
                 queue = new ReferenceQueue<Closeable>();

@@ -14,8 +14,10 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -40,7 +42,9 @@ public class OdfOutputShop extends FsMultiplexedOutputShop<ZipArchiveEntry> {
      * @param output the decorated output shop.
      * @param pool the pool for buffering entry data.
      */
-    public OdfOutputShop(ZipOutputShop output, IOPool<?> pool) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public OdfOutputShop(@WillCloseWhenClosed ZipOutputShop output, IOPool<?> pool) {
         super(output, pool);
     }
 
@@ -68,7 +72,7 @@ public class OdfOutputShop extends FsMultiplexedOutputShop<ZipArchiveEntry> {
                 }
                 return super.newOutputStream();
             }
-        } // class Output
+        } // Output
 
         return new Output();
     }

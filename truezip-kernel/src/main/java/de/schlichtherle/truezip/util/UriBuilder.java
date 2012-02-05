@@ -9,10 +9,10 @@
 package de.schlichtherle.truezip.util;
 
 import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
-import javax.annotation.CheckForNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.CharBuffer;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**

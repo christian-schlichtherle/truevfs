@@ -80,7 +80,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * {@link java.io.IOException} for the cause exception.
  * The second type parameter determines the type of exception which may be
  * thrown by the exception handlers themselves and is freely selectable.
- *
+ * <p>
+ * TODO: Consider allowing {@link Throwable} as type parameters.
+ * 
  * @param   <C> The type of the cause exception.
  * @param   <X> The type of the thrown exception.
  * @author  Christian Schlichtherle

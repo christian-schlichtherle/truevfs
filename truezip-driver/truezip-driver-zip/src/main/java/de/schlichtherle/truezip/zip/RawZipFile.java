@@ -21,8 +21,7 @@ import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.overhead;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static de.schlichtherle.truezip.zip.ZipParametersUtils.parameters;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,6 +33,9 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipException;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
@@ -55,6 +57,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  * This class is able to skip a preamble like the one found in self extracting
  * archives.
  *
+ * @param   <E> The type of the ZIP entries.
  * @see     RawZipOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -122,13 +125,15 @@ implements Iterable<E>, Closeable {
      * @throws IOException on any other I/O related issue.
      * @see    #recoverLostEntries()
      */
+    @CreatesObligation
     protected RawZipFile(
-            ReadOnlyFile zip,
+            @WillCloseWhenClosed ReadOnlyFile zip,
             ZipFileParameters<E> param)
     throws IOException {
         this(new SingleReadOnlyFilePool(zip), param);
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     RawZipFile(
             final Pool<ReadOnlyFile, IOException> source,
             final ZipFileParameters<E> param)
@@ -821,6 +826,7 @@ implements Iterable<E>, Closeable {
      *
      * @throws ZipException If this ZIP file has been closed.
      */
+    @CreatesObligation
     public InputStream getPreambleInputStream() throws IOException {
         assertOpen();
         return new ReadOnlyFileInputStream(
@@ -851,6 +857,7 @@ implements Iterable<E>, Closeable {
      *
      * @throws ZipException If this ZIP file has been closed.
      */
+    @CreatesObligation
     public InputStream getPostambleInputStream() throws IOException {
         assertOpen();
         return new ReadOnlyFileInputStream(
@@ -885,6 +892,7 @@ implements Iterable<E>, Closeable {
      * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(name, null, true)}.
      */
+    @CreatesObligation
     public final @Nullable InputStream getInputStream(String name)
     throws IOException {
         return getInputStream(name, null, true);
@@ -894,6 +902,7 @@ implements Iterable<E>, Closeable {
      * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(entry.getName(), null, true)} instead.
      */
+    @CreatesObligation
     public final @Nullable InputStream getInputStream(ZipEntry entry)
     throws IOException {
         return getInputStream(entry.getName(), null, true);
@@ -903,6 +912,7 @@ implements Iterable<E>, Closeable {
      * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(name, true, true)}.
      */
+    @CreatesObligation
     public final @Nullable InputStream getCheckedInputStream(String name)
     throws IOException {
         return getInputStream(name, true, true);
@@ -912,6 +922,7 @@ implements Iterable<E>, Closeable {
      * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(entry.getName(), true, true)} instead.
      */
+    @CreatesObligation
     public final @Nullable InputStream getCheckedInputStream(ZipEntry entry)
     throws IOException {
         return getInputStream(entry.getName(), true, true);
@@ -960,6 +971,8 @@ implements Iterable<E>, Closeable {
      *         Format Specification.
      * @throws IOException If the entry cannot get read from this ZipFile.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected @Nullable InputStream getInputStream(
             final String name,
             @CheckForNull Boolean check,
@@ -1095,8 +1108,8 @@ implements Iterable<E>, Closeable {
         final ReadOnlyFile rof = this.rof;
         if (null == rof)
             return;
-        this.rof = null;
         rof.close();
+        this.rof = null;
     }
 
     /**
@@ -1108,7 +1121,9 @@ implements Iterable<E>, Closeable {
     private final class EntryReadOnlyFile extends IntervalReadOnlyFile {
         private boolean closed;
 
-        EntryReadOnlyFile(long start, long length)
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        EntryReadOnlyFile(final long start, final long length)
         throws IOException {
             super(RawZipFile.this.rof, start, length);
             assert null != RawZipFile.this.rof;
@@ -1119,10 +1134,10 @@ implements Iterable<E>, Closeable {
         public void close() throws IOException {
             if (this.closed)
                 return;
-            this.closed = true;
-            RawZipFile.this.open--;
             // Never close the raw ZIP file!
             //super.close();
+            this.closed = true;
+            RawZipFile.this.open--;
         }
     } // EntryReadOnlyFile
 
@@ -1135,7 +1150,11 @@ implements Iterable<E>, Closeable {
 
         final long length;
 
-        public SafeBufferedReadOnlyFile(ReadOnlyFile rof, long length)
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        public SafeBufferedReadOnlyFile(
+                final @WillCloseWhenClosed ReadOnlyFile rof,
+                final long length)
         throws IOException {
             super(rof);
             assert length <= rof.length();

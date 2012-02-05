@@ -29,7 +29,7 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.*;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,6 +38,9 @@ import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -241,15 +244,23 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      * @return {@code entry.isEncrypted()}.
      * @since  TrueZIP 7.3
      */
-    protected boolean check(ZipInputShop input, ZipArchiveEntry entry) {
+    protected boolean check(
+            @WillNotClose ZipInputShop input,
+            ZipArchiveEntry entry) {
         return entry.isEncrypted();
     }
 
-    final boolean process(ZipInputShop input, ZipArchiveEntry local, ZipArchiveEntry peer) {
+    final boolean process(
+            @WillNotClose ZipInputShop input,
+            ZipArchiveEntry local,
+            ZipArchiveEntry peer) {
         return process(local, peer);
     }
 
-    final boolean process(ZipOutputShop output, ZipArchiveEntry local, ZipArchiveEntry peer) {
+    final boolean process(
+            @WillNotClose ZipOutputShop output,
+            ZipArchiveEntry local,
+            ZipArchiveEntry peer) {
         return process(peer, local);
     }
 
@@ -457,15 +468,16 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
             return newInputShop(model, rof);
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             rof.close();
             throw ex;
         }
     }
 
+    @CreatesObligation
     protected InputShop<ZipArchiveEntry> newInputShop(
             FsModel model,
-            ReadOnlyFile rof)
+            @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
         final ZipInputShop input = new ZipInputShop(this, model, rof);
         try {
@@ -526,7 +538,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     public final OutputShop<ZipArchiveEntry> newOutputShop(
             final FsModel model,
             final OutputSocket<?> output,
-            final @CheckForNull InputShop<ZipArchiveEntry> source)
+            final InputShop<ZipArchiveEntry> source)
     throws IOException {
         return newOutputShop0(
                 model,
@@ -534,10 +546,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
                 (ZipInputShop) source);
     }
 
+    @CreatesObligation
     private OutputShop<ZipArchiveEntry> newOutputShop0(
             final FsModel model,
             final OptionOutputSocket output,
-            final @CheckForNull ZipInputShop source)
+            final @CheckForNull @WillNotClose ZipInputShop source)
     throws IOException {
         final BitField<FsOutputOption> options = output.getOptions();
         if (null != source)
@@ -545,10 +558,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         return newOutputShop(model, output, source);
     }
 
+    @CreatesObligation
     protected OutputShop<ZipArchiveEntry> newOutputShop(
             final FsModel model,
             final OptionOutputSocket output,
-            final @CheckForNull ZipInputShop source)
+            final @CheckForNull @WillNotClose ZipInputShop source)
     throws IOException {
         final OutputStream out = output.newOutputStream();
         try {
@@ -559,10 +573,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
         }
     }
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected OutputShop<ZipArchiveEntry> newOutputShop(
             FsModel model,
-            OutputStream out,
-            @CheckForNull ZipInputShop source)
+            @WillCloseWhenClosed OutputStream out,
+            @CheckForNull @WillNotClose ZipInputShop source)
     throws IOException {
         return new FsMultiplexedOutputShop<ZipArchiveEntry>(
                 new ZipOutputShop(this, model, out, source),

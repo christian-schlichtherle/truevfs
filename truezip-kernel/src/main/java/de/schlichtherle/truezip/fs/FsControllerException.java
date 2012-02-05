@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -86,6 +86,7 @@ public abstract class FsControllerException extends IOException {
 
     FsControllerException(@CheckForNull Throwable cause) {
         super(cause);
+        assert !(cause instanceof FsControllerException) : cause;
     }
 
     /**

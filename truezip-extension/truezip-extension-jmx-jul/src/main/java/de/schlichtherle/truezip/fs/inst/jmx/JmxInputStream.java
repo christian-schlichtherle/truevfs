@@ -9,8 +9,10 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -21,7 +23,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class JmxInputStream extends DecoratingInputStream {
     private final JmxIOStatistics stats;
 
-    JmxInputStream(InputStream in, JmxIOStatistics stats) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    JmxInputStream(@WillCloseWhenClosed InputStream in, JmxIOStatistics stats) {
         super(in);
         assert null != stats;
         this.stats = stats;
@@ -42,5 +46,4 @@ final class JmxInputStream extends DecoratingInputStream {
             stats.incBytesRead(ret);
         return ret;
     }
-    
 }

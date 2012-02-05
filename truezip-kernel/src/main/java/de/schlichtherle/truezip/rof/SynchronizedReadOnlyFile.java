@@ -9,9 +9,11 @@
 package de.schlichtherle.truezip.rof;
 
 import de.schlichtherle.truezip.socket.InputShop;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import java.io.IOException;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -38,7 +40,10 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
      *             protected resource, e.g. an {@link InputShop}.
      *             So the lock should never be this object itself.
      */
-    public SynchronizedReadOnlyFile(final @Nullable ReadOnlyFile rof) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public SynchronizedReadOnlyFile(
+            final @Nullable @WillCloseWhenClosed ReadOnlyFile rof) {
         this(rof, null);
     }
 
@@ -49,8 +54,10 @@ public class SynchronizedReadOnlyFile extends DecoratingReadOnlyFile {
      * @param lock the object to synchronize on.
      *        If {@code null}, then this object is used, not the stream.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public SynchronizedReadOnlyFile(
-            final @Nullable ReadOnlyFile rof,
+            final @Nullable @WillCloseWhenClosed ReadOnlyFile rof,
             final @CheckForNull Object lock) {
         super(rof);
         this.lock = null != lock ? lock : this;

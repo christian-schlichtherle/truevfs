@@ -24,8 +24,7 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,9 +32,12 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.swing.Icon;
 
 /**
  * A content caching file system controller implements a combined caching and
@@ -467,7 +469,9 @@ extends FsLockModelDecoratingController<
 
         /** An input stream proxy. */
         final class EntryInputStream extends DecoratingInputStream {
-            EntryInputStream(InputStream in) {
+            @CreatesObligation
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            EntryInputStream(@WillCloseWhenClosed InputStream in) {
                 super(in);
             }
 
@@ -512,7 +516,9 @@ extends FsLockModelDecoratingController<
         /** A seekable byte channel proxy. */
         final class EntrySeekableByteChannel
         extends DecoratingSeekableByteChannel {
-            EntrySeekableByteChannel(SeekableByteChannel sbc) {
+            @CreatesObligation
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            EntrySeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
                 super(sbc);
             }
 
@@ -529,7 +535,9 @@ extends FsLockModelDecoratingController<
 
         /** An output stream proxy. */
         final class EntryOutputStream extends DecoratingOutputStream {
-            EntryOutputStream(OutputStream out) {
+            @CreatesObligation
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            EntryOutputStream(@WillCloseWhenClosed OutputStream out) {
                 super(out);
             }
 

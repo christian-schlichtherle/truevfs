@@ -60,7 +60,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
     protected OutputShop<ZipArchiveEntry> newOutputShop(
             FsModel model,
             OutputStream out,
-            @CheckForNull ZipInputShop source)
+            ZipInputShop source)
     throws IOException {
         return new ZipOutputShop(this, model, out, source);
     }

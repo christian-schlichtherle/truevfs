@@ -19,12 +19,14 @@ import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.JointIterator;
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -38,7 +40,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
- * @param   E The type of the archive entries.
+ * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -64,8 +66,10 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * @param output the decorated output shop.
      * @param pool the pool for buffering entry data.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public FsMultiplexedOutputShop(
-            final OutputShop<E> output,
+            final @WillCloseWhenClosed OutputShop<E> output,
             final IOPool<?> pool) {
         super(output);
         if (null == pool)
@@ -134,10 +138,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                         return new BufferedEntryOutputStream(
                                 temp, getBoundSocket());
                     } catch (IOException ex) {
-                        try {
-                            temp.release();
-                        } catch (IOException discard) {
-                        }
+                        temp.release();
                         throw ex;
                     }
                 } else {
@@ -145,7 +146,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                             getBoundSocket().newOutputStream());
                 }
             }
-        } // class Output
+        } // Output
 
         return new Output();
     }
@@ -153,16 +154,55 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     /**
      * Returns whether the container output archive is busy writing an archive
      * entry or not.
+     * 
+     * @return Whether the container output archive is busy writing an archive
+     *         entry or not.
      */
     public boolean isBusy() {
         return busy;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isBusy())
+            throw new IOException("Output shop is still busy!");
+        storeBuffers();
+        assert buffers.isEmpty();
+        delegate.close();
+    }
+
+    private void storeBuffers() throws IOException {
+        if (isBusy())
+            return;
+
+        final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                = new SequentialIOExceptionBuilder<IOException, SequentialIOException>(
+                    IOException.class, SequentialIOException.class);
+        final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
+        while (i.hasNext()) {
+            final BufferedEntryOutputStream out = i.next();
+            boolean remove = true;
+            try {
+                remove = out.store(false);
+            } catch (InputException ex) {
+                builder.warn(ex); // let's continue anyway...
+            } catch (IOException ex) {
+                throw builder.fail(ex); // something's wrong writing this MultiplexedOutputStream!
+            } finally {
+                if (remove)
+                    i.remove();
+            }
+        }
+        builder.check();
     }
 
     /** This entry output stream writes directly to this output shop. */
     private class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
-        EntryOutputStream(final OutputStream out) {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        EntryOutputStream(final @WillCloseWhenClosed OutputStream out) {
             super(out);
             busy = true;
         }
@@ -171,15 +211,12 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         public void close() throws IOException {
             if (closed)
                 return;
+            delegate.close();
             closed = true;
             busy = false;
-            try {
-                delegate.close();
-            } finally {
-                storeBuffers();
-            }
+            storeBuffers();
         }
-    } // class EntryOutputStream
+    } // EntryOutputStream
 
     /**
      * This entry output stream writes the archive entry to an
@@ -194,7 +231,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         final InputSocket<Entry> input;
         boolean closed;
 
+        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
                 final IOPool.Entry<?> temp,
                 final OutputSocket<? extends E> output)
@@ -229,22 +268,19 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         public void close() throws IOException {
             if (closed)
                 return;
+            delegate.close();
             closed = true;
             try {
-                delegate.close();
+                final Entry src = input.getLocalTarget();
+                final E dst = getTarget();
+                // Never copy anything but the DATA size!
+                if (UNKNOWN == dst.getSize(DATA))
+                    dst.setSize(DATA, src.getSize(DATA));
+                for (Access type : ALL_ACCESS_SET)
+                    if (UNKNOWN == dst.getTime(type))
+                        dst.setTime(type, src.getTime(type));
             } finally {
-                try {
-                    final Entry src = input.getLocalTarget();
-                    final E dst = getTarget();
-                    // Never copy anything but the DATA size!
-                    if (UNKNOWN == dst.getSize(DATA))
-                        dst.setSize(DATA, src.getSize(DATA));
-                    for (Access type : ALL_ACCESS_SET)
-                        if (UNKNOWN == dst.getTime(type))
-                            dst.setTime(type, src.getTime(type));
-                } finally {
-                    storeBuffers();
-                }
+                storeBuffers();
             }
         }
 
@@ -261,42 +297,5 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
             return true;
         }
-    } // class BufferedEntryOutputStream
-
-    @Override
-    public void close() throws IOException {
-        if (isBusy())
-            throw new IOException("Output shop is still busy!");
-        try {
-            storeBuffers();
-            assert buffers.isEmpty();
-        } finally {
-            delegate.close();
-        }
-    }
-
-    private void storeBuffers() throws IOException {
-        if (isBusy())
-            return;
-
-        final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
-                = new SequentialIOExceptionBuilder<IOException, SequentialIOException>(
-                    IOException.class, SequentialIOException.class);
-        final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
-        while (i.hasNext()) {
-            final BufferedEntryOutputStream out = i.next();
-            boolean remove = true;
-            try {
-                remove = out.store(false);
-            } catch (InputException ex) {
-                builder.warn(ex); // let's continue anyway...
-            } catch (IOException ex) {
-                throw builder.fail(ex); // something's wrong writing this MultiplexedOutputStream!
-            } finally {
-                if (remove)
-                    i.remove();
-            }
-        }
-        builder.check();
-    }
+    } // BufferedEntryOutputStream
 }

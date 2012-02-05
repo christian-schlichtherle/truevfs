@@ -19,14 +19,17 @@ import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static de.schlichtherle.truezip.zip.WinZipAesUtils.overhead;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import static de.schlichtherle.truezip.zip.ZipParametersUtils.parameters;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
@@ -37,6 +40,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  *
+ * @param   <E> The type of the ZIP entries.
  * @see     RawZipFile
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -91,9 +95,11 @@ implements Iterable<E> {
      * @param  param the parameters for writing the ZIP file.
      * @since  TrueZIP 7.3
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected RawZipOutputStream(
-            final OutputStream out,
-            final @CheckForNull RawZipFile<E> appendee,
+            final @WillCloseWhenClosed OutputStream out,
+            final @CheckForNull @WillNotClose RawZipFile<E> appendee,
             final ZipOutputStreamParameters param) {
         super(newLEDataOutputStream(out, appendee));
         this.dos = (LEDataOutputStream) this.delegate;
@@ -113,9 +119,11 @@ implements Iterable<E> {
         setLevel0(param.getLevel());
     }
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private static LEDataOutputStream newLEDataOutputStream(
-            final OutputStream out,
-            final @CheckForNull RawZipFile<?> appendee) {
+            final @WillCloseWhenClosed OutputStream out,
+            final @CheckForNull @WillNotClose RawZipFile<?> appendee) {
         if (null == out)
             throw new NullPointerException();
         return null != appendee
@@ -708,15 +716,20 @@ implements Iterable<E> {
         finish();
         if (this.closed)
             return;
+        this.delegate.close();
         this.closed = true;
         this.entries.clear();
-        this.delegate.close();
     }
 
     /** Adjusts the number of written bytes in the offset for appending mode. */
     private static final class AppendingLEDataOutputStream
     extends LEDataOutputStream {
-        AppendingLEDataOutputStream(OutputStream out, RawZipFile<?> appendee) {
+
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        AppendingLEDataOutputStream(
+                final @WillCloseWhenClosed OutputStream out,
+                final @WillNotClose RawZipFile<?> appendee) {
             super(out);
             super.written = appendee.getOffsetMapper().unmap(appendee.length());
         }

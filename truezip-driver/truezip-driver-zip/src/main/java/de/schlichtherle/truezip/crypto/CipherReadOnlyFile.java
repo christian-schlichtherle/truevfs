@@ -10,8 +10,10 @@ package de.schlichtherle.truezip.crypto;
 
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 
@@ -126,7 +128,9 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      *        This may be {@code null}, but must be properly initialized
      *        <em>before</em> a call to {@link #init}.
      */
-    protected CipherReadOnlyFile(@Nullable ReadOnlyFile rof) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    protected CipherReadOnlyFile(@Nullable @WillCloseWhenClosed ReadOnlyFile rof) {
         super(rof);
     }
 

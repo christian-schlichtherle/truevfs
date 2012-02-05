@@ -10,10 +10,11 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillClose;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -92,8 +93,11 @@ public abstract class IOSocket<LT, PT> {
     public static void copy(final InputSocket <?> input,
                             final OutputSocket<?> output)
     throws IOException {
-        final InputStream in = input.connect(output).newInputStream();
-        OutputStream out = null;
+        if (null == output)
+            throw new NullPointerException();
+
+        final @WillClose InputStream in = input.connect(output).newInputStream();
+        @WillClose OutputStream out = null;
         try {
             // .connect(input) is redundant unless .newInputStream() messed
             // with the connection, which is impossible outside this package.
@@ -107,6 +111,7 @@ public abstract class IOSocket<LT, PT> {
                 }
             }
         }
+
         try {
             Streams.copy(in, out);
         } finally {

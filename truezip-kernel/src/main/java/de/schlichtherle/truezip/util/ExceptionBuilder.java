@@ -20,6 +20,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * the processing by calling {@link #warn(Exception)} and later check out the
  * assembled exception by calling {@link #fail(Exception)} or
  * {@link #check()}.
+ * <p>
+ * TODO: Consider allowing {@link Throwable} as type parameters.
  *
  * @param   <C> The type of the cause exception.
  * @param   <X> The type of the assembled exception.

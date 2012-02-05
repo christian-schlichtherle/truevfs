@@ -10,7 +10,9 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -21,7 +23,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class JmxReadOnlyFile extends DecoratingReadOnlyFile {
     private final JmxIOStatistics stats;
 
-    JmxReadOnlyFile(ReadOnlyFile rof, JmxIOStatistics stats) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    JmxReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof, JmxIOStatistics stats) {
         super(rof);
         assert null != stats;
         this.stats = stats;

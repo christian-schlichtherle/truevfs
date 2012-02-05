@@ -8,15 +8,11 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.socket.InputSocket;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.*;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -87,6 +83,8 @@ public final class TFileInputStream extends DecoratingInputStream {
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileInputStream(String path)
     throws FileNotFoundException {
         super(newInputStream(new TFile(path)));
@@ -102,11 +100,14 @@ public final class TFileInputStream extends DecoratingInputStream {
      *         stream for the archive file.
      * @throws FileNotFoundException On any other I/O related issue.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileInputStream(File file)
     throws FileNotFoundException {
         super(newInputStream(file));
     }
 
+    @CreatesObligation
     private static InputStream newInputStream(final File src)
     throws FileNotFoundException {
         final InputSocket<?> input = TBIO.getInputSocket(src,

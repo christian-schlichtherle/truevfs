@@ -9,8 +9,10 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -21,7 +23,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class JmxOutputStream extends DecoratingOutputStream {
     private final JmxIOStatistics stats;
 
-    JmxOutputStream(OutputStream out, JmxIOStatistics stats) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    JmxOutputStream(@WillCloseWhenClosed OutputStream out, JmxIOStatistics stats) {
         super(out);
         assert null != stats;
         this.stats = stats;
@@ -37,6 +41,5 @@ final class JmxOutputStream extends DecoratingOutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         delegate.write(b, off, len);
         stats.incBytesWritten(len);
-    }
-    
+    }    
 }

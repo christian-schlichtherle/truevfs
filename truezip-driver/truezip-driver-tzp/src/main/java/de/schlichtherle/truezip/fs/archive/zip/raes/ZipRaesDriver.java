@@ -28,10 +28,10 @@ import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -211,6 +211,9 @@ public abstract class ZipRaesDriver extends JarDriver {
     newInputShop(   final FsModel model,
                     final InputSocket<?> input)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
+
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
             final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
@@ -244,11 +247,15 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected OutputShop<ZipArchiveEntry> newOutputShop(
             final FsModel model,
             final OptionOutputSocket output,
-            final @CheckForNull ZipInputShop source)
+            final ZipInputShop source)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
+
         final OutputStream out = new LazyOutputSocket<Entry>(output)
                 .newOutputStream();
         try {

@@ -25,10 +25,10 @@ extends DelegatingInputSocket<E> {
 
     private final InputSocket<? extends E> delegate;
 
-    protected DecoratingInputSocket(final InputSocket<? extends E> input) {
-        if (null == input)
+    protected DecoratingInputSocket(final InputSocket<? extends E> delegate) {
+        if (null == delegate)
             throw new NullPointerException();
-        this.delegate = input;
+        this.delegate = delegate;
     }
 
     @Override
@@ -42,10 +42,12 @@ extends DelegatingInputSocket<E> {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String d = delegate.toString();
+        return new StringBuilder(n.length() + "[delegate=".length() + d.length() + 1)
+                .append(n)
                 .append("[delegate=")
-                .append(getDelegate())
+                .append(d)
                 .append(']')
                 .toString();
     }

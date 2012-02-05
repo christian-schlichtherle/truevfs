@@ -13,7 +13,6 @@ import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputShop;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
@@ -48,10 +47,11 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected OutputShop<ZipArchiveEntry> newOutputShop(
             final FsModel model,
             final OutputStream out,
-            final @CheckForNull ZipInputShop source)
+            final ZipInputShop source)
     throws IOException {
         final IOPool<?> pool = getPool();
         final ZipOutputShop shop = new ZipOutputShop(this, model, out, source);

@@ -8,6 +8,8 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
@@ -24,15 +26,22 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@CleanupObligation
 public interface ReadOnlyFile extends Closeable {
 
     /**
      * Returns the length of the file in bytes.
+     * 
+     * @return The length of the file in bytes.
+     * @throws IOException On any I/O failure.
      */
     long length() throws IOException;
 
     /**
      * Returns the current byte position in the file as a zero-based index.
+     * 
+     * @return The current byte position in the file as a zero-based index.
+     * @throws IOException On any I/O failure.
      */
     long getFilePointer() throws IOException;
 
@@ -49,19 +58,27 @@ public interface ReadOnlyFile extends Closeable {
      * platform it doesn't.
      *
      * @param pos The current byte position as a zero-based index.
-     * @throws IOException If {@code pos} is less than {@code 0} or if
-     *         an I/O error occurs.
+     * @throws IOException If {@code pos} is less than {@code 0} or on any
+     *         I/O failure.
      */
     void seek(long pos) throws IOException;
 
     /**
      * Reads and returns the next byte or -1 if the end of the file has been
      * reached.
+     * 
+     * @return The next byte or -1 if the end of the file has been reached.
+     * @throws IOException On any I/O failure.
      */
     int read() throws IOException;
 
     /**
      * Equivalent to {@link #read(byte[], int, int) read(b, 0, b.length)}.
+     * 
+     * @param  b The buffer to fill with data.
+     * @return The total number of bytes read, or {@code -1} if there is
+     *         no more data because the end of the file has been reached.
+     * @throws IOException On any I/O failure.
      */
     int read(byte[] b) throws IOException;
 
@@ -76,12 +93,17 @@ public interface ReadOnlyFile extends Closeable {
      * @param  len The maximum number of bytes to read.
      * @return The total number of bytes read, or {@code -1} if there is
      *         no more data because the end of the file has been reached.
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O failure.
      */
     int read(byte[] b, int off, int len) throws IOException;
 
     /**
      * Equivalent to {@link #readFully(byte[], int, int) readFully(b, 0, b.length)}.
+     * 
+     * @param  b The buffer to fill with data.
+     * @throws EOFException If less than {@code len} bytes are available
+     *         before the end of the file is reached.
+     * @throws IOException On any I/O failure.
      */
     void readFully(byte[] b) throws IOException;
 
@@ -93,14 +115,17 @@ public interface ReadOnlyFile extends Closeable {
      * @param  len The number of bytes to read.
      * @throws EOFException If less than {@code len} bytes are available
      *         before the end of the file is reached.
-     * @throws IOException On any I/O related issue.
+     * @throws IOException On any I/O failure.
      */
     void readFully(byte[] b, int off, int len) throws IOException;
 
     /**
      * Closes this read-only file and releases any non-heap resources
      * allocated for it.
+     * 
+     * @throws IOException On any I/O failure.
      */
     @Override
+    @DischargesObligation
     void close() throws IOException;
 }

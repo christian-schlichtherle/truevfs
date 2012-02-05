@@ -9,11 +9,12 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -42,6 +43,8 @@ extends IOSocket<E, Entry> {
      * <p>
      * The peer target is {@code null} if and only if this socket is not
      * {@link #connect}ed to another socket.
+     * 
+     * @throws IOException On any I/O failure.
      */
     @Override
     public @Nullable Entry getPeerTarget() throws IOException {
@@ -97,11 +100,13 @@ extends IOSocket<E, Entry> {
      * buffered.
      * Buffering should be addressed by client applications instead.
      * 
+     * @return A new seekable byte channel.
+     * @throws IOException On any I/O failure.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
-     * @throws IOException on any I/O error.
      * @since  TrueZIP 7.2
      */
+    @CreatesObligation
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
@@ -115,8 +120,9 @@ extends IOSocket<E, Entry> {
      * Buffering should be addressed by the caller instead - see
      * {@link IOSocket#copy}.
      *
-     * @throws IOException on any I/O error.
      * @return A new output stream.
+     * @throws IOException On any I/O failure.
      */
+    @CreatesObligation
     public abstract OutputStream newOutputStream() throws IOException;
 }

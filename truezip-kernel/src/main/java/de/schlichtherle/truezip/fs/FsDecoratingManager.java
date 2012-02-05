@@ -22,17 +22,18 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class FsDecoratingManager<M extends FsManager>
 extends FsManager {
 
+    /** The decorated file system manager. */
     protected final M delegate;
 
     /**
      * Constructs a new decorating file system manager.
      *
-     * @param manager the decorated file system manager.
+     * @param delegate the file system manager to decorate.
      */
-    protected FsDecoratingManager(final M manager) {
-        if (null == manager)
+    protected FsDecoratingManager(final M delegate) {
+        if (null == delegate)
             throw new NullPointerException();
-        this.delegate = manager;
+        this.delegate = delegate;
     }
 
     @Override

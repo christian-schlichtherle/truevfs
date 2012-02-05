@@ -56,7 +56,7 @@ public class ReadOnlySfxDriver extends ZipDriver {
     protected final OutputShop<ZipArchiveEntry> newOutputShop(
             final FsModel model,
             final OptionOutputSocket output,
-            final @CheckForNull ZipInputShop source)
+            final ZipInputShop source)
     throws IOException {
         throw new FileNotFoundException(
                 "driver class does not support creating or modifying SFX archives");

@@ -12,16 +12,14 @@ import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
 import static de.schlichtherle.truezip.crypto.raes.Constants.*;
 import de.schlichtherle.truezip.crypto.raes.Type0RaesParameters.KeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Random;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import org.bouncycastle.crypto.BufferedBlockCipher;
-import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.Digest;
-import org.bouncycastle.crypto.Mac;
-import org.bouncycastle.crypto.PBEParametersGenerator;
+import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESFastEngine;
 import org.bouncycastle.crypto.generators.PKCS12ParametersGenerator;
@@ -64,8 +62,10 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     /** The offset where the encrypted application data starts. */
     private long start;
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     Type0RaesOutputStream(
-            final OutputStream out,
+            final @WillCloseWhenClosed OutputStream out,
             final Type0RaesParameters param)
     throws IOException{
         super(out, new BufferedBlockCipher(

@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.rof;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -32,6 +33,7 @@ public class ByteArrayReadOnlyFile extends AbstractReadOnlyFile {
      *        Note that this array is <em>not</em> copied, so beware of
      *        concurrent modifications!
      */
+    @CreatesObligation
     public ByteArrayReadOnlyFile(final byte[] buf) {
         this(buf, 0, buf.length);
     }

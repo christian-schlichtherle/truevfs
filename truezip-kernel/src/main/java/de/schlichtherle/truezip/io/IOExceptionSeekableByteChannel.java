@@ -8,11 +8,13 @@
  */
 package de.schlichtherle.truezip.io;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * A decorating seekable byte channel which saves the last {@link IOException}
@@ -35,8 +37,10 @@ extends DecoratingSeekableByteChannel {
      *
      * @param channel the nullable seekable byte channel to decorate.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected IOExceptionSeekableByteChannel(
-            @Nullable SeekableByteChannel channel) {
+            @Nullable @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);
     }
 

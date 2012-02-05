@@ -16,10 +16,10 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool.Releasable;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Date;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**

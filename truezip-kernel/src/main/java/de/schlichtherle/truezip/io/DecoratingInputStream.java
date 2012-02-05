@@ -8,10 +8,14 @@
  */
 package de.schlichtherle.truezip.io;
 
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * An abstract decorator for an input stream.
@@ -23,6 +27,7 @@ import java.io.InputStream;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@CleanupObligation
 public abstract class DecoratingInputStream extends InputStream {
 
     /** The nullable decorated input stream. */
@@ -31,10 +36,12 @@ public abstract class DecoratingInputStream extends InputStream {
     /**
      * Constructs a new decorating input stream.
      *
-     * @param in the nullable input stream to decorate.
+     * @param delegate the nullable input stream to decorate.
      */
-    protected DecoratingInputStream(final @Nullable InputStream in) {
-        this.delegate = in;
+    @CreatesObligation
+    protected DecoratingInputStream(
+            final @Nullable @WillCloseWhenClosed InputStream delegate) {
+        this.delegate = delegate;
     }
 
     @Override
@@ -63,6 +70,7 @@ public abstract class DecoratingInputStream extends InputStream {
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         delegate.close();
     }
@@ -88,10 +96,12 @@ public abstract class DecoratingInputStream extends InputStream {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String d = delegate.toString();
+        return new StringBuilder(n.length() + "[delegate=".length() + d.length() + 1)
+                .append(n)
                 .append("[delegate=")
-                .append(delegate)
+                .append(d)
                 .append(']')
                 .toString();
     }

@@ -8,9 +8,11 @@
  */
 package de.schlichtherle.truezip.io;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -46,7 +48,9 @@ implements DataOutput {
      *
      * @param out The underlying output stream which is saved for subsequent use.
      */
-    public LEDataOutputStream(OutputStream out) {
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public LEDataOutputStream(@WillCloseWhenClosed OutputStream out) {
         super(out);
     }
 

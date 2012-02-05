@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,10 +31,14 @@ extends DecoratingReadOnlyFile {
 
     private final Entry target;
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     JulReadOnlyFile(final InputSocket<?> socket) throws IOException {
         this(socket, socket.getLocalTarget());
     }
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private JulReadOnlyFile(final InputSocket<?> socket, final Entry target)
     throws IOException {
         super(socket.newReadOnlyFile());

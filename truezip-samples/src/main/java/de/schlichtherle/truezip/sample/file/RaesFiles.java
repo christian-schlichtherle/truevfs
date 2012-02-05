@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.annotation.WillClose;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
@@ -60,6 +61,7 @@ public class RaesFiles {
      * parent directory path except the files themselves, which are not
      * recognized as archive files.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void encrypt(
             final String plainFilePath,
             final String raesFilePath,
@@ -71,14 +73,16 @@ public class RaesFiles {
                 KeyManagerLocator.SINGLETON,
                 raesFile/*.getCanonicalFile()*/.toURI());
         final InputStream in = new TFileInputStream(plainFile);
+        RaesOutputStream out = null;
         try {
-            final RaesOutputStream out = RaesOutputStream.getInstance(
+            out = RaesOutputStream.getInstance(
                     new TFileOutputStream(raesFile, false),
                     params);
-            TFile.cp(in, out);
         } finally {
-            in.close();
+            if (null == out) // exception?
+                in.close();
         }
+        TFile.cp(in, out);
     }
 
     /**
@@ -108,6 +112,7 @@ public class RaesFiles {
      *        Otherwise, only the key/password and the file length get
      *        authenticated.
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void decrypt(
             final String raesFilePath,
             final String plainFilePath,
@@ -126,7 +131,13 @@ public class RaesFiles {
             if (authenticate)
                 rrof.authenticate();
             final InputStream in = new ReadOnlyFileInputStream(rrof);
-            final OutputStream out = new TFileOutputStream(plainFile, false);
+            OutputStream out = null;
+            try {
+                out = new TFileOutputStream(plainFile, false);
+            } finally {
+                if (null == out) // exception?
+                    in.close();
+            }
             TFile.cp(in, out);
         } finally {
             rof.close();

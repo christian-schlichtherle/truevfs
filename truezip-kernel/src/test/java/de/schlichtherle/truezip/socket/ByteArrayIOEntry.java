@@ -14,6 +14,9 @@ import de.schlichtherle.truezip.io.SeekableByteBufferChannel;
 import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.JSE7;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import java.io.*;
@@ -214,6 +217,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     } // class ByteArrayInputSocket
 
     private class DataInputChannel extends SeekableByteBufferChannel {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         DataInputChannel() {
             super(ByteBuffer.wrap(data).asReadOnlyBuffer());
         }
@@ -276,6 +280,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     } // class ByteArrayOutputSocket
 
     private class DataOutputChannel extends SeekableByteBufferChannel {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         DataOutputChannel() {
             super((ByteBuffer) ByteBuffer.allocate(initialCapacity).limit(0));
         }

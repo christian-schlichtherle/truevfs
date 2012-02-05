@@ -8,10 +8,12 @@
  */
 package de.schlichtherle.truezip.io;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
 
 /**
  * A decorating output stream which saves the last {@link IOException}
@@ -31,10 +33,13 @@ public class IOExceptionOutputStream extends DecoratingOutputStream {
     /**
      * Constructs a new I/O exception output stream.
      *
-     * @param out the nullable output stream to decorate.
+     * @param delegate the nullable output stream to decorate.
      */
-    protected IOExceptionOutputStream(@Nullable OutputStream out) {
-        super(out);
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    protected IOExceptionOutputStream(
+            @Nullable @WillCloseWhenClosed OutputStream delegate) {
+        super(delegate);
     }
 
     @Override

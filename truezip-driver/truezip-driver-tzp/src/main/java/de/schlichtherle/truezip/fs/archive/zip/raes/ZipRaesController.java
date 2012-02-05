@@ -23,8 +23,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
-import javax.swing.Icon;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.swing.Icon;
 
 /**
  * This file system controller decorates another file system controller in
