@@ -396,8 +396,6 @@ public final class TFile extends File {
      *        {@link #getDefaultArchiveDetector() default archive detector} is
      *        used instead.
      */
-    // TODO: For TrueZIP 8, consider removing the copy construction feature.
-    // This is useless in Java.
     public TFile(   final File file,
                     final @CheckForNull TArchiveDetector detector) {
         super(file.getPath());
