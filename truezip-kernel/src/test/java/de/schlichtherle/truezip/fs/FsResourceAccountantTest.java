@@ -72,7 +72,7 @@ public class FsResourceAccountantTest {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
         } while (0 < accountant.waitForeignResources(TIMEOUT_MILLIS));
         final long time = System.currentTimeMillis() - start;
-        logger.log(Level.FINER, "All resources were closed after waiting for {0} milliseconds.", time);
+        logger.log(Level.FINER, "All resources were closed after waiting for {0} ms.", time);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class FsResourceAccountantTest {
         final long start = System.currentTimeMillis();
         final int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         final long time = System.currentTimeMillis() - start;
-        assertTrue("Timeout after " + time + " milliseconds!",
+        assertTrue("Timeout after " + time + " ms!",
                 time <= TIMEOUT_MILLIS); // be forgiving!
         assertThat(resources, is(1));
     }
@@ -102,7 +102,7 @@ public class FsResourceAccountantTest {
             final long start = System.currentTimeMillis();
             int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
             final long time = System.currentTimeMillis() - start;
-            assertTrue("Timeout while waiting for " + clazz.getSimpleName() + " after " + time + " milliseconds!",
+            assertTrue("Timeout while waiting for " + clazz.getSimpleName() + " after " + time + " ms!",
                     time <= TIMEOUT_MILLIS); // be forgiving!
             assertThat(resources, is(0));
         }
@@ -123,14 +123,14 @@ public class FsResourceAccountantTest {
         long start = System.currentTimeMillis();
         int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         long time = System.currentTimeMillis() - start;
-        assertTrue("Premature return before timeout after " + time + " milliseconds with " + resources + " open resources!",
+        assertTrue("Premature return after " + time + " ms instead of " + TIMEOUT_MILLIS + " ms timeout with " + resources + " open resources!",
                 time >= TIMEOUT_MILLIS); // be forgiving!
         assertTrue(resources > 0);
         accountant.closeAllResources(SequentialIOExceptionBuilder.create());
         start = System.currentTimeMillis();
         resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         time = System.currentTimeMillis() - start;
-        assertTrue("Timeout after " + time + " milliseconds!",
+        assertTrue("Timeout after " + time + " ms!",
                 time <= TIMEOUT_MILLIS); // be forgiving!
         assertThat(resources, is(0));
     }
