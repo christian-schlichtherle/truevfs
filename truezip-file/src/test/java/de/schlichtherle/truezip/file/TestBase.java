@@ -14,12 +14,14 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import org.junit.After;
 import org.junit.Before;
 
@@ -36,6 +38,14 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
             CURRENT_DIRECTORY = FsMountPoint.create(new File("").toURI());
     protected static final String[] NO_STRINGS = new String[0];
     private static final String ARCHIVE_DETECTOR = "archiveDetector";
+    private static final boolean FS_MANAGER_ISOLATE
+            = Boolean.getBoolean(FsManager.class.getName() + ".isolate");
+    static {
+        Logger  .getLogger(TestBase.class.getName())
+                .log(   Level.CONFIG,
+                        "Isolate file system managers: {0}",
+                        FS_MANAGER_ISOLATE);
+    }
 
     private @Nullable D driver;
     private @Nullable TArchiveDetector detector;
@@ -73,11 +83,17 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
         final Map<String, Object> environment = new HashMap<String, Object>();
         environment.put(ARCHIVE_DETECTOR, detector);
         final TConfig config = TConfig.push();
-        // Using a private file system manager violates the third party access
-        // constraints, but may be helpful in identifying isolation issues
-        // during integration tests - see
-        // http://truezip.java.net/truezip-file/usage.html#Third_Party_Access
-        if (Boolean.getBoolean(FsManager.class.getName() + ".isolate"))
+        // Using a private file system manager would normally violate the third
+        // party access constraints, but in this context it's safe because no
+        // two test methods should ever access the same archive file(s) except
+        // when performing a sync of all mounted file systems.
+        // Mind that a sync should always succeed (unless there's an issue in
+        // the parent file system) und must not confuse other threads about the
+        // state of the synced archive file(s).
+        // So the default value 'false' helps to identify potential isolation
+        // issues in case this invariant is not met.
+        // See http://truezip.java.net/truezip-file/usage.html#Third_Party_Access
+        if (FS_MANAGER_ISOLATE)
             config.setManager(new FsDefaultManager());
         config.setLenient(true);
         config.setArchiveDetector(detector);
