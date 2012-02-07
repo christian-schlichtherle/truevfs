@@ -31,6 +31,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// TODO: Extract Sink interface with new*() methods.
 @NotThreadSafe
 public abstract class OutputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
