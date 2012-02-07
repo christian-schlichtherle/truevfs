@@ -48,14 +48,18 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     private long windowOff = -1;
     private ByteBuffer window;
 
-    public MemoryMappedReadOnlyFile(File file) throws FileNotFoundException {
+    public MemoryMappedReadOnlyFile(final File file) throws FileNotFoundException {
         channel = new FileInputStream(file).getChannel();
         try {
-            window(0);
+            try {
+                window(0);
+            } catch (IOException ex) {
+                channel.close();
+                throw ex;
+            }
         } catch (IOException ex) {
-            FileNotFoundException ex2 = new FileNotFoundException(ex.toString());
-            ex2.initCause(ex);
-            throw ex2;
+            throw (FileNotFoundException)
+                    new FileNotFoundException(ex.toString()).initCause(ex);
         }
         assert window != null;
         assert windowOff == 0;
@@ -71,7 +75,7 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
      */
     private int available() throws IOException {
         assertOpen();
-        if (window.remaining() <= 0)
+        if (0 >= window.remaining())
             window(windowOff + WINDOW_LEN);
         return window.remaining();
     }
@@ -106,7 +110,7 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     public void seek(final long fp) throws IOException {
         assertOpen();
 
-        if (fp < 0)
+        if (0 > fp)
             throw new IOException("file pointer must not be negative");
         final long length = length();
         if (fp > length)
@@ -125,7 +129,7 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     @Override
     public int read(final byte[] buf, final int off, int len)
     throws IOException {
-        if (len == 0)
+        if (0 == len)
             return 0; // be fault-tolerant and compatible to RandomAccessFile
 
         // Check state.
@@ -134,8 +138,8 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
             return -1; // EOF
 
         // Check parameters.
-        if (buf == null)
-            throw new NullPointerException("buf");
+        if (null == buf)
+            throw new NullPointerException();
         if (off < 0 || len < 0 || off + len > buf.length)
             throw new IndexOutOfBoundsException();
 
@@ -149,11 +153,22 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     @Override
     public void close() throws IOException {
         final FileChannel channel = this.channel;
-        if (channel == null)
+        if (null == channel)
             return;
-        this.window = null;
-        this.channel = null;
+
         channel.close();
+        this.channel = null;
+        this.window = null;
+
+        // Workaround for garbage collection issue with memory mapped files.
+        // Note that there's no guarantee that this works: Most times it
+        // does, sometimes it doesn't!
+        // This may also happen during the integration tests.
+        System.gc();
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException ignore) {
+        }
     }
 
     /**
@@ -162,7 +177,7 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
      * @throws IOException If the preconditions do not hold.
      */
     private void assertOpen() throws IOException {
-        if (channel == null)
+        if (null == channel)
             throw new IOException("file is closed");
     }
 }
