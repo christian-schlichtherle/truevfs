@@ -72,6 +72,22 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <!-- Still unreliable when run in parallel.
+                                    Run manually when required. -->
+                            <exclude>**/swing/*IT.class</exclude>
+                            <!-- Uncomment for testing with JSE 6 only. -->
+                            <!--exclude>**/nio/file/zip/*IT.class</exclude-->
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -100,25 +116,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>integration-test</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <configuration>
-                            <excludes>
-                                <!-- Still unreliable when run in parallel.
-                                     Run manually when required. -->
-                                <exclude>**/swing/*IT.class</exclude>
-                                <!-- Uncomment for testing with JSE 6 only. -->
-                                <!--exclude>**/nio/file/zip/*IT.class</exclude-->
-                            </excludes>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
