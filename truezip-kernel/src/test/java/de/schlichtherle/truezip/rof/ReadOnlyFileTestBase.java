@@ -80,22 +80,26 @@ public abstract class ReadOnlyFileTestBase {
     throws IOException;
 
     @After
-    public void tearDown() throws IOException {
+    public void tearDown() {
         try {
             try {
-                final ReadOnlyFile trof = this.trof;
-                this.trof = null;
-                if (trof != null)
-                    trof.close();
+                try {
+                    final ReadOnlyFile trof = this.trof;
+                    this.trof = null;
+                    if (trof != null)
+                        trof.close();
+                } finally {
+                    final ReadOnlyFile rrof = this.rrof;
+                    this.rrof = null;
+                    if (rrof != null)
+                        rrof.close();
+                }
             } finally {
-                final ReadOnlyFile rrof = this.rrof;
-                this.rrof = null;
-                if (rrof != null)
-                    rrof.close();
+                if (temp.exists() && !temp.delete())
+                    throw new IOException(temp + " (could not delete)");
             }
-        } finally {
-            if (temp.exists() && !temp.delete())
-                logger.log(Level.WARNING, "{0} (could not delete)", temp);
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, ex.toString(), ex);
         }
     }
 

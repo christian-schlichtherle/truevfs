@@ -59,13 +59,16 @@ public final class IntervalReadOnlyFileIT extends ReadOnlyFileTestBase {
 
     @After
     @Override
-    public void tearDown() throws IOException {
+    public void tearDown() {
         try {
-            super.tearDown();
-        } finally {
-            if (temp2.exists() && !temp2.delete())
-                logger.log(Level.WARNING, "{0} (could not delete)", temp2);
-            
+            try {
+                super.tearDown();
+            } finally {
+                if (temp2.exists() && !temp2.delete())
+                    throw new IOException(temp2 + " (could not delete)");
+            }
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, ex.toString(), ex);
         }
     }
 }

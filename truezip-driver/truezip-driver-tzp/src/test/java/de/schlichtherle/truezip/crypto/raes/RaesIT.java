@@ -59,14 +59,18 @@ public final class RaesIT extends ReadOnlyFileTestBase {
     }
 
     @Override
-    public void tearDown() throws IOException {
+    public void tearDown() {
         try {
-            super.tearDown();
-        } finally {
-            final File cipherFile = this.cipherFile;
-            this.cipherFile = null;
-            if (null != cipherFile && !cipherFile.delete() && cipherFile.exists())
-                logger.log(Level.WARNING, "{0} (File.delete() failed)", cipherFile);
+            try {
+                super.tearDown();
+            } finally {
+                final File cipherFile = this.cipherFile;
+                this.cipherFile = null;
+                if (null != cipherFile && cipherFile.exists() && !cipherFile.delete())
+                    throw new IOException(cipherFile + " (could not delete)");
+            }
+        } catch (IOException ex) {
+            logger.log(Level.WARNING, ex.toString(), ex);
         }
     }
 }
