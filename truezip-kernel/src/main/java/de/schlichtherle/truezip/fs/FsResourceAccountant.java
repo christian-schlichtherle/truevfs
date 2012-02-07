@@ -61,7 +61,7 @@ public final class FsResourceAccountant {
      * resource if there are no more references to it.
      */
     @GuardedBy("lock")
-    private final Map<Closeable, Account> threads
+    private final Map<Closeable, Account> accounts
             = new WeakHashMap<Closeable, Account>();
 
     /**
@@ -88,8 +88,8 @@ public final class FsResourceAccountant {
     void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
         lock.lock();
         try {
-            if (!threads.containsKey(resource))
-                threads.put(resource, new Account(resource));
+            if (!accounts.containsKey(resource))
+                accounts.put(resource, new Account(resource));
         } finally {
             lock.unlock();
         }
@@ -105,7 +105,7 @@ public final class FsResourceAccountant {
     void stopAccountingFor(final @WillNotClose Closeable resource) {
         lock.lock();
         try {
-            final Account ref = threads.remove(resource);
+            final Account ref = accounts.remove(resource);
             if (null != ref) {
                 ref.clear();
                 ref.enqueue();
@@ -169,7 +169,7 @@ public final class FsResourceAccountant {
     int localResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final Account ref : threads.values())
+        for (final Account ref : accounts.values())
             if (ref.owner.get() == currentThread)
                 n++;
         return n;
@@ -186,7 +186,7 @@ public final class FsResourceAccountant {
      * @return The number of <em>all</em> accounted closeable resources.
      */
     private int totalResources() {
-        return threads.size();
+        return accounts.size();
     }
 
     /**
@@ -202,7 +202,7 @@ public final class FsResourceAccountant {
     throws X {
         lock.lock();
         try {
-            for (final Iterator<Closeable> i = threads.keySet().iterator(); i.hasNext(); ) {
+            for (final Iterator<Closeable> i = accounts.keySet().iterator(); i.hasNext(); ) {
                 final Closeable c = i.next();
                 i.remove();
                 try {
@@ -215,7 +215,7 @@ public final class FsResourceAccountant {
                     handler.warn(ex); // may throw an exception!
                 }
             }
-            assert threads.isEmpty();
+            assert accounts.isEmpty();
         } finally {
             // Let's be paranoid about try-finally!
             try {
@@ -291,12 +291,10 @@ public final class FsResourceAccountant {
             while (true) {
                 try {
                     final Account account = (Account) queue.remove();
-                    try {
-                        if (account.isEnqueuedByGC())
-                            System.runFinalization();
-                    } finally {
+                    if (account.isEnqueuedByGC())
+                        System.runFinalization();
+                    else
                         account.signalAll();
-                    }
                 } catch (InterruptedException ignore) {
                 }
             }
