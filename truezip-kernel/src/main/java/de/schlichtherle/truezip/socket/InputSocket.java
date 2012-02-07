@@ -33,6 +33,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// TODO: Extract Source interface with new*() methods.
 @NotThreadSafe
 public abstract class InputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
