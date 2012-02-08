@@ -14,10 +14,9 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.OutputClosedException;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
@@ -48,7 +47,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TFileTestBase<D extends FsArchiveDriver<?>>
+public abstract class TFileTestBase<D extends FsCharsetArchiveDriver<?>>
 extends TestBase<D> {
 
     private static final Logger

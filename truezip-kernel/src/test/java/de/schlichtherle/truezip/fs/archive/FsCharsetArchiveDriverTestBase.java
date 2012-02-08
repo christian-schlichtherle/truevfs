@@ -8,9 +8,8 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
-import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
@@ -27,9 +26,9 @@ import org.junit.Test;
 public abstract class FsCharsetArchiveDriverTestBase {
 
     private static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider();
+            IO_POOL_PROVIDER = new ByteArrayIOPoolService(2048);
 
-    private static final String TEXT = "fubar";
+    private static final String ENCODABLE_TEXT = "fubar";
 
     private FsCharsetArchiveDriver<?> driver;
 
@@ -42,7 +41,7 @@ public abstract class FsCharsetArchiveDriverTestBase {
 
     @Test
     public final void testAssertEncodable() throws CharConversionException {
-        driver.assertEncodable(TEXT);
+        driver.assertEncodable(ENCODABLE_TEXT);
     }
 
     @Test
@@ -56,7 +55,7 @@ public abstract class FsCharsetArchiveDriverTestBase {
                 start.countDown();
                 start.await();
                 for (int i = 0; i < 100000; i++)
-                    driver.assertEncodable(TEXT);
+                    driver.assertEncodable(ENCODABLE_TEXT);
                 return null;
             }
         } // TestTask
@@ -69,13 +68,5 @@ public abstract class FsCharsetArchiveDriverTestBase {
         } // TestTaskFactory
 
         runConcurrent(NUM_IO_THREADS, new TestTaskFactory()).join();
-    }
-
-    private static final class ByteArrayIOPoolProvider
-    implements IOPoolProvider {
-        @Override
-        public IOPool<?> get() {
-            return new ByteArrayIOPool(2048);
-        }
     }
 }
