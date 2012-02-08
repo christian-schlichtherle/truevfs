@@ -40,7 +40,7 @@ public class FsResourceAccountantTest {
 
     @Test
     public void accounting() throws IOException {
-        final Resource resource = new Resource();
+        final EvilResource resource = new EvilResource();
         accountant.startAccountingFor(resource);
         accountant.startAccountingFor(resource); // redundant
         accountant.stopAccountingFor(resource);
@@ -77,7 +77,7 @@ public class FsResourceAccountantTest {
 
     @Test
     public void waitLocalResources() throws InterruptedException {
-        final Resource resource = new Resource();
+        final EvilResource resource = new EvilResource();
         accountant.startAccountingFor(resource);
         final long start = System.currentTimeMillis();
         final int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
@@ -144,7 +144,7 @@ public class FsResourceAccountantTest {
     private final class ResourceHog extends Thread implements Callable<Void> {
         @Override
         public void run() {
-            Resource resource = new Resource();
+            EvilResource resource = new EvilResource();
             accountant.startAccountingFor(resource);
             accountant.startAccountingFor(resource); // redundant call should do no harm
         }
@@ -165,7 +165,7 @@ public class FsResourceAccountantTest {
      * stale resource then.
      */
     private final class EvilResourceHog extends Thread implements Callable<Void> {
-        final Resource resource = new Resource();
+        final EvilResource resource = new EvilResource();
 
         @Override
         public void run() {
@@ -181,7 +181,17 @@ public class FsResourceAccountantTest {
         }
     } // EvilResourceHog
 
-    private class Resource implements Closeable {
+    private class EvilResource implements Closeable {
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof EvilResource; // worst case
+        }
+
+        @Override
+        public int hashCode() {
+            return 0; // worst case
+        }
+        
         @Override
         public void close() {
         }
