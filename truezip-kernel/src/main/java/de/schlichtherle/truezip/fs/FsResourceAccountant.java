@@ -19,7 +19,6 @@ import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -61,8 +60,9 @@ public final class FsResourceAccountant {
      * resource if there are no more references to it.
      */
     @GuardedBy("lock")
-    private final Map<Closeable, Account> accounts
-            = new WeakHashMap<Closeable, Account>();
+    @SuppressWarnings("unchecked")
+    private final Map<Closeable, Account>
+            accounts = new WeakIdentityHashMap();
 
     /**
      * Constructs a new resource accountant with the given lock.
@@ -83,7 +83,7 @@ public final class FsResourceAccountant {
     /**
      * Starts accounting for the given closeable resource.
      * 
-     * @param  resource the closeable resource to start accounting for.
+     * @param resource the closeable resource to start accounting for.
      */
     void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
         lock.lock();
@@ -100,7 +100,7 @@ public final class FsResourceAccountant {
      * This method should be called from the implementation of
      * {@link Closeable#close()} in the given closeable resource.
      * 
-     * @param  resource the closeable resource to stop accounting for.
+     * @param resource the closeable resource to stop accounting for.
      */
     void stopAccountingFor(final @WillNotClose Closeable resource) {
         lock.lock();
@@ -200,29 +200,27 @@ public final class FsResourceAccountant {
     <X extends Exception>
     void closeAllResources(final ExceptionHandler<? super IOException, X> handler)
     throws X {
+        assert null != handler;
+
         lock.lock();
         try {
             for (final Iterator<Closeable> i = accounts.keySet().iterator(); i.hasNext(); ) {
-                final Closeable c = i.next();
+                final Closeable resource = i.next();
                 i.remove();
                 try {
                     // This should trigger another attempt to remove the
                     // closeable from the map, but this should cause no
                     // ConcurrentModificationException because the closeable
                     // has already been removed.
-                    c.close();
+                    resource.close();
                 } catch (IOException ex) {
                     handler.warn(ex); // may throw an exception!
                 }
             }
             assert accounts.isEmpty();
         } finally {
-            // Let's be paranoid about try-finally!
-            try {
-                condition.signalAll();
-            } finally {
-                lock.unlock();
-            }
+            condition.signalAll();
+            lock.unlock();
         }
     }
 
