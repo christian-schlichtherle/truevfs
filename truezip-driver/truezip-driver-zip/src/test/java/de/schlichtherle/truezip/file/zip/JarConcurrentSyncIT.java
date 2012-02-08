@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.ConcurrentSyncTestBase;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -23,7 +24,7 @@ public final class JarConcurrentSyncIT extends ConcurrentSyncTestBase<JarDriver>
     }
 
     @Override
-    protected JarDriver newArchiveDriver() {
-        return new JarDriver(IO_POOL_PROVIDER);
+    protected JarDriver newArchiveDriver(IOPoolProvider provider) {
+        return new JarDriver(provider);
     }
 }

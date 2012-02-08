@@ -53,7 +53,7 @@ public abstract class TestBase<D extends FsCharsetArchiveDriver<?>> {
     }
 
     /** The data to get compressed. */
-    protected static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
+    private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
     static {
         new Random().nextBytes(DATA);
     }
@@ -64,6 +64,7 @@ public abstract class TestBase<D extends FsCharsetArchiveDriver<?>> {
     private @Nullable D driver;
     private @Nullable TArchiveDetector detector;
     private @Nullable Map<String, ?> environment;
+    protected byte[] data;
 
     protected abstract String getSuffixList();
 
@@ -114,6 +115,7 @@ public abstract class TestBase<D extends FsCharsetArchiveDriver<?>> {
         this.driver = driver;
         this.detector = detector;
         this.environment = environment;
+        this.data = DATA.clone();
     }
 
     @After

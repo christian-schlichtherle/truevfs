@@ -63,7 +63,6 @@ extends TestBase<D> {
 
     private File temp;
     private TFile archive;
-    private byte[] data;
 
     @Override
     public void setUp() throws IOException {
@@ -71,7 +70,6 @@ extends TestBase<D> {
         temp = createTempFile();
         TFile.rm(temp);
         archive = new TFile(temp);
-        data = DATA.clone();
     }
 
     private File createTempFile() throws IOException {

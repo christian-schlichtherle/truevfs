@@ -65,7 +65,6 @@ extends TestBase<D> {
 
     private Path temp;
     private TPath archive;
-    private byte[] data;
 
     @Override
     public void setUp() throws IOException {
@@ -73,7 +72,6 @@ extends TestBase<D> {
         temp = createTempFile();
         delete(temp);
         archive = new TPath(temp);
-        data = DATA.clone();
     }
 
     private Path createTempFile() throws IOException {
