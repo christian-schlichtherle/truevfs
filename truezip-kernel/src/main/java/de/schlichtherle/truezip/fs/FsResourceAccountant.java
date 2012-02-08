@@ -60,9 +60,8 @@ public final class FsResourceAccountant {
      * resource if there are no more references to it.
      */
     @GuardedBy("lock")
-    @SuppressWarnings("unchecked")
     private final Map<Closeable, Account>
-            accounts = new WeakIdentityHashMap();
+            accounts = new WeakIdentityHashMap<Closeable, Account>();
 
     /**
      * Constructs a new resource accountant with the given lock.

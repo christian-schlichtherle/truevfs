@@ -1,53 +1,39 @@
 /*
-  * JBoss, Home of Professional Open Source
-  * Copyright 2005, JBoss Inc., and individual contributors as indicated
-  * by the @authors tag. See the copyright.txt in the distribution for a
-  * full listing of individual contributors.
-  *
-  * This is free software; you can redistribute it and/or modify it
-  * under the terms of the GNU Lesser General Public License as
-  * published by the Free Software Foundation; either version 2.1 of
-  * the License, or (at your option) any later version.
-  *
-  * This software is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-  * License along with this software; if not, write to the Free
-  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
-  */
-
+ * Copyright 2004-2012 Schlichtherle IT Services
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package de.schlichtherle.truezip.fs;
 
-import java.lang.ref.WeakReference;
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
- * A hashtable-based <tt>Map</tt> implementation with <em>weak keys</em> and
- * using reference-equality in place of object-equality when comparing keys
- * (and values).  In an <tt>WeakIdentityHashMap</tt>, two keys <tt>k1</tt> and
- * <tt>k2</tt> are considered equal if and only if <tt>(k1==k2)</tt>.
- * An entry in a <tt>WeakIdentityHashMap</tt> will automatically be removed when
- * its key is no longer in ordinary use.  More precisely, the presence of a
- * mapping for a given key will not prevent the key from being discarded by the
- * garbage collector, that is, made finalizable, finalized, and then reclaimed.
- * When a key has been discarded its entry is effectively removed from the map.
- *
- * <p>Based on java.util.WeakHashMap</p>
+ * Like {@link java.util.WeakHashMap}, but compares keys using object identity
+ * (==) instead of object equality ({@link Object#equals}).
+ * <p>
+ * This class is based on {@code java.util.WeakHashMap} from the
+ * <a href="http://openjdk.java.net/">OpenJDK</a> project and has been
+ * backported to JSE&nbsp;6.
  *
  * @see     java.util.IdentityHashMap
  * @see     java.util.WeakHashMap
  * @author  Dawid Kurzyniec
  * @author  <a href="mailto:kabir.khan@jboss.org">Kabir Khan</a>
- * @author  Christian Schlichtherle (minor tweaks)
+ * @author  Christian Schlichtherle (updated to match JSE 7 and backported to JSE 6)
  * @version $Id$
  */
-@SuppressWarnings("unchecked")
-final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
+@DefaultAnnotation(Nullable.class)
+final class WeakIdentityHashMap<K,V>
+/*extends AbstractMap<K,V>*/
+implements Map<K,V> {
 
     /**
      * The default initial capacity -- MUST be a power of two.
@@ -69,7 +55,7 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     /**
      * The table, resized as necessary. Length MUST Always be a power of two.
      */
-    private Entry[] table;
+    private Entry<K,V>[] table;
 
     /**
      * The number of key-value mappings contained in this weak hash map.
@@ -89,33 +75,27 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     /**
      * Reference queue for cleared WeakEntries
      */
-    private final ReferenceQueue queue = new ReferenceQueue();
+    private final ReferenceQueue<Object> queue = new ReferenceQueue<Object>();
 
     /**
-     * The number of times this HashMap has been structurally modified
-     * Structural modifications are those that change the number of mappings in
-     * the HashMap or otherwise modify its internal structure (e.g.,
-     * rehash).  This field is used to make iterators on Collection-views of
-     * the HashMap fail-fast.  (See ConcurrentModificationException).
+     * The number of times this WeakIdentityHashMap has been structurally
+     * modified.
+     * Structural modifications are those that change the number of
+     * mappings in the map or otherwise modify its internal structure
+     * (e.g., rehash).
+     * This field is used to make iterators on Collection-views of the map
+     * fail-fast.
      */
-    private volatile int modCount;
+    private int modCount;
 
     /**
-     * Each of these fields are initialized to contain an instance of the
-     * appropriate view the first time this view is requested.  The views are
-     * stateless, so there's no reason to create more than one of each.
-     */
-    transient volatile Set        keySet = null;
-    transient volatile Collection values = null;
-
-    /**
-     * Constructs a new, empty <tt>WeakIdentityHashMap</tt> with the given
+     * Constructs a new, empty {@code WeakIdentityHashMap} with the given
      * initial capacity and the given load factor.
      *
      * @param  initialCapacity The initial capacity of the
-     *                         <tt>WeakIdentityHashMap</tt>
+     *                         {@code WeakIdentityHashMap}
      * @param  loadFactor      The load factor of the
-     *                         <tt>WeakIdentityHashMap</tt>
+     *                         {@code WeakIdentityHashMap}
      * @throws IllegalArgumentException  If the initial capacity is negative,
      *         or if the load factor is nonpositive.
      */
@@ -132,17 +112,17 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
         int capacity = 1;
         while (capacity < initialCapacity)
             capacity <<= 1;
-        table = new Entry[capacity];
+        table = newTable(capacity);
         this.loadFactor = loadFactor;
         threshold = (int)(capacity * loadFactor);
     }
 
     /**
-     * Constructs a new, empty <tt>WeakIdentityHashMap</tt> with the given
-     * initial capacity and the default load factor, which is <tt>0.75</tt>.
+     * Constructs a new, empty {@code WeakIdentityHashMap} with the given
+     * initial capacity and the default load factor, which is {@code 0.75}.
      *
      * @param  initialCapacity The initial capacity of the
-     *                         <tt>WeakIdentityHashMap</tt>
+     *                         {@code WeakIdentityHashMap}
      * @throws IllegalArgumentException  If the initial capacity is negative.
      */
     WeakIdentityHashMap(int initialCapacity) {
@@ -150,28 +130,28 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     }
 
     /**
-     * Constructs a new, empty <tt>WeakIdentityHashMap</tt> with the default
+     * Constructs a new, empty {@code WeakIdentityHashMap} with the default
      * initial capacity (16) and the default load factor (0.75).
      */
     WeakIdentityHashMap() {
         this.loadFactor = DEFAULT_LOAD_FACTOR;
         threshold = DEFAULT_INITIAL_CAPACITY;
-        table = new Entry[DEFAULT_INITIAL_CAPACITY];
+        table = newTable(DEFAULT_INITIAL_CAPACITY);
     }
 
     /**
-     * Constructs a new <tt>WeakIdentityHashMap</tt> with the same mappings as
-     * the specified <tt>Map</tt>.  The <tt>WeakIdentityHashMap</tt> is created
-     * with default load factor, which is <tt>0.75</tt> and an initial capacity
-     * sufficient to hold the mappings in the specified <tt>Map</tt>.
+     * Constructs a new {@code WeakIdentityHashMap} with the same mappings as
+     * the specified {@code Map}.  The {@code WeakIdentityHashMap} is created
+     * with default load factor, which is {@code 0.75} and an initial capacity
+     * sufficient to hold the mappings in the specified {@code Map}.
      *
-     * @param   t the map whose mappings are to be placed in this map.
+     * @param   m the map whose mappings are to be placed in this map.
      * @throws  NullPointerException if the specified map is null.
      */
-    WeakIdentityHashMap(Map t) {
-        this(Math.max((int) (t.size() / DEFAULT_LOAD_FACTOR) + 1, 16),
+    WeakIdentityHashMap(final @Nonnull Map<? extends K, ? extends V> m) {
+        this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1, 16),
              DEFAULT_LOAD_FACTOR);
-        putAll(t);
+        putAll(m);
     }
 
     // internal utilities
@@ -196,17 +176,9 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     }
 
     /**
-     * Return a hash code for non-null Object x.
-     */
-    int hash(Object x) {
-        int h = System.identityHashCode(x);
-        return h - (h << 7);  // that is,, -127 * h
-    }
-
-    /**
      * Return index for hash code h.
      */
-    static int indexFor(int h, int length) {
+    private static int indexFor(int h, int length) {
         return h & (length-1);
     }
 
@@ -214,28 +186,30 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
      * Expunge stale entries from the table.
      */
     private void expungeStaleEntries() {
-        Object r;
-        while ( (r = queue.poll()) != null) {
-            Entry e = (Entry)r;
-            int h = e.hash;
-            int i = indexFor(h, table.length);
+        for (Object x; (x = queue.poll()) != null; ) {
+            synchronized (queue) {
+                @SuppressWarnings("unchecked")
+                Entry<K,V> e = (Entry<K,V>)x;
+                int i = indexFor(e.hash, table.length);
 
-            Entry prev = table[i];
-            Entry p = prev;
-            while (p != null) {
-                Entry next = p.next;
-                if (p == e) {
-                    if (prev == e)
-                        table[i] = next;
-                    else
-                        prev.next = next;
-                    e.next = null;  // Help GC
-                    e.value = null; //  "   "
-                    size--;
-                    break;
+                Entry<K,V> prev = table[i];
+                Entry<K,V> p = prev;
+                while (p != null) {
+                    Entry<K,V> next = p.next;
+                    if (p == e) {
+                        if (prev == e)
+                            table[i] = next;
+                        else
+                            prev.next = next;
+                        // Must not null out e.next;
+                        // stale entries may be in use by a HashIterator
+                        e.value = null; // Help GC
+                        size--;
+                        break;
+                    }
+                    prev = p;
+                    p = next;
                 }
-                prev = p;
-                p = next;
             }
         }
     }
@@ -243,9 +217,19 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     /**
      * Return the table after first expunging stale entries
      */
-    private Entry[] getTable() {
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
+    private Entry<K,V>[] getTable() {
         expungeStaleEntries();
         return table;
+    }
+
+    private int hash(Object x) {
+        return System.identityHashCode(x);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Entry<K,V>[] newTable(int n) {
+        return (Entry<K,V>[]) new Entry<?,?>[n];
     }
 
     /**
@@ -254,6 +238,7 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
      * entries that will be removed before next attempted access
      * because they are no longer referenced.
      */
+    @Override
     public int size() {
         if (size == 0)
             return 0;
@@ -262,35 +247,40 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     }
 
     /**
-     * Returns <tt>true</tt> if this map contains no key-value mappings.
+     * Returns {@code true} if this map contains no key-value mappings.
      * This result is a snapshot, and may not reflect unprocessed
      * entries that will be removed before next attempted access
      * because they are no longer referenced.
      */
+    @Override
     public boolean isEmpty() {
         return size() == 0;
     }
 
     /**
-     * Returns the value to which the specified key is mapped in this weak
-     * hash map, or <tt>null</tt> if the map contains no mapping for
-     * this key.  A return value of <tt>null</tt> does not <i>necessarily</i>
-     * indicate that the map contains no mapping for the key; it is also
-     * possible that the map explicitly maps the key to <tt>null</tt>. The
-     * <tt>containsKey</tt> method may be used to distinguish these two
-     * cases.
+     * Returns the value to which the specified key is mapped,
+     * or {@code null} if the map contains no mapping for this key.
      *
-     * @param   key the key whose associated value is to be returned.
-     * @return  the value to which this map maps the specified key, or
-     *          <tt>null</tt> if the map contains no mapping for this key.
+     * <p>More formally, if this map contains a mapping from a key
+     * {@code k} to a value {@code v} such that {@code (key==null ? k==null :
+     * key.equals(k))}, then this method returns {@code v}; otherwise
+     * it returns {@code null}.  (There can be at most one such mapping.)
+     * 
+     * <p>A return value of {@code null} does not <i>necessarily</i>
+     * indicate that the map contains no mapping for the key; it is also
+     * possible that the map explicitly maps the key to {@code null}.
+     * The {@link #containsKey containsKey} operation may be used to
+     * distinguish these two cases.
+     *
      * @see #put(Object, Object)
      */
-    public Object get(Object key) {
+    @Override
+    public V get(Object key) {
         Object k = maskNull(key);
         int h = hash(k);
-        Entry[] tab = getTable();
+        Entry<K,V>[] tab = getTable();
         int index = indexFor(h, tab.length);
-        Entry e = tab[index];
+        Entry<K,V> e = tab[index];
         while (e != null) {
             if (e.hash == h && k == e.get())
                 return e.value;
@@ -300,13 +290,14 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     }
 
     /**
-     * Returns <tt>true</tt> if this map contains a mapping for the
+     * Returns {@code true} if this map contains a mapping for the
      * specified key.
      *
      * @param   key   The key whose presence in this map is to be tested
-     * @return  <tt>true</tt> if there is a mapping for <tt>key</tt>;
-     *          <tt>false</tt> otherwise
+     * @return  {@code true} if there is a mapping for {@code key};
+     *          {@code false} otherwise
      */
+    @Override
     public boolean containsKey(Object key) {
         return getEntry(key) != null;
     }
@@ -315,12 +306,12 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
      * Returns the entry associated with the specified key in the HashMap.
      * Returns null if the HashMap contains no mapping for this key.
      */
-    Entry getEntry(Object key) {
+    private Entry<K,V> getEntry(Object key) {
         Object k = maskNull(key);
         int h = hash(k);
-        Entry[] tab = getTable();
+        Entry<K,V>[] tab = getTable();
         int index = indexFor(h, tab.length);
-        Entry e = tab[index];
+        Entry<K,V> e = tab[index];
         while (e != null && !(e.hash == h && k == e.get()))
             e = e.next;
         return e;
@@ -333,20 +324,21 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
      *
      * @param key key with which the specified value is to be associated.
      * @param value value to be associated with the specified key.
-     * @return previous value associated with specified key, or <tt>null</tt>
-     *	       if there was no mapping for key.  A <tt>null</tt> return can
+     * @return previous value associated with specified key, or {@code null}
+     *	       if there was no mapping for key.  A {@code null} return can
      *	       also indicate that the HashMap previously associated
-     *	       <tt>null</tt> with the specified key.
+     *	       {@code null} with the specified key.
      */
-    public Object put(Object key, Object value) {
+    @Override
+    public V put(K key, V value) {
         Object k = maskNull(key);
         int h = hash(k);
-        Entry[] tab = getTable();
+        Entry<K,V>[] tab = getTable();
         int i = indexFor(h, tab.length);
         
-        for (Entry e = tab[i]; e != null; e = e.next) {
+        for (Entry<K,V> e = tab[i]; e != null; e = e.next) {
             if (h == e.hash && k == e.get()) {
-                Object oldValue = e.value;
+                V oldValue = e.value;
                 if (value != oldValue)
                     e.value = value;
                 return oldValue;
@@ -354,34 +346,36 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
         }
 
         modCount++;
-        tab[i] = new Entry(k, value, queue, h, tab[i]);
+        Entry<K,V> e = tab[i];
+        tab[i] = new Entry<K,V>(k, value, queue, h, e);
         if (++size >= threshold)
             resize(tab.length * 2);
         return null;
     }
 
     /**
-     * Rehashes the contents of this map into a new <tt>HashMap</tt> instance
+     * Rehashes the contents of this map into a new {@code HashMap} instance
      * with a larger capacity. This method is called automatically when the
      * number of keys in this map exceeds its capacity and load factor.
      *
-     * Note that this method is a no-op if it's called with newCapacity ==
-     * 2*MAXIMUM_CAPACITY (which is Integer.MIN_VALUE).
+     * If current capacity is MAXIMUM_CAPACITY, this method does not
+     * resize the map, but sets threshold to Integer.MAX_VALUE.
+     * This has the effect of preventing future calls.
      *
-     * @param newCapacity the new capacity, MUST be a power of two.
+     * @param newCapacity the new capacity, MUST be a power of two;
+     *        must be greater than current capacity unless current
+     *        capacity is MAXIMUM_CAPACITY (in which case value
+     *        is irrelevant).
      */
-    void resize(int newCapacity) {
-        // assert (newCapacity & -newCapacity) == newCapacity; // power of 2
-
-        Entry[] oldTable = getTable();
+    private void resize(int newCapacity) {
+        Entry<K,V>[] oldTable = getTable();
         int oldCapacity = oldTable.length;
-
-        // check if needed
-        if (size < threshold || oldCapacity > newCapacity)
+        if (oldCapacity == MAXIMUM_CAPACITY) {
+            threshold = Integer.MAX_VALUE;
             return;
+        }
 
-        Entry[] newTable = new Entry[newCapacity];
-
+        Entry<K,V>[] newTable = newTable(newCapacity);
         transfer(oldTable, newTable);
         table = newTable;
 
@@ -400,12 +394,12 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
     }
 
     /** Transfer all entries from src to dest tables */
-    private void transfer(Entry[] src, Entry[] dest) {
+    private void transfer(Entry<K,V>[] src, Entry<K,V>[] dest) {
         for (int j = 0; j < src.length; ++j) {
-            Entry e = src[j];
+            Entry<K,V> e = src[j];
             src[j] = null;
             while (e != null) {
-                Entry next = e.next;
+                Entry<K,V> next = e.next;
                 Object key = e.get();
                 if (key == null) {
                     e.next = null;  // Help GC
@@ -426,49 +420,70 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
      * mappings will replace any mappings that this map had for any of the
      * keys currently in the specified map.<p>
      *
-     * @param t mappings to be stored in this map.
+     * @param m mappings to be stored in this map.
      * @throws  NullPointerException if the specified map is null.
      */
-    public void putAll(Map t) {
-        // Expand enough to hold t's elements without resizing.
-        int n = t.size();
-        if (n == 0)
+    @Override
+    public void putAll(Map<? extends K, ? extends V> m) {
+        int numKeysToBeAdded = m.size();
+        if (numKeysToBeAdded == 0)
             return;
-        if (n >= threshold) {
-            n = (int)(n / loadFactor + 1);
-            if (n > MAXIMUM_CAPACITY)
-                n = MAXIMUM_CAPACITY;
-            int capacity = table.length;
-            while (capacity < n)
-                capacity <<= 1;
-            resize(capacity);
+
+        /*
+         * Expand the map if the map if the number of mappings to be added
+         * is greater than or equal to threshold.  This is conservative; the
+         * obvious condition is (m.size() + size) >= threshold, but this
+         * condition could result in a map with twice the appropriate capacity,
+         * if the keys to be added overlap with the keys already in this map.
+         * By using the conservative calculation, we subject ourself
+         * to at most one extra resize.
+         */
+        if (numKeysToBeAdded > threshold) {
+            int targetCapacity = (int)(numKeysToBeAdded / loadFactor + 1);
+            if (targetCapacity > MAXIMUM_CAPACITY)
+                targetCapacity = MAXIMUM_CAPACITY;
+            int newCapacity = table.length;
+            while (newCapacity < targetCapacity)
+                newCapacity <<= 1;
+            if (newCapacity > table.length)
+                resize(newCapacity);
         }
 
-        for (Iterator i = t.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry e = (Map.Entry) i.next();
+        for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
             put(e.getKey(), e.getValue());
-        }
     }
 
     /**
-     * Removes the mapping for this key from this map if present.
+     * Removes the mapping for a key from this weak hash map if it is present.
+     * More formally, if this map contains a mapping from key <tt>k</tt> to
+     * value <tt>v</tt> such that <code>(key==null ?  k==null :
+     * key.equals(k))</code>, that mapping is removed.  (The map can contain
+     * at most one such mapping.)
      *
-     * @param key key whose mapping is to be removed from the map.
-     * @return previous value associated with specified key, or <tt>null</tt>
-     *	       if there was no mapping for key.  A <tt>null</tt> return can
-     *	       also indicate that the map previously associated <tt>null</tt>
-     *	       with the specified key.
+     * <p>Returns the value to which this map previously associated the key,
+     * or <tt>null</tt> if the map contained no mapping for the key.  A
+     * return value of <tt>null</tt> does not <i>necessarily</i> indicate
+     * that the map contained no mapping for the key; it's also possible
+     * that the map explicitly mapped the key to <tt>null</tt>.
+     *
+     * <p>The map will not contain a mapping for the specified key once the
+     * call returns.
+     *
+     * @param key key whose mapping is to be removed from the map
+     * @return the previous value associated with <tt>key</tt>, or
+     *         <tt>null</tt> if there was no mapping for <tt>key</tt>
      */
-    public Object remove(Object key) {
+    @Override
+    public V remove(Object key) {
         Object k = maskNull(key);
         int h = hash(k);
-        Entry[] tab = getTable();
+        Entry<K,V>[] tab = getTable();
         int i = indexFor(h, tab.length);
-        Entry prev = tab[i];
-        Entry e = prev;
+        Entry<K,V> prev = tab[i];
+        Entry<K,V> e = prev;
 
         while (e != null) {
-            Entry next = e.next;
+            Entry<K,V> next = e.next;
             if (h == e.hash && k == e.get()) {
                 modCount++;
                 size--;
@@ -485,22 +500,20 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
         return null;
     }
 
-
-
     /** Special version of remove needed by Entry set */
-    Entry removeMapping(Object o) {
+    boolean removeMapping(Object o) {
         if (!(o instanceof Map.Entry))
-            return null;
-        Entry[] tab = getTable();
-        Map.Entry entry = (Map.Entry)o;
+            return false;
+        Entry<K,V>[] tab = getTable();
+        Map.Entry<?,?> entry = (Map.Entry<?,?>)o;
         Object k = maskNull(entry.getKey());
         int h = hash(k);
         int i = indexFor(h, tab.length);
-        Entry prev = tab[i];
-        Entry e = prev;
+        Entry<K,V> prev = tab[i];
+        Entry<K,V> e = prev;
 
         while (e != null) {
-            Entry next = e.next;
+            Entry<K,V> next = e.next;
             if (h == e.hash && e.equals(entry)) {
                 modCount++;
                 size--;
@@ -508,18 +521,21 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
                     tab[i] = next;
                 else
                     prev.next = next;
-                return e;
+                return true;
             }
             prev = e;
             e = next;
         }
 
-        return null;
+        return false;
     }
 
     /**
-     * Removes all mappings from this map.
+     * Removes all of the mappings from this map.
+     * The map will be empty after this call returns.
      */
+    @Override
+    @SuppressWarnings("empty-statement")
     public void clear() {
         // clear out ref queue. We don't need to expunge entries
         // since table is getting cleared.
@@ -527,9 +543,7 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
             ;
 
         modCount++;
-        Entry tab[] = table;
-        for (int i = 0; i < tab.length; ++i)
-            tab[i] = null;
+        Arrays.fill(table, null);
         size = 0;
 
         // Allocation of array may have caused GC, which may have caused
@@ -540,20 +554,21 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
    }
 
     /**
-     * Returns <tt>true</tt> if this map maps one or more keys to the
+     * Returns {@code true} if this map maps one or more keys to the
      * specified value.
      *
      * @param value value whose presence in this map is to be tested.
-     * @return <tt>true</tt> if this map maps one or more keys to the
+     * @return {@code true} if this map maps one or more keys to the
      *         specified value.
      */
+    @Override
     public boolean containsValue(Object value) {
         if (value==null)
             return containsNullValue();
 
-        Entry tab[] = getTable();
+        Entry<K,V> tab[] = getTable();
         for (int i = tab.length ; i-- > 0 ;)
-            for (Entry e = tab[i] ; e != null ; e = e.next)
+            for (Entry<K,V> e = tab[i] ; e != null ; e = e.next)
                 if (value.equals(e.value))
                     return true;
         return false;
@@ -563,9 +578,9 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
      * Special-case code for containsValue with null argument
      */
     private boolean containsNullValue() {
-        Entry tab[] = getTable();
+        Entry<K,V> tab[] = getTable();
         for (int i = tab.length ; i-- > 0 ;)
-            for (Entry e = tab[i] ; e != null ; e = e.next)
+            for (Entry<K,V> e = tab[i] ; e != null ; e = e.next)
                 if (e.value==null)
                     return true;
         return false;
@@ -575,44 +590,50 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
      * The entries in this hash table extend WeakReference, using its main ref
      * field as the key.
      */
-    private static class Entry extends WeakReference implements Map.Entry {
-        private Object value;
-        private final int hash;
-        private Entry next;
+    private static class Entry<K,V> extends WeakReference<Object> implements Map.Entry<K,V> {
+        V value;
+        final int hash;
+        Entry<K,V> next;
 
         /**
          * Create new entry.
          */
-        Entry(Object key, Object value, ReferenceQueue queue,
-              int hash, Entry next) {
+        Entry(Object key, V value,
+              ReferenceQueue<Object> queue,
+              int hash, Entry<K,V> next) {
             super(key, queue);
             this.value = value;
             this.hash  = hash;
             this.next  = next;
         }
 
-        public Object getKey() {
-            return unmaskNull(this.get());
+        @SuppressWarnings("unchecked")
+        @Override
+        public K getKey() {
+            return (K) WeakIdentityHashMap.unmaskNull(this.get());
         }
 
-        public Object getValue() {
+        @Override
+        public V getValue() {
             return value;
         }
 
-        public Object setValue(Object newValue) {
-            Object oldValue = value;
+        @Override
+        public V setValue(V newValue) {
+            V oldValue = value;
             value = newValue;
             return oldValue;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
-            Map.Entry e = (Map.Entry)o;
-            Object k1 = getKey();
+            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+            K k1 = getKey();
             Object k2 = e.getKey();
             if (k1 == k2) {
-                Object v1 = getValue();
+                V v1 = getValue();
                 Object v2 = e.getValue();
                 if (v1 == v2 || (v1 != null && v1.equals(v2)))
                     return true;
@@ -620,22 +641,24 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
             return false;
         }
 
+        @Override
         public int hashCode() {
-            Object k = getKey();
-            Object v = getValue();
+            K k = getKey();
+            V v = getValue();
             return  ((k==null ? 0 : System.identityHashCode(k)) ^
                      (v==null ? 0 : v.hashCode()));
         }
 
+        @Override
         public String toString() {
             return getKey() + "=" + getValue();
         }
     }
 
-    private abstract class HashIterator implements Iterator {
+    private abstract class HashIterator<T> implements Iterator<T> {
         int index;
-        Entry entry = null;
-        Entry lastReturned = null;
+        Entry<K,V> entry = null;
+        Entry<K,V> lastReturned = null;
         int expectedModCount = modCount;
 
         /**
@@ -651,14 +674,15 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
         Object currentKey = null;
 
         HashIterator() {
-            index = (size() != 0 ? table.length : 0);
+            index = isEmpty() ? 0 : table.length;
         }
 
+        @Override
         public boolean hasNext() {
-            Entry[] t = table;
+            Entry<K,V>[] t = table;
 
             while (nextKey == null) {
-                Entry e = entry;
+                Entry<K,V> e = entry;
                 int i = index;
                 while (e == null && i > 0)
                     e = t[--i];
@@ -675,7 +699,8 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
             return true;
         }
 
-        protected Entry nextEntry() {
+        /** The common parts of next() across different types of iterators */
+        Entry<K,V> nextEntry() {
             if (modCount != expectedModCount)
                 throw new ConcurrentModificationException();
             if (nextKey == null && !hasNext())
@@ -688,6 +713,8 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
             return lastReturned;
         }
 
+        @Override
+        @SuppressWarnings("element-type-mismatch")
         public void remove() {
             if (lastReturned == null)
                 throw new IllegalStateException();
@@ -702,57 +729,77 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
 
     }
 
-    private class ValueIterator extends HashIterator {
-        public Object next() {
+    private class ValueIterator extends HashIterator<V> {
+        @Override
+        public V next() {
             return nextEntry().value;
         }
     }
 
-    private class KeyIterator extends HashIterator {
-        public Object next() {
+    private class KeyIterator extends HashIterator<K> {
+        @Override
+        public K next() {
             return nextEntry().getKey();
         }
     }
 
-    private class EntryIterator extends HashIterator {
-        public Object next() {
+    private class EntryIterator extends HashIterator<Map.Entry<K,V>> {
+        @Override
+        public Map.Entry<K,V> next() {
             return nextEntry();
         }
     }
 
     // Views
 
-    private transient Set entrySet = null;
+    private transient Set<Map.Entry<K,V>> entrySet = null;
 
     /**
-     * Returns a set view of the keys contained in this map.  The set is
-     * backed by the map, so changes to the map are reflected in the set, and
-     * vice-versa.  The set supports element removal, which removes the
-     * corresponding mapping from this map, via the <tt>Iterator.remove</tt>,
-     * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt>, and
-     * <tt>clear</tt> operations.  It does not support the <tt>add</tt> or
-     * <tt>addAll</tt> operations.
-     *
-     * @return a set view of the keys contained in this map.
+     * Each of these fields are initialized to contain an instance of the
+     * appropriate view the first time this view is requested.  The views are
+     * stateless, so there's no reason to create more than one of each.
      */
-    public Set keySet() {
-        Set ks = keySet;
-        return (ks != null ? ks : (keySet = new KeySet()));
+    private transient volatile Set<K>        keySet = null;
+    private transient volatile Collection<V> values = null;
+
+    /**
+     * Returns a {@link Set} view of the keys contained in this map.
+     * The set is backed by the map, so changes to the map are
+     * reflected in the set, and vice-versa.  If the map is modified
+     * while an iteration over the set is in progress (except through
+     * the iterator's own <tt>remove</tt> operation), the results of
+     * the iteration are undefined.  The set supports element removal,
+     * which removes the corresponding mapping from the map, via the
+     * <tt>Iterator.remove</tt>, <tt>Set.remove</tt>,
+     * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt>
+     * operations.  It does not support the <tt>add</tt> or <tt>addAll</tt>
+     * operations.
+     */
+    @Override
+    public Set<K> keySet() {
+        Set<K> ks = keySet;
+        return ks != null ? ks : (keySet = new KeySet());
     }
 
-    private class KeySet extends AbstractSet {
-        public Iterator iterator() {
+    private class KeySet extends AbstractSet<K> {
+        @Override
+        public Iterator<K> iterator() {
             return new KeyIterator();
         }
 
+        @Override
         public int size() {
             return WeakIdentityHashMap.this.size();
         }
 
+        @Override
+        @SuppressWarnings("element-type-mismatch")
         public boolean contains(Object o) {
             return containsKey(o);
         }
 
+        @Override
+        @SuppressWarnings("element-type-mismatch")
         public boolean remove(Object o) {
             if (containsKey(o)) {
                 WeakIdentityHashMap.this.remove(o);
@@ -762,178 +809,153 @@ final class WeakIdentityHashMap /*extends AbstractMap*/ implements Map {
                 return false;
         }
 
+        @Override
         public void clear() {
             WeakIdentityHashMap.this.clear();
         }
 
-        public Object[] toArray() {
-            Collection c = new ArrayList(size());
-            for (Iterator i = iterator(); i.hasNext(); )
-                c.add(i.next());
-            return c.toArray();
+        private Collection<K> deepCopy() {
+            final Collection<K> list = new ArrayList<K>(size());
+            for (final K k : this)
+                list.add(k);
+            return list;
         }
 
-        public Object[] toArray(Object a[]) {
-            Collection c = new ArrayList(size());
-            for (Iterator i = iterator(); i.hasNext(); )
-                c.add(i.next());
-            return c.toArray(a);
+        @Override
+        public Object[] toArray() {
+            return deepCopy().toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T a[]) {
+            return deepCopy().toArray(a);
         }
     }
 
     /**
-     * Returns a collection view of the values contained in this map.  The
-     * collection is backed by the map, so changes to the map are reflected in
-     * the collection, and vice-versa.  The collection supports element
-     * removal, which removes the corresponding mapping from this map, via the
-     * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-     * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations.
-     * It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
-     *
-     * @return a collection view of the values contained in this map.
+     * Returns a {@link Collection} view of the values contained in this map.
+     * The collection is backed by the map, so changes to the map are
+     * reflected in the collection, and vice-versa.  If the map is
+     * modified while an iteration over the collection is in progress
+     * (except through the iterator's own <tt>remove</tt> operation),
+     * the results of the iteration are undefined.  The collection
+     * supports element removal, which removes the corresponding
+     * mapping from the map, via the <tt>Iterator.remove</tt>,
+     * <tt>Collection.remove</tt>, <tt>removeAll</tt>,
+     * <tt>retainAll</tt> and <tt>clear</tt> operations.  It does not
+     * support the <tt>add</tt> or <tt>addAll</tt> operations.
      */
-    public Collection values() {
-        Collection vs = values;
-        return (vs != null ?  vs : (values = new Values()));
+    @Override
+    public Collection<V> values() {
+        Collection<V> vs = values;
+        return vs != null ?  vs : (values = new Values());
     }
 
-    private class Values extends AbstractCollection {
-        public Iterator iterator() {
+    private class Values extends AbstractCollection<V> {
+        @Override
+        public Iterator<V> iterator() {
             return new ValueIterator();
         }
 
+        @Override
         public int size() {
             return WeakIdentityHashMap.this.size();
         }
 
+        @Override
+        @SuppressWarnings("element-type-mismatch")
         public boolean contains(Object o) {
             return containsValue(o);
         }
 
+        @Override
         public void clear() {
             WeakIdentityHashMap.this.clear();
         }
 
-        public Object[] toArray() {
-            Collection c = new ArrayList(size());
-            for (Iterator i = iterator(); i.hasNext(); )
-                c.add(i.next());
-            return c.toArray();
+        private Collection<V> deepCopy() {
+            final Collection<V> list = new ArrayList<V>(size());
+            for (final V v : this)
+                list.add(v);
+            return list;
         }
 
-        public Object[] toArray(Object a[]) {
-            Collection c = new ArrayList(size());
-            for (Iterator i = iterator(); i.hasNext(); )
-                c.add(i.next());
-            return c.toArray(a);
+        @Override
+        public Object[] toArray() {
+            return deepCopy().toArray();
+        }
+
+        @Override
+        public <T> T[] toArray(T a[]) {
+            return deepCopy().toArray(a);
         }
     }
 
     /**
-     * Returns a collection view of the mappings contained in this map.  Each
-     * element in the returned collection is a <tt>Map.Entry</tt>.  The
-     * collection is backed by the map, so changes to the map are reflected in
-     * the collection, and vice-versa.  The collection supports element
-     * removal, which removes the corresponding mapping from the map, via the
-     * <tt>Iterator.remove</tt>, <tt>Collection.remove</tt>,
-     * <tt>removeAll</tt>, <tt>retainAll</tt>, and <tt>clear</tt> operations.
-     * It does not support the <tt>add</tt> or <tt>addAll</tt> operations.
-     *
-     * @return a collection view of the mappings contained in this map.
-     * @see java.util.Map.Entry
+     * Returns a {@link Set} view of the mappings contained in this map.
+     * The set is backed by the map, so changes to the map are
+     * reflected in the set, and vice-versa.  If the map is modified
+     * while an iteration over the set is in progress (except through
+     * the iterator's own <tt>remove</tt> operation, or through the
+     * <tt>setValue</tt> operation on a map entry returned by the
+     * iterator) the results of the iteration are undefined.  The set
+     * supports element removal, which removes the corresponding
+     * mapping from the map, via the <tt>Iterator.remove</tt>,
+     * <tt>Set.remove</tt>, <tt>removeAll</tt>, <tt>retainAll</tt> and
+     * <tt>clear</tt> operations.  It does not support the
+     * <tt>add</tt> or <tt>addAll</tt> operations.
      */
-    public Set entrySet() {
-        Set es = entrySet;
-        return (es != null ? es : (entrySet = new EntrySet()));
+    @Override
+    public Set<Map.Entry<K,V>> entrySet() {
+        Set<Map.Entry<K,V>> es = entrySet;
+        return es != null ? es : (entrySet = new EntrySet());
     }
 
-    private class EntrySet extends AbstractSet {
-        public Iterator iterator() {
+    private class EntrySet extends AbstractSet<Map.Entry<K,V>> {
+        @Override
+        public Iterator<Map.Entry<K,V>> iterator() {
             return new EntryIterator();
         }
 
+        @Override
         public boolean contains(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
-            Map.Entry e = (Map.Entry)o;
-            Entry candidate = getEntry(e.getKey());
+            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+            Entry<K,V> candidate = getEntry(e.getKey());
             return candidate != null && candidate.equals(e);
         }
 
+        @Override
         public boolean remove(Object o) {
-            return removeMapping(o) != null;
+            return removeMapping(o);
         }
 
+        @Override
         public int size() {
             return WeakIdentityHashMap.this.size();
         }
 
+        @Override
         public void clear() {
             WeakIdentityHashMap.this.clear();
         }
 
+        private List<Map.Entry<K,V>> deepCopy() {
+            List<Map.Entry<K,V>> list = new ArrayList<Map.Entry<K,V>>(size());
+            for (Map.Entry<K,V> e : this)
+                list.add(new AbstractMap.SimpleEntry<K,V>(e));
+            return list;
+        }
+
+        @Override
         public Object[] toArray() {
-            Collection c = new ArrayList(size());
-            for (Iterator i = iterator(); i.hasNext(); )
-                c.add(new SimpleEntry((Map.Entry) i.next()));
-            return c.toArray();
+            return deepCopy().toArray();
         }
 
-        public Object[] toArray(Object a[]) {
-            Collection c = new ArrayList(size());
-            for (Iterator i = iterator(); i.hasNext(); )
-                c.add(new SimpleEntry((Map.Entry) i.next()));
-            return c.toArray(a);
+        @Override
+        public <T> T[] toArray(T[] a) {
+            return deepCopy().toArray(a);
         }
     }
-
-    static class SimpleEntry implements Map.Entry {
-        Object key;
-        Object value;
-
-        public SimpleEntry(Object key, Object value) {
-            this.key   = key;
-            this.value = value;
-        }
-
-        public SimpleEntry(Map.Entry e) {
-            this.key   = e.getKey();
-            this.value = e.getValue();
-        }
-
-        public Object getKey() {
-            return key;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public Object setValue(Object value) {
-            Object oldValue = this.value;
-            this.value = value;
-            return oldValue;
-        }
-
-        public boolean equals(Object o) {
-            if (!(o instanceof Map.Entry))
-                return false;
-            Map.Entry e = (Map.Entry)o;
-            return eq(key, e.getKey()) &&  eq(value, e.getValue());
-        }
-
-        public int hashCode() {
-            return ((key   == null)   ? 0 :   key.hashCode()) ^
-                   ((value == null)   ? 0 : value.hashCode());
-        }
-
-        public String toString() {
-            return key + "=" + value;
-        }
-
-        private static boolean eq(Object o1, Object o2) {
-            return (o1 == null ? o2 == null : o1.equals(o2));
-        }
-    }
-
 }
