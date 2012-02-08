@@ -42,6 +42,7 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
             CURRENT_DIRECTORY = FsMountPoint.create(new File("").toURI());
     protected static final String[] NO_STRINGS = new String[0];
     private static final String ARCHIVE_DETECTOR = "archiveDetector";
+
     private static final boolean FS_MANAGER_ISOLATE
             = Boolean.getBoolean(FsManager.class.getName() + ".isolate");
     static {
@@ -57,7 +58,7 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
         new Random().nextBytes(DATA);
     }
 
-    protected static final IOPoolProvider
+    private static final IOPoolProvider
             IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
 
     private @Nullable D driver;
@@ -74,7 +75,7 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
         return "." + getScheme();
     }
 
-    protected abstract D newArchiveDriver();
+    protected abstract D newArchiveDriver(IOPoolProvider provider);
 
     protected final @Nullable D getArchiveDriver() {
         return driver;
@@ -90,7 +91,7 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
 
     @Before
     public void setUp() throws IOException {
-        final D driver = newArchiveDriver();
+        final D driver = newArchiveDriver(IO_POOL_PROVIDER);
         final TArchiveDetector detector
                 = new TArchiveDetector(getSuffixList(), driver);
         final Map<String, Object> environment = new HashMap<String, Object>();

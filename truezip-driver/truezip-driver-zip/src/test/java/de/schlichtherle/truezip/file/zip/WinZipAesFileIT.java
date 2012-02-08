@@ -13,8 +13,9 @@ import de.schlichtherle.truezip.file.TFileTestBase;
 import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import javax.annotation.Nullable;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
+import javax.annotation.Nullable;
 
 /**
  * @author  Christian Schlichtherle
@@ -30,8 +31,8 @@ public final class WinZipAesFileIT extends TFileTestBase<TestWinZipAesDriver> {
     }
 
     @Override
-    protected TestWinZipAesDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(IO_POOL_PROVIDER, view);
+    protected TestWinZipAesDriver newArchiveDriver(IOPoolProvider provider) {
+        return new TestWinZipAesDriver(provider, view);
     }
 
     @Override

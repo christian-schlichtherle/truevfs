@@ -11,13 +11,15 @@ package de.schlichtherle.truezip.nio.file.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
 import de.schlichtherle.truezip.key.MockView;
-import static de.schlichtherle.truezip.key.MockView.Action.*;
+import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
+import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.nio.file.TPathTestBase;
-import javax.annotation.Nullable;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import static java.nio.file.Files.*;
+import javax.annotation.Nullable;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -35,8 +37,8 @@ public final class ZipRaesPathIT extends TPathTestBase<TestZipRaesDriver> {
     }
 
     @Override
-    protected TestZipRaesDriver newArchiveDriver() {
-        return new TestZipRaesDriver(IO_POOL_PROVIDER, view);
+    protected TestZipRaesDriver newArchiveDriver(IOPoolProvider provider) {
+        return new TestZipRaesDriver(provider, view);
     }
 
     @Override
