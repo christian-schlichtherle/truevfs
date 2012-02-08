@@ -9,13 +9,13 @@
 package de.schlichtherle.truezip.file.tar;
 
 import de.schlichtherle.truezip.file.TFileTestBase;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TarFileTestBase<D extends FsArchiveDriver<?>>
+public abstract class TarFileTestBase<D extends FsCharsetArchiveDriver<?>>
 extends TFileTestBase<D> {
 
     /**

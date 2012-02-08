@@ -8,14 +8,14 @@
  */
 package de.schlichtherle.truezip.nio.file.tar;
 
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.nio.file.TPathTestBase;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TarPathTestBase<D extends FsArchiveDriver<?>>
+public abstract class TarPathTestBase<D extends FsCharsetArchiveDriver<?>>
 extends TPathTestBase<D> {
 
     /**

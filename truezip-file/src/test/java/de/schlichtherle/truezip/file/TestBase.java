@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.SuffixSet;
@@ -33,7 +33,7 @@ import org.junit.Before;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TestBase<D extends FsArchiveDriver<?>> {
+public abstract class TestBase<D extends FsCharsetArchiveDriver<?>> {
 
     protected static final long TIMEOUT_MILLIS = 50;
     protected static final FsMountPoint
