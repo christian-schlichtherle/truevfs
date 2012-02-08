@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TFileTestBase;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -23,7 +24,7 @@ public final class JarFileIT extends TFileTestBase<JarDriver> {
     }
 
     @Override
-    protected JarDriver newArchiveDriver() {
-        return new JarDriver(IO_POOL_PROVIDER);
+    protected JarDriver newArchiveDriver(IOPoolProvider provider) {
+        return new JarDriver(provider);
     }
 }

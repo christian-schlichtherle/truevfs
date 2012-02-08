@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
 import de.schlichtherle.truezip.nio.file.TPathTestBase;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -23,7 +24,7 @@ public final class OdfPathIT extends TPathTestBase<OdfDriver> {
     }
 
     @Override
-    protected OdfDriver newArchiveDriver() {
-        return new OdfDriver(IO_POOL_PROVIDER);
+    protected OdfDriver newArchiveDriver(IOPoolProvider provider) {
+        return new OdfDriver(provider);
     }
 }
