@@ -27,7 +27,7 @@ import org.junit.Test;
 public abstract class FsCharsetArchiveDriverTestBase {
 
     private static final IOPoolProvider
-            POOL_PROVIDER = new ByteArrayIOPoolProvider();
+            IO_POOL_PROVIDER = new ByteArrayIOPoolProvider();
 
     private static final String TEXT = "fubar";
 
@@ -35,7 +35,7 @@ public abstract class FsCharsetArchiveDriverTestBase {
 
     @Before
     public void setUp() {
-        driver = newArchiveDriver(POOL_PROVIDER);
+        driver = newArchiveDriver(IO_POOL_PROVIDER);
     }
 
     protected abstract FsCharsetArchiveDriver<?> newArchiveDriver(IOPoolProvider provider);
@@ -46,7 +46,7 @@ public abstract class FsCharsetArchiveDriverTestBase {
     }
 
     @Test
-    public final void testMultithreading() throws Throwable {
+    public final void testMultithreadedAssertEncodable() throws Throwable {
         final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
         class TestTask implements Callable<Void> {

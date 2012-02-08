@@ -13,12 +13,15 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
@@ -26,6 +29,7 @@ import org.junit.After;
 import org.junit.Before;
 
 /**
+ * @param   <D> The type of the archive driver.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -46,6 +50,15 @@ public abstract class TestBase<D extends FsArchiveDriver<?>> {
                         "Isolate file system managers: {0}",
                         FS_MANAGER_ISOLATE);
     }
+
+    /** The data to get compressed. */
+    protected static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
+    static {
+        new Random().nextBytes(DATA);
+    }
+
+    protected static final IOPoolProvider
+            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
 
     private @Nullable D driver;
     private @Nullable TArchiveDetector detector;
