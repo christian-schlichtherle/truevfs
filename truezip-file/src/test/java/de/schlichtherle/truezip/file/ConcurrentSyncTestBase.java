@@ -50,20 +50,10 @@ extends TestBase<D> {
      */
     private static final String TEMP_FILE_PREFIX = "tzp-sync";
 
-    /** The data to get compressed. */
-    private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
-    static {
-        new Random().nextBytes(DATA);
-    }
-
-    protected static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
-
     private static final int NUM_REPEATS = 100;
 
     private File temp;
     private TFile archive;
-    private byte[] data;
 
     @Override
     public void setUp() throws IOException {
@@ -71,7 +61,6 @@ extends TestBase<D> {
         temp = createTempFile();
         TFile.rm(temp);
         archive = new TFile(temp);
-        data = DATA.clone();
     }
 
     private File createTempFile() throws IOException {
