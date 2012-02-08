@@ -14,16 +14,13 @@ import de.schlichtherle.truezip.io.SeekableByteBufferChannel;
 import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.JSE7;
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.EnumMap;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -46,7 +43,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             times = new EnumMap<Access, Long>(Access.class);
     private int reads;
     private int writes;
-    int initialCapacity;
+    private int initialCapacity;
 
     /**
      * Equivalent to {@link #ByteArrayIOEntry(String, int) new ByteArrayIOPool(name, 32)}.

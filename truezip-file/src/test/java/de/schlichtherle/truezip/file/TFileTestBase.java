@@ -44,6 +44,7 @@ import org.junit.Test;
  * Performs integration testing of a particular {@link FsArchiveDriver}
  * by using the API of the TrueZIP File* module.
  *
+ * @param   <D> The type of the archive driver.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -60,15 +61,6 @@ extends TestBase<D> {
      * TrueZIP Path API and the TrueZIP File* API.
      */
     private static final String TEMP_FILE_PREFIX = "tzp-file";
-
-    /** The data to get compressed. */
-    private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
-    static {
-        new Random().nextBytes(DATA);
-    }
-
-    protected static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
 
     private File temp;
     private TFile archive;
