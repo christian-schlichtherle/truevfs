@@ -28,7 +28,8 @@ import javax.annotation.concurrent.Immutable;
  * <p>
  * Sub-classes must be thread-safe and should be immutable.
  * 
- * @author Christian Schlichtherle
+ * @param   <E> The type of the archive entries.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
