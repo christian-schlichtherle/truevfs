@@ -45,6 +45,7 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
         return driver;
     }
 
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     protected final byte[] getData() {
         return data;
     }
