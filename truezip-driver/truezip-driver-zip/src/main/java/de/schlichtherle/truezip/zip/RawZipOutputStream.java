@@ -731,6 +731,7 @@ implements Iterable<E> {
                 final @WillCloseWhenClosed OutputStream out,
                 final @WillNotClose RawZipFile<?> appendee) {
             super(out);
+            assert null != out;
             super.written = appendee.getOffsetMapper().unmap(appendee.length());
         }
     } // AppendingLEDataOutputStream
