@@ -148,6 +148,8 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
             FsModel model,
             @WillCloseWhenClosed InputStream in)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         return new TarInputShop(this, in);
     }
 
@@ -185,6 +187,8 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
             OutputStream out,
             @CheckForNull @WillNotClose TarInputShop source)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         return new TarOutputShop(this, out);
     }
 }
