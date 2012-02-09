@@ -60,12 +60,6 @@ extends ArchiveTestBase<D> {
         archive = new TFile(temp);
     }
 
-    private File createTempFile() throws IOException {
-        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
-        // fail in testCopyContainingOrSameFiles() - explain why!
-        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
-    }
-
     @Override
     public void tearDown() {
         try {
@@ -81,6 +75,12 @@ extends ArchiveTestBase<D> {
         } finally {
             super.tearDown();
         }
+    }
+
+    private File createTempFile() throws IOException {
+        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
+        // fail in testCopyContainingOrSameFiles() - explain why!
+        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
     private void umount() throws FsSyncException {
