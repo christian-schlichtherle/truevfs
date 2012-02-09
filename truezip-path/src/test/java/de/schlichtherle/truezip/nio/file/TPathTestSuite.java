@@ -8,16 +8,15 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
+import de.schlichtherle.truezip.file.ArchiveTestBase;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.file.TestSuite;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.io.Streams;
@@ -49,8 +48,8 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TPathTestSuite<D extends FsCharsetArchiveDriver<?>>
-extends TestSuite<D> {
+public abstract class TPathTestSuite<D extends FsArchiveDriver<?>>
+extends ArchiveTestBase<D> {
 
     private static final Logger
             logger = Logger.getLogger(TPathTestSuite.class.getName());
@@ -74,12 +73,6 @@ extends TestSuite<D> {
         archive = new TPath(temp);
     }
 
-    private Path createTempFile() throws IOException {
-        // TODO: Removing .toRealPath() causes archive.toFile().rm_r() to
-        // fail in testCopyContainingOrSameFiles() - explain why!
-        return Files.createTempFile(TEMP_FILE_PREFIX, getSuffix()).toRealPath();
-    }
-
     @Override
     public void tearDown() {
         try {
@@ -91,10 +84,16 @@ extends TestSuite<D> {
                     delete(temp);                
             }
         } catch (IOException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
+            logger.log(Level.INFO, ex.toString(), ex);
         } finally {
             super.tearDown();
         }
+    }
+
+    private Path createTempFile() throws IOException {
+        // TODO: Removing .toRealPath() causes archive.toFile().rm_r() to
+        // fail in testCopyContainingOrSameFiles() - explain why!
+        return Files.createTempFile(TEMP_FILE_PREFIX, getSuffix()).toRealPath();
     }
 
     private void umount() throws FsSyncException {
@@ -105,7 +104,7 @@ extends TestSuite<D> {
     private void createTestFile(final TPath path) throws IOException {
         final OutputStream out = newOutputStream(path);
         try {
-            out.write(data);
+            out.write(getData());
         } finally {
             out.close();
         }
@@ -149,15 +148,15 @@ extends TestSuite<D> {
         assertTrue(exists(file));
         assertFalse(isDirectory(file));
         assertTrue(isRegularFile(file));
-        assertEquals(data.length, size(file));
+        assertEquals(getData().length, size(file));
         assertTrue(getLastModifiedTime(file).toMillis() > 0);
 
         // Read back portion
         {
             InputStream in = newInputStream(file);
             try {
-                byte[] buf = new byte[data.length];
-                assertTrue(ArrayHelper.equals(data, 0, buf, 0, in.read(buf)));
+                byte[] buf = new byte[getData().length];
+                assertTrue(ArrayHelper.equals(getData(), 0, buf, 0, in.read(buf)));
             } finally {
                 in.close();
             }
@@ -555,14 +554,14 @@ extends TestSuite<D> {
         // an open output stream.
         OutputStream out = newOutputStream(file1);
         try {
-            Streams.cat(new ByteArrayInputStream(data), out);
+            Streams.cat(new ByteArrayInputStream(getData()), out);
         } finally {
             out.close();
         }
         
         out = newOutputStream(file2);
         try {
-            Streams.cat(new ByteArrayInputStream(data), out);
+            Streams.cat(new ByteArrayInputStream(getData()), out);
         } finally {
             out.close();
         }
@@ -570,7 +569,7 @@ extends TestSuite<D> {
         umount(); // ensure two entries in the archive
         
         out = newOutputStream(file1);
-        Streams.cat(new ByteArrayInputStream(data), out);
+        Streams.cat(new ByteArrayInputStream(getData()), out);
         
         // out is still open!
         try {
@@ -591,7 +590,7 @@ extends TestSuite<D> {
         }
 
         // out is still open!
-        Streams.cat(new ByteArrayInputStream(data), out); // write again
+        Streams.cat(new ByteArrayInputStream(getData()), out); // write again
         
         // out is still open!
         try {
@@ -603,7 +602,7 @@ extends TestSuite<D> {
         }
         
         try {
-            Streams.cat(new ByteArrayInputStream(data), out); // write again
+            Streams.cat(new ByteArrayInputStream(getData()), out); // write again
             fail("Expected exception when writing to entry output stream of an unmounted archive file!");
         } catch (OutputClosedException expected) {
         }
@@ -824,23 +823,23 @@ extends TestSuite<D> {
     }
 
     private void assertInput(final TPath file) throws IOException {
-        final InputStream in = new ByteArrayInputStream(data);
+        final InputStream in = new ByteArrayInputStream(getData());
         try {
             copy(in, file);
         } finally {
             in.close();
         }
-        assertEquals(data.length, size(file));
+        assertEquals(getData().length, size(file));
     }
 
     private void assertOutput(final TPath file) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
         try {
             copy(file, out);
         } finally {
             out.close();
         }
-        assertTrue(Arrays.equals(data, out.toByteArray()));
+        assertTrue(Arrays.equals(getData(), out.toByteArray()));
     }
 
     @Test
@@ -854,7 +853,7 @@ extends TestSuite<D> {
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
         
-        copy(new ByteArrayInputStream(data), entry);
+        copy(new ByteArrayInputStream(getData()), entry);
         
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
@@ -997,9 +996,9 @@ extends TestSuite<D> {
 
         // Check result.
         {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
             copy(a, out);
-            assertTrue(Arrays.equals(data, out.toByteArray()));
+            assertTrue(Arrays.equals(getData(), out.toByteArray()));
         }
 
         // Cleanup.
@@ -1063,7 +1062,7 @@ extends TestSuite<D> {
                 fail();
             } catch (IOException expected) {
             }
-            out1.write(data);
+            out1.write(getData());
             try {
                 archive.toFile().rm_r();
                 fail();
@@ -1079,7 +1078,7 @@ extends TestSuite<D> {
                 fail();
             } catch (IOException expected) {
             }
-            out2.write(data);
+            out2.write(getData());
             try {
                 archive.toFile().rm_r();
                 fail();
@@ -1093,13 +1092,13 @@ extends TestSuite<D> {
             final InputStream in2 = newInputStream(entry2);
             try {
                 delete(entry2);
-                final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+                final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
                 try {
                     Streams.cat(in2, out);
                 } finally {
                     out.close();
                 }
-                assertTrue(Arrays.equals(data, out.toByteArray()));
+                assertTrue(Arrays.equals(getData(), out.toByteArray()));
                 try {
                     archive.toFile().rm_r();
                     fail();
@@ -1113,13 +1112,13 @@ extends TestSuite<D> {
                 fail("deleted within archive.toFile().rm_r()");
             } catch (IOException expected) {
             }
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
             try {
                 Streams.cat(in1, out);
             } finally {
                 out.close();
             }
-            assertTrue(Arrays.equals(data, out.toByteArray()));
+            assertTrue(Arrays.equals(getData(), out.toByteArray()));
             try {
                 archive.toFile().rm_r();
                 fail();
@@ -1155,7 +1154,7 @@ extends TestSuite<D> {
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
         final TPath tmp = newNonArchivePath(archive);
-        final InputStream in = new ByteArrayInputStream(data);
+        final InputStream in = new ByteArrayInputStream(getData());
         copy(in, tmp);
         assertRenameArchiveToTemp(archive);
     }
@@ -1330,7 +1329,7 @@ extends TestSuite<D> {
         Collections.shuffle(entries, new Random());
 
         // Now read in the entries in the shuffled order.
-        final byte[] buf = new byte[data.length];
+        final byte[] buf = new byte[getData().length];
         for (final Path _entry : entries) {
             final TPath entry = (TPath) _entry;
             // Read full entry and check the contents.
@@ -1343,11 +1342,11 @@ extends TestSuite<D> {
                     if (0 > read)
                         break;
                     assertTrue(read > 0);
-                    assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                    assertTrue(ArrayHelper.equals(getData(), off, buf, 0, read));
                     off += read;
                 }
                 assertEquals(-1, read);
-                assertEquals(off, data.length);
+                assertEquals(off, getData().length);
                 assertTrue(0 >= in.read(new byte[0]));
             } finally {
                 in.close();
@@ -1547,7 +1546,7 @@ extends TestSuite<D> {
             createTestFile(entry2);
 
             umount();
-            assertTrue(size(path) > 2 * data.length); // two entries plus one central directory
+            assertTrue(size(path) > 2 * getData().length); // two entries plus one central directory
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1559,7 +1558,7 @@ extends TestSuite<D> {
             delete(entry2);
 
             umount();
-            assertTrue(size(path) > 6 * data.length); // six entries plus two central directories
+            assertTrue(size(path) > 6 * getData().length); // six entries plus two central directories
         } finally {
             config.close();
         }

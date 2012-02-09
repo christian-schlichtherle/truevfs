@@ -8,40 +8,26 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import java.io.CharConversionException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsCharsetArchiveDriverTestSuite {
-
-    private static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(2048);
+public abstract class FsCharsetArchiveDriverTestSuite
+extends FsArchiveDriverTestBase<FsCharsetArchiveDriver<?>> {
 
     private static final String ENCODABLE_TEXT = "fubar";
 
-    private FsCharsetArchiveDriver<?> driver;
-
-    @Before
-    public void setUp() {
-        driver = newArchiveDriver(IO_POOL_PROVIDER);
-    }
-
-    protected abstract FsCharsetArchiveDriver<?> newArchiveDriver(IOPoolProvider provider);
-
     @Test
     public final void testAssertEncodable() throws CharConversionException {
-        driver.assertEncodable(ENCODABLE_TEXT);
+        getArchiveDriver().assertEncodable(ENCODABLE_TEXT);
     }
 
     @Test
@@ -55,7 +41,7 @@ public abstract class FsCharsetArchiveDriverTestSuite {
                 start.countDown();
                 start.await();
                 for (int i = 0; i < 100000; i++)
-                    driver.assertEncodable(ENCODABLE_TEXT);
+                    getArchiveDriver().assertEncodable(ENCODABLE_TEXT);
                 return null;
             }
         } // TestTask
