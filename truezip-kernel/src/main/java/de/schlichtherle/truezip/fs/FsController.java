@@ -15,10 +15,10 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.swing.Icon;
 import javax.swing.JTree;
 
@@ -399,7 +399,6 @@ public abstract class FsController<M extends FsModel> {
     /**
      * Two file system controllers are considered equal if and only if they
      * are identical.
-     * This can't get overriden.
      * 
      * @param that the object to compare.
      */
@@ -411,7 +410,6 @@ public abstract class FsController<M extends FsModel> {
 
     /**
      * Returns a hash code which is consistent with {@link #equals}.
-     * This can't get overriden.
      */
     @Override
     public final int hashCode() {
@@ -424,10 +422,12 @@ public abstract class FsController<M extends FsModel> {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String m = getModel().toString();
+        return new StringBuilder(n.length() + "[model=".length() + m.length() + 1)
+                .append(n)
                 .append("[model=")
-                .append(getModel())
+                .append(m)
                 .append(']')
                 .toString();
     }
