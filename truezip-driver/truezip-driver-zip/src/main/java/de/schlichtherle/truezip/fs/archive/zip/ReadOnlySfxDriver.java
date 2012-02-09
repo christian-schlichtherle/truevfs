@@ -11,7 +11,6 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputShop;
-import javax.annotation.CheckForNull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -58,6 +57,8 @@ public class ReadOnlySfxDriver extends ZipDriver {
             final OptionOutputSocket output,
             final ZipInputShop source)
     throws IOException {
+        assert null != model;
+        assert null != output;
         throw new FileNotFoundException(
                 "driver class does not support creating or modifying SFX archives");
     }

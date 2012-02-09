@@ -465,6 +465,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
             return newInputShop(model, rof);
@@ -479,6 +481,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
             FsModel model,
             @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
+        assert null != model;
         final ZipInputShop input = new ZipInputShop(this, model, rof);
         try {
             input.recoverLostEntries();
@@ -540,6 +543,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
             final OutputSocket<?> output,
             final InputShop<ZipArchiveEntry> source)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         return newOutputShop0(
                 model,
                 (OptionOutputSocket) output,
@@ -564,6 +569,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
             final OptionOutputSocket output,
             final @CheckForNull @WillNotClose ZipInputShop source)
     throws IOException {
+        assert null != model;
         final OutputStream out = output.newOutputStream();
         try {
             return newOutputShop(model, out, source);

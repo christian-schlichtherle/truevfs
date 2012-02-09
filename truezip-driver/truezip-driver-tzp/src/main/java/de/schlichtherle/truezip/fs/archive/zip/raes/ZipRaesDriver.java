@@ -255,7 +255,6 @@ public abstract class ZipRaesDriver extends JarDriver {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-
         final OutputStream out = new LazyOutputSocket<Entry>(output)
                 .newOutputStream();
         try {

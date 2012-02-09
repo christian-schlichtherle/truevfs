@@ -53,8 +53,8 @@ public class OdfDriver extends JarDriver {
             final OutputStream out,
             final ZipInputShop source)
     throws IOException {
-        final IOPool<?> pool = getPool();
         final ZipOutputShop shop = new ZipOutputShop(this, model, out, source);
+        final IOPool<?> pool = getPool();
         return null != source && source.isAppendee()
                 ? new FsMultiplexedOutputShop<ZipArchiveEntry>(shop, pool)
                 : new OdfOutputShop(shop, pool);
