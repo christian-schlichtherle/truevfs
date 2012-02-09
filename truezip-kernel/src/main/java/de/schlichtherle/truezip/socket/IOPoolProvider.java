@@ -19,12 +19,13 @@ package de.schlichtherle.truezip.socket;
 public interface IOPoolProvider {
 
     /**
-     * Returns an I/O entry pool.
+     * Returns the I/O buffer pool to use for allocating temporary I/O buffers.
      * <p>
-     * Calling this method several times may return different I/O entry pools,
-     * so callers should cache the result for subsequent use.
+     * Multiple invocations should return the same I/O buffer pool.
+     * However, callers should cache the return value for subsequent use in
+     * case it isn't always the same.
      *
-     * @return An I/O entry pool.
+     * @return The I/O buffer pool to use for allocating temporary I/O buffers.
      */
     IOPool<?> get();
 }

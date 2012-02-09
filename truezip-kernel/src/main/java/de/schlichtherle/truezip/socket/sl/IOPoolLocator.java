@@ -52,12 +52,6 @@ public final class IOPoolLocator implements IOPoolProvider {
     private IOPoolLocator() {
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link IOPoolLocator} delegates the
-     * call to the container loaded by the constructor.
-     */
     @Override
     public IOPool<?> get() {
         return Boot.SERVICE.get();
