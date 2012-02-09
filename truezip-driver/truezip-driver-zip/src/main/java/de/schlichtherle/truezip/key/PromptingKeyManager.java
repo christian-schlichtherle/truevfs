@@ -9,8 +9,8 @@
 package de.schlichtherle.truezip.key;
 
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import javax.annotation.Nullable;
 import java.net.URI;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -96,10 +96,12 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String v = getView().toString();
+        return new StringBuilder(n.length() + "[view=".length() + v.length() + 1)
+                .append(n)
                 .append("[view=")
-                .append(getView())
+                .append(v)
                 .append(']')
                 .toString();
     }
