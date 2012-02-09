@@ -32,7 +32,7 @@ extends DelegatingInputSocket<E> {
     }
 
     @Override
-    protected InputSocket<? extends E> getDelegate() {
+    protected final InputSocket<? extends E> getDelegate() {
         return delegate;
     }
 
