@@ -294,12 +294,7 @@ public final class IOCache implements Flushable, Closeable {
             final Buffer buffer = this.buffer;
             return null != buffer
                     ? buffer.data
-                    : new CacheEntry(input.getLocalTarget());
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
+                    : new ProxyEntry(input/*.bind(this)*/.getLocalTarget()); // do NOT bind!
         }
 
         @Override
@@ -336,12 +331,7 @@ public final class IOCache implements Flushable, Closeable {
             final Buffer buffer = this.buffer;
             return null != buffer
                     ? buffer.data
-                    : new CacheEntry(output.getLocalTarget());
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
+                    : new ProxyEntry(output/*.bind(this)*/.getLocalTarget()); // do NOT bind!
         }
 
         @Override
@@ -355,13 +345,13 @@ public final class IOCache implements Flushable, Closeable {
         }
     } // Output
 
-    /** Hides backing store entries. */
+    /** Used to proxy the backing store entries. */
     @Immutable
-    private static class CacheEntry extends DecoratingEntry<Entry> {
-        CacheEntry(Entry entry) {
+    private static class ProxyEntry extends DecoratingEntry<Entry> {
+        ProxyEntry(Entry entry) {
             super(entry);
         }
-    } // CacheEntry
+    } // Proxy
 
     @Immutable
     private final class InputBufferPool
