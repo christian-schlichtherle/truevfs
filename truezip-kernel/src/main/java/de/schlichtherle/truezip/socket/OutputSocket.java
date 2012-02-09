@@ -31,7 +31,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-// TODO: Extract Sink interface with new*() methods.
+// TODO: Extract Sink interface for the new*() methods.
 @NotThreadSafe
 public abstract class OutputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
@@ -47,6 +47,7 @@ extends IOSocket<E, Entry> {
      * 
      * @throws IOException On any I/O failure.
      */
+    // See https://java.net/jira/browse/TRUEZIP-203
     @Override
     public final @Nullable Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
