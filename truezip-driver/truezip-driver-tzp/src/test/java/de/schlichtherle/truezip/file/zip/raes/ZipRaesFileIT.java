@@ -17,7 +17,6 @@ import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
-import javax.annotation.Nullable;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -27,7 +26,7 @@ import org.junit.Test;
  */
 public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
 
-    private @Nullable MockView<AesCipherParameters> view;
+    private MockView<AesCipherParameters> view;
 
     @Override
     protected String getSuffixList() {
@@ -35,27 +34,10 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
     }
 
     @Override
-    protected TestZipRaesDriver newArchiveDriver(IOPoolProvider provider) {
-        return new TestZipRaesDriver(provider, view);
-    }
-
-    @Override
-    public void setUp() throws IOException {
-        this.view = new MockView<AesCipherParameters>();
-        super.setUp();
-        final AesCipherParameters key = new AesCipherParameters();
-        key.setPassword("secret".toCharArray());
-        view.setKey(key);
-        view.setAction(ENTER);
-    }
-
-    @Override
-    public void tearDown() {
-        try {
-            view.setAction(ENTER);
-        } finally {
-            super.tearDown();
-        }
+    protected TestZipRaesDriver newArchiveDriver(final IOPoolProvider provider) {
+        final TestZipRaesDriver driver = new TestZipRaesDriver(provider);
+        view = driver.getView();
+        return driver;
     }
 
     @Test

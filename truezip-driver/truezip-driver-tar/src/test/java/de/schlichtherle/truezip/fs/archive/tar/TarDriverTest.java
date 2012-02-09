@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.fs.archive.zip;
+package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
@@ -15,11 +15,16 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipCharsetArchiveDriverTest
-extends FsCharsetArchiveDriverTestSuite {
+public final class TarDriverTest
+extends FsCharsetArchiveDriverTestSuite<TarDriver> {
 
     @Override
-    protected ZipDriver newArchiveDriver(IOPoolProvider provider) {
-        return new ZipDriver(provider);
+    protected TarDriver newArchiveDriver(IOPoolProvider provider) {
+        return new TarDriver(provider);
+    }
+
+    @Override
+    protected String getUnencodableName() {
+        return "\u0080";
     }
 }

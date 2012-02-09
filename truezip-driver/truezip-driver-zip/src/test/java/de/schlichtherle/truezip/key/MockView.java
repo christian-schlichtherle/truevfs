@@ -11,15 +11,16 @@ package de.schlichtherle.truezip.key;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import javax.annotation.CheckForNull;
 import java.net.URI;
 import java.util.Random;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A view implementation which uses its properties for providing a key whenever
  * the user is prompted.
  *
+ * @param   <K> The type of the safe key.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -100,6 +101,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
         action.promptReadKey(controller, key, changeRequested);
     }
 
+    @SuppressWarnings("PublicInnerClass")
     public enum Action {
         ENTER {
             @Override

@@ -13,7 +13,6 @@ import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.SuffixSet;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,12 +37,8 @@ public class TarDriverServiceTest {
             assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
     }
 
-    @Test
+    @Test(expected = UnsupportedOperationException.class)
     public void testImmutability() {
-        try {
-            instance.get().remove(FsScheme.create("tar"));
-            fail("put");
-        } catch (UnsupportedOperationException expected) {
-        }
+        instance.get().remove(FsScheme.create("tar"));
     }
 }

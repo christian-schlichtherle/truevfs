@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.ArchiveTestBase;
+import de.schlichtherle.truezip.file.ArchiveIOTestBase;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
@@ -49,7 +49,7 @@ import org.junit.Test;
  * @version $Id$
  */
 public abstract class TPathTestSuite<D extends FsArchiveDriver<?>>
-extends ArchiveTestBase<D> {
+extends ArchiveIOTestBase<D> {
 
     private static final Logger
             logger = Logger.getLogger(TPathTestSuite.class.getName());
