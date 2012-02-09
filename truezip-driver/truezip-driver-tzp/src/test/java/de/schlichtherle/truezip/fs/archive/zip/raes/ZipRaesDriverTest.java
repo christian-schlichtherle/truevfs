@@ -6,25 +6,25 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.file;
+package de.schlichtherle.truezip.fs.archive.zip.raes;
 
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class MockArchiveTestBase
-extends ArchiveTestBase<MockArchiveDriver> {
+public final class ZipRaesDriverTest
+extends FsCharsetArchiveDriverTestSuite<ZipRaesDriver> {
 
     @Override
-    protected final String getSuffixList() {
-        return "mok|mok1|mok2";
+    protected TestZipRaesDriver newArchiveDriver(final IOPoolProvider provider) {
+        return new TestZipRaesDriver(provider);
     }
 
     @Override
-    protected final MockArchiveDriver newArchiveDriver(IOPoolProvider provider) {
-        return new MockArchiveDriver();
+    protected String getUnencodableName() {
+        return null;
     }
 }

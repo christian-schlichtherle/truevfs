@@ -19,10 +19,29 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  */
 public class TestZipRaesDriver extends SafeZipRaesDriver {
 
-    public TestZipRaesDriver(
-            IOPoolProvider ioPoolProvider,
-            MockView<AesCipherParameters> view) {
+    private final MockView<AesCipherParameters> view;
+
+    public TestZipRaesDriver(IOPoolProvider ioPoolProvider) {
+        this(ioPoolProvider, newView());
+    }
+
+    private TestZipRaesDriver(
+            final IOPoolProvider ioPoolProvider,
+            final MockView<AesCipherParameters> view) {
         super(ioPoolProvider, new PromptingKeyManagerService(view));
+        this.view = view;
+    }
+
+    private static MockView<AesCipherParameters> newView() {
+        final AesCipherParameters key = new AesCipherParameters();
+        key.setPassword("secret".toCharArray());
+        final MockView<AesCipherParameters> view = new MockView<AesCipherParameters>();
+        view.setKey(key);
+        return view;
+    }
+
+    public MockView<AesCipherParameters> getView() {
+        return view;
     }
 
     @Override

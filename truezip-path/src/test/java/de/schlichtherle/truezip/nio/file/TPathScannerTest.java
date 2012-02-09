@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.MockArchiveTestBase;
+import de.schlichtherle.truezip.file.MockArchiveIOTestBase;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsPath;
@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TPathScannerTest extends MockArchiveTestBase {
+public class TPathScannerTest extends MockArchiveIOTestBase {
 
     @Test
     public void testScan() throws URISyntaxException {

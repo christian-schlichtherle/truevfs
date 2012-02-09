@@ -23,12 +23,9 @@ import javax.annotation.concurrent.Immutable;
 import javax.swing.Icon;
 
 /**
- * An abstract factory for components required for accessing a federated file
- * system which is enclosed in a parent file system.
- * Implementations of this abstract base class are used to access archive file
- * formats like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
- * <p>
- * Sub-classes must be thread-safe and should be immutable.
+ * An abstract factory for components required for accessing archive files.
+ * Implementations of this abstract base class are used to access specific
+ * archive formats like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -43,7 +40,6 @@ extends FsDriver {
      * <p>
      * The implementation in the class {@link FsArchiveDriver} always returns
      * {@code true}.
-     * This can't get overridden.
      */
     @Override
     public final boolean isFederated() {
@@ -51,9 +47,13 @@ extends FsDriver {
     }
 
     /**
-     * Returns the pool to use for allocating temporary I/O buffers.
+     * Returns the I/O buffer pool to use for allocating temporary I/O buffers.
+     * <p>
+     * Multiple invocations should return the same I/O buffer pool.
+     * However, callers should cache the return value for subsequent use in
+     * case it isn't always the same.
      *
-     * @return The pool to use for allocating temporary I/O buffers.
+     * @return The I/O buffer pool to use for allocating temporary I/O buffers.
      */
     protected abstract IOPool<?> getPool();
 

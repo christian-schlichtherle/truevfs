@@ -33,7 +33,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TFileTest extends MockArchiveTestBase {
+public class TFileTest extends MockArchiveIOTestBase {
 
     private static final Logger logger
             = Logger.getLogger(TFileTest.class.getName());

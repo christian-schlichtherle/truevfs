@@ -34,7 +34,7 @@ import org.junit.Test;
  * @version $Id$
  */
 public abstract class ConcurrentSyncTestSuite<D extends FsArchiveDriver<?>>
-extends ArchiveTestBase<D> {
+extends ArchiveIOTestBase<D> {
 
     private static final Logger
             logger = Logger.getLogger(ConcurrentSyncTestSuite.class.getName());

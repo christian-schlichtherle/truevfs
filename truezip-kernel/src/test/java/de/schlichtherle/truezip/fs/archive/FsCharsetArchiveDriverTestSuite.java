@@ -14,29 +14,56 @@ import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import java.io.CharConversionException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import javax.annotation.CheckForNull;
 import org.junit.Test;
 
 /**
+ * @param   <D> The type of the charset archive driver.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsCharsetArchiveDriverTestSuite
-extends FsArchiveDriverTestBase<FsCharsetArchiveDriver<?>> {
+public abstract class FsCharsetArchiveDriverTestSuite<
+        D extends FsCharsetArchiveDriver<?>>
+extends FsArchiveDriverTestSuite<D> {
 
-    private static final String ENCODABLE_TEXT = "fubar";
+    private static final String ENCODABLE_NAME;
+    static {
+        // US-ASCII must always be encodable.
+        final StringBuilder builder = new StringBuilder(128);
+        for (char c = 0; c <= 127; c++)
+            builder.append(c);
+        ENCODABLE_NAME = builder.toString();
+    }
 
     @Test
     public void testCharset() {
         assert null != getArchiveDriver().getCharset();
     }
 
+    @Test(expected = CharConversionException.class)
+    public void testUnencodableName() throws CharConversionException {
+        final String name = getUnencodableName();
+        if (null == name)
+            throw new CharConversionException("Ignore me!");
+        getArchiveDriver().assertEncodable(name);
+    }
+
+    /**
+     * Returns an unencodable name or {@code null} if all characters are
+     * encodable in entry names for this archive type.
+     * 
+     * @return An unencodable name or {@code null} if all characters are
+     *         encodable in entry names for this archive type.
+     */
+    protected abstract @CheckForNull String getUnencodableName();
+
     @Test
-    public void testAssertEncodable() throws CharConversionException {
-        getArchiveDriver().assertEncodable(ENCODABLE_TEXT);
+    public void testEncodableName() throws CharConversionException {
+        getArchiveDriver().assertEncodable(ENCODABLE_NAME);
     }
 
     @Test
-    public void testMultithreadedAssertEncodable() throws Throwable {
+    public void testMultithreadedEncodableName() throws Throwable {
         final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
         class TestTask implements Callable<Void> {
@@ -46,7 +73,7 @@ extends FsArchiveDriverTestBase<FsCharsetArchiveDriver<?>> {
                 start.countDown();
                 start.await();
                 for (int i = 0; i < 100000; i++)
-                    getArchiveDriver().assertEncodable(ENCODABLE_TEXT);
+                    getArchiveDriver().assertEncodable(ENCODABLE_NAME);
                 return null;
             }
         } // TestTask

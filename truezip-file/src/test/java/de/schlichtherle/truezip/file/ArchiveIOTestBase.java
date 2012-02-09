@@ -29,7 +29,7 @@ import org.junit.After;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveTestBase<D extends FsArchiveDriver<?>>
+public abstract class ArchiveIOTestBase<D extends FsArchiveDriver<?>>
 extends FsArchiveDriverTestBase<D> {
 
     protected static final long TIMEOUT_MILLIS = 50;
@@ -43,7 +43,7 @@ extends FsArchiveDriverTestBase<D> {
     private static final boolean FS_MANAGER_ISOLATE
             = Boolean.getBoolean(FsManager.class.getName() + ".isolate");
     static {
-        Logger  .getLogger(ArchiveTestBase.class.getName())
+        Logger  .getLogger(ArchiveIOTestBase.class.getName())
                 .log(   Level.CONFIG,
                         "Isolate file system managers: {0}",
                         FS_MANAGER_ISOLATE);
