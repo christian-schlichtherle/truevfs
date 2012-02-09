@@ -26,12 +26,17 @@ extends FsArchiveDriverTestBase<FsCharsetArchiveDriver<?>> {
     private static final String ENCODABLE_TEXT = "fubar";
 
     @Test
-    public final void testAssertEncodable() throws CharConversionException {
+    public void testCharset() {
+        assert null != getArchiveDriver().getCharset();
+    }
+
+    @Test
+    public void testAssertEncodable() throws CharConversionException {
         getArchiveDriver().assertEncodable(ENCODABLE_TEXT);
     }
 
     @Test
-    public final void testMultithreadedAssertEncodable() throws Throwable {
+    public void testMultithreadedAssertEncodable() throws Throwable {
         final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
         class TestTask implements Callable<Void> {
