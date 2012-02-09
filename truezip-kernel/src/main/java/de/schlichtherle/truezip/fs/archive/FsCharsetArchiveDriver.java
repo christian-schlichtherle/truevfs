@@ -75,6 +75,7 @@ extends FsArchiveDriver<E> {
      * @param  type an entry type.
      * @return The fixed entry name.
      */
+    // TODO: Consider renaming this method to normalize().
     protected static String toZipOrTarEntryName(String name, Type type) {
         return DIRECTORY == type
                 ? name.endsWith(SEPARATOR) ? name : name + SEPARATOR_CHAR
