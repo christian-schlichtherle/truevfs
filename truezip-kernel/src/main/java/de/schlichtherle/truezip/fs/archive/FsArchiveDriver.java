@@ -169,7 +169,7 @@ extends FsDriver {
      * Called to prepare reading an archive file artifact of this driver from
      * {@code name} in {@code controller} using {@code options}.
      * <p>
-     * This method should be overridden in order to modify the given options
+     * This method may get overridden in order to modify the given options
      * before forwarding the call to the given controller.
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
@@ -223,7 +223,7 @@ extends FsDriver {
      * the entry {@code name} in {@code controller} using {@code options} and
      * the nullable {@code template}.
      * <p>
-     * This method should be overridden in order to modify the given options
+     * This method may get overridden in order to modify the given options
      * before forwarding the call to the given controller.
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
