@@ -47,6 +47,8 @@ implements InputShop<ZipArchiveEntry> {
             final @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
         super(rof, driver);
+        if (null == model)
+            throw new NullPointerException();
         this.driver = driver;
         this.model = model;
     }
