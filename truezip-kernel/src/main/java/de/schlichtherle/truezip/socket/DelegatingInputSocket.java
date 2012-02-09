@@ -41,7 +41,7 @@ extends InputSocket<E> {
     /**
      * Binds the decorated socket to this socket and returns it.
      *
-     * @return The bound decorated socket.
+     * @return The bound delegate socket.
      * @throws IOException On any I/O failure. 
      */
     protected InputSocket<? extends E> getBoundSocket() throws IOException {
@@ -72,14 +72,5 @@ extends InputSocket<E> {
     @Override
     public InputStream newInputStream() throws IOException {
         return getBoundSocket().newInputStream();
-    }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return getClass().getName();
     }
 }

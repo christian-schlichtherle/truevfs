@@ -40,7 +40,7 @@ extends OutputSocket<E> {
     /**
      * Binds the delegate socket to this socket and returns it.
      *
-     * @return The bound decorated socket.
+     * @return The bound delegate socket.
      * @throws IOException On any I/O failure. 
      */
     protected OutputSocket<? extends E> getBoundSocket() throws IOException {
@@ -66,14 +66,5 @@ extends OutputSocket<E> {
     @Override
     public OutputStream newOutputStream() throws IOException {
         return getBoundSocket().newOutputStream();
-    }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return getClass().getName();
     }
 }
