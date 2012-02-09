@@ -136,6 +136,8 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
     @Override
     public TarInputShop newInputShop(FsModel model, InputSocket<?> input)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         final InputStream in = input.newInputStream();
         try {
             return newTarInputShop(model, in);
@@ -148,8 +150,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
             FsModel model,
             @WillCloseWhenClosed InputStream in)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
+        assert null != model;
         return new TarInputShop(this, in);
     }
 
@@ -167,6 +168,8 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
             OutputSocket<?> output,
             InputShop<TTarArchiveEntry> source)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         final OutputStream out = output.newOutputStream();
         try {
             return new FsMultiplexedOutputShop<TTarArchiveEntry>(
@@ -187,8 +190,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
             OutputStream out,
             @CheckForNull @WillNotClose TarInputShop source)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
+        assert null != model;
         return new TarOutputShop(this, out);
     }
 }
