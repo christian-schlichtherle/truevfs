@@ -20,15 +20,15 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.swing.Icon;
 
 /**
  * A decorating file system controller which performs a
@@ -322,11 +322,6 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
 
         @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             while (true) {
                 try {
@@ -382,11 +377,6 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                     sync();
                 }
             }
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
         }
 
         @Override

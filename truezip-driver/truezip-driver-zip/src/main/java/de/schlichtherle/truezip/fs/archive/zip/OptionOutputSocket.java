@@ -44,11 +44,6 @@ extends DecoratingOutputSocket<Entry> {
     }
 
     @Override
-    public Entry getPeerTarget() throws IOException {
-        return getBoundSocket().getPeerTarget();
-    }
-
-    @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         return getBoundSocket().newSeekableByteChannel();
     }

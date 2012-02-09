@@ -19,14 +19,14 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.swing.Icon;
 
 /**
  * A file system controller which decorates another file system controller in
@@ -279,12 +279,6 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
         }
 
         @Override
-        public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             final FsDefaultArchiveController<?>
                     delegate = FsContextController.this.delegate;
@@ -344,12 +338,6 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
             } finally {
                 delegate.setContext(context);
             }
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            // Same implementation as super class, but makes stack trace nicer.
-            return getBoundSocket().getPeerTarget();
         }
 
         @Override

@@ -100,14 +100,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
             }
 
             @Override
-            public Entry getPeerTarget() throws IOException {
-                final InputShop<E> delegate = SynchronizedInputShop.this.delegate;
-                synchronized (delegate) {
-                    return getBoundSocket().getPeerTarget();
-                }
-            }
-
-            @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 final InputShop<E> delegate = SynchronizedInputShop.this.delegate;
                 synchronized (delegate) {

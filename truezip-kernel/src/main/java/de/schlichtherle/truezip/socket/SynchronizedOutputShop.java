@@ -100,14 +100,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
-            public Entry getPeerTarget() throws IOException {
-                final OutputShop<E> delegate = SynchronizedOutputShop.this.delegate;
-                synchronized (delegate) {
-                    return getBoundSocket().getPeerTarget();
-                }
-            }
-
-            @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 throw new UnsupportedOperationException("TODO: Implement this!");
             }

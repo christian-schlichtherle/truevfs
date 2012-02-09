@@ -13,7 +13,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -51,12 +50,6 @@ extends InputSocket<E> {
     @Override
     public E getLocalTarget() throws IOException {
         return getBoundSocket().getLocalTarget();
-    }
-
-    @Override
-    @Nullable
-    public Entry getPeerTarget() throws IOException {
-        return getBoundSocket().getPeerTarget();
     }
 
     @Override

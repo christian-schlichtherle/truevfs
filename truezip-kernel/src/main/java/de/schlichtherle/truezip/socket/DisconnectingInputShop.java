@@ -88,12 +88,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
             }
 
             @Override
-            public Entry getPeerTarget() throws IOException {
-                checkOpen();
-                return getBoundSocket().getPeerTarget();
-            }
-
-            @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 checkOpen();
                 return new DisconnectingReadOnlyFile(

@@ -18,14 +18,14 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.swing.Icon;
 
 /**
  * Implements a chain of responsibility in order to resolve
@@ -383,11 +383,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             try {
                 return getBoundSocket().newReadOnlyFile();
@@ -477,11 +472,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                     throw ex.getCause();
                 }
             }
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
         }
 
         @Override
