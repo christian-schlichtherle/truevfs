@@ -49,9 +49,8 @@ extends IOSocket<E, Entry> {
      * 
      * @throws IOException On any I/O failure.
      */
-    // TODO: Declare this final!
     @Override
-    public /*final*/ @Nullable Entry getPeerTarget() throws IOException {
+    public final @Nullable Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
 
