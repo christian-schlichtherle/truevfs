@@ -15,14 +15,15 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.swing.Icon;
 
 /**
- * @author Christian Schlichtherle
+ * @param   <M> The file system model.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public class DummyController<M extends FsModel> extends FsController<M> {
