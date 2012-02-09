@@ -33,6 +33,7 @@ import org.junit.Test;
  * Performs integration testing of a particular {@link FsArchiveDriver}
  * by using the API of the TrueZIP File* module.
  *
+ * @param   <D> The type of the archive driver.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
