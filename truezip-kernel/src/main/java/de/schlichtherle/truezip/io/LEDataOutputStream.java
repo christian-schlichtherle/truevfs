@@ -285,6 +285,7 @@ implements DataOutput {
     /**
      * This method is not implemented.
      *
+     * @param str the string to write.
      * @throws UnsupportedOperationException Always.
      */
     @Override
