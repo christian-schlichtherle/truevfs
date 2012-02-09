@@ -52,24 +52,6 @@ extends FsArchiveDriverTestBase<D> {
     private TArchiveDetector detector;
     private Map<String, ?> environment;
 
-    protected abstract String getSuffixList();
-
-    protected FsScheme getScheme() {
-        return FsScheme.create(new SuffixSet(getSuffixList()).iterator().next());
-    }
-
-    protected final String getSuffix() {
-        return "." + getScheme();
-    }
-
-    protected final TArchiveDetector getArchiveDetector() {
-        return detector;
-    }
-
-    protected final Map<String, ?> getEnvironment() {
-        return environment;
-    }
-
     @Override
     public void setUp() throws IOException {
         super.setUp();
@@ -99,5 +81,23 @@ extends FsArchiveDriverTestBase<D> {
     @After
     public void tearDown() {
         TConfig.pop();
+    }
+
+    protected abstract String getSuffixList();
+
+    protected final FsScheme getScheme() {
+        return FsScheme.create(new SuffixSet(getSuffixList()).iterator().next());
+    }
+
+    protected final String getSuffix() {
+        return "." + getScheme();
+    }
+
+    protected final TArchiveDetector getArchiveDetector() {
+        return detector;
+    }
+
+    protected final Map<String, ?> getEnvironment() {
+        return environment;
     }
 }
