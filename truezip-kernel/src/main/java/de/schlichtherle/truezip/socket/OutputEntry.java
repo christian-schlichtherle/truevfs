@@ -13,6 +13,7 @@ import de.schlichtherle.truezip.entry.Entry;
 /**
  * An entry which provides output sockets.
  *
+ * @param   <E> The type of this output entry.
  * @see     InputEntry
  * @author  Christian Schlichtherle
  * @version $Id$
