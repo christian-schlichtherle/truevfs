@@ -10,8 +10,8 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -56,13 +56,14 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
      */
     @Override
     public FsController<?>
-    getController(FsMountPoint mountPoint, FsCompositeDriver driver) {
+    getController(  final FsMountPoint mountPoint,
+                    final FsCompositeDriver driver) {
         FsController<?> controller = delegate.getController(mountPoint, driver);
         if (null == this.shutdown) { // DCL does work with volatile fields since JSE 5!
             synchronized (this) {
                 Shutdown shutdown = this.shutdown;
                 if (null == shutdown) {
-                    shutdown = new Shutdown(new Sync(delegate));
+                    shutdown = new Shutdown(delegate);
                     RUNTIME.addShutdownHook(shutdown);
                     this.shutdown = shutdown;
                 }
@@ -84,12 +85,12 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
      */
     @Override
     public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super IOException, X> handler)
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super IOException, X> handler)
     throws X {
         if (null != this.shutdown) {
             synchronized (this) {
-                Shutdown shutdown = this.shutdown;
+                final Shutdown shutdown = this.shutdown;
                 if (null != shutdown) {
                     this.shutdown = null;
                     RUNTIME.removeShutdownHook(shutdown);
@@ -101,13 +102,13 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
 
     /** A shutdown hook thread. */
     private static class Shutdown extends Thread {
-        Shutdown(Runnable runnable) {
-            super(runnable, "TrueZIP Filesystem Manager Shutdown Hook");
+        Shutdown(final FsManager manager) {
+            super(new Sync(manager), Sync.class.getName());
             super.setPriority(Thread.MAX_PRIORITY);
         }
-    } // class Shutdown
+    } // Shutdown
 
-    /** A runnable which committs all unsynchronized changes to file systems. */
+    /** A runnable which commits all unsynchronized changes to file systems. */
     private static class Sync implements Runnable {
         private final FsManager manager;
 
@@ -125,6 +126,5 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
                 ex.printStackTrace();
             }
         }
-    } // class Sync
+    } // Sync
 }
-
