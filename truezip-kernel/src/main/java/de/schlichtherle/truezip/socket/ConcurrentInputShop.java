@@ -114,17 +114,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
             @Override
             @GuardedBy("lock")
-            public Entry getPeerTarget() throws IOException {
-                lock.lock();
-                try {
-                    return getBoundSocket().getPeerTarget();
-                } finally {
-                    lock.unlock();
-                }
-            }
-
-            @Override
-            @GuardedBy("lock")
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 final ReadOnlyFile rof;
                 lock.lock();

@@ -47,8 +47,9 @@ extends IOSocket<E, Entry> {
      * 
      * @throws IOException On any I/O failure.
      */
+    // TODO: Declare this final!
     @Override
-    public @Nullable Entry getPeerTarget() throws IOException {
+    public /*final*/ @Nullable Entry getPeerTarget() throws IOException {
         return null == peer ? null : peer.getLocalTarget();
     }
 
@@ -63,8 +64,8 @@ extends IOSocket<E, Entry> {
      * @param  to the output socket with the peer target to inherit.
      * @return {@code this}
      */
-    public final OutputSocket<E> bind(@CheckForNull final OutputSocket<?> to) {
-        this.peer = null != to ? to.peer : null;
+    public final OutputSocket<E> bind(final OutputSocket<?> to) {
+        this.peer = to.peer;
         return this;
     }
 

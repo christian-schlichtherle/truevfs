@@ -277,11 +277,6 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             return getBoundSocket().newReadOnlyFile();
         }
@@ -328,11 +323,6 @@ extends FsLockModelDecoratingController<
         @Override
         public Entry getLocalTarget() throws IOException {
             return getBoundSocket().getLocalTarget();
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
         }
 
         @Override

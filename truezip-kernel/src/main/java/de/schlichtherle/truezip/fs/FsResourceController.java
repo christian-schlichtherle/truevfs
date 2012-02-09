@@ -24,15 +24,15 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.swing.Icon;
 
 /**
  * Accounts input and output resources returned by its decorated controller.
@@ -305,11 +305,6 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             assert isWriteLockedByCurrentThread();
             return new AccountingReadOnlyFile(
@@ -347,11 +342,6 @@ extends FsLockModelDecoratingController<
         @Override
         public Entry getLocalTarget() throws IOException {
             return getBoundSocket().getLocalTarget();
-        }
-
-        @Override
-        public Entry getPeerTarget() throws IOException {
-            return getBoundSocket().getPeerTarget();
         }
 
         @Override

@@ -111,17 +111,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
-            @GuardedBy("lock")
-            public Entry getPeerTarget() throws IOException {
-                lock.lock();
-                try {
-                    return getBoundSocket().getPeerTarget();
-                } finally {
-                    lock.unlock();
-                }
-            }
-
-            @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 throw new UnsupportedOperationException("TODO: Implement this!");
             }

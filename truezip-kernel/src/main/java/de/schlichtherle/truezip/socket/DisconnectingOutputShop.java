@@ -86,12 +86,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
-            public Entry getPeerTarget() throws IOException {
-                checkOpen();
-                return getBoundSocket().getPeerTarget();
-            }
-
-            @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 checkOpen();
                 throw new UnsupportedOperationException("TODO: Implement this!");
