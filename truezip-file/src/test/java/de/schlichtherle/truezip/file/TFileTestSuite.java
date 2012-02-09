@@ -14,7 +14,6 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.util.ArrayHelper;
@@ -47,8 +46,8 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TFileTestSuite<D extends FsCharsetArchiveDriver<?>>
-extends TestSuite<D> {
+public abstract class TFileTestSuite<D extends FsArchiveDriver<?>>
+extends ArchiveTestBase<D> {
 
     private static final Logger
             logger = Logger.getLogger(TFileTestSuite.class.getName());
@@ -72,12 +71,6 @@ extends TestSuite<D> {
         archive = new TFile(temp);
     }
 
-    private File createTempFile() throws IOException {
-        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
-        // fail in testCopyContainingOrSameFiles() - explain why!
-        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
-    }
-
     @Override
     public void tearDown() {
         try {
@@ -89,10 +82,16 @@ extends TestSuite<D> {
                     throw new IOException(temp + " (could not delete)");
             }
         } catch (IOException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
+            logger.log(Level.INFO, ex.toString(), ex);
         } finally {
             super.tearDown();
         }
+    }
+
+    private File createTempFile() throws IOException {
+        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
+        // fail in testCopyContainingOrSameFiles() - explain why!
+        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
     private void umount() throws FsSyncException {
@@ -103,7 +102,7 @@ extends TestSuite<D> {
     private void createTestFile(final TFile file) throws IOException {
         final OutputStream out = new TFileOutputStream(file);
         try {
-            out.write(data);
+            out.write(getData());
         } finally {
             out.close();
         }
@@ -205,15 +204,15 @@ extends TestSuite<D> {
         assertTrue(file.exists());
         assertFalse(file.isDirectory());
         assertTrue(file.isFile());
-        assertEquals(data.length, file.length());
+        assertEquals(getData().length, file.length());
         assertTrue(file.lastModified() > 0);
 
         // Read back portion
         {
             InputStream in = new TFileInputStream(file);
             try {
-                byte[] buf = new byte[data.length];
-                assertTrue(ArrayHelper.equals(data, 0, buf, 0, in.read(buf)));
+                byte[] buf = new byte[getData().length];
+                assertTrue(ArrayHelper.equals(getData(), 0, buf, 0, in.read(buf)));
             } finally {
                 in.close();
             }
@@ -581,14 +580,14 @@ extends TestSuite<D> {
         // an open output stream.
         OutputStream out = new TFileOutputStream(file1);
         try {
-            TFile.cat(new ByteArrayInputStream(data), out);
+            TFile.cat(new ByteArrayInputStream(getData()), out);
         } finally {
             out.close();
         }
         
         out = new TFileOutputStream(file2);
         try {
-            TFile.cat(new ByteArrayInputStream(data), out);
+            TFile.cat(new ByteArrayInputStream(getData()), out);
         } finally {
             out.close();
         }
@@ -596,7 +595,7 @@ extends TestSuite<D> {
         umount(); // ensure two entries in the archive
         
         out = new TFileOutputStream(file1);
-        TFile.cat(new ByteArrayInputStream(data), out);
+        TFile.cat(new ByteArrayInputStream(getData()), out);
         
         // out is still open!
         try {
@@ -619,7 +618,7 @@ extends TestSuite<D> {
         }
 
         // out is still open!
-        TFile.cat(new ByteArrayInputStream(data), out); // write again
+        TFile.cat(new ByteArrayInputStream(getData()), out); // write again
         
         // out is still open!
         try {
@@ -631,7 +630,7 @@ extends TestSuite<D> {
         }
         
         try {
-            TFile.cat(new ByteArrayInputStream(data), out); // write again
+            TFile.cat(new ByteArrayInputStream(getData()), out); // write again
             fail("Expected exception when writing to entry output stream of an unmounted archive file!");
         } catch (OutputClosedException expected) {
         }
@@ -783,23 +782,23 @@ extends TestSuite<D> {
     }
 
     private void assertInput(final TFile file) throws IOException {
-        final InputStream in = new ByteArrayInputStream(data);
+        final InputStream in = new ByteArrayInputStream(getData());
         try {
             file.input(in);
         } finally {
             in.close();
         }
-        assertEquals(data.length, file.length());
+        assertEquals(getData().length, file.length());
     }
 
     private void assertOutput(final TFile file) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
         try {
             file.output(out);
         } finally {
             out.close();
         }
-        assertTrue(Arrays.equals(data, out.toByteArray()));
+        assertTrue(Arrays.equals(getData(), out.toByteArray()));
     }
 
     @Test
@@ -813,7 +812,7 @@ extends TestSuite<D> {
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
         
-        entry.input(new ByteArrayInputStream(data));
+        entry.input(new ByteArrayInputStream(getData()));
         
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
@@ -956,9 +955,9 @@ extends TestSuite<D> {
 
         // Check result.
         {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
             TFile.cp(a, out);
-            assertTrue(Arrays.equals(data, out.toByteArray()));
+            assertTrue(Arrays.equals(getData(), out.toByteArray()));
         }
 
         // Cleanup.
@@ -1018,7 +1017,7 @@ extends TestSuite<D> {
                 fail();
             } catch (IOException expected) {
             }
-            out1.write(data);
+            out1.write(getData());
             try {
                 archive.rm_r();
                 fail();
@@ -1034,7 +1033,7 @@ extends TestSuite<D> {
                 fail();
             } catch (IOException expected) {
             }
-            out2.write(data);
+            out2.write(getData());
             try {
                 archive.rm_r();
                 fail();
@@ -1048,13 +1047,13 @@ extends TestSuite<D> {
             final InputStream in2 = new TFileInputStream(entry2);
             try {
                 entry2.rm();
-                final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+                final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
                 try {
                     TFile.cat(in2, out);
                 } finally {
                     out.close();
                 }
-                assertTrue(Arrays.equals(data, out.toByteArray()));
+                assertTrue(Arrays.equals(getData(), out.toByteArray()));
                 try {
                     archive.rm_r();
                     fail();
@@ -1068,13 +1067,13 @@ extends TestSuite<D> {
                 fail("deleted within archive.rm_r()");
             } catch (IOException expected) {
             }
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
             try {
                 TFile.cat(in1, out);
             } finally {
                 out.close();
             }
-            assertTrue(Arrays.equals(data, out.toByteArray()));
+            assertTrue(Arrays.equals(getData(), out.toByteArray()));
             try {
                 archive.rm_r();
                 fail();
@@ -1112,7 +1111,7 @@ extends TestSuite<D> {
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
         final TFile tmp = newNonArchiveFile(archive);
-        final InputStream in = new ByteArrayInputStream(data);
+        final InputStream in = new ByteArrayInputStream(getData());
         TFile.cp(in, tmp);
         assertRenameArchiveToTemp(archive);
     }
@@ -1293,7 +1292,7 @@ extends TestSuite<D> {
         Collections.shuffle(entries, new Random());
 
         // Now read in the entries in the shuffled order.
-        final byte[] buf = new byte[data.length];
+        final byte[] buf = new byte[getData().length];
         for (final TFile entry : entries) {
             // Read full entry and check the contents.
             final InputStream in = new TFileInputStream(entry);
@@ -1305,11 +1304,11 @@ extends TestSuite<D> {
                     if (0 > read)
                         break;
                     assertTrue(read > 0);
-                    assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                    assertTrue(ArrayHelper.equals(getData(), off, buf, 0, read));
                     off += read;
                 }
                 assertEquals(-1, read);
-                assertEquals(off, data.length);
+                assertEquals(off, getData().length);
                 assertTrue(0 >= in.read(new byte[0]));
             } finally {
                 in.close();
@@ -1509,7 +1508,7 @@ extends TestSuite<D> {
             createTestFile(entry2);
 
             umount();
-            assertTrue(file.length() > 2 * data.length); // two entries plus one central directory
+            assertTrue(file.length() > 2 * getData().length); // two entries plus one central directory
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1524,7 +1523,7 @@ extends TestSuite<D> {
             entry2.rm();
 
             umount();
-            assertTrue(file.length() > 6 * data.length); // six entries plus two central directories
+            assertTrue(file.length() > 6 * getData().length); // six entries plus two central directories
         } finally {
             config.close();
         }

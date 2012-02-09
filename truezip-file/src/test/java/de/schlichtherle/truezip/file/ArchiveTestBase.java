@@ -12,28 +12,25 @@ import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriverTestBase;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 import org.junit.After;
-import org.junit.Before;
 
 /**
  * @param   <D> The type of the archive driver.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TestSuite<D extends FsCharsetArchiveDriver<?>> {
+public abstract class ArchiveTestBase<D extends FsArchiveDriver<?>>
+extends FsArchiveDriverTestBase<D> {
 
     protected static final long TIMEOUT_MILLIS = 50;
     protected static final FsMountPoint
@@ -46,25 +43,14 @@ public abstract class TestSuite<D extends FsCharsetArchiveDriver<?>> {
     private static final boolean FS_MANAGER_ISOLATE
             = Boolean.getBoolean(FsManager.class.getName() + ".isolate");
     static {
-        Logger  .getLogger(TestSuite.class.getName())
+        Logger  .getLogger(ArchiveTestBase.class.getName())
                 .log(   Level.CONFIG,
                         "Isolate file system managers: {0}",
                         FS_MANAGER_ISOLATE);
     }
 
-    /** The data to get compressed. */
-    private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
-    static {
-        new Random().nextBytes(DATA);
-    }
-
-    private static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive type specific overhead
-
-    private @Nullable D driver;
-    private @Nullable TArchiveDetector detector;
-    private @Nullable Map<String, ?> environment;
-    protected byte[] data;
+    private TArchiveDetector detector;
+    private Map<String, ?> environment;
 
     protected abstract String getSuffixList();
 
@@ -76,25 +62,19 @@ public abstract class TestSuite<D extends FsCharsetArchiveDriver<?>> {
         return "." + getScheme();
     }
 
-    protected abstract D newArchiveDriver(IOPoolProvider provider);
-
-    protected final @Nullable D getArchiveDriver() {
-        return driver;
-    }
-
-    protected final @Nullable TArchiveDetector getArchiveDetector() {
+    protected final TArchiveDetector getArchiveDetector() {
         return detector;
     }
 
-    protected final @Nullable Map<String, ?> getEnvironment() {
+    protected final Map<String, ?> getEnvironment() {
         return environment;
     }
 
-    @Before
+    @Override
     public void setUp() throws IOException {
-        final D driver = newArchiveDriver(IO_POOL_PROVIDER);
+        super.setUp();
         final TArchiveDetector detector
-                = new TArchiveDetector(getSuffixList(), driver);
+                = new TArchiveDetector(getSuffixList(), getArchiveDriver());
         final Map<String, Object> environment = new HashMap<String, Object>();
         environment.put(ARCHIVE_DETECTOR, detector);
         final TConfig config = TConfig.push();
@@ -112,10 +92,8 @@ public abstract class TestSuite<D extends FsCharsetArchiveDriver<?>> {
             config.setManager(new FsDefaultManager());
         config.setLenient(true);
         config.setArchiveDetector(detector);
-        this.driver = driver;
         this.detector = detector;
         this.environment = environment;
-        this.data = DATA.clone();
     }
 
     @After

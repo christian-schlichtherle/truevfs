@@ -11,16 +11,12 @@ package de.schlichtherle.truezip.file;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import java.io.*;
 import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
@@ -37,8 +33,8 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ConcurrentSyncTestSuite<D extends FsCharsetArchiveDriver<?>>
-extends TestSuite<D> {
+public abstract class ConcurrentSyncTestSuite<D extends FsArchiveDriver<?>>
+extends ArchiveTestBase<D> {
 
     private static final Logger
             logger = Logger.getLogger(ConcurrentSyncTestSuite.class.getName());
@@ -81,7 +77,7 @@ extends TestSuite<D> {
                     throw new IOException(temp + " (could not delete)");
             }
         } catch (IOException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
+            logger.log(Level.INFO, ex.toString(), ex);
         } finally {
             super.tearDown();
         }
@@ -141,22 +137,22 @@ extends TestSuite<D> {
     }
 
     private void assertInput(final TFile file) throws IOException {
-        final InputStream in = new ByteArrayInputStream(data);
+        final InputStream in = new ByteArrayInputStream(getData());
         try {
             file.input(in);
         } finally {
             in.close();
         }
-        assertEquals(data.length, file.length());
+        assertEquals(getData().length, file.length());
     }
 
     private void assertOutput(final TFile file) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream(data.length);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
         try {
             file.output(out);
         } finally {
             out.close();
         }
-        assertTrue(Arrays.equals(data, out.toByteArray()));
+        assertTrue(Arrays.equals(getData(), out.toByteArray()));
     }
 }

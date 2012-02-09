@@ -15,7 +15,8 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class MockTestSuite extends TestSuite<MockArchiveDriver> {
+public abstract class MockArchiveTestBase
+extends ArchiveTestBase<MockArchiveDriver> {
 
     @Override
     protected final String getSuffixList() {
