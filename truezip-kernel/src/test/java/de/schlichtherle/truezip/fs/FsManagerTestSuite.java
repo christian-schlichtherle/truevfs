@@ -24,7 +24,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsManagerTestBase {
+public abstract class FsManagerTestSuite {
 
     private final FsCompositeDriver driver
             = new FsDefaultDriver(new DummyDriverService("file|zip"));

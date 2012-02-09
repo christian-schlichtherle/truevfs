@@ -37,11 +37,11 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ConcurrentSyncTestBase<D extends FsCharsetArchiveDriver<?>>
-extends TestBase<D> {
+public abstract class ConcurrentSyncTestSuite<D extends FsCharsetArchiveDriver<?>>
+extends TestSuite<D> {
 
     private static final Logger
-            logger = Logger.getLogger(ConcurrentSyncTestBase.class.getName());
+            logger = Logger.getLogger(ConcurrentSyncTestSuite.class.getName());
 
     /**
      * The prefix for temporary files, which is {@value}.

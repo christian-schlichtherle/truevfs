@@ -21,7 +21,7 @@ import static org.junit.Assert.assertSame;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WinZipAesIT extends ZipTestBase {
+public final class WinZipAesIT extends ZipTestSuite {
 
     @Override
     public ZipEntry newEntry(String name) {

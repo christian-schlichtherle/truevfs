@@ -21,7 +21,7 @@ import org.junit.Before;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class IntervalReadOnlyFileIT extends ReadOnlyFileTestBase {
+public final class IntervalReadOnlyFileIT extends ReadOnlyFileTestSuite {
 
     private static final Logger logger = Logger.getLogger(
             IntervalReadOnlyFileIT.class.getName());

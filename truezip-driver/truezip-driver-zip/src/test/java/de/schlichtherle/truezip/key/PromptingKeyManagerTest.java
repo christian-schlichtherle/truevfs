@@ -20,7 +20,7 @@ import org.junit.Test;
  * @version $Id$
  */
 public class PromptingKeyManagerTest
-extends KeyManagerTestBase<PromptingKeyManager<?>> {
+extends KeyManagerTestSuite<PromptingKeyManager<?>> {
 
     @Override
     protected PromptingKeyManager<?> newKeyManager() {

@@ -15,7 +15,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarGZipFileIT extends TarFileTestBase<TarGZipDriver> {
+public final class TarGZipFileIT extends TarFileTestSuite<TarGZipDriver> {
 
     @Override
     protected String getSuffixList() {

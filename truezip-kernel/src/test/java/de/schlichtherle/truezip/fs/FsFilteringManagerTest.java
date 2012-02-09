@@ -23,7 +23,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class FsFilteringManagerTest extends FsManagerTestBase {
+public class FsFilteringManagerTest extends FsManagerTestSuite {
 
     @Override
     protected FsManager newManager(Type type) {

@@ -26,10 +26,11 @@ import org.netbeans.jemmy.operators.*;
 import org.netbeans.jemmy.util.NameComponentChooser;
 
 /**
+ * @param   <P> The type of the key panel.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class KeyPanelTestBase<P extends KeyPanel> extends JemmyUtils {
+public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
     private static final ComponentChooser
             KEY_FILE_CHOOSER = new NameComponentChooser("keyFileChooser");
 

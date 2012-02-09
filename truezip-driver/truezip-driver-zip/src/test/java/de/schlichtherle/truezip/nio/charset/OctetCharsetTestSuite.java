@@ -23,7 +23,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class OctetCharsetTestBase {
+public abstract class OctetCharsetTestSuite {
 
     private Charset charset;
 

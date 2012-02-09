@@ -14,7 +14,7 @@ import static de.schlichtherle.truezip.zip.ZipEntry.BZIP2;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class BZip2ZipIT extends ZipTestBase {
+public final class BZip2ZipIT extends ZipTestSuite {
     @Override
     public ZipEntry newEntry(String name) {
         ZipEntry entry = new ZipEntry(name);

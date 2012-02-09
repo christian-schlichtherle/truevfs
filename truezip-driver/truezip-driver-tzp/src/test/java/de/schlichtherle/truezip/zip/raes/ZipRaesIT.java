@@ -15,7 +15,7 @@ import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.zip.ZipFile;
 import de.schlichtherle.truezip.zip.ZipOutputStream;
-import de.schlichtherle.truezip.zip.ZipTestBase;
+import de.schlichtherle.truezip.zip.ZipTestSuite;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipRaesIT extends ZipTestBase {
+public final class ZipRaesIT extends ZipTestSuite {
 
     /** Cipher text shorter than this gets authenticated. */
     private static int AUTHENTICATION_TRIGGER = 512 * 1024;

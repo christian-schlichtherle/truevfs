@@ -10,8 +10,8 @@ package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileTestBase;
-import de.schlichtherle.truezip.file.TestBase;
+import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.file.TestSuite;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
@@ -45,15 +45,15 @@ import org.junit.Test;
  * by using the API of the TrueZIP Path module.
  *
  * @param   <D> The type of the archive driver.
- * @see     TFileTestBase Test suite for the TrueZIP File* API.
+ * @see     TFileTestSuite Test suite for the TrueZIP File* API.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TPathTestBase<D extends FsCharsetArchiveDriver<?>>
-extends TestBase<D> {
+public abstract class TPathTestSuite<D extends FsCharsetArchiveDriver<?>>
+extends TestSuite<D> {
 
     private static final Logger
-            logger = Logger.getLogger(TPathTestBase.class.getName());
+            logger = Logger.getLogger(TPathTestSuite.class.getName());
 
     /**
      * The prefix for temporary files, which is {@value}.

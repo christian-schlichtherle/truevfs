@@ -33,10 +33,10 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
+public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
     private static final Logger
-            logger = Logger.getLogger(ZipTestBase.class.getName());
+            logger = Logger.getLogger(ZipTestSuite.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -62,6 +62,8 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
      * to be zipped.
      * It must also finally call this superclass implementation to create
      * the temporary file to be used as a ZIP file.
+     * 
+     * @throws IOException On any I/O failure.
      */
     @Before
     public void setUp() throws IOException {
@@ -487,6 +489,8 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
      * Note that this is a hack which works with plain ZIP files only (e.g. not
      * with RAES encrypted ZIP files) and may easily break if the
      * ZipOutputStream class changes its implementation!
+     * 
+     * @throws IOException On any I/O failure.
      */
     @Test
     public void testBadGetCheckedInputStream() throws IOException {
@@ -567,6 +571,8 @@ public abstract class ZipTestBase implements ZipEntryFactory<ZipEntry> {
      * <p>
      * Note that this may work with plain ZIP files only (e.g. not
      * with RAES encrypted ZIP files).
+     * 
+     * @throws IOException On any I/O failure.
      */
     @Test
     public void testAppending() throws IOException {

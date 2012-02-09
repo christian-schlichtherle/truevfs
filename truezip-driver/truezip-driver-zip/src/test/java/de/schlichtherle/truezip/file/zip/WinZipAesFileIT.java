@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFileTestBase;
+import de.schlichtherle.truezip.file.TFileTestSuite;
 import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WinZipAesFileIT extends TFileTestBase<TestWinZipAesDriver> {
+public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
 
     private @Nullable MockView<AesPbeParameters> view;
 
