@@ -236,10 +236,15 @@ extends FsFileSystemArchiveController<E> {
     @Override
     OutputSocket<? extends E> getOutputSocket(final E entry) {
         class Output extends DelegatingOutputSocket<E> {
+            @CheckForNull OutputSocket<? extends E> delegate;
+
             @Override
             protected OutputSocket<? extends E> getDelegate()
             throws IOException {
-                return makeOutput().getOutputSocket(entry);
+                final OutputSocket<? extends E> delegate = this.delegate;
+                return null != delegate
+                        ? delegate
+                        : (this.delegate = makeOutput().getOutputSocket(entry));
             }
         } // Output
 
