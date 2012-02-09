@@ -99,7 +99,7 @@ public abstract class ReadOnlyFileTestSuite {
                     throw new IOException(temp + " (could not delete)");
             }
         } catch (IOException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
+            logger.log(Level.INFO, ex.toString(), ex);
         }
     }
 
