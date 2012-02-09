@@ -18,6 +18,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import javax.swing.Icon;
@@ -141,15 +142,18 @@ extends FsDriver {
      * the returned file system controller must be thread-safe!
      *
      * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
+     * @param  parent the non-null parent file system controller.
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      */
     @Override
     public FsController<?>
-    newController(final FsModel model, final FsController<?> parent) {
-        assert !(model instanceof FsLockModel);
-        final FsLockModel lockModel = new FsLockModel(model);
+    newController(final FsModel model, final @Nonnull FsController<?> parent) {
+        final boolean isLockModel = model instanceof FsLockModel;
+        assert !isLockModel;
+        final FsLockModel lockModel = isLockModel
+                ? (FsLockModel) model
+                : new FsLockModel(model);
         return  new FsSyncController<FsLockModel>(
                     new FsLockController(
                         new FsUnlinkController(
