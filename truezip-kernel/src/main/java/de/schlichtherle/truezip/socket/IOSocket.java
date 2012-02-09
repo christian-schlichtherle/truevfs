@@ -61,6 +61,7 @@ public abstract class IOSocket<LT, PT> {
      * conditions in order to resolve these potential issues.
      *
      * @return The local target for I/O operations.
+     * @throws IOException On any I/O failure. 
      */
     public abstract LT getLocalTarget() throws IOException;
 
@@ -70,6 +71,7 @@ public abstract class IOSocket<LT, PT> {
      * The same considerations as for {@link #getLocalTarget} apply here, too.
      *
      * @return The peer target for I/O operations.
+     * @throws IOException On any I/O failure. 
      */
     public abstract @CheckForNull PT getPeerTarget() throws IOException;
 
@@ -148,7 +150,8 @@ public abstract class IOSocket<LT, PT> {
 
     /**
      * Two sockets are considered equal if and only if they are identical.
-     * This can't get overriden.
+     * 
+     * @param that The object to test.
      */
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
@@ -158,7 +161,6 @@ public abstract class IOSocket<LT, PT> {
 
     /**
      * Returns a hash code which is consistent with {@link #equals}.
-     * This can't get overriden.
      */
     @Override
     public final int hashCode() {
