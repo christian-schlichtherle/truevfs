@@ -59,7 +59,7 @@ public abstract class TestBase<D extends FsCharsetArchiveDriver<?>> {
     }
 
     private static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive file type specific overhead
+            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive type specific overhead
 
     private @Nullable D driver;
     private @Nullable TArchiveDetector detector;
