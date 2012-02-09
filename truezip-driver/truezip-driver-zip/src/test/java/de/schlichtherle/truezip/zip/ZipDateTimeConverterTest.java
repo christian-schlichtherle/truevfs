@@ -12,7 +12,7 @@ package de.schlichtherle.truezip.zip;
  * @author Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipDateTimeConverterTest extends DateTimeConverterTestBase {
+public final class ZipDateTimeConverterTest extends DateTimeConverterTestSuite {
 
     @Override
     DateTimeConverter getInstance() {

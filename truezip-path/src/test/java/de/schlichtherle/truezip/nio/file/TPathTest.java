@@ -10,7 +10,7 @@ package de.schlichtherle.truezip.nio.file;
 
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
-import de.schlichtherle.truezip.file.MockTestBase;
+import de.schlichtherle.truezip.file.MockTestSuite;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsPath;
@@ -30,7 +30,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TPathTest extends MockTestBase {
+public class TPathTest extends MockTestSuite {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")

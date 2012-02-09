@@ -9,14 +9,14 @@
 package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.nio.file.TPathTestBase;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class CheckedZipPathIT extends TPathTestBase<CheckedZipDriver> {
+public final class CheckedZipPathIT extends TPathTestSuite<CheckedZipDriver> {
 
     @Override
     protected String getSuffixList() {

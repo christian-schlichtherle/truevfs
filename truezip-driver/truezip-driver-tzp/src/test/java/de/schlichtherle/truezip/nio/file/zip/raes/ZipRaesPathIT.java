@@ -15,7 +15,7 @@ import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
-import de.schlichtherle.truezip.nio.file.TPathTestBase;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import static java.nio.file.Files.*;
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class ZipRaesPathIT extends TPathTestBase<TestZipRaesDriver> {
+public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
 
     private @Nullable MockView<AesCipherParameters> view;
 

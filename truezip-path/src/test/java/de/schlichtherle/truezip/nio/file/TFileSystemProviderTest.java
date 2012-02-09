@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.MockTestBase;
+import de.schlichtherle.truezip.file.MockTestSuite;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TFileSystemProviderTest extends MockTestBase {
+public class TFileSystemProviderTest extends MockTestSuite {
 
     private TFileSystemProvider provider;
 

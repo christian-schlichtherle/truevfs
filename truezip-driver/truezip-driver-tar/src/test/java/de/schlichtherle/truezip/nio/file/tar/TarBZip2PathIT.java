@@ -16,7 +16,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class TarBZip2PathIT extends TarPathTestBase<TarBZip2Driver> {
+public final class TarBZip2PathIT extends TarPathTestSuite<TarBZip2Driver> {
 
     @Override
     protected String getSuffixList() {

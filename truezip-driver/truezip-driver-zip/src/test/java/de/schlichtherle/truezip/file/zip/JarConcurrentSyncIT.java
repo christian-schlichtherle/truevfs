@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.file.ConcurrentSyncTestBase;
+import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 
@@ -16,7 +16,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class JarConcurrentSyncIT extends ConcurrentSyncTestBase<JarDriver> {
+public final class JarConcurrentSyncIT extends ConcurrentSyncTestSuite<JarDriver> {
 
     @Override
     protected String getSuffixList() {

@@ -47,11 +47,11 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TFileTestBase<D extends FsCharsetArchiveDriver<?>>
-extends TestBase<D> {
+public abstract class TFileTestSuite<D extends FsCharsetArchiveDriver<?>>
+extends TestSuite<D> {
 
     private static final Logger
-            logger = Logger.getLogger(TFileTestBase.class.getName());
+            logger = Logger.getLogger(TFileTestSuite.class.getName());
 
     /**
      * The prefix for temporary files, which is {@value}.

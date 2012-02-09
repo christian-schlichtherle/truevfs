@@ -23,7 +23,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class FsCharsetArchiveDriverTestBase {
+public abstract class FsCharsetArchiveDriverTestSuite {
 
     private static final IOPoolProvider
             IO_POOL_PROVIDER = new ByteArrayIOPoolService(2048);

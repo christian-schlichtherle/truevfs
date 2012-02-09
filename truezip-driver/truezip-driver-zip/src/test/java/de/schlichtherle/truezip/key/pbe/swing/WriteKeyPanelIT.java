@@ -20,7 +20,7 @@ import org.netbeans.jemmy.operators.JPasswordFieldOperator;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WriteKeyPanelIT extends KeyPanelTestBase<WriteKeyPanel> {
+public final class WriteKeyPanelIT extends KeyPanelTestSuite<WriteKeyPanel> {
 
     @Override
     protected WriteKeyPanel newKeyPanel() {

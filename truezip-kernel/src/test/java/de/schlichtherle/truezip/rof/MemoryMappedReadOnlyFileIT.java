@@ -15,7 +15,7 @@ import java.io.IOException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class MemoryMappedReadOnlyFileIT extends ReadOnlyFileTestBase {
+public final class MemoryMappedReadOnlyFileIT extends ReadOnlyFileTestSuite {
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {
         return new MemoryMappedReadOnlyFile(file);

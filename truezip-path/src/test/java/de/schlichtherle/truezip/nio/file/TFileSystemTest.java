@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.MockTestBase;
+import de.schlichtherle.truezip.file.MockTestSuite;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import java.io.IOException;
 import java.net.URI;
@@ -21,7 +21,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TFileSystemTest extends MockTestBase {
+public class TFileSystemTest extends MockTestSuite {
 
     @Test
     public void testNewFileSystem() throws IOException {

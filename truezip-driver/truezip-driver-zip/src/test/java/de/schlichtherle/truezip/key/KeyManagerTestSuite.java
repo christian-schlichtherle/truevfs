@@ -14,10 +14,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * @param   <M> The type of the key manager.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class KeyManagerTestBase<M extends KeyManager<?>> {
+public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
     protected M manager;
 
     @Before

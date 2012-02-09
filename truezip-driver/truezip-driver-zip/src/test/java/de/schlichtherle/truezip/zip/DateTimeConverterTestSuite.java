@@ -20,10 +20,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class DateTimeConverterTestBase {
+public abstract class DateTimeConverterTestSuite {
 
     private DateTimeConverter instance;
     private long minJavaTime, maxJavaTime;

@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.file.zip.TestWinZipAesDriver;
 import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.nio.file.TPathTestBase;
+import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import javax.annotation.Nullable;
@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class WinZipAesPathIT extends TPathTestBase<TestWinZipAesDriver> {
+public final class WinZipAesPathIT extends TPathTestSuite<TestWinZipAesDriver> {
 
     private @Nullable MockView<AesPbeParameters> view;
 

@@ -33,7 +33,7 @@ import org.junit.Before;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class TestBase<D extends FsCharsetArchiveDriver<?>> {
+public abstract class TestSuite<D extends FsCharsetArchiveDriver<?>> {
 
     protected static final long TIMEOUT_MILLIS = 50;
     protected static final FsMountPoint
@@ -46,7 +46,7 @@ public abstract class TestBase<D extends FsCharsetArchiveDriver<?>> {
     private static final boolean FS_MANAGER_ISOLATE
             = Boolean.getBoolean(FsManager.class.getName() + ".isolate");
     static {
-        Logger  .getLogger(TestBase.class.getName())
+        Logger  .getLogger(TestSuite.class.getName())
                 .log(   Level.CONFIG,
                         "Isolate file system managers: {0}",
                         FS_MANAGER_ISOLATE);
