@@ -113,7 +113,7 @@ extends ArchiveIOTestBase<D> {
     }
 
     protected static TFile newNonArchiveFile(TFile file) {
-        return file.getNonArchiveFile();
+        return file.toNonArchiveFile();
     }
 
     @Test
