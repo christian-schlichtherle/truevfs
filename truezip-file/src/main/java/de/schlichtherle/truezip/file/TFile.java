@@ -3777,7 +3777,7 @@ public final class TFile extends File {
      * @since  TrueZIP 7.3
      */
     public TFile compact() throws IOException {
-        if (isArchive()) // FIXME: isTopLevelArchive()
+        if (isTopLevelArchive()) // see http://java.net/jira/browse/TRUEZIP-205
             compact(this);
         return this;
     }
