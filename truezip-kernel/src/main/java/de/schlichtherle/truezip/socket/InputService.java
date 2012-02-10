@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.EntryContainer;
+import java.util.Iterator;
 
 /**
  * A service for input sockets.
@@ -20,6 +21,14 @@ import de.schlichtherle.truezip.entry.EntryContainer;
  * @version $Id$
  */
 public interface InputService<E extends Entry> extends EntryContainer<E> {
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The iterator returned by this method must be unmodifiable.
+     */
+    @Override
+    Iterator<E> iterator();
 
     /**
      * Returns an input socket for reading from the entry with the given name.
