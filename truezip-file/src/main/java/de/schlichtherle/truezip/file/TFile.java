@@ -3533,7 +3533,7 @@ public final class TFile extends File {
         try {
             final @WillClose TFileOutputStream out = new TFileOutputStream(this);
             try {
-                cat(in, out);
+                Streams.cat(in, out);
             } finally {
                 out.close();
             }
@@ -3601,7 +3601,7 @@ public final class TFile extends File {
 
         final @WillClose TFileInputStream in = new TFileInputStream(this);
         try {
-            cat(in, out);
+            Streams.cat(in, out);
         } finally {
             in.close();
         }
