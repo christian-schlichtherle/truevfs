@@ -148,12 +148,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
             return delegate.read(b, off, len);
         }
 
-        /*@Override
-        public void readFully(byte[] b, int off, int len) throws IOException {
-            assertNotClosed();
-            delegate.readFully(b, off, len);
-        }*/
-
         @Override
         public void close() throws IOException {
             if (!closed)
