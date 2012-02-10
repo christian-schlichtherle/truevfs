@@ -715,7 +715,6 @@ public final class TFile extends File {
         this.detector = detector;
 
         final FsPath mpp = mountPoint.getPath();
-
         if (null == mpp) {
             assert !mountPoint.toUri().isOpaque();
             this.enclArchive = null;
@@ -1366,6 +1365,7 @@ public final class TFile extends File {
         if (parent == null)
             return null;
 
+        final TFile enclArchive = this.enclArchive;
         if (null != enclArchive
                 && enclArchive.getPath().length() == parent.getPath().length()) {
             assert enclArchive.getPath().equals(parent.getPath());
@@ -1381,7 +1381,7 @@ public final class TFile extends File {
 
     @Override
     public TFile getAbsoluteFile() {
-        String p = getAbsolutePath();
+        final String p = getAbsolutePath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
@@ -1405,7 +1405,7 @@ public final class TFile extends File {
      * @see    #getNormalizedFile()
      */
     public TFile getNormalizedAbsoluteFile() {
-        String p = getNormalizedAbsolutePath();
+        final String p = getNormalizedAbsolutePath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
@@ -1434,7 +1434,7 @@ public final class TFile extends File {
      *         directory as this instance.
      */
     public TFile getNormalizedFile() {
-        String p = getNormalizedPath();
+        final String p = getNormalizedPath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
@@ -1451,7 +1451,7 @@ public final class TFile extends File {
 
     @Override
     public TFile getCanonicalFile() throws IOException {
-        String p = getCanonicalPath();
+        final String p = getCanonicalPath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
@@ -1469,7 +1469,7 @@ public final class TFile extends File {
      *         instance of this class.
      */
     public TFile getCanOrAbsFile() {
-        String p = getCanOrAbsPath();
+        final String p = getCanOrAbsPath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
@@ -1582,9 +1582,10 @@ public final class TFile extends File {
      * @return The entry name relative to the innermost archive file.
      */
     public @Nullable String getInnerEntryName() {
+        final FsEntryName enclEntryName;
         return this == innerArchive
                 ? ROOT.getPath()
-                : null == enclEntryName
+                : null == (enclEntryName = this.enclEntryName)
                     ? null
                     : enclEntryName.getPath();
     }
@@ -1692,9 +1693,10 @@ public final class TFile extends File {
      *         archive file, or {@code null} otherwise.
      */
     @Nullable FsController<?> getController() {
+        final FsController<?> controller = this.controller;
         if (this != innerArchive || null != controller)
             return controller;
-        assert this == innerArchive;
+        final File delegate = this.delegate;
         final String path = Paths.normalize(delegate.getPath(), separatorChar);
         final FsScheme scheme = detector.getScheme(path);
         // See http://java.net/jira/browse/TRUEZIP-154 .
@@ -1705,6 +1707,8 @@ public final class TFile extends File {
                     + "\"! Check run-time class path configuration.");
         final FsMountPoint mountPoint;
         try {
+            final TFile enclArchive = this.enclArchive;
+            final FsEntryName enclEntryName = this.enclEntryName;
             assert (null != enclArchive) == (null != enclEntryName);
             mountPoint = new FsMountPoint(scheme, null == enclArchive
                     ? new FsPath(   delegate)
@@ -1715,7 +1719,7 @@ public final class TFile extends File {
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
-        return controller = getController(mountPoint);
+        return this.controller = getController(mountPoint);
     }
 
     @SuppressWarnings("deprecation")
@@ -1741,9 +1745,9 @@ public final class TFile extends File {
      *         by this instance is a direct or indirect parent of the path
      *         represented by the given {@code file}.
      */
-    public boolean isParentOf(File file) {
-        String a = this.getAbsolutePath();
-        String b = file.getAbsoluteFile().getParent();
+    public boolean isParentOf(final File file) {
+        final String a = this.getAbsolutePath();
+        final String b = file.getAbsoluteFile().getParent();
         return b != null ? Paths.contains(a, b, separatorChar) : false;
     }
 
@@ -1814,7 +1818,7 @@ public final class TFile extends File {
      *         root or a UNC (if running on the Windows platform).
      */
     public boolean isFileSystemRoot() {
-        TFile canOrAbsFile = getCanOrAbsFile();
+        final TFile canOrAbsFile = getCanOrAbsFile();
         return ROOTS.contains(canOrAbsFile) || isUNC(canOrAbsFile.getPath());
     }
 
