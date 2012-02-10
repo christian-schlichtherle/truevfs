@@ -112,10 +112,6 @@ extends ArchiveIOTestBase<D> {
         return archive;
     }
 
-    protected static TFile newNonArchiveFile(TFile file) {
-        return file.toNonArchiveFile();
-    }
-
     @Test
     public void testArchiveControllerStateWithInputStream()
     throws IOException, InterruptedException {
@@ -185,7 +181,7 @@ extends ArchiveIOTestBase<D> {
         assertFalsePositive(entry);
         archive.rm();
 
-        assertTrue(newNonArchiveFile(archive).mkdir());
+        assertTrue(archive.toNonArchiveFile().mkdir());
         assertFalsePositive(entry);
         archive.rm();
     }
@@ -221,7 +217,7 @@ extends ArchiveIOTestBase<D> {
 
         // Create directory false positive.
 
-        assertTrue(newNonArchiveFile(file).mkdir());
+        assertTrue(file.toNonArchiveFile().mkdir());
         assertTrue(file.exists());
         assertTrue(file.isDirectory());
         assertFalse(file.isFile());
@@ -371,7 +367,7 @@ extends ArchiveIOTestBase<D> {
             };
             TFile file = archive;
             for (int i = 0; i <= names.length; i++) {
-                final TFile file2 = newNonArchiveFile(file);
+                final TFile file2 = file.toNonArchiveFile();
                 assertTrue(file2.mkdir());
                 assertIllegalDirectoryOperations(file2);
                 file2.rm();
@@ -450,7 +446,7 @@ extends ArchiveIOTestBase<D> {
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        TFile.rm(newNonArchiveFile(archive)); // use plain file to delete instead!
+        TFile.rm(archive.toNonArchiveFile()); // use plain file to delete instead!
         assertFalse(archive.exists());
         assertFalse(archive.isDirectory());
         assertFalse(archive.isFile());
@@ -545,7 +541,7 @@ extends ArchiveIOTestBase<D> {
             }
             umount(); // It must not fail twice for the same reason!
 
-            TFile.rm(newNonArchiveFile(archive));
+            TFile.rm(archive.toNonArchiveFile());
         } finally {
             // Closing the invalidated stream explicitly should be OK.
             in1.close();
@@ -864,7 +860,7 @@ extends ArchiveIOTestBase<D> {
         assertCopyDelete(archive, names, 0);
         archive.rm();
 
-        assertTrue(newNonArchiveFile(archive).mkdir()); // create false positive archive file
+        assertTrue(archive.toNonArchiveFile().mkdir()); // create false positive archive file
         assertCopyDelete(archive, names, 0);
         archive.rm();
     }
@@ -881,7 +877,7 @@ extends ArchiveIOTestBase<D> {
         assertCopyDelete(dir, names, off + 1); // continue recursion
         dir.rm();
 
-        assertTrue(newNonArchiveFile(dir).mkdir()); // create false positive archive file
+        assertTrue(dir.toNonArchiveFile().mkdir()); // create false positive archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
         dir.rm();
@@ -1083,7 +1079,7 @@ extends ArchiveIOTestBase<D> {
             in1.close();
         }
         archive.rm_r();
-        assertFalse(newNonArchiveFile(archive).exists());
+        assertFalse(archive.toNonArchiveFile().exists());
     }
     
     @Test
@@ -1110,7 +1106,7 @@ extends ArchiveIOTestBase<D> {
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final TFile tmp = newNonArchiveFile(archive);
+        final TFile tmp = archive.toNonArchiveFile();
         final InputStream in = new ByteArrayInputStream(getData());
         TFile.cp(in, tmp);
         assertRenameArchiveToTemp(archive);
@@ -1125,7 +1121,7 @@ extends ArchiveIOTestBase<D> {
         TFile tmp = new TFile(TFile.createTempFile(TEMP_FILE_PREFIX, null));
         tmp.rm();
         assertFalse(tmp.exists());
-        assertFalse(newNonArchiveFile(tmp).exists());
+        assertFalse(tmp.toNonArchiveFile().exists());
 
         // Now rename the archive to the temporary path.
         // Depending on the true state of the object "archive", this will
@@ -1133,12 +1129,12 @@ extends ArchiveIOTestBase<D> {
         // plain file (iff archive is a false positive).
         archive.mv(tmp);
         assertFalse(archive.exists());
-        assertFalse(newNonArchiveFile(archive).exists());
+        assertFalse(archive.toNonArchiveFile().exists());
 
         // Now delete resulting temporary file or directory.
         tmp.rm_r();
         assertFalse(tmp.exists());
-        assertFalse(newNonArchiveFile(tmp).exists());
+        assertFalse(tmp.toNonArchiveFile().exists());
     }
 
     @Test
@@ -1182,11 +1178,11 @@ extends ArchiveIOTestBase<D> {
     private void assertRenameTo(TFile src, TFile dst) throws IOException {
         assertTrue(src.exists());
         assertFalse(dst.exists());
-        assertFalse(newNonArchiveFile(dst).exists());
+        assertFalse(dst.toNonArchiveFile().exists());
         assert TFile.isLenient();
         src.mv(dst);
         assertFalse(src.exists());
-        assertFalse(newNonArchiveFile(src).exists());
+        assertFalse(src.toNonArchiveFile().exists());
         assertTrue(dst.exists());
     }
 
@@ -1203,7 +1199,7 @@ extends ArchiveIOTestBase<D> {
 
         assertNull(dir.listFiles());
         assertNull(dir2.listFiles());
-        assertNull(newNonArchiveFile(dir2).listFiles());
+        assertNull(dir2.toNonArchiveFile().listFiles());
 
         TFile.rm(dir);
 
@@ -1486,7 +1482,7 @@ extends ArchiveIOTestBase<D> {
                     TFile.umount(dst);
                 }
             } finally {
-                newNonArchiveFile(dst).rm();
+                dst.toNonArchiveFile().rm();
             }
         } finally {
             TFile.umount(src);
@@ -1496,7 +1492,7 @@ extends ArchiveIOTestBase<D> {
 
     @Test
     public void testGrowing() throws IOException {
-        final TFile file = newNonArchiveFile(archive);
+        final TFile file = archive.toNonArchiveFile();
         final TFile entry1 = new TFile(archive, "entry1");
         final TFile entry2 = new TFile(archive, "entry2");
 

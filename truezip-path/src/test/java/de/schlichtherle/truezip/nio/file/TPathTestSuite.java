@@ -114,10 +114,6 @@ extends ArchiveIOTestBase<D> {
         return archive;
     }
 
-    protected static TPath newNonArchivePath(TPath path) {
-        return path.toNonArchivePath();
-    }
-
     @Test
     public final void testFalsePositives() throws IOException {
         assertFalsePositive(archive);
@@ -129,7 +125,7 @@ extends ArchiveIOTestBase<D> {
         assertFalsePositive(entry);
         delete(archive);
 
-        createDirectory(newNonArchivePath(archive));
+        createDirectory(archive.toNonArchivePath());
         assertFalsePositive(entry);
         delete(archive);
     }
@@ -165,7 +161,7 @@ extends ArchiveIOTestBase<D> {
 
         // Create directory false positive.
 
-        createDirectory(newNonArchivePath(file));
+        createDirectory(file.toNonArchivePath());
         assertTrue(exists(file));
         assertTrue(isDirectory(file));
         assertFalse(isRegularFile(file));
@@ -331,7 +327,7 @@ extends ArchiveIOTestBase<D> {
             };
             TPath file = archive;
             for (int i = 0; i <= names.length; i++) {
-                final TPath file2 = newNonArchivePath(file);
+                final TPath file2 = file.toNonArchivePath();
                 createDirectory(file2);
                 assertIllegalDirectoryOperations(file2);
                 delete(file2);
@@ -409,7 +405,7 @@ extends ArchiveIOTestBase<D> {
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        delete(newNonArchivePath(archive)); // use plain file to delete instead!
+        delete(archive.toNonArchivePath()); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
@@ -519,7 +515,7 @@ extends ArchiveIOTestBase<D> {
             }
             umount(); // It must not fail twice for the same reason!
 
-            delete(newNonArchivePath(archive));
+            delete(archive.toNonArchivePath());
         } finally {
             // Closing the invalidated stream explicitly should be OK.
             in1.close();
@@ -905,7 +901,7 @@ extends ArchiveIOTestBase<D> {
         assertCopyDelete(archive, names, 0);
         delete(archive);
 
-        createDirectory(newNonArchivePath(archive)); // create false positive archive file
+        createDirectory(archive.toNonArchivePath()); // create false positive archive file
         assertCopyDelete(archive, names, 0);
         delete(archive);
     }
@@ -922,7 +918,7 @@ extends ArchiveIOTestBase<D> {
         assertCopyDelete(dir, names, off + 1); // continue recursion
         delete(dir);
 
-        createDirectory(newNonArchivePath(dir)); // create false positive archive file
+        createDirectory(dir.toNonArchivePath()); // create false positive archive file
         assertCopyDelete(parent, dir);
         assertCopyDelete(dir, names, off + 1); // continue recursion
         delete(dir);
@@ -1039,7 +1035,7 @@ extends ArchiveIOTestBase<D> {
         } catch (IOException expected) {
         }
         umount(); // allow external modifications!
-        delete(newNonArchivePath(archive)); // use plain file to delete instead!
+        delete(archive.toNonArchivePath()); // use plain file to delete instead!
         assertFalse(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
@@ -1128,7 +1124,7 @@ extends ArchiveIOTestBase<D> {
             in1.close();
         }
         archive.toFile().rm_r();
-        assertFalse(exists(newNonArchivePath(archive)));
+        assertFalse(exists(archive.toNonArchivePath()));
     }
     
     @Test
@@ -1153,7 +1149,7 @@ extends ArchiveIOTestBase<D> {
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
         // false positive.
-        final TPath tmp = newNonArchivePath(archive);
+        final TPath tmp = archive.toNonArchivePath();
         final InputStream in = new ByteArrayInputStream(getData());
         copy(in, tmp);
         assertRenameArchiveToTemp(archive);
@@ -1168,7 +1164,7 @@ extends ArchiveIOTestBase<D> {
         TPath tmp = new TPath(Files.createTempFile(TEMP_FILE_PREFIX, null));
         delete(tmp);
         assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchivePath(tmp)));
+        assertFalse(exists(tmp.toNonArchivePath()));
 
         // Now rename the archive to the temporary path.
         // Depending on the true state of the object "archive", this will
@@ -1176,12 +1172,12 @@ extends ArchiveIOTestBase<D> {
         // plain file (iff archive is a false positive).
         archive.toFile().mv(tmp.toFile());
         assertFalse(exists(archive));
-        assertFalse(exists(newNonArchivePath(archive)));
+        assertFalse(exists(archive.toNonArchivePath()));
 
         // Now delete resulting temporary file or directory.
         tmp.toFile().rm_r();
         assertFalse(exists(tmp));
-        assertFalse(exists(newNonArchivePath(tmp)));
+        assertFalse(exists(tmp.toNonArchivePath()));
     }
 
     @Test
@@ -1225,11 +1221,11 @@ extends ArchiveIOTestBase<D> {
     private void assertRenameTo(TPath src, TPath dst) throws IOException {
         assertTrue(exists(src));
         assertFalse(exists(dst));
-        assertFalse(exists(newNonArchivePath(dst)));
+        assertFalse(exists(dst.toNonArchivePath()));
         assert TConfig.get().isLenient();
         src.toFile().mv(dst.toFile());
         assertFalse(exists(src));
-        assertFalse(exists(newNonArchivePath(src)));
+        assertFalse(exists(src.toNonArchivePath()));
         assertTrue(exists(dst));
     }
 
@@ -1246,7 +1242,7 @@ extends ArchiveIOTestBase<D> {
 
         assertNull(listFiles(dir));
         assertNull(listFiles(dir2));
-        assertNull(listFiles(newNonArchivePath(dir2)));
+        assertNull(listFiles(dir2.toNonArchivePath()));
 
         delete(dir);
 
@@ -1524,7 +1520,7 @@ extends ArchiveIOTestBase<D> {
                     dst.getFileSystem().close();
                 }
             } finally {
-                delete(newNonArchivePath(dst));
+                delete(dst.toNonArchivePath());
             }
         } finally {
             src.getFileSystem().close();
@@ -1534,7 +1530,7 @@ extends ArchiveIOTestBase<D> {
 
     @Test
     public void testGrowing() throws IOException {
-        final TPath path = newNonArchivePath(archive);
+        final TPath path = archive.toNonArchivePath();
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
 

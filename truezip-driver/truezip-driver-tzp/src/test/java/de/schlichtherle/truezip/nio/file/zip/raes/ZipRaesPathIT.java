@@ -47,7 +47,7 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
         view.setAction(CANCEL);
 
         final TPath archive = getArchive();
-        assertFalse(exists(newNonArchivePath(archive)));
+        assertFalse(exists(archive.toNonArchivePath()));
 
         final TPath entry1 = archive.resolve("entry1");
         try {
