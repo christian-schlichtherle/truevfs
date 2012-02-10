@@ -22,8 +22,6 @@ import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +31,8 @@ import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 
