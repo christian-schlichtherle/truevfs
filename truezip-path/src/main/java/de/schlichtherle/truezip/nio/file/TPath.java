@@ -26,8 +26,6 @@ import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.File;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
@@ -45,6 +43,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -74,26 +74,26 @@ import javax.annotation.concurrent.Immutable;
  * {@link TConfig#push() pushes} a temporary configuration on the inheritbale
  * thread local stack of configurations as follows:
  * </p>
- * <pre>{@code
- *     // Create reference to the current directory.
- *     TPath directory = new TPath("");
- *     // This is how you would detect a prospective archive file, supposing
- *     // the JAR of the module TrueZIP Driver ZIP is present on the run time
- *     // class path.
- *     TPath archive = directory.resolve("archive.zip");
- *     TPath file;
- *     try (TConfig config = TConfig.push()) {
- *         config.setArchiveDetector(TArchiveDetector.NULL);
- *         // Ignore prospective archive file here.
- *         file = directory.resolve("archive.zip");
- *     }
- *     // Once created, the prospective archive file detection does not change
- *     // because a TPath is immutable.
- *     assert archive.getArchiveDetector() == TArchiveDetector.ALL;
- *     assert archive.isArchive();
- *     assert file.getArchiveDetector() == TArchiveDetector.NULL;
- *     assert !file.isArchive();
- * }</pre>
+ * <pre><code>
+ * // Create reference to the current directory.
+ * TPath directory = new TPath("");
+ * // This is how you would detect a prospective archive file, supposing
+ * // the JAR of the module TrueZIP Driver ZIP is present on the run time
+ * // class path.
+ * TPath archive = directory.resolve("archive.zip");
+ * TPath file;
+ * try (TConfig config = TConfig.push()) {
+ *     config.setArchiveDetector(TArchiveDetector.NULL);
+ *     // Ignore prospective archive file here.
+ *     file = directory.resolve("archive.zip");
+ * }
+ * // Once created, the prospective archive file detection does not change
+ * // because a TPath is immutable.
+ * assert archive.getArchiveDetector() == TArchiveDetector.ALL;
+ * assert archive.isArchive();
+ * assert file.getArchiveDetector() == TArchiveDetector.NULL;
+ * assert !file.isArchive();
+ * </code></pre>
  * <p>
  * Mind that you should either use {@code archive} or {@code file} from the 
  * previous example to do any subsequent I/O - but not both - so that you don't
@@ -586,7 +586,24 @@ public final class TPath implements Path {
         return TPathScanner.isAbsolute(getName());
     }
 
-    TPath getNonArchivePath() {
+    /**
+     * Returns a path object for the same path name, but does not detect any
+     * archive file name patterns in the last path name segment.
+     * The parent path object is unaffected by this transformation, so the
+     * path name of this path object may address an entry in an archive file.
+     * <p>
+     * <em>Warning:</em> Doing I/O on the returned path object will yield
+     * inconsistent results and may even cause <strong>loss of data</strong> if
+     * the last path name segment addresses an archive file which is currently
+     * mounted by the TrueZIP Kernel!
+     * 
+     * @return A path object for the same path name, but does not detect any
+     *         archive file name patterns in the last path name segment.
+     * @see    TFileSystem#close()
+     * @see    TFileSystemProvider#umount()
+     * @since  TrueZIP 7.5
+     */
+    public TPath toNonArchivePath() {
         final TConfig config = TConfig.push();
         try {
             config.setArchiveDetector(TArchiveDetector.NULL);
@@ -600,7 +617,7 @@ public final class TPath implements Path {
             config.close();
         }
     }
-    
+
     @Override
     public @Nullable TPath getRoot() {
         final URI n = getName();

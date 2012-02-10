@@ -106,25 +106,66 @@ import javax.swing.filechooser.FileSystemView;
  *
  * <a name="traversal"><h3>Traversing Directory Trees</h3></a>
  * <p>
- * When traversing directory trees using different instances of this class,
- * it's important that they use {@link TArchiveDetector}s which recognize the
- * same set of archive files, i.e. their {@link TArchiveDetector#toString()}
- * method compares {@link String#equals(Object) equal}.
- * This is required in order to make sure that the cached data structures
- * in the TrueZIP Kernel do not get bypassed.
- * Otherwise, archive files may loose data or even get corrupted!
+ * When traversing directory trees, e.g. when searching, copying or moving
+ * them, it's important that all file objects use
+ * {@linkplain TArchiveDetector#equals equivalent} {@link TArchiveDetector}
+ * objects for archive file detection in these directory trees.
+ * This is required in order to make sure that the virtual file system state
+ * which is managed by the TrueZIP Kernel does not get bypassed.
+ * Otherwise, file system operations on archive files would yield inconsistent
+ * results and may even cause <strong>loss of data</strong>!
  * <p>
- * When copying or moving a directory tree, if you need a verbatim copy of any
- * archive files within this directory tree, then make sure that any cached
- * data structures in the TrueZIP Kernel are purged by calling {@link #umount()}
- * before calling one of the methods which accept the additional parameter
- * {@link TArchiveDetector#NULL} for the traversal of this directory tree.
- * For example, to make a recursive archive copy, call
+ * By default, all file objects use {@link TArchiveDetector#ALL} in order to
+ * detect all supported archive types (see {@link TConfig} for other options).
+ * This is fine because it's fail-safe and performs reasonably well when
+ * copying archive files (e.g. ZIP entries won't get recompressed thanks to
+ * <a href="#RDC">RDC</a>).
+ * 
+ * <a name="copy"><h4>Copying Or Moving Directory Trees</h4></a>
+ * <p>
+ * Using {@code TArchiveDetector.ALL} results in <i>structural copies</i>
+ * rather than <i>verbatim copies</i> (byte-by-byte copies) of any archive
+ * files within the source directory tree.
+ * However, sometimes you may want verbatim copies, e.g. when comparing hash
+ * sums for archive files.
+ * <p>
+ * In this case, you need to unmount any archive file in the source and
+ * destination directory trees first, e.g. by calling {@link #umount()},
+ * before you can proceed with the operation.
+ * For the subsequent traversal of the directory trees, you can use one of the
+ * methods which accept additional {@code TArchiveDetector} parameter(s) and
+ * pass it {@link TArchiveDetector#NULL} in order to inhibit the detection of
+ * prospective archive files.
+ * For example, to make a recursive <em>verbatim</em> copy, you could use this:
  * <pre><code>
- * TFile src = ...
- * TFile dst = ...
+ * TFile src = ...;
+ * TFile dst = ...;
  * TFile.umount(); // commit changes and purge any cached data
- * TFile.cp_rp(src, dst, TArchiveDetector.NULL, TArchiveDetector.NULL);
+ * TFile.cp_rp(src, dst, TArchiveDetector.NULL);
+ * </code></pre>
+ * <p>
+ * However, the call to {@code TFile.umount()} may unmount more archive files
+ * than required for the copying operation.
+ * You can selectively unmount archive files by using this instead:
+ * <pre><code>
+ * TFile src = ...;
+ * TFile dst = ...;
+ * if (src.isTopLevelArchive) TFile.umount(src); // unmount selectively
+ * if (dst.isTopLevelArchive) TFile.umount(dst); // dito
+ * TFile.cp_rp(src, dst, TArchiveDetector.NULL);
+ * </code></pre>
+ * <p>
+ * Finally, the additional {@code TArchiveDetector.NULL} parameter to
+ * {@code TFile.cp_rp()} is only applied to any <em>members</em> of {@code src}
+ * and {@code dst}.
+ * If these objects may address archive files themselves, you could use this
+ * instead:
+ * <pre><code>
+ * TFile src = ...;
+ * TFile dst = ...;
+ * if (src.isTopLevelArchive) TFile.umount(src); // unmount selectively
+ * if (dst.isTopLevelArchive) TFile.umount(dst); // dito
+ * src.toNonArchiveFile().cp_rp(dst.toNonArchiveFile());
  * </code></pre>
  * 
  * <a name="falsePositives"/><h3>Detecting Archive Files and False Positives</h3>
@@ -982,9 +1023,7 @@ public final class TFile extends File {
             final TFile archive,
             final BitField<FsSyncOption> options)
     throws FsSyncException {
-        if (!archive.isArchive())
-            throw new IllegalArgumentException(archive + " (not an archive file)");
-        if (null != archive.getEnclArchive())
+        if (!archive.isTopLevelArchive())
             throw new IllegalArgumentException(archive + " (not a top level archive file)");
         new FsFilteringManager(
                 TConfig.getCurrentManager(),
@@ -1032,9 +1071,9 @@ public final class TFile extends File {
      * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
-        sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
+     *  sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
+     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
      * }.
      *
      * @param  forceCloseInputAndOutput see
@@ -1069,11 +1108,11 @@ public final class TFile extends File {
      * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
-        sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
-                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
+     *  sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
+     *          .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
+     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
+     *          .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
+     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
      * }.
      *
      * @param  waitCloseInput see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
@@ -1117,9 +1156,7 @@ public final class TFile extends File {
      * accessed read-only.
      * <p>
      * This method is equivalent to calling
-     * {@link #sync(BitField)
-        sync(archive, FsSyncOptions.UMOUNT)
-     * }.
+     * {@link #sync(BitField) sync(archive, FsSyncOptions.UMOUNT)}.
      *
      * @param  archive a top level federated file system, i.e. a prospective
      *         archive file.
@@ -1154,10 +1191,10 @@ public final class TFile extends File {
      * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
-        sync(   archive,
-                BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
+     *  sync(   archive,
+     *          BitField.of(FsSyncOption.CLEAR_CACHE)
+     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
      * }.
      *
      * @param  archive a top level federated file system, i.e. a prospective
@@ -1199,12 +1236,12 @@ public final class TFile extends File {
      * <p>
      * This method is equivalent to calling
      * {@link #sync(BitField)
-        sync(   archive,
-                BitField.of(FsSyncOption.CLEAR_CACHE)
-                .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
-                .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
-                .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
-                .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
+     *  sync(   archive,
+     *          BitField.of(FsSyncOption.CLEAR_CACHE)
+     *          .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
+     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
+     *          .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
+     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
      * }.
      *
      * @param  archive a top level federated file system, i.e. a prospective
@@ -1281,7 +1318,25 @@ public final class TFile extends File {
         TConfig.get().setArchiveDetector(detector);
     }
 
-    TFile getNonArchiveFile() {
+    /**
+     * Returns a file object for the same path name, but does not detect any
+     * archive file name patterns in the last path name segment.
+     * The parent file object is unaffected by this transformation, so the
+     * path name of this file object may address an entry in an archive file.
+     * <p>
+     * <em>Warning:</em> Doing I/O on the returned file object will yield
+     * inconsistent results and may even cause <strong>loss of data</strong> if
+     * the last path name segment addresses an archive file which is currently
+     * mounted by the TrueZIP Kernel - see
+     * <a href="#traversal">Traversing Directory Trees</a>!
+     * 
+     * @return A file object for the same path name, but does not detect any
+     *         archive file name patterns in the last path name segment.
+     * @see    #umount(TFile)
+     * @see    #umount()
+     * @since  TrueZIP 7.5
+     */
+    public TFile toNonArchiveFile() {
         return new TFile(getParentFile(), getName(), TArchiveDetector.NULL);
     }
 
@@ -1300,13 +1355,11 @@ public final class TFile extends File {
                 : getParentFile();
     }
 
-    /** {@inheritDoc} */
     @Override
     public @Nullable String getParent() {
         return delegate.getParent();
     }
 
-    /** {@inheritDoc} */
     @Override
     public @Nullable TFile getParentFile() {
         final File parent = delegate.getParentFile();
@@ -1326,14 +1379,12 @@ public final class TFile extends File {
         return new TFile(parent, enclArchive, detector);
     }
 
-    /** {@inheritDoc} */
     @Override
     public TFile getAbsoluteFile() {
         String p = getAbsolutePath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getAbsolutePath() {
         return delegate.getAbsolutePath();
@@ -1398,14 +1449,12 @@ public final class TFile extends File {
         return Paths.normalize(getPath(), separatorChar);
     }
 
-    /** {@inheritDoc} */
     @Override
     public TFile getCanonicalFile() throws IOException {
         String p = getCanonicalPath();
         return p.equals(getPath()) ? this : new TFile(p, detector);
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getCanonicalPath() throws IOException {
         return delegate.getCanonicalPath();
@@ -1438,6 +1487,27 @@ public final class TFile extends File {
         } catch (IOException ex) {
             return Paths.normalize(getAbsolutePath(), separatorChar);
         }
+    }
+
+    @Override
+    public String getPath() {
+        return delegate.getPath();
+    }
+
+    @Override
+    public String getName() {
+        return delegate.getName();
+    }
+
+    /**
+     * Returns the {@link TArchiveDetector} that was used to detect any archive
+     * files in the path of this file object at construction time.
+     * 
+     * @return The {@link TArchiveDetector} that was used to detect any archive
+     *         files in the path of this file object at construction time.
+     */
+    public TArchiveDetector getArchiveDetector() {
+        return detector;
     }
 
     /**
@@ -1565,14 +1635,33 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the {@link TArchiveDetector} that was used to detect any archive
-     * files in the path of this file object at construction time.
+     * Returns {@code true} if and only if this file is a
+     * {@linkplain #getTopLevelArchive() top level archive file}.
      * 
-     * @return The {@link TArchiveDetector} that was used to detect any archive
-     *         files in the path of this file object at construction time.
+     * @return {@code true} if and only if this file is a
+     *         {@linkplain #getTopLevelArchive() top level archive file}.
+     * @since  TrueZIP 7.5
      */
-    public TArchiveDetector getArchiveDetector() {
-        return detector;
+    public boolean isTopLevelArchive() {
+        return getTopLevelArchive() == this;
+    }
+
+    /**
+     * Returns the top level archive file in the path or {@code null} if this
+     * file object does not name an archive file.
+     * A top level archive is not enclosed in another archive.
+     * If this method returns non-{@code null}, the value denotes the longest
+     * part of the path which may (but does not need to) exist as a plain file
+     * in the platform file system.
+     * 
+     * @return The top level archive file in the path or {@code null} if this
+     *         file object does not name an archive file.
+     */
+    public @Nullable TFile getTopLevelArchive() {
+        final TFile enclArchive = this.enclArchive;
+        return null != enclArchive
+                ? enclArchive.getTopLevelArchive()
+                : innerArchive;
     }
 
     /**
@@ -1656,6 +1745,16 @@ public final class TFile extends File {
         String a = this.getAbsolutePath();
         String b = file.getAbsoluteFile().getParent();
         return b != null ? Paths.contains(a, b, separatorChar) : false;
+    }
+
+    @Override
+    public boolean isAbsolute() {
+        return delegate.isAbsolute();
+    }
+
+    @Override
+    public boolean isHidden() {
+        return delegate.isHidden();
     }
 
     /**
@@ -1815,46 +1914,6 @@ public final class TFile extends File {
         return delegate.compareTo(other);
     }
 
-    /**
-     * Returns The top level archive file in the path or {@code null}
-     * if this file object does not name an archive file.
-     * A top level archive is not enclosed in another archive.
-     * If this does not return {@code null}, this denotes the longest
-     * part of the path which actually may (but does not need to) exist
-     * as a plain file in the platform file system.
-     */
-    public @Nullable TFile getTopLevelArchive() {
-        final TFile enclArchive = this.enclArchive;
-        return null != enclArchive
-                ? enclArchive.getTopLevelArchive()
-                : innerArchive;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getPath() {
-        return delegate.getPath();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public String getName() {
-        return delegate.getName();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isAbsolute() {
-        return delegate.isAbsolute();
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public boolean isHidden() {
-        return delegate.isHidden();
-    }
-
-    /** {@inheritDoc} */
     @Override
     public String toString() {
         return delegate.toString();
@@ -2562,7 +2621,6 @@ public final class TFile extends File {
         return delegate.createNewFile();
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean mkdirs() {
         if (null == innerArchive)
@@ -3143,8 +3201,7 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void cp(File src, File dst)
-    throws IOException {
+    public static void cp(File src, File dst) throws IOException {
         TBIO.cp(false, src, dst);
     }
 
@@ -3233,8 +3290,7 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void cp_p(File src, File dst)
-    throws IOException {
+    public static void cp_p(File src, File dst) throws IOException {
         TBIO.cp(true, src, dst);
     }
 
@@ -3677,7 +3733,8 @@ public final class TFile extends File {
     /**
      * Compacts this archive file by removing any redundant archive entry
      * contents and meta data, including central directories.
-     * If this instance does not identify an {@link #isArchive() archive file},
+     * If this file isn't a
+     * {@linkplain #isTopLevelArchive() top level archive file},
      * then this operation does nothing and returns immediately.
      * <p>
      * This operation is intended to compact archive files which have been
@@ -3720,7 +3777,7 @@ public final class TFile extends File {
      * @since  TrueZIP 7.3
      */
     public TFile compact() throws IOException {
-        if (isArchive())
+        if (isArchive()) // FIXME: isTopLevelArchive()
             compact(this);
         return this;
     }
@@ -3753,7 +3810,7 @@ public final class TFile extends File {
 
                 // Move the compacted archive file over to the grown archive
                 // file like a regular file.
-                if (!move(compact.getNonArchiveFile(), grown.getNonArchiveFile()))
+                if (!move(compact.toNonArchiveFile(), grown.toNonArchiveFile()))
                     throw new IOException(compact + " (cannot move to " + grown + ")");
             } catch (IOException ex) {
                 compact.rm();

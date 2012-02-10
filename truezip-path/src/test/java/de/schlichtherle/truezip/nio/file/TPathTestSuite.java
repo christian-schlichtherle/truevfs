@@ -115,7 +115,7 @@ extends ArchiveIOTestBase<D> {
     }
 
     protected static TPath newNonArchivePath(TPath path) {
-        return path.getNonArchivePath();
+        return path.toNonArchivePath();
     }
 
     @Test
