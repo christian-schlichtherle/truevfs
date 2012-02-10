@@ -45,7 +45,7 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
         view.setAction(CANCEL);
 
         final TFile archive = getArchive();
-        assertFalse(newNonArchiveFile(archive).exists());
+        assertFalse(archive.toNonArchiveFile().exists());
 
         final TFile entry1 = new TFile(archive, "entry1");
         assertFalse(entry1.mkdirs());
