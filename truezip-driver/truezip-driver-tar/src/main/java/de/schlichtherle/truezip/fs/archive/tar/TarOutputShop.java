@@ -24,6 +24,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -84,7 +85,7 @@ implements OutputShop<TTarArchiveEntry> {
 
     @Override
     public Iterator<TTarArchiveEntry> iterator() {
-        return entries.values().iterator();
+        return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     @Override
@@ -117,10 +118,10 @@ implements OutputShop<TTarArchiveEntry> {
                     entry.setSize(size);
                     return new EntryOutputStream(entry);
                 }
-                // The source entry does not exist or cannot support DDC
-                // to the destination entry.
-                // So we need to buffer the output in a temporary file and
-                // write it upon close().
+                // The source entry does not exist or cannot support Raw Data
+                // Copying (RDC) to the destination entry.
+                // So we need to write the output to a temporary buffer and
+                // copy it upon close().
                 return new BufferedEntryOutputStream(
                         pool.allocate(),
                         entry);
@@ -179,18 +180,18 @@ implements OutputShop<TTarArchiveEntry> {
      * output stream and finally deleted.
      */
     private final class BufferedEntryOutputStream extends DecoratingOutputStream {
-        final IOPool.Entry<?> temp;
+        final IOPool.Entry<?> buffer;
         final TTarArchiveEntry entry;
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
-                final IOPool.Entry<?> temp,
+                final IOPool.Entry<?> buffer,
                 final TTarArchiveEntry entry)
         throws IOException {
-            super(temp.getOutputSocket().newOutputStream());
-            this.temp = temp;
+            super(buffer.getOutputSocket().newOutputStream());
+            this.buffer = buffer;
             this.entry = entry;
             entries.put(entry.getName(), entry);
             busy = true;
@@ -202,15 +203,23 @@ implements OutputShop<TTarArchiveEntry> {
                 return;
             super.close();
             closed = true;
-            busy = false;
-            entry.setSize(temp.getSize(DATA));
             store();
         }
 
         void store() throws IOException {
+            final IOPool.Entry<?> buffer = this.buffer;
+            assert null != buffer;
+
+            final TTarArchiveEntry entry = this.entry;
+            assert null != entry;
+
+            TarOutputShop.this.busy = false;
             try {
-                final InputStream in = temp.getInputSocket().newInputStream();
+                final InputStream in = buffer.getInputSocket().newInputStream();
                 try {
+                    entry.setSize(buffer.getSize(DATA));
+                    if (UNKNOWN == entry.getModTime().getTime())
+                        entry.setModTime(System.currentTimeMillis());
                     putArchiveEntry(entry);
                     try {
                         Streams.cat(in, TarOutputShop.this);
@@ -221,7 +230,7 @@ implements OutputShop<TTarArchiveEntry> {
                     in.close();
                 }
             } finally {
-                temp.release();
+                buffer.release();
             }
         }
     } // BufferedEntryOutputStream

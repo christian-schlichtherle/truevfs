@@ -57,7 +57,7 @@ implements OutputShop<ZipArchiveEntry> {
     private final ZipDriver driver;
     private final FsModel model;
     private @CheckForNull IOPool.Entry<?> postamble;
-    private @CheckForNull ZipArchiveEntry tempEntry;
+    private @CheckForNull ZipArchiveEntry bufferedEntry;
     private ZipCryptoParameters param;
 
     @CreatesObligation
@@ -92,7 +92,7 @@ implements OutputShop<ZipArchiveEntry> {
             if (0 < source.getPostambleLength()) {
                 this.postamble = getPool().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
-                                postamble.getOutputSocket().newOutputStream());
+                                this.postamble.getOutputSocket().newOutputStream());
             }
         }
     }
@@ -121,12 +121,12 @@ implements OutputShop<ZipArchiveEntry> {
 
     @Override
     public int getSize() {
-        return super.size() + (null != this.tempEntry ? 1 : 0);
+        return super.size() + (null != this.bufferedEntry ? 1 : 0);
     }
 
     @Override
     public Iterator<ZipArchiveEntry> iterator() {
-        final ZipArchiveEntry tempEntry = this.tempEntry;
+        final ZipArchiveEntry tempEntry = this.bufferedEntry;
         if (null == tempEntry)
             return super.iterator();
         return new JointIterator<ZipArchiveEntry>(
@@ -139,7 +139,7 @@ implements OutputShop<ZipArchiveEntry> {
         ZipArchiveEntry entry = super.getEntry(name);
         if (null != entry)
             return entry;
-        entry = tempEntry;
+        entry = this.bufferedEntry;
         return null != entry && name.equals(entry.getName()) ? entry : null;
     }
 
@@ -172,7 +172,7 @@ implements OutputShop<ZipArchiveEntry> {
                         && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);
                     if (peer instanceof ZipArchiveEntry) {
-                        // Set up entry attributes for Direct Data Copying (DDC).
+                        // Set up entry attributes for Raw Data Copying (RDC).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
@@ -216,7 +216,7 @@ implements OutputShop<ZipArchiveEntry> {
      */
     @Override
     public final boolean isBusy() {
-        return super.isBusy() || null != this.tempEntry;
+        return super.isBusy() || null != this.bufferedEntry;
     }
 
     /**
@@ -227,6 +227,7 @@ implements OutputShop<ZipArchiveEntry> {
         super.finish();
         final IOPool.Entry<?> postamble = this.postamble;
         if (null != postamble) {
+            this.postamble = null;
             try {
                 final InputSocket<?> input = postamble.getInputSocket();
                 final InputStream in = input.newInputStream();
@@ -246,7 +247,6 @@ implements OutputShop<ZipArchiveEntry> {
                     in.close();
                 }
             } finally {
-                this.postamble = null;
                 postamble.release();
             }
         }
@@ -285,20 +285,20 @@ implements OutputShop<ZipArchiveEntry> {
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream extends CheckedOutputStream {
-        final IOPool.Entry<?> temp;
+        final IOPool.Entry<?> buffer;
         final boolean process;
         boolean closed;
 
         @CreatesObligation
         BufferedEntryOutputStream(
-                final IOPool.Entry<?> temp,
+                final IOPool.Entry<?> buffer,
                 final ZipArchiveEntry entry,
                 final boolean process)
         throws IOException {
-            super(temp.getOutputSocket().newOutputStream(), new CRC32());
+            super(buffer.getOutputSocket().newOutputStream(), new CRC32());
             assert STORED == entry.getMethod();
-            this.temp = temp;
-            ZipOutputShop.this.tempEntry = entry;
+            this.buffer = buffer;
+            ZipOutputShop.this.bufferedEntry = entry;
             this.process = process;
         }
 
@@ -309,27 +309,29 @@ implements OutputShop<ZipArchiveEntry> {
                 return;
             super.close();
             closed = true;
-            try {
-                final long length = temp.getSize(DATA);
-                final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
-                assert null != tempEntry;
-                assert STORED == tempEntry.getMethod();
-                tempEntry.setCrc(getChecksum().getValue());
-                tempEntry.setCompressedSize(length);
-                tempEntry.setSize(length);
-                store();
-            } finally {
-                ZipOutputShop.this.tempEntry = null;
-            }
+            store();
         }
 
         void store() throws IOException {
+            final IOPool.Entry<?> buffer = this.buffer;
+            assert null != buffer;
+
+            final ZipArchiveEntry entry = ZipOutputShop.this.bufferedEntry;
+            assert null != entry;
+            assert STORED == entry.getMethod();
+
+            ZipOutputShop.this.bufferedEntry = null;
             try {
-                final InputStream in = temp.getInputSocket().newInputStream();
+                final InputStream in = buffer.getInputSocket().newInputStream();
                 try {
-                    final ZipArchiveEntry tempEntry = ZipOutputShop.this.tempEntry;
-                    assert null != tempEntry;
-                    putNextEntry(tempEntry, this.process);
+                    final long length = buffer.getSize(DATA);
+                    entry.setCrc(getChecksum().getValue());
+                    entry.setCompressedSize(length);
+                    entry.setSize(length);
+                    // Redundant because the super class does this.
+                    /*if (UNKNOWN == entry.getTime())
+                        entry.setTime(System.currentTimeMillis());*/
+                    putNextEntry(entry, this.process);
                     try {
                         Streams.cat(in, ZipOutputShop.this);
                     } finally {
@@ -339,7 +341,7 @@ implements OutputShop<ZipArchiveEntry> {
                     in.close();
                 }
             } finally {
-                temp.release();
+                buffer.release();
             }
         }
     } // BufferedEntryOutputStream
