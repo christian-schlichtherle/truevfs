@@ -98,7 +98,7 @@ implements EntryContainer<MockArchiveEntry> {
         public void close() {
             closed = true;
         }
-    } // class InputArchive
+    } // InputArchive
 
     public final class OutputArchive
     extends MockArchiveEntryContainer
@@ -159,5 +159,5 @@ implements EntryContainer<MockArchiveEntry> {
         public void close() {
             closed = true;
         }
-    } // class OutputArchive
+    } // OutputArchive
 }
