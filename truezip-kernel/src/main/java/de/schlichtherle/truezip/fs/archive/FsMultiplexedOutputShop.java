@@ -142,8 +142,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                         throw ex;
                     }
                 } else {
-                    return new EntryOutputStream(
-                            getBoundSocket().newOutputStream());
+                    return new EntryOutputStream(getBoundSocket());
                 }
             }
         } // Output
@@ -202,8 +201,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        EntryOutputStream(final @WillCloseWhenClosed OutputStream out) {
-            super(out);
+        EntryOutputStream(final OutputSocket<? extends E> output)
+        throws IOException {
+            super(output.newOutputStream());
             busy = true;
         }
 
@@ -225,34 +225,34 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * output shop and finally deleted unless this output shop is still busy.
      */
     private class BufferedEntryOutputStream extends DecoratingOutputStream {
-        final IOPool.Entry<?> temp;
-        final OutputSocket<? extends E> output;
-        final E local;
         final InputSocket<Entry> input;
+        final OutputSocket<? extends E> output;
+        final IOPool.Entry<?> buffer;
+        final E local;
         boolean closed;
 
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
-                final IOPool.Entry<?> temp,
+                final IOPool.Entry<?> buffer,
                 final OutputSocket<? extends E> output)
         throws IOException {
-            super(temp.getOutputSocket().newOutputStream());
+            super(buffer.getOutputSocket().newOutputStream());
             this.output = output;
             this.local = output.getLocalTarget();
             final Entry peer = output.getPeerTarget();
             class ProxyInput extends DecoratingInputSocket<Entry> {
                 ProxyInput() {
-                    super(temp.getInputSocket());
+                    super(buffer.getInputSocket());
                 }
 
                 @Override
                 public Entry getLocalTarget() {
-                    return null != peer ? peer : temp;
+                    return null != peer ? peer : buffer;
                 }
             }
-            this.temp = temp;
+            this.buffer = buffer;
             this.input = new ProxyInput();
             final BufferedEntryOutputStream
                     old = buffers.put(local.getName(), this);
@@ -270,18 +270,15 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 return;
             delegate.close();
             closed = true;
-            try {
-                final Entry src = input.getLocalTarget();
-                final E dst = getTarget();
-                // Never copy anything but the DATA size!
-                if (UNKNOWN == dst.getSize(DATA))
-                    dst.setSize(DATA, src.getSize(DATA));
-                for (Access type : ALL_ACCESS_SET)
-                    if (UNKNOWN == dst.getTime(type))
-                        dst.setTime(type, src.getTime(type));
-            } finally {
-                storeBuffers();
-            }
+            final Entry src = input.getLocalTarget();
+            final E dst = getTarget();
+            // Never copy anything but the DATA size!
+            if (UNKNOWN == dst.getSize(DATA))
+                dst.setSize(DATA, src.getSize(DATA));
+            for (Access type : ALL_ACCESS_SET)
+                if (UNKNOWN == dst.getTime(type))
+                    dst.setTime(type, src.getTime(type));
+            storeBuffers();
         }
 
         boolean store(boolean discard) throws IOException {
@@ -289,11 +286,17 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
                 return false;
+            final InputSocket<Entry> input = this.input;
+            assert null != input;
+            final OutputSocket<? extends E> output = this.output;
+            assert null != output;
+            final IOPool.Entry<?> buffer = this.buffer;
+            assert null != buffer;
             try {
                 if (!discard)
                     IOSocket.copy(input, output);
             } finally {
-                temp.release();
+                buffer.release();
             }
             return true;
         }
