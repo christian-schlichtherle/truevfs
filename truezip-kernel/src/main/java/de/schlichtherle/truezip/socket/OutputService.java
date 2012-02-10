@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.EntryContainer;
+import java.util.Iterator;
 
 /**
  * A service for output sockets.
@@ -24,6 +25,14 @@ import de.schlichtherle.truezip.entry.EntryContainer;
  * @version $Id$
  */
 public interface OutputService<E extends Entry> extends EntryContainer<E> {
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The iterator returned by this method must be unmodifiable.
+     */
+    @Override
+    Iterator<E> iterator();
 
     /**
      * Returns an output socket for writing to the given entry.
