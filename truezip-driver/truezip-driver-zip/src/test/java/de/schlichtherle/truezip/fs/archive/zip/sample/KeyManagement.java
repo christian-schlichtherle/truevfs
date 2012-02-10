@@ -61,13 +61,15 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param delegate the file system driver provider to decorate.
-     * @param suffixes A list of file name suffixes which shall identify
-     *        prospective archive files.
-     *        This must not be {@code null} and must not be empty.
-     * @param password the password byte array to be copied for internal use.
-     *        The bytes should be limited to seven bits only, see
-     *        {@link WinZipAesParameters}.
+     * @param  delegate the file system driver provider to decorate.
+     * @param  suffixes A list of file name suffixes which shall identify
+     *         prospective archive files.
+     *         This must not be {@code null} and must not be empty.
+     * @param  password the password byte array to be copied for internal use.
+     *         The bytes should be limited to seven bits only, see
+     *         {@link WinZipAesParameters}.
+     * @return A new archive detector which uses the given password for all
+     *         WinZip AES encrypted ZIP entries with the given list of suffixes.
      */
     public static TArchiveDetector newArchiveDetector1(
             FsDriverProvider delegate,
@@ -80,7 +82,7 @@ public final class KeyManagement {
     private static final class CustomJarDriver1 extends JarDriver {
         final ZipCryptoParameters param;
         
-        public CustomJarDriver1(byte[] password) {
+        CustomJarDriver1(byte[] password) {
             super(IOPoolLocator.SINGLETON);
             param = new CustomWinZipAesParameters(password);
         }
@@ -178,13 +180,15 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param delegate the file system driver provider to decorate.
-     * @param suffixes A list of file name suffixes which shall identify
-     *        prospective archive files.
-     *        This must not be {@code null} and must not be empty.
-     * @param password the password char array to be copied for internal use.
-     *        The characters should be limited to US-ASCII, see
-     *        {@link WinZipAesParameters}.
+     * @param  delegate the file system driver provider to decorate.
+     * @param  suffixes A list of file name suffixes which shall identify
+     *         prospective archive files.
+     *         This must not be {@code null} and must not be empty.
+     * @param  password the password char array to be copied for internal use.
+     *         The characters should be limited to US-ASCII, see
+     *         {@link WinZipAesParameters}.
+     * @return A new archive detector which uses the given password for all
+     *         WinZip AES encrypted ZIP entries with the given list of suffixes.
      */
     public static TArchiveDetector newArchiveDetector2(
             FsDriverProvider delegate,
@@ -197,7 +201,7 @@ public final class KeyManagement {
     private static final class CustomJarDriver2 extends JarDriver {
         final KeyManagerProvider provider;
         
-        public CustomJarDriver2(char[] password) {
+        CustomJarDriver2(char[] password) {
             super(IOPoolLocator.SINGLETON);
             this.provider = new PromptingKeyManagerService(
                     new CustomView(password));
