@@ -10,12 +10,12 @@ package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
