@@ -100,24 +100,24 @@ public interface ReadOnlyFile extends Closeable {
     /**
      * Equivalent to {@link #readFully(byte[], int, int) readFully(b, 0, b.length)}.
      * 
-     * @param  b The buffer to fill with data.
+     * @param  buf the buffer to fill with data.
      * @throws EOFException If less than {@code len} bytes are available
      *         before the end of the file is reached.
      * @throws IOException On any I/O failure.
      */
-    void readFully(byte[] b) throws IOException;
+    void readFully(byte[] buf) throws IOException;
 
     /**
      * Reads {@code len} bytes into the given buffer at the given position.
      *
-     * @param  b The buffer to fill with data.
-     * @param  off The start offset of the data.
-     * @param  len The number of bytes to read.
+     * @param  buf the buffer to fill with data.
+     * @param  off the start offset of the data.
+     * @param  len the number of bytes to read.
      * @throws EOFException If less than {@code len} bytes are available
      *         before the end of the file is reached.
      * @throws IOException On any I/O failure.
      */
-    void readFully(byte[] b, int off, int len) throws IOException;
+    void readFully(byte[] buf, int off, int len) throws IOException;
 
     /**
      * Closes this read-only file and releases any non-heap resources
