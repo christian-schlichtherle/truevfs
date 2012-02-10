@@ -62,6 +62,7 @@ public interface Entry {
     String getName();
 
     /** Defines the type of entry. */
+    @SuppressWarnings("PublicInnerClass")
     enum Type {
 
         /**
@@ -104,6 +105,7 @@ public interface Entry {
     Set<Type> ALL_TYPE_SET = Collections.unmodifiableSet(EnumSet.allOf(Type.class));
 
     /** Defines the type of size information for an entry. */
+    @SuppressWarnings("PublicInnerClass")
     enum Size {
         DATA,
         STORAGE
@@ -123,6 +125,7 @@ public interface Entry {
     long getSize(Size type);
 
     /** Defines the type of access information for an entry. */
+    @SuppressWarnings("PublicInnerClass")
     enum Access {
         /** Last modification. */
         WRITE,
