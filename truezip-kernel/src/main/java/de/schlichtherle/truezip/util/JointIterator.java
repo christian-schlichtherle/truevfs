@@ -15,7 +15,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * An iterator which concatenates the elements of two other iterators.
  *
- * @author Christian Schlichtherle
+ * @param   <E> The type of the elements.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
