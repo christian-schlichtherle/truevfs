@@ -47,7 +47,7 @@ public final class KeyManagement {
         TFile.setDefaultArchiveDetector(detector);
 // END SNIPPET: install
     }
-    
+
 // START SNIPPET: newArchiveDetector1
     /**
      * Returns a new archive detector which uses the given password for all
@@ -179,7 +179,7 @@ public final class KeyManagement {
         CustomView(char[] password) {
             this.password = password.clone();
         }
-
+        
         /**
          * You need to create a new key because the key manager may eventually
          * reset it when the archive file gets moved or deleted.
@@ -190,7 +190,7 @@ public final class KeyManagement {
             param.setKeyStrength(KeyStrength.BITS_128);
             return param;
         }
-
+        
         @Override
         public void promptWriteKey(Controller<AesCipherParameters> controller)
         throws UnknownKeyException {
