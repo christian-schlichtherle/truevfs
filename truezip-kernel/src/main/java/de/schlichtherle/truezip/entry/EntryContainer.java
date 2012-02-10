@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import javax.annotation.CheckForNull;
 import java.util.Iterator;
+import javax.annotation.CheckForNull;
 
 /**
  * An iterable container for entries.
@@ -21,7 +21,12 @@ import java.util.Iterator;
 public interface EntryContainer<E extends Entry>
 extends Iterable<E> {
 
-    /** Returns the number of entries in this container. */
+    /**
+     * Returns the number of entries in this container.
+     * 
+     * @return The number of entries in this container.
+     */
+    // TODO: Rename this to size().
     int getSize();
 
     /**
@@ -36,7 +41,7 @@ extends Iterable<E> {
      * For example, if this container represents an archive file, the iteration
      * should reflect the natural order of the entries in the archive file.
      *
-     * @return A new iterator over all entries in this container.
+     * @return A new iterator for all entries in this container.
      */
     @Override
     Iterator<E> iterator();
