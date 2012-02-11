@@ -16,6 +16,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.fs.mock.MockController;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
@@ -28,7 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -53,7 +53,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private @Nullable FsController<?> parent;
 
-    @Before
+    @Override
     public void setUp() throws IOException {
         super.setUp();
         parent = newController(model.getParent());
@@ -118,13 +118,13 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void getInputSocketMustForwardTheCallToTheGivenController() {
-        final FsController<FsModel> controller
-                = new MockController<FsModel>(model.getParent(), null) {
+        final FsController<FsModel> controller = new MockController<FsModel>(
+                model.getParent(), null, getMaxArchiveLength()) {
             @Override
             public InputSocket<?> getInputSocket(
                     FsEntryName name,
                     BitField<FsInputOption> options) {
-                assertNotNull(name);
+                assertEquals(FsEntryName.ROOT, name);
                 assertNotNull(options);
                 throw new UnsupportedOperationException();
             }
@@ -141,14 +141,14 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void getOutputSocketMustForwardTheCallToTheGivenController() {
-        final FsController<FsModel> controller
-                = new MockController<FsModel>(model.getParent(), null) {
+        final FsController<FsModel> controller = new MockController<FsModel>(
+                model.getParent(), null, getMaxArchiveLength()) {
             @Override
             public OutputSocket<?> getOutputSocket(
                     FsEntryName name,
                     BitField<FsOutputOption> options,
                     Entry template) {
-                assertNotNull(name);
+                assertEquals(FsEntryName.ROOT, name);
                 assertNotNull(options);
                 throw new UnsupportedOperationException();
             }
@@ -190,7 +190,7 @@ extends FsArchiveDriverTestBase<D> {
                 .newOutputShop(model, getArchiveOutputSocket(), null);
         try {
             for (int i = 0; i < MAX_ENTRIES; i++)
-                output(os.getOutputSocket(newEntry(i)));
+                output(os, i);
             check(os);
         } finally {
             os.close();
@@ -201,7 +201,7 @@ extends FsArchiveDriverTestBase<D> {
         try {
             check(is);
             for (int i = 0; i < MAX_ENTRIES; i++)
-                input(is.getInputSocket(name(i)));
+                input(is, i);
         } finally {
             is.close();
         }
@@ -218,20 +218,22 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private <E extends FsArchiveEntry> void check(final EntryContainer<E> c) {
+        assertEquals(MAX_ENTRIES, c.getSize());
         final Iterator<E> it = c.iterator();
         for (int i = 0; i < MAX_ENTRIES; i++) {
             final E e = it.next();
             assertNotNull(e);
             assertEquals(name(i), e.getName());
             assertSame(FILE, e.getType());
-            assertEquals(getData().length, e.getSize(DATA));
-            assertTrue(getData().length <= e.getSize(STORAGE));
+            assertEquals(getDataLength(), e.getSize(DATA));
+            assertTrue(getDataLength() <= e.getSize(STORAGE)); // random data is not compressible!
             assertTrue(UNKNOWN != e.getTime(WRITE));
             try {
                 it.remove();
                 fail();
             } catch (UnsupportedOperationException expected) {
             }
+            assertSame(e, c.getEntry(e.getName()));
         }
         assertFalse(it.hasNext());
         try {
@@ -239,13 +241,18 @@ extends FsArchiveDriverTestBase<D> {
             fail();
         } catch (NoSuchElementException expected) {
         }
+        try {
+            it.remove();
+            fail();
+        } catch (UnsupportedOperationException expected) {
+        }
         assertEquals(MAX_ENTRIES, c.getSize());
     }
 
-    private E newEntry(int i) throws CharConversionException {
-        final E e = getArchiveDriver().newEntry(name(i), Entry.Type.FILE, null);
+    private E newEntry(final String name) throws CharConversionException {
+        final E e = getArchiveDriver().newEntry(name, Entry.Type.FILE, null);
         assertNotNull(e);
-        assertEquals(name(i), e.getName());
+        assertEquals(name, e.getName());
         assertSame(FILE, e.getType());
         assertTrue(UNKNOWN == e.getSize(DATA));
         assertTrue(UNKNOWN == e.getSize(STORAGE));
@@ -259,18 +266,30 @@ extends FsArchiveDriverTestBase<D> {
         return Integer.toString(i);
     }
 
-    private void output(final OutputSocket<?> output) throws IOException {
+    private void output(final OutputShop<E> shop, final int i)
+    throws IOException {
+        final String name = name(i);
+        final E entry = newEntry(name);
+        final OutputSocket<? extends E> output = shop.getOutputSocket(entry);
+
+        assertNull(shop.getEntry(name));
+        assertEquals(i, shop.getSize());
         final OutputStream out = output.newOutputStream();
         try {
+            assertSame(entry, shop.getEntry(name));
+            assertEquals(i + 1, shop.getSize());
             out.write(getData());
         } finally {
             out.close();
         }
     }
 
-    private void input(final InputSocket<?> input) throws IOException {
+    private void input(final InputShop<E> shop, final int i)
+    throws IOException {
+        final InputSocket<? extends E> input = shop.getInputSocket(name(i));
+
         {
-            final byte[] buf = new byte[getData().length];
+            final byte[] buf = new byte[getDataLength()];
             final InputStream in = input.newInputStream();
             try {
                 readFully(in, buf);
@@ -282,7 +301,7 @@ extends FsArchiveDriverTestBase<D> {
         }
 
         try {
-            final byte[] buf = new byte[getData().length];
+            final byte[] buf = new byte[getDataLength()];
             final ReadOnlyFile rof = input.newReadOnlyFile();
             try {
                 rof.readFully(buf);
@@ -327,7 +346,7 @@ extends FsArchiveDriverTestBase<D> {
         final FsModel parent = newNonArchiveModel();
         return new FsDefaultModel(
                 FsMountPoint.create(URI.create(
-                    "scheme:" + parent.getMountPoint() + name.toString() + "!/")),
+                    "scheme:" + parent.getMountPoint() + name + "!/")),
                 parent);
     }
 
@@ -338,6 +357,6 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private int getMaxArchiveLength() {
-        return MAX_ENTRIES * getData().length * 4 / 3; // account for archive type specific overhead
+        return MAX_ENTRIES * getDataLength() * 4 / 3; // account for archive type specific overhead
     }
 }

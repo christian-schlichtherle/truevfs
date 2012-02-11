@@ -144,14 +144,14 @@ extends ArchiveIOTestBase<D> {
         assertTrue(exists(file));
         assertFalse(isDirectory(file));
         assertTrue(isRegularFile(file));
-        assertEquals(getData().length, size(file));
+        assertEquals(getDataLength(), size(file));
         assertTrue(getLastModifiedTime(file).toMillis() > 0);
 
         // Read back portion
         {
             InputStream in = newInputStream(file);
             try {
-                byte[] buf = new byte[getData().length];
+                byte[] buf = new byte[getDataLength()];
                 assertTrue(ArrayHelper.equals(getData(), 0, buf, 0, in.read(buf)));
             } finally {
                 in.close();
@@ -825,11 +825,11 @@ extends ArchiveIOTestBase<D> {
         } finally {
             in.close();
         }
-        assertEquals(getData().length, size(file));
+        assertEquals(getDataLength(), size(file));
     }
 
     private void assertOutput(final TPath file) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
         try {
             copy(file, out);
         } finally {
@@ -992,7 +992,7 @@ extends ArchiveIOTestBase<D> {
 
         // Check result.
         {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
             copy(a, out);
             assertTrue(Arrays.equals(getData(), out.toByteArray()));
         }
@@ -1088,7 +1088,7 @@ extends ArchiveIOTestBase<D> {
             final InputStream in2 = newInputStream(entry2);
             try {
                 delete(entry2);
-                final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+                final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
                 try {
                     Streams.cat(in2, out);
                 } finally {
@@ -1108,7 +1108,7 @@ extends ArchiveIOTestBase<D> {
                 fail("deleted within archive.toFile().rm_r()");
             } catch (IOException expected) {
             }
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
             try {
                 Streams.cat(in1, out);
             } finally {
@@ -1325,7 +1325,7 @@ extends ArchiveIOTestBase<D> {
         Collections.shuffle(entries, new Random());
 
         // Now read in the entries in the shuffled order.
-        final byte[] buf = new byte[getData().length];
+        final byte[] buf = new byte[getDataLength()];
         for (final Path _entry : entries) {
             final TPath entry = (TPath) _entry;
             // Read full entry and check the contents.
@@ -1342,7 +1342,7 @@ extends ArchiveIOTestBase<D> {
                     off += read;
                 }
                 assertEquals(-1, read);
-                assertEquals(off, getData().length);
+                assertEquals(off, getDataLength());
                 assertTrue(0 >= in.read(new byte[0]));
             } finally {
                 in.close();
@@ -1542,7 +1542,7 @@ extends ArchiveIOTestBase<D> {
             createTestFile(entry2);
 
             umount();
-            assertTrue(size(path) > 2 * getData().length); // two entries plus one central directory
+            assertTrue(size(path) > 2 * getDataLength()); // two entries plus one central directory
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1554,7 +1554,7 @@ extends ArchiveIOTestBase<D> {
             delete(entry2);
 
             umount();
-            assertTrue(size(path) > 6 * getData().length); // six entries plus two central directories
+            assertTrue(size(path) > 6 * getDataLength()); // six entries plus two central directories
         } finally {
             config.close();
         }

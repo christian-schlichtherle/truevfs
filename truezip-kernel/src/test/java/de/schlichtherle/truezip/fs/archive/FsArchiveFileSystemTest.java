@@ -18,6 +18,7 @@ import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
+import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.UriBuilder;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -118,14 +119,17 @@ public class FsArchiveFileSystemTest {
         };
 
         // Populate and check container.
-        final MockArchiveEntryContainer container = new MockArchiveEntryContainer();
+        final MockArchiveEntryContainer
+                container = MockArchiveEntryContainer.create(
+                    new ByteArrayIOPoolService(0),
+                    initialCapacity(paramss.length));
         final MockArchiveDriver driver = new MockArchiveDriver();
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
             final MockArchiveEntry ae = driver.newEntry(aen, type, null);
             assertEquals(aen, ae.getName());
-            container   .new OutputArchive()
+            container   .newOutputShop()
                         .getOutputSocket(ae)
                         .newOutputStream()
                         .close();

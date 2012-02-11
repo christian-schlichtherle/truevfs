@@ -6,11 +6,19 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.mock;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsEntry;
+import de.schlichtherle.truezip.fs.FsEntryName;
+import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -184,7 +192,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
                 final IOEntry<?> o = map.putIfAbsent(name, n);
                 return (null != o ? o : n).getOutputSocket();
             }
-        } // Input
+        } // Output
 
         return new Output();
     }

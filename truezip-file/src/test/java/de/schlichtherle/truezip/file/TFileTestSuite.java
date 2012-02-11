@@ -200,14 +200,14 @@ extends ArchiveIOTestBase<D> {
         assertTrue(file.exists());
         assertFalse(file.isDirectory());
         assertTrue(file.isFile());
-        assertEquals(getData().length, file.length());
+        assertEquals(getDataLength(), file.length());
         assertTrue(file.lastModified() > 0);
 
         // Read back portion
         {
             InputStream in = new TFileInputStream(file);
             try {
-                byte[] buf = new byte[getData().length];
+                byte[] buf = new byte[getDataLength()];
                 assertTrue(ArrayHelper.equals(getData(), 0, buf, 0, in.read(buf)));
             } finally {
                 in.close();
@@ -784,11 +784,11 @@ extends ArchiveIOTestBase<D> {
         } finally {
             in.close();
         }
-        assertEquals(getData().length, file.length());
+        assertEquals(getDataLength(), file.length());
     }
 
     private void assertOutput(final TFile file) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
         try {
             file.output(out);
         } finally {
@@ -951,7 +951,7 @@ extends ArchiveIOTestBase<D> {
 
         // Check result.
         {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
             TFile.cp(a, out);
             assertTrue(Arrays.equals(getData(), out.toByteArray()));
         }
@@ -1043,7 +1043,7 @@ extends ArchiveIOTestBase<D> {
             final InputStream in2 = new TFileInputStream(entry2);
             try {
                 entry2.rm();
-                final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+                final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
                 try {
                     TFile.cat(in2, out);
                 } finally {
@@ -1063,7 +1063,7 @@ extends ArchiveIOTestBase<D> {
                 fail("deleted within archive.rm_r()");
             } catch (IOException expected) {
             }
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
             try {
                 TFile.cat(in1, out);
             } finally {
@@ -1288,7 +1288,7 @@ extends ArchiveIOTestBase<D> {
         Collections.shuffle(entries, new Random());
 
         // Now read in the entries in the shuffled order.
-        final byte[] buf = new byte[getData().length];
+        final byte[] buf = new byte[getDataLength()];
         for (final TFile entry : entries) {
             // Read full entry and check the contents.
             final InputStream in = new TFileInputStream(entry);
@@ -1304,7 +1304,7 @@ extends ArchiveIOTestBase<D> {
                     off += read;
                 }
                 assertEquals(-1, read);
-                assertEquals(off, getData().length);
+                assertEquals(off, getDataLength());
                 assertTrue(0 >= in.read(new byte[0]));
             } finally {
                 in.close();
@@ -1504,7 +1504,7 @@ extends ArchiveIOTestBase<D> {
             createTestFile(entry2);
 
             umount();
-            assertTrue(file.length() > 2 * getData().length); // two entries plus one central directory
+            assertTrue(file.length() > 2 * getDataLength()); // two entries plus one central directory
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1519,7 +1519,7 @@ extends ArchiveIOTestBase<D> {
             entry2.rm();
 
             umount();
-            assertTrue(file.length() > 6 * getData().length); // six entries plus two central directories
+            assertTrue(file.length() > 6 * getDataLength()); // six entries plus two central directories
         } finally {
             config.close();
         }
