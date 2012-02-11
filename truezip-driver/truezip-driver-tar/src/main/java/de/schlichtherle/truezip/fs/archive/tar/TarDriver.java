@@ -44,13 +44,11 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
      */
     public static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
 
-    private final IOPoolProvider provider;
+    private final IOPool<?> ioPool;
 
     public TarDriver(final IOPoolProvider provider) {
         super(TAR_CHARSET);
-        if (null == provider)
-            throw new NullPointerException();
-        this.provider = provider;
+        this.ioPool = provider.get();
     }
 
     /**
@@ -68,7 +66,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
 
     @Override
     protected final IOPool<?> getPool() {
-        return provider.get();
+        return ioPool;
     }
 
     /**
