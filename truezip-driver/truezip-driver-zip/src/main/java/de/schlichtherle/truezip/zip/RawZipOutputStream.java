@@ -183,14 +183,13 @@ implements Iterable<E> {
     /**
      * Returns an iteration of all entries written to this ZIP file so
      * far.
-     * Note that the iteration supports element removal and the returned
-     * entries are shared with this instance.
+     * Note that the iterated entries are shared with this instance.
      * It is illegal to put more entries into this ZIP output stream
      * concurrently or modify the state of the iterated entries.
      */
     @Override
     public Iterator<E> iterator() {
-        return entries.values().iterator();
+        return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     /**

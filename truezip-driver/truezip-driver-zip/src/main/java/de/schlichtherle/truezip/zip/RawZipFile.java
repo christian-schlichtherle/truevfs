@@ -26,6 +26,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -774,13 +775,12 @@ implements Iterable<E>, Closeable {
 
     /**
      * Returns an iteration of all entries in this ZIP file.
-     * Note that the iteration supports element removal and the returned
-     * entries are shared with this instance.
+     * Note that the iterated entries are shared with this instance.
      * It is illegal to change their state!
      */
     @Override
     public Iterator<E> iterator() {
-        return entries.values().iterator();
+        return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     /**
