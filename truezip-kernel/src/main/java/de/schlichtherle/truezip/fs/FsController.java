@@ -422,13 +422,8 @@ public abstract class FsController<M extends FsModel> {
      */
     @Override
     public String toString() {
-        final String n = getClass().getName();
-        final String m = getModel().toString();
-        return new StringBuilder(n.length() + "[model=".length() + m.length() + 1)
-                .append(n)
-                .append("[model=")
-                .append(m)
-                .append(']')
-                .toString();
+        return String.format("%s[model=%s]",
+                getClass().getName(),
+                getModel());
     }
 }

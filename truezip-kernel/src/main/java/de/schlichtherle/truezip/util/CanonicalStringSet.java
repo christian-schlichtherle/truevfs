@@ -130,20 +130,16 @@ public class CanonicalStringSet extends AbstractSet<String> {
      */
     @Override
     public String toString() {
-        final Iterator<String> i = iterator();
-        if (i.hasNext()) {
-            final StringBuilder sb = new StringBuilder();
-            int c = 0;
-            do {
-                final String string = i.next();
-                if (c++ > 0)
-                    sb.append(separator);
-                sb.append(string);
-            } while (i.hasNext());
-            return sb.toString();
-        } else {
+        final int capacity = size() * 11;
+        if (0 >= capacity)
             return "";
+        final StringBuilder s = new StringBuilder(capacity);
+        for (final String string : this) {
+            if (s.length() > 0)
+                s.append(separator);
+            s.append(string);
         }
+        return s.toString();
     }
 
     /**

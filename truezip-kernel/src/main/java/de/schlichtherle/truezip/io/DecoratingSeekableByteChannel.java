@@ -93,13 +93,8 @@ implements SeekableByteChannel {
      */
     @Override
     public String toString() {
-        final String n = getClass().getName();
-        final String d = delegate.toString();
-        return new StringBuilder(n.length() + "[delegate=".length() + d.length() + 1)
-                .append(n)
-                .append("[delegate=")
-                .append(d)
-                .append(']')
-                .toString();
+        return String.format("%s[delegate=%s]",
+                getClass().getName(),
+                delegate);
     }
 }

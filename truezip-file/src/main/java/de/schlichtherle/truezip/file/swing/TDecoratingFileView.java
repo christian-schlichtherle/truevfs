@@ -66,11 +66,8 @@ public abstract class TDecoratingFileView extends FileView {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[delegate=")
-                .append(delegate)
-                .append(']')
-                .toString();
+        return String.format("%s[delegate=%s]",
+                getClass().getName(),
+                delegate);
     }
 }

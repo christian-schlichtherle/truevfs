@@ -8,9 +8,13 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import static de.schlichtherle.truezip.zip.Constants.*;
-import static de.schlichtherle.truezip.zip.ExtraField.*;
-import static de.schlichtherle.truezip.zip.LittleEndian.*;
+import static de.schlichtherle.truezip.zip.Constants.EMPTY;
+import static de.schlichtherle.truezip.zip.Constants.FORCE_ZIP64_EXT;
+import static de.schlichtherle.truezip.zip.ExtraField.WINZIP_AES_ID;
+import static de.schlichtherle.truezip.zip.ExtraField.ZIP64_HEADER_ID;
+import static de.schlichtherle.truezip.zip.LittleEndian.readLong;
+import static de.schlichtherle.truezip.zip.LittleEndian.writeLong;
+import java.util.Formatter;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -33,6 +37,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// TODO: Consider implementing de.schlichtherle.truezip.fs.entry.Entry.
 @NotThreadSafe
 public class ZipEntry implements Cloneable {
 
@@ -764,20 +769,29 @@ public class ZipEntry implements Cloneable {
      */
     @Override
     public String toString() {
-        return new StringBuilder(getClass().getName())
-                .append("[name=")
-                .append(getName())
-                .append(",time=")
-                .append(getTime())
-                .append(",method=")
-                .append(getMethod())
-                .append(",crc=")
-                .append(getCrc())
-                .append(",size=")
-                .append(getSize())
-                .append(",compressedSize=")
-                .append(getCompressedSize())
-                .append("]")
-                .toString();
+        final StringBuilder s = new StringBuilder(256);
+        final Formatter f = new Formatter(s)
+                .format("%s[name=%s", getClass().getName(), getName());
+        long value;
+        if (UNKNOWN != (value = getGeneralPurposeBitFlags()))
+            f.format(", time=0x%04X", value);
+        if (UNKNOWN != (value = getMethod()))
+            f.format(", method=%d", value);
+        if (UNKNOWN != (value = getTime()))
+            f.format(", time=%tc", value);
+        if (UNKNOWN != (value = getCrc()))
+            f.format(", crc=0x%08X", value);
+        if (UNKNOWN != (value = getCompressedSize()))
+            f.format(", compressedSize=%d", value);
+        if (UNKNOWN != (value = getSize()))
+            f.format(", size=%d", value);
+        if (UNKNOWN != (value = getExternalAttributes()))
+            f.format(", crc=0x%08X", value);
+        {
+            final String comment = getComment();
+            if (null != comment)
+                f.format(", comment=\"%s\"", comment);
+        }
+        return s.append("]").toString();
     }
 }

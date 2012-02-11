@@ -60,11 +60,8 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[delegate=")
-                .append(delegate)
-                .append("]")
-                .toString();
+        return String.format("%s[delegate=%s]",
+                getClass().getName(),
+                delegate);
     }
 }

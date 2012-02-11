@@ -10,9 +10,9 @@ package de.schlichtherle.truezip.fs.archive;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import de.schlichtherle.truezip.fs.FsEntry;
-import javax.annotation.Nullable;
 import java.io.CharConversionException;
 import java.util.*;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -54,17 +54,17 @@ implements Cloneable {
      */
     @SuppressWarnings("unchecked")
     public FsCovariantEntry<E> clone(FsArchiveDriver<E> driver) {
-        final FsCovariantEntry<E> that;
+        final FsCovariantEntry<E> clone;
         try {
-            that = (FsCovariantEntry<E>) super.clone();
+            clone = (FsCovariantEntry<E>) super.clone();
         } catch (CloneNotSupportedException ex) {
             throw new AssertionError(ex);
         }
-        final Map<Type, E> thatMap = that.map = new EnumMap<Type, E>(Type.class);
+        final Map<Type, E> cloneMap = clone.map = new EnumMap<Type, E>(Type.class);
         try {
             for (final Map.Entry<Type, E> entry : this.map.entrySet()) {
                 final FsArchiveEntry delegate = entry.getValue();
-                thatMap.put(entry.getKey(),
+                cloneMap.put(entry.getKey(),
                             driver.newEntry(delegate.getName(),
                                             delegate.getType(),
                                             delegate));
@@ -74,8 +74,8 @@ implements Cloneable {
         }
         final LinkedHashSet<String> members = this.members;
         if (null != members)
-            that.members = (LinkedHashSet<String>) members.clone();
-        return that;
+            clone.members = (LinkedHashSet<String>) members.clone();
+        return clone;
     }
 
     @Override

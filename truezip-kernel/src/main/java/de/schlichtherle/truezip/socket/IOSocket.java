@@ -128,24 +128,19 @@ public abstract class IOSocket<LT, PT> {
      */
     @Override
     public String toString() {
-        // Note that the target actually must not be null, but this method
-        // should work even if the interface contract is broken in order to
-        // support debugging.
-        String lts;
+        LT lt;
         try {
-            final LT lt = getLocalTarget();
-            lts = null == lt ? "(null)" : lt.toString();
+            lt = getLocalTarget();
         } catch (IOException ex) {
-            lts = "(?)";
+            lt = null;
         }
-        String rts;
+        PT pt;
         try {
-            final PT rt = getPeerTarget();
-            rts = null == rt ? "(null)" : rt.toString();
+            pt = getPeerTarget();
         } catch (IOException ex) {
-            rts = "(?)";
+            pt = null;
         }
-        return lts + " <-> " + rts;
+        return String.format("%s <-> %s", lt, pt);
     }
 
     /**

@@ -161,11 +161,8 @@ public abstract class TDecoratingFileSystemView extends FileSystemView {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[delegate=")
-                .append(delegate)
-                .append(']')
-                .toString();
+        return String.format("%s[delegate=%s]",
+                getClass().getName(),
+                delegate);
     }
 }

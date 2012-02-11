@@ -119,19 +119,10 @@ extends FsArchiveDriver<E> {
      */
     @Override
     public String toString() {
-        final String n = getClass().getName();
-        final String f = Boolean.toString(isFederated());
-        final String p = Integer.toString(getPriority());
-        final String c = getCharset().toString();
-        return new StringBuilder(n.length() + "[charset=".length() + c.length() + "[federated=".length() + f.length() + ",priority=" + p.length())
-                .append(n)
-                .append("[charset=")
-                .append(c)
-                .append("[federated=")
-                .append(f)
-                .append(",priority=")
-                .append(p)
-                .append(']')
-                .toString();
+        return String.format("%s[charset=%s, federated=%b, priority=%d]",
+                getClass().getName(),
+                getCharset(),
+                isFederated(),
+                getPriority());
     }
 }

@@ -174,11 +174,8 @@ implements Iterable<FsController<?>> {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[size=")
-                .append(getSize())
-                .append(']')
-                .toString();
+        return String.format("%s[size=%d]",
+                getClass().getName(),
+                getSize());
     }
 }

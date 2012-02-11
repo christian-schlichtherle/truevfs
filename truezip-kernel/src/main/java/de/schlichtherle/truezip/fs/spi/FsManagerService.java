@@ -40,11 +40,8 @@ public abstract class FsManagerService implements FsManagerProvider {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[priority=")
-                .append(getPriority())
-                .append(']')
-                .toString();
+        return String.format("%s[priority=%d]",
+                getClass().getName(),
+                getPriority());
     }
 }

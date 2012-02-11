@@ -110,6 +110,8 @@ implements KeyManager<K> {
      */
     @Override
     public String toString() {
-        return getClass().getName();
+        return String.format("%s[priority=%d]",
+                getClass().getName(),
+                getPriority());
     }
 }
