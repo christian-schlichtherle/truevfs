@@ -30,13 +30,13 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     private static final IOPoolProvider
             IO_POOL_PROVIDER = new ByteArrayIOPoolService(DATA.length * 4 / 3); // account for archive type specific overhead
 
-    private D driver;
     private byte[] data;
+    private D driver;
 
     @Before
     public void setUp() throws IOException {
-        driver = newArchiveDriver(IO_POOL_PROVIDER);
         data = DATA.clone();
+        driver = newArchiveDriver(IO_POOL_PROVIDER);
     }
 
     protected abstract D newArchiveDriver(IOPoolProvider provider);
