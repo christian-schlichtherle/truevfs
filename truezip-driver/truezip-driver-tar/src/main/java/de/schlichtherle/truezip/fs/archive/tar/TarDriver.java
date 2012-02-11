@@ -36,7 +36,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  * @version $Id$
  */
 @Immutable
-public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
+public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
 
     /**
      * The default character set for entry names and comments, which is
@@ -95,7 +95,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
     }
 
     @Override
-    public TTarArchiveEntry newEntry(
+    public TarDriverEntry newEntry(
             String name,
             final Type type,
             final Entry template,
@@ -103,7 +103,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
-        final TTarArchiveEntry entry;
+        final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {
             entry = newEntry(name, (TarArchiveEntry) template);
         } else {
@@ -116,12 +116,12 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
         return entry;
     }
 
-    public TTarArchiveEntry newEntry(String name) {
-        return new TTarArchiveEntry(name);
+    public TarDriverEntry newEntry(String name) {
+        return new TarDriverEntry(name);
     }
 
-    public TTarArchiveEntry newEntry(String name, TarArchiveEntry template) {
-        return new TTarArchiveEntry(name, template);
+    public TarDriverEntry newEntry(String name, TarArchiveEntry template) {
+        return new TarDriverEntry(name, template);
     }
 
     /**
@@ -161,16 +161,16 @@ public class TarDriver extends FsCharsetArchiveDriver<TTarArchiveEntry> {
      * {@link FsMultiplexedOutputShop}.
      */
     @Override
-    public OutputShop<TTarArchiveEntry> newOutputShop(
+    public OutputShop<TarDriverEntry> newOutputShop(
             FsModel model,
             OutputSocket<?> output,
-            InputShop<TTarArchiveEntry> source)
+            InputShop<TarDriverEntry> source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
         final OutputStream out = output.newOutputStream();
         try {
-            return new FsMultiplexedOutputShop<TTarArchiveEntry>(
+            return new FsMultiplexedOutputShop<TarDriverEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (IOException ex) {

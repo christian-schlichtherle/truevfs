@@ -54,7 +54,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  */
 public class TarOutputShop
 extends TarArchiveOutputStream
-implements OutputShop<TTarArchiveEntry> {
+implements OutputShop<TarDriverEntry> {
 
     /**
      * The number of entries which can be initially accomodated by
@@ -64,9 +64,9 @@ implements OutputShop<TTarArchiveEntry> {
      */
     public static final int OVERHEAD_SIZE = FsArchiveFileSystem.OVERHEAD_SIZE;
 
-    /** Maps entry names to tar entries [String -> TTarArchiveEntry]. */
-    private final Map<String, TTarArchiveEntry> entries
-            = new LinkedHashMap<String, TTarArchiveEntry>(
+    /** Maps entry names to tar entries [String -> TarDriverEntry]. */
+    private final Map<String, TarDriverEntry> entries
+            = new LinkedHashMap<String, TarDriverEntry>(
                     initialCapacity(OVERHEAD_SIZE));
 
     private final IOPool<?> pool;
@@ -84,23 +84,23 @@ implements OutputShop<TTarArchiveEntry> {
     }
 
     @Override
-    public Iterator<TTarArchiveEntry> iterator() {
+    public Iterator<TarDriverEntry> iterator() {
         return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     @Override
-    public @CheckForNull TTarArchiveEntry getEntry(String name) {
+    public @CheckForNull TarDriverEntry getEntry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public OutputSocket<TTarArchiveEntry> getOutputSocket(final TTarArchiveEntry entry) {
+    public OutputSocket<TarDriverEntry> getOutputSocket(final TarDriverEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<TTarArchiveEntry> {
+        class Output extends OutputSocket<TarDriverEntry> {
             @Override
-            public TTarArchiveEntry getLocalTarget() {
+            public TarDriverEntry getLocalTarget() {
                 return entry;
             }
 
@@ -144,14 +144,14 @@ implements OutputShop<TTarArchiveEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #getOutputSocket(TTarArchiveEntry)}.
+     * These preconditions are checked by {@link #getOutputSocket(TarDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        EntryOutputStream(final TTarArchiveEntry entry)
+        EntryOutputStream(final TarDriverEntry entry)
         throws IOException {
             super(TarOutputShop.this);
             putArchiveEntry(entry);
@@ -181,14 +181,14 @@ implements OutputShop<TTarArchiveEntry> {
      */
     private final class BufferedEntryOutputStream extends DecoratingOutputStream {
         final IOPool.Entry<?> buffer;
-        final TTarArchiveEntry entry;
+        final TarDriverEntry entry;
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
                 final IOPool.Entry<?> buffer,
-                final TTarArchiveEntry entry)
+                final TarDriverEntry entry)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
             this.buffer = buffer;
@@ -210,7 +210,7 @@ implements OutputShop<TTarArchiveEntry> {
             final IOPool.Entry<?> buffer = this.buffer;
             assert null != buffer;
 
-            final TTarArchiveEntry entry = this.entry;
+            final TarDriverEntry entry = this.entry;
             assert null != entry;
 
             TarOutputShop.this.busy = false;
