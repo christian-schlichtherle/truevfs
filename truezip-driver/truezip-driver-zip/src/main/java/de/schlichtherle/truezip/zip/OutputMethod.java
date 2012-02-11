@@ -32,6 +32,7 @@ interface OutputMethod {
      * @param  entry the ZIP entry to check and update.
      * @throws IOException if checking the given entry failed for some reason.
      */
+    // TODO: Change @throws ZipException -> @throws IllegalArgumentException
     void init(ZipEntry entry) throws IOException;
 
     /**
