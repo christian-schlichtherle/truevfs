@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.spi.DummyDriverService;
+import de.schlichtherle.truezip.fs.spi.MockDriverService;
 import de.schlichtherle.truezip.util.Link.Type;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import java.net.URI;
@@ -35,7 +35,7 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
     @Test
     public void testFiltering() {
         final FsCompositeDriver driver = new FsDefaultDriver(
-                new DummyDriverService("file|tar|tar.gz|zip"));
+                new MockDriverService("file|tar|tar.gz|zip"));
         for (final String[][] params : new String[][][] {
             // { { /* filter */ }, { /* test set */ }, { /* result set */ } },
             { { "file:/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" } },

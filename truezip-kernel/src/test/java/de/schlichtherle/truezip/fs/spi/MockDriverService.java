@@ -19,11 +19,11 @@ import java.util.Map;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class DummyDriverService extends FsDriverService {
+public final class MockDriverService extends FsDriverService {
 
     private final Map<FsScheme, FsDriver> drivers;
 
-    public DummyDriverService(String suffixes) {
+    public MockDriverService(String suffixes) {
         this.drivers = newMap(new Object[][] {
             { suffixes, new MockDriver() },
         });
