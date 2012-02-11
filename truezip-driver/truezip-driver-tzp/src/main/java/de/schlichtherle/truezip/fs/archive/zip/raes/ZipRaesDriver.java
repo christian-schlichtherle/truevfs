@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.OptionOutputSocket;
-import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -135,7 +135,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected abstract long getAuthenticationTrigger();
 
     @Override
-    protected final boolean check(ZipInputShop input, ZipArchiveEntry entry) {
+    protected final boolean check(ZipInputShop input, ZipDriverEntry entry) {
         // Optimization: If the cipher text alias the encrypted ZIP file is
         // smaller than the authentication trigger, then its entire cipher text
         // has already been authenticated by {@link ZipRaesDriver#newInputShop}.
@@ -162,7 +162,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns a new {@link ZipArchiveEntry}, enforcing that the data gets
+     * Returns a new {@link ZipDriverEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
      * This feature strengthens the security level of the authentication
@@ -170,19 +170,19 @@ public abstract class ZipRaesDriver extends JarDriver {
      * (usually a temporary file) in case the output is not copied from a file
      * system entry as its input.
      * <p>
-     * Furthermore, the method {@link ZipArchiveEntry#clearEncryption()} is
+     * Furthermore, the method {@link ZipDriverEntry#clearEncryption()} is
      * called in order to prevent adding a redundant encryption layer for the
      * individual ZIP entry because this would confuse users, increase the size
      * of the resulting archive file and unecessarily heat the CPU.
      */
     @Override
-    public ZipArchiveEntry newEntry(
+    public ZipDriverEntry newEntry(
             final String path,
             final Type type,
             final Entry template,
             final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        final ZipArchiveEntry entry
+        final ZipDriverEntry entry
                 = super.newEntry(path, type, template, mknod.set(COMPRESS));
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
         // Entry level encryption is enabled if mknod.get(ENCRYPTED) is true
@@ -207,7 +207,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public final InputShop<ZipArchiveEntry>
+    public final InputShop<ZipDriverEntry>
     newInputShop(   final FsModel model,
                     final InputSocket<?> input)
     throws IOException {
@@ -248,7 +248,7 @@ public abstract class ZipRaesDriver extends JarDriver {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputShop<ZipArchiveEntry> newOutputShop(
+    protected OutputShop<ZipDriverEntry> newOutputShop(
             final FsModel model,
             final OptionOutputSocket output,
             final ZipInputShop source)

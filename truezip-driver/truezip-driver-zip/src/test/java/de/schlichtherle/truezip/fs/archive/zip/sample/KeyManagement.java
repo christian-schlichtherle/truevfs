@@ -16,7 +16,7 @@ import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.PromptingKeyManagerService;
-import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
@@ -115,8 +115,8 @@ public final class KeyManagement {
 
         @Override
         protected boolean process(
-                ZipArchiveEntry input,
-                ZipArchiveEntry output) {
+                ZipDriverEntry input,
+                ZipDriverEntry output) {
             // Because we are using the same encryption key for all entries
             // of our custom archive file format we do NOT need to process the
             // entries according to the following pipeline when copying them:

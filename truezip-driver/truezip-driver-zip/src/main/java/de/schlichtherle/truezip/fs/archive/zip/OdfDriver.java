@@ -48,7 +48,7 @@ public class OdfDriver extends JarDriver {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputShop<ZipArchiveEntry> newOutputShop(
+    protected OutputShop<ZipDriverEntry> newOutputShop(
             final FsModel model,
             final OutputStream out,
             final ZipInputShop source)
@@ -56,7 +56,7 @@ public class OdfDriver extends JarDriver {
         final ZipOutputShop shop = new ZipOutputShop(this, model, out, source);
         final IOPool<?> pool = getPool();
         return null != source && source.isAppendee()
-                ? new FsMultiplexedOutputShop<ZipArchiveEntry>(shop, pool)
+                ? new FsMultiplexedOutputShop<ZipDriverEntry>(shop, pool)
                 : new OdfOutputShop(shop, pool);
     }
 }

@@ -41,7 +41,7 @@ public class CheckedZipDriver extends ZipDriver {
      * @return {@code true}
      */
     @Override
-    protected boolean check(ZipInputShop input, ZipArchiveEntry entry) {
+    protected boolean check(ZipInputShop input, ZipDriverEntry entry) {
         return true;
     }
 }
