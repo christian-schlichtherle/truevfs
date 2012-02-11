@@ -30,7 +30,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TTarArchiveEntry
+public class TarDriverEntry
 extends TarArchiveEntry
 implements FsArchiveEntry, Releasable<IOException> {
 
@@ -40,13 +40,13 @@ implements FsArchiveEntry, Releasable<IOException> {
     private byte init; // bit flags for init state
     private @CheckForNull Entry<?> temp;
 
-    public TTarArchiveEntry(final String name) {
+    public TarDriverEntry(final String name) {
         super(name, true);
         // Fix super class constructor.
         super.setUserName(System.getProperty("user.name", ""));
     }
 
-    protected TTarArchiveEntry(
+    protected TarDriverEntry(
             final String name,
             final TarArchiveEntry template) {
         super(name, true);

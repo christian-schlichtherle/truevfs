@@ -43,7 +43,7 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
  * @version $Id$
  */
 public class TarInputShop
-implements InputShop<TTarArchiveEntry> {
+implements InputShop<TarDriverEntry> {
 
     /** Default record size */
     private static final int DEFAULT_RCDSIZE = 512;
@@ -57,8 +57,8 @@ implements InputShop<TTarArchiveEntry> {
             = NAMELEN + MODELEN + UIDLEN + GIDLEN + SIZELEN + MODTIMELEN;
 
     /** Maps entry names to I/O pool entries. */
-    private final Map<String, TTarArchiveEntry>
-            entries = new LinkedHashMap<String, TTarArchiveEntry>(
+    private final Map<String, TarDriverEntry>
+            entries = new LinkedHashMap<String, TarDriverEntry>(
                     initialCapacity(TarOutputShop.OVERHEAD_SIZE));
 
     /**
@@ -80,10 +80,10 @@ implements InputShop<TTarArchiveEntry> {
             TarArchiveEntry tinEntry;
             while (null != (tinEntry = (TarArchiveEntry) tin.getNextEntry())) {
                 final String name = getName(tinEntry);
-                TTarArchiveEntry entry = entries.get(name);
+                TarDriverEntry entry = entries.get(name);
                 if (null != entry)
                     entry.release();
-                entry = new TTarArchiveEntry(name, tinEntry);
+                entry = new TarDriverEntry(name, tinEntry);
                 if (!tinEntry.isDirectory()) {
                     final Entry<?> temp = pool.allocate();
                     entry.setTemp(temp);
@@ -195,24 +195,24 @@ implements InputShop<TTarArchiveEntry> {
     }
 
     @Override
-    public final Iterator<TTarArchiveEntry> iterator() {
+    public final Iterator<TarDriverEntry> iterator() {
         return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     @Override
-    public final @CheckForNull TTarArchiveEntry getEntry(String name) {
+    public final @CheckForNull TarDriverEntry getEntry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public InputSocket<TTarArchiveEntry> getInputSocket(final String name) {
+    public InputSocket<TarDriverEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends InputSocket<TTarArchiveEntry> {
+        class Input extends InputSocket<TarDriverEntry> {
             @Override
-            public TTarArchiveEntry getLocalTarget() throws IOException {
-                final TTarArchiveEntry entry = getEntry(name);
+            public TarDriverEntry getLocalTarget() throws IOException {
+                final TarDriverEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 if (entry.isDirectory())
@@ -241,8 +241,8 @@ implements InputShop<TTarArchiveEntry> {
     }
 
     private void close0() throws IOException {
-        Collection<TTarArchiveEntry> values = entries.values();
-        for (Iterator<TTarArchiveEntry> i = values.iterator(); i.hasNext(); i.remove())
+        Collection<TarDriverEntry> values = entries.values();
+        for (Iterator<TarDriverEntry> i = values.iterator(); i.hasNext(); i.remove())
             i.next().release();
     }
 }
