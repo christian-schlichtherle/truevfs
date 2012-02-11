@@ -17,7 +17,9 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author Christian Schlichtherle
+ * @param   <E> the type of the I/O buffers.
+ * @param   <D> the type of the instrumenting director.
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @Immutable
@@ -38,7 +40,7 @@ implements IOPool<E> {
 
     @Override
     public Entry<E> allocate() throws IOException {
-        return new IOBuffer(delegate.allocate());
+        return new Buffer(delegate.allocate());
     }
 
     @Override
@@ -46,11 +48,12 @@ implements IOPool<E> {
         resource.release();
     }
 
-    public class IOBuffer
+    @SuppressWarnings("PublicInnerClass")
+    public class Buffer
     extends DecoratingEntry<Entry<E>>
     implements Entry<E> {
 
-        protected IOBuffer(Entry<E> delegate) {
+        protected Buffer(Entry<E> delegate) {
             super(delegate);
         }
 
@@ -68,5 +71,5 @@ implements IOPool<E> {
         public void release() throws IOException {
             delegate.release();
         }
-    }
+    } // Buffer
 }
