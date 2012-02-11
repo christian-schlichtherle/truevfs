@@ -18,8 +18,8 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import java.lang.management.ManagementFactory;
-import javax.management.*;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.management.*;
 
 /**
  * @author  Christian Schlichtherle
@@ -137,7 +137,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
+    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.Buffer context) {
         return new JmxInputSocket<E>(input, this, temp);
     }
 
@@ -148,7 +148,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
+    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.Buffer context) {
         return new JmxOutputSocket<E>(output, this, temp);
     }
 
@@ -160,7 +160,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private static final class JmxNio2Director extends JmxDirector {
         @Override
-        public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
+        public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.Buffer context) {
             return new JmxNio2InputSocket<E>(input, this, super.temp);
         }
 
@@ -171,7 +171,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
         }
 
         @Override
-        public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.IOBuffer context) {
+        public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.Buffer context) {
             return new JmxNio2OutputSocket<E>(output, this, super.temp);
         }
 

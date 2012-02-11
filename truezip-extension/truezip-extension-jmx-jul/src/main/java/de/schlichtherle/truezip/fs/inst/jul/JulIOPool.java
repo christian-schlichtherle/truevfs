@@ -33,12 +33,13 @@ extends InstrumentingIOPool<E, JulDirector> {
 
     @Override
     public Entry<E> allocate() throws IOException {
-        return new JulIOBuffer(delegate.allocate());
+        return new Buffer(delegate.allocate());
     }
 
-    private final class JulIOBuffer extends IOBuffer {
+    private final class Buffer
+    extends InstrumentingIOPool<E, JulDirector>.Buffer {
 
-        JulIOBuffer(Entry<E> model) {
+        Buffer(Entry<E> model) {
             super(model);
             logger.log(FINE, "Allocated " + delegate, new NeverThrowable());
         }
@@ -51,5 +52,5 @@ extends InstrumentingIOPool<E, JulDirector> {
                 logger.log(FINE, "Released " + delegate, new NeverThrowable());
             }
         }
-    }
+    } // Buffer
 }
