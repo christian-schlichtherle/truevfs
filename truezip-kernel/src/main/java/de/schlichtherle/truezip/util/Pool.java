@@ -15,6 +15,8 @@ package de.schlichtherle.truezip.util;
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *
+ * @param   <R> The type of the resources managed by this pool.
+ * @param   <X> The type of the exceptions thrown by this pool.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -27,7 +29,7 @@ public interface Pool<R, X extends Exception> {
      * allocated resources because this could cause a memory leak.
      *
      * @return A resource.
-     * @throws Exception if allocating the resource failed for any reason.
+     * @throws X if allocating the resource failed for any reason.
      */
     R allocate() throws X;
 
@@ -40,7 +42,7 @@ public interface Pool<R, X extends Exception> {
      * @throws RuntimeException if the given resource has not been allocated
      *         by this pool or has already been released to this pool and the
      *         implementation cannot tolerate this.
-     * @throws Exception if releasing the resource failed for any other reason.
+     * @throws X if releasing the resource failed for any other reason.
      */
     void release(R resource) throws X;
 
@@ -48,7 +50,10 @@ public interface Pool<R, X extends Exception> {
      * This interface is designed to be used with Pools which enable their
      * resources to release itself.
      * TODO for TrueZIP 8: This should be named "Resource".
+     * 
+     * @param <X> The type of the exceptions thrown by this releasable.
      */
+    @SuppressWarnings("PublicInnerClass")
     interface Releasable<X extends Exception> {
 
         /**
@@ -59,7 +64,8 @@ public interface Pool<R, X extends Exception> {
          * @throws IllegalStateException if this resource has already been
          *         released to its pool and the implementation cannot tolerate
          *         this.
+         * @throws X if releasing the resource failed for any other reason.
          */
         void release() throws X;
-    }
+    } // Releasable
 }
