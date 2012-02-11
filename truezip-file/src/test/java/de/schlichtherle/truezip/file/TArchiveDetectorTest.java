@@ -13,11 +13,11 @@ import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
-import static org.hamcrest.CoreMatchers.*;
+import javax.annotation.Nullable;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class TArchiveDetectorTest {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testIllegalConstructors() {
+    public void testIllegalConstructors() throws Throwable {
         for (TArchiveDetector delegate : new TArchiveDetector[] {
             NIL,
             ALL,
@@ -119,12 +119,11 @@ public class TArchiveDetectorTest {
     @SuppressWarnings({"unchecked", "ResultOfObjectAllocationIgnored"})
     private void assertIllegalConstructors(
             final Class<? extends Throwable> expected,
-            final Object[][] list) {
+            final Object[][] list)
+    throws Throwable {
         for (int i = 0; i < list.length; i++) {
             final Object[] args = list[i];
-            Object arg0 = args[0];
-            Object arg1 = null;
-            Object arg2 = null;
+            Object arg0 = args[0], arg1, arg2;
             try {
                 switch (args.length) {
                     case 1:
@@ -209,8 +208,9 @@ public class TArchiveDetectorTest {
                     default:
                         throw new AssertionError();
                 }
-            } catch (Throwable ex) {
-                assertTrue(expected.isAssignableFrom(ex.getClass()));
+            } catch (final Throwable ex) {
+                if (!expected.isAssignableFrom(ex.getClass()))
+                    throw ex;
             }
         }
     }
@@ -342,6 +342,7 @@ public class TArchiveDetectorTest {
         }, ALL);
     }
 
+    @SuppressWarnings("AssignmentToForLoopParameter")
     private void assertScheme(
             final String[][] tests,
             final TArchiveDetector... detectors) {

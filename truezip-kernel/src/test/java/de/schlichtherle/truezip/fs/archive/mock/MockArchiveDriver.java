@@ -29,18 +29,20 @@ extends FsCharsetArchiveDriver<MockArchiveEntry> {
 
     private static final Charset charset = Charset.forName("UTF-8");
     
-    private volatile IOPoolProvider provider;
+    private final IOPool<?> ioPool;
 
     public MockArchiveDriver() {
+        this(new ByteArrayIOPoolService(32));
+    }
+
+    public MockArchiveDriver(final IOPoolProvider provider) {
         super(charset);
+        this.ioPool = provider.get();
     }
 
     @Override
     protected IOPool<?> getPool() {
-        final IOPoolProvider provider = this.provider;
-        return (null != provider
-                ? provider
-                : (this.provider = new ByteArrayIOPoolService(2048))).get();
+        return ioPool;
     }
 
     @Override

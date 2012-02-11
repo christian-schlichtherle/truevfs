@@ -103,7 +103,9 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
         } else if (minLimit > Integer.MAX_VALUE) {
             throw new OutOfMemoryError();
         } else {
-            long newCapacity = oldCapacity << 1;
+            long newCapacity = 0 < oldCapacity ? oldCapacity : 1;
+            while ((newCapacity <<= 1) < minLimit) {
+            }
             if (newCapacity > Integer.MAX_VALUE)
                 newCapacity = minLimit;
             final byte[] array = new byte[(int) newCapacity];

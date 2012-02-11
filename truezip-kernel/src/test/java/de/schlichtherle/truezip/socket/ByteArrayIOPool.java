@@ -28,11 +28,6 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     private final AtomicInteger total = new AtomicInteger();
     private final AtomicInteger active = new AtomicInteger();
 
-    /** Equivalent to {@link #ByteArrayIOPool(int) new ByteArrayIOPool(32)}. */
-    public ByteArrayIOPool() {
-        this(32);
-    }
-
     /**
      * Constructs a new byte array I/O pool.
      *
@@ -40,7 +35,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
      *        writing to an allocated I/O entry.
      */
     public ByteArrayIOPool(final int initialCapacity) {
-        if (initialCapacity < 0)
+        if (0 > initialCapacity)
             throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity);
         this.initialCapacity = initialCapacity;
     }

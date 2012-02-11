@@ -34,7 +34,7 @@ public final class ByteArrayIOPoolService extends IOPoolService {
      * 
      * @param initialCapacity the initial capacity in bytes.
      */
-    public ByteArrayIOPoolService(int initialCapacity) {
+    public ByteArrayIOPoolService(final int initialCapacity) {
         pool = new ByteArrayIOPool(initialCapacity);
     }
 

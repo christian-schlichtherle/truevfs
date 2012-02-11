@@ -49,4 +49,8 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     protected final byte[] getData() {
         return data;
     }
+
+    protected final int getDataLength() {
+        return data.length;
+    }
 }

@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsInputOption;
 import static de.schlichtherle.truezip.fs.FsInputOptions.NO_INPUT_OPTIONS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
@@ -233,7 +234,8 @@ public class TConfigTest {
         TConfig c = TConfig.push();
         try {
             // Change the inheritable thread local configuration.
-            c.setArchiveDetector(new TArchiveDetector("mok", new MockArchiveDriver()));
+            c.setArchiveDetector(
+                    new TArchiveDetector("mok", new MockArchiveDriver()));
             // Use the inheritable thread local configuration.
             TFile f2 = new TFile("file.mok");
             assertTrue(f2.isArchive());
@@ -246,31 +248,32 @@ public class TConfigTest {
 
     @Test
     public void advancedUseCase() {
+        final FsDriver d = new MockArchiveDriver();
         final TConfig c1 = TConfig.get();
         assertThat(TConfig.get(), sameInstance(c1));
-        final TArchiveDetector detector1 = c1.getArchiveDetector();
-        assertThat(c1.getArchiveDetector(), sameInstance(detector1));
-        final TArchiveDetector detector2 = new TArchiveDetector("mok", new MockArchiveDriver());
+        final TArchiveDetector ad1 = c1.getArchiveDetector();
+        assertThat(c1.getArchiveDetector(), sameInstance(ad1));
+        final TArchiveDetector ad2 = new TArchiveDetector("mok", d);
         final TConfig c2 = TConfig.push();
         try {
-            c2.setArchiveDetector(detector2);
+            c2.setArchiveDetector(ad2);
             assertThat(TConfig.get(), sameInstance(c2));
-            assertThat(c2.getArchiveDetector(), sameInstance(detector2));
-            final TArchiveDetector detector3 = new TArchiveDetector("mok", new MockArchiveDriver());
-            final TConfig config3 = TConfig.push();
+            assertThat(c2.getArchiveDetector(), sameInstance(ad2));
+            final TArchiveDetector ad3 = new TArchiveDetector("mok", d);
+            final TConfig c3 = TConfig.push();
             try {
-                config3.setArchiveDetector(detector3);
-                assertThat(TConfig.get(), sameInstance(config3));
-                assertThat(config3.getArchiveDetector(), sameInstance(detector3));
+                c3.setArchiveDetector(ad3);
+                assertThat(TConfig.get(), sameInstance(c3));
+                assertThat(c3.getArchiveDetector(), sameInstance(ad3));
             } finally {
-                config3.close();
+                c3.close();
             }
             assertThat(TConfig.get(), sameInstance(c2));
-            assertThat(c2.getArchiveDetector(), sameInstance(detector2));
+            assertThat(c2.getArchiveDetector(), sameInstance(ad2));
         } finally {
             c2.close();
         }
         assertThat(TConfig.get(), sameInstance(c1));
-        assertThat(c1.getArchiveDetector(), sameInstance(detector1));
+        assertThat(c1.getArchiveDetector(), sameInstance(ad1));
     }
 }
