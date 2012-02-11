@@ -57,6 +57,7 @@ implements FsArchiveEntry, Releasable<IOException> {
         super.setUserName(template.getUserName());
         super.setGroupId(template.getGroupId());
         super.setGroupName(template.getGroupName());
+        super.setLinkName(template.getLinkName());
     }
 
     private boolean isInit(final int mask) {
@@ -92,7 +93,7 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public final long getSize() {
+    public long getSize() {
         return isInit(SIZE) ? super.getSize() : UNKNOWN;
     }
 
@@ -127,7 +128,7 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public final Date getModTime() {
+    public Date getModTime() {
         return isInit(MODTIME) ? super.getModTime() : new Date(UNKNOWN);
     }
 
@@ -141,6 +142,11 @@ implements FsArchiveEntry, Releasable<IOException> {
         super.setModTime(known ? time : 0);
         setInit(MODTIME, known);
     }
+
+    /*@Override // FIXME: Uncomment this!
+    public void setModTime(Date time) {
+        setModTime(time.getTime());
+    }*/
 
     @Override
     public long getTime(Access type) {
