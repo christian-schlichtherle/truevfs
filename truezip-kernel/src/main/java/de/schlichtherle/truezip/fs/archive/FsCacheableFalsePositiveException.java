@@ -30,6 +30,7 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 final class FsCacheableFalsePositiveException extends FsFalsePositiveException {
+
     FsCacheableFalsePositiveException(IOException cause) {
         super(cause);
     }

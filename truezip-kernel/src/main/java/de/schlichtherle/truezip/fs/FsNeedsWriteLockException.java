@@ -23,8 +23,4 @@ import javax.annotation.concurrent.Immutable;
 public final class FsNeedsWriteLockException extends FsControllerException {
     static final FsNeedsWriteLockException
             SINGLETON = new FsNeedsWriteLockException();
-
-    private FsNeedsWriteLockException() {
-        super(null);
-    }
 }

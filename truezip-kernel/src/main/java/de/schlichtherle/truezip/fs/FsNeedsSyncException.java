@@ -26,8 +26,4 @@ import javax.annotation.concurrent.Immutable;
 public final class FsNeedsSyncException extends FsControllerException {
     public static final FsNeedsSyncException
             SINGLETON = new FsNeedsSyncException();
-
-    private FsNeedsSyncException() {
-        super(null);
-    }
 }
