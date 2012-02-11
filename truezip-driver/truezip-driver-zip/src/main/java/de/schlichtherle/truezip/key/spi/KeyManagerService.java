@@ -11,6 +11,7 @@ package de.schlichtherle.truezip.key.spi;
 import de.schlichtherle.truezip.key.AbstractKeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
+import de.schlichtherle.truezip.util.Maps;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,7 +63,8 @@ public abstract class KeyManagerService extends AbstractKeyManagerProvider {
      */
     public static Map<Class<?>, KeyManager<?>> newMap(final Object[][] config) {
         final Map<Class<?>, KeyManager<?>>
-                managers = new HashMap<Class<?>, KeyManager<?>>();
+                managers = new HashMap<Class<?>, KeyManager<?>>(
+                    Maps.initialCapacity(config.length));
         for (final Object[] param : config) {
             final Class<?> type = ServiceLocator.promote(param[0], Class.class);
             final KeyManager<?> newManager = ServiceLocator.promote(param[1], KeyManager.class);
