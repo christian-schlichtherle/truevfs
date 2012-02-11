@@ -13,6 +13,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntries;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.util.Pool.Releasable;
@@ -181,13 +182,6 @@ implements FsArchiveEntry, Releasable<IOException> {
      */
     @Override
     public String toString() {
-        final StringBuilder s = new StringBuilder(getClass().getName())
-                .append("[name=").append(getName())
-                .append(",type=").append(getType());
-        for (Size type : ALL_SIZE_SET)
-            s.append(",size(").append(type).append(")=").append(getSize(type));
-        for (Access type : ALL_ACCESS_SET)
-            s.append(",time(").append(type).append(")=").append(getTime(type));
-        return s.append("]").toString();
+        return FsArchiveEntries.toString(this);
     }
 }

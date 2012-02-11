@@ -106,15 +106,10 @@ public abstract class FsModel {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[mountPoint=")
-                .append(getMountPoint())
-                .append(",parent=")
-                .append(getParent())
-                .append(",touched=")
-                .append(isTouched())
-                .append("]")
-                .toString();
+        return String.format("%s[mountPoint=%s, parent=%s, touched=%b]",
+                getClass().getName(),
+                getMountPoint(),
+                getParent(),
+                isTouched());
     }
 }

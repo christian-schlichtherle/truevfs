@@ -8,12 +8,12 @@
  */
 package de.schlichtherle.truezip.util;
 
-import javax.annotation.CheckForNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -246,13 +246,16 @@ implements Iterable<E>, Serializable {
      */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
+        final int capacity = bits.size() * 11;
+        if (0 >= capacity)
+            return "";
+        final StringBuilder s = new StringBuilder(capacity);
         for (final E bit : bits) {
-            if (sb.length() > 0)
-                sb.append('|');
-            sb.append(bit);
+            if (s.length() > 0)
+                s.append('|');
+            s.append(bit);
         }
-        return sb.toString();
+        return s.toString();
     }
 
     /**

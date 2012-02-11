@@ -64,11 +64,8 @@ final class FsOperationContext {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
-                .append("[outputOptions=")
-                .append(getOutputOptions())
-                .append("]")
-                .toString();
+        return String.format("%s[outputOptions=%s]",
+                getClass().getName(),
+                getOutputOptions());
     }
 }

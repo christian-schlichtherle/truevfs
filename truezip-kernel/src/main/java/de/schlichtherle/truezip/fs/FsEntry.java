@@ -9,6 +9,8 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.util.BitField;
+import java.util.Formatter;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Set;
@@ -97,19 +99,19 @@ public abstract class FsEntry implements Entry {
      */
     @Override
     public String toString() {
-        final StringBuilder s = new StringBuilder(getClass().getName())
-                .append("[name=").append(getName())
-                .append(",types=");//.append(BitField.copyOf(getTypes()));
-        for (Iterator<Type> i = getTypes().iterator(); i.hasNext(); ) {
-            s.append(i.next());
-            if (i.hasNext())
-                s.append('|');
+        final StringBuilder s = new StringBuilder(256);
+        final Formatter f = new Formatter(s).format("%s[name=%s, types=%s",
+                getClass().getName(), getName(), BitField.copyOf(getTypes()));
+        for (Size type : ALL_SIZE_SET) {
+            final long size = getSize(type);
+            if (UNKNOWN != size)
+                f.format(", size(%s)=%d", type, size);
         }
-        for (Size type : ALL_SIZE_SET)
-            s.append(",size(").append(type).append(")=").append(getSize(type));
-        for (Access type : ALL_ACCESS_SET)
-            s.append(",time(").append(type).append(")=").append(getTime(type));
-        return s.append(",members=").append(getMembers()).append(']')
-                .toString();
+        for (Access type : ALL_ACCESS_SET) {
+            final long time = getTime(type);
+            if (UNKNOWN != time)
+                f.format(", time(%s)=%tc", type, time);
+        }
+        return f.format(",members=%s]", getMembers()).toString();
     }
 }

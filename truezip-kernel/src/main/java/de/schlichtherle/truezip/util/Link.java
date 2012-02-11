@@ -8,12 +8,12 @@
  */
 package de.schlichtherle.truezip.util;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 
 /**
  * A link has a nullable {@link #getTarget() target} property.
@@ -108,12 +108,9 @@ public interface Link<T> {
 
             @Override
             public String toString() {
-                return new StringBuilder()
-                        .append(getClass().getName())
-                        .append("[target=")
-                        .append(getTarget())
-                        .append(']')
-                        .toString();
+                return String.format("%s[target=%s]",
+                        getClass().getName(),
+                        getTarget());
             }
         }
 
@@ -131,12 +128,9 @@ public interface Link<T> {
 
             @Override
             public String toString() {
-                return new StringBuilder()
-                        .append(getClass().getName())
-                        .append("[target=")
-                        .append(getTarget())
-                        .append(']')
-                        .toString();
+                return String.format("%s[target=%s]",
+                        getClass().getName(),
+                        getTarget());
             }
         }
 
@@ -154,12 +148,9 @@ public interface Link<T> {
 
             @Override
             public String toString() {
-                return new StringBuilder()
-                        .append(getClass().getName())
-                        .append("[target=")
-                        .append(getTarget())
-                        .append(']')
-                        .toString();
+                return String.format("%s[target=%s]",
+                        getClass().getName(),
+                        getTarget());
             }
         }
 
@@ -177,12 +168,9 @@ public interface Link<T> {
 
             @Override
             public String toString() {
-                return new StringBuilder()
-                        .append(getClass().getName())
-                        .append("[target=")
-                        .append(getTarget())
-                        .append(']')
-                        .toString();
+                return String.format("%s[target=%s]",
+                        getClass().getName(),
+                        getTarget());
             }
         }
     }
