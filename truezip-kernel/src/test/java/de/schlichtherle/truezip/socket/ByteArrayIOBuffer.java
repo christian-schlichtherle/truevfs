@@ -31,7 +31,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
+public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
 
     private static final SocketFactory FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
@@ -46,9 +46,9 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     private int initialCapacity;
 
     /**
-     * Equivalent to {@link #ByteArrayIOEntry(String, int) new ByteArrayIOPool(name, 32)}.
+     * Equivalent to {@link #ByteArrayIOBuffer(String, int) new ByteArrayIOPool(name, 32)}.
      */
-    public ByteArrayIOEntry(String name) {
+    public ByteArrayIOBuffer(String name) {
         this(name, 32);
     }
 
@@ -60,7 +60,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
      * @param initialCapacity the initial capacity of the array to use for
      *        the next output to this I/O entry.
      */
-    public ByteArrayIOEntry(final String name, final int initialCapacity) {
+    public ByteArrayIOBuffer(final String name, final int initialCapacity) {
         this.name = name;
         setInitialCapacity(initialCapacity);
     }
@@ -73,7 +73,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
      *        the next output to this I/O entry.
      */
     public final void setInitialCapacity(final int initialCapacity) {
-        if (0 > initialCapacity) // Yoda conditions, I like!
+        if (0 > initialCapacity) // Yoda conditions I like!
             throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity);
         this.initialCapacity = initialCapacity;
     }
@@ -135,49 +135,60 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
     }
 
     @Override
-    public InputSocket<ByteArrayIOEntry> getInputSocket() {
+    public InputSocket<ByteArrayIOBuffer> getInputSocket() {
         return FACTORY.newInputSocket(this);
     }
 
     @Override
-    public OutputSocket<ByteArrayIOEntry> getOutputSocket() {
+    public OutputSocket<ByteArrayIOBuffer> getOutputSocket() {
         return FACTORY.newOutputSocket(this);
     }
 
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
     @Override
     public String toString() {
-        return name;
+        final String c = getClass().getName();
+        final String n = getName();
+        return new StringBuilder(c.length() + "[name=".length() + n.length() + 1)
+                .append(c)
+                .append("[name=")
+                .append(n)
+                .append(']')
+                .toString();
     }
 
     @Immutable
     private enum SocketFactory {
         OIO() {
             @Override
-            InputSocket<ByteArrayIOEntry> newInputSocket(ByteArrayIOEntry entry) {
+            InputSocket<ByteArrayIOBuffer> newInputSocket(ByteArrayIOBuffer entry) {
                 return entry.new ByteArrayInputSocket();
             }
 
             @Override
-            OutputSocket<ByteArrayIOEntry> newOutputSocket(ByteArrayIOEntry entry) {
+            OutputSocket<ByteArrayIOBuffer> newOutputSocket(ByteArrayIOBuffer entry) {
                 return entry.new ByteArrayOutputSocket();
             }
         },
 
         NIO2() {
             @Override
-            InputSocket<ByteArrayIOEntry> newInputSocket(ByteArrayIOEntry entry) {
+            InputSocket<ByteArrayIOBuffer> newInputSocket(ByteArrayIOBuffer entry) {
                 return entry.new Nio2ByteArrayInputSocket();
             }
 
             @Override
-            OutputSocket<ByteArrayIOEntry> newOutputSocket(ByteArrayIOEntry entry) {
+            OutputSocket<ByteArrayIOBuffer> newOutputSocket(ByteArrayIOBuffer entry) {
                 return entry.new Nio2ByteArrayOutputSocket();
             }
         };
         
-        abstract InputSocket<ByteArrayIOEntry> newInputSocket(ByteArrayIOEntry entry);
-        abstract OutputSocket<ByteArrayIOEntry> newOutputSocket(ByteArrayIOEntry entry);
-    } // enum SocketFactory
+        abstract InputSocket<ByteArrayIOBuffer> newInputSocket(ByteArrayIOBuffer entry);
+        abstract OutputSocket<ByteArrayIOBuffer> newOutputSocket(ByteArrayIOBuffer entry);
+    } // SocketFactory
 
     private final class Nio2ByteArrayInputSocket
     extends ByteArrayInputSocket {
@@ -186,12 +197,12 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             count();
             return new DataInputChannel();
         }
-    } // class Nio2ByteArrayInputSocket
+    } // Nio2ByteArrayInputSocket
 
-    private class ByteArrayInputSocket extends InputSocket<ByteArrayIOEntry> {
+    private class ByteArrayInputSocket extends InputSocket<ByteArrayIOBuffer> {
         @Override
-        public final ByteArrayIOEntry getLocalTarget() throws IOException {
-            return ByteArrayIOEntry.this;
+        public final ByteArrayIOBuffer getLocalTarget() throws IOException {
+            return ByteArrayIOBuffer.this;
         }
 
         final void count() throws FileNotFoundException {
@@ -211,7 +222,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             count();
             return new DataInputStream();
         }
-    } // class ByteArrayInputSocket
+    } // ByteArrayInputSocket
 
     private class DataInputChannel extends SeekableByteBufferChannel {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -221,10 +232,10 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
         @Override
         public void close() throws IOException {
-            times.put(READ, System.currentTimeMillis());
             super.close();
+            times.put(READ, System.currentTimeMillis());
         }
-    } // class DataInputChannel
+    } // DataInputChannel
 
     private class DataReadOnlyFile extends ByteArrayReadOnlyFile {
         DataReadOnlyFile() {
@@ -233,10 +244,10 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
         @Override
         public void close() throws IOException {
-            times.put(READ, System.currentTimeMillis());
             super.close();
+            times.put(READ, System.currentTimeMillis());
         }
-    } // class DataReadOnlyFile
+    } // DataReadOnlyFile
 
     private class DataInputStream extends ByteArrayInputStream {
         DataInputStream() {
@@ -245,10 +256,10 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
         @Override
         public void close() throws IOException {
-            times.put(READ, System.currentTimeMillis());
             super.close();
+            times.put(READ, System.currentTimeMillis());
         }
-    } // class DataInputStream
+    } // DataInputStream
 
     private final class Nio2ByteArrayOutputSocket
     extends ByteArrayOutputSocket {
@@ -257,12 +268,12 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             count();
             return new DataOutputChannel();
         }
-    } // class Nio2ByteArrayOutputSocket
+    } // Nio2ByteArrayOutputSocket
 
-    private class ByteArrayOutputSocket extends OutputSocket<ByteArrayIOEntry> {
+    private class ByteArrayOutputSocket extends OutputSocket<ByteArrayIOBuffer> {
         @Override
-        public final ByteArrayIOEntry getLocalTarget() throws IOException {
-            return ByteArrayIOEntry.this;
+        public final ByteArrayIOBuffer getLocalTarget() throws IOException {
+            return ByteArrayIOBuffer.this;
         }
 
         final void count() {
@@ -274,7 +285,7 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
             count();
             return new DataOutputStream();
         }
-    } // class ByteArrayOutputSocket
+    } // ByteArrayOutputSocket
 
     private class DataOutputChannel extends SeekableByteBufferChannel {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -284,12 +295,12 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
         @Override
         public void close() throws IOException {
-            times.put(WRITE, System.currentTimeMillis());
             super.close();
+            times.put(WRITE, System.currentTimeMillis());
             final ByteBuffer buffer = getByteBuffer();
             data = Arrays.copyOf(buffer.array(), buffer.limit());
         }
-    }
+    } // DataOutputChannel
 
     private class DataOutputStream extends ByteArrayOutputStream {
         DataOutputStream() {
@@ -298,9 +309,9 @@ public class ByteArrayIOEntry implements IOEntry<ByteArrayIOEntry> {
 
         @Override
         public void close() throws IOException {
-            times.put(WRITE, System.currentTimeMillis());
             super.close();
+            times.put(WRITE, System.currentTimeMillis());
             data = toByteArray();
         }
-    } // class DataOutputStream
+    } // DataOutputStream
 }

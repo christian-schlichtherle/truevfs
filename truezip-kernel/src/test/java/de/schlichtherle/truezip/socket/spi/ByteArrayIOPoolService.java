@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.socket.spi;
 
-import de.schlichtherle.truezip.socket.ByteArrayIOEntry;
+import de.schlichtherle.truezip.socket.ByteArrayIOBuffer;
 import de.schlichtherle.truezip.socket.ByteArrayIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
 import javax.annotation.concurrent.Immutable;
@@ -29,7 +29,7 @@ public final class ByteArrayIOPoolService extends IOPoolService {
     /**
      * Constructs a new instance which provides a
      * {@link ByteArrayIOPool byte array I/O pool} where each allocated
-     * {@link ByteArrayIOEntry byte array I/O entry} has an initial capacity
+     * {@link ByteArrayIOBuffer byte array I/O entry} has an initial capacity
      * of the given number of bytes.
      * 
      * @param initialCapacity the initial capacity in bytes.

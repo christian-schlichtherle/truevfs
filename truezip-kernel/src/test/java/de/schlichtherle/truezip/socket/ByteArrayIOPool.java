@@ -20,7 +20,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class ByteArrayIOPool implements IOPool<ByteArrayIOEntry> {
+public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
 
     private static final String MOCK_ENTRY_NAME = "mock";
 
@@ -54,7 +54,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOEntry> {
     }
 
     @Override
-    public void release(IOPool.Entry<ByteArrayIOEntry> entry) throws IOException {
+    public void release(IOPool.Entry<ByteArrayIOBuffer> entry) throws IOException {
         entry.release();
     }
 
@@ -71,8 +71,8 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOEntry> {
 
     @NotThreadSafe
     public final class Entry
-    extends ByteArrayIOEntry
-    implements IOPool.Entry<ByteArrayIOEntry> {
+    extends ByteArrayIOBuffer
+    implements IOPool.Entry<ByteArrayIOBuffer> {
         private boolean released;
 
         private Entry(int i) {

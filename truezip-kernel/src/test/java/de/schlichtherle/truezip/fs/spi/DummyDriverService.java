@@ -8,9 +8,9 @@
  */
 package de.schlichtherle.truezip.fs.spi;
 
-import de.schlichtherle.truezip.fs.DummyDriver;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.MockDriver;
 import java.util.Map;
 
 /**
@@ -25,7 +25,7 @@ public final class DummyDriverService extends FsDriverService {
 
     public DummyDriverService(String suffixes) {
         this.drivers = newMap(new Object[][] {
-            { suffixes, new DummyDriver() },
+            { suffixes, new MockDriver() },
         });
     }
 

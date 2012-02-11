@@ -9,17 +9,14 @@
 package de.schlichtherle.truezip.fs;
 
 /**
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class DummyDriver extends FsDriver {
+public class MockDriver extends FsDriver {
 
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        assert null == model.getParent()
-                    ? null == parent
-                    : model.getParent().equals(parent.getModel());
-        return new DummyController<FsModel>(model, parent);
+        return new MockController<FsModel>(model, parent);
     }
 }

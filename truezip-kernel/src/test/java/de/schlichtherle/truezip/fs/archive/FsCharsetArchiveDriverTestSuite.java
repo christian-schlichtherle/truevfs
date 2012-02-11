@@ -18,30 +18,32 @@ import javax.annotation.CheckForNull;
 import org.junit.Test;
 
 /**
+ * @param   <E> The type of the archive entries.
  * @param   <D> The type of the charset archive driver.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public abstract class FsCharsetArchiveDriverTestSuite<
-        D extends FsCharsetArchiveDriver<?>>
-extends FsArchiveDriverTestSuite<D> {
+        E extends FsArchiveEntry,
+        D extends FsCharsetArchiveDriver<E>>
+extends FsArchiveDriverTestSuite<E, D> {
 
-    private static final String ENCODABLE_NAME;
+    private static final String US_ASCII_CHARACTERS;
     static {
-        // US-ASCII must always be encodable.
         final StringBuilder builder = new StringBuilder(128);
         for (char c = 0; c <= 127; c++)
             builder.append(c);
-        ENCODABLE_NAME = builder.toString();
+        US_ASCII_CHARACTERS = builder.toString();
     }
 
     @Test
-    public void testCharset() {
+    public void charsetMustNotBeNull() {
         assert null != getArchiveDriver().getCharset();
     }
 
     @Test(expected = CharConversionException.class)
-    public void testUnencodableName() throws CharConversionException {
+    public void unencodableNameMustThrowCharConversionException()
+    throws CharConversionException {
         final String name = getUnencodableName();
         if (null == name)
             throw new CharConversionException("Ignore me!");
@@ -58,12 +60,14 @@ extends FsArchiveDriverTestSuite<D> {
     protected abstract @CheckForNull String getUnencodableName();
 
     @Test
-    public void testEncodableName() throws CharConversionException {
-        getArchiveDriver().assertEncodable(ENCODABLE_NAME);
+    public void allUsAsciiCharactersMustBeEncodable()
+    throws CharConversionException {
+        getArchiveDriver().assertEncodable(US_ASCII_CHARACTERS);
     }
 
     @Test
-    public void testMultithreadedEncodableName() throws Throwable {
+    public void allUsAsciiCharactersMustBeEncodableWhenRunningMultithreaded()
+    throws Throwable {
         final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
         class TestTask implements Callable<Void> {
@@ -73,7 +77,7 @@ extends FsArchiveDriverTestSuite<D> {
                 start.countDown();
                 start.await();
                 for (int i = 0; i < 100000; i++)
-                    getArchiveDriver().assertEncodable(ENCODABLE_NAME);
+                    getArchiveDriver().assertEncodable(US_ASCII_CHARACTERS);
                 return null;
             }
         } // TestTask
