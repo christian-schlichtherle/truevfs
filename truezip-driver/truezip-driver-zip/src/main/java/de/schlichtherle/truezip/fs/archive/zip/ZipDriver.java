@@ -68,8 +68,8 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public class ZipDriver
-extends FsCharsetArchiveDriver<ZipArchiveEntry>
-implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
+extends FsCharsetArchiveDriver<ZipDriverEntry>
+implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
 
     private static final Logger logger = Logger.getLogger(
             ZipDriver.class.getName(),
@@ -246,21 +246,21 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      */
     protected boolean check(
             @WillNotClose ZipInputShop input,
-            ZipArchiveEntry entry) {
+            ZipDriverEntry entry) {
         return entry.isEncrypted();
     }
 
     final boolean process(
             @WillNotClose ZipInputShop input,
-            ZipArchiveEntry local,
-            ZipArchiveEntry peer) {
+            ZipDriverEntry local,
+            ZipDriverEntry peer) {
         return process(local, peer);
     }
 
     final boolean process(
             @WillNotClose ZipOutputShop output,
-            ZipArchiveEntry local,
-            ZipArchiveEntry peer) {
+            ZipDriverEntry local,
+            ZipDriverEntry peer) {
         return process(peer, local);
     }
 
@@ -287,7 +287,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      *         sent in raw format.
      * @since  TrueZIP 7.3
      */
-    protected boolean process(ZipArchiveEntry input, ZipArchiveEntry output) {
+    protected boolean process(ZipDriverEntry input, ZipDriverEntry output) {
         return input.isEncrypted() || output.isEncrypted();
     }
 
@@ -396,7 +396,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     }
 
     @Override
-    public ZipArchiveEntry newEntry(
+    public ZipDriverEntry newEntry(
             String name,
             final Type type,
             final Entry template,
@@ -404,7 +404,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     throws CharConversionException {
         assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
-        final ZipArchiveEntry entry;
+        final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {
             entry = newEntry(name, (ZipEntry) template);
         } else {
@@ -435,11 +435,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      * Returns a new ZIP archive entry with the given {@code name}.
      *
      * @param  name the entry name.
-     * @return {@code new ZipArchiveEntry(name)}
+     * @return {@code new ZipDriverEntry(name)}
      */
     @Override
-    public ZipArchiveEntry newEntry(String name) {
-        return new ZipArchiveEntry(name);
+    public ZipDriverEntry newEntry(String name) {
+        return new ZipDriverEntry(name);
     }
 
     /**
@@ -447,10 +447,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      * other properties copied from the given template.
      *
      * @param  name the entry name.
-     * @return {@code new ZipArchiveEntry(name, template)}
+     * @return {@code new ZipDriverEntry(name, template)}
      */
-    public ZipArchiveEntry newEntry(String name, ZipEntry template) {
-        return new ZipArchiveEntry(name, template);
+    public ZipDriverEntry newEntry(String name, ZipEntry template) {
+        return new ZipDriverEntry(name, template);
     }
 
     /**
@@ -461,7 +461,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      * {@link #newInputShop}.
      */
     @Override
-    public InputShop<ZipArchiveEntry> newInputShop(
+    public InputShop<ZipDriverEntry> newInputShop(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
@@ -477,7 +477,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     }
 
     @CreatesObligation
-    protected InputShop<ZipArchiveEntry> newInputShop(
+    protected InputShop<ZipDriverEntry> newInputShop(
             FsModel model,
             @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
@@ -538,10 +538,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
      * which uses the current {@link #getPool}.
      */
     @Override
-    public final OutputShop<ZipArchiveEntry> newOutputShop(
+    public final OutputShop<ZipDriverEntry> newOutputShop(
             final FsModel model,
             final OutputSocket<?> output,
-            final InputShop<ZipArchiveEntry> source)
+            final InputShop<ZipDriverEntry> source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
@@ -552,7 +552,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     }
 
     @CreatesObligation
-    private OutputShop<ZipArchiveEntry> newOutputShop0(
+    private OutputShop<ZipDriverEntry> newOutputShop0(
             final FsModel model,
             final OptionOutputSocket output,
             final @CheckForNull @WillNotClose ZipInputShop source)
@@ -564,7 +564,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
     }
 
     @CreatesObligation
-    protected OutputShop<ZipArchiveEntry> newOutputShop(
+    protected OutputShop<ZipDriverEntry> newOutputShop(
             final FsModel model,
             final OptionOutputSocket output,
             final @CheckForNull @WillNotClose ZipInputShop source)
@@ -581,12 +581,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipArchiveEntry> {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputShop<ZipArchiveEntry> newOutputShop(
+    protected OutputShop<ZipDriverEntry> newOutputShop(
             FsModel model,
             @WillCloseWhenClosed OutputStream out,
             @CheckForNull @WillNotClose ZipInputShop source)
     throws IOException {
-        return new FsMultiplexedOutputShop<ZipArchiveEntry>(
+        return new FsMultiplexedOutputShop<ZipDriverEntry>(
                 new ZipOutputShop(this, model, out, source),
                 getPool());
     }

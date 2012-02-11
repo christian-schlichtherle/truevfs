@@ -51,13 +51,13 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public class ZipOutputShop
-extends RawZipOutputStream<ZipArchiveEntry>
-implements OutputShop<ZipArchiveEntry> {
+extends RawZipOutputStream<ZipDriverEntry>
+implements OutputShop<ZipDriverEntry> {
 
     private final ZipDriver driver;
     private final FsModel model;
     private @CheckForNull IOPool.Entry<?> postamble;
-    private @CheckForNull ZipArchiveEntry bufferedEntry;
+    private @CheckForNull ZipDriverEntry bufferedEntry;
     private ZipCryptoParameters param;
 
     @CreatesObligation
@@ -125,18 +125,18 @@ implements OutputShop<ZipArchiveEntry> {
     }
 
     @Override
-    public Iterator<ZipArchiveEntry> iterator() {
-        final ZipArchiveEntry tempEntry = this.bufferedEntry;
+    public Iterator<ZipDriverEntry> iterator() {
+        final ZipDriverEntry tempEntry = this.bufferedEntry;
         if (null == tempEntry)
             return super.iterator();
-        return new JointIterator<ZipArchiveEntry>(
+        return new JointIterator<ZipDriverEntry>(
                 super.iterator(),
                 Collections.singletonList(tempEntry).iterator());
     }
 
     @Override
-    public @CheckForNull ZipArchiveEntry getEntry(final String name) {
-        ZipArchiveEntry entry = super.getEntry(name);
+    public @CheckForNull ZipDriverEntry getEntry(final String name) {
+        ZipDriverEntry entry = super.getEntry(name);
         if (null != entry)
             return entry;
         entry = this.bufferedEntry;
@@ -144,13 +144,13 @@ implements OutputShop<ZipArchiveEntry> {
     }
 
     @Override
-    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry entry) { // local target
+    public OutputSocket<ZipDriverEntry> getOutputSocket(final ZipDriverEntry entry) { // local target
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<ZipArchiveEntry> {
+        class Output extends OutputSocket<ZipDriverEntry> {
             @Override
-            public ZipArchiveEntry getLocalTarget() {
+            public ZipDriverEntry getLocalTarget() {
                 return entry;
             }
 
@@ -171,12 +171,12 @@ implements OutputShop<ZipArchiveEntry> {
                 } else if (null != (peer = getPeerTarget())
                         && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);
-                    if (peer instanceof ZipArchiveEntry) {
+                    if (peer instanceof ZipDriverEntry) {
                         // Set up entry attributes for Raw Data Copying (RDC).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
-                        final ZipArchiveEntry zpt = (ZipArchiveEntry) peer;
+                        final ZipDriverEntry zpt = (ZipDriverEntry) peer;
                         process = driver.process(ZipOutputShop.this, entry, zpt);
                         if (!process) {
                             entry.setPlatform(zpt.getPlatform());
@@ -259,13 +259,13 @@ implements OutputShop<ZipArchiveEntry> {
      * writing another entry and the entry holds enough information to write
      * the entry header.
      * These preconditions are checked by
-     * {@link #getOutputSocket(ZipArchiveEntry)}.
+     * {@link #getOutputSocket(ZipDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        EntryOutputStream(ZipArchiveEntry entry, boolean process)
+        EntryOutputStream(ZipDriverEntry entry, boolean process)
         throws IOException {
             super(ZipOutputShop.this);
             putNextEntry(entry, process);
@@ -292,7 +292,7 @@ implements OutputShop<ZipArchiveEntry> {
         @CreatesObligation
         BufferedEntryOutputStream(
                 final IOPool.Entry<?> buffer,
-                final ZipArchiveEntry entry,
+                final ZipDriverEntry entry,
                 final boolean process)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream(), new CRC32());
@@ -316,7 +316,7 @@ implements OutputShop<ZipArchiveEntry> {
             final IOPool.Entry<?> buffer = this.buffer;
             assert null != buffer;
 
-            final ZipArchiveEntry entry = ZipOutputShop.this.bufferedEntry;
+            final ZipDriverEntry entry = ZipOutputShop.this.bufferedEntry;
             assert null != entry;
             assert STORED == entry.getMethod();
 

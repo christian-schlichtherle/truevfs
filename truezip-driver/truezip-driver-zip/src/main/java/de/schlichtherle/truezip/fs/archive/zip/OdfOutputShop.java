@@ -28,7 +28,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-public class OdfOutputShop extends FsMultiplexedOutputShop<ZipArchiveEntry> {
+public class OdfOutputShop extends FsMultiplexedOutputShop<ZipDriverEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";
@@ -49,17 +49,17 @@ public class OdfOutputShop extends FsMultiplexedOutputShop<ZipArchiveEntry> {
     }
 
     @Override
-    public OutputSocket<ZipArchiveEntry> getOutputSocket(final ZipArchiveEntry entry) {
+    public OutputSocket<ZipDriverEntry> getOutputSocket(final ZipDriverEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratingOutputSocket<ZipArchiveEntry> {
+        class Output extends DecoratingOutputSocket<ZipDriverEntry> {
             Output() {
                 super(OdfOutputShop.super.getOutputSocket(entry));
             }
 
             @Override
-            public ZipArchiveEntry getLocalTarget() throws IOException {
+            public ZipDriverEntry getLocalTarget() throws IOException {
                 return entry;
             }
 

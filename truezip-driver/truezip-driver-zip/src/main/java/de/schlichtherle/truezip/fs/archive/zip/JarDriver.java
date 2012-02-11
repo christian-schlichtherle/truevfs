@@ -62,11 +62,11 @@ public class JarDriver extends ZipDriver {
      * Returns a new JAR archive entry with the given {@code name}.
      *
      * @param  name the entry name.
-     * @return {@code new JarArchiveEntry(name)}
+     * @return {@code new JarDriverEntry(name)}
      */
     @Override
-    public JarArchiveEntry newEntry(String name) {
-        return new JarArchiveEntry(name);
+    public JarDriverEntry newEntry(String name) {
+        return new JarDriverEntry(name);
     }
 
     /**
@@ -74,10 +74,10 @@ public class JarDriver extends ZipDriver {
      * other properties copied from the given template.
      *
      * @param  name the entry name.
-     * @return {@code new JarArchiveEntry(name, template)}
+     * @return {@code new JarDriverEntry(name, template)}
      */
     @Override
-    public JarArchiveEntry newEntry(String name, ZipEntry template) {
-        return new JarArchiveEntry(name, template);
+    public JarDriverEntry newEntry(String name, ZipEntry template) {
+        return new JarDriverEntry(name, template);
     }
 }

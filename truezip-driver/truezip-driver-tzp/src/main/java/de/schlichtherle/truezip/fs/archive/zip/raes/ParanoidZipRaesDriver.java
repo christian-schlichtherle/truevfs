@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.archive.zip.ZipArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
 import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
@@ -57,7 +57,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      * written entries.
      */
     @Override
-    protected OutputShop<ZipArchiveEntry> newOutputShop(
+    protected OutputShop<ZipDriverEntry> newOutputShop(
             FsModel model,
             OutputStream out,
             ZipInputShop source)

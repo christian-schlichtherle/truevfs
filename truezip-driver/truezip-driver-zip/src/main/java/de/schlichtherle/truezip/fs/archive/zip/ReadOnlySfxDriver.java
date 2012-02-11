@@ -52,7 +52,7 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    protected final OutputShop<ZipArchiveEntry> newOutputShop(
+    protected final OutputShop<ZipDriverEntry> newOutputShop(
             final FsModel model,
             final OptionOutputSocket output,
             final ZipInputShop source)

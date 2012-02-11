@@ -26,13 +26,13 @@ import de.schlichtherle.truezip.zip.ZipEntry;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
+public class ZipDriverEntry extends ZipEntry implements FsArchiveEntry {
 
-    public ZipArchiveEntry(String name) {
+    public ZipDriverEntry(String name) {
         super(name);
     }
 
-    protected ZipArchiveEntry(String name, ZipEntry template) {
+    protected ZipDriverEntry(String name, ZipEntry template) {
         super(name, template);
     }
 
@@ -45,7 +45,7 @@ public class ZipArchiveEntry extends ZipEntry implements FsArchiveEntry {
      * Returns a {@link DateTimeConverter} for the conversion of Java time
      * to DOS date/time fields and vice versa.
      * <p>
-     * The implementation in the class {@link ZipArchiveEntry} returns
+     * The implementation in the class {@link ZipDriverEntry} returns
      * {@link DateTimeConverter#ZIP}.
      *
      * @return {@link DateTimeConverter#ZIP}

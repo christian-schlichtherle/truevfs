@@ -31,8 +31,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public class ZipInputShop
-extends RawZipFile<ZipArchiveEntry>
-implements InputShop<ZipArchiveEntry> {
+extends RawZipFile<ZipDriverEntry>
+implements InputShop<ZipDriverEntry> {
 
     private final ZipDriver driver;
     private final FsModel model;
@@ -101,14 +101,14 @@ implements InputShop<ZipArchiveEntry> {
     }
 
     @Override
-    public InputSocket<ZipArchiveEntry> getInputSocket(final String name) {
+    public InputSocket<ZipDriverEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends InputSocket<ZipArchiveEntry> {
+        class Input extends InputSocket<ZipDriverEntry> {
             @Override
-            public ZipArchiveEntry getLocalTarget() throws IOException {
-                final ZipArchiveEntry entry = getEntry(name);
+            public ZipDriverEntry getLocalTarget() throws IOException {
+                final ZipDriverEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 return entry;
@@ -121,10 +121,10 @@ implements InputShop<ZipArchiveEntry> {
 
             @Override
             public InputStream newInputStream() throws IOException {
-                final ZipArchiveEntry lt = getLocalTarget();
+                final ZipDriverEntry lt = getLocalTarget();
                 final Entry pt = getPeerTarget();
-                final ZipArchiveEntry zpt = pt instanceof ZipArchiveEntry
-                        ? (ZipArchiveEntry) pt
+                final ZipDriverEntry zpt = pt instanceof ZipDriverEntry
+                        ? (ZipDriverEntry) pt
                         : null;
                 final ZipDriver driver = ZipInputShop.this.driver;
                 return getInputStream(
