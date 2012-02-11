@@ -144,14 +144,9 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
      */
     @Override
     public String toString() {
-        final String c = getClass().getName();
-        final String n = getName();
-        return new StringBuilder(c.length() + "[name=".length() + n.length() + 1)
-                .append(c)
-                .append("[name=")
-                .append(n)
-                .append(']')
-                .toString();
+        return String.format("%s[name=%s]",
+                getClass().getName(),
+                getName());
     }
 
     @Immutable
