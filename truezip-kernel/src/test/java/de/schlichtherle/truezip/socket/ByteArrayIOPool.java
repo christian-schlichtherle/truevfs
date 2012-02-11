@@ -41,7 +41,6 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     }
 
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("VO_VOLATILE_INCREMENT")
     public Entry<ByteArrayIOBuffer> allocate() {
         Buffer entry = new Buffer(total.getAndIncrement());
         active.getAndIncrement();
