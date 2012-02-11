@@ -91,6 +91,7 @@ extends FsArchiveDriver<E> {
      * @throws CharConversionException If the path name contains characters
      *         which cannot get encoded.
      */
+    // TODO: Consider naming this checkEncodable because of throws declaration.
     protected final void assertEncodable(String name)
     throws CharConversionException {
         if (!encoder.canEncode(name))
