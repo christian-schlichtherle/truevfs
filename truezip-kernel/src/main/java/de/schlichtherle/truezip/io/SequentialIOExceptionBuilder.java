@@ -19,8 +19,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * When the assembly is thrown or returned later, it is sorted by
  * {@link SequentialIOException#sortPriority() priority}.
  *
- * @param   <C> The type of the cause exceptions.
- * @param   <X> The type of the assembled exception.
+ * @param   <C> the type of the cause exceptions.
+ * @param   <X> the type of the assembled exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -33,6 +33,8 @@ extends AbstractExceptionBuilder<C, X> {
 
     /**
      * Static constructor provided for comforting the most essential use case.
+     * 
+     * @return A new sequential I/O exception builder.
      */
     public static SequentialIOExceptionBuilder<Exception, SequentialIOException>
     create() {

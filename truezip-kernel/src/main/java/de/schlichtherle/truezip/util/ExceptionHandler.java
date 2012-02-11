@@ -83,8 +83,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * TODO: Consider allowing {@link Throwable} as type parameters.
  * 
- * @param   <C> The type of the cause exception.
- * @param   <X> The type of the thrown exception.
+ * @param   <C> the type of the cause exception.
+ * @param   <X> the type of the thrown exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -100,8 +100,8 @@ public interface ExceptionHandler<C extends Exception, X extends Exception> {
      * Finally, if the implementation maintains a state, it must be updated
      * so that this instance can be reused to handle more exceptions!
      *
-     * @param   cause the exception to handle.
-     * @return  The exception to throw.
+     * @param  cause the exception to handle.
+     * @return The exception to throw.
      */
     X fail(C cause);
 
@@ -114,9 +114,8 @@ public interface ExceptionHandler<C extends Exception, X extends Exception> {
      * If the implementation maintains a state, it must be updated
      * so that this instance can be reused to handle more exceptions.
      *
-     * @param   cause the exception to handle - {@code null} is not permitted.
-     * @throws Exception if the implementation wants the caller to abort its
-     *         task.
+     * @param  cause the exception to handle - {@code null} is not permitted.
+     * @throws X if the implementation wants the caller to abort its task.
      */
     void warn(C cause) throws X;
 }

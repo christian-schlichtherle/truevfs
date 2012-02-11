@@ -16,8 +16,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Subclasses must implement {@link #update(Exception, Exception)} and may
  * override {@link #post(Exception)}.
  *
- * @param   <C> The type of the cause exception.
- * @param   <X> The type of the assembled exception.
+ * @param   <C> the type of the cause exception.
+ * @param   <X> the type of the assembled exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -85,7 +85,9 @@ implements ExceptionBuilder<C, X> {
     /**
      * {@inheritDoc}
      *
-     * @see #post(Exception)
+     * @throws X the assembled exception if the implementation wants
+     *         the caller to abort its task.
+     * @see    #post(Exception)
      */
     @Override
     public final void check() throws X {
