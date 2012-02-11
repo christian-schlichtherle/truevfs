@@ -26,6 +26,7 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public class FsFalsePositiveException extends FsControllerException {
+
     public FsFalsePositiveException(IOException cause) {
         super(cause);
         assert null != cause;
