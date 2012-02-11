@@ -6,7 +6,11 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.mock;
+
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsDriver;
+import de.schlichtherle.truezip.fs.FsModel;
 
 /**
  * @author  Christian Schlichtherle

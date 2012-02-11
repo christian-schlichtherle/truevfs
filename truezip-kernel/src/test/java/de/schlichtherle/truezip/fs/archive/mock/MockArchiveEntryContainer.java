@@ -23,37 +23,69 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public class MockArchiveEntryContainer
 implements EntryContainer<MockArchiveEntry> {
 
-    private final Map<String, MockArchiveEntry>
-            map = new LinkedHashMap<String, MockArchiveEntry>();
-    private final IOPool<?> pool = new ByteArrayIOPool(2048);
+    final IOPool<?> pool;
+    final Map<String, MockArchiveEntry> entries;
+
+    public static MockArchiveEntryContainer create(
+            final IOPoolProvider provider) {
+        return create(provider, 32);
+    }
+
+    public static MockArchiveEntryContainer create(
+            final IOPoolProvider provider,
+            final int initialCapacity) {
+        final IOPool<?> pool = provider.get();
+        if (null == pool)
+            throw new NullPointerException();
+        return new MockArchiveEntryContainer(
+                pool,
+                new LinkedHashMap<String, MockArchiveEntry>(initialCapacity));
+    }
+
+    private MockArchiveEntryContainer(
+            final IOPool<?> pool,
+            final Map<String, MockArchiveEntry> entries) {
+        this.pool = pool;
+        this.entries = entries;
+    }
 
     @Override
     public int getSize() {
-        return map.size();
+        return entries.size();
     }
 
     @Override
     public Iterator<MockArchiveEntry> iterator() {
-        return Collections.unmodifiableCollection(map.values()).iterator();
+        return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     @Override
     public MockArchiveEntry getEntry(String name) {
-        return map.get(name);
+        return entries.get(name);
     }
 
-    public final class InputArchive
+    public InputShop<MockArchiveEntry> newInputShop() {
+        return new MockInputShop(pool, entries);
+    }
+
+    private static final class MockInputShop
     extends MockArchiveEntryContainer
     implements InputShop<MockArchiveEntry> {
         private boolean closed;
+
+        MockInputShop(IOPool<?> pool, Map<String, MockArchiveEntry> entries) {
+            super(pool, entries);
+        }
 
         @Override
         public InputSocket<? extends MockArchiveEntry> getInputSocket(
@@ -64,7 +96,7 @@ implements EntryContainer<MockArchiveEntry> {
             class Input extends InputSocket<MockArchiveEntry> {
                 @Override
                 public MockArchiveEntry getLocalTarget() throws IOException {
-                    final MockArchiveEntry entry = map.get(name);
+                    final MockArchiveEntry entry = entries.get(name);
                     if (null == entry)
                         throw new FileNotFoundException(name + " (entry not found)");
                     return entry;
@@ -98,12 +130,20 @@ implements EntryContainer<MockArchiveEntry> {
         public void close() {
             closed = true;
         }
-    } // InputArchive
+    } // MockInputShop
 
-    public final class OutputArchive
+    public OutputShop<MockArchiveEntry> newOutputShop() {
+        return new MockOutputShop(pool, entries);
+    }
+
+    private static final class MockOutputShop
     extends MockArchiveEntryContainer
     implements OutputShop<MockArchiveEntry> {
         private boolean closed;
+
+        MockOutputShop(IOPool<?> pool, Map<String, MockArchiveEntry> entries) {
+            super(pool, entries);
+        }
 
         @Override
         public OutputSocket<? extends MockArchiveEntry> getOutputSocket(
@@ -122,7 +162,7 @@ implements EntryContainer<MockArchiveEntry> {
                 throws IOException {
                     if (closed)
                         throw new IOException("Output shop closed!");
-                    map.put(entry.getName(), entry);
+                    entries.put(entry.getName(), entry);
                     IOPool.Entry<?> _io = entry.io;
                     if (null == _io)
                         entry.io = _io = pool.allocate(); // note no call to io.release()!
@@ -159,5 +199,5 @@ implements EntryContainer<MockArchiveEntry> {
         public void close() {
             closed = true;
         }
-    } // OutputArchive
+    } // MockOutputShop
 }

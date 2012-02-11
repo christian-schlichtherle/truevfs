@@ -6,11 +6,11 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.fs.spi;
+package de.schlichtherle.truezip.fs.mock;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.MockDriver;
+import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import java.util.Map;
 
 /**

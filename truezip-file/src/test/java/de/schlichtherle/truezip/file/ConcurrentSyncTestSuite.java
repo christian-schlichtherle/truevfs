@@ -143,11 +143,11 @@ extends ArchiveIOTestBase<D> {
         } finally {
             in.close();
         }
-        assertEquals(getData().length, file.length());
+        assertEquals(getDataLength(), file.length());
     }
 
     private void assertOutput(final TFile file) throws IOException {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream(getData().length);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
         try {
             file.output(out);
         } finally {
