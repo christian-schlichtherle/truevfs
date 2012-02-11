@@ -48,7 +48,7 @@ implements SeekableByteChannel {
     public int read(ByteBuffer dst) throws IOException {
         return delegate.read(dst);
     }
-    
+
     @Override
     public int write(ByteBuffer src) throws IOException {
         return delegate.write(src);
@@ -80,7 +80,7 @@ implements SeekableByteChannel {
     public boolean isOpen() {
         return delegate.isOpen();
     }
-    
+
     @Override
     @DischargesObligation
     public void close() throws IOException {
