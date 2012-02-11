@@ -275,6 +275,15 @@ extends FsDriver {
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.entry.Entry.Type, de.schlichtherle.truezip.entry.Entry, de.schlichtherle.truezip.util.BitField)
      * newEntry(name, type, template, FsOutputOptions.NO_OUTPUT_OPTIONS)}.
+     * 
+     * @param  name an entry name.
+     * @param  type an entry type.
+     * @param  template if not {@code null}, then the new entry shall inherit
+     *         as much properties from this entry as possible - with the
+     *         exception of its name and type.
+     * @return A new entry for the given name.
+     * @throws CharConversionException if {@code name} contains characters
+     *         which are invalid.
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template)
     throws CharConversionException {
