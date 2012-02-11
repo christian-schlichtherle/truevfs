@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import javax.annotation.concurrent.Immutable;
 
 /**
+ * @param   <D> the type of the instrumenting driver.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -43,7 +44,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
 
     public abstract FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context);
 
-    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, D>.IOBuffer context) {
+    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, D>.Buffer context) {
         return instrument(input);
     }
 
@@ -55,7 +56,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
         return input; //new InstrumentingInputSocket<E>(input, this);
     }
 
-    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, D>.IOBuffer context) {
+    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, D>.Buffer context) {
         return instrument(output);
     }
 
