@@ -64,7 +64,7 @@ extends FsArchiveDriver<E> {
     }
 
     /**
-     * Fixes the given <i>entry name</i> so that it forms a valid entry name
+     * Fixes the given entry {@code name} so that it forms a valid entry name
      * for ZIP or TAR files by ensuring that the returned entry name ends with
      * the separator character {@code '/'} if and only if {@code type} is
      * {@code DIRECTORY}.
@@ -119,14 +119,18 @@ extends FsArchiveDriver<E> {
      */
     @Override
     public String toString() {
-        return new StringBuilder()
-                .append(getClass().getName())
+        final String n = getClass().getName();
+        final String f = Boolean.toString(isFederated());
+        final String p = Integer.toString(getPriority());
+        final String c = getCharset().toString();
+        return new StringBuilder(n.length() + "[charset=".length() + c.length() + "[federated=".length() + f.length() + ",priority=" + p.length())
+                .append(n)
                 .append("[charset=")
-                .append(getCharset())
-                .append(",federated=")
-                .append(isFederated())
+                .append(c)
+                .append("[federated=")
+                .append(f)
                 .append(",priority=")
-                .append(getPriority())
+                .append(p)
                 .append(']')
                 .toString();
     }
