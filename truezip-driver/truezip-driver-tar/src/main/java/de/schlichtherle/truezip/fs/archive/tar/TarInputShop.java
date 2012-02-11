@@ -18,9 +18,9 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import javax.annotation.CheckForNull;
 import java.io.*;
 import java.util.*;
+import javax.annotation.CheckForNull;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -196,7 +196,7 @@ implements InputShop<TTarArchiveEntry> {
 
     @Override
     public final Iterator<TTarArchiveEntry> iterator() {
-        return entries.values().iterator();
+        return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     @Override
