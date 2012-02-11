@@ -30,11 +30,12 @@ public interface IOPool<E extends IOEntry<E>>
 extends Pool<IOPool.Entry<E>, IOException> {
 
     /**
-     * A releasable I/O entry.
-     * TODO for TrueZIP 8: This should be named "IOBuffer".
+     * A releasable I/O buffer.
+     * TODO for TrueZIP 8: This should be named "Buffer".
      * 
      * @param <E> the type of the I/O entries.
      */
+    @SuppressWarnings("PublicInnerClass")
     interface Entry<E extends IOEntry<E>>
     extends IOEntry<E>, Pool.Releasable<IOException> {
     }
