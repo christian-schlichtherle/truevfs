@@ -143,10 +143,10 @@ implements FsArchiveEntry, Releasable<IOException> {
         setInit(MODTIME, known);
     }
 
-    /*@Override // FIXME: Uncomment this!
+    @Override
     public void setModTime(Date time) {
         setModTime(time.getTime());
-    }*/
+    }
 
     @Override
     public long getTime(Access type) {
