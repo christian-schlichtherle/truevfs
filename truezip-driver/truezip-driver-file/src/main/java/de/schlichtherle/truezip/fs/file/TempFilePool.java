@@ -9,11 +9,11 @@
 package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.socket.IOPool;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.File;
 import static java.io.File.createTempFile;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -47,8 +47,8 @@ final class TempFilePool implements IOPool<FileEntry> {
     }
 
     @Override
-    public TempFileBuffer allocate() throws IOException {
-        return new TempFileBuffer(createTempFile(name, null, dir), this);
+    public Buffer allocate() throws IOException {
+        return new Buffer(createTempFile(name, null, dir), this);
     }
 
     @Override
@@ -58,11 +58,11 @@ final class TempFilePool implements IOPool<FileEntry> {
 
     /** A temp file pool entry. */
     @NotThreadSafe
-    private static final class TempFileBuffer
+    private static final class Buffer
     extends FileEntry
     implements Entry<FileEntry> {
 
-        TempFileBuffer(File file, final TempFilePool pool) {
+        Buffer(File file, final TempFilePool pool) {
             super(file);
             assert null != file;
             assert null != pool;
@@ -96,5 +96,5 @@ final class TempFilePool implements IOPool<FileEntry> {
                 super.finalize();
             }
         }
-    } // PoolEntry
+    } // Buffer
 }

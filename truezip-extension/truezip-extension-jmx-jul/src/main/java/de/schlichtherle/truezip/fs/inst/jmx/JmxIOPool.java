@@ -28,13 +28,14 @@ extends InstrumentingIOPool<E, JmxDirector> {
 
     @Override
     public Entry<E> allocate() throws IOException {
-        return new JmxIOBuffer(delegate.allocate());
+        return new Buffer(delegate.allocate());
     }
 
-    private final class JmxIOBuffer extends IOBuffer {
+    private final class Buffer
+    extends InstrumentingIOPool<E, JmxDirector>.Buffer {
 
         @SuppressWarnings("LeakingThisInConstructor")
-        JmxIOBuffer(Entry<E> model) {
+        Buffer(Entry<E> model) {
             super(model);
             JmxIOBufferView.register(this);
         }
@@ -47,5 +48,5 @@ extends InstrumentingIOPool<E, JmxDirector> {
                 JmxIOBufferView.unregister(this);
             }
         }
-    }
+    } // Buffer
 }
