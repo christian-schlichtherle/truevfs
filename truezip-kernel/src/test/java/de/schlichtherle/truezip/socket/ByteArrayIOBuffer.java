@@ -109,6 +109,7 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
     }
 
     /**
+     * @param  type the access type.
      * @return The number of times an input or output socket has been used to
      *         open a connection to the backing byte array.
      */
