@@ -46,13 +46,6 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
     private int initialCapacity;
 
     /**
-     * Equivalent to {@link #ByteArrayIOBuffer(String, int) new ByteArrayIOPool(name, 32)}.
-     */
-    public ByteArrayIOBuffer(String name) {
-        this(name, 32);
-    }
-
-    /**
      * Constructs a new byte array I/O entry with the given name and initial
      * capacity of the byte array for the next output to this I/O entry.
      *
@@ -73,7 +66,7 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
      *        the next output to this I/O entry.
      */
     public final void setInitialCapacity(final int initialCapacity) {
-        if (0 > initialCapacity) // Yoda conditions I like!
+        if (0 > initialCapacity)
             throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity);
         this.initialCapacity = initialCapacity;
     }

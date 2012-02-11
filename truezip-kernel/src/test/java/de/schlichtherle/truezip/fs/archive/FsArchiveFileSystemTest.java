@@ -17,6 +17,7 @@ import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveEntryContainer;
+import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.UriBuilder;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -30,8 +31,9 @@ public class FsArchiveFileSystemTest {
 
     @Test
     public void testListeners() {
-        final FsArchiveFileSystem<?> fileSystem
-                = FsArchiveFileSystem.newEmptyFileSystem(new MockArchiveDriver());
+        final FsArchiveFileSystem<?>
+                fileSystem = FsArchiveFileSystem.newEmptyFileSystem(
+                    new MockArchiveDriver());
 
         try {
             fileSystem.addFsArchiveFileSystemTouchListener(null);
@@ -94,6 +96,7 @@ public class FsArchiveFileSystemTest {
     }
 
     @Test
+    @SuppressWarnings("AssignmentToForLoopParameter")
     public void testPopulation() throws Exception {
         final String[][] paramss = new String[][] {
             // { $ARCHIVE_ENTRY_NAME [, $FILE_SYSTEM_ENTRY_NAME]* },

@@ -25,6 +25,6 @@ extends ArchiveIOTestBase<MockArchiveDriver> {
 
     @Override
     protected final MockArchiveDriver newArchiveDriver(IOPoolProvider provider) {
-        return new MockArchiveDriver();
+        return new MockArchiveDriver(provider);
     }
 }

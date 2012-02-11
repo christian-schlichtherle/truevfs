@@ -9,19 +9,21 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Access.READ;
+import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.IOCache.Strategy;
+import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_BACK;
+import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_THROUGH;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import de.schlichtherle.truezip.socket.IOCache.Strategy;
-import java.io.IOException;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
-
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.*;
-import static de.schlichtherle.truezip.socket.IOCache.Strategy.*;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle
@@ -29,6 +31,7 @@ import static org.junit.Assert.*;
  */
 public final class IOCacheTest {
 
+    private static final int INITIAL_CAPACITY = 32;
     private static final String MOCK_ENTRY_NAME = "mock";
     private static final String MOCK_ENTRY_DATA_READ = "read";
     private static final String MOCK_ENTRY_DATA_WRITE = "write";
@@ -50,7 +53,7 @@ public final class IOCacheTest {
             ByteArrayIOBuffer front;
             ByteArrayIOBuffer back;
 
-            back = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            back = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             back.setData(MOCK_ENTRY_DATA_READ.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
@@ -60,7 +63,7 @@ public final class IOCacheTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getEntry(), nullValue());
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(front.getData(), nullValue());
             try {
                 IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
@@ -83,7 +86,7 @@ public final class IOCacheTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getEntry(), nullValue());
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(pool.getSize(), is(0));
             assertThat(front.getData(), nullValue());
             IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
@@ -95,7 +98,7 @@ public final class IOCacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_READ.length()));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             front.setData(MOCK_ENTRY_DATA_WRITE.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
@@ -148,7 +151,7 @@ public final class IOCacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            back = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            back = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             back.setData(MOCK_ENTRY_DATA_READ.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
@@ -161,7 +164,7 @@ public final class IOCacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
             assertThat(cache.getEntry(), notNullValue());
             assertThat(pool.getSize(), is(1));
@@ -181,7 +184,7 @@ public final class IOCacheTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getEntry(), nullValue());
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             try {
                 IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
                 fail();
@@ -215,7 +218,7 @@ public final class IOCacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_READ.length()));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME);
+            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             front.setData(MOCK_ENTRY_DATA_WRITE.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
