@@ -277,9 +277,9 @@ public class TArchiveDetectorTest {
     }
 
     private void assertSuffixes(final String[] args) {
-        for (int i = 0; i < args.length; i++) {
+        for (int i = 0; i < args.length; ) {
             final String result = args[i++];
-            final String suffixes = args[i];
+            final String suffixes = args[i++];
             TArchiveDetector
             detector = new TArchiveDetector(suffixes, driver);
             assertEquals(result, detector.toString());
