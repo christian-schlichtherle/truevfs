@@ -305,9 +305,10 @@ extends FsLockModelController {
                 }
             }
             try {
-                final OutputStream out = getOutputSocket(entry)
-                        .bind(null == in ? this : null) // do NOT bind when appending!
-                        .newOutputStream();
+                final OutputSocket<? extends E> output = getOutputSocket(entry);
+                if (null == in) // do NOT bind when appending!
+                    output.bind(this);
+                final OutputStream out = output.newOutputStream();
                 try {
                     mknod.run();
                     if (in != null)
