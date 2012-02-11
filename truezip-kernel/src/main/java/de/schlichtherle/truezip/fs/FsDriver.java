@@ -75,9 +75,9 @@ public abstract class FsDriver {
     @Override
     public String toString() {
         final String n = getClass().getName();
-        final boolean f = isFederated();
-        final int p = getPriority();
-        return new StringBuilder(n.length() + "[federated=".length() + 5 + ",priority=" + 20)
+        final String f = Boolean.toString(isFederated());
+        final String p = Integer.toString(getPriority());
+        return new StringBuilder(n.length() + "[federated=".length() + f.length() + ",priority=" + p.length())
                 .append(n)
                 .append("[federated=")
                 .append(f)
