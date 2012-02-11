@@ -23,8 +23,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * TODO: Consider allowing {@link Throwable} as type parameters.
  *
- * @param   <C> The type of the cause exception.
- * @param   <X> The type of the assembled exception.
+ * @param   <C> the type of the cause exception.
+ * @param   <X> the type of the assembled exception.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -53,7 +53,7 @@ extends ExceptionHandler<C, X> {
      * <p>
      * {@inheritDoc}
      *
-     * @throws Exception the assembled exception if the implementation wants
+     * @throws X the assembled exception if the implementation wants
      *         the caller to abort its task.
      */
     @Override
@@ -64,7 +64,7 @@ extends ExceptionHandler<C, X> {
      * the result of the assembly
      * in order to enable the assembly of another exception.
      *
-     * @throws Exception the assembled exception if the implementation wants
+     * @throws X the assembled exception if the implementation wants
      *         the caller to abort its task.
      */
     void check() throws X;
