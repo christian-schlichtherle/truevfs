@@ -16,13 +16,13 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A pool of byte array I/O buffers.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
 public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
 
-    private static final String MOCK_ENTRY_NAME = "mock";
+    private static final String BUFFER_NAME = "buffer";
 
     private final int initialCapacity;
     private final AtomicInteger total = new AtomicInteger();
@@ -42,14 +42,14 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("VO_VOLATILE_INCREMENT")
-    public Entry allocate() {
-        Entry entry = new Entry(total.getAndIncrement());
+    public Entry<ByteArrayIOBuffer> allocate() {
+        Buffer entry = new Buffer(total.getAndIncrement());
         active.getAndIncrement();
         return entry;
     }
 
     @Override
-    public void release(IOPool.Entry<ByteArrayIOBuffer> entry) throws IOException {
+    public void release(Entry<ByteArrayIOBuffer> entry) throws IOException {
         entry.release();
     }
 
@@ -65,22 +65,22 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     }
 
     @NotThreadSafe
-    public final class Entry
+    private final class Buffer
     extends ByteArrayIOBuffer
-    implements IOPool.Entry<ByteArrayIOBuffer> {
+    implements Entry<ByteArrayIOBuffer> {
         private boolean released;
 
-        private Entry(int i) {
-            super(MOCK_ENTRY_NAME + i, ByteArrayIOPool.this.initialCapacity);
+        Buffer(int i) {
+            super(BUFFER_NAME + i, ByteArrayIOPool.this.initialCapacity);
         }
 
         @Override
         public void release() throws IOException {
             if (released)
                 throw new IllegalStateException("entry has already been released!");
-            released = true;
             active.getAndDecrement();
             setData(null);
+            released = true;
         }
     }
 }
