@@ -16,7 +16,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
  * @version $Id$
  */
 public final class JarDriverTest
-extends FsCharsetArchiveDriverTestSuite<JarDriver> {
+extends FsCharsetArchiveDriverTestSuite<ZipArchiveEntry, JarDriver> {
 
     @Override
     protected JarDriver newArchiveDriver(IOPoolProvider provider) {

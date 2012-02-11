@@ -28,7 +28,7 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     }
 
     private static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(4 * DATA.length / 3); // account for archive type specific overhead
+            IO_POOL_PROVIDER = new ByteArrayIOPoolService(DATA.length * 4 / 3); // account for archive type specific overhead
 
     private D driver;
     private byte[] data;
