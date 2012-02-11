@@ -8,7 +8,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.spi.DummyDriverService;
+import de.schlichtherle.truezip.fs.spi.MockDriverService;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link.Type;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
@@ -27,7 +27,7 @@ import org.junit.Test;
 public abstract class FsManagerTestSuite {
 
     private final FsCompositeDriver driver
-            = new FsDefaultDriver(new DummyDriverService("file|zip"));
+            = new FsDefaultDriver(new MockDriverService("file|zip"));
     private FsManager manager;
 
     @Before
