@@ -180,19 +180,18 @@ extends FsFileSystemArchiveController<E> {
             } catch (FsControllerException nonLocalFlowControl) {
                 assert !(nonLocalFlowControl instanceof FsFalsePositiveException);
                 throw nonLocalFlowControl;
-            } catch (final IOException existsButInaccessible) {
-                if (autoCreate)
-                    throw existsButInaccessible;
-                else
-                    throw new FsFalsePositiveException(existsButInaccessible);
+            } catch (final IOException inaccessible) {
+                throw autoCreate
+                        ? inaccessible
+                        : new FsFalsePositiveException(inaccessible);
             }
             if (autoCreate) {
                 if (null != parentEntry)
                     throw new FsPersistentFalsePositiveException(ex);
             } else {
-                if (null != parentEntry && !parentEntry.isType(SPECIAL))
-                    throw new FsPersistentFalsePositiveException(ex);
-                throw new FsFalsePositiveException(ex);
+                throw null == parentEntry || parentEntry.isType(SPECIAL)
+                        ? new FsFalsePositiveException(ex)
+                        : new FsPersistentFalsePositiveException(ex);
             }
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
