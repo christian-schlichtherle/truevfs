@@ -27,6 +27,8 @@ import javax.swing.Icon;
  * An abstract factory for components required for accessing archive files.
  * Implementations of this abstract base class are used to access specific
  * archive formats like ZIP, JAR, TZP, TAR, TAR.GZ, TAR.BZ2 etc.
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  *
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
@@ -204,12 +206,12 @@ extends FsDriver {
      *         If the file system entry for the given model exists in the
      *         parent file system and is not of the type {@link Type#SPECIAL},
      *         then this exception is deemed to indicate a
-     *         <em>permanent false positive</em> archive file and gets cached
+     *         <em>persistent false positive</em> archive file and gets cached
      *         until the file system controller for the given model is
-     *         {@link FsController#sync(de.schlichtherle.truezip.util.BitField, de.schlichtherle.truezip.util.ExceptionHandler) synced}
+     *         {@linkplain FsController#sync(de.schlichtherle.truezip.util.BitField, de.schlichtherle.truezip.util.ExceptionHandler) synced}
      *         again.
      *         Otherwise, this exception is deemed to indicate a
-     *         <em>preliminary false positive</em> archive file and does not
+     *         <em>transient false positive</em> archive file and does not
      *         get cached.
      */
     @CreatesObligation
