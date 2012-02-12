@@ -12,6 +12,8 @@ import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
 import java.io.CharConversionException;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import javax.annotation.CheckForNull;
@@ -28,12 +30,21 @@ public abstract class FsCharsetArchiveDriverTestSuite<
         D extends FsCharsetArchiveDriver<E>>
 extends FsArchiveDriverTestSuite<E, D> {
 
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
     private static final String US_ASCII_CHARACTERS;
     static {
         final StringBuilder builder = new StringBuilder(128);
         for (char c = 0; c <= 127; c++)
             builder.append(c);
         US_ASCII_CHARACTERS = builder.toString();
+    }
+
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+        assert !UTF8.equals(getArchiveDriver().getCharset())
+                || null == getUnencodableName() : "Bad test setup!";
     }
 
     @Test
