@@ -180,25 +180,21 @@ extends FsFileSystemArchiveController<E> {
             } catch (FsControllerException nonLocalFlowControl) {
                 assert !(nonLocalFlowControl instanceof FsFalsePositiveException);
                 throw nonLocalFlowControl;
-            } catch (final IOException inaccessible) {
+            } catch (final IOException inaccessibleEntry) {
                 throw autoCreate
-                        ? inaccessible
-                        : new FsFalsePositiveException(inaccessible);
+                        ? inaccessibleEntry
+                        : new FsFalsePositiveException(inaccessibleEntry);
             }
-            if (autoCreate) {
-                if (null != parentEntry)
-                    throw new FsPersistentFalsePositiveException(ex);
+            if (null == parentEntry && autoCreate) {
+                // This may fail if the container file is an RAES encrypted ZIP
+                // file and the user cancels password prompting.
+                makeOutput();
+                fileSystem = newEmptyFileSystem(driver);
             } else {
-                throw null == parentEntry || parentEntry.isType(SPECIAL)
-                        ? new FsFalsePositiveException(ex)
-                        : new FsPersistentFalsePositiveException(ex);
+                throw null != parentEntry && !parentEntry.isType(SPECIAL)
+                        ? new FsPersistentFalsePositiveException(ex)
+                        : new FsFalsePositiveException(ex);
             }
-            // The entry does NOT exist in the parent archive
-            // file, but we may create it automatically.
-            // This may fail if the container file is an RAES encrypted ZIP
-            // file and the user cancels password prompting.
-            makeOutput();
-            fileSystem = newEmptyFileSystem(driver);
         }
         fileSystem.addFsArchiveFileSystemTouchListener(touchListener);
         setFileSystem(fileSystem);
