@@ -32,6 +32,8 @@ import javax.annotation.concurrent.Immutable;
  * <p>
  * In addition, this driver limits the number of concurrent entry output
  * streams to one, so that writing unencrypted temporary files is inhibited.
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @see     SafeZipRaesDriver
  * @author  Christian Schlichtherle

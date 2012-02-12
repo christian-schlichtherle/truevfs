@@ -31,6 +31,8 @@ import javax.annotation.concurrent.Immutable;
  * When using this driver to create or modify an ODF file, then in order to
  * achieve best performance, the {@code mimetype} entry should always get
  * written first in order to avoid temp file buffering of all other entries.
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  *
  * @see     <a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf">Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream</a>
  * @see     <a href="http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf">Open Document Format for Office Applications (OpenDocument) v1.1; Section 17.4: MIME Type Stream</a>

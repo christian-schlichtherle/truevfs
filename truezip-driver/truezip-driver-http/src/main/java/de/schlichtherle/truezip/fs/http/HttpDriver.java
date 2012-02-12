@@ -13,8 +13,8 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -23,6 +23,8 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
 /**
  * A file system driver for the HTTP(S) schemes.
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @see     #newClient()
  * @author  Christian Schlichtherle

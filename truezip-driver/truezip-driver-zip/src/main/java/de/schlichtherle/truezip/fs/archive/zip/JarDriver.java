@@ -33,6 +33,8 @@ import javax.annotation.concurrent.Immutable;
  * <p>
  * This driver does <em>not</em> check the CRC value of any entries in existing
  * archives - use {@link CheckedJarDriver} instead.
+ * <p>
+ * Sub-classes must be thread-safe and should be immutable!
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
