@@ -10,14 +10,18 @@ package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -32,6 +36,10 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public final class DisconnectingInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
+
+    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO2
+            : SocketFactory.OIO;
 
     private boolean closed;
 
@@ -75,41 +83,74 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(final String name) {
-        class Input extends DecoratingInputSocket<E> {
-            Input() {
-                super(DisconnectingInputShop.super.getInputSocket(name));
-            }
-
-            @Override
-            public E getLocalTarget() throws IOException {
-                checkOpen();
-                return getBoundSocket().getLocalTarget();
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                checkOpen();
-                return new DisconnectingReadOnlyFile(
-                        getBoundSocket().newReadOnlyFile());
-            }
-
-            @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                checkOpen();
-                throw new UnsupportedOperationException("TODO: Implement this!");
-            }
-
-            @Override
-            public InputStream newInputStream() throws IOException {
-                checkOpen();
-                return new DisconnectingInputStream(
-                        getBoundSocket().newInputStream());
-            }
-        } // Input
-
-        return new Input();
+    public InputSocket<? extends E> getInputSocket(String name) {
+        return SOCKET_FACTORY
+                .newInputSocket(this, delegate.getInputSocket(name));
     }
+
+    @Immutable
+    private enum SocketFactory {
+        OIO() {
+            @Override
+            <E extends Entry> InputSocket<? extends E> newInputSocket(
+                    final DisconnectingInputShop<E> shop,
+                    final InputSocket<? extends E> input) {
+                return shop.new Input(input);
+            }
+        },
+
+        NIO2() {
+            @Override
+            <E extends Entry> InputSocket<? extends E> newInputSocket(
+                    final DisconnectingInputShop<E> shop,
+                    final InputSocket<? extends E> input) {
+                return shop.new Nio2Input(input);
+            }
+        };
+
+        abstract <E extends Entry> InputSocket<? extends E> newInputSocket(
+                final DisconnectingInputShop<E> shop,
+                final InputSocket <? extends E> input);
+    } // SocketFactory
+
+    private class Nio2Input extends Input {
+        Nio2Input(InputSocket<? extends E> input) {
+            super(input);
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            checkOpen();
+            return new DisconnectingSeekableByteChannel(
+                    getBoundSocket().newSeekableByteChannel());
+        }
+    } // Nio2Input
+
+    private class Input extends DecoratingInputSocket<E> {
+        Input(InputSocket<? extends E> input) {
+            super(input);
+        }
+
+        @Override
+        public E getLocalTarget() throws IOException {
+            checkOpen();
+            return getBoundSocket().getLocalTarget();
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            checkOpen();
+            return new DisconnectingReadOnlyFile(
+                    getBoundSocket().newReadOnlyFile());
+        }
+
+        @Override
+        public InputStream newInputStream() throws IOException {
+            checkOpen();
+            return new DisconnectingInputStream(
+                    getBoundSocket().newInputStream());
+        }
+    } // Input
 
     private final class DisconnectingReadOnlyFile
     extends DecoratingReadOnlyFile {
@@ -154,6 +195,63 @@ extends DecoratingInputShop<E, InputShop<E>> {
                 delegate.close();
         }
     } // DisconnectingReadOnlyFile
+
+    private final class DisconnectingSeekableByteChannel
+    extends DecoratingSeekableByteChannel {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DisconnectingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public int read(ByteBuffer dst) throws IOException {
+            checkOpen();
+            return delegate.read(dst);
+        }
+
+        @Override
+        public int write(ByteBuffer src) throws IOException {
+            checkOpen();
+            return delegate.write(src);
+        }
+
+        @Override
+        public long position() throws IOException {
+            checkOpen();
+            return delegate.position();
+        }
+
+        @Override
+        public SeekableByteChannel position(long newPosition) throws IOException {
+            checkOpen();
+            delegate.position(newPosition);
+            return this;
+        }
+
+        @Override
+        public long size() throws IOException {
+            checkOpen();
+            return delegate.size();
+        }
+
+        @Override
+        public SeekableByteChannel truncate(long size) throws IOException {
+            checkOpen();
+            delegate.truncate(size);
+            return this;
+        }
+
+        @Override
+        public boolean isOpen() {
+            return !closed && delegate.isOpen();
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (!closed)
+                delegate.close();
+        }
+    } // DisconnectingSeekableByteChannel
 
     private final class DisconnectingInputStream
     extends DecoratingInputStream {
