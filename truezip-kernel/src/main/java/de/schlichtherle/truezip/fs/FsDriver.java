@@ -14,7 +14,7 @@ import javax.annotation.concurrent.Immutable;
 /**
  * An abstract factory for components required to access a file system.
  * <p>
- * Sub-classes must be thread-safe and should be immutable.
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
