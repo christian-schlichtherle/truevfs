@@ -31,6 +31,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * An archive driver for Tape Archive files (TAR).
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @author  Christian Schlichtherle
  * @version $Id$

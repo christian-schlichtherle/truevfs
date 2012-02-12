@@ -37,6 +37,8 @@ import javax.annotation.concurrent.Immutable;
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally
  * authenticates the cipher data of the input archive files presented to it.
+ * <p>
+ * Sub-classes must be thread-safe and should be immutable!
  * 
  * @author  Christian Schlichtherle
  * @version $Id$

@@ -17,14 +17,16 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.STORE;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
 import java.io.*;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @author Christian Schlichtherle
  * @version $Id$

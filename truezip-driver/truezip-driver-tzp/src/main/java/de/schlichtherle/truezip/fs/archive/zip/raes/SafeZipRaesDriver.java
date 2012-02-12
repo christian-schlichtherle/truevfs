@@ -32,6 +32,8 @@ import javax.annotation.concurrent.Immutable;
  * hash function because of its frequent collisions, its linear output and
  * small output size.
  * It's the ZIP inflation algorithm which actually comes to our rescue!
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @see     ParanoidZipRaesDriver
  * @author  Christian Schlichtherle

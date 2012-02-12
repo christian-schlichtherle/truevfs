@@ -20,6 +20,8 @@ import javax.annotation.concurrent.Immutable;
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,
  * but doesn't support to create or update them because this would spoil the
  * SFX code in its preamble.
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @author Christian Schlichtherle
  * @version $Id$

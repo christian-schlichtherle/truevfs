@@ -24,6 +24,8 @@ import javax.annotation.concurrent.Immutable;
  * Other than this, the archive entry will be processed normally.
  * So if just the CRC-32 value for the entry in the archive file has been
  * modified, you can still read its entire contents.
+ * <p>
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
