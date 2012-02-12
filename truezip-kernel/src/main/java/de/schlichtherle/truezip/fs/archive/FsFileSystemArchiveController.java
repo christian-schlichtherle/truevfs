@@ -10,9 +10,9 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsLockModel;
+import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -93,7 +93,7 @@ extends FsArchiveController<E> {
             checkWriteLockedByCurrentThread();
             try {
                 mount(autoCreate);
-            } catch (FsCacheableFalsePositiveException ex) {
+            } catch (FsPersistentFalsePositiveException ex) {
                 // Cache exception for false positive file system.
                 //   The state is reset when unlink() is called on the false
                 // positive file system or sync().
@@ -150,9 +150,9 @@ extends FsArchiveController<E> {
     } // MountedFileSystem
 
     private final class FalsePositiveFileSystem extends MountState<E> {
-        private FsCacheableFalsePositiveException exception;
+        private FsFalsePositiveException exception;
 
-        private FalsePositiveFileSystem(final FsCacheableFalsePositiveException exception) {
+        private FalsePositiveFileSystem(final FsFalsePositiveException exception) {
             if (null == exception)
                 throw new NullPointerException();
             this.exception = exception;

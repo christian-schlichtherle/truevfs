@@ -156,7 +156,7 @@ extends FsFileSystemArchiveController<E> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     void mount(final boolean autoCreate) throws IOException {
         // HC SUNT DRACONES!
-        FsArchiveFileSystem<E> fs;
+        FsArchiveFileSystem<E> fileSystem;
         try {
             // readOnly must be set first because the parent archive controller
             // could be a FileController and on Windows this property changes
@@ -165,41 +165,44 @@ extends FsFileSystemArchiveController<E> {
             final InputSocket<?> socket = driver.getInputSocket(
                     parent, name, MOUNT_INPUT_OPTIONS);
             final Entry rootTemplate = socket.getLocalTarget();
-            final InputArchive<E> ia = new InputArchive<E>(
+            final InputArchive<E> archive = new InputArchive<E>(
                     driver.newInputShop(getModel(), socket));
-            setInputArchive(ia);
-            fs = newPopulatedFileSystem(
-                    driver, ia.getDriverProduct(), rootTemplate, readOnly);
-        } catch (FsControllerException ex) {
-            assert !(ex instanceof FsFalsePositiveException);
-            throw ex;
+            setInputArchive(archive);
+            fileSystem = newPopulatedFileSystem(
+                    driver, archive.getDriverProduct(), rootTemplate, readOnly);
+        } catch (FsControllerException nonLocalFlowControl) {
+            assert !(nonLocalFlowControl instanceof FsFalsePositiveException);
+            throw nonLocalFlowControl;
         } catch (final IOException ex) {
-            if (!autoCreate) {
-                final FsEntry parentEntry;
-                try {
-                    parentEntry = parent.getEntry(name);
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (final IOException ex2) {
-                    //ex2.initCause(ex);
-                    throw new FsFalsePositiveException(ex2);
-                }
+            final FsEntry parentEntry;
+            try {
+                parentEntry = parent.getEntry(name);
+            } catch (FsControllerException nonLocalFlowControl) {
+                assert !(nonLocalFlowControl instanceof FsFalsePositiveException);
+                throw nonLocalFlowControl;
+            } catch (final IOException existsButInaccessible) {
+                if (autoCreate)
+                    throw existsButInaccessible;
+                else
+                    throw new FsFalsePositiveException(existsButInaccessible);
+            }
+            if (autoCreate) {
+                if (null != parentEntry)
+                    throw new FsPersistentFalsePositiveException(ex);
+            } else {
                 if (null != parentEntry && !parentEntry.isType(SPECIAL))
-                    throw new FsCacheableFalsePositiveException(ex);
+                    throw new FsPersistentFalsePositiveException(ex);
                 throw new FsFalsePositiveException(ex);
             }
-            if (null != parent.getEntry(name))
-                throw new FsCacheableFalsePositiveException(ex);
             // The entry does NOT exist in the parent archive
             // file, but we may create it automatically.
             // This may fail if the container file is an RAES encrypted ZIP
             // file and the user cancels password prompting.
             makeOutput();
-            fs = newEmptyFileSystem(driver);
+            fileSystem = newEmptyFileSystem(driver);
         }
-        fs.addFsArchiveFileSystemTouchListener(touchListener);
-        setFileSystem(fs);
+        fileSystem.addFsArchiveFileSystemTouchListener(touchListener);
+        setFileSystem(fileSystem);
     }
 
     /**
