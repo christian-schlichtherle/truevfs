@@ -16,6 +16,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract base class of an archive driver which provides convenient
@@ -25,12 +26,13 @@ import java.nio.charset.CharsetEncoder;
  * character set, e.g. the ZIP file format with the IBM437 character set or
  * the TAR file format with the US-ASCII character set.
  * <p>
- * Sub-classes must be thread-safe and should be immutable.
+ * Subclasses must be thread-safe and should be immutable!
  * 
  * @param   <E> The type of the archive entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@Immutable
 public abstract class FsCharsetArchiveDriver<E extends FsArchiveEntry>
 extends FsArchiveDriver<E> {
 
