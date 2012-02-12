@@ -242,8 +242,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             this.output = output;
             this.local = output.getLocalTarget();
             final Entry peer = output.getPeerTarget();
-            class ProxyInput extends DecoratingInputSocket<Entry> {
-                ProxyInput() {
+            class ProxyInputSocket extends DecoratingInputSocket<Entry> {
+                ProxyInputSocket() {
                     super(buffer.getInputSocket());
                 }
 
@@ -253,7 +253,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 }
             }
             this.buffer = buffer;
-            this.input = new ProxyInput();
+            this.input = new ProxyInputSocket();
             final BufferedEntryOutputStream
                     old = buffers.put(local.getName(), this);
             if (null != old)
@@ -270,15 +270,19 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 return;
             delegate.close();
             closed = true;
+            copyProperties();
+            storeBuffers();
+        }
+
+        void copyProperties() throws IOException {
             final Entry src = input.getLocalTarget();
             final E dst = getTarget();
             // Never copy anything but the DATA size!
             if (UNKNOWN == dst.getSize(DATA))
                 dst.setSize(DATA, src.getSize(DATA));
-            for (Access type : ALL_ACCESS_SET)
+            for (final Access type : ALL_ACCESS_SET)
                 if (UNKNOWN == dst.getTime(type))
                     dst.setTime(type, src.getTime(type));
-            storeBuffers();
         }
 
         boolean store(boolean discard) throws IOException {
