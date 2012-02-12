@@ -204,8 +204,8 @@ extends FsDriver {
      * @return A new input shop.
      * @throws IOException on any I/O error.
      *         If the file system entry for the given model exists in the
-     *         parent file system and is not of the type {@link Type#SPECIAL},
-     *         then this exception is deemed to indicate a
+     *         parent file system and is <em>not</em> a {@link Type#SPECIAL}
+     *         type, then this exception is deemed to indicate a
      *         <em>persistent false positive</em> archive file and gets cached
      *         until the file system controller for the given model is
      *         {@linkplain FsController#sync(de.schlichtherle.truezip.util.BitField, de.schlichtherle.truezip.util.ExceptionHandler) synced}
