@@ -155,11 +155,10 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     /**
-     * Returns a file system entry or {@code null} if no file system entry
-     * exists for the given name.
-     * Modifying the returned object is either not supported (i.e. throws an
-     * {@link UnsupportedOperationException}) or does not show any effect on
-     * the file system.
+     * Returns the file system entry for the given name or {@code null} if it
+     * doesn't exist.
+     * Modifying the returned entry does not show any effect on the file system
+     * and may result in an {@link UnsupportedOperationException}.
      * 
      * @param  name the name of the file system entry.
      * @return A file system entry or {@code null} if no file system entry
