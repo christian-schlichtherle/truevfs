@@ -118,8 +118,8 @@ implements OutputShop<TarDriverEntry> {
                     entry.setSize(size);
                     return new EntryOutputStream(entry);
                 }
-                // The source entry does not exist or cannot support Raw Data
-                // Copying (RDC) to the destination entry.
+                // The source entry does not exist or cannot support Raw
+                // Content Copying (RCC) to the destination entry.
                 // So we need to write the output to a temporary buffer and
                 // copy it upon close().
                 return new BufferedEntryOutputStream(
