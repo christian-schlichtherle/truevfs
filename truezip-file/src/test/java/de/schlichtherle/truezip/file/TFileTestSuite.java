@@ -47,7 +47,7 @@ import org.junit.Test;
  * @version $Id$
  */
 public abstract class TFileTestSuite<D extends FsArchiveDriver<?>>
-extends ArchiveIOTestBase<D> {
+extends ConfiguredClientTestBase<D> {
 
     private static final Logger
             logger = Logger.getLogger(TFileTestSuite.class.getName());

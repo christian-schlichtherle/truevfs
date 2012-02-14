@@ -11,12 +11,14 @@ package de.schlichtherle.truezip.fs.mock;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class MockDriver extends FsDriver {
+@Immutable
+public final class MockDriver extends FsDriver {
 
     @Override
     public FsController<?>

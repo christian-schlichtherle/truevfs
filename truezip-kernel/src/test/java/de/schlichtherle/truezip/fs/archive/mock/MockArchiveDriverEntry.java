@@ -9,17 +9,18 @@
 package de.schlichtherle.truezip.fs.archive.mock;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntries;
 import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool;
+import java.io.IOException;
 import java.util.EnumMap;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class MockArchiveEntry implements FsArchiveEntry {
+public final class MockArchiveDriverEntry implements FsArchiveEntry {
 
     private final String name;
     private final Type type;
@@ -27,9 +28,9 @@ public final class MockArchiveEntry implements FsArchiveEntry {
             sizes = new EnumMap<Size, Long>(Size.class);
     private final EnumMap<Access, Long>
             times = new EnumMap<Access, Long>(Access.class);
-    @Nullable IOPool.Entry<?> io;
+    private @CheckForNull IOPool.Entry<?> buffer;
 
-    public MockArchiveEntry(final String name,
+    public MockArchiveDriverEntry(final String name,
                             final Type type,
                             final @CheckForNull Entry template) {
         assert null != name;
@@ -48,6 +49,11 @@ public final class MockArchiveEntry implements FsArchiveEntry {
                     times.put(access, value);
             }
         }
+    }
+
+    IOPool.Entry<?> getBuffer(final IOPool<?> ioPool) throws IOException {
+        final IOPool.Entry<?> buffer = this.buffer;
+        return null != buffer ? buffer : (this.buffer = ioPool.allocate());
     }
 
     @Override
@@ -90,13 +96,6 @@ public final class MockArchiveEntry implements FsArchiveEntry {
      */
     @Override
     public String toString() {
-        final StringBuilder s = new StringBuilder(getClass().getName())
-                .append("[name=").append(getName())
-                .append(",type=").append(getType());
-        for (Size type : ALL_SIZE_SET)
-            s.append(",size(").append(type).append(")=").append(getSize(type));
-        for (Access type : ALL_ACCESS_SET)
-            s.append(",time(").append(type).append(")=").append(getTime(type));
-        return s.append("]").toString();
+        return FsArchiveEntries.toString(this);
     }
 }
