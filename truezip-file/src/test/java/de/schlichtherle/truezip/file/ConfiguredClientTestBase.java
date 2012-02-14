@@ -18,7 +18,7 @@ import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +29,7 @@ import org.junit.After;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class ArchiveIOTestBase<D extends FsArchiveDriver<?>>
+public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
 extends FsArchiveDriverTestBase<D> {
 
     protected static final long TIMEOUT_MILLIS = 50;
@@ -43,7 +43,7 @@ extends FsArchiveDriverTestBase<D> {
     private static final boolean FS_MANAGER_ISOLATE
             = Boolean.getBoolean(FsManager.class.getName() + ".isolate");
     static {
-        Logger  .getLogger(ArchiveIOTestBase.class.getName())
+        Logger  .getLogger(ConfiguredClientTestBase.class.getName())
                 .log(   Level.CONFIG,
                         "Isolate file system managers: {0}",
                         FS_MANAGER_ISOLATE);
@@ -55,10 +55,8 @@ extends FsArchiveDriverTestBase<D> {
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        final TArchiveDetector detector
-                = new TArchiveDetector(getSuffixList(), getArchiveDriver());
-        final Map<String, Object> environment = new HashMap<String, Object>();
-        environment.put(ARCHIVE_DETECTOR, detector);
+        detector = new TArchiveDetector(getSuffixList(), getArchiveDriver());
+        environment = Collections.singletonMap(ARCHIVE_DETECTOR, detector);
         final TConfig config = TConfig.push();
         // Using a private file system manager would normally violate the third
         // party access constraints, but in this context it's safe because no
@@ -74,8 +72,6 @@ extends FsArchiveDriverTestBase<D> {
             config.setManager(new FsDefaultManager());
         config.setLenient(true);
         config.setArchiveDetector(detector);
-        this.detector = detector;
-        this.environment = environment;
     }
 
     @After
@@ -97,6 +93,7 @@ extends FsArchiveDriverTestBase<D> {
         return detector;
     }
 
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     protected final Map<String, ?> getEnvironment() {
         return environment;
     }

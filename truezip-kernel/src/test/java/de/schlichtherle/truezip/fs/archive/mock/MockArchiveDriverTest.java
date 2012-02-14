@@ -6,25 +6,25 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.file;
+package de.schlichtherle.truezip.fs.archive.mock;
 
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public abstract class MockArchiveIOTestBase
-extends ArchiveIOTestBase<MockArchiveDriver> {
+public final class MockArchiveDriverTest
+extends FsCharsetArchiveDriverTestSuite<MockArchiveDriverEntry, MockArchiveDriver> {
 
     @Override
-    protected final String getSuffixList() {
-        return "mok|mok1|mok2";
+    protected MockArchiveDriver newArchiveDriver(IOPoolProvider provider) {
+        return new MockArchiveDriver(provider);
     }
 
     @Override
-    protected final MockArchiveDriver newArchiveDriver(IOPoolProvider provider) {
-        return new MockArchiveDriver(provider);
+    protected String getUnencodableName() {
+        return null;
     }
 }

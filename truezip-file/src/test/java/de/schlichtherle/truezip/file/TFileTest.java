@@ -19,7 +19,6 @@ import static java.io.File.separatorChar;
 import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ServiceConfigurationError;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +32,7 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public class TFileTest extends MockArchiveIOTestBase {
+public class TFileTest extends MockArchiveDriverTestBase {
 
     private static final Logger logger
             = Logger.getLogger(TFileTest.class.getName());
@@ -92,6 +91,7 @@ public class TFileTest extends MockArchiveIOTestBase {
     }
 
     @Test
+    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testUriConstructor() throws Exception {
         TFile file;
         final String fs = separator;
@@ -134,25 +134,25 @@ public class TFileTest extends MockArchiveIOTestBase {
         // One ZIP file in path with one redundant mok: scheme.
 
         try {
-            file = new TFile(new URI("mok", "mok:file:/a .mok/b .mok!/", null));
+            new TFile(new URI("mok", "mok:file:/a .mok/b .mok!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "mok:file:/a .mok/b .mok!", null));
+            new TFile(new URI("mok", "mok:file:/a .mok/b .mok!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "mok:file:/a .mok!/b .mok/", null));
+            new TFile(new URI("mok", "mok:file:/a .mok!/b .mok/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "mok:file:/a .mok!/b .mok", null));
+            new TFile(new URI("mok", "mok:file:/a .mok!/b .mok", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -160,25 +160,25 @@ public class TFileTest extends MockArchiveIOTestBase {
         // One ZIP file in path with two redundant mok: schemes.
 
         try {
-            file = new TFile(new URI("mok", "mok:mok:file:/a .mok/b .mok!/", null));
+            new TFile(new URI("mok", "mok:mok:file:/a .mok/b .mok!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "mok:mok:file:/a .mok/b .mok!", null));
+            new TFile(new URI("mok", "mok:mok:file:/a .mok/b .mok!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok/", null));
+            new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok", null));
+            new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -203,13 +203,13 @@ public class TFileTest extends MockArchiveIOTestBase {
         // and hence one redundant mok: scheme.
 
         try {
-            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok!/../c .mok!/", null));
+            new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok!/../c .mok!/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok!/../c .mok!", null));
+            new TFile(new URI("mok", "mok:mok:file:/a .mok!/b .mok!/../c .mok!", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -217,13 +217,13 @@ public class TFileTest extends MockArchiveIOTestBase {
         // One ZIP file in path which is removed by normalization.
 
         try {
-            file = new TFile(new URI("mok", "file:/a .mok!/../b .mok/", null));
+            new TFile(new URI("mok", "file:/a .mok!/../b .mok/", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            file = new TFile(new URI("mok", "file:/a .mok!/../b .mok", null));
+            new TFile(new URI("mok", "file:/a .mok!/../b .mok", null));
             fail();
         } catch (IllegalArgumentException ex) {
         }
@@ -518,15 +518,15 @@ public class TFileTest extends MockArchiveIOTestBase {
     /**
      * Tests issue #TRUEZIP-154.
      * 
-     * @see     <a href="http://java.net/jira/browse/TRUEZIP-154">ServiceConfigurationError: Unknown file system scheme for path without a suffix</a>
+     * @see    <a href="http://java.net/jira/browse/TRUEZIP-154">ServiceConfigurationError: Unknown file system scheme for path without a suffix</a>
      */
     @Test
-    public void testIssue154() throws URISyntaxException {
+    public void testIssue154() {
         for (String param : new String[] {
             "mok:file:/foo!/",
             "mok:mok:file:/foo!/bar!/",
         }) {
-            FsPath path = new FsPath(new URI(param));
+            FsPath path = FsPath.create(URI.create(param));
             try {
                 assertIssue154(new TFile(path));
                 assertIssue154(new TFile(path.toUri()));
@@ -539,11 +539,7 @@ public class TFileTest extends MockArchiveIOTestBase {
     private void assertIssue154(TFile file) {
         for (; null != file; file = file.getEnclArchive()) {
             assertTrue(file.isArchive());
-            try {
-                file.exists();
-                fail("The mock archive driver should not support I/O.");
-            } catch (UnsupportedOperationException expected) {
-            }
+            file.exists(); // don't care for the result
         }
     }
 }

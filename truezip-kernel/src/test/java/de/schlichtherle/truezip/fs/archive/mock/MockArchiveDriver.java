@@ -11,65 +11,86 @@ package de.schlichtherle.truezip.fs.archive.mock;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.CharConversionException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@ThreadSafe
 public final class MockArchiveDriver
-extends FsCharsetArchiveDriver<MockArchiveEntry> {
+extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
 
     private static final Charset charset = Charset.forName("UTF-8");
     
-    private final IOPool<?> ioPool;
+    private final IOPoolProvider provider;
+    private final ConcurrentMap<FsMountPoint, MockArchiveDriverEntryContainer>
+            containers = new ConcurrentHashMap<FsMountPoint, MockArchiveDriverEntryContainer>();
 
     public MockArchiveDriver() {
-        this(new ByteArrayIOPoolService(32));
+        this(new ByteArrayIOPoolService(0));
     }
 
     public MockArchiveDriver(final IOPoolProvider provider) {
         super(charset);
-        this.ioPool = provider.get();
+        provider.get(); // NPE-check
+        this.provider = provider;
     }
 
     @Override
     protected IOPool<?> getPool() {
-        return ioPool;
+        return provider.get();
     }
 
     @Override
-    public InputShop<MockArchiveEntry> newInputShop(
-            FsModel model,
-            InputSocket<?> input)
+    public InputShop<MockArchiveDriverEntry> newInputShop(
+            final FsModel model,
+            final InputSocket<?> input)
     throws IOException {
-        throw new UnsupportedOperationException("The mock archive driver does not support I/O.");
+        final FsMountPoint mp = model.getMountPoint();
+        input.getLocalTarget(); // don't care for the result
+        final MockArchiveDriverEntryContainer
+                c = containers.get(mp);
+        if (null == c)
+            throw new FileNotFoundException(mp.toString());
+        return c.newInputShop();
     }
 
     @Override
-    public OutputShop<MockArchiveEntry> newOutputShop(
+    public OutputShop<MockArchiveDriverEntry> newOutputShop(
             FsModel model,
             OutputSocket<?> output,
-            InputShop<MockArchiveEntry> source)
+            InputShop<MockArchiveDriverEntry> source)
     throws IOException {
-        throw new UnsupportedOperationException("The mock archive driver does not support I/O.");
+        final FsMountPoint mp = model.getMountPoint();
+        output.getLocalTarget(); // don't care for the result
+        final MockArchiveDriverEntryContainer
+                n = MockArchiveDriverEntryContainer.create(provider);
+        final MockArchiveDriverEntryContainer
+                o = containers.putIfAbsent(mp, n);
+        return (null != o ? o : n).newOutputShop();
     }
 
     @Override
-    public MockArchiveEntry newEntry(
+    public MockArchiveDriverEntry newEntry(
             String name,
             Type type,
             Entry template,
             BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        return new MockArchiveEntry(
+        return new MockArchiveDriverEntry(
                 toZipOrTarEntryName(name, type),
                 type,
                 template);
