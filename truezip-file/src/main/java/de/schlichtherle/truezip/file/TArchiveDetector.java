@@ -16,13 +16,13 @@ import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.SuffixSet;
-import javax.annotation.CheckForNull;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -268,6 +268,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
     }
 
     @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Map<FsScheme, FsDriver> get() {
         return drivers;
     }
