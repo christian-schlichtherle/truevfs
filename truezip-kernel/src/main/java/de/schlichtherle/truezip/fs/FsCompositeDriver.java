@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import javax.annotation.Nullable;
 import java.util.ServiceConfigurationError;
+import javax.annotation.Nullable;
 
 /**
  * Queries the scheme of the mount point of the given file system model in
