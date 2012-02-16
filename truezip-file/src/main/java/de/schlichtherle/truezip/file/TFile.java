@@ -1040,7 +1040,7 @@ public final class TFile extends File {
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
-     * This method is equivalent to calling
+     * Calling this method is equivalent to
      * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
@@ -1053,6 +1053,8 @@ public final class TFile extends File {
      *         This implies loss of data!
      * @see    #sync(BitField)
      */
+    // TODO: Refactor this to something like TControl.umount() and refactor all
+    // other variants and incarnations accordingly.
     public static void umount()
     throws FsSyncException {
         sync(UMOUNT);
@@ -1068,7 +1070,7 @@ public final class TFile extends File {
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
-     * This method is equivalent to calling
+     * Calling this method is equivalent to
      * {@link #sync(BitField)
      *  sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
      *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
@@ -1105,7 +1107,7 @@ public final class TFile extends File {
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
-     * This method is equivalent to calling
+     * Calling this method is equivalent to
      * {@link #sync(BitField)
      *  sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
      *          .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
@@ -1154,7 +1156,7 @@ public final class TFile extends File {
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
-     * This method is equivalent to calling
+     * Calling this method is equivalent to
      * {@link #sync(BitField) sync(archive, FsSyncOptions.UMOUNT)}.
      *
      * @param  archive a top level federated file system, i.e. a prospective
@@ -1188,7 +1190,7 @@ public final class TFile extends File {
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
-     * This method is equivalent to calling
+     * Calling this method is equivalent to
      * {@link #sync(BitField)
      *  sync(   archive,
      *          BitField.of(FsSyncOption.CLEAR_CACHE)
@@ -1233,7 +1235,7 @@ public final class TFile extends File {
      * Note that temporary files may get used even if the archive files where
      * accessed read-only.
      * <p>
-     * This method is equivalent to calling
+     * Calling this method is equivalent to
      * {@link #sync(BitField)
      *  sync(   archive,
      *          BitField.of(FsSyncOption.CLEAR_CACHE)
