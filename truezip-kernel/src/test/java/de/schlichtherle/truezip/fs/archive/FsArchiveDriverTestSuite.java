@@ -283,14 +283,17 @@ extends FsArchiveDriverTestBase<D> {
 
         assertNull(shop.getEntry(name));
         assertEquals(i, shop.getSize());
+
+        boolean failure = true;
         final OutputStream out = output.newOutputStream();
         try {
             assertSame(entry, shop.getEntry(name));
             assertEquals(i + 1, shop.getSize());
             out.write(getData());
-        } catch (IOException ex) {
-            out.close();
-            throw ex;
+            failure = false;
+        } finally {
+            if (failure)
+                out.close();
         }
         return out;
     }
@@ -349,17 +352,16 @@ extends FsArchiveDriverTestBase<D> {
 
         {
             final byte[] buf = new byte[getDataLength()];
+            boolean failure = true;
             final InputStream in = input.newInputStream();
             try {
                 readFully(in, buf);
+                assertTrue(Arrays.equals(getData(), buf));
                 assertEquals(-1, in.read());
-            } catch (IOException ex) {
-                in.close();
-                throw ex;
-            }
-            if (!Arrays.equals(getData(), buf)) {
-                in.close();
-                fail();
+                failure = false;
+            } finally {
+                if (failure)
+                    in.close();
             }
             return in;
         }
