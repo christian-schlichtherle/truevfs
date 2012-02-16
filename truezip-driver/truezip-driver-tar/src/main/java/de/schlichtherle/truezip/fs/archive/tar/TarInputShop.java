@@ -246,7 +246,9 @@ implements InputShop<TarDriverEntry> {
 
     private void close0() throws IOException {
         Collection<TarDriverEntry> values = entries.values();
-        for (Iterator<TarDriverEntry> i = values.iterator(); i.hasNext(); i.remove())
+        for (final Iterator<TarDriverEntry> i = values.iterator();
+                i.hasNext();
+                i.remove())
             i.next().release();
     }
 }
