@@ -18,7 +18,7 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Adapts a byte buffer to a seekable byte channel.
+ * Adapts a {@linkplain ByteBuffer byte buffer} to a seekable byte channel.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -31,67 +31,75 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
 
     /**
      * Constructs a new seekable byte buffer channel with a
-     * {@link ByteBuffer#duplicate() duplicate} of the given byte buffer as
-     * its initial byte buffer.
+     * {@linkplain ByteBuffer#duplicate() duplicate} of the given byte buffer
+     * as its initial {@linkplain #getByteBuffer() byte buffer}.
      * Note that the buffer contents are shared between the client application
      * and this class.
      * 
      * @param  buffer the initial byte buffer to read or write.
-     * @throws IllegalArgumentException if {@code buffer} supports no
-     *         {@link ByteBuffer#array() array} access for copying data using
-     *         relative bulk {@link ByteBuffer#get(byte[], int, int) get}
-     *         and {@link ByteBuffer#put(byte[], int, int) put} methods.
+     * @throws IllegalArgumentException if {@code buffer} is not read-only and
+     *         supports no {@linkplain ByteBuffer#array() array access} for
+     *         resizing it.
      */
     @CreatesObligation
     public SeekableByteBufferChannel(final ByteBuffer buffer) {
-        if (!buffer.hasArray())
+        if (!buffer.isReadOnly() && !buffer.hasArray())
             throw new IllegalArgumentException();
         this.buffer = buffer.duplicate();
     }
 
     /**
-     * Returns a {@link ByteBuffer#duplicate() duplicate} of the backing byte
-     * buffer.
+     * Returns a {@linkplain ByteBuffer#duplicate() duplicate} of the backing
+     * byte buffer.
      * Note that the buffer contents are shared between the client application
      * and this class.
      * 
-     * @return A {@link ByteBuffer#duplicate() duplicate} of the backing byte
-     *         buffer.
+     * @return A {@linkplain ByteBuffer#duplicate() duplicate} of the backing
+     *         byte buffer.
      */
     public ByteBuffer getByteBuffer() {
         return buffer.duplicate();
     }
 
     @Override
-    public final int read(final ByteBuffer dst) {
+    public final int read(final ByteBuffer dst) throws IOException {
         final int available = buffer.remaining();
-        if (available <= 0)
+        if (0 >= available)
             return -1;
         int remaining = dst.remaining();
         if (remaining > available)
             remaining = available;
-        final int position = buffer.position();
-        dst.put(buffer.array(), buffer.arrayOffset() + position, remaining);
-        buffer.position(position + remaining);
+        final int limit;
+        if (available > remaining) {
+            limit = buffer.limit();
+            buffer.limit(buffer.position() + remaining);
+        } else {
+            limit = -1;
+        }
+        try {
+            dst.put(buffer);
+        } finally {
+            if (0 <= limit)
+                buffer.limit(limit);
+        }
         return remaining;
     }
 
     @Override
-    public final int write(final ByteBuffer src) {
+    public final int write(final ByteBuffer src) throws IOException {
         final int remaining = src.remaining();
         final int position = buffer.position();
         ensureLimit(position + remaining);
-        src.get(buffer.array(), buffer.arrayOffset() + position, remaining);
-        buffer.position(position + remaining);
+        buffer.put(src);
         return remaining;
     }
 
     @Override
-    public final long position() {
+    public final long position() throws IOException {
         return buffer.position();
     }
 
-    private void ensureLimit(final long minLimit) {
+    private void ensureLimit(final long minLimit) throws IOException {
         final int limit = buffer.limit();
         if (minLimit <= limit)
             return;
@@ -115,28 +123,30 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
     }
 
     @Override
-    public final SeekableByteBufferChannel position(long newPosition) {
+    public final SeekableByteBufferChannel position(long newPosition)
+    throws IOException {
         ensureLimit(newPosition);
         buffer.position((int) newPosition);
         return this;
     }
 
     @Override
-    public final long size() {
+    public final long size() throws IOException {
         return buffer.limit();
     }
 
     @Override
-    public final SeekableByteBufferChannel truncate(final long newSize) {
-        if (newSize < buffer.limit())
+    public final SeekableByteBufferChannel truncate(final long newSize)
+    throws IOException {
+        if (buffer.limit() > newSize)
             buffer.limit((int) newSize);
         return this;
     }
 
     /**
-     * Returns {@code true}.
+     * Returns always {@code true}.
      * 
-     * @return {@code true}.
+     * @return always {@code true}.
      */
     @Override
     public boolean isOpen() {
