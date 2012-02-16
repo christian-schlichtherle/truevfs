@@ -22,6 +22,9 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.*;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -195,6 +198,7 @@ extends FsArchiveDriverTestBase<D> {
         } finally {
             os.close();
         }
+        os.close();
 
         final InputShop<E> is = getArchiveDriver()
                 .newInputShop(model, getArchiveInputSocket());
@@ -205,6 +209,7 @@ extends FsArchiveDriverTestBase<D> {
         } finally {
             is.close();
         }
+        is.close();
     }
 
     private InputSocket<?> getArchiveInputSocket() {
@@ -271,6 +276,7 @@ extends FsArchiveDriverTestBase<D> {
         final String name = name(i);
         final E entry = newEntry(name);
         final OutputSocket<? extends E> output = shop.getOutputSocket(entry);
+        assertSame(entry, output.getLocalTarget());
 
         assertNull(shop.getEntry(name));
         assertEquals(i, shop.getSize());
@@ -282,11 +288,60 @@ extends FsArchiveDriverTestBase<D> {
         } finally {
             out.close();
         }
+        out.close(); // expect no issues
     }
 
     private void input(final InputShop<E> shop, final int i)
     throws IOException {
         final InputSocket<? extends E> input = shop.getInputSocket(name(i));
+
+        {
+            final byte[] buf = new byte[getDataLength()];
+            ReadOnlyFile rof;
+            try {
+                rof = input.newReadOnlyFile();
+            } catch (UnsupportedOperationException ex) {
+                rof = null;
+                logger.log(Level.FINE,
+                        input.getClass()
+                            + " does not support newReadOnlyFile().",
+                        ex);
+            }
+            if (null != rof) {
+                try {
+                    rof.readFully(buf);
+                    assertEquals(-1, rof.read());
+                } finally {
+                    rof.close();
+                }
+                rof.close(); // expect no issues
+                assertTrue(Arrays.equals(getData(), buf));
+            }
+        }
+
+        {
+            final byte[] buf = new byte[getDataLength()];
+            SeekableByteChannel sbc;
+            try {
+                sbc = input.newSeekableByteChannel();
+            } catch (UnsupportedOperationException ex) {
+                sbc = null;
+                logger.log(Level.FINE,
+                        input.getClass()
+                            + " does not support newSeekableByteChannel().",
+                        ex);
+            }
+            if (null != sbc) {
+                try {
+                    readFully(sbc, ByteBuffer.wrap(buf));
+                    assertEquals(-1, sbc.read(ByteBuffer.wrap(buf)));
+                } finally {
+                    sbc.close();
+                }
+                sbc.close(); // expect no issues
+                assertTrue(Arrays.equals(getData(), buf));
+            }
+        }
 
         {
             final byte[] buf = new byte[getDataLength()];
@@ -297,37 +352,24 @@ extends FsArchiveDriverTestBase<D> {
             } finally {
                 in.close();
             }
+            in.close(); // expect no issues
             assertTrue(Arrays.equals(getData(), buf));
-        }
-
-        try {
-            final byte[] buf = new byte[getDataLength()];
-            final ReadOnlyFile rof = input.newReadOnlyFile();
-            try {
-                rof.readFully(buf);
-                assertEquals(-1, rof.read());
-            } finally {
-                rof.close();
-            }
-            assertTrue(Arrays.equals(getData(), buf));
-        } catch (UnsupportedOperationException ignore) {
         }
     }
 
     private static void readFully(InputStream in, byte[] b)
     throws IOException {
-        readFully(in, b, 0, b.length);
+        new DataInputStream(in).readFully(b);
     }
 
-    private static void readFully(  final InputStream in,
-                                    final byte[] buf,
-                                    final int off,
-                                    final int len)
+    private static void readFully(  final ReadableByteChannel rbc,
+                                    final ByteBuffer buf)
     throws IOException {
-        int total = 0, read;
+        final int len = buf.remaining();
+        int total = 0;
         do {
-            read = in.read(buf, off + total, len - total);
-            if (read < 0)
+            final int read = rbc.read(buf);
+            if (0 > read)
                 throw new EOFException();
             total += read;
         } while (total < len);
