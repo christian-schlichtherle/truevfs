@@ -82,7 +82,9 @@ extends ConfiguredClientTestBase<D> {
                     throw new IOException(temp + " (could not delete)");
             }
         } catch (IOException ex) {
-            logger.log(Level.INFO, ex.toString(), ex);
+            logger.log(Level.INFO,
+                    "Failed to clean up temporary archive file - this may be just a subsequent error:",
+                    ex);
         } finally {
             super.tearDown();
         }
@@ -610,7 +612,10 @@ extends ConfiguredClientTestBase<D> {
             if (!(ex.getCause() instanceof FsSyncException)
                     || !(ex.getCause().getCause() instanceof FileBusyException))
                     throw ex;
-            logger.warning("This archive driver does NOT support concurrent writing of different entries in the same archive file.");
+            logger.log(Level.INFO,
+                    getArchiveDriver().getClass()
+                        + " does not support concurrent writing of different entries in the same archive file.",
+                    ex);
         }
 
         // out is still open!
