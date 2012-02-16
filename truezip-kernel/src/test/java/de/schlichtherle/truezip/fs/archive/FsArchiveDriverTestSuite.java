@@ -193,8 +193,13 @@ extends FsArchiveDriverTestBase<D> {
         final OutputShop<E> os = getArchiveDriver()
                 .newOutputShop(model, getArchiveOutputSocket(), null);
         try {
-            for (int i = 0; i < MAX_ENTRIES; i++)
-                output(os, i).close();
+            final Closeable[] streams = new Closeable[MAX_ENTRIES];
+            try {
+                for (int i = 0; i < streams.length; i++)
+                    streams[i] = output(os, i);
+            } finally {
+                close(streams);
+            }
             check(os);
         } finally {
             os.close();
@@ -205,12 +210,34 @@ extends FsArchiveDriverTestBase<D> {
                 .newInputShop(model, getArchiveInputSocket());
         try {
             check(is);
-            for (int i = 0; i < MAX_ENTRIES; i++)
-                input(is, i).close();
+            final Closeable[] streams = new Closeable[MAX_ENTRIES];
+            try {
+                for (int i = 0; i < streams.length; i++) {
+                    input(is, i).close(); // first attempt
+                    streams[i] = input(is, i); // second attempt
+                }
+            } finally {
+                close(streams);
+            }
         } finally {
             is.close();
         }
         is.close();
+    }
+
+    private static void close(final Closeable[] resources) throws IOException {
+        IOException failure = null;
+        for (final Closeable resource : resources) {
+            if (null != resource) {
+                try {
+                    resource.close();
+                } catch (IOException ex) {
+                    failure = ex;
+                }
+            }
+        }
+        if (null != failure)
+            throw failure;
     }
 
     private InputSocket<?> getArchiveInputSocket() {
