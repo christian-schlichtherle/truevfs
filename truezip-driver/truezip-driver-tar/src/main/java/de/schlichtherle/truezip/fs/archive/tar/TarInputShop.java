@@ -13,12 +13,14 @@ import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import java.io.*;
+import java.nio.channels.SeekableByteChannel;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import org.apache.commons.compress.archivers.ArchiveEntry;
@@ -176,17 +178,10 @@ implements InputShop<TarDriverEntry> {
             return pin;
         }
     }
-    
+
     private static void readFully(final InputStream in, final byte[] buf)
     throws IOException {
-        final int l = buf.length;
-        int n = 0;
-        do  {
-            final int r = in.read(buf, n, l - n);
-            if (0 >= r)
-                throw new EOFException();
-            n += r;
-        } while (n < l);
+        new DataInputStream(in).readFully(buf);
     }
 
     @Override
@@ -208,7 +203,6 @@ implements InputShop<TarDriverEntry> {
     public InputSocket<TarDriverEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
-
         class Input extends InputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry getLocalTarget() throws IOException {
@@ -216,21 +210,31 @@ implements InputShop<TarDriverEntry> {
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
                 if (entry.isDirectory())
-                    throw new FileNotFoundException(name + " (cannot read directories)");
+                    throw new FileNotFoundException(name + " (cannot read directory entries)");
                 return entry;
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return getLocalTarget().getTemp().getInputSocket().newReadOnlyFile();
+                return getInputSocket().newReadOnlyFile();
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                return getInputSocket().newSeekableByteChannel();
             }
 
             @Override
             public InputStream newInputStream()
             throws IOException {
-                return getLocalTarget().getTemp().getInputSocket().newInputStream();
+                return getInputSocket().newInputStream();
             }
-        } // class Input
+
+            InputSocket<? extends IOEntry<?>> getInputSocket()
+            throws IOException {
+                return getLocalTarget().getTemp().getInputSocket();
+            }
+        } // Input
 
         return new Input();
     }
