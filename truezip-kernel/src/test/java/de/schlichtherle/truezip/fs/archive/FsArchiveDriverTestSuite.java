@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.fs.mock.MockController;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -193,7 +194,7 @@ extends FsArchiveDriverTestBase<D> {
                 .newOutputShop(model, getArchiveOutputSocket(), null);
         try {
             for (int i = 0; i < MAX_ENTRIES; i++)
-                output(os, i);
+                output(os, i).close();
             check(os);
         } finally {
             os.close();
@@ -205,7 +206,7 @@ extends FsArchiveDriverTestBase<D> {
         try {
             check(is);
             for (int i = 0; i < MAX_ENTRIES; i++)
-                input(is, i);
+                input(is, i).close();
         } finally {
             is.close();
         }
@@ -222,9 +223,10 @@ extends FsArchiveDriverTestBase<D> {
                 FsOutputOptions.NO_OUTPUT_OPTIONS, null);
     }
 
-    private <E extends FsArchiveEntry> void check(final EntryContainer<E> c) {
-        assertEquals(MAX_ENTRIES, c.getSize());
-        final Iterator<E> it = c.iterator();
+    private <E extends FsArchiveEntry> void check(
+            final EntryContainer<E> container) {
+        assertEquals(MAX_ENTRIES, container.getSize());
+        final Iterator<E> it = container.iterator();
         for (int i = 0; i < MAX_ENTRIES; i++) {
             final E e = it.next();
             assertNotNull(e);
@@ -238,7 +240,7 @@ extends FsArchiveDriverTestBase<D> {
                 fail();
             } catch (UnsupportedOperationException expected) {
             }
-            assertSame(e, c.getEntry(e.getName()));
+            assertSame(e, container.getEntry(e.getName()));
         }
         assertFalse(it.hasNext());
         try {
@@ -251,7 +253,7 @@ extends FsArchiveDriverTestBase<D> {
             fail();
         } catch (UnsupportedOperationException expected) {
         }
-        assertEquals(MAX_ENTRIES, c.getSize());
+        assertEquals(MAX_ENTRIES, container.getSize());
     }
 
     private E newEntry(final String name) throws CharConversionException {
@@ -271,7 +273,8 @@ extends FsArchiveDriverTestBase<D> {
         return Integer.toString(i);
     }
 
-    private void output(final OutputShop<E> shop, final int i)
+    @CreatesObligation
+    private OutputStream output(final OutputShop<E> shop, final int i)
     throws IOException {
         final String name = name(i);
         final E entry = newEntry(name);
@@ -285,13 +288,14 @@ extends FsArchiveDriverTestBase<D> {
             assertSame(entry, shop.getEntry(name));
             assertEquals(i + 1, shop.getSize());
             out.write(getData());
-        } finally {
+        } catch (IOException ex) {
             out.close();
+            throw ex;
         }
-        out.close(); // expect no issues
+        return out;
     }
 
-    private void input(final InputShop<E> shop, final int i)
+    private InputStream input(final InputShop<E> shop, final int i)
     throws IOException {
         final InputSocket<? extends E> input = shop.getInputSocket(name(i));
 
@@ -349,11 +353,15 @@ extends FsArchiveDriverTestBase<D> {
             try {
                 readFully(in, buf);
                 assertEquals(-1, in.read());
-            } finally {
+            } catch (IOException ex) {
                 in.close();
+                throw ex;
             }
-            in.close(); // expect no issues
-            assertTrue(Arrays.equals(getData(), buf));
+            if (!Arrays.equals(getData(), buf)) {
+                in.close();
+                fail();
+            }
+            return in;
         }
     }
 
