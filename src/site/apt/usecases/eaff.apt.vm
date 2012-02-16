@@ -19,8 +19,8 @@ Encrypted Application File Format
     or write archive files using cumbersome archive type specific APIs?
     And wouldn't it be also nice if you wouldn't have to deal with complex
     encryption, decryption and authentication code?
-    And wouldn't it be even nicer if you wouldn't have to write the Swing or
-    console based dialog in order to prompt the user for a password?
+    And wouldn't it be even nicer if you wouldn't have to write the user dialog
+    for password prompting?
 
 * Accessing Encrypted and Authenticated Application File Formats
 
