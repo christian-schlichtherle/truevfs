@@ -9,7 +9,7 @@
 package de.schlichtherle.truezip.util;
 
 /**
- * Holds a static boolean telling us if the JSE&nbsp;7 API is availabe for this
+ * Holds a static boolean telling us if the JSE&nbsp;7 API is availabe to this
  * JVM.
  * This is convenient if an a-priori test is required.
  * 
@@ -19,7 +19,7 @@ package de.schlichtherle.truezip.util;
 public final class JSE7 {
 
     /**
-     * Is {@code true} if and only if the JSE&nbsp;7 API is available for this
+     * {@code true} if and only if the JSE&nbsp;7 API is available to this
      * JVM.
      */
     public static final boolean AVAILABLE;
