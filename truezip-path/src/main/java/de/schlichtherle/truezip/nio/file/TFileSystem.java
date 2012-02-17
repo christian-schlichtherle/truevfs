@@ -53,7 +53,7 @@ public final class TFileSystem extends FileSystem {
     @SuppressWarnings("deprecation")
     TFileSystem(final TPath path) {
         assert null != path;
-        this.controller = TConfig.getCurrentManager().getController(
+        this.controller = TConfig.get().getFsManager().getController(
                 path.getMountPoint(),
                 path.getArchiveDetector());
         this.provider = TFileSystemProvider.get(path.getName());
@@ -136,7 +136,7 @@ public final class TFileSystem extends FileSystem {
      */
     @SuppressWarnings("deprecation")
     public void sync(BitField<FsSyncOption> options) throws FsSyncException {
-        new FsFilteringManager(TConfig.getCurrentManager(), getMountPoint())
+        new FsFilteringManager(TConfig.get().getFsManager(), getMountPoint())
                 .sync(options);
     }
 
