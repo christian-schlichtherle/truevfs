@@ -114,7 +114,7 @@ public class TConfigTest {
                 } catch (IllegalStateException expected) {
                 }
             }
-        } // class TestThread
+        } // TestThread
 
         TestThread t = new TestThread();
         t.start();
