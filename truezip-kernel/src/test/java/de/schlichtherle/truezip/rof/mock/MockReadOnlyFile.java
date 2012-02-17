@@ -29,7 +29,8 @@ public final class MockReadOnlyFile extends DecoratingReadOnlyFile {
     @CreatesObligation
     public MockReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
         super(rof);
-        rof.getClass();
+        if (null == rof)
+            throw new NullPointerException();
     }
 
     @Override

@@ -30,7 +30,8 @@ public final class MockOutputStream extends DecoratingOutputStream {
     @CreatesObligation
     public MockOutputStream(@WillCloseWhenClosed OutputStream out) {
         super(out);
-        out.getClass();
+        if (null == out)
+            throw new NullPointerException();
     }
 
     @Override

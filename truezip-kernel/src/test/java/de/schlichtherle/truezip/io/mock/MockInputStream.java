@@ -30,7 +30,8 @@ public final class MockInputStream extends DecoratingInputStream {
     @CreatesObligation
     public MockInputStream(@WillCloseWhenClosed InputStream in) {
         super(in);
-        in.getClass();
+        if (null == in)
+            throw new NullPointerException();
     }
 
     @Override
