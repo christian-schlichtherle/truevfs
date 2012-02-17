@@ -17,9 +17,10 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.mock.MockController;
+import static de.schlichtherle.truezip.mock.MockControl.trigger;
+import static de.schlichtherle.truezip.mock.MockControl.wraps;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
-import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -55,7 +56,7 @@ extends FsArchiveDriverTestBase<D> {
             name = FsEntryName.create(URI.create("archive"));
     private static final FsModel model = newArchiveModel();
 
-    private @Nullable FsController<?> parent;
+    private @Nullable MockController<FsModel> parent;
 
     @Override
     public void setUp() throws IOException {
@@ -122,49 +123,34 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void getInputSocketMustForwardTheCallToTheGivenController() {
-        final FsController<FsModel> controller = new MockController<FsModel>(
-                model.getParent(), null, getMaxArchiveLength()) {
-            @Override
-            public InputSocket<?> getInputSocket(
-                    FsEntryName name,
-                    BitField<FsInputOption> options) {
-                assertEquals(FsEntryName.ROOT, name);
-                assertNotNull(options);
-                throw new UnsupportedOperationException();
-            }
-        };
+        final Throwable expected = new RuntimeException();
+        trigger(MockController.class, expected);
         try {
             getArchiveDriver().getInputSocket(
-                    controller,
+                    parent,
                     FsEntryName.ROOT,
                     FsInputOptions.NO_INPUT_OPTIONS);
             fail();
-        } catch (UnsupportedOperationException expected) {
+        } catch (final RuntimeException got) {
+            if (!wraps(got, expected))
+                throw got;
         }
     }
 
     @Test
     public void getOutputSocketMustForwardTheCallToTheGivenController() {
-        final FsController<FsModel> controller = new MockController<FsModel>(
-                model.getParent(), null, getMaxArchiveLength()) {
-            @Override
-            public OutputSocket<?> getOutputSocket(
-                    FsEntryName name,
-                    BitField<FsOutputOption> options,
-                    Entry template) {
-                assertEquals(FsEntryName.ROOT, name);
-                assertNotNull(options);
-                throw new UnsupportedOperationException();
-            }
-        };
+        final Throwable expected = new RuntimeException();
+        trigger(MockController.class, expected);
         try {
             getArchiveDriver().getOutputSocket(
-                    controller,
+                    parent,
                     FsEntryName.ROOT,
                     FsOutputOptions.NO_OUTPUT_OPTIONS,
                     null);
             fail();
-        } catch (UnsupportedOperationException expected) {
+        } catch (final RuntimeException got) {
+            if (!wraps(got, expected))
+                throw got;
         }
     }
 
