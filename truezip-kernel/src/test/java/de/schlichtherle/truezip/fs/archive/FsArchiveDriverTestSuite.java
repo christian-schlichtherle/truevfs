@@ -18,7 +18,7 @@ import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.mock.MockController;
 import static de.schlichtherle.truezip.mock.MockControl.trigger;
-import static de.schlichtherle.truezip.mock.MockControl.wraps;
+import static de.schlichtherle.truezip.mock.MockControl.contains;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -132,7 +132,7 @@ extends FsArchiveDriverTestBase<D> {
                     FsInputOptions.NO_INPUT_OPTIONS);
             fail();
         } catch (final RuntimeException got) {
-            if (!wraps(got, expected))
+            if (!contains(got, expected))
                 throw got;
         }
     }
@@ -149,7 +149,7 @@ extends FsArchiveDriverTestBase<D> {
                     null);
             fail();
         } catch (final RuntimeException got) {
-            if (!wraps(got, expected))
+            if (!contains(got, expected))
                 throw got;
         }
     }
