@@ -187,9 +187,12 @@ implements Closeable { // this could be AutoCloseable in JSE 7
         }
     }
 
-    public static boolean wraps(Throwable thiz, Throwable that) {
-        return thiz == that
-                || null != thiz && wraps(thiz.getCause(), that);
+    public static boolean contains(Throwable thiz, final Throwable that) {
+        do {
+            if (thiz == that)
+                return true;
+        } while (null != (thiz = thiz.getCause()));
+        return false;
     }
 
     @Override
