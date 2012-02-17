@@ -28,23 +28,32 @@ import javax.annotation.concurrent.ThreadSafe;
  * A container for configuration options with global or inheritable thread
  * local scope.
  * <p>
- * A client application can use {@link #push()} to create a new
- * <i>inheritable thread local configuration</i> by copying the
- * <i>current configuration</i> and pushing the copy on top of the inheritable
- * thread local stack.
- * <p>
- * Later, the client application can use {@link #pop()} or {@link #close()} to
- * pop the current configuration or {@code this} configuration respectively
- * off the top of the inheritable thread local stack.
- * <p>
- * Finally, a client application can use {@link #get()} to get access to the
- * current configuration.
- * If no configuration has been pushed on the inheritable thread local stack
- * before, the <i>global configuration</i> is returned.
- * <p>
- * Whenever a child thread is started, it shares the current configuration
- * with its parent thread.
+ * A thread can call {@link #get()} to get access to the
+ * <i>current configuration</i> at any time .
+ * If no configuration has been pushed onto the inheritable thread local
+ * configuration stack before, this will return the <i>global configuration</i>
+ * which is shared by all threads (hence its name).
  * Mind that access to the global configuration is <em>not</em> synchronized.
+ * <p>
+ * To create an <i>inheritable thread local configuration</i>, a thread can
+ * simply call {@link #push()}.
+ * This will copy the <i>current configuration</i> (which may be identical to
+ * the global configuration) and push the copy on top of the inheritable thread
+ * local configuration stack.
+ * <p>
+ * Later, the thread can use {@link #pop()} or {@link #close()} to
+ * pop the current configuration or {@code this} configuration respectively
+ * off the top of the inheritable thread local configuration stack again.
+ * <p>
+ * Finally, whenever a child thread gets started, it will share the
+ * <em>same</em> current configuration with its parent thread.
+ * This is achieved by copying the top level element of the parent's
+ * inheritable thread local configuration stack.
+ * If the parent's inheritable thread local configuration stack is empty, then
+ * the child will share the global configuration as its current configuration
+ * with its parent.
+ * As an implication, {@link #pop()} or {@link #close()} can be called at most
+ * once in the child thread.
  * 
  * <a name="examples"/><h3>Examples</h3>
  *
@@ -543,13 +552,6 @@ public final class TConfig implements Closeable {
             configs.remove();
     }
 
-    /**
-     * An inheritable thread local configuration stack.
-     * Whenever a child thread is started, it will share the current
-     * configuration with its parent thread by creating a new inheritable
-     * thread local stack with the parent thread's current configuration as the
-     * only element.
-     */
     private static final class InheritableThreadLocalConfigStack
     extends InheritableThreadLocal<Deque<TConfig>> {
         @Override
