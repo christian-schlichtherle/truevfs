@@ -337,32 +337,23 @@ implements Closeable { // this could be AutoCloseable in JSE 7
 
     /** Copy constructor for inheritable thread local configurations. */
     private TConfig(final TConfig template) {
-        this.manager = template.getManager();
+        this.manager = template.getFsManager();
         this.detector = template.getArchiveDetector();
         this.inputPreferences = template.getInputPreferences();
         this.outputPreferences = template.getOutputPreferences();
     }
 
     /**
-     * Returns the file system manager of the current configuration.
+     * Returns the file system manager.
      * 
-     * @return     The file system manager of the current configuration.
+     * @return     The file system manager.
+     * @since      TrueZIP 7.5 (package private before)
      * @deprecated This public class property is solely intended to be used by
      *             the TrueZIP&nbsp;Path module and should never be used by
      *             client applications.
-     * @since      TrueZIP 7.5
      */
     @Deprecated
-    public static FsManager getCurrentManager() {
-        return get().getManager();
-    }
-
-    /**
-     * Returns the file system manager.
-     * 
-     * @return The file system manager.
-     */
-    FsManager getManager() {
+    public FsManager getFsManager() {
         return this.manager;
     }
 

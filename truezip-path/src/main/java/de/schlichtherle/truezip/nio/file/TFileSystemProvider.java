@@ -136,7 +136,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @SuppressWarnings("deprecation")
     public static void umount() throws FsSyncException {
-        TConfig.getCurrentManager().sync(UMOUNT);
+        TConfig.get().getFsManager().sync(UMOUNT);
     }
 
     /**

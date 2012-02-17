@@ -276,7 +276,8 @@ final class TBIO {
         }
         final FsPath path = new FsPath(src);
         return  TConfig
-                .getCurrentManager()
+                .get()
+                .getFsManager()
                 .getController( path.getMountPoint(), getDetector(src))
                 .getInputSocket(path.getEntryName(), options);
     }
@@ -306,7 +307,8 @@ final class TBIO {
         }
         final FsPath path = new FsPath(dst);
         return  TConfig
-                .getCurrentManager()
+                .get()
+                .getFsManager()
                 .getController(     path.getMountPoint(), getDetector(dst))
                 .getOutputSocket(   path.getEntryName(),
                                     options.clear(CREATE_PARENTS),

@@ -972,7 +972,7 @@ public final class TFile extends File {
     @SuppressWarnings("deprecation")
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
-        TConfig.getCurrentManager().sync(options);
+        TConfig.get().getFsManager().sync(options);
     }
 
     
@@ -1025,7 +1025,7 @@ public final class TFile extends File {
         if (!archive.isTopLevelArchive())
             throw new IllegalArgumentException(archive + " (not a top level archive file)");
         new FsFilteringManager(
-                TConfig.getCurrentManager(),
+                TConfig.get().getFsManager(),
                 archive.getController().getModel().getMountPoint()
                 ).sync(options);
     }
@@ -1726,7 +1726,7 @@ public final class TFile extends File {
 
     @SuppressWarnings("deprecation")
     private FsController<?> getController(FsMountPoint mountPoint) {
-        return TConfig.getCurrentManager().getController(mountPoint, detector);
+        return TConfig.get().getFsManager().getController(mountPoint, detector);
     }
 
     /**
