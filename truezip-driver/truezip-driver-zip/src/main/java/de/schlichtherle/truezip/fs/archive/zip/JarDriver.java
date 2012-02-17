@@ -53,11 +53,10 @@ public class JarDriver extends ZipDriver {
      * This constructor uses {@link #JAR_CHARSET} for encoding entry names
      * and comments.
      *
-     * @param ioPoolProvider the provider for I/O entry pools for allocating
-     *        temporary I/O entries (buffers).
+     * @param provider the provider for the I/O buffer pool.
      */
-    public JarDriver(IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider, JAR_CHARSET);
+    public JarDriver(IOPoolProvider provider) {
+        super(provider, JAR_CHARSET);
     }
 
     /**

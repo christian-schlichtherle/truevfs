@@ -54,17 +54,15 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * Constructs a new RAES encrypted ZIP file driver.
      *
-     * @param ioPoolProvider the I/O entry pool provider for allocating
-     *        temporary I/O entries (buffers).
+     * @param ioPoolProvider the provider for the I/O buffer pool.
      * @param keyManagerProvider the key manager provider for accessing
      *        protected resources (cryptography).
      */
     public ZipRaesDriver(   final IOPoolProvider ioPoolProvider,
                             final KeyManagerProvider keyManagerProvider) {
         super(ioPoolProvider);
-        if (null == keyManagerProvider)
+        if (null == (this.keyManagerProvider = keyManagerProvider))
             throw new NullPointerException();
-        this.keyManagerProvider = keyManagerProvider;
     }
 
     /**

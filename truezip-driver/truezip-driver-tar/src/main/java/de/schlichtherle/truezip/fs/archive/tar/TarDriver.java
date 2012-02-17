@@ -31,6 +31,10 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
  * An archive driver for Tape Archive files (TAR).
+ * By default, TAR files use the US-ASCII character set for the encoding of
+ * entry names.
+ * This configuration pretty much constraints the applicability of this file
+ * format to North American countries.
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  * 
@@ -48,9 +52,15 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
 
     private final IOPool<?> ioPool;
 
+    /**
+     * Constructs a new TAR driver.
+     *
+     * @param provider the provider for the I/O buffer pool.
+     */
     public TarDriver(final IOPoolProvider provider) {
         super(TAR_CHARSET);
-        this.ioPool = provider.get();
+        if (null == (this.ioPool = provider.get()))
+            throw new NullPointerException();
     }
 
     /**

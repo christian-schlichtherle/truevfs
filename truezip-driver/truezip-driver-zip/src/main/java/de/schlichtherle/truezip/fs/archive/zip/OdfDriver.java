@@ -44,8 +44,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class OdfDriver extends JarDriver {
 
-    public OdfDriver(IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider);
+    public OdfDriver(IOPoolProvider provider) {
+        super(provider);
     }
 
     @Override

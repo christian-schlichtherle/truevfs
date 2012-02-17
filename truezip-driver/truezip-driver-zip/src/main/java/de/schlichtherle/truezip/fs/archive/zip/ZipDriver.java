@@ -44,7 +44,7 @@ import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * An archive driver for plain old ZIP files.
+ * An archive driver for ZIP files.
  * By default, ZIP files use the IBM437 character set for the encoding of entry
  * names and comments (unless the General Purpose Bit 11 is present in
  * accordance with appendix D of the
@@ -86,7 +86,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     private final IOPool<?> ioPool;
 
     /**
-     * Constructs a new ZIP file driver.
+     * Constructs a new ZIP driver.
      * This constructor uses {@link #ZIP_CHARSET} for encoding entry names
      * and comments.
      *
@@ -98,15 +98,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * Constructs a new ZIP file driver.
+     * Constructs a new ZIP driver.
      *
-     * @param ioPoolProvider the provider for I/O entry pools for allocating
-     *        temporary I/O entries (buffers).
+     * @param provider the provider for the I/O buffer pool.
      * @param charset the character set for encoding entry names and comments.
      */
-    protected ZipDriver(IOPoolProvider ioPoolProvider, Charset charset) {
+    protected ZipDriver(IOPoolProvider provider, Charset charset) {
         super(charset);
-        this.ioPool = ioPoolProvider.get();
+        if (null == (this.ioPool = provider.get()))
+            throw new NullPointerException();
     }
 
     /**
