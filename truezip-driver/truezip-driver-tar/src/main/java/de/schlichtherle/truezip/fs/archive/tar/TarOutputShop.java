@@ -179,7 +179,8 @@ implements OutputShop<TarDriverEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    private final class BufferedEntryOutputStream extends DecoratingOutputStream {
+    private final class BufferedEntryOutputStream
+    extends DecoratingOutputStream {
         final IOPool.Entry<?> buffer;
         final TarDriverEntry entry;
         boolean closed;
@@ -201,7 +202,7 @@ implements OutputShop<TarDriverEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-            super.close();
+            delegate.close();
             closed = true;
             store();
         }
