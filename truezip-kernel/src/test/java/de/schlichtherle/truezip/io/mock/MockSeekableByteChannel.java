@@ -30,7 +30,8 @@ public final class MockSeekableByteChannel extends DecoratingSeekableByteChannel
     @CreatesObligation
     public MockSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
         super(sbc);
-        sbc.getClass();
+        if (null == sbc)
+            throw new NullPointerException();
     }
 
     @Override
