@@ -46,6 +46,8 @@ public class TConfigTest {
 
     @Test
     public void pop() {
+        TConfig.push();
+        TConfig.pop();
         try {
             TConfig.pop();
             fail();
@@ -63,23 +65,16 @@ public class TConfigTest {
                 c1.close();
                 fail();
             } catch (IllegalStateException notTopElement) {
+                assertSame(c2, TConfig.get());
             } finally {
                 c2.close();
-                try {
-                    c2.close();
-                    fail();
-                } catch (IllegalStateException alreadyClosed) {
-                }
             }
+            c2.close(); // should get ignored
+            assertSame(c1, TConfig.get());
         } finally {
             c1.close();
-            try {
-                c1.close();
-                fail();
-            } catch (IllegalStateException emptyStack) {
-                assertTrue(emptyStack.getCause() instanceof NoSuchElementException);
-            }
         }
+        c1.close(); // should get ignored
     }
 
     @Test

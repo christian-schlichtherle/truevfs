@@ -15,13 +15,11 @@ import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.InheritableThreadLocalStack;
+import de.schlichtherle.truezip.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -244,7 +242,9 @@ public class AppTest {
  */
 @ThreadSafe
 @CleanupObligation
-public final class TConfig implements Closeable {
+public final class TConfig
+extends Resource<RuntimeException>
+implements Closeable { // this could be AutoCloseable in JSE 7
 
     /**
      * The default value of the
@@ -272,8 +272,8 @@ public final class TConfig implements Closeable {
     private static final BitField<FsOutputOption>
             OUTPUT_PREFERENCES_COMPLEMENT_MASK = OUTPUT_PREFERENCES_MASK.not();
 
-    private static final InheritableThreadLocalConfigStack configs
-            = new InheritableThreadLocalConfigStack();
+    private static final InheritableThreadLocalStack<TConfig>
+            configs = new InheritableThreadLocalStack<TConfig>();
 
     private static final TConfig GLOBAL = new TConfig();
 
@@ -290,7 +290,8 @@ public final class TConfig implements Closeable {
 
     /**
      * Returns the current configuration.
-     * First, this method peeks the inheritable thread local configuration stack.
+     * First, this method peeks the inheritable thread local configuration
+     * stack.
      * If no configuration has been {@link #push() pushed} yet, the global
      * configuration is returned.
      * Mind that the global configuration is shared by all threads.
@@ -299,33 +300,31 @@ public final class TConfig implements Closeable {
      * @see    #push()
      */
     public static TConfig get() {
-        final TConfig config = configs.get().peek();
-        return null != config ? config : GLOBAL;
+        return configs.peekOrElse(GLOBAL);
     }
 
     /**
      * Creates a new current configuration by copying the current configuration
-     * and pushing the copy onto the inheritable thread local stack.
+     * and pushing the copy onto the inheritable thread local configuration
+     * stack.
      * 
      * @return The new current configuration.
      * @see    #get()
      */
     @CreatesObligation
     public static TConfig push() {
-        final TConfig config = new TConfig(get());
-        configs.get().push(config);
-        return config;
+        return configs.push(new TConfig(get()));
     }
 
     /**
      * Pops the {@link #get() current configuration} off the inheritable thread
-     * local stack.
+     * local configuration stack.
      * 
      * @throws IllegalStateException If the {@link #get() current configuration}
      *         is the global configuration.
      */
     public static void pop() {
-        get().close();
+        configs.popIff(get());
     }
 
     /** Default constructor for the global configuration. */
@@ -527,45 +526,8 @@ public final class TConfig implements Closeable {
         this.outputPreferences = preferences;
     }
 
-    /**
-     * Pops this configuration off the inheritable thread local stack.
-     * 
-     * @throws IllegalStateException If this configuration is not the top
-     *         element of the inheritable thread local stack.
-     */
     @Override
-    @DischargesObligation
-    public void close() {
-        final InheritableThreadLocalConfigStack configs = TConfig.configs;
-        final Deque<TConfig> stack = configs.get();
-        final TConfig expected;
-        try {
-            expected = stack.pop();
-        } catch (NoSuchElementException ex) {
-            throw new IllegalStateException("The inheritable thread local configuration stack is empty!", ex);
-        }
-        if (expected != this) {
-            stack.push(expected);
-            throw new IllegalStateException("This configuration is not the top element of the inheritable thread local configuration stack!");
-        }
-        if (stack.isEmpty())
-            configs.remove();
+    protected void onClose() {
+        configs.popIff(this);
     }
-
-    private static final class InheritableThreadLocalConfigStack
-    extends InheritableThreadLocal<Deque<TConfig>> {
-        @Override
-        protected Deque<TConfig> initialValue() {
-            return new LinkedList<TConfig>();
-        }
-
-        @Override
-        protected Deque<TConfig> childValue(final Deque<TConfig> parent) {
-            final Deque<TConfig> child = new LinkedList<TConfig>();
-            final TConfig element = parent.peek();
-            if (null != element)
-                child.push(element);
-            return child;
-        }
-    } // InheritableThreadLocalConfigStack
 }
