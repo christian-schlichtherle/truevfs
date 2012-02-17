@@ -69,9 +69,8 @@ public final class InheritableThreadLocalStack<T> {
     public @Nullable T pop() {
         final Deque<T> stack = get();
         final T element = stack.pop();
-        if (stack.isEmpty()) {
+        if (stack.isEmpty())
             stacks.remove();
-        }
         return element;
     }
 
