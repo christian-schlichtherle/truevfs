@@ -125,7 +125,8 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     }
 
     public static Throwable trigger(final Class<?> from, final Throwable toThrow) {
-        from.getClass(); // null check
+        if (null == from)
+            throw new NullPointerException();
         wrap(toThrow); // test if wrappable
         return get().put(from, toThrow);
     }
