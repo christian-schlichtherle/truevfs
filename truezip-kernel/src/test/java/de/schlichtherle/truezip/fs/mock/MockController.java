@@ -191,7 +191,11 @@ public class MockController<M extends FsModel> extends FsController<M> {
     }
 
     @Override
-    public void mknod(FsEntryName name, Type type, BitField<FsOutputOption> options, Entry template) throws IOException {
+    public void mknod(  FsEntryName name,
+                        Type type,
+                        BitField<FsOutputOption> options,
+                        Entry template)
+    throws IOException {
         assert null != name;
         assert null != type;
         assert null != options;
@@ -209,7 +213,8 @@ public class MockController<M extends FsModel> extends FsController<M> {
     @Override
     public <X extends IOException> void
     sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler) {
+            ExceptionHandler<? super FsSyncException, X> handler)
+    throws IOException {
         assert null != options;
         assert null != handler;
     }
