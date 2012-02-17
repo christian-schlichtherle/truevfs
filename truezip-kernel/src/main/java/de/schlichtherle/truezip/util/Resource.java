@@ -20,6 +20,7 @@ import java.io.IOException;
  * @param   <X> The exception type which may get thrown by {@link #close()}.
  *          If this is an {@link IOException}, then the subclass can implement
  *          the {@link Closeable} interface, too.
+ * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  * @version $Id$
  */
