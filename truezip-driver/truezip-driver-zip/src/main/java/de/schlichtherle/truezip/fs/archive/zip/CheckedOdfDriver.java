@@ -33,8 +33,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class CheckedOdfDriver extends OdfDriver {
 
-    public CheckedOdfDriver(IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider);
+    public CheckedOdfDriver(IOPoolProvider provider) {
+        super(provider);
     }
 
     /**

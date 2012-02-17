@@ -33,8 +33,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class CheckedZipDriver extends ZipDriver {
 
-    public CheckedZipDriver(IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider);
+    public CheckedZipDriver(IOPoolProvider provider) {
+        super(provider);
     }
 
     /**

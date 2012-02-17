@@ -36,8 +36,8 @@ public class ReadOnlySfxDriver extends ZipDriver {
     public static final Charset SFX_CHARSET
             = Charset.forName(System.getProperty("file.encoding"));
 
-    public ReadOnlySfxDriver(IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider, SFX_CHARSET);
+    public ReadOnlySfxDriver(IOPoolProvider provider) {
+        super(provider, SFX_CHARSET);
     }
 
     /**

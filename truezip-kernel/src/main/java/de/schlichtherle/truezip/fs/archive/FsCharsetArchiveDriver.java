@@ -46,10 +46,9 @@ extends FsArchiveDriver<E> {
      *        Depending on the archive file format, this may get used for
      *        reading an archive file, too.
      */
-    protected FsCharsetArchiveDriver(Charset charset) {
-        if (null == charset)
+    protected FsCharsetArchiveDriver(final Charset charset) {
+        if (null == (this.charset = charset))
             throw new NullPointerException();
-        this.charset = charset;
     }
 
     /**

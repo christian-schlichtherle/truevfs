@@ -30,7 +30,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class MockArchiveDriver
+public class MockArchiveDriver
 extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
 
     private static final Charset charset = Charset.forName("UTF-8");
@@ -45,8 +45,8 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
 
     public MockArchiveDriver(final IOPoolProvider provider) {
         super(charset);
-        provider.get(); // NPE-check
-        this.provider = provider;
+        if (null == (this.provider = provider).get())
+            throw new NullPointerException();
     }
 
     @Override

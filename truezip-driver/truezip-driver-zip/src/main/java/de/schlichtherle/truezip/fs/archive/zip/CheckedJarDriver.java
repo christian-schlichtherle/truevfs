@@ -33,8 +33,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class CheckedJarDriver extends JarDriver {
 
-    public CheckedJarDriver(IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider);
+    public CheckedJarDriver(IOPoolProvider provider) {
+        super(provider);
     }
 
     /**
