@@ -12,6 +12,7 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
+import de.schlichtherle.truezip.util.Maps;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.net.URISyntaxException;
@@ -65,14 +66,14 @@ public abstract class FsDriverService implements FsDriverProvider {
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
     public static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
-        final Map<FsScheme, FsDriver>
-                drivers = new HashMap<FsScheme, FsDriver>();
+        final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>(
+                Maps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = toSchemes(param[0]);
             final FsDriver newDriver = ServiceLocator.promote(
                     param[1], FsDriver.class);
             if (schemes.isEmpty())
-                throw new IllegalArgumentException("No schemes for " + newDriver);
+                throw new IllegalArgumentException("No file system schemes for " + newDriver);
             for (final FsScheme scheme : schemes) {
                 final FsDriver oldDriver = drivers.put(scheme, newDriver);
                 if (null != oldDriver && null != newDriver
