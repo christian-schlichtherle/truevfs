@@ -14,8 +14,10 @@ import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Size;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
+import de.schlichtherle.truezip.util.Maps;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -35,30 +38,32 @@ import javax.annotation.concurrent.NotThreadSafe;
 public class MockArchiveDriverEntryContainer
 implements EntryContainer<MockArchiveDriverEntry> {
 
-    final IOPool<?> pool;
+    private final TestConfig config;
     final Map<String, MockArchiveDriverEntry> entries;
 
     public static MockArchiveDriverEntryContainer create(
-            final IOPoolProvider provider) {
-        return create(provider, 32);
-    }
-
-    public static MockArchiveDriverEntryContainer create(
-            final IOPoolProvider provider,
-            final int initialCapacity) {
-        final IOPool<?> pool = provider.get();
-        if (null == pool)
-            throw new NullPointerException();
-        return new MockArchiveDriverEntryContainer(
-                pool,
-                new LinkedHashMap<String, MockArchiveDriverEntry>(initialCapacity));
+            @CheckForNull TestConfig config) {
+        return new MockArchiveDriverEntryContainer(config, null);
     }
 
     private MockArchiveDriverEntryContainer(
-            final IOPool<?> pool,
-            final Map<String, MockArchiveDriverEntry> entries) {
-        this.pool = pool;
+            @CheckForNull TestConfig config,
+            @CheckForNull Map<String, MockArchiveDriverEntry> entries) {
+        if (null == config)
+            config = TestConfig.get();
+        if (null == entries)
+            entries = new LinkedHashMap<String, MockArchiveDriverEntry>(
+                    Maps.initialCapacity(config.getNumEntries()));
+        this.config = config;
         this.entries = entries;
+    }
+
+    private IOPoolProvider getIOPoolProvider() {
+        return config.getIOPoolProvider();
+    }
+
+    IOPool<?> getIOPool() {
+        return getIOPoolProvider().get();
     }
 
     @Override
@@ -78,16 +83,16 @@ implements EntryContainer<MockArchiveDriverEntry> {
 
     public InputShop<MockArchiveDriverEntry> newInputShop() {
         return new DisconnectingInputShop<MockArchiveDriverEntry>(
-                new MockInputShop(pool, entries));
+                new MockInputShop(config, entries));
     }
 
     private static final class MockInputShop
     extends MockArchiveDriverEntryContainer
     implements InputShop<MockArchiveDriverEntry> {
 
-        MockInputShop(  IOPool<?> pool,
+        MockInputShop(  TestConfig config,
                         Map<String, MockArchiveDriverEntry> entries) {
-            super(pool, entries);
+            super(config, entries);
         }
 
         @Override
@@ -124,7 +129,9 @@ implements EntryContainer<MockArchiveDriverEntry> {
 
                 InputSocket<? extends IOEntry<?>>
                 getBufferInputSocket() throws IOException {
-                    return getLocalTarget().getBuffer(pool).getInputSocket();
+                    return getLocalTarget()
+                            .getBuffer(getIOPool())
+                            .getInputSocket();
                 }
             } // Input
 
@@ -137,16 +144,16 @@ implements EntryContainer<MockArchiveDriverEntry> {
 
     public OutputShop<MockArchiveDriverEntry> newOutputShop() {
         return new DisconnectingOutputShop<MockArchiveDriverEntry>(
-                new MockOutputShop(pool, entries));
+                new MockOutputShop(config, entries));
     }
 
     private static final class MockOutputShop
     extends MockArchiveDriverEntryContainer
     implements OutputShop<MockArchiveDriverEntry> {
 
-        MockOutputShop( IOPool<?> pool,
+        MockOutputShop( TestConfig config,
                         Map<String, MockArchiveDriverEntry> entries) {
-            super(pool, entries);
+            super(config, entries);
         }
 
         @Override
@@ -188,14 +195,16 @@ implements EntryContainer<MockArchiveDriverEntry> {
                 OutputSocket<? extends IOEntry<?>>
                 getBufferOutputSocket() throws IOException {
                     entries.put(entry.getName(), entry);
-                    return getLocalTarget().getBuffer(pool).getOutputSocket();
+                    return getLocalTarget()
+                            .getBuffer(getIOPool())
+                            .getOutputSocket();
                 }
 
                 void copyProperties() {
                     final MockArchiveDriverEntry dst = getLocalTarget();
                     final IOPool.Entry<?> src;
                     try {
-                        src = dst.getBuffer(pool);
+                        src = dst.getBuffer(getIOPool());
                     } catch (IOException ex) {
                         throw new AssertionError(ex);
                     }

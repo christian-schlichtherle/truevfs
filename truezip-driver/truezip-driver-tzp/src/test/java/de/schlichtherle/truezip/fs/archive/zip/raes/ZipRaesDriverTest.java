@@ -10,7 +10,6 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -20,8 +19,8 @@ public final class ZipRaesDriverTest
 extends FsCharsetArchiveDriverTestSuite<ZipDriverEntry, ZipRaesDriver> {
 
     @Override
-    protected TestZipRaesDriver newArchiveDriver(final IOPoolProvider provider) {
-        return new TestZipRaesDriver(provider);
+    protected TestZipRaesDriver newArchiveDriver() {
+        return new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
     }
 
     @Override

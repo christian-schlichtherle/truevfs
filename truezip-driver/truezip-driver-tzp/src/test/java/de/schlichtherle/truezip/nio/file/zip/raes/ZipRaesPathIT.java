@@ -16,7 +16,6 @@ import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
@@ -36,8 +35,9 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
     }
 
     @Override
-    protected TestZipRaesDriver newArchiveDriver(final IOPoolProvider provider) {
-        final TestZipRaesDriver driver = new TestZipRaesDriver(provider);
+    protected TestZipRaesDriver newArchiveDriver() {
+        final TestZipRaesDriver
+                driver = new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
         view = driver.getView();
         return driver;
     }

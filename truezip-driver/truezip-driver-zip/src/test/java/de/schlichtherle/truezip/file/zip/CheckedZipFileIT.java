@@ -10,7 +10,6 @@ package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -24,7 +23,7 @@ public final class CheckedZipFileIT extends TFileTestSuite<CheckedZipDriver> {
     }
 
     @Override
-    protected CheckedZipDriver newArchiveDriver(IOPoolProvider provider) {
-        return new CheckedZipDriver(provider);
+    protected CheckedZipDriver newArchiveDriver() {
+        return new CheckedZipDriver(getTestConfig().getIOPoolProvider());
     }
 }

@@ -6,15 +6,16 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.mock;
+package de.schlichtherle.truezip.test;
 
+import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.InheritableThreadLocalStack;
 import de.schlichtherle.truezip.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
-import java.util.HashMap;
-import java.util.Map;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -54,22 +55,28 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 @CleanupObligation
-public final class MockControl
+public final class TestConfig
 extends Resource<RuntimeException>
 implements Closeable { // this could be AutoCloseable in JSE 7
 
-    private static final InheritableThreadLocalStack<MockControl>
-            configs = new InheritableThreadLocalStack<MockControl>();
+    public static final int DEFAULT_NUM_ENTRIES = 10;
+    public static final int DEFAULT_DATA_LENGTH = 1024;
 
-    private static final MockControl GLOBAL = new MockControl();
+    private static final InheritableThreadLocalStack<TestConfig>
+            configs = new InheritableThreadLocalStack<TestConfig>();
+
+    private static final TestConfig GLOBAL = new TestConfig();
 
     // I don't think this field should be volatile.
     // This would make a difference if and only if two threads were changing
     // the GLOBAL configuration concurrently, which is discouraged.
     // Instead, the global configuration should only get changed once at
     // application startup and then each thread should modify only its thread
-    // local configuration which has been obtained by a call to MockControl.push().
-    private Map<Class<?>, Throwable> map;
+    // local configuration which has been obtained by a call to TestConfig.push().
+    private final ThrowControl control;
+    private int numEmtries = DEFAULT_NUM_ENTRIES;
+    private int dataSize = DEFAULT_DATA_LENGTH;
+    private IOPoolProvider ioPoolProvider;
 
     /**
      * Returns the current configuration.
@@ -82,7 +89,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @return The current configuration.
      * @see    #push()
      */
-    public static MockControl get() {
+    public static TestConfig get() {
         return configs.peekOrElse(GLOBAL);
     }
 
@@ -95,8 +102,8 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @see    #get()
      */
     @CreatesObligation
-    public static MockControl push() {
-        return configs.push(new MockControl(get()));
+    public static TestConfig push() {
+        return configs.push(new TestConfig(get()));
     }
 
     /**
@@ -111,89 +118,52 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     }
 
     /** Default constructor for the global configuration. */
-    private MockControl() {
-        this.map = new HashMap<Class<?>, Throwable>();
+    private TestConfig() {
+        this.control = new ThrowControl();
     }
 
     /** Copy constructor for inheritable thread local configurations. */
-    private MockControl(final MockControl template) {
-        this.map = new HashMap<Class<?>, Throwable>(template.map);
+    private TestConfig(final TestConfig template) {
+        this.control = new ThrowControl(template.getControl());
+        this.numEmtries = template.getNumEntries();
+        this.dataSize = template.getDataSize();
+        this.ioPoolProvider = template.getIOPoolProvider();
     }
 
-    public static Throwable trigger(Throwable toThrow) {
-        return trigger(Object.class, toThrow);
+    public ThrowControl getControl() {
+        return this.control;
     }
 
-    public static Throwable trigger(final Class<?> from, final Throwable toThrow) {
-        if (null == from)
-            throw new NullPointerException();
-        wrap(toThrow); // test if wrappable
-        return get().put(from, toThrow);
+    public int getNumEntries() {
+        return this.numEmtries;
     }
 
-    private Throwable put(final Class<?> from, final Throwable toThrow) {
-        // DON'T put wrap(toThrow)! We want the stack trace of the call to
-        // check(*), not of the call to this method!
-        return map.put(from, toThrow);
+    public void setNumEntries(final int numEntries) {
+        if (0 > numEntries)
+            throw new IllegalArgumentException();
+        this.numEmtries = numEntries;
     }
 
-    public static Throwable clear(Class<?> from) {
-        return get().remove(from);
+    public int getDataSize() {
+        return this.dataSize;
     }
 
-    private Throwable remove(Class<?> from) {
-        return map.remove(from);
+    public void setDataSize(final int dataLength) {
+        if (0 > dataLength)
+            throw new IllegalArgumentException();
+        this.dataSize = dataLength;
     }
 
-    public static <X extends Throwable> void check( final Object thiz,
-                                                    final Class<X> throwz)
-    throws X {
-        final Class<?> clazz = thiz.getClass();
-        get().check(clazz, throwz);
+    public IOPoolProvider getIOPoolProvider() {
+        final IOPoolProvider ioPoolProvider = this.ioPoolProvider;
+        return null != ioPoolProvider
+                ? ioPoolProvider
+                : (this.ioPoolProvider = new ByteArrayIOPoolService(getDataSize()));
     }
 
-    @SuppressWarnings("unchecked")
-    private <X extends Throwable> void check(   final Class<?> thiz,
-                                                final Class<X> throwz)
-    throws X {
-        final Throwable toThrow = map.remove(thiz);
-        if (null != toThrow)
-            if (throwz.isAssignableFrom(toThrow.getClass()))
-                throw wrap((X) toThrow);
-            else
-                map.put(thiz, toThrow); // restore
-
-        // No match, now recursively check interfaces first and then super
-        // classes.
-        // This may result in redundant checks for interfaces.
-        for (final Class<?> ic : thiz.getInterfaces())
-            check(ic, throwz);
-        final Class<?> sc = thiz.getSuperclass();
-        if (null != sc)
-            check(sc, throwz);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <X extends Throwable> X wrap(final X toThrow) {
-        return (X) instantiate(toThrow.getClass()).initCause(toThrow);
-    }
-
-    private static <O> O instantiate(final Class<O> clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (InstantiationException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
-    public static boolean contains(Throwable thiz, final Throwable that) {
-        do {
-            if (thiz == that)
-                return true;
-        } while (null != (thiz = thiz.getCause()));
-        return false;
+    public void setIOPoolProvider(
+            final @CheckForNull IOPoolProvider ioPoolProvider) {
+        this.ioPoolProvider = ioPoolProvider;
     }
 
     @Override

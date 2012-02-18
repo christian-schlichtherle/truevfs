@@ -15,7 +15,6 @@ import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
 import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -34,8 +33,9 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
     }
 
     @Override
-    protected TestZipRaesDriver newArchiveDriver(final IOPoolProvider provider) {
-        final TestZipRaesDriver driver = new TestZipRaesDriver(provider);
+    protected TestZipRaesDriver newArchiveDriver() {
+        final TestZipRaesDriver
+                driver = new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
         view = driver.getView();
         return driver;
     }

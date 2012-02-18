@@ -30,9 +30,9 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             times = new EnumMap<Access, Long>(Access.class);
     private @CheckForNull IOPool.Entry<?> buffer;
 
-    public MockArchiveDriverEntry(final String name,
-                            final Type type,
-                            final @CheckForNull Entry template) {
+    public MockArchiveDriverEntry(  final String name,
+                                    final Type type,
+                                    final @CheckForNull Entry template) {
         assert null != name;
         assert null != type;
         this.name = name;

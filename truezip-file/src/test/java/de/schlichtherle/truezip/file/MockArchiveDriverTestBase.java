@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -24,7 +23,7 @@ extends ConfiguredClientTestBase<MockArchiveDriver> {
     }
 
     @Override
-    protected final MockArchiveDriver newArchiveDriver(IOPoolProvider provider) {
-        return new MockArchiveDriver(provider);
+    protected final MockArchiveDriver newArchiveDriver() {
+        return new MockArchiveDriver(getTestConfig());
     }
 }

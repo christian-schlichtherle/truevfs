@@ -8,10 +8,12 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
+import de.schlichtherle.truezip.test.TestConfig;
+import edu.umd.cs.findbugs.annotations.OverrideMustInvoke;
+import edu.umd.cs.findbugs.annotations.When;
 import java.io.IOException;
 import java.util.Random;
+import org.junit.After;
 import org.junit.Before;
 
 /**
@@ -27,22 +29,26 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
         new Random().nextBytes(DATA);
     }
 
-    private static final IOPoolProvider
-            IO_POOL_PROVIDER = new ByteArrayIOPoolService(DATA.length * 4 / 3); // account for archive type specific overhead
-
     private byte[] data;
-    private D driver;
+    private volatile D driver;
 
     @Before
+    @OverrideMustInvoke(When.FIRST)
     public void setUp() throws IOException {
         data = DATA.clone();
-        driver = newArchiveDriver(IO_POOL_PROVIDER);
+        final TestConfig config = TestConfig.push();
+        config.setDataSize(data.length * 4 / 3); // account for archive type specific overhead
+        config.setIOPoolProvider(null); // reset
     }
 
-    protected abstract D newArchiveDriver(IOPoolProvider provider);
+    @After
+    @OverrideMustInvoke(When.LAST)
+    public void tearDown() {
+        TestConfig.pop();
+    }
 
-    protected final D getArchiveDriver() {
-        return driver;
+    protected final TestConfig getTestConfig() {
+        return TestConfig.get();
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
@@ -53,4 +59,11 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     protected final int getDataLength() {
         return data.length;
     }
+
+    protected final D getArchiveDriver() {
+        final D driver = this.driver;
+        return null != driver ? driver : (this.driver = newArchiveDriver());
+    }
+
+    protected abstract D newArchiveDriver();
 }

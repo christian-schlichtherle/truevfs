@@ -10,7 +10,6 @@ package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -24,7 +23,7 @@ public final class OdfFileIT extends TFileTestSuite<OdfDriver> {
     }
 
     @Override
-    protected OdfDriver newArchiveDriver(IOPoolProvider provider) {
-        return new OdfDriver(provider);
+    protected OdfDriver newArchiveDriver() {
+        return new OdfDriver(getTestConfig().getIOPoolProvider());
     }
 }

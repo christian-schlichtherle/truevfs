@@ -13,7 +13,6 @@ import de.schlichtherle.truezip.file.TFileTestSuite;
 import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 import java.io.IOException;
 import javax.annotation.Nullable;
 
@@ -31,8 +30,9 @@ public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
     }
 
     @Override
-    protected TestWinZipAesDriver newArchiveDriver(IOPoolProvider provider) {
-        return new TestWinZipAesDriver(provider, view);
+    protected TestWinZipAesDriver newArchiveDriver() {
+        return new TestWinZipAesDriver( getTestConfig().getIOPoolProvider(),
+                                        view);
     }
 
     @Override
