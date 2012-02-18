@@ -23,6 +23,6 @@ public final class MockDriver extends FsDriver {
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new MockController<FsModel>(model, parent);
+        return new MockController<FsModel>(model, parent, null);
     }
 }

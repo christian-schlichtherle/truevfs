@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.junit.After;
 
 /**
  * @param   <D> The type of the archive driver.
@@ -74,9 +73,13 @@ extends FsArchiveDriverTestBase<D> {
         config.setArchiveDetector(detector);
     }
 
-    @After
+    @Override
     public void tearDown() {
-        TConfig.pop();
+        try {
+            TConfig.pop();
+        } finally {
+            super.tearDown();
+        }
     }
 
     protected abstract String getSuffixList();

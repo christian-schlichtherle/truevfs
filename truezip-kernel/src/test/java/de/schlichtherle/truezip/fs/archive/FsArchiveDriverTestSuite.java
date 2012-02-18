@@ -17,10 +17,11 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.mock.MockController;
-import static de.schlichtherle.truezip.mock.MockControl.trigger;
-import static de.schlichtherle.truezip.mock.MockControl.contains;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
+import de.schlichtherle.truezip.test.TestConfig;
+import de.schlichtherle.truezip.test.ThrowControl;
+import static de.schlichtherle.truezip.test.ThrowControl.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -32,7 +33,6 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Nullable;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -50,18 +50,32 @@ extends FsArchiveDriverTestBase<D> {
     private static final Logger
             logger = Logger.getLogger(FsArchiveDriverTestSuite.class.getName());
 
-    private static final int MAX_ENTRIES = 10;
-
     private static final FsEntryName
             name = FsEntryName.create(URI.create("archive"));
     private static final FsModel model = newArchiveModel();
 
-    private @Nullable MockController<FsModel> parent;
+    private MockController<FsModel> parent;
 
     @Override
     public void setUp() throws IOException {
         super.setUp();
+        // Order is important here!
+        final TestConfig config = getTestConfig();
+        config.setDataSize(getMaxArchiveLength());
+        config.setIOPoolProvider(null); // reset
         parent = newController(model.getParent());
+    }
+
+    private ThrowControl getControl() {
+        return getTestConfig().getControl();
+    }
+
+    private int getNumEntries() {
+        return getTestConfig().getNumEntries();
+    }
+
+    private Throwable trigger(Class<?> from, Throwable toThrow) {
+        return getControl().trigger(from, toThrow);
     }
 
     @Test
@@ -126,10 +140,7 @@ extends FsArchiveDriverTestBase<D> {
         final Throwable expected = new RuntimeException();
         trigger(MockController.class, expected);
         try {
-            getArchiveDriver().getInputSocket(
-                    parent,
-                    FsEntryName.ROOT,
-                    FsInputOptions.NO_INPUT_OPTIONS);
+            getArchiveInputSocket();
             fail();
         } catch (final RuntimeException got) {
             if (!contains(got, expected))
@@ -142,11 +153,7 @@ extends FsArchiveDriverTestBase<D> {
         final Throwable expected = new RuntimeException();
         trigger(MockController.class, expected);
         try {
-            getArchiveDriver().getOutputSocket(
-                    parent,
-                    FsEntryName.ROOT,
-                    FsOutputOptions.NO_OUTPUT_OPTIONS,
-                    null);
+            getArchiveOutputSocket();
             fail();
         } catch (final RuntimeException got) {
             if (!contains(got, expected))
@@ -179,7 +186,7 @@ extends FsArchiveDriverTestBase<D> {
         final OutputShop<E> os = getArchiveDriver()
                 .newOutputShop(model, getArchiveOutputSocket(), null);
         try {
-            final Closeable[] streams = new Closeable[MAX_ENTRIES];
+            final Closeable[] streams = new Closeable[getNumEntries()];
             try {
                 for (int i = 0; i < streams.length; i++)
                     streams[i] = output(os, i);
@@ -196,7 +203,7 @@ extends FsArchiveDriverTestBase<D> {
                 .newInputShop(model, getArchiveInputSocket());
         try {
             check(is);
-            final Closeable[] streams = new Closeable[MAX_ENTRIES];
+            final Closeable[] streams = new Closeable[getNumEntries()];
             try {
                 for (int i = 0; i < streams.length; i++) {
                     input(is, i).close(); // first attempt
@@ -212,14 +219,36 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private static void close(final Closeable[] resources) throws IOException {
+        final IOException expected = new IOException();
         IOException failure = null;
         for (final Closeable resource : resources) {
-            if (null != resource) {
-                try {
-                    resource.close();
-                } catch (IOException ex) {
-                    failure = ex;
-                }
+            if (null == resource)
+                break;
+            /*final Class<?> from;
+            // Mind that resource may be decorating the respective Mock* class!
+            if (resource instanceof InputStream)
+                trigger(from = InputStream.class, expected);
+            else if (resource instanceof OutputStream)
+                trigger(from = OutputStream.class, expected);
+            else if (resource instanceof ReadOnlyFile)
+                trigger(from = ReadOnlyFile.class, expected);
+            else if (resource instanceof SeekableByteChannel)
+                trigger(from = SeekableByteChannel.class, expected);
+            else
+                from = null;*/
+            try {
+                resource.close();
+            } catch (final IOException got) {
+                if (!contains(got, expected))
+                    failure = got;
+            } finally {
+                /*if (null != from)
+                    clear(from);*/
+            }
+            try {
+                resource.close();
+            } catch (final IOException ex) {
+                failure = ex;
             }
         }
         if (null != failure)
@@ -238,9 +267,10 @@ extends FsArchiveDriverTestBase<D> {
 
     private <E extends FsArchiveEntry> void check(
             final EntryContainer<E> container) {
-        assertEquals(MAX_ENTRIES, container.getSize());
+        final int numEntries = getNumEntries();
+        assertEquals(numEntries, container.getSize());
         final Iterator<E> it = container.iterator();
-        for (int i = 0; i < MAX_ENTRIES; i++) {
+        for (int i = 0; i < numEntries; i++) {
             final E e = it.next();
             assertNotNull(e);
             assertEquals(name(i), e.getName());
@@ -266,7 +296,7 @@ extends FsArchiveDriverTestBase<D> {
             fail();
         } catch (UnsupportedOperationException expected) {
         }
-        assertEquals(MAX_ENTRIES, container.getSize());
+        assertEquals(numEntries, container.getSize());
     }
 
     private E newEntry(final String name) throws CharConversionException {
@@ -401,10 +431,8 @@ extends FsArchiveDriverTestBase<D> {
     private <M extends FsModel> MockController<M>
     newController(final M model) {
         final FsModel pm = model.getParent();
-        final FsController<FsModel> pc = null == pm
-                ? null
-                : newController(pm);
-        return new MockController<M>(model, pc, getMaxArchiveLength());
+        final FsController<FsModel> pc = null == pm ? null : newController(pm);
+        return new MockController<M>(model, pc, getTestConfig());
     }
 
     private static FsModel newArchiveModel() {
@@ -422,6 +450,6 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private int getMaxArchiveLength() {
-        return MAX_ENTRIES * getDataLength() * 4 / 3; // account for archive type specific overhead
+        return getNumEntries() * getDataLength() * 4 / 3; // account for archive type specific overhead
     }
 }

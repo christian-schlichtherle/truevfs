@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.nio.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
@@ -24,12 +23,18 @@ public final class TarBZip2PathIT extends TarPathTestSuite<TarBZip2Driver> {
     }
 
     @Override
-    protected TarBZip2Driver newArchiveDriver(IOPoolProvider provider) {
-        return new TarBZip2Driver(provider) {
+    protected TarBZip2Driver newArchiveDriver() {
+        class TestDriver extends TarBZip2Driver {
+            TestDriver() {
+                super(getTestConfig().getIOPoolProvider());
+            }
+
             @Override
             public int getLevel() {
                 return BZip2CompressorOutputStream.MIN_BLOCKSIZE;
             }
-        };
+        } // TestDriver
+
+        return new TestDriver();
     }
 }

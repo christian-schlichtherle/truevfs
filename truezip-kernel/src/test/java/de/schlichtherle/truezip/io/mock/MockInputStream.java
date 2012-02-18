@@ -9,82 +9,94 @@
 package de.schlichtherle.truezip.io.mock;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.mock.MockControl;
-import static de.schlichtherle.truezip.mock.MockControl.check;
+import de.schlichtherle.truezip.test.TestConfig;
+import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A decorating input stream which supports throwing exceptions according to
- * {@link MockControl}.
+ * {@link TestConfig}.
  * 
  * @see     MockOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class MockInputStream extends DecoratingInputStream {
+
+    private final ThrowControl control;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
-    public MockInputStream(@WillCloseWhenClosed InputStream in) {
+    public MockInputStream( final @WillCloseWhenClosed InputStream in,
+                            final @CheckForNull TestConfig config) {
         super(in);
         if (null == in)
             throw new NullPointerException();
+        if (null == (this.control = (null != config ? config : TestConfig.get()).getControl()))
+            throw new NullPointerException();
+    }
+
+    private void checkAnyException() throws IOException {
+        control.check(this, IOException.class);
+        checkUndeclaredException();
+    }
+
+    private void checkUndeclaredException() {
+        control.check(this, RuntimeException.class);
+        control.check(this, Error.class);
     }
 
     @Override
     public int read() throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.read();
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.read(b, off, len);
     }
 
     @Override
     public long skip(long n) throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.skip(n);
     }
 
     @Override
     public int available() throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.available();
     }
 
     @Override
     public void close() throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         delegate.close();
     }
 
     @Override
     public void mark(int readlimit) {
-        check(this, RuntimeException.class);
+        checkUndeclaredException();
         delegate.mark(readlimit);
     }
 
     @Override
     public void reset() throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         delegate.reset();
     }
 
     @Override
     public boolean markSupported() {
-        check(this, RuntimeException.class);
+        checkUndeclaredException();
         return delegate.markSupported();
     }
 }

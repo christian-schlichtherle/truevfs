@@ -9,85 +9,97 @@
 package de.schlichtherle.truezip.io.mock;
 
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
-import de.schlichtherle.truezip.mock.MockControl;
-import static de.schlichtherle.truezip.mock.MockControl.check;
+import de.schlichtherle.truezip.test.TestConfig;
+import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A decorating seekable byte channel which supports throwing exceptions
- * according to {@link MockControl}.
+ * according to {@link TestConfig}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public final class MockSeekableByteChannel extends DecoratingSeekableByteChannel {
+
+    private final ThrowControl control;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
-    public MockSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+    public MockSeekableByteChannel(
+            final @WillCloseWhenClosed SeekableByteChannel sbc,
+            final @CheckForNull TestConfig config) {
         super(sbc);
         if (null == sbc)
             throw new NullPointerException();
+        if (null == (this.control = (null != config ? config : TestConfig.get()).getControl()))
+            throw new NullPointerException();
+    }
+
+    private void checkAnyException() throws IOException {
+        control.check(this, IOException.class);
+        checkUndeclaredException();
+    }
+
+    private void checkUndeclaredException() {
+        control.check(this, RuntimeException.class);
+        control.check(this, Error.class);
     }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.read(dst);
     }
 
     @Override
     public int write(ByteBuffer src) throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.write(src);
     }
 
     @Override
     public long position() throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.position();
     }
 
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         delegate.position(newPosition);
         return this;
     }
 
     @Override
     public long size() throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         return delegate.size();
     }
 
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         delegate.truncate(size);
         return this;
     }
 
     @Override
     public boolean isOpen() {
-        check(this, RuntimeException.class);
+        checkUndeclaredException();
         return delegate.isOpen();
     }
 
     @Override
     public void close() throws IOException {
-        check(this, IOException.class);
-        check(this, RuntimeException.class);
+        checkAnyException();
         delegate.close();
     }
 }

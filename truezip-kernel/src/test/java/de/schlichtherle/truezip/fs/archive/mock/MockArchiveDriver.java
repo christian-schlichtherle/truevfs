@@ -15,14 +15,16 @@ import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.socket.*;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
+import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Maps;
 import java.io.CharConversionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -35,23 +37,30 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
 
     private static final Charset charset = Charset.forName("UTF-8");
     
-    private final IOPoolProvider provider;
+    private final TestConfig config;
     private final ConcurrentMap<FsMountPoint, MockArchiveDriverEntryContainer>
-            containers = new ConcurrentHashMap<FsMountPoint, MockArchiveDriverEntryContainer>();
+            containers;
 
     public MockArchiveDriver() {
-        this(new ByteArrayIOPoolService(0));
+        this(null);
     }
 
-    public MockArchiveDriver(final IOPoolProvider provider) {
+    public MockArchiveDriver(@CheckForNull TestConfig config) {
         super(charset);
-        if (null == (this.provider = provider).get())
-            throw new NullPointerException();
+        if (null == config)
+            config = TestConfig.get();
+        this.config = config;
+        this.containers = new ConcurrentHashMap<FsMountPoint, MockArchiveDriverEntryContainer>(
+                Maps.initialCapacity(config.getNumEntries()));
+    }
+
+    private IOPoolProvider getIOPoolProvider() {
+        return config.getIOPoolProvider();
     }
 
     @Override
     protected IOPool<?> getPool() {
-        return provider.get();
+        return getIOPoolProvider().get();
     }
 
     @Override
@@ -77,7 +86,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
         final FsMountPoint mp = model.getMountPoint();
         output.getLocalTarget(); // don't care for the result
         final MockArchiveDriverEntryContainer
-                n = MockArchiveDriverEntryContainer.create(provider);
+                n = MockArchiveDriverEntryContainer.create(config);
         final MockArchiveDriverEntryContainer
                 o = containers.putIfAbsent(mp, n);
         return (null != o ? o : n).newOutputShop();

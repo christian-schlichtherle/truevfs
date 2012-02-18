@@ -17,11 +17,13 @@ import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntryContainer;
-import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
+import de.schlichtherle.truezip.test.TestConfig;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.UriBuilder;
 import static org.hamcrest.CoreMatchers.*;
+import org.junit.After;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -29,6 +31,16 @@ import org.junit.Test;
  * @version $Id$
  */
 public class FsArchiveFileSystemTest {
+
+    @Before
+    public void setUp() {
+        TestConfig.push();
+    }
+
+    @After
+    public void tearDown() {
+        TestConfig.pop();
+    }
 
     @Test
     public void testListeners() {
@@ -119,11 +131,11 @@ public class FsArchiveFileSystemTest {
         };
 
         // Populate and check container.
+        final TestConfig config = TestConfig.get();
+        config.setNumEntries(paramss.length);
         final MockArchiveDriverEntryContainer
-                container = MockArchiveDriverEntryContainer.create(
-                    new ByteArrayIOPoolService(0),
-                    initialCapacity(paramss.length));
-        final MockArchiveDriver driver = new MockArchiveDriver();
+                container = MockArchiveDriverEntryContainer.create(config);
+        final MockArchiveDriver driver = new MockArchiveDriver(config);
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;

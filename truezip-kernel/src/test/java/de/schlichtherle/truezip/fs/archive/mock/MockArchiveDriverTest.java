@@ -9,7 +9,6 @@
 package de.schlichtherle.truezip.fs.archive.mock;
 
 import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -19,8 +18,8 @@ public final class MockArchiveDriverTest
 extends FsCharsetArchiveDriverTestSuite<MockArchiveDriverEntry, MockArchiveDriver> {
 
     @Override
-    protected MockArchiveDriver newArchiveDriver(IOPoolProvider provider) {
-        return new MockArchiveDriver(provider);
+    protected MockArchiveDriver newArchiveDriver() {
+        return new MockArchiveDriver(getTestConfig());
     }
 
     @Override

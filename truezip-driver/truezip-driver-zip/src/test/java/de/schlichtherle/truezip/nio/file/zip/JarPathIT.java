@@ -10,7 +10,6 @@ package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle
@@ -24,7 +23,7 @@ public final class JarPathIT extends TPathTestSuite<JarDriver> {
     }
 
     @Override
-    protected JarDriver newArchiveDriver(IOPoolProvider provider) {
-        return new JarDriver(provider);
+    protected JarDriver newArchiveDriver() {
+        return new JarDriver(getTestConfig().getIOPoolProvider());
     }
 }
