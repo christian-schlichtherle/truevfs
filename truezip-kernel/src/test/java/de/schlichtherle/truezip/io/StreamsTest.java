@@ -15,7 +15,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -24,6 +27,8 @@ import org.junit.Test;
  * @version $Id$
  */
 public class StreamsTest {
+
+    private static final Random rnd = new Random();
 
     @Test
     public void testCat() throws IOException {
@@ -107,9 +112,13 @@ public class StreamsTest {
             result.get(); // check out exception
     }
 
-    private static class MockInputStream extends DecoratingInputStream {
-        static final Random rnd = new Random();
+    private static byte[] newBuffer() {
+        final byte[] buffer = new byte[2 * Streams.FIFO_SIZE * Streams.BUFFER_SIZE];
+        rnd.nextBytes(buffer);
+        return buffer;
+    }
 
+    private static class MockInputStream extends DecoratingInputStream {
         final byte[] buffer;
         boolean closed;
 
@@ -118,12 +127,6 @@ public class StreamsTest {
         MockInputStream(final byte[] buffer) {
             super(new ByteArrayInputStream(buffer));
             this.buffer = buffer;
-        }
-
-        static byte[] newBuffer() {
-            final byte[] buffer = new byte[2 * Streams.FIFO_SIZE * Streams.BUFFER_SIZE];
-            rnd.nextBytes(buffer);
-            return buffer;
         }
 
         @Override
@@ -173,8 +176,8 @@ public class StreamsTest {
     }
 
     private static class MockOutputStream extends DecoratingOutputStream {
-        boolean closed;
         boolean flushed;
+        boolean closed;
 
         MockOutputStream(final MockInputStream in) {
             super(new ByteArrayOutputStream(in.buffer.length));
@@ -184,11 +187,6 @@ public class StreamsTest {
         public void write(int b) throws IOException {
             throw new AssertionError();
         }
-
-        /*@Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            delegate.write(b, off, len);
-        }*/
 
         @Override
         public void flush() throws IOException {

@@ -12,11 +12,11 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.io.mock.MockInputStream;
-import de.schlichtherle.truezip.io.mock.MockOutputStream;
-import de.schlichtherle.truezip.io.mock.MockSeekableByteChannel;
+import de.schlichtherle.truezip.io.ThrowingInputStream;
+import de.schlichtherle.truezip.io.ThrowingOutputStream;
+import de.schlichtherle.truezip.io.ThrowingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.mock.MockReadOnlyFile;
+import de.schlichtherle.truezip.rof.ThrowingReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
@@ -71,7 +71,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
 
     private ThrowControl getControl() {
         final ThrowControl control = this.control;
-        return null != control ? control : (this.control = config.getControl());
+        return null != control ? control : (this.control = config.getThrowControl());
     }
 
     private void checkAnyException() throws IOException {
@@ -193,25 +193,25 @@ public class MockController<M extends FsModel> extends FsController<M> {
             @Override
             public ReadOnlyFile newReadOnlyFile()
             throws IOException {
-                return new MockReadOnlyFile(
+                return new ThrowingReadOnlyFile(
                         getBoundSocket().newReadOnlyFile(),
-                        config);
+                        config.getThrowControl());
             }
 
             @Override
             public SeekableByteChannel newSeekableByteChannel()
             throws IOException {
-                return new MockSeekableByteChannel(
+                return new ThrowingSeekableByteChannel(
                         getBoundSocket().newSeekableByteChannel(),
-                        config);
+                        config.getThrowControl());
             }
 
             @Override
             public InputStream newInputStream()
             throws IOException {
-                return new MockInputStream(
+                return new ThrowingInputStream(
                         getBoundSocket().newInputStream(),
-                        config);
+                        config.getThrowControl());
             }
         } // Input
 
@@ -241,17 +241,17 @@ public class MockController<M extends FsModel> extends FsController<M> {
             @Override
             public SeekableByteChannel newSeekableByteChannel()
             throws IOException {
-                return new MockSeekableByteChannel(
+                return new ThrowingSeekableByteChannel(
                         getBoundSocket().newSeekableByteChannel(),
-                        config);
+                        config.getThrowControl());
             }
 
             @Override
             public OutputStream newOutputStream()
             throws IOException {
-                return new MockOutputStream(
+                return new ThrowingOutputStream(
                         getBoundSocket().newOutputStream(),
-                        config);
+                        config.getThrowControl());
             }
         } // Output
 

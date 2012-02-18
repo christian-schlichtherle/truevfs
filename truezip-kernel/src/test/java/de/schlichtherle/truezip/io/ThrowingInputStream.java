@@ -6,7 +6,7 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.io.mock;
+package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.test.TestConfig;
@@ -27,19 +27,20 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-public final class MockInputStream extends DecoratingInputStream {
+public final class ThrowingInputStream extends DecoratingInputStream {
 
     private final ThrowControl control;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
-    public MockInputStream( final @WillCloseWhenClosed InputStream in,
-                            final @CheckForNull TestConfig config) {
+    public ThrowingInputStream( final @WillCloseWhenClosed InputStream in,
+                            final @CheckForNull ThrowControl control) {
         super(in);
         if (null == in)
             throw new NullPointerException();
-        if (null == (this.control = (null != config ? config : TestConfig.get()).getControl()))
-            throw new NullPointerException();
+        this.control = null != control
+                ? control
+                : TestConfig.get().getThrowControl();
     }
 
     private void checkAnyException() throws IOException {

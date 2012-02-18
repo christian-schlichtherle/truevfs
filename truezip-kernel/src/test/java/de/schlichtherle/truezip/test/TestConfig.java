@@ -73,7 +73,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     // Instead, the global configuration should only get changed once at
     // application startup and then each thread should modify only its thread
     // local configuration which has been obtained by a call to TestConfig.push().
-    private final ThrowControl control;
+    private final ThrowControl throwControl;
     private int numEmtries = DEFAULT_NUM_ENTRIES;
     private int dataSize = DEFAULT_DATA_LENGTH;
     private IOPoolProvider ioPoolProvider;
@@ -119,19 +119,19 @@ implements Closeable { // this could be AutoCloseable in JSE 7
 
     /** Default constructor for the global configuration. */
     private TestConfig() {
-        this.control = new ThrowControl();
+        this.throwControl = new ThrowControl();
     }
 
     /** Copy constructor for inheritable thread local configurations. */
     private TestConfig(final TestConfig template) {
-        this.control = new ThrowControl(template.getControl());
+        this.throwControl = new ThrowControl(template.getThrowControl());
         this.numEmtries = template.getNumEntries();
         this.dataSize = template.getDataSize();
         this.ioPoolProvider = template.getIOPoolProvider();
     }
 
-    public ThrowControl getControl() {
-        return this.control;
+    public ThrowControl getThrowControl() {
+        return this.throwControl;
     }
 
     public int getNumEntries() {
