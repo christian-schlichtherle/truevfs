@@ -66,30 +66,18 @@ extends FsArchiveDriverTestBase<D> {
         parent = newController(model.getParent());
     }
 
-    private ThrowControl getControl() {
-        return getTestConfig().getControl();
-    }
-
-    private int getNumEntries() {
-        return getTestConfig().getNumEntries();
-    }
-
-    private Throwable trigger(Class<?> from, Throwable toThrow) {
-        return getControl().trigger(from, toThrow);
-    }
-
     @Test
-    public void archiveDriverMustBeFederated() {
+    public void testArchiveDriverMustBeFederated() {
         assertTrue(getArchiveDriver().isFederated());
     }
 
     @Test
-    public void ioPoolMustNotBeNull() {
+    public void testIOPoolMustNotBeNull() {
         assertNotNull(getArchiveDriver().getPool());
     }
 
     @Test
-    public void ioPoolShouldBeConstant() {
+    public void testIOPoolShouldBeConstant() {
         final IOPool<?> p1 = getArchiveDriver().getPool();
         final IOPool<?> p2 = getArchiveDriver().getPool();
         if (p1 != p2)
@@ -97,37 +85,37 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test(expected = NullPointerException.class)
-    public void newControllerMustNotTolerateNullModel() {
+    public void testNewControllerMustNotTolerateNullModel() {
         getArchiveDriver().newController(null, parent);
     }
 
     @Test(expected = NullPointerException.class)
-    public void newControllerMustNotTolerateNullParent() {
+    public void testNewControllerMustNotTolerateNullParent() {
         getArchiveDriver().newController(model, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void newControllerMustCheckParentMemberMatch1() {
+    public void testNewControllerMustCheckParentMemberMatch1() {
         getArchiveDriver().newController(model.getParent(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void newControllerMustCheckParentMemberMatch2() {
+    public void testNewControllerMustCheckParentMemberMatch2() {
         getArchiveDriver().newController(model.getParent(), parent);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void newControllerMustCheckParentMemberMatch3() {
+    public void testNewControllerMustCheckParentMemberMatch3() {
         getArchiveDriver().newController(model, newController(model));
     }
 
     @Test
-    public void newControllerMustNotReturnNull() {
+    public void testNewControllerMustNotReturnNull() {
         assertNotNull(getArchiveDriver().newController(model, parent));
     }
 
     @Test
-    public void newControllerMustMeetPostConditions() {
+    public void testNewControllerMustMeetPostConditions() {
         final FsController<?> c = getArchiveDriver()
                 .newController(model, parent);
         assertNotNull(c);
@@ -136,7 +124,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test
-    public void getInputSocketMustForwardTheCallToTheGivenController() {
+    public void testGetInputSocketMustForwardTheCallToTheGivenController() {
         final Throwable expected = new RuntimeException();
         trigger(MockController.class, expected);
         try {
@@ -149,7 +137,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test
-    public void getOutputSocketMustForwardTheCallToTheGivenController() {
+    public void testGetOutputSocketMustForwardTheCallToTheGivenController() {
         final Throwable expected = new RuntimeException();
         trigger(MockController.class, expected);
         try {
@@ -162,27 +150,27 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test(expected = NullPointerException.class)
-    public void newInputShopMustNotTolerateNullModel() throws IOException {
+    public void testNewInputShopMustNotTolerateNullModel() throws IOException {
         getArchiveDriver().newInputShop(null, getArchiveInputSocket());
     }
 
     @Test(expected = NullPointerException.class)
-    public void newInputShopMustNotTolerateNullInputSocket() throws IOException {
+    public void testNewInputShopMustNotTolerateNullInputSocket() throws IOException {
         getArchiveDriver().newInputShop(model, null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void newOutputShopMustNotTolerateNullModel() throws IOException {
+    public void testNewOutputShopMustNotTolerateNullModel() throws IOException {
         getArchiveDriver().newOutputShop(null, getArchiveOutputSocket(), null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void newOutputShopMustNotTolerateNullInputSocket() throws IOException {
+    public void testNewOutputShopMustNotTolerateNullInputSocket() throws IOException {
         getArchiveDriver().newOutputShop(model, null, null);
     }
 
     @Test
-    public void persistenceRoundTrip() throws IOException {
+    public void testRoundTripPersistence() throws IOException {
         final OutputShop<E> os = getArchiveDriver()
                 .newOutputShop(model, getArchiveOutputSocket(), null);
         try {
@@ -451,5 +439,17 @@ extends FsArchiveDriverTestBase<D> {
 
     private int getMaxArchiveLength() {
         return getNumEntries() * getDataLength() * 4 / 3; // account for archive type specific overhead
+    }
+
+    private Throwable trigger(Class<?> from, Throwable toThrow) {
+        return getControl().trigger(from, toThrow);
+    }
+
+    private ThrowControl getControl() {
+        return getTestConfig().getControl();
+    }
+
+    private int getNumEntries() {
+        return getTestConfig().getNumEntries();
     }
 }
