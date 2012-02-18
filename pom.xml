@@ -25,17 +25,19 @@
 
     <name>TrueZIP</name>
     <description>
-        TrueZIP is a Java based plug-in framework for virtual file
-        systems (VFS) which provides transparent access to archive
-        files as if they were just plain directories.
+TrueZIP is a Java based plug-in framework for virtual file systems
+(VFS) which enables client applications to performa CRUD (Create,
+Read, Update, Delete) operations on archive files as if they were
+virtual directories, even with nested archive files in
+multithreaded environments.
 
-        As an API, TrueZIP provides transparent, uniform, thread-safe,
-        read/write access to archive files as if they were just plain
-        directories in a file system path.
+As a library, TrueZIP provides simple, uniform, transparent,
+thread-safe, read/write access to archive files as if they were
+virtual directories in a file system path.
 
-        As a framework, TrueZIP provides the interfaces and classes to
-        write file system drivers which plug-in to its federated file
-        system space.
+As a framework, TrueZIP provides the interfaces and classes to
+write file system drivers which plug-in to its federated file
+system space.
     </description>
     <url>http://truezip.java.net</url>
     <inceptionYear>2004</inceptionYear>
@@ -72,6 +74,7 @@
     </scm>
 
     <properties>
+        <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
 
@@ -245,6 +248,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
+                    <!--version>2.11</version--> <!-- override default 2.12 ! -->
                     <configuration>
                         <!-- Consider 90% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
@@ -337,15 +341,15 @@
                                 <requireMavenVersion>
                                     <version>3.0.4</version>
                                     <message>
-Some older versions than Maven 3.0.4 (e.g. Maven 3.0.3) do not evaluate the
-property expression in project/distributionManagement/site/url.
+While using an older version of Maven may work, it hasn't been tested and is
+probably not producing exactly the same results.
                                     </message>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>1.7</version>
                                     <message>
 Most modules require JSE 7 at compile time.
-Note that at run time, only JSE 6 is required.
+Note that at run time, only JSE 6 is required though.
                                     </message>
                                 </requireJavaVersion>
                             </rules>
