@@ -60,7 +60,7 @@ public class TFileTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testValidPathConstructor() {
+    public void testPathConstructor() {
         for (final String[] params : new String[][] {
             { "mok2:mok1:file:/foo.mok1!/bar.mok2!/META-INF/MANIFEST.MF", "/foo.mok1/bar.mok2/META-INF/MANIFEST.MF", "/foo.mok1/bar.mok2", "/foo.mok1/bar.mok2", "META-INF/MANIFEST.MF", },
             { "mok2:mok1:file:/foo.mok1!/bar.mok2!/", "/foo.mok1/bar.mok2", "/foo.mok1/bar.mok2", "/foo.mok1", "bar.mok2", },
@@ -71,23 +71,32 @@ public class TFileTest extends MockArchiveDriverTestBase {
             { "file:/foo", "/foo", null, null, null, },
             { "file:/", "/", null, null, null, },
         }) {
-            final TFile file = new TFile(FsPath.create(URI.create(params[0])));
-            assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
-            if (null != params[2]) {
-                assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));
-            } else {
-                assertThat(file.getInnerArchive(), nullValue());
-            }
-            if (null != params[3]) {
-                assertThat(file.getEnclArchive().getPath(), equalTo(params[3].replace('/', separatorChar)));
-                assertThat(file.getEnclEntryName(), equalTo(params[4]));
-            } else {
-                assertThat(file.getEnclArchive(), nullValue());
-                assertThat(file.getEnclEntryName(), nullValue());
-            }
-            assertThat(new TFile(file.toFsPath()), equalTo(file.getNormalizedAbsoluteFile()));
-            assertThat(new TFile(file.toURI()), equalTo(file.getAbsoluteFile()));
+            assertPathConstructor(
+                    new TFile(FsPath.create(URI.create(params[0]))),
+                    params);
+            assertPathConstructor(
+                    new TFile(FsPath.create(URI.create(params[0])), null),
+                    params);
         }
+    }
+
+    private static void assertPathConstructor(final TFile file, final String[] params) {
+        assertThat(file.getArchiveDetector(), is(TFile.getDefaultArchiveDetector()));
+        assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
+        if (null != params[2]) {
+            assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));
+        } else {
+            assertThat(file.getInnerArchive(), nullValue());
+        }
+        if (null != params[3]) {
+            assertThat(file.getEnclArchive().getPath(), equalTo(params[3].replace('/', separatorChar)));
+            assertThat(file.getEnclEntryName(), equalTo(params[4]));
+        } else {
+            assertThat(file.getEnclArchive(), nullValue());
+            assertThat(file.getEnclEntryName(), nullValue());
+        }
+        assertThat(new TFile(file.toFsPath()), equalTo(file.getNormalizedAbsoluteFile()));
+        assertThat(new TFile(file.toURI()), equalTo(file.getAbsoluteFile()));
     }
 
     @Test
@@ -424,7 +433,7 @@ public class TFileTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testUriAndFsPath() {
+    public void testUriAndFsPathConversion() {
         for (final String[] params : new String[][] {
             { "/file", "file:/file" },
             { "/archive.mok", "mok:file:/archive.mok!/" },
@@ -536,7 +545,7 @@ public class TFileTest extends MockArchiveDriverTestBase {
         }
     }
 
-    private void assertIssue154(TFile file) {
+    private static void assertIssue154(TFile file) {
         for (; null != file; file = file.getEnclArchive()) {
             assertTrue(file.isArchive());
             file.exists(); // don't care for the result
