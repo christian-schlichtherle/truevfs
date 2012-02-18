@@ -6,41 +6,40 @@
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  */
-package de.schlichtherle.truezip.io.mock;
+package de.schlichtherle.truezip.rof;
 
-import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * A decorating seekable byte channel which supports throwing exceptions
- * according to {@link TestConfig}.
+ * A decorating read only file which supports throwing exceptions according to
+ * {@link TestConfig}.
  * 
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
-public final class MockSeekableByteChannel extends DecoratingSeekableByteChannel {
+public final class ThrowingReadOnlyFile extends DecoratingReadOnlyFile {
 
     private final ThrowControl control;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
-    public MockSeekableByteChannel(
-            final @WillCloseWhenClosed SeekableByteChannel sbc,
-            final @CheckForNull TestConfig config) {
-        super(sbc);
-        if (null == sbc)
+    public ThrowingReadOnlyFile(final @WillCloseWhenClosed ReadOnlyFile rof,
+                            final @CheckForNull ThrowControl control) {
+        super(rof);
+        if (null == rof)
             throw new NullPointerException();
-        if (null == (this.control = (null != config ? config : TestConfig.get()).getControl()))
-            throw new NullPointerException();
+        this.control = null != control
+                ? control
+                : TestConfig.get().getThrowControl();
     }
 
     private void checkAnyException() throws IOException {
@@ -54,47 +53,33 @@ public final class MockSeekableByteChannel extends DecoratingSeekableByteChannel
     }
 
     @Override
-    public int read(ByteBuffer dst) throws IOException {
+    public long length() throws IOException {
         checkAnyException();
-        return delegate.read(dst);
+        return delegate.length();
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
+    public long getFilePointer() throws IOException {
         checkAnyException();
-        return delegate.write(src);
+        return delegate.getFilePointer();
     }
 
     @Override
-    public long position() throws IOException {
+    public void seek(long pos) throws IOException {
         checkAnyException();
-        return delegate.position();
+        delegate.seek(pos);
     }
 
     @Override
-    public SeekableByteChannel position(long newPosition) throws IOException {
+    public int read() throws IOException {
         checkAnyException();
-        delegate.position(newPosition);
-        return this;
+        return delegate.read();
     }
 
     @Override
-    public long size() throws IOException {
+    public int read(byte[] b, int off, int len) throws IOException {
         checkAnyException();
-        return delegate.size();
-    }
-
-    @Override
-    public SeekableByteChannel truncate(long size) throws IOException {
-        checkAnyException();
-        delegate.truncate(size);
-        return this;
-    }
-
-    @Override
-    public boolean isOpen() {
-        checkUndeclaredException();
-        return delegate.isOpen();
+        return delegate.read(b, off, len);
     }
 
     @Override

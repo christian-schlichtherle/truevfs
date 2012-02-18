@@ -446,7 +446,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private ThrowControl getControl() {
-        return getTestConfig().getControl();
+        return getTestConfig().getThrowControl();
     }
 
     private int getNumEntries() {
