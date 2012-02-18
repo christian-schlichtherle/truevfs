@@ -250,7 +250,7 @@ system space.
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <!--version>2.11</version--> <!-- override default 2.12 ! -->
                     <configuration>
-                        <!-- Consider 90% blocking factor for I/O. -->
+                        <!-- Consider 80% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
                         <systemPropertyVariables>
                             <!-- FIXME: While running the tests with isolated
