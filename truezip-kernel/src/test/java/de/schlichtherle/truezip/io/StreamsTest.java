@@ -8,10 +8,14 @@
  */
 package de.schlichtherle.truezip.io;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import de.schlichtherle.truezip.socket.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.test.TestConfig;
+import de.schlichtherle.truezip.test.ThrowControl;
+import static de.schlichtherle.truezip.test.ThrowControl.contains;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -19,7 +23,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import org.junit.After;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -28,71 +34,146 @@ import org.junit.Test;
  */
 public class StreamsTest {
 
+    private static final int
+            BUFFER_SIZE = 2 * Streams.FIFO_SIZE * Streams.BUFFER_SIZE;
     private static final Random rnd = new Random();
 
-    @Test
-    public void testCat() throws IOException {
-        final MockInputStream in = new MockInputStream();
-        final MockOutputStream out = new MockOutputStream(in);
-        Thread.currentThread().interrupt();
-        try {
-            Streams.cat(in, out);
-            fail();
-        } catch (InputException expected) {
-            assertTrue(expected.getCause() instanceof EOFException);
-        }
-        assertTrue(Thread.interrupted());
-        assertTrue(out.flushed);
-        assertFalse(out.closed);
-        assertFalse(in.closed);
-        assertArrayEquals(in.buffer, out.toByteArray());
+    private ByteArrayIOBuffer buffer;
+
+    @Before
+    public void setUp() {
+        TestConfig.push();
+        buffer = newByteArrayIOBuffer();
+    }
+
+    @After
+    public void tearDown() {
+        TestConfig.pop();
+    }
+
+    private static ByteArrayIOBuffer newByteArrayIOBuffer() {
+        final byte[] data = new byte[BUFFER_SIZE];
+        rnd.nextBytes(data);
+        return new ByteArrayIOBuffer("test", data);
+    }
+
+    private static TestInputStream newTestInputStream(ByteArrayIOBuffer buffer)
+    throws IOException {
+        return new TestInputStream(buffer.getInputSocket().newInputStream());
+    }
+
+    private static TestOutputStream newTestOutputStream(ByteArrayIOBuffer buffer)
+    throws IOException {
+        return new TestOutputStream(buffer.getOutputSocket().newOutputStream());
     }
 
     @Test
-    public void testOutputException() throws IOException {
-        final MockInputStream in = new MockInputStream();
-        final MockOutputStream out = new MockOutputStream(in) {
+    public void testCat() throws IOException {
+        new CatTest() {
             @Override
-            public void write(byte[] b, int off, int len) throws IOException {
-                throw new EOFException();
+            void cat(final TestInputStream in, final TestOutputStream out)
+            throws IOException {
+                Streams.cat(in, out);
+                Streams.cat(in, out); // repeated calls don't matter
             }
-        };
-        Thread.currentThread().interrupt();
-        try {
-            Streams.cat(in, out);
-            fail();
-        } catch (EOFException expected) {
-        }
-        assertTrue(Thread.interrupted());
-        assertFalse(out.flushed);
-        assertFalse(out.closed);
-        assertFalse(in.closed);
+        }.run();
+    }
+
+    @Test
+    public void testCatInputException() throws IOException {
+        assertCatInputException(new IOException());
+        assertCatInputException(new RuntimeException());
+        assertCatInputException(new Error());
+    }
+
+    private void assertCatInputException(final Throwable expected)
+    throws IOException {
+        new CatTest() {
+            @Override
+            void cat(final TestInputStream in, final TestOutputStream out)
+            throws IOException {
+                final ThrowControl control = TestConfig.get().getThrowControl();
+                control.trigger(ThrowingInputStream.class, expected);
+                final ThrowingInputStream
+                        tis = new ThrowingInputStream(in, control);
+                try {
+                    Streams.cat(tis, out);
+                    fail();
+                } catch (final IOException got) {
+                    if (!contains(got, expected))
+                        throw got;
+                } catch (final RuntimeException got) {
+                    if (!contains(got, expected))
+                        throw got;
+                } catch (final Error got) {
+                    if (!contains(got, expected))
+                        throw got;
+                }
+                Streams.cat(in, out);
+            }
+        }.run();
+    }
+
+    @Test
+    public void testCatOutputException() throws IOException {
+        assertCatOutputException(new IOException());
+        assertCatOutputException(new RuntimeException());
+        assertCatOutputException(new Error());
+    }
+
+    private void assertCatOutputException(final Throwable expected)
+    throws IOException {
+        new CatTest() {
+            @Override
+            void cat(final TestInputStream in, final TestOutputStream out)
+            throws IOException {
+                final ThrowControl control = TestConfig.get().getThrowControl();
+                control.trigger(ThrowingOutputStream.class, expected);
+                final ThrowingOutputStream tos = new ThrowingOutputStream(out);
+                Streams.cat(in, out);
+                try {
+                    Streams.cat(in, tos);
+                    fail();
+                } catch (final IOException got) {
+                    if (!contains(got, expected))
+                        throw got;
+                } catch (final RuntimeException got) {
+                    if (!contains(got, expected))
+                        throw got;
+                } catch (final Error got) {
+                    if (!contains(got, expected))
+                        throw got;
+                }
+            }
+        }.run();
     }
 
     @Test
     public void testCopy() throws IOException {
-        final MockInputStream in = new MockInputStream();
-        final MockOutputStream out = new MockOutputStream(in);
+        assertCopy(buffer);
+    }
+
+    private void assertCopy(final ByteArrayIOBuffer buffer)
+    throws IOException {
+        final byte[] data = buffer.getData();
+        final TestInputStream in = newTestInputStream(buffer);
+        final TestOutputStream out = newTestOutputStream(buffer);
         Thread.currentThread().interrupt();
-        try {
-            Streams.copy(in, out);
-            fail();
-        } catch (InputException expected) {
-            assertTrue(expected.getCause() instanceof EOFException);
-        }
+        Streams.copy(in, out);
         assertTrue(Thread.interrupted());
         assertTrue(out.flushed);
         assertTrue(out.closed);
         assertTrue(in.closed);
-        assertArrayEquals(in.buffer, out.toByteArray());
+        assertNotSame(data, buffer.getData());
+        assertArrayEquals(data, buffer.getData());
     }
 
     @Test
-    public void testMultithreading() throws Exception {
+    public void testMultithreadedCopying() throws Exception {
         class Task implements Callable<Void> {
             @Override
             public Void call() throws IOException {
-                testCopy();
+                assertCopy(newByteArrayIOBuffer());
                 return null;
             }
         } // Task
@@ -112,35 +193,42 @@ public class StreamsTest {
             result.get(); // check out exception
     }
 
-    private static byte[] newBuffer() {
-        final byte[] buffer = new byte[2 * Streams.FIFO_SIZE * Streams.BUFFER_SIZE];
-        rnd.nextBytes(buffer);
-        return buffer;
-    }
+    private static abstract class CatTest {
+        final byte[] data = new byte[BUFFER_SIZE];
+        { rnd.nextBytes(data); }
+        final ByteArrayIOBuffer buffer = new ByteArrayIOBuffer("test", data);
 
-    private static class MockInputStream extends DecoratingInputStream {
-        final byte[] buffer;
+        void run() throws IOException {
+            final TestInputStream in = newTestInputStream(buffer);
+            final TestOutputStream out = newTestOutputStream(buffer);
+            Thread.currentThread().interrupt();
+            cat(in, out);
+            assertTrue("The interrupt status should not have changed!",
+                    Thread.interrupted());
+            assertTrue(out.flushed);
+            assertFalse(out.closed);
+            assertFalse(in.closed);
+            in.close();
+            out.close();
+            assertNotSame(data, buffer.getData());
+            assertArrayEquals(data, buffer.getData());
+        }
+
+        abstract void cat(  final TestInputStream in,
+                            final TestOutputStream out)
+        throws IOException;
+    } // Cat
+
+    private static class TestInputStream extends DecoratingInputStream {
         boolean closed;
 
-        MockInputStream() { this(newBuffer()); }
-
-        MockInputStream(final byte[] buffer) {
-            super(new ByteArrayInputStream(buffer));
-            this.buffer = buffer;
+        TestInputStream(final InputStream in) {
+            super(in);
         }
 
         @Override
         public int read() throws IOException {
             throw new AssertionError();
-        }
-
-        @Override
-        public int read(final byte[] b, final int off, final int len)
-        throws IOException {
-            final int read = delegate.read(b, off, len);
-            if (0 > read)
-                throw new EOFException();
-            return read;
         }
 
         @Override
@@ -175,12 +263,12 @@ public class StreamsTest {
         }
     }
 
-    private static class MockOutputStream extends DecoratingOutputStream {
+    private static class TestOutputStream extends DecoratingOutputStream {
         boolean flushed;
         boolean closed;
 
-        MockOutputStream(final MockInputStream in) {
-            super(new ByteArrayOutputStream(in.buffer.length));
+        TestOutputStream(final OutputStream out) {
+            super(out);
         }
 
         @Override
@@ -198,10 +286,6 @@ public class StreamsTest {
         public void close() throws IOException {
             delegate.close();
             closed = true;
-        }
-
-        byte[] toByteArray() {
-            return ((ByteArrayOutputStream) delegate).toByteArray();
         }
     }
 }
