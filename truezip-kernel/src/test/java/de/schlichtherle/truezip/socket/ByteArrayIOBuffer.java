@@ -25,9 +25,18 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An I/O entry which uses a byte array.
+ * An I/O buffer which is backed by a byte array.
+ * <p>
+ * The reference to the {@linkplain #getData() backing array} may be set to
+ * {@code null}, in which case any attempt to start input from this I/O buffer
+ * will result in a {@link FileNotFoundException}.
+ * The reference gets updated upon each call to {@code close()} on any
+ * {@link OutputStream} or {@link SeekableByteChannel}.
+ * It can also get explicitly set by calling the constructor
+ * {@link #ByteArrayIOBuffer(String, byte[])} or the method
+ * {@link #setData(byte[])}.
  * 
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
@@ -38,32 +47,67 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
             : SocketFactory.OIO;
 
     private final String name;
+    private int initialCapacity;
     private @Nullable byte[] data;
     private final EnumMap<Access, Long>
             times = new EnumMap<Access, Long>(Access.class);
     private int reads;
     private int writes;
-    private int initialCapacity;
 
     /**
-     * Constructs a new byte array I/O entry with the given name and initial
-     * capacity of the byte array for the next output to this I/O entry.
+     * Constructs a new byte array I/O buffer.
+     * The reference to the {@linkplain #getData() backing array} is set to
+     * {@code null} by this constructor.
      *
-     * @param name the name of this entry.
-     * @param initialCapacity the initial capacity of the array to use for
-     *        the next output to this I/O entry.
+     * @param name the name of this I/O buffer.
+     * @param initialCapacity the initial capacity of the next backing array
+     *        to allocate when starting output to this I/O buffer.
      */
-    public ByteArrayIOBuffer(final String name, final int initialCapacity) {
-        this.name = name;
+    public ByteArrayIOBuffer(String name, int initialCapacity) {
+        this(name, null, initialCapacity);
+    }
+
+    /**
+     * Constructs a new byte array I/O buffer.
+     * The {@linkplain #getInitialCapacity() initial capacity} will be set to
+     * length of the given backing array.
+     * Note that the given backing array does <em>not</em> get copied, so
+     * beware of concurrent modifications!
+     *
+     * @param name the name of this I/O buffer.
+     * @param data the backing array.
+     */
+    public ByteArrayIOBuffer(String name, byte[] data) {
+        this(name, data, data.length);
+    }
+
+    private ByteArrayIOBuffer(  final String name,
+                                final @CheckForNull byte[] data,
+                                final int initialCapacity) {
+        if (null == (this.name = name))
+            throw new NullPointerException();
+        setData(data);
         setInitialCapacity(initialCapacity);
     }
 
     /**
-     * Sets the initial capacity of the byte array for the next output to this
-     * I/O entry.
+     * Returns the initial capacity of the next backing array to allocate when
+     * starting output to this I/O buffer.
+     * 
+     * @since  TrueZIP 7.5
+     * @return The initial capacity of the next backing array to allocate when
+     *         starting output to this I/O buffer.
+     */
+    public final int getInitialCapacity() {
+        return this.initialCapacity;
+    }
+
+    /**
+     * Sets the initial capacity of the next backing array to allocate when
+     * starting output to this I/O buffer.
      *
-     * @param initialCapacity the initial capacity of the array to use for
-     *        the next output to this I/O entry.
+     * @param initialCapacity the initial capacity of the next backing array
+     *        to allocate when starting output to this I/O buffer.
      */
     public final void setInitialCapacity(final int initialCapacity) {
         if (0 > initialCapacity)
@@ -72,29 +116,28 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
     }
 
     /**
-     * Returns the byte array for input from this I/O entry.
-     * This usually results from the last output and is initially {@code null}.
-     * Note that the returned array is <em>not</em> copied, so beware of
-     * concurrent modifications!
+     * Returns the nullable backing array.
+     * Note that the returned backing array does <em>not</em> get copied, so
+     * beware of concurrent modifications!
      *
-     * @return The byte array for input from this I/O entry.
+     * @return The nullable backing array.
      */
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("EI_EXPOSE_REP")
-    public @CheckForNull byte[] getData() {
+    public final @Nullable byte[] getData() {
         return data;
     }
 
     /**
-     * Sets the byte array for input from this I/O entry.
-     * Note that the given array is <em>not</em> copied, so beware of
-     * concurrent modifications!
+     * Sets the nullable backing array.
+     * Note that the given backing array does <em>not</em> get copied, so
+     * beware of concurrent modifications!
      *
-     * @param data the byte array for input from this I/O entry.
+     * @param data the nullable backing array.
      */
     @SuppressWarnings("AssignmentToCollectionOrArrayFieldFromParameter")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("EI_EXPOSE_REP2")
-    public void setData(final @CheckForNull byte[] data) {
+    public final void setData(final @CheckForNull byte[] data) {
         this.data = data;
     }
 
@@ -104,7 +147,7 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
     }
 
     @Override
-    public long getSize(Size type) {
+    public final long getSize(Size type) {
         return null != data ? data.length : UNKNOWN;
     }
 
@@ -114,7 +157,7 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
      *         open a connection to the backing byte array.
      */
     // http://java.net/jira/browse/TRUEZIP-83
-    public int getCount(Access type) {
+    public final int getCount(Access type) {
         return type == WRITE ? writes : reads;
     }
 
@@ -123,18 +166,18 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
      *         array has been closed.
      */
     @Override
-    public long getTime(Access type) {
+    public final long getTime(Access type) {
         final Long time = times.get(type);
         return null != time ? time : UNKNOWN;
     }
 
     @Override
-    public InputSocket<ByteArrayIOBuffer> getInputSocket() {
+    public final InputSocket<ByteArrayIOBuffer> getInputSocket() {
         return FACTORY.newInputSocket(this);
     }
 
     @Override
-    public OutputSocket<ByteArrayIOBuffer> getOutputSocket() {
+    public final OutputSocket<ByteArrayIOBuffer> getOutputSocket() {
         return FACTORY.newOutputSocket(this);
     }
 
