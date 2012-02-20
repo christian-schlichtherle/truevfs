@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -22,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * A decorating input stream which supports throwing exceptions according to
  * {@link TestConfig}.
  * 
- * @see     MockOutputStream
+ * @see     ThrowingOutputStream
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -33,8 +32,14 @@ public final class ThrowingInputStream extends DecoratingInputStream {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
+    public ThrowingInputStream(@WillCloseWhenClosed InputStream in) {
+        this(in, null);
+    }
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    @CreatesObligation
     public ThrowingInputStream( final @WillCloseWhenClosed InputStream in,
-                            final @CheckForNull ThrowControl control) {
+                                final @CheckForNull ThrowControl control) {
         super(in);
         if (null == in)
             throw new NullPointerException();
