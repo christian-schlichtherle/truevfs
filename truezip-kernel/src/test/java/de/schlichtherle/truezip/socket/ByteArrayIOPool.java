@@ -22,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
 
-    private static final String BUFFER_NAME = "buffer";
+    private static final String BUFFER_NAME = "buffer-";
 
     private final int initialCapacity;
     private final AtomicInteger total = new AtomicInteger();
