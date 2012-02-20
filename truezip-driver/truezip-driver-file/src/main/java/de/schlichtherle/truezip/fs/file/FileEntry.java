@@ -20,8 +20,6 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Pool.Releasable;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.File;
 import static java.io.File.separatorChar;
 import java.io.IOException;
@@ -29,6 +27,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
