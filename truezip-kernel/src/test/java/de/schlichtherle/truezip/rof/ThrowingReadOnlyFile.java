@@ -8,8 +8,6 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -29,6 +27,12 @@ import javax.annotation.concurrent.NotThreadSafe;
 public final class ThrowingReadOnlyFile extends DecoratingReadOnlyFile {
 
     private final ThrowControl control;
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    @CreatesObligation
+    public ThrowingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
+        this(rof, null);
+    }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation

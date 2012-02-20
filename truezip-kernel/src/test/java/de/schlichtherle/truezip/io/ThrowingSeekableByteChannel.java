@@ -8,7 +8,6 @@
  */
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -30,6 +29,13 @@ import javax.annotation.concurrent.NotThreadSafe;
 public final class ThrowingSeekableByteChannel extends DecoratingSeekableByteChannel {
 
     private final ThrowControl control;
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    @CreatesObligation
+    public ThrowingSeekableByteChannel(
+            @WillCloseWhenClosed SeekableByteChannel sbc) {
+        this(sbc, null);
+    }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
