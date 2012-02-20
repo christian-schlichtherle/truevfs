@@ -80,7 +80,7 @@ implements InputShop<TarDriverEntry> {
         final IOPool<?> pool = driver.getPool();
         try {
             TarArchiveEntry tinEntry;
-            while (null != (tinEntry = (TarArchiveEntry) tin.getNextEntry())) {
+            while (null != (tinEntry = tin.getNextTarEntry())) {
                 final String name = getName(tinEntry);
                 TarDriverEntry entry = entries.get(name);
                 if (null != entry)
