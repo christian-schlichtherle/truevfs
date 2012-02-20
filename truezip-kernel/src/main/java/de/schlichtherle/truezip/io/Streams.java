@@ -179,7 +179,7 @@ public final class Streams {
                     try {
                         final byte[] buf = buffer.buf;
                         read = _in.read(buf, 0, buf.length);
-                    } catch (IOException ex) {
+                    } catch (final Throwable ex) {
                         exception = new InputException(ex);
                         read = -1;
                     }
@@ -234,26 +234,14 @@ public final class Streams {
                 try {
                     final byte[] buf = buffer.buf;
                     out.write(buf, 0, write);
-                } catch (IOException ex) {
-                    // Cancel reader thread synchronously.
-                    // Cancellation of the reader thread is required
-                    // so that a re-entry to the cat(...) method by the same
-                    // thread cannot not reuse the same shared buffers that
-                    // an unfinished reader thread of a previous call is
-                    // still using.
-                    result.cancel(true);
-                    while (true) {
-                        try {
-                            result.get();
-                            break;
-                        } catch (CancellationException ex2) {
-                            break;
-                        } catch (ExecutionException ex2) {
-                            throw new AssertionError(ex2);
-                        } catch (InterruptedException ex2) {
-                            interrupted = true;
-                        }
-                    }
+                } catch (final IOException ex) {
+                    cancel(result);
+                    throw ex;
+                } catch (final RuntimeException ex) {
+                    cancel(result);
+                    throw ex;
+                } catch (final Error ex) {
+                    cancel(result);
                     throw ex;
                 }
 
@@ -273,9 +261,38 @@ public final class Streams {
             if (null != ex)
                 throw ex;
         } finally {
-            Buffer.release(buffers);
             if (interrupted)
                 Thread.currentThread().interrupt();
+            Buffer.release(buffers);
+        }
+    }
+
+    /**
+     * Cancels the reader thread synchronously.
+     * Synchronous cancellation of the reader thread is required so that a
+     * re-entry to the cat(...) method by the same thread cannot concurrently
+     * access the same shared buffers that an unfinished reader thread of a
+     * previous call may still be using.
+     */
+    private static void cancel(final Future<?> result) {
+        result.cancel(true);
+        boolean interrupted = false;
+        try {
+            while (true) {
+                try {
+                    result.get();
+                    break;
+                } catch (CancellationException ex2) {
+                    break;
+                } catch (ExecutionException ex2) {
+                    throw new AssertionError(ex2);
+                } catch (InterruptedException ex2) {
+                    interrupted = true;
+                }
+            }
+        } finally {
+            if (interrupted)
+                Thread.currentThread().interrupt(); // restore
         }
     }
 
