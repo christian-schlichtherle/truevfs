@@ -46,49 +46,49 @@ public final class ThrowingReadOnlyFile extends DecoratingReadOnlyFile {
                 : TestConfig.get().getThrowControl();
     }
 
-    private void checkAnyException() throws IOException {
+    private void checkAllExceptions() throws IOException {
         control.check(this, IOException.class);
-        checkUndeclaredException();
+        checkUndeclaredExceptions();
     }
 
-    private void checkUndeclaredException() {
+    private void checkUndeclaredExceptions() {
         control.check(this, RuntimeException.class);
         control.check(this, Error.class);
     }
 
     @Override
     public long length() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.length();
     }
 
     @Override
     public long getFilePointer() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.getFilePointer();
     }
 
     @Override
     public void seek(long pos) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.seek(pos);
     }
 
     @Override
     public int read() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.read();
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.read(b, off, len);
     }
 
     @Override
     public void close() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.close();
     }
 }

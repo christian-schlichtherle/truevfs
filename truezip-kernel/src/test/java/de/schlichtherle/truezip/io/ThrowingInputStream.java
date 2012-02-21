@@ -48,61 +48,61 @@ public final class ThrowingInputStream extends DecoratingInputStream {
                 : TestConfig.get().getThrowControl();
     }
 
-    private void checkAnyException() throws IOException {
+    private void checkAllExceptions() throws IOException {
         control.check(this, IOException.class);
-        checkUndeclaredException();
+        checkUndeclaredExceptions();
     }
 
-    private void checkUndeclaredException() {
+    private void checkUndeclaredExceptions() {
         control.check(this, RuntimeException.class);
         control.check(this, Error.class);
     }
 
     @Override
     public int read() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.read();
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.read(b, off, len);
     }
 
     @Override
     public long skip(long n) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.skip(n);
     }
 
     @Override
     public int available() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.available();
     }
 
     @Override
     public void close() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.close();
     }
 
     @Override
     public void mark(int readlimit) {
-        checkUndeclaredException();
+        checkUndeclaredExceptions();
         delegate.mark(readlimit);
     }
 
     @Override
     public void reset() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.reset();
     }
 
     @Override
     public boolean markSupported() {
-        checkUndeclaredException();
+        checkUndeclaredExceptions();
         return delegate.markSupported();
     }
 }

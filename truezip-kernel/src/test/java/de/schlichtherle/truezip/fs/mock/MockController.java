@@ -36,20 +36,23 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.Icon;
 
 /**
- * @param   <M> The file system model.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
-public class MockController<M extends FsModel> extends FsController<M> {
+public class MockController extends FsController<FsModel> {
 
-    private final M model;
+    private final FsModel model;
     private final @Nullable FsController<?> parent;
-    private final TestConfig config;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final ConcurrentMap<FsEntryName, IOEntry<?>>
             map = new ConcurrentHashMap<FsEntryName, IOEntry<?>>();
+    private final TestConfig config;
     private volatile @CheckForNull ThrowControl control;
+
+    public MockController(FsModel model, @CheckForNull FsController<?> parent) {
+        this(model, parent, null);
+    }
 
     /**
      * Constructs a new mock controller.
@@ -58,7 +61,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
      * @param parent The parent file system controller.
      * @param config The mocking configuration.
      */
-    public MockController(  final M model,
+    public MockController(  final FsModel model,
                             final @CheckForNull FsController<?> parent,
                             final @CheckForNull TestConfig config) {
         assert null == model.getParent()
@@ -69,77 +72,77 @@ public class MockController<M extends FsModel> extends FsController<M> {
         this.config = null != config ? config : TestConfig.get();
     }
 
-    private ThrowControl getControl() {
+    private ThrowControl getThrowControl() {
         final ThrowControl control = this.control;
         return null != control ? control : (this.control = config.getThrowControl());
     }
 
-    private void checkAnyException() throws IOException {
-        getControl().check(this, IOException.class);
-        checkUndeclaredException();
+    private void checkAllExceptions(final Object thiz) throws IOException {
+        getThrowControl().check(thiz, IOException.class);
+        checkUndeclaredExceptions(this);
     }
 
-    private void checkUndeclaredException() {
-        getControl().check(this, RuntimeException.class);
-        getControl().check(this, Error.class);
+    private void checkUndeclaredExceptions(final Object thiz) {
+        getThrowControl().check(thiz, RuntimeException.class);
+        getThrowControl().check(thiz, Error.class);
     }
 
     @Override
-    public M getModel() {
-        checkUndeclaredException();
+    public FsModel getModel() {
+        checkUndeclaredExceptions(this);
         return model;
     }
 
     @Override
     public FsController<?> getParent() {
-        checkUndeclaredException();
+        checkUndeclaredExceptions(this);
         return parent;
     }
 
     @Override
     @Deprecated
     public Icon getOpenIcon() throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         return null;
     }
 
     @Override
     @Deprecated
     public Icon getClosedIcon() throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         return null;
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         return false;
     }
 
     @Override
     public FsEntry getEntry(FsEntryName name) throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
     }
@@ -150,7 +153,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
             Map<Access, Long> times,
             BitField<FsOutputOption> options)
     throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         assert null != times;
         assert null != options;
@@ -164,7 +167,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
             long value,
             BitField<FsOutputOption> options)
     throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         assert null != types;
         assert null != options;
@@ -175,7 +178,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<FsInputOption> options) {
-        checkUndeclaredException();
+        checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
 
@@ -183,7 +186,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
             @Override
             protected InputSocket<? extends Entry> getDelegate()
             throws IOException {
-                checkAnyException();
+                checkAllExceptions(this);
                 final IOEntry<?> buffer = map.get(name);
                 if (null == buffer)
                     throw new FileNotFoundException(name.toString());
@@ -223,7 +226,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
             final FsEntryName name,
             final BitField<FsOutputOption> options,
             final Entry template) {
-        checkUndeclaredException();
+        checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
 
@@ -231,7 +234,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
             @Override
             protected OutputSocket<? extends Entry> getDelegate()
             throws IOException {
-                checkAnyException();
+                checkAllExceptions(this);
                 final IOEntry<?> n = new ByteArrayIOBuffer(
                         name.toString(), config.getDataSize());
                 final IOEntry<?> o = map.putIfAbsent(name, n);
@@ -264,7 +267,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
                         BitField<FsOutputOption> options,
                         Entry template)
     throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         assert null != type;
         assert null != options;
@@ -274,7 +277,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
     @Override
     public void unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != name;
         assert null != options;
         throw new UnsupportedOperationException();
@@ -285,7 +288,7 @@ public class MockController<M extends FsModel> extends FsController<M> {
     sync(   BitField<FsSyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        checkAnyException();
+        checkAllExceptions(this);
         assert null != options;
         assert null != handler;
     }

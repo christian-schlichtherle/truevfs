@@ -50,63 +50,63 @@ public final class ThrowingSeekableByteChannel extends DecoratingSeekableByteCha
                 : TestConfig.get().getThrowControl();
     }
 
-    private void checkAnyException() throws IOException {
+    private void checkAllExceptions() throws IOException {
         control.check(this, IOException.class);
-        checkUndeclaredException();
+        checkUndeclaredExceptions();
     }
 
-    private void checkUndeclaredException() {
+    private void checkUndeclaredExceptions() {
         control.check(this, RuntimeException.class);
         control.check(this, Error.class);
     }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.read(dst);
     }
 
     @Override
     public int write(ByteBuffer src) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.write(src);
     }
 
     @Override
     public long position() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.position();
     }
 
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.position(newPosition);
         return this;
     }
 
     @Override
     public long size() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         return delegate.size();
     }
 
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.truncate(size);
         return this;
     }
 
     @Override
     public boolean isOpen() {
-        checkUndeclaredException();
+        checkUndeclaredExceptions();
         return delegate.isOpen();
     }
 
     @Override
     public void close() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.close();
     }
 }

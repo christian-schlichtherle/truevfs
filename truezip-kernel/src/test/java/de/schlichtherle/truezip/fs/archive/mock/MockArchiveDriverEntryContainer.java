@@ -14,9 +14,10 @@ import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Size;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
+import de.schlichtherle.truezip.test.TestConfig;
+import de.schlichtherle.truezip.test.ThrowControl;
 import de.schlichtherle.truezip.util.Maps;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,61 +39,86 @@ import javax.annotation.concurrent.NotThreadSafe;
 public class MockArchiveDriverEntryContainer
 implements EntryContainer<MockArchiveDriverEntry> {
 
-    private final TestConfig config;
     final Map<String, MockArchiveDriverEntry> entries;
+    private final TestConfig config;
+    private @CheckForNull ThrowControl control;
 
     public static MockArchiveDriverEntryContainer create(
             @CheckForNull TestConfig config) {
-        return new MockArchiveDriverEntryContainer(config, null);
+        if (null == config)
+            config = TestConfig.get();
+        return new MockArchiveDriverEntryContainer(
+                new LinkedHashMap<String, MockArchiveDriverEntry>(
+                    Maps.initialCapacity(config.getNumEntries())),
+                config);
     }
 
     private MockArchiveDriverEntryContainer(
-            @CheckForNull TestConfig config,
-            @CheckForNull Map<String, MockArchiveDriverEntry> entries) {
-        if (null == config)
-            config = TestConfig.get();
-        if (null == entries)
-            entries = new LinkedHashMap<String, MockArchiveDriverEntry>(
-                    Maps.initialCapacity(config.getNumEntries()));
-        this.config = config;
+            final Map<String, MockArchiveDriverEntry> entries,
+            final TestConfig config) {
         this.entries = entries;
+        this.config = config;
+    }
+
+    private ThrowControl getThrowControl() {
+        final ThrowControl control = this.control;
+        return null != control ? control : (this.control = config.getThrowControl());
+    }
+
+    private void checkUndeclaredExceptions() {
+        getThrowControl().check(this, RuntimeException.class);
+        getThrowControl().check(this, Error.class);
     }
 
     private IOPoolProvider getIOPoolProvider() {
         return config.getIOPoolProvider();
     }
 
-    IOPool<?> getIOPool() {
+    final IOPool<?> getIOPool() {
         return getIOPoolProvider().get();
     }
 
     @Override
     public int getSize() {
+        checkUndeclaredExceptions();
         return entries.size();
     }
 
     @Override
     public Iterator<MockArchiveDriverEntry> iterator() {
+        checkUndeclaredExceptions();
         return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     @Override
     public MockArchiveDriverEntry getEntry(String name) {
+        checkUndeclaredExceptions();
         return entries.get(name);
     }
 
     public InputShop<MockArchiveDriverEntry> newInputShop() {
-        return new DisconnectingInputShop<MockArchiveDriverEntry>(
-                new MockInputShop(config, entries));
+        checkUndeclaredExceptions();
+        return new ThrowingInputShop<MockArchiveDriverEntry>(
+                new DisconnectingInputShop<MockArchiveDriverEntry>(
+                    new MockInputShop(entries, config)),
+                config);
+    }
+
+    public OutputShop<MockArchiveDriverEntry> newOutputShop() {
+        checkUndeclaredExceptions();
+        return new ThrowingOutputShop<MockArchiveDriverEntry>(
+                new DisconnectingOutputShop<MockArchiveDriverEntry>(
+                    new MockOutputShop(entries, config)),
+                config);
     }
 
     private static final class MockInputShop
     extends MockArchiveDriverEntryContainer
     implements InputShop<MockArchiveDriverEntry> {
 
-        MockInputShop(  TestConfig config,
-                        Map<String, MockArchiveDriverEntry> entries) {
-            super(config, entries);
+        MockInputShop(  Map<String, MockArchiveDriverEntry> entries,
+                        TestConfig config) {
+            super(entries, config);
         }
 
         @Override
@@ -142,18 +168,13 @@ implements EntryContainer<MockArchiveDriverEntry> {
         public void close() { }
     } // MockInputShop
 
-    public OutputShop<MockArchiveDriverEntry> newOutputShop() {
-        return new DisconnectingOutputShop<MockArchiveDriverEntry>(
-                new MockOutputShop(config, entries));
-    }
-
     private static final class MockOutputShop
     extends MockArchiveDriverEntryContainer
     implements OutputShop<MockArchiveDriverEntry> {
 
-        MockOutputShop( TestConfig config,
-                        Map<String, MockArchiveDriverEntry> entries) {
-            super(config, entries);
+        MockOutputShop( Map<String, MockArchiveDriverEntry> entries,
+                        TestConfig config) {
+            super(entries, config);
         }
 
         @Override

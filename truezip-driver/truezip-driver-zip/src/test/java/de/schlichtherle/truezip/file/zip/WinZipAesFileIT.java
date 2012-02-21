@@ -8,22 +8,14 @@
  */
 package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
-import de.schlichtherle.truezip.key.MockView;
-import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import java.io.IOException;
-import javax.annotation.Nullable;
+import de.schlichtherle.truezip.fs.archive.zip.TestWinZipAesDriver;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
-
-    private @Nullable MockView<AesPbeParameters> view;
-
     @Override
     protected String getSuffixList() {
         return "zip";
@@ -31,18 +23,6 @@ public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
-        return new TestWinZipAesDriver( getTestConfig().getIOPoolProvider(),
-                                        view);
-    }
-
-    @Override
-    public void setUp() throws IOException {
-        this.view = new MockView<AesPbeParameters>();
-        super.setUp();
-        final TConfig config = TConfig.get();
-        config.setOutputPreferences(config.getOutputPreferences().set(ENCRYPT));
-        final AesPbeParameters key = new AesPbeParameters();
-        key.setPassword("secret".toCharArray());
-        view.setKey(key);
+        return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
     }
 }
