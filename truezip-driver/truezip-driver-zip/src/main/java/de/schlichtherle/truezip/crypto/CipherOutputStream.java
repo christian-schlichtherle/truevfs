@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
@@ -37,6 +38,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+@NotThreadSafe
 public class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for preprocessing the output. */
@@ -49,8 +51,8 @@ public class CipherOutputStream extends DecoratingOutputStream {
      */
     private byte[] cipherOut = new byte[0];
 
-    /** Whether this stream has been closed or not. */
-    private boolean closed;
+    /** Whether or not {@link #finish()} has been called in {@link #close()}. */
+    private boolean finished;
 
     /**
      * Creates a new cipher output stream.
@@ -80,7 +82,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void assertOpen() throws IOException {
+    private void checkOpen() throws IOException {
         if (null == cipher)
             throw new IOException("cipher output stream is not in open state");
     }
@@ -95,7 +97,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
     @Override
     public void write(final int b)
     throws IOException {
-        assertOpen();
+        checkOpen();
 
         int cipherLen = cipher.getUpdateOutputSize(1);
         byte[] cipherOut = this.cipherOut;
@@ -119,7 +121,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
     @Override
     public void write(final byte[] buf, final int off, final int len)
     throws IOException {
-        assertOpen();
+        checkOpen();
 
         int cipherLen = cipher.getUpdateOutputSize(len);
         byte[] cipherOut = this.cipherOut;
@@ -143,7 +145,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
      *         text is invalid, i.e. required padding information is missing.
      */
     protected void finish() throws IOException {
-        assertOpen();
+        checkOpen();
 
         int cipherLen = cipher.getOutputSize(0);
         byte[] cipherOut = this.cipherOut;
@@ -169,15 +171,13 @@ public class CipherOutputStream extends DecoratingOutputStream {
      */
     @Override
     public void close() throws IOException {
-        // Order is important here!
-        if (closed)
-            return;
-        closed = true;
-        try {
-            finish();
-        } finally {
-            cipher = null;
+        if (null != cipher) {
+            if (!finished) {
+                finish();
+                finished = true;
+            }
             delegate.close();
+            cipher = null;
         }
     }
 }
