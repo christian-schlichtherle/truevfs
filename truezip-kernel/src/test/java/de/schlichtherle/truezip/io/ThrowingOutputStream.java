@@ -48,37 +48,37 @@ public final class ThrowingOutputStream extends DecoratingOutputStream {
                 : TestConfig.get().getThrowControl();
     }
 
-    private void checkAnyException() throws IOException {
+    private void checkAllExceptions() throws IOException {
         control.check(this, IOException.class);
-        checkUndeclaredException();
+        checkUndeclaredExceptions();
     }
 
-    private void checkUndeclaredException() {
+    private void checkUndeclaredExceptions() {
         control.check(this, RuntimeException.class);
         control.check(this, Error.class);
     }
 
     @Override
     public void write(int b) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.write(b);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.write(b, off, len);
     }
 
     @Override
     public void flush() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.flush();
     }
 
     @Override
     public void close() throws IOException {
-        checkAnyException();
+        checkAllExceptions();
         delegate.close();
     }
 }

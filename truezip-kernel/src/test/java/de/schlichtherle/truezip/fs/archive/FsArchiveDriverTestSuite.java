@@ -17,11 +17,16 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.mock.MockController;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import static de.schlichtherle.truezip.test.ThrowControl.contains;
+import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -33,6 +38,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -53,8 +59,7 @@ extends FsArchiveDriverTestBase<D> {
     private static final FsEntryName
             name = FsEntryName.create(URI.create("archive"));
     private static final FsModel model = newArchiveModel();
-
-    private MockController<FsModel> parent;
+    private FsController<?> parent;
 
     @Override
     public void setUp() throws IOException {
@@ -171,6 +176,11 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void testRoundTripPersistence() throws IOException {
+        assertWrite();
+        assertRead();
+    }
+
+    private void assertWrite() throws IOException {
         final OutputShop<E> os = getArchiveDriver()
                 .newOutputShop(model, getArchiveOutputSocket(), null);
         try {
@@ -183,10 +193,29 @@ extends FsArchiveDriverTestBase<D> {
             }
             check(os);
         } finally {
+            final IOException expected = new IOException();
+            trigger(TestCloseable.class, expected);
+            try {
+                // This call may succeed if the archive driver is not using the
+                // parent controller (i.e. the MockArchiveDriver).
+                os.close();
+                //fail();
+            } catch (final IOException got) {
+                if (!contains(got, expected))
+                    throw got;
+            } finally {
+                clear(TestCloseable.class);
+            }
             os.close();
         }
-        os.close();
+    }
 
+    private OutputSocket<?> getArchiveOutputSocket() {
+        return getArchiveDriver().getOutputSocket(parent, name,
+                FsOutputOptions.NO_OUTPUT_OPTIONS, null);
+    }
+
+    private void assertRead() throws IOException {
         final InputShop<E> is = getArchiveDriver()
                 .newInputShop(model, getArchiveInputSocket());
         try {
@@ -201,38 +230,34 @@ extends FsArchiveDriverTestBase<D> {
                 close(streams);
             }
         } finally {
+            final IOException expected = new IOException();
+            trigger(TestCloseable.class, expected);
+            try {
+                // This call may succeed if the archive driver is not using the
+                // parent controller (i.e. the MockArchiveDriver) or has been
+                // reading the archive file upfront (e.g. the TAR driver).
+                is.close();
+                //fail();
+            } catch (final IOException got) {
+                if (!contains(got, expected))
+                    throw got;
+            } finally {
+                clear(TestCloseable.class);
+            }
             is.close();
         }
-        is.close();
+    }
+
+    private InputSocket<?> getArchiveInputSocket() {
+        return getArchiveDriver().getInputSocket(parent, name,
+                FsInputOptions.NO_INPUT_OPTIONS);
     }
 
     private static void close(final Closeable[] resources) throws IOException {
-        final IOException expected = new IOException();
         IOException failure = null;
         for (final Closeable resource : resources) {
             if (null == resource)
                 break;
-            /*final Class<?> from;
-            // Mind that resource may be decorating the respective Mock* class!
-            if (resource instanceof InputStream)
-                trigger(from = InputStream.class, expected);
-            else if (resource instanceof OutputStream)
-                trigger(from = OutputStream.class, expected);
-            else if (resource instanceof ReadOnlyFile)
-                trigger(from = ReadOnlyFile.class, expected);
-            else if (resource instanceof SeekableByteChannel)
-                trigger(from = SeekableByteChannel.class, expected);
-            else
-                from = null;*/
-            try {
-                resource.close();
-            } catch (final IOException got) {
-                if (!contains(got, expected))
-                    failure = got;
-            } finally {
-                /*if (null != from)
-                    clear(from);*/
-            }
             try {
                 resource.close();
             } catch (final IOException ex) {
@@ -241,16 +266,6 @@ extends FsArchiveDriverTestBase<D> {
         }
         if (null != failure)
             throw failure;
-    }
-
-    private InputSocket<?> getArchiveInputSocket() {
-        return getArchiveDriver().getInputSocket(parent, name,
-                FsInputOptions.NO_INPUT_OPTIONS);
-    }
-
-    private OutputSocket<?> getArchiveOutputSocket() {
-        return getArchiveDriver().getOutputSocket(parent, name,
-                FsOutputOptions.NO_OUTPUT_OPTIONS, null);
     }
 
     private <E extends FsArchiveEntry> void check(
@@ -264,7 +279,8 @@ extends FsArchiveDriverTestBase<D> {
             assertEquals(name(i), e.getName());
             assertSame(FILE, e.getType());
             assertEquals(getDataLength(), e.getSize(DATA));
-            assertTrue(getDataLength() <= e.getSize(STORAGE)); // random data is not compressible!
+            final long storage = e.getSize(STORAGE);
+            assertTrue(UNKNOWN == storage || getDataLength() <= storage); // random data is not compressible!
             assertTrue(UNKNOWN != e.getTime(WRITE));
             try {
                 it.remove();
@@ -416,11 +432,10 @@ extends FsArchiveDriverTestBase<D> {
         } while (total < len);
     }
 
-    private <M extends FsModel> MockController<M>
-    newController(final M model) {
+    private MockController newController(final FsModel model) {
         final FsModel pm = model.getParent();
-        final FsController<FsModel> pc = null == pm ? null : newController(pm);
-        return new MockController<M>(model, pc, getTestConfig());
+        final FsController<?> pc = null == pm ? null : newController(pm);
+        return new TestController(model, pc);
     }
 
     private static FsModel newArchiveModel() {
@@ -442,14 +457,163 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private Throwable trigger(Class<?> from, Throwable toThrow) {
-        return getControl().trigger(from, toThrow);
+        return getThrowControl().trigger(from, toThrow);
     }
 
-    private ThrowControl getControl() {
+    private Throwable clear(Class<?> from) {
+        return getThrowControl().clear(from);
+    }
+
+    private void checkAllExceptions(final Object thiz) throws IOException {
+        getThrowControl().check(thiz, IOException.class);
+        checkUndeclaredExceptions(this);
+    }
+
+    private void checkUndeclaredExceptions(final Object thiz) {
+        getThrowControl().check(thiz, RuntimeException.class);
+        getThrowControl().check(thiz, Error.class);
+    }
+
+    private ThrowControl getThrowControl() {
         return getTestConfig().getThrowControl();
     }
 
     private int getNumEntries() {
         return getTestConfig().getNumEntries();
     }
+
+    private final class TestController extends MockController {
+        TestController( FsModel model,
+                        @CheckForNull FsController<?> parent) {
+            super(model, parent, getTestConfig());
+        }
+
+        @Override
+        public InputSocket<?> getInputSocket(
+                final FsEntryName name,
+                final BitField<FsInputOption> options) {
+            assert null != name;
+            assert null != options;
+
+            class Input extends DecoratingInputSocket<Entry> {
+                Input() {
+                    super(TestController.super.getInputSocket(name, options));
+                }
+
+                @Override
+                public ReadOnlyFile newReadOnlyFile()
+                throws IOException {
+                    return new TestReadOnlyFile(
+                            getBoundSocket().newReadOnlyFile());
+                }
+
+                @Override
+                public SeekableByteChannel newSeekableByteChannel()
+                throws IOException {
+                    return new TestSeekableByteChannel(
+                            getBoundSocket().newSeekableByteChannel());
+                }
+
+                @Override
+                public InputStream newInputStream()
+                throws IOException {
+                    return new TestInputStream(
+                            getBoundSocket().newInputStream());
+                }
+            } // Input
+
+            return new Input();
+        }
+
+        @Override
+        public OutputSocket<?> getOutputSocket(
+                final FsEntryName name,
+                final BitField<FsOutputOption> options,
+                final Entry template) {
+            assert null != name;
+            assert null != options;
+
+            class Output extends DecoratingOutputSocket<Entry> {
+                Output() {
+                    super(TestController.super.getOutputSocket(name, options, template));
+                }
+
+                @Override
+                public SeekableByteChannel newSeekableByteChannel()
+                throws IOException {
+                    return new TestSeekableByteChannel(
+                            getBoundSocket().newSeekableByteChannel());
+                }
+
+                @Override
+                public OutputStream newOutputStream()
+                throws IOException {
+                    return new TestOutputStream(
+                            getBoundSocket().newOutputStream());
+                }
+            } // Output
+
+            return new Output();
+        }
+    } // TestController
+
+    @SuppressWarnings("MarkerInterface")
+    private interface TestCloseable extends Closeable {
+    }
+
+    private final class TestReadOnlyFile
+    extends DecoratingReadOnlyFile
+    implements TestCloseable {
+        TestReadOnlyFile(ReadOnlyFile rof) {
+            super(rof);
+        }
+
+        @Override
+        public void close() throws IOException {
+            checkAllExceptions(this);
+            delegate.close();
+        }
+    } // TestReadOnlyfile
+
+    private final class TestSeekableByteChannel
+    extends DecoratingSeekableByteChannel
+    implements TestCloseable {
+        TestSeekableByteChannel(SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public void close() throws IOException {
+            checkAllExceptions(this);
+            delegate.close();
+        }
+    } // TestSeekableByteChannel
+
+    private final class TestInputStream
+    extends DecoratingInputStream
+    implements TestCloseable {
+        TestInputStream(InputStream in) {
+            super(in);
+        }
+
+        @Override
+        public void close() throws IOException {
+            checkAllExceptions(this);
+            delegate.close();
+        }
+    } // TestInputStream
+
+    private final class TestOutputStream
+    extends DecoratingOutputStream
+    implements TestCloseable {
+        TestOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void close() throws IOException {
+            checkAllExceptions(this);
+            delegate.close();
+        }
+    } // TestOutputStream
 }
