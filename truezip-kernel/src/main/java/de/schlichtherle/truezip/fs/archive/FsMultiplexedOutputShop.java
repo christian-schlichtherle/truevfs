@@ -119,6 +119,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
     @Override
     public OutputSocket<? extends E> getOutputSocket(final E entry) {
+        if (null == entry)
+            throw new NullPointerException();
+
         class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(FsMultiplexedOutputShop.super.getOutputSocket(entry));
@@ -130,24 +133,26 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
-            public OutputStream newOutputStream()
-            throws IOException {
-                if (isBusy()) {
-                    final IOPool.Entry<?> temp = pool.allocate();
-                    try {
-                        return new BufferedEntryOutputStream(
-                                temp, getBoundSocket());
-                    } catch (IOException ex) {
-                        temp.release();
-                        throw ex;
-                    }
-                } else {
-                    return new EntryOutputStream(getBoundSocket());
-                }
+            public OutputStream newOutputStream() throws IOException {
+                return isBusy()
+                        ? newBufferedEntryOutputStream(getBoundSocket())
+                        : new EntryOutputStream(getBoundSocket());
             }
         } // Output
 
         return new Output();
+    }
+
+    private BufferedEntryOutputStream newBufferedEntryOutputStream(
+            final OutputSocket<? extends E> output)
+    throws IOException {
+        final IOPool.Entry<?> buffer = pool.allocate();
+        try {
+            return new BufferedEntryOutputStream(buffer, output);
+        } catch (final IOException ex) {
+            buffer.release();
+            throw ex;
+        }
     }
 
     /**
@@ -234,9 +239,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        BufferedEntryOutputStream(
-                final IOPool.Entry<?> buffer,
-                final OutputSocket<? extends E> output)
+        BufferedEntryOutputStream(  final IOPool.Entry<?> buffer,
+                                    final OutputSocket<? extends E> output)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
             this.output = output;
