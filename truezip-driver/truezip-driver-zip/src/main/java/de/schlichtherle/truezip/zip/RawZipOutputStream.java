@@ -492,13 +492,10 @@ implements Iterable<E> {
         final ZipEntry entry = this.entry;
         if (null == entry)
             return;
-        try {
-            this.processor.finish();
-        } finally {
-            this.delegate = this.dos;
-            this.processor = null;
-            this.entry = null;
-        }
+        this.processor.finish();
+        this.delegate = this.dos;
+        this.processor = null;
+        this.entry = null;
         flush();
     }
 
@@ -523,7 +520,6 @@ implements Iterable<E> {
     public void finish() throws IOException {
         if (this.finished)
             return;
-        this.finished = true;
         closeEntry();
         final LEDataOutputStream dos = this.dos;
         this.cdOffset = dos.size();
@@ -532,6 +528,7 @@ implements Iterable<E> {
             if (!writeCentralFileHeader(i.next()))
                 i.remove();
         writeEndOfCentralDirectory();
+        this.finished = true;
     }
 
     /**
@@ -712,12 +709,12 @@ implements Iterable<E> {
      */
     @Override
     public void close() throws IOException {
-        finish();
         if (this.closed)
             return;
+        finish();
         this.delegate.close();
-        this.closed = true;
         this.entries.clear();
+        this.closed = true;
     }
 
     /** Adjusts the number of written bytes in the offset for appending mode. */
