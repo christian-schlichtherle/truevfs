@@ -26,6 +26,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class FsSyncException extends SequentialIOException {
+
     private static final long serialVersionUID = 4893219420357369739L;
 
     /**
