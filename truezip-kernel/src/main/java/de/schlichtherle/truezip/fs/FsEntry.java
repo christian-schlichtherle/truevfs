@@ -11,9 +11,8 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Formatter;
-import javax.annotation.Nullable;
-import java.util.Iterator;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * An abstract file system entry is an entry which can implement multiple types
