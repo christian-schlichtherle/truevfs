@@ -208,7 +208,7 @@ extends FsArchiveDriverTestBase<D> {
             }
             os.close();
         }
-        // This is undefined in the contract, but the kernel decorates the
+        // This is undefined in the contract, so the kernel decorates the
         // driver product with a DisconnectingOutputShop to assert this.
         /*try {
             output(os, getNumEntries()).close();
@@ -278,7 +278,7 @@ extends FsArchiveDriverTestBase<D> {
             }
             is.close();
         }
-        // This is undefined in the contract, but the kernel decorates the
+        // This is undefined in the contract, so the kernel decorates the
         // driver product with a DisconnectingInputShop to assert this.
         /*try {
             input(is, getNumEntries()).close();
