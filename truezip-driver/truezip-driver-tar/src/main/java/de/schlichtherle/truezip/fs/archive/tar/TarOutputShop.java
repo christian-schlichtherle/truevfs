@@ -139,6 +139,15 @@ implements OutputShop<TarDriverEntry> {
         return busy;
     }
 
+    /*@Override
+    public void close() throws IOException {
+        // In case the output stream writes to an entry in an enclosing archive
+        // file, the effect of this call is to try acquiring the write lock,
+        // which may fail with an IOException in order to prevent a dead lock.
+        super.flush();
+        super.close();
+    }*/
+
     /**
      * This entry output stream writes directly to our subclass.
      * It can only be used if this output stream is not currently busy
