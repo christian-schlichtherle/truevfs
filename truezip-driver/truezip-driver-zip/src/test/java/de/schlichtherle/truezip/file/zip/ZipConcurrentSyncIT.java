@@ -9,21 +9,21 @@
 package de.schlichtherle.truezip.file.zip;
 
 import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
-import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 
 /**
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-public final class JarConcurrentSyncIT extends ConcurrentSyncTestSuite<JarDriver> {
+public final class ZipConcurrentSyncIT extends ConcurrentSyncTestSuite<ZipDriver> {
 
     @Override
     protected String getSuffixList() {
-        return "jar";
+        return "zip";
     }
 
     @Override
-    protected JarDriver newArchiveDriver() {
-        return new JarDriver(getTestConfig().getIOPoolProvider());
+    protected ZipDriver newArchiveDriver() {
+        return new ZipDriver(getTestConfig().getIOPoolProvider());
     }
 }
