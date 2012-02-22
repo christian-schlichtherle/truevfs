@@ -89,8 +89,8 @@ extends FsLockModelDecoratingController<
         return this.writeLock;
     }
 
-    private <T> T
-    readOrWriteLocked(IOOperation<T> operation) throws IOException {
+    private <T> T readOrWriteLocked(IOOperation<T> operation)
+    throws IOException {
         try {
             return readLocked(operation);
         } catch (FsNeedsWriteLockException ex) {
@@ -148,8 +148,8 @@ extends FsLockModelDecoratingController<
      * @throws NeedsLockRetryException See above.
      */
     @SuppressWarnings("unchecked")
-    private static <T> T
-    locked(final IOOperation<T> operation, final Lock lock) throws IOException {
+    private static <T> T locked(final IOOperation<T> operation, final Lock lock)
+    throws IOException {
         final ThreadTool thread = threadTool.get();
         if (thread.locking) {
             if (!lock.tryLock())
@@ -674,7 +674,7 @@ extends FsLockModelDecoratingController<
                 };
             }
         },
-        
+
         NEW {
             @Override
             ThreadLocal<ThreadTool> newThreadLocalTool() {
@@ -696,9 +696,11 @@ extends FsLockModelDecoratingController<
 
     @Immutable
     @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-    private static final class NeedsLockRetryException
+    public static final class NeedsLockRetryException
     extends FsControllerException {
-        static final NeedsLockRetryException
+        public static final NeedsLockRetryException
                 SINGLETON = new NeedsLockRetryException();
-    }
+
+        private NeedsLockRetryException() { }
+    } // NeedsLockRetryException
 }
