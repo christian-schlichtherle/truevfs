@@ -80,10 +80,12 @@ extends ConfiguredClientTestBase<D> {
                 umount();
             } finally {
                 archive = null;
-                if (exists(temp))
+                final Path temp = this.temp;
+                this.temp = null;
+                if (null != temp && exists(temp))
                     delete(temp);                
             }
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             logger.log(Level.INFO,
                     "Failed to clean up temporary archive file (this error may be just implied)!",
                     ex);
