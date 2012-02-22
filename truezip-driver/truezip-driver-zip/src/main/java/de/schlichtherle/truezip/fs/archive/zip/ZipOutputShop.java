@@ -172,7 +172,7 @@ implements OutputShop<ZipDriverEntry> {
                         && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);
                     if (peer instanceof ZipDriverEntry) {
-                        // Set up entry attributes for Raw Content Copying (RCC).
+                        // Set up entry attributes for Raw Data Transfer (RDT).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
