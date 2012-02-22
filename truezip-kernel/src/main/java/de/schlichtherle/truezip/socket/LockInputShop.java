@@ -34,7 +34,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public class ConcurrentInputShop<E extends Entry>
+public class LockInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
     private final Lock lock;
@@ -47,7 +47,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ConcurrentInputShop(
+    public LockInputShop(
             final @WillCloseWhenClosed InputShop<E> input,
             final Lock lock) {
         super(input);
@@ -98,7 +98,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
     public InputSocket<? extends E> getInputSocket(final String name) {
         class Input extends DecoratingInputSocket<E> {
             Input() {
-                super(ConcurrentInputShop.super.getInputSocket(name));
+                super(LockInputShop.super.getInputSocket(name));
             }
 
             @Override

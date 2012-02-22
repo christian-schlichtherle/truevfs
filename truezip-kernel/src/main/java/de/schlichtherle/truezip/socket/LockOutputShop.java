@@ -32,7 +32,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public class ConcurrentOutputShop<E extends Entry>
+public class LockOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
 
     private final Lock lock;
@@ -45,7 +45,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ConcurrentOutputShop(
+    public LockOutputShop(
             final @WillCloseWhenClosed OutputShop<E> output,
             final Lock lock) {
         super(output);
@@ -96,7 +96,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     public final OutputSocket<? extends E> getOutputSocket(final E entry) {
         class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(ConcurrentOutputShop.super.getOutputSocket(entry));
+                super(LockOutputShop.super.getOutputSocket(entry));
             }
 
             @Override

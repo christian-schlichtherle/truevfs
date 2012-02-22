@@ -35,7 +35,6 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -478,22 +477,14 @@ extends FsFileSystemArchiveController<E> {
     } // DummyInputArchive
 
     private static final class InputArchive<E extends FsArchiveEntry>
-    extends ConcurrentInputShop<E> {
+    extends LockInputShop<E> {
         final InputShop<E> driverProduct;
-        final Lock lock;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         InputArchive(final @WillCloseWhenClosed InputShop<E> input) {
-            this(input, new ReentrantLock());
-        }
-
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        InputArchive(final @WillCloseWhenClosed InputShop<E> input, final Lock lock) {
-            super(new DisconnectingInputShop<E>(input), lock);
+            super(new DisconnectingInputShop<E>(input), new ReentrantLock());
             this.driverProduct = input;
-            this.lock = lock;
         }
 
         /**
@@ -506,22 +497,14 @@ extends FsFileSystemArchiveController<E> {
     } // InputArchive
 
     private static final class OutputArchive<E extends FsArchiveEntry>
-    extends ConcurrentOutputShop<E> {
+    extends LockOutputShop<E> {
         final OutputShop<E> driverProduct;
-        final Lock lock;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         OutputArchive(final @WillCloseWhenClosed OutputShop<E> output) {
-            this(output, new ReentrantLock());
-        }
-
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        OutputArchive(final @WillCloseWhenClosed OutputShop<E> output, final Lock lock) {
-            super(new DisconnectingOutputShop<E>(output), lock);
+            super(new DisconnectingOutputShop<E>(output), new ReentrantLock());
             this.driverProduct = output;
-            this.lock = lock;
         }
 
         /**
