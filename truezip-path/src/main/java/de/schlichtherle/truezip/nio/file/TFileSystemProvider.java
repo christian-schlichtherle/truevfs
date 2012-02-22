@@ -339,10 +339,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
         copy(promote(source), promote(target), options);
     }
 
-    private static void copy(
-            final TPath src,
-            final TPath dst,
-            final CopyOption... options)
+    private static void copy(   final TPath src,
+                                final TPath dst,
+                                final CopyOption... options)
     throws IOException {
         if (isSameFile0(src, dst))
             throw new IOException(dst + " (source and destination are the same file)");
