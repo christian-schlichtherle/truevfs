@@ -45,9 +45,8 @@ public class LockInputStream extends DecoratingInputStream {
             final @Nullable @WillCloseWhenClosed InputStream in,
             final Lock lock) {
         super(in);
-        if (null == lock)
+        if (null == (this.lock = lock))
             throw new NullPointerException();
-        this.lock = lock;
     }
 
     @Override

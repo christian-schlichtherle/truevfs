@@ -25,8 +25,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * Decorates another output shop to allow concurrent access which is
  * synchronized by a {@link Lock} object provided to its constructor.
  *
- * @see     ConcurrentInputShop
  * @param   <E> The type of the entries.
+ * @see     LockInputShop
  * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  * @version $Id$
@@ -49,9 +49,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             final @WillCloseWhenClosed OutputShop<E> output,
             final Lock lock) {
         super(output);
-        if (null == lock)
+        if (null == (this.lock = lock))
             throw new NullPointerException();
-        this.lock = lock;
     }
 
     @Override
