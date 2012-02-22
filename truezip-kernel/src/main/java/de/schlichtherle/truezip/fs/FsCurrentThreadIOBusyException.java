@@ -21,7 +21,7 @@ public final class FsCurrentThreadIOBusyException
 extends FsResourceIOBusyException {
     private static final long serialVersionUID = 1L;
 
-    FsCurrentThreadIOBusyException(final int local) {
+    FsCurrentThreadIOBusyException(int local) {
         super("Number of open I/O streams for the current thread: %d", local);
     }
 }
