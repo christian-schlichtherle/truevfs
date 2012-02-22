@@ -897,7 +897,7 @@ implements Iterable<E> {
 
         @Override
         public void init(final ZipEntry entry) throws IOException {
-            // HC SUNT DRACONES - ORDER IS CRITICAL!
+            // HC SUNT DRACONES!
             this.entryParam = new WinZipAesEntryParameters(this.generalParam,
                     entry);
             final AesKeyStrength keyStrength = this.entryParam.getKeyStrength();
