@@ -111,13 +111,13 @@ extends ConfiguredClientTestBase<D> {
                 new SyncTaskFactory());
         try {
             for (int i = 0; i++ < NUM_REPEATS; )
-                assertInputOutput();
+                inputOutput();
         } finally {
             joiner.join();
         }
     }
 
-    private void assertInputOutput() throws IOException {
+    private void inputOutput() throws IOException {
         //assertInputOutput(archive);
         
         //final TFile archiveTest = new TFile(archive, "test");
@@ -125,18 +125,18 @@ extends ConfiguredClientTestBase<D> {
         
         final TFile archiveInner = new TFile(archive, "inner" + getSuffix());
         final TFile archiveInnerTest = new TFile(archiveInner, "test");
-        assertInputOutput(archiveInnerTest);
+        inputOutput(archiveInnerTest);
         archiveInner.rm();
         archive.rm();
     }
 
-    private void assertInputOutput(final TFile file) throws IOException {
-        assertInput(file);
-        assertOutput(file);
+    private void inputOutput(final TFile file) throws IOException {
+        input(file);
+        output(file);
         file.rm();
     }
 
-    private void assertInput(final TFile file) throws IOException {
+    private void input(final TFile file) throws IOException {
         final InputStream in = new ByteArrayInputStream(getData());
         try {
             file.input(in);
@@ -146,7 +146,7 @@ extends ConfiguredClientTestBase<D> {
         assertEquals(getDataLength(), file.length());
     }
 
-    private void assertOutput(final TFile file) throws IOException {
+    private void output(final TFile file) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
         try {
             file.output(out);
