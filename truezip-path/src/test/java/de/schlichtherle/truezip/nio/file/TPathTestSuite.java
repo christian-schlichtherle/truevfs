@@ -85,7 +85,7 @@ extends ConfiguredClientTestBase<D> {
             }
         } catch (IOException ex) {
             logger.log(Level.INFO,
-                    "Failed to clean up temporary archive file - this may be just a subsequent error:",
+                    "Failed to clean up temporary archive file (this error may be just implied)!",
                     ex);
         } finally {
             super.tearDown();
