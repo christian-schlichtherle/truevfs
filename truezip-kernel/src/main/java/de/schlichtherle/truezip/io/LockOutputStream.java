@@ -45,9 +45,8 @@ public class LockOutputStream extends DecoratingOutputStream {
             final @Nullable @WillCloseWhenClosed OutputStream out,
             final Lock lock) {
         super(out);
-        if (null == lock)
+        if (null == (this.lock = lock))
             throw new NullPointerException();
-        this.lock = lock;
     }
 
     @Override

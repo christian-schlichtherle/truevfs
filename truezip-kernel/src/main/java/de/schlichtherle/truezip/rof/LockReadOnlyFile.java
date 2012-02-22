@@ -42,9 +42,8 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
             final @Nullable @WillCloseWhenClosed ReadOnlyFile rof,
             final Lock lock) {
         super(rof);
-        if (null == lock)
+        if (null == (this.lock = lock))
             throw new NullPointerException();
-        this.lock = lock;
     }
 
     @Override
