@@ -119,7 +119,7 @@ implements OutputShop<TarDriverEntry> {
                     return new EntryOutputStream(entry);
                 }
                 // The source entry does not exist or cannot support Raw
-                // Content Copying (RCC) to the destination entry.
+                // Data Transfer (RDT) to the destination entry.
                 // So we need to write the output to a temporary buffer and
                 // copy it upon close().
                 return new BufferedEntryOutputStream(

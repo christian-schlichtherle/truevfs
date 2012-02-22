@@ -84,23 +84,23 @@ import javax.swing.filechooser.FileSystemView;
  * not work.
  * This limitation is designed to prevent ambiguous method semantics.
  *
- * <a name="directDataCopying"/><a name="RCC"/><h4>Raw Content Copying (RCC)</h4>
+ * <a name="directDataCopying"/><a name="RDT"/><h4>Raw Data Transfer (RDT)</h4>
  * <p>
  * <i>[Note that this feature has been renamed from Direct Data Copying (DDC)
- *    to Raw Content Copying (RCC) in TrueZIP 7.5.]</i>
+ *    to Raw Data Transfer (RDT) in TrueZIP 7.5]</i>
  * <p>
  * If data is copied from an archive file to another archive file of the
  * same type, some of the copy methods support a feature called <i>Raw Data
- * Copying</i> (RCC) to achieve best performance:</a>
- * With RCC, the raw entry data is copied from the source archive to the
+ * Transfer</i> (RDT) to achieve best performance:</a>
+ * With RDT, the raw entry data is copied from the source archive to the
  * destination archive without the need to temporarily reproduce, copy and
  * process the original data again.
  * <p>
  * The benefits of this feature are archive driver specific:
- * In case of ZIP files with compressed entries, this avoids the need to
- * inflate the data from the source entry just to deflate it again for the
- * destination entry.
- * In case of TAR files, it avoids the need to create an additional temporary
+ * In case of ZIP files with compressed entries, RDT avoids inflating the entry
+ * content when reading the source entry and immediately deflating it again
+ * when writing the destination entry.
+ * In case of TAR files, RDT avoids the need to create an additional temporary
  * file, but shows no impact otherwise because the TAR file format doesn't
  * support compression.
  *
@@ -119,7 +119,7 @@ import javax.swing.filechooser.FileSystemView;
  * detect all supported archive types (see {@link TConfig} for other options).
  * This is fine because it's fail-safe and performs reasonably well when
  * copying archive files (e.g. ZIP entries won't get recompressed thanks to
- * <a href="#RCC">RCC</a>).
+ * <a href="#RDT">RDT</a>).
  * 
  * <a name="copy"><h4>Copying Or Moving Directory Trees</h4></a>
  * <p>
@@ -2959,7 +2959,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3018,7 +3018,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>No</td>
      * </tr>
      * <tr>
@@ -3095,7 +3095,7 @@ public final class TFile extends File {
      *   <td>Always</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>No</td>
      * </tr>
      * <tr>
@@ -3179,7 +3179,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3268,7 +3268,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3372,7 +3372,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3496,7 +3496,7 @@ public final class TFile extends File {
      *   <td>n/a</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>Yes</td>
      * </tr>
      * <tr>
@@ -3567,7 +3567,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3636,7 +3636,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
@@ -3707,7 +3707,7 @@ public final class TFile extends File {
      *   <td>Never</td>
      * </tr>
      * <tr>
-     *   <td><a href="#RCC">Raw Content Copying (RCC)</a></td>
+     *   <td><a href="#RDT">Raw Data Transfer (RDT)</a></td>
      *   <td>n/a</td>
      * </tr>
      * <tr>
