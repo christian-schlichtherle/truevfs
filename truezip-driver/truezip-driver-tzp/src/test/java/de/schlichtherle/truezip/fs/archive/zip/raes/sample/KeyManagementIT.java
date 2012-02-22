@@ -72,7 +72,7 @@ public final class KeyManagementIT {
         } catch (FsSyncException ex) {
             logger.log(Level.WARNING, ex.toString(), ex);
         }
-        if (temp.exists() && !temp.delete())
+        if (null != temp && temp.exists() && !temp.delete())
             logger.log(Level.WARNING, "{0} (could not delete)", temp);
     }
 
