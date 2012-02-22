@@ -9,14 +9,13 @@
 package de.schlichtherle.truezip.io;
 
 import java.io.File;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests the class {@link SequentialIOException}.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 public final class SequentialIOExceptionTest {
@@ -86,7 +85,7 @@ public final class SequentialIOExceptionTest {
         private static final long serialVersionUID = 4893204620357369739L;
 
         TestException(String message, int priority) {
-            super(message, priority);
+            super(message, null, priority);
         }
     }
 
