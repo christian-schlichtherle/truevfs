@@ -617,6 +617,23 @@ extends FsLockModelDecoratingController<
             super(out);
         }
 
+        /**
+         * Calling this method may be used to try the write lock without
+         * breaking output consistency.
+         */
+        /*@Override
+        public void flush() throws IOException {
+            class Flush implements IOOperation<Void> {
+                @Override
+                public Void call() throws IOException {
+                    delegate.flush();
+                    return null;
+                }
+            } // Flush
+
+            writeLocked(new Flush());
+        }*/
+
         @Override
         public void close() throws IOException {
             closeWriteLocked(delegate);
