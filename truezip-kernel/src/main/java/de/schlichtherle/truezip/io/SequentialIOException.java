@@ -43,7 +43,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * <p>
  * This class is thread-safe.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
@@ -63,7 +63,7 @@ public class SequentialIOException extends IOException implements Cloneable {
     static final Comparator<SequentialIOException> PRIORITY_COMP
             = new Comparator<SequentialIOException>() {
         @Override
-		public int compare(SequentialIOException l, SequentialIOException r) {
+        public int compare(SequentialIOException l, SequentialIOException r) {
             final int cmp = l.priority - r.priority;
             return cmp != 0 ? cmp : INDEX_COMP.compare(l, r);
         }
@@ -77,7 +77,7 @@ public class SequentialIOException extends IOException implements Cloneable {
     static final Comparator<SequentialIOException> INDEX_COMP
             = new Comparator<SequentialIOException>() {
         @Override
-		public int compare(SequentialIOException l, SequentialIOException r) {
+        public int compare(SequentialIOException l, SequentialIOException r) {
             return l.index - r.index;
         }
     };
@@ -98,11 +98,11 @@ public class SequentialIOException extends IOException implements Cloneable {
     int maxIndex; // effectively final
 
     public SequentialIOException() {
-        this(null, null, 0);
+        this((String) null, 0);
     }
 
     public SequentialIOException(final @CheckForNull String message) {
-        this(message, null, 0);
+        this(message, 0);
     }
 
     public SequentialIOException(final @CheckForNull Throwable cause) {
@@ -116,13 +116,14 @@ public class SequentialIOException extends IOException implements Cloneable {
     }
 
     public SequentialIOException(final int priority) {
-        this(null, null, priority);
+        this((String) null, priority);
     }
 
     public SequentialIOException(
             final @CheckForNull String message,
             final int priority) {
-        this(message, null, priority);
+        super(message);
+        this.priority = priority;
     }
 
     public SequentialIOException(
