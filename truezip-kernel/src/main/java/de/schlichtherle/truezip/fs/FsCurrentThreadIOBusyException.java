@@ -17,7 +17,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @version $Id$
  */
 @ThreadSafe
-public final class FsCurrentThreadIOBusyException extends FsResourceIOBusyException {
+public final class FsCurrentThreadIOBusyException
+extends FsResourceIOBusyException {
     private static final long serialVersionUID = 1L;
 
     FsCurrentThreadIOBusyException(final int local) {
