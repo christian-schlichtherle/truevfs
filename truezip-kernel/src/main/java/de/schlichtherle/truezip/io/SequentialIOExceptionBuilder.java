@@ -41,11 +41,13 @@ extends AbstractExceptionBuilder<C, X> {
         return new SequentialIOExceptionBuilder<Exception, SequentialIOException>(Exception.class, SequentialIOException.class);
     }
 
-    public SequentialIOExceptionBuilder(Class<C> c, Class<X> x) {
+    public SequentialIOExceptionBuilder(final Class<C> c, final Class<X> x) {
         try {
             if (!x.isAssignableFrom(c))
-                x.getConstructor(String.class).newInstance("test"); // fail-fast!
-        } catch (Exception ex) {
+                x   .getConstructor(String.class)
+                    .newInstance("test")
+                    .initCause(null); // fail-fast test!
+        } catch (final Exception ex) {
             throw new IllegalArgumentException(ex);
         }
         this.clazz = x;
@@ -61,22 +63,21 @@ extends AbstractExceptionBuilder<C, X> {
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected final X update(C cause, X previous) {
+    protected final X update(final C cause, final X previous) {
         final X next;
         try {
-            next = clazz.isInstance(cause)
-                    ? ((X) cause)
+            next = (X) (clazz.isInstance(cause)
+                    ? cause
                     : clazz .getConstructor(String.class)
-                            .newInstance(cause.toString());
-        } catch (Exception ex) {
+                            .newInstance(cause.toString())
+                            .initCause(cause));
+        } catch (final Exception ex) {
             ex.initCause(cause);
             throw new AssertionError(ex);
         }
-        if (next != cause)
-            next.initCause(cause);
         try {
             return (X) next.initPredecessor(previous);
-        } catch (IllegalStateException ex) {
+        } catch (final IllegalStateException ex) {
             if (null != previous)
                 throw (IllegalStateException) ex.initCause(next);
             return next;
