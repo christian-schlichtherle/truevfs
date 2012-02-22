@@ -83,16 +83,14 @@ public final class ThrowControl {
     }
 
     @SuppressWarnings("unchecked")
-    private static <X extends Throwable> X wrap(final X toThrow) {
-        return (X) instantiate(toThrow.getClass()).initCause(toThrow);
-    }
-
-    private static <O> O instantiate(final Class<O> clazz) {
+    private static <X extends Throwable> X wrap(final X x) {
         try {
-            return clazz.newInstance();
-        } catch (InstantiationException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (IllegalAccessException ex) {
+            return (X) x.getClass()
+                        .getConstructor(String.class)
+                        .newInstance(x.toString())
+                        .initCause(x);
+        } catch (final Exception ex) {
+            ex.initCause(x);
             throw new IllegalArgumentException(ex);
         }
     }
