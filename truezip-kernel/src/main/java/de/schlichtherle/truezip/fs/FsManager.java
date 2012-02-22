@@ -23,7 +23,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * <p>
  * Sub-classes must be thread-safe, too.
  *
- * @author Christian Schlichtherle
+ * @author  Christian Schlichtherle
  * @version $Id$
  */
 @ThreadSafe
@@ -99,7 +99,7 @@ implements Iterable<FsController<?>> {
      *         synchronization option {@link FsSyncOption#ABORT_CHANGES} is set.
      */
     public final void
-    sync(BitField<FsSyncOption> options) throws FsSyncException {
+    sync(final BitField<FsSyncOption> options) throws FsSyncException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
@@ -141,7 +141,7 @@ implements Iterable<FsController<?>> {
         for (final FsController<?> controller : this) {
             try {
                 controller.sync(options, handler);
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 handler.warn(ex);
             }
         }
