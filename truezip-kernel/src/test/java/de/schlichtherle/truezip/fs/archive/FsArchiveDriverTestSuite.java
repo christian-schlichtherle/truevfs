@@ -176,11 +176,11 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void testRoundTripPersistence() throws IOException {
-        assertWrite();
-        assertRead();
+        output();
+        input();
     }
 
-    private void assertWrite() throws IOException {
+    private void output() throws IOException {
         final OutputShop<E> os = getArchiveDriver()
                 .newOutputShop(model, getArchiveOutputSocket(), null);
         try {
@@ -208,6 +208,38 @@ extends FsArchiveDriverTestBase<D> {
             }
             os.close();
         }
+        // This is undefined in the contract, but the kernel decorates the
+        // driver product with a DisconnectingOutputShop to assert this.
+        /*try {
+            output(os, getNumEntries()).close();
+            fail();
+        } catch (IOException expected) {
+        }*/
+    }
+
+    @CreatesObligation
+    private OutputStream output(final OutputShop<E> shop, final int i)
+    throws IOException {
+        final String name = name(i);
+        final E entry = newEntry(name);
+        final OutputSocket<? extends E> output = shop.getOutputSocket(entry);
+        assertSame(entry, output.getLocalTarget());
+
+        assertNull(shop.getEntry(name));
+        assertEquals(i, shop.getSize());
+
+        boolean failure = true;
+        final OutputStream out = output.newOutputStream();
+        try {
+            assertSame(entry, shop.getEntry(name));
+            assertEquals(i + 1, shop.getSize());
+            out.write(getData());
+            failure = false;
+        } finally {
+            if (failure)
+                out.close();
+        }
+        return out;
     }
 
     private OutputSocket<?> getArchiveOutputSocket() {
@@ -215,7 +247,7 @@ extends FsArchiveDriverTestBase<D> {
                 FsOutputOptions.NO_OUTPUT_OPTIONS, null);
     }
 
-    private void assertRead() throws IOException {
+    private void input() throws IOException {
         final InputShop<E> is = getArchiveDriver()
                 .newInputShop(model, getArchiveInputSocket());
         try {
@@ -245,6 +277,82 @@ extends FsArchiveDriverTestBase<D> {
                 clear(TestCloseable.class);
             }
             is.close();
+        }
+        // This is undefined in the contract, but the kernel decorates the
+        // driver product with a DisconnectingInputShop to assert this.
+        /*try {
+            input(is, getNumEntries()).close();
+            fail();
+        } catch (IOException expected) {
+        }*/
+    }
+
+    private InputStream input(final InputShop<E> shop, final int i)
+    throws IOException {
+        final InputSocket<? extends E> input = shop.getInputSocket(name(i));
+
+        {
+            final byte[] buf = new byte[getDataLength()];
+            ReadOnlyFile rof;
+            try {
+                rof = input.newReadOnlyFile();
+            } catch (UnsupportedOperationException ex) {
+                rof = null;
+                logger.log(Level.FINE,
+                        input.getClass()
+                            + " does not support newReadOnlyFile().",
+                        ex);
+            }
+            if (null != rof) {
+                try {
+                    rof.readFully(buf);
+                    assertEquals(-1, rof.read());
+                } finally {
+                    rof.close();
+                }
+                rof.close(); // expect no issues
+                assertTrue(Arrays.equals(getData(), buf));
+            }
+        }
+
+        {
+            final byte[] buf = new byte[getDataLength()];
+            SeekableByteChannel sbc;
+            try {
+                sbc = input.newSeekableByteChannel();
+            } catch (UnsupportedOperationException ex) {
+                sbc = null;
+                logger.log(Level.FINE,
+                        input.getClass()
+                            + " does not support newSeekableByteChannel().",
+                        ex);
+            }
+            if (null != sbc) {
+                try {
+                    readFully(sbc, ByteBuffer.wrap(buf));
+                    assertEquals(-1, sbc.read(ByteBuffer.wrap(buf)));
+                } finally {
+                    sbc.close();
+                }
+                sbc.close(); // expect no issues
+                assertTrue(Arrays.equals(getData(), buf));
+            }
+        }
+
+        {
+            final byte[] buf = new byte[getDataLength()];
+            boolean failure = true;
+            final InputStream in = input.newInputStream();
+            try {
+                readFully(in, buf);
+                assertTrue(Arrays.equals(getData(), buf));
+                assertEquals(-1, in.read());
+                failure = false;
+            } finally {
+                if (failure)
+                    in.close();
+            }
+            return in;
         }
     }
 
@@ -318,100 +426,6 @@ extends FsArchiveDriverTestBase<D> {
 
     private static String name(int i) {
         return Integer.toString(i);
-    }
-
-    @CreatesObligation
-    private OutputStream output(final OutputShop<E> shop, final int i)
-    throws IOException {
-        final String name = name(i);
-        final E entry = newEntry(name);
-        final OutputSocket<? extends E> output = shop.getOutputSocket(entry);
-        assertSame(entry, output.getLocalTarget());
-
-        assertNull(shop.getEntry(name));
-        assertEquals(i, shop.getSize());
-
-        boolean failure = true;
-        final OutputStream out = output.newOutputStream();
-        try {
-            assertSame(entry, shop.getEntry(name));
-            assertEquals(i + 1, shop.getSize());
-            out.write(getData());
-            failure = false;
-        } finally {
-            if (failure)
-                out.close();
-        }
-        return out;
-    }
-
-    private InputStream input(final InputShop<E> shop, final int i)
-    throws IOException {
-        final InputSocket<? extends E> input = shop.getInputSocket(name(i));
-
-        {
-            final byte[] buf = new byte[getDataLength()];
-            ReadOnlyFile rof;
-            try {
-                rof = input.newReadOnlyFile();
-            } catch (UnsupportedOperationException ex) {
-                rof = null;
-                logger.log(Level.FINE,
-                        input.getClass()
-                            + " does not support newReadOnlyFile().",
-                        ex);
-            }
-            if (null != rof) {
-                try {
-                    rof.readFully(buf);
-                    assertEquals(-1, rof.read());
-                } finally {
-                    rof.close();
-                }
-                rof.close(); // expect no issues
-                assertTrue(Arrays.equals(getData(), buf));
-            }
-        }
-
-        {
-            final byte[] buf = new byte[getDataLength()];
-            SeekableByteChannel sbc;
-            try {
-                sbc = input.newSeekableByteChannel();
-            } catch (UnsupportedOperationException ex) {
-                sbc = null;
-                logger.log(Level.FINE,
-                        input.getClass()
-                            + " does not support newSeekableByteChannel().",
-                        ex);
-            }
-            if (null != sbc) {
-                try {
-                    readFully(sbc, ByteBuffer.wrap(buf));
-                    assertEquals(-1, sbc.read(ByteBuffer.wrap(buf)));
-                } finally {
-                    sbc.close();
-                }
-                sbc.close(); // expect no issues
-                assertTrue(Arrays.equals(getData(), buf));
-            }
-        }
-
-        {
-            final byte[] buf = new byte[getDataLength()];
-            boolean failure = true;
-            final InputStream in = input.newInputStream();
-            try {
-                readFully(in, buf);
-                assertTrue(Arrays.equals(getData(), buf));
-                assertEquals(-1, in.read());
-                failure = false;
-            } finally {
-                if (failure)
-                    in.close();
-            }
-            return in;
-        }
     }
 
     private static void readFully(InputStream in, byte[] b)
