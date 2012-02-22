@@ -326,11 +326,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     @Override
     public void delete(Path path) throws IOException {
-        delete(promote(path));
-    }
-
-    private static void delete(TPath path) throws IOException {
-        path.delete();
+        promote(path).delete();
     }
 
     @Override
@@ -402,7 +398,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private static void move(TPath source, TPath target, CopyOption... options)
     throws IOException {
         copy(source, target, StandardCopyOption.COPY_ATTRIBUTES);
-        delete(source);
+        source.delete();
     }
 
     @Override
