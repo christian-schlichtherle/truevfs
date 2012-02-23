@@ -19,18 +19,21 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
 import static java.nio.file.Files.*;
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumMap;
 import java.util.Map;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import javax.swing.Icon;
 
 /**
  * A file system controller with a prospective directory in the platform file
@@ -42,12 +45,6 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 final class FileController extends FsModelController<FsModel>  {
-
-    private static final OpenOption[] RWD_OPTIONS = {
-        StandardOpenOption.READ,
-        StandardOpenOption.WRITE,
-        StandardOpenOption.DSYNC,
-    };
 
     private final Path target;
 
@@ -108,7 +105,7 @@ final class FileController extends FsModelController<FsModel>  {
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
         Path file = target.resolve(name.getPath());
-        return Files.isReadable(file);
+        return Files.isExecutable(file);
     }
 
     @Override
@@ -118,8 +115,8 @@ final class FileController extends FsModelController<FsModel>  {
         //   setAttribute(file, "readOnly", Boolean.TRUE, null);
         // is not available!
         if (!file.toFile().setReadOnly())
-            if (exists(file)) // just guessing here
-                throw new AccessDeniedException(file.toString());
+            if (exists(file))
+                throw new AccessDeniedException(file.toString()); // just guessing here
             else
                 throw new FileNotFoundException(file.toString());
     }
