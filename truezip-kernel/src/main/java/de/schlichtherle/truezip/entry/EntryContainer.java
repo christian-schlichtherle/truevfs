@@ -14,7 +14,7 @@ import javax.annotation.CheckForNull;
 /**
  * An iterable container for entries.
  *
- * @param   <E> The type of the entries in this container.
+ * @param   <E> the type of the entries in this container.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
