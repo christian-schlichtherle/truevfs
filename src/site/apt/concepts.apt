@@ -16,13 +16,16 @@ Concepts
 
     [[1]] The Access Tier is a facade for the Kernel Tier which provides
           convenient-to-use client APIs for TrueZIP applications.
-          It consists of the client API modules
+          No file system state is managed by this tier, which enables a TrueZIP
+          application to work with any client API concurrently.
+          This tier consists of the modules
           {{{./truezip-file/index.html}TrueZIP&#160;File*}}
           and
           {{{./truezip-path/index.html}TrueZIP&#160;Path}}
           (since TrueZIP 7.2).
-          No file system state is managed by this tier, which enables a TrueZIP
-          application to work with any API concurrently, too.
+          In addition to the canonical term <i>access module<i>, each of these
+          may also get referred to by the term <i>client API module</i> for
+          better comprehensibility.
 
     [[1]] The Kernel Tier manages all virtual file system state.
           It also provides multithreading, multiplexing, caching and buffering
