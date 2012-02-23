@@ -141,6 +141,13 @@ public class MockController extends FsController<FsModel> {
     }
 
     @Override
+    public boolean isExecutable(FsEntryName name) throws IOException {
+        checkAllExceptions(this);
+        assert null != name;
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void setReadOnly(FsEntryName name) throws IOException {
         checkAllExceptions(this);
         assert null != name;
