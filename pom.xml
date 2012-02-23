@@ -15,7 +15,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>epl10-oss-parent</artifactId>
-        <version>21</version>
+        <version>22</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -26,7 +26,7 @@
     <name>TrueZIP</name>
     <description>
 TrueZIP is a Java based plug-in framework for virtual file systems
-(VFS) which enables client applications to performa CRUD (Create,
+(VFS) which enables TrueZIP applications to performa CRUD (Create,
 Read, Update, Delete) operations on archive files as if they were
 virtual directories, even with nested archive files in
 multithreaded environments.
@@ -248,17 +248,16 @@ system space.
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <!--version>2.11</version--> <!-- override default 2.12 ! -->
                     <configuration>
                         <!-- Consider 80% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
                         <systemPropertyVariables>
-                            <!-- FIXME: While running the tests with isolated
+                            <!-- While running the tests with isolated
                                  file system managers yields better performance
                                  it would also masquerade any multithreading
                                  and file system synchronization bugs, so it's
                                  generally discouraged. -->
-                            <de.schlichtherle.truezip.fs.FsManager.isolate>true</de.schlichtherle.truezip.fs.FsManager.isolate>
+                            <de.schlichtherle.truezip.fs.FsManager.isolate>false</de.schlichtherle.truezip.fs.FsManager.isolate>
                             <de.schlichtherle.truezip.zip.forceZip64Ext>false</de.schlichtherle.truezip.zip.forceZip64Ext>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
