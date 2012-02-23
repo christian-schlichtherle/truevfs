@@ -64,11 +64,15 @@ public abstract class FsEntry implements Entry {
     }
 
     /**
-     * If this is not a directory entry, {@code null} is returned.
-     * Otherwise, a set of strings is returned which represent the base names
-     * of the members of this directory entry.
+     * Returns a set of strings with the base names of the members of this
+     * directory entry or {@code null} if and only if this is not a directory
+     * entry.
      * Whether or not modifying the returned set is supported and the effect
      * on the file system is implementation specific.
+     * 
+     * @return A set of strings with the base names of the members of this
+     *         directory entry or {@code null} if and only if this is not a
+     *         directory entry.
      */
     public abstract @Nullable Set<String> getMembers();
 
