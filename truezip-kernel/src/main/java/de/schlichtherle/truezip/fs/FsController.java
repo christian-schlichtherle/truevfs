@@ -178,6 +178,9 @@ public abstract class FsController<M extends FsModel> {
      * @return {@code false} if the named file system entry is not readable.
      * @throws IOException on any I/O failure.
      */
+    // TODO: Consider using a Boolean return value in order to use null to
+    // indicate that this property is not supported
+    // - see http://java.net/jira/browse/TRUEZIP-224 .
     public abstract boolean isReadable(FsEntryName name) throws IOException;
 
     /**
@@ -187,6 +190,9 @@ public abstract class FsController<M extends FsModel> {
      * @return {@code false} if the named file system entry is not writable.
      * @throws IOException on any I/O failure.
      */
+    // TODO: Consider using a Boolean return value in order to use null to
+    // indicate that this property is not supported
+    // - see http://java.net/jira/browse/TRUEZIP-224 .
     public abstract boolean isWritable(FsEntryName name) throws IOException;
 
     /**
@@ -200,8 +206,11 @@ public abstract class FsController<M extends FsModel> {
      * @throws IOException on any I/O failure.
      * @since  TrueZIP 7.2.
      */
+    // TODO: Consider using a Boolean return value in order to use null to
+    // indicate that this property is not supported
+    // - see http://java.net/jira/browse/TRUEZIP-224 .
     public boolean isExecutable(FsEntryName name) throws IOException {
-        throw new IOException(new UnsupportedOperationException());
+        return false;
     }
 
     /**
