@@ -115,10 +115,24 @@
         </goals>
     </action>
     <action>
-            <actionName>CUSTOM-source:aggregate</actionName>
-            <displayName>source:aggregate</displayName>
-            <goals>
-                <goal>source:aggregate</goal>
-            </goals>
-        </action>
+        <actionName>CUSTOM-source:aggregate</actionName>
+        <displayName>source:aggregate</displayName>
+        <goals>
+            <goal>source:aggregate</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-versions:display-dependency-updates</actionName>
+        <displayName>versions:display-dependency-updates</displayName>
+        <goals>
+            <goal>versions:display-dependency-updates</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-versions:display-plugin-updates</actionName>
+        <displayName>versions:display-plugin-updates</displayName>
+        <goals>
+            <goal>versions:display-plugin-updates</goal>
+        </goals>
+    </action>
 </actions>
