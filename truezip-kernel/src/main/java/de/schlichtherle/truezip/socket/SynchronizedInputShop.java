@@ -27,7 +27,7 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @see        SynchronizedOutputShop
  * @param      <E> The type of the entries.
- * @deprecated Use {@link ConcurrentInputShop} instead.
+ * @deprecated Use {@link LockInputShop} instead.
  * @author     Christian Schlichtherle
  * @version    $Id$
  */
