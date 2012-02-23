@@ -8,17 +8,17 @@
  */
 package de.schlichtherle.truezip.io;
 
+import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Indicates that an input resource (input stream etc.) has been closed.
+ * Indicates that a resource has been closed.
  *
- * @see     OutputClosedException
+ * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  * @version $Id$
  */
-// TODO: Remove this class and just use its super class.
 @ThreadSafe
-public class InputClosedException extends ClosedException {
-    private static final long serialVersionUID = 4563928734723923649L;
+public class ClosedException extends IOException {
+    private static final long serialVersionUID = 7502497562473974639L;
 }

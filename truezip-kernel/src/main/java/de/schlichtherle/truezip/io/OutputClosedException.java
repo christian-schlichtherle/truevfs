@@ -8,27 +8,17 @@
  */
 package de.schlichtherle.truezip.io;
 
-import javax.annotation.CheckForNull;
-import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Indicates that an output resource (output stream etc.) for an entry has been
- * forced to close.
+ * Indicates that an output resource (output stream etc.) has been closed.
  *
  * @see     InputClosedException
  * @author  Christian Schlichtherle
  * @version $Id$
  */
+// TODO: Remove this class and just use its super class.
 @ThreadSafe
-public class OutputClosedException extends IOException {
+public class OutputClosedException extends ClosedException {
     private static final long serialVersionUID = 4563928734723923649L;
-
-    public OutputClosedException() {
-        super("Output resource has been closed!");
-    }
-
-    public OutputClosedException(@CheckForNull Throwable cause) {
-        super("Output resource has been closed!", cause);
-    }
 }
