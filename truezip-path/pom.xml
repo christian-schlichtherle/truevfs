@@ -20,11 +20,11 @@
 
     <name>TrueZIP Path</name>
     <description>
-        This module provides the TPath class for uniform, transparent,
-        thread-safe, read/write access to archive files as if they were just
-        plain directories in a file system path.
-        It also provides the TFileSystemProvider class to implement a file
-        system provider for the NIO.2 API (JSR 203) in JSE 7.
+This module provides the TPath class
+for simple, uniform, transparent, thread-safe, read/write access to archive
+files as if they were virtual directories in a file system path.
+It also provides the TFileSystemProvider class to implement a file
+system provider for the NIO.2 API (JSR 203) in JSE 7.
     </description>
 
     <dependencies>

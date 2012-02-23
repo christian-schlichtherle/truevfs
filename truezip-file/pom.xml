@@ -22,13 +22,12 @@
 
     <name>TrueZIP File*</name>
     <description>
-        This module provides the TFile* classes
-        for uniform, transparent, thread-safe,
-        read/write access to archive files as if they were just plain
-        directories in a file system path.
+This module provides the TFile* classes
+for simple, uniform, transparent, thread-safe, read/write access to archive
+files as if they were virtual directories in a file system path.
 
-        This module also provides Swing GUI classes for viewing file trees
-        and choosing entries in archive files.
+This module also provides Swing GUI classes for viewing file trees
+and choosing entries in archive files.
     </description>
 
     <dependencies>
