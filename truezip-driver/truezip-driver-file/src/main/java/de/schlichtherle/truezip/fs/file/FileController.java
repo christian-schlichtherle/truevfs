@@ -121,8 +121,8 @@ final class FileController extends FsModelController<FsModel>  {
     public void setReadOnly(FsEntryName name) throws IOException {
         final File file = new File(target, name.getPath());
         if (!file.setReadOnly())
-            if (file.exists()) // just guessing here
-                throw new IOException(file + " (access denied)");
+            if (file.exists())
+                throw new IOException(file + " (access denied)"); // just guessing here
             else
                 throw new FileNotFoundException(file.toString());
     }
