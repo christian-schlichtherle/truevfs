@@ -258,7 +258,7 @@ system space.
                         <systemPropertyVariables>
                             <!-- While running the tests with isolated
                                  file system managers yields better performance
-                                 it would also conceil any multithreading and
+                                 it would also conceal any multithreading and
                                  file system synchronization bugs, so it's
                                  generally discouraged. -->
                             <de.schlichtherle.truezip.fs.FsManager.isolate>false</de.schlichtherle.truezip.fs.FsManager.isolate>
