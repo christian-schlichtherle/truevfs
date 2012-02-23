@@ -14,7 +14,7 @@ About TrueZIP Path
     It also provides the
     {{{./apidocs/de/schlichtherle/truezip/nio/file/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
     class to implement a file system provider for the NIO.2 API (JSR 203) in
-    JSE 7.
+    JSE&#160;7.
 
     This is the primary API for JSE&#160;7 compliant TrueZIP applications:
     Like the API of the module {{{../truezip-file/index.html}TrueZIP File*}},
