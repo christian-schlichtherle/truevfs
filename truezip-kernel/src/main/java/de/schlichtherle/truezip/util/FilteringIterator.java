@@ -8,23 +8,34 @@
  */
 package de.schlichtherle.truezip.util;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An iterator which filters another iterator.
+ * An iterator which filters another iterator by means of its
+ * {@link #accept(Object)} method.
  * 
+ * @param   <T> The type of elements returned by this iterator.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
 @NotThreadSafe
 public abstract class FilteringIterator<T> implements Iterator<T> {
-    private final Iterator<T> iterator;
+    private final Iterator<T> it;
     private @CheckForNull Boolean hasNext;
     private @Nullable T next;
+
+    /**
+     * Constructs a new filtering iterator which filters the given iterable.
+     * 
+     * @param iterable the iterable to filter.
+     */
+    protected FilteringIterator(Iterable<T> iterable) {
+        this(iterable.iterator());
+    }
 
     /**
      * Constructs a new filtering iterator which filters the given iterator.
@@ -32,17 +43,8 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
      * @param iterator the iterator to filter.
      */
     protected FilteringIterator(final Iterator<T> iterator) {
-        assert null != iterator; // doesn't matter much if assertions are disabled
-        this.iterator = iterator;
-    }
-
-    /**
-     * Constructs a new filtering iterator which filters the given iterable.
-     * 
-     * @param iterable the iterable to filter.
-     */
-    protected FilteringIterator(final Iterable<T> iterable) {
-        this.iterator = iterable.iterator();
+        if (null == (this.it = iterator))
+            throw new NullPointerException();
     }
 
     /**
@@ -59,8 +61,8 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
     public boolean hasNext() {
         if (null != hasNext)
             return hasNext;
-        while (iterator.hasNext())
-            if (accept(next = iterator.next()))
+        while (it.hasNext())
+            if (accept(next = it.next()))
                 return hasNext = true;
         return hasNext = false;
     }
@@ -75,6 +77,6 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
 
     @Override
     public void remove() {
-        iterator.remove();
+        it.remove();
     }
 }
