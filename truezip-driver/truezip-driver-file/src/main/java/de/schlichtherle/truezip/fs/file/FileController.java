@@ -20,7 +20,6 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
 import java.io.File;
 import static java.io.File.separatorChar;
 import java.io.FileNotFoundException;
@@ -29,8 +28,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
-import javax.swing.Icon;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import javax.swing.Icon;
 
 /**
  * A file system controller with a prospective directory in the platform file
