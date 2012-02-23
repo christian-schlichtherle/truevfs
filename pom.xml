@@ -248,14 +248,18 @@ system space.
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
+                     <!-- Avoid the default version 2.12 because it's known to
+                          conceal some multithreading and file system
+                          synchronization bugs. -->
+                    <version>2.11</version>
                     <configuration>
                         <!-- Consider 80% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
                         <systemPropertyVariables>
                             <!-- While running the tests with isolated
                                  file system managers yields better performance
-                                 it would also masquerade any multithreading
-                                 and file system synchronization bugs, so it's
+                                 it would also conceil any multithreading and
+                                 file system synchronization bugs, so it's
                                  generally discouraged. -->
                             <de.schlichtherle.truezip.fs.FsManager.isolate>false</de.schlichtherle.truezip.fs.FsManager.isolate>
                             <de.schlichtherle.truezip.zip.forceZip64Ext>false</de.schlichtherle.truezip.zip.forceZip64Ext>
