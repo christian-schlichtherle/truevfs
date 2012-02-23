@@ -9,13 +9,14 @@
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsEntryName;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate an exceptional condition in an {@link FsArchiveFileSystem}.
  */
+// TODO: Remove this exception type.
 @ThreadSafe
 public class FsArchiveFileSystemException extends IOException {
     private static final long serialVersionUID = 4652084652223428651L;
