@@ -33,6 +33,20 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
         return lock.readLock();
     }
 
+    /**
+     * Returns {@code true} if and only if the read lock is held by the
+     * current thread.
+     * This method should only get used for assert statements, not for lock
+     * control!
+     * 
+     * @return {@code true} if and only if the read lock is held by the
+     *         current thread.
+     * @see    #checkNotReadLockedByCurrentThread()
+     */
+    boolean isReadLockedByCurrentThread() {
+        return 0 != lock.getReadHoldCount();
+    }
+
     public WriteLock writeLock() {
         return lock.writeLock();
     }
@@ -61,22 +75,7 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
      */
     public void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
-        if (!lock.isWriteLockedByCurrentThread())
-            throw FsNeedsWriteLockException.SINGLETON;
-    }
-
-    /**
-     * Asserts that the read lock is <em>not</em> held by the current thread,
-     * so that the caller can safely acquire the write lock without dead
-     * locking.
-     * Use this method for lock control.
-     * 
-     * @throws FsNeedsWriteLockException if the <i>read lock</i> is
-     *         held by the current thread.
-     */
-    void checkNotReadLockedByCurrentThread()
-    throws FsNeedsWriteLockException {
-        if (0 < lock.getReadHoldCount())
+        if (!isWriteLockedByCurrentThread())
             throw FsNeedsWriteLockException.SINGLETON;
     }
 }

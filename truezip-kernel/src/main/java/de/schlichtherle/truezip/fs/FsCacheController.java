@@ -122,7 +122,7 @@ extends FsLockModelDecoratingController<
                         final BitField<FsOutputOption> options,
                         final Entry template)
     throws IOException {
-        assert isWriteLockedByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
         final EntryController controller = controllers.get(name);
         delegate.mknod(name, type, options, template);
         if (null != controller) {
@@ -135,7 +135,7 @@ extends FsLockModelDecoratingController<
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        assert isWriteLockedByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
         final EntryController controller = controllers.get(name);
         delegate.unlink(name, options);
         if (null != controller) {
@@ -159,7 +159,7 @@ extends FsLockModelDecoratingController<
     beforeSync( final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
-        assert isWriteLockedByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
         if (0 >= controllers.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
@@ -260,7 +260,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         protected InputSocket<?> getBoundSocket() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             EntryController controller = controllers.get(name);
             if (null == controller) {
                 if (!options.get(FsInputOption.CACHE))
@@ -310,7 +310,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         protected OutputSocket<?> getBoundSocket() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             EntryController controller = controllers.get(name);
             if (null == controller) {
                 if (!options.get(FsOutputOption.CACHE))
@@ -417,13 +417,13 @@ extends FsLockModelDecoratingController<
         }
 
         void beginOutput() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             delegate.mknod(name, FILE, outputOptions, template);
             assert isTouched();
         }
 
         void endOutput() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             //assert isTouched(); // may have been concurrently synced!
             delegate.mknod(
                     name,
@@ -450,7 +450,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public InputStream newInputStream() throws IOException {
-                assert isWriteLockedByCurrentThread();
+                assert getModel().isWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
                 assert isTouched();
                 return new EntryInputStream(in);
@@ -467,7 +467,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void close() throws IOException {
-                assert isWriteLockedByCurrentThread();
+                assert getModel().isWriteLockedByCurrentThread();
                 delegate.close();
                 controllers.put(name, EntryController.this);
             }
@@ -514,7 +514,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void close() throws IOException {
-                assert isWriteLockedByCurrentThread();
+                assert getModel().isWriteLockedByCurrentThread();
                 try {
                     delegate.close();
                 } finally {
@@ -533,7 +533,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void close() throws IOException {
-                assert isWriteLockedByCurrentThread();
+                assert getModel().isWriteLockedByCurrentThread();
                 try {
                     delegate.close();
                 } finally {

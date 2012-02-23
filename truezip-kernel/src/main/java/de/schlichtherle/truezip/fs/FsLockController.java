@@ -11,9 +11,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.schlichtherle.truezip.io.*;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
@@ -105,7 +103,8 @@ extends FsLockModelDecoratingController<
 
     private <T> T
     writeLocked(IOOperation<T> operation) throws IOException {
-        checkNotReadLockedByCurrentThread();
+        assert !getModel().isReadLockedByCurrentThread()
+                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
         return locked(operation, writeLock());
     }
 
@@ -461,8 +460,14 @@ extends FsLockModelDecoratingController<
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                    final SeekableByteChannel sbc;
+                    //try {
+                        sbc = getBoundSocket().newSeekableByteChannel();
+                    /*} catch (final InputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                        throw ex;
+                    }*/
+                    return new LockSeekableByteChannel(sbc);
                 }
             } // NewSeekableByteChannel
 
@@ -493,8 +498,14 @@ extends FsLockModelDecoratingController<
             class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
-                    return new LockReadOnlyFile(
-                            getBoundSocket().newReadOnlyFile());
+                    final ReadOnlyFile rof;
+                    //try {
+                        rof = getBoundSocket().newReadOnlyFile();
+                    /*} catch (final InputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                        throw ex;
+                    }*/
+                    return new LockReadOnlyFile(rof);
                 }
             } // NewReadOnlyFile
 
@@ -506,8 +517,14 @@ extends FsLockModelDecoratingController<
             class NewInputStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
-                    return new LockInputStream(
-                            getBoundSocket().newInputStream());
+                    final InputStream in;
+                    //try {
+                        in = getBoundSocket().newInputStream();
+                    /*} catch (final InputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                        throw ex;
+                    }*/
+                    return new LockInputStream(in);
                 }
             } // NewInputStream
 
@@ -526,8 +543,14 @@ extends FsLockModelDecoratingController<
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                    final SeekableByteChannel sbc;
+                    //try {
+                        sbc = getBoundSocket().newSeekableByteChannel();
+                    /*} catch (final OutputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                        throw ex;
+                    }*/
+                    return new LockSeekableByteChannel(sbc);
                 }
             } // NewSeekableByteChannel
 
@@ -558,8 +581,14 @@ extends FsLockModelDecoratingController<
             class NewOutputStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
-                    return new LockOutputStream(
-                            getBoundSocket().newOutputStream());
+                    final OutputStream out;
+                    //try {
+                        out = getBoundSocket().newOutputStream();
+                    /*} catch (final OutputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                        throw ex;
+                    }*/
+                    return new LockOutputStream(out);
                 }
             } // NewOutputStream
 
@@ -696,11 +725,9 @@ extends FsLockModelDecoratingController<
 
     @Immutable
     @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-    public static final class NeedsLockRetryException
+    private static final class NeedsLockRetryException
     extends FsControllerException {
-        public static final NeedsLockRetryException
+        static final NeedsLockRetryException
                 SINGLETON = new NeedsLockRetryException();
-
-        private NeedsLockRetryException() { }
     } // NeedsLockRetryException
 }

@@ -46,17 +46,8 @@ extends FsDecoratingController<FsLockModel, C>  {
         return getModel().writeLock();
     }
 
-    protected final boolean isWriteLockedByCurrentThread() {
-        return getModel().isWriteLockedByCurrentThread();
-    }
-
     protected final void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         getModel().checkWriteLockedByCurrentThread();
-    }
-
-    protected final void checkNotReadLockedByCurrentThread()
-    throws FsNeedsWriteLockException {
-        getModel().checkNotReadLockedByCurrentThread();
     }
 }
