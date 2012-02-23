@@ -61,7 +61,7 @@ import javax.swing.JTree;
  * {@link RuntimeException} or an {@link IOException} to respectively indicate
  * wrong input parameters or a file system operation failure.
  * Where the following terms consider a failure, the term equally applies to
- * BOTH exception types.
+ * both exception types.
  * <li>
  * With the exception of {@link #sync}, all file system operations SHOULD be
  * <i>atomic</i>, that is they either succeed or fail completely as if they had
@@ -96,7 +96,7 @@ import javax.swing.JTree;
  * system upon a call to {@code sync}.
  * </ol>
  * 
- * @param   <M> The type of the file system model.
+ * @param   <M> the type of the file system model.
  * @see     FsManager
  * @see     <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  * @author  Christian Schlichtherle
@@ -128,7 +128,8 @@ public abstract class FsController<M extends FsModel> {
      * e.g. a {@link JTree}.
      * 
      * @return The nullable icon.
-     * @deprecated GUI features will be removed from this class in TrueZIP 8.
+     * @throws IOException on any I/O failure.
+     * @deprecated GUI features will get removed from this class in TrueZIP 8.
      */
     @Deprecated
     public abstract @Nullable Icon getOpenIcon()
@@ -140,7 +141,8 @@ public abstract class FsController<M extends FsModel> {
      * e.g. a {@link JTree}.
      * 
      * @return The nullable icon.
-     * @deprecated GUI features will be removed from this class in TrueZIP 8.
+     * @throws IOException on any I/O failure.
+     * @deprecated GUI features will get removed from this class in TrueZIP 8.
      */
     @Deprecated
     public abstract @Nullable Icon getClosedIcon()
@@ -150,6 +152,7 @@ public abstract class FsController<M extends FsModel> {
      * Returns {@code true} if and only if the file system is read-only.
      * 
      * @return {@code true} if and only if the file system is read-only.
+     * @throws IOException on any I/O failure.
      */
     public abstract boolean isReadOnly()
     throws IOException;
@@ -163,6 +166,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @return A file system entry or {@code null} if no file system entry
      *         exists for the given name.
+     * @throws IOException on any I/O failure.
      */
     public abstract @Nullable FsEntry getEntry(FsEntryName name)
     throws IOException;
@@ -172,6 +176,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not readable.
+     * @throws IOException on any I/O failure.
      */
     public abstract boolean isReadable(FsEntryName name) throws IOException;
 
@@ -180,6 +185,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not writable.
+     * @throws IOException on any I/O failure.
      */
     public abstract boolean isWritable(FsEntryName name) throws IOException;
 
@@ -191,10 +197,11 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not executable.
+     * @throws IOException on any I/O failure.
      * @since  TrueZIP 7.2.
      */
     public boolean isExecutable(FsEntryName name) throws IOException {
-        return false;
+        throw new IOException(new UnsupportedOperationException());
     }
 
     /**
@@ -203,8 +210,8 @@ public abstract class FsController<M extends FsModel> {
      * controller implementations because they do not support it.
      * 
      * @param  name the name of the file system entry.
-     * @throws IOException By typical federated (archive) file system
-     *         controller implementations because they do not support it.
+     * @throws IOException on any I/O failure or if this operation is not
+     *         supported.
      */
     public abstract void setReadOnly(FsEntryName name)
     throws IOException;
@@ -219,8 +226,10 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the file system entry name.
      * @param  times the access times.
+     * @param  options the file system output options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code times} succeeded.
+     * @throws IOException on any I/O failure.
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
      * @since  TrueZIP 7.2
@@ -251,8 +260,10 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the file system entry name.
      * @param  types the access types.
      * @param  value the last access time.
+     * @param  options the file system output options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code types} succeeded.
+     * @throws IOException on any I/O failure.
      */
     public abstract boolean setTime(
             FsEntryName name,
@@ -305,8 +316,8 @@ public abstract class FsController<M extends FsModel> {
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.
-     * @throws IOException on any I/O error, including but not limited to these
-     *         reasons:
+     * @throws IOException on any I/O failure, including but not limited to
+     *         these reasons:
      *         <ul>
      *         <li>The file system is read only.
      *         <li>{@code name} contains characters which are not
@@ -333,6 +344,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the file system entry name.
      * @param  options output options for this operation.
+     * @throws IOException on any I/O failure.
      */
     public abstract void
     unlink(FsEntryName name, BitField<FsOutputOption> options)
