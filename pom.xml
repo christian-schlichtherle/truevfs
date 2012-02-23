@@ -11,11 +11,14 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <prerequisites>
+        <maven>${maven.enforcer.requireMavenVersion}</maven>
+    </prerequisites>
 
     <parent>
         <groupId>de.schlichtherle</groupId>
-        <artifactId>epl10-oss-parent</artifactId>
-        <version>22</version>
+        <artifactId>oss-parent</artifactId>
+        <version>2</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -41,10 +44,13 @@ system space.
     </description>
     <url>http://truezip.java.net</url>
     <inceptionYear>2004</inceptionYear>
-    <issueManagement>
-        <system>JIRA</system>
-        <url>http://java.net/jira/browse/TRUEZIP</url>
-    </issueManagement>
+    <licenses>
+        <license>
+            <name>Eclipse Public License, Version 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     <mailingLists>
         <mailingList>
             <name>Announce Mailing List</name>
@@ -67,6 +73,10 @@ system space.
             <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
         </mailingList>
     </mailingLists>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://java.net/jira/browse/TRUEZIP</url>
+    </issueManagement>
     <scm>
         <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
         <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
@@ -74,6 +84,13 @@ system space.
     </scm>
 
     <properties>
+        <!-- While using an older Maven version may work, this hasn't been
+             tested and is probably not producing exactly the same results. -->
+        <maven.enforcer.requireMavenVersion>3.0.4</maven.enforcer.requireMavenVersion>
+        <!-- Most modules require JSE 7 at compile time.
+             Note that at run time, only JSE 6 is required though. -->
+        <maven.enforcer.requireJavaVersion>1.7</maven.enforcer.requireJavaVersion>
+
         <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
@@ -330,37 +347,6 @@ system space.
                 </plugin>
             </plugins>
         </pluginManagement>
-        <plugins>
-            <plugin>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>enforce-maven</id>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>3.0.4</version>
-                                    <message>
-While using an older version of Maven may work, it hasn't been tested and is
-probably not producing exactly the same results.
-                                    </message>
-                                </requireMavenVersion>
-                                <requireJavaVersion>
-                                    <version>1.7</version>
-                                    <message>
-Most modules require JSE 7 at compile time.
-Note that at run time, only JSE 6 is required though.
-                                    </message>
-                                </requireJavaVersion>
-                            </rules>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
     <distributionManagement>
