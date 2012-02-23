@@ -309,8 +309,7 @@ public final class TFileSystem extends FileSystem {
             final TPath path,
             final Filter<? super Path> filter)
     throws IOException {
-        final FsEntryName name = path.getEntryName();
-        final FsEntry entry = getController().getEntry(name);
+        final FsEntry entry = getEntry(path);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
             throw new NotDirectoryException(path.toString());
