@@ -19,8 +19,8 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
-import javax.swing.Icon;
 import javax.annotation.concurrent.NotThreadSafe;
+import javax.swing.Icon;
 
 /**
  * A decorating file system controller which unlinks the target archive file
@@ -49,7 +49,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        assert isWriteLockedByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
 
         if (name.isRoot()) {
             try {

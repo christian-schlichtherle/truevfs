@@ -63,7 +63,7 @@ extends FsLockModelDecoratingController<
     }
 
     private FsResourceAccountant getAccountant() {
-        assert isWriteLockedByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
         final FsResourceAccountant accountant = this.accountant;
         return null != accountant
                 ? accountant
@@ -90,7 +90,7 @@ extends FsLockModelDecoratingController<
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        assert isWriteLockedByCurrentThread();
+        assert getModel().isWriteLockedByCurrentThread();
         waitIdle(options, handler);
         closeAll(handler);
         delegate.sync(options, handler);
@@ -287,7 +287,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -306,14 +306,14 @@ extends FsLockModelDecoratingController<
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             return new AccountingReadOnlyFile(
                     getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             return new AccountingInputStream(
                     getBoundSocket().newInputStream());
         }
@@ -327,7 +327,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -346,7 +346,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            assert isWriteLockedByCurrentThread();
+            assert getModel().isWriteLockedByCurrentThread();
             return new AccountingOutputStream(
                     getBoundSocket().newOutputStream());
         }
