@@ -29,7 +29,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * when this input shop gets closed.
  *
  * @see     DisconnectingOutputShop
- * @param   <E> The type of the entries.
+ * @param   <E> the type of the entries.
  * @author  Christian Schlichtherle
  * @version $Id$
  */
@@ -55,26 +55,19 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     /**
-     * Disconnects this shop from its decorated shop.
-     * All subsequent calls will behave as if this shop had been closed,
-     * although this is not happening in this method.
+     * Closes this input shop.
+     * Subsequent calls to this method will just forward the call to the
+     * decorated input shop.
+     * Subsequent calls to any other method of this input shop will result in
+     * an {@link InputClosedException}, even if the call to this method fails
+     * with an {@link IOException}.
      * 
-     * @return {@code true} if the shop has been successfully disconnected or
-     *         {@code false} if it was already disconnected or closed.
-     *         
+     * @throws IOException on any I/O failure.
      */
-    public boolean disconnect() {
-        final boolean closed = this.closed;
-        this.closed = true;
-        return !closed;
-    }
-
     @Override
     public void close() throws IOException {
-        if (closed)
-            return;
-        delegate.close();
         closed = true;
+        delegate.close();
     }
 
     private void checkOpen() throws IOException {
