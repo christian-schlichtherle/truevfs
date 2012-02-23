@@ -22,6 +22,7 @@ import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.FilteringIterator;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -122,12 +123,12 @@ public final class TFileSystem extends FileSystem {
      *         federated file system or the combination of synchronization
      *         options is illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is consumed or if the
+     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is consumed.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
+     *         updated with constraints, such as a failure to consumed the last
      *         modification time of the entry for the federated file system
      *         (i.e. archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
@@ -160,7 +161,7 @@ public final class TFileSystem extends FileSystem {
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
+     *         updated with constraints, such as a failure to consumed the last
      *         modification time of the entry for the federated file system
      *         (i.e. prospective archive file) in its parent file system.
      * @throws FsSyncException if any error conditions occur.
@@ -316,47 +317,55 @@ public final class TFileSystem extends FileSystem {
 
         @NotThreadSafe
         class Adapter implements Iterator<Path> {
-            final Iterator<String> i = set.iterator();
-            @CheckForNull Path next;
+            final Iterator<String> it = set.iterator();
 
             @Override
             public boolean hasNext() {
-                while (i.hasNext()) {
-                    next = path.resolve(i.next());
-                    try {
-                        if (filter.accept(next))
-                            return true;
-                    } catch (IOException ex) {
-                        throw new DirectoryIteratorException(ex);
-                    }
-                }
-                next = null;
-                return false;
+                return it.hasNext();
             }
 
             @Override
             public Path next() {
-                if (null == next)
-                    throw new NoSuchElementException();
-                return next;
+                return path.resolve(it.next());
             }
 
             @Override
             public void remove() {
-                throw new UnsupportedOperationException();
+                throw new UnsupportedOperationException("Not supported yet.");
             }
-        }
+        } // Adapter
 
+        @NotThreadSafe
+        class FilterIterator extends FilteringIterator<Path> {
+            FilterIterator() { super(new Adapter()); }
+
+            @Override
+            protected boolean accept(Path element) {
+                try {
+                    return filter.accept(element);
+                } catch (IOException ex) {
+                    throw new DirectoryIteratorException(ex);
+                }
+            }
+        } // FilterIterator
+
+        @NotThreadSafe
         class Stream implements DirectoryStream<Path> {
+            boolean consumed;
+
             @Override
             public Iterator<Path> iterator() {
-                return new Adapter();
+                if (consumed)
+                    throw new IllegalStateException();
+                consumed = true;
+                return new FilterIterator();
             }
 
             @Override
             public void close() {
+                consumed = true;
             }
-        }
+        } // Stream
 
         return new Stream();
     }
