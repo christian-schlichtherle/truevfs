@@ -30,6 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -376,16 +377,10 @@ extends FsLockModelDecoratingController<
             }
         } // Sync
 
-        try {
-            writeLocked(new Sync());
-        } catch (final FsControllerException ex) {
-            throw ex;
-        } catch (final IOException ex) {
-            throw ex;
-        }
+        writeLocked(new Sync());
     }
 
-    void closeWriteLocked(final Closeable closeable) throws IOException {
+    void close(final Closeable closeable) throws IOException {
         class Close implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
@@ -451,14 +446,13 @@ extends FsLockModelDecoratingController<
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    final SeekableByteChannel sbc;
                     try {
-                        sbc = getBoundSocket().newSeekableByteChannel();
+                        return new LockSeekableByteChannel(
+                                getBoundSocket().newSeekableByteChannel());
                     } catch (final InputClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
-                    return new LockSeekableByteChannel(sbc);
                 }
             } // NewSeekableByteChannel
 
@@ -489,14 +483,13 @@ extends FsLockModelDecoratingController<
             class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
-                    final ReadOnlyFile rof;
                     try {
-                        rof = getBoundSocket().newReadOnlyFile();
+                        return new LockReadOnlyFile(
+                                getBoundSocket().newReadOnlyFile());
                     } catch (final InputClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
-                    return new LockReadOnlyFile(rof);
                 }
             } // NewReadOnlyFile
 
@@ -508,14 +501,13 @@ extends FsLockModelDecoratingController<
             class NewInputStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
-                    final InputStream in;
                     try {
-                        in = getBoundSocket().newInputStream();
+                        return new LockInputStream(
+                                getBoundSocket().newInputStream());
                     } catch (final InputClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
-                    return new LockInputStream(in);
                 }
             } // NewInputStream
 
@@ -534,14 +526,13 @@ extends FsLockModelDecoratingController<
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    final SeekableByteChannel sbc;
                     try {
-                        sbc = getBoundSocket().newSeekableByteChannel();
+                        return new LockSeekableByteChannel(
+                                getBoundSocket().newSeekableByteChannel());
                     } catch (final OutputClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
-                    return new LockSeekableByteChannel(sbc);
                 }
             } // NewSeekableByteChannel
 
@@ -572,14 +563,13 @@ extends FsLockModelDecoratingController<
             class NewOutputStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
-                    final OutputStream out;
                     try {
-                        out = getBoundSocket().newOutputStream();
+                        return new LockOutputStream(
+                                getBoundSocket().newOutputStream());
                     } catch (final OutputClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
-                    return new LockOutputStream(out);
                 }
             } // NewOutputStream
 
@@ -597,9 +587,9 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            closeWriteLocked(delegate);
+            close(delegate);
         }
-    } // LockingReadOnlyFile
+    } // LockReadOnlyFile
 
     private final class LockSeekableByteChannel
     extends DecoratingSeekableByteChannel {
@@ -611,9 +601,9 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            closeWriteLocked(delegate);
+            close(delegate);
         }
-    } // LockingSeekableByteChannel
+    } // LockSeekableByteChannel
 
     private final class LockInputStream
     extends DecoratingInputStream {
@@ -625,9 +615,9 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            closeWriteLocked(delegate);
+            close(delegate);
         }
-    } // LockingInputStream
+    } // LockInputStream
 
     private final class LockOutputStream
     extends DecoratingOutputStream {
@@ -639,9 +629,9 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            closeWriteLocked(delegate);
+            close(delegate);
         }
-    } // LockingOutputStream
+    } // LockOutputStream
 
     @NotThreadSafe
     private static final class ThreadTool {
@@ -705,7 +695,7 @@ extends FsLockModelDecoratingController<
             return TRACEABLE ? new NeedsLockRetryException() : SINGLETON;
         }
 
-        static final NeedsLockRetryException
+        static final @Nullable NeedsLockRetryException
                 SINGLETON = TRACEABLE ? null : new NeedsLockRetryException();
     } // NeedsLockRetryException
 }
