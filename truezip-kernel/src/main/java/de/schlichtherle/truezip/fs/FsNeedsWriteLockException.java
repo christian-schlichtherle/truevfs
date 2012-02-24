@@ -17,9 +17,9 @@ import javax.annotation.concurrent.Immutable;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public final class FsNeedsWriteLockException extends FsControllerException {
     static FsNeedsWriteLockException get() {
-        return TRACE ? new FsNeedsWriteLockException() : SINGLETON;
+        return TRACEABLE ? new FsNeedsWriteLockException() : SINGLETON;
     }
 
     private static final FsNeedsWriteLockException
-            SINGLETON = TRACE ? null : new FsNeedsWriteLockException();
+            SINGLETON = TRACEABLE ? null : new FsNeedsWriteLockException();
 }

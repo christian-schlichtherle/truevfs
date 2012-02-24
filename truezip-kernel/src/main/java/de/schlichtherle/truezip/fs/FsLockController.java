@@ -702,10 +702,10 @@ extends FsLockModelDecoratingController<
     private static final class NeedsLockRetryException
     extends FsControllerException {
         static NeedsLockRetryException get() {
-            return TRACE ? new NeedsLockRetryException() : SINGLETON;
+            return TRACEABLE ? new NeedsLockRetryException() : SINGLETON;
         }
 
         static final NeedsLockRetryException
-                SINGLETON = TRACE ? null : new NeedsLockRetryException();
+                SINGLETON = TRACEABLE ? null : new NeedsLockRetryException();
     } // NeedsLockRetryException
 }
