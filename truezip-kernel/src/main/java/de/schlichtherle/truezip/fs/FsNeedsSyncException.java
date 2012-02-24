@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.BitField;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -23,6 +24,6 @@ public final class FsNeedsSyncException extends FsControllerException {
         return TRACEABLE ? new FsNeedsSyncException() : SINGLETON;
     }
 
-    private static final FsNeedsSyncException
+    private static final @Nullable FsNeedsSyncException
             SINGLETON = TRACEABLE ? null : new FsNeedsSyncException();
 }

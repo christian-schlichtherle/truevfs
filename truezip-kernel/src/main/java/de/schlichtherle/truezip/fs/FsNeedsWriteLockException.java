@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -20,6 +21,6 @@ public final class FsNeedsWriteLockException extends FsControllerException {
         return TRACEABLE ? new FsNeedsWriteLockException() : SINGLETON;
     }
 
-    private static final FsNeedsWriteLockException
+    private static final @Nullable FsNeedsWriteLockException
             SINGLETON = TRACEABLE ? null : new FsNeedsWriteLockException();
 }
