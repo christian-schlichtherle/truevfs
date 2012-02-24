@@ -138,17 +138,18 @@ implements InputShop<TarDriverEntry> {
         // If the record is the null record, the TAR file is empty and we're
         // done with validating.
         if (!Arrays.equals(buf, NULL_RECORD)) {
+            final long expected;
             try {
-                final long expected = TarUtils.parseOctal(buf, CHECKSUM_OFFSET, 8);
-                for (int i = 0; i < 8; i++)
-                    buf[CHECKSUM_OFFSET + i] = ' ';
-                final long is = TarUtils.computeCheckSum(buf);
-                if (expected != is)
-                    throw new IOException(
-                            "Illegal initial record in TAR file: Expected checksum " + expected + ", is " + is + "!");
+                expected = TarUtils.parseOctal(buf, CHECKSUM_OFFSET, 8);
             } catch (IllegalArgumentException ex) {
-                throw new IOException("Illegal initial record in TAR file!");
+                throw new IOException("Illegal initial record in TAR file!", ex);
             }
+            for (int i = 0; i < 8; i++)
+                buf[CHECKSUM_OFFSET + i] = ' ';
+            final long actual = TarUtils.computeCheckSum(buf);
+            if (expected != actual)
+                throw new IOException(
+                        "Illegal initial record in TAR file: Expected / actual checksum := " + expected + " / " + actual + "!");
         }
         return new TarArchiveInputStream(vin, DEFAULT_BLKSIZE, DEFAULT_RCDSIZE);
     }
