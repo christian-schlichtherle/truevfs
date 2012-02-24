@@ -397,15 +397,15 @@ extends FsLockModelDecoratingController<
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    final FsLockController controller,
-                    final InputSocket<?> input) {
+                    FsLockController controller,
+                    InputSocket<?> input) {
                 return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    final FsLockController controller,
-                    final OutputSocket<?> output) {
+                    FsLockController controller,
+                    OutputSocket<?> output) {
                 return controller.new Output(output);
             }
         },
@@ -413,26 +413,26 @@ extends FsLockModelDecoratingController<
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    final FsLockController controller,
-                    final InputSocket<?> input) {
+                    FsLockController controller,
+                    InputSocket<?> input) {
                 return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    final FsLockController controller,
-                    final OutputSocket<?> output) {
+                    FsLockController controller,
+                    OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                final FsLockController controller,
-                final InputSocket <?> input);
+                FsLockController controller,
+                InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                final FsLockController controller,
-                final OutputSocket <?> output);
+                FsLockController controller,
+                OutputSocket <?> output);
     } // SocketFactory
 
     @NotThreadSafe
