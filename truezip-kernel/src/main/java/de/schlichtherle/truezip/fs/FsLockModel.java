@@ -12,8 +12,8 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A file system model which supports multiple concurrent reader threads.
  *
- * @see     FsLockController
- * @author  Christian Schlichtherle
+ * @see    FsLockController
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class FsLockModel extends FsDecoratingModel<FsModel> {
@@ -36,7 +36,6 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
      * 
      * @return {@code true} if and only if the read lock is held by the
      *         current thread.
-     * @see    #checkNotReadLockedByCurrentThread()
      */
     boolean isReadLockedByCurrentThread() {
         return 0 != lock.getReadHoldCount();
