@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.socket;
 
@@ -17,11 +13,10 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Delegates all methods to another output socket.
  *
- * @see     DelegatingInputSocket
- * @param   <E> The type of the {@link #getLocalTarget() local target}.
- * @since   TrueZIP 7.3
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    DelegatingInputSocket
+ * @param  <E> the type of the {@link #getLocalTarget() local target}.
+ * @since  TrueZIP 7.3
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class DelegatingOutputSocket<E extends Entry>

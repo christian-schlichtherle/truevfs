@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.socket;
 
@@ -19,10 +15,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * A lazy output socket provides proxy output streams which acquire their
  * underlying local target upon the first read access.
  *
- * @param   <E> The type of the {@link #getLocalTarget() local target}.
- * @see     LazyInputSocket
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> the type of the {@link #getLocalTarget() local target}.
+ * @see    LazyInputSocket
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class LazyOutputSocket<E extends Entry>
