@@ -43,7 +43,7 @@ import javax.swing.Icon;
  * archive file in its parent file system and resolves archive entry collisions,
  * for example by performing a full update of the target archive file.
  *
- * @param  <E> The type of the archive entries.
+ * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
