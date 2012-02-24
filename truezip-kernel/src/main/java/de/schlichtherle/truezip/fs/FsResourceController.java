@@ -20,12 +20,14 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.Icon;
@@ -349,10 +351,9 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingReadOnlyFile
     extends DecoratingReadOnlyFile {
-        //boolean closed;
-
+        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountingReadOnlyFile(ReadOnlyFile rof) {
+        AccountingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
             getAccountant().startAccountingFor(this);
         }
@@ -361,7 +362,6 @@ extends FsLockModelDecoratingController<
         public void close() throws IOException {
             getAccountant().stopAccountingFor(this);
             delegate.close();
-            //closed = true;
         }
 
         @Override
@@ -370,8 +370,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                //if (!closed)
-                    delegate.close();
+                delegate.close();
             } finally {
                 super.finalize();
             }
@@ -380,10 +379,9 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        //boolean closed;
-
+        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountingSeekableByteChannel(SeekableByteChannel sbc) {
+        AccountingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
             getAccountant().startAccountingFor(this);
         }
@@ -401,8 +399,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                //if (!closed)
-                    delegate.close();
+                delegate.close();
             } finally {
                 super.finalize();
             }
@@ -411,10 +408,9 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingInputStream
     extends DecoratingInputStream {
-        //boolean closed;
-
+        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountingInputStream(InputStream in) {
+        AccountingInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
             getAccountant().startAccountingFor(this);
         }
@@ -423,7 +419,6 @@ extends FsLockModelDecoratingController<
         public void close() throws IOException {
             getAccountant().stopAccountingFor(this);
             delegate.close();
-            //closed = true;
         }
 
         @Override
@@ -432,8 +427,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                //if (!closed)
-                    delegate.close();
+                delegate.close();
             } finally {
                 super.finalize();
             }
@@ -442,10 +436,9 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingOutputStream
     extends DecoratingOutputStream {
-        //boolean closed;
-
+        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        AccountingOutputStream(OutputStream out) {
+        AccountingOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
             getAccountant().startAccountingFor(this);
         }
@@ -454,7 +447,6 @@ extends FsLockModelDecoratingController<
         public void close() throws IOException {
             getAccountant().stopAccountingFor(this);
             delegate.close();
-            //closed = true;
         }
 
         @Override
@@ -463,8 +455,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                //if (!closed)
-                    delegate.close();
+                delegate.close();
             } finally {
                 super.finalize();
             }
