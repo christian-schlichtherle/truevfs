@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.socket;
 
@@ -25,10 +21,9 @@ import javax.annotation.concurrent.ThreadSafe;
  * Mind that all synchronization is performed on the decorated output shop!
  *
  * @see        SynchronizedInputShop
- * @param      <E> The type of the entries.
+ * @param      <E> the type of the entries.
  * @deprecated Use {@link LockOutputShop} instead.
  * @author     Christian Schlichtherle
- * @version    $Id$
  */
 @Deprecated
 @ThreadSafe

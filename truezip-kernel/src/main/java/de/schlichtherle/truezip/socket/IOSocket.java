@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.socket;
 
@@ -30,12 +26,11 @@ import javax.annotation.concurrent.ThreadSafe;
  * copying a compressed archive entry to another archive entry of the same
  * type.
  *
- * @param   <LT> the type of the {@link #getLocalTarget() local target}
- *          for I/O operations.
- * @param   <PT> the type of the {@link #getPeerTarget() peer target}
- *          for I/O operations.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <LT> the type of the {@link #getLocalTarget() local target}
+ *         for I/O operations.
+ * @param  <PT> the type of the {@link #getPeerTarget() peer target}
+ *         for I/O operations.
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class IOSocket<LT, PT> {
