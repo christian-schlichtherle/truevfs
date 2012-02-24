@@ -174,9 +174,9 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
      */
     @Override
     public OutputShop<TarDriverEntry> newOutputShop(
-            FsModel model,
-            OutputSocket<?> output,
-            InputShop<TarDriverEntry> source)
+            final FsModel model,
+            final OutputSocket<?> output,
+            final InputShop<TarDriverEntry> source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
@@ -185,10 +185,10 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             return new FsMultiplexedOutputShop<TarDriverEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             try {
                 out.close();
-            } catch (IOException ex2) {
+            } catch (final IOException ex2) {
                 throw (IOException) ex2.initCause(ex);
             }
             throw ex;
