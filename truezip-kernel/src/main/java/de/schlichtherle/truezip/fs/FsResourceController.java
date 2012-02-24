@@ -5,8 +5,6 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -25,12 +23,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Accounts input and output resources returned by its decorated controller.
@@ -169,68 +165,6 @@ extends FsLockModelDecoratingController<
         final FsResourceAccountant accountant = this.accountant;
         if (null != accountant)
             accountant.closeAllResources(new IOExceptionHandler());
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return delegate.getClosedIcon();
-    }
-
-    @Override
-    public FsEntry getEntry(FsEntryName name) throws IOException {
-        return delegate.getEntry(name);
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return delegate.getOpenIcon();
-    }
-
-    @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
-        return delegate.isExecutable(name);
-    }
-
-    @Override
-    public boolean isReadOnly() throws IOException {
-        return delegate.isReadOnly();
-    }
-
-    @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
-        return delegate.isReadable(name);
-    }
-
-    @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
-        return delegate.isWritable(name);
-    }
-
-    @Override
-    public void mknod(FsEntryName name, Type type, BitField<FsOutputOption> options, Entry template) throws IOException {
-        delegate.mknod(name, type, options, template);
-    }
-
-    @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
-        delegate.setReadOnly(name);
-    }
-
-    @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times, BitField<FsOutputOption> options) throws IOException {
-        return delegate.setTime(name, times, options);
-    }
-
-    @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value, BitField<FsOutputOption> options) throws IOException {
-        return delegate.setTime(name, types, value, options);
-    }
-
-    @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options) throws IOException {
-        delegate.unlink(name, options);
     }
 
     @Immutable

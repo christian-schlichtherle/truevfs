@@ -7,7 +7,10 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.io.*;
+import de.schlichtherle.truezip.io.ClosedException;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
@@ -449,7 +452,7 @@ extends FsLockModelDecoratingController<
                     try {
                         return new LockSeekableByteChannel(
                                 getBoundSocket().newSeekableByteChannel());
-                    } catch (final InputClosedException ex) {
+                    } catch (final ClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
@@ -486,7 +489,7 @@ extends FsLockModelDecoratingController<
                     try {
                         return new LockReadOnlyFile(
                                 getBoundSocket().newReadOnlyFile());
-                    } catch (final InputClosedException ex) {
+                    } catch (final ClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
@@ -504,7 +507,7 @@ extends FsLockModelDecoratingController<
                     try {
                         return new LockInputStream(
                                 getBoundSocket().newInputStream());
-                    } catch (final InputClosedException ex) {
+                    } catch (final ClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
@@ -529,7 +532,7 @@ extends FsLockModelDecoratingController<
                     try {
                         return new LockSeekableByteChannel(
                                 getBoundSocket().newSeekableByteChannel());
-                    } catch (final OutputClosedException ex) {
+                    } catch (final ClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
@@ -566,7 +569,7 @@ extends FsLockModelDecoratingController<
                     try {
                         return new LockOutputStream(
                                 getBoundSocket().newOutputStream());
-                    } catch (final OutputClosedException ex) {
+                    } catch (final ClosedException ex) {
                         ex.initCause(NeedsLockRetryException.get());
                         throw ex;
                     }
