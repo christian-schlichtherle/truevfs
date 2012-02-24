@@ -68,7 +68,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         delegate.close();
     }
 
-    private void checkOpen() throws IOException {
+    void checkOpen() throws IOException {
         if (closed)
             throw new OutputClosedException();
     }
