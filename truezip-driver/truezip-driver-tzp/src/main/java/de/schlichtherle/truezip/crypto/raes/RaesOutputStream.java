@@ -32,7 +32,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
 
     /**
      * Update the given KLAC with the given file {@code length} in
-     * little endian order and finalize it, writing the result to {@code buf}.
+     * little endian order and finish it, writing the result to {@code buf}.
      * The KLAC must already have been initialized and updated with the
      * password bytes as retrieved according to PKCS #12.
      * The result is stored in {@code buf}, which must match the given
