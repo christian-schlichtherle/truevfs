@@ -25,7 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * Decorates another output shop to allow concurrent access which is
  * synchronized by a {@link Lock} object provided to its constructor.
  *
- * @param   <E> The type of the entries.
+ * @param   <E> the type of the entries.
  * @see     LockInputShop
  * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
