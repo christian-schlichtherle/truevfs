@@ -24,8 +24,8 @@ import javax.annotation.concurrent.Immutable;
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  * 
- * @param   <E> the type of the archive entries.
- * @author  Christian Schlichtherle
+ * @param  <E> the type of the archive entries.
+ * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class FsCharsetArchiveDriver<E extends FsArchiveEntry>
