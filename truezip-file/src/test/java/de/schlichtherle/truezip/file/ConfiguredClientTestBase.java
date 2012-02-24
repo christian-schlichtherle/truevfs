@@ -1,15 +1,10 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsDefaultManager;
-import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
@@ -24,28 +19,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * @param   <D> The type of the archive driver.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <D> the type of the archive driver.
+ * @author Christian Schlichtherle
  */
 public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
 extends FsArchiveDriverTestBase<D> {
 
     protected static final long TIMEOUT_MILLIS = 50;
-    protected static final FsMountPoint
-            ROOT_DIRECTORY = FsMountPoint.create(URI.create("file:/"));
-    protected static final FsMountPoint
-            CURRENT_DIRECTORY = FsMountPoint.create(new File("").toURI());
+    protected static final FsMountPoint ROOT_DIRECTORY = FsMountPoint
+            .create(URI.create("file:/"));
+    protected static final FsMountPoint CURRENT_DIRECTORY = FsMountPoint
+            .create(new File("").toURI());
     protected static final String[] NO_STRINGS = new String[0];
     private static final String ARCHIVE_DETECTOR = "archiveDetector";
 
-    private static final boolean FS_MANAGER_ISOLATE
-            = Boolean.getBoolean(FsManager.class.getName() + ".isolate");
+    private static final boolean ISOLATE_FS_MANAGER = Boolean
+            .getBoolean(ConfiguredClientTestBase.class.getName() + ".isolateFsManager");
     static {
         Logger  .getLogger(ConfiguredClientTestBase.class.getName())
                 .log(   Level.CONFIG,
-                        "Isolate file system managers: {0}",
-                        FS_MANAGER_ISOLATE);
+                        "Isolate file system manager: {0}",
+                        ISOLATE_FS_MANAGER);
     }
 
     private TArchiveDetector detector;
@@ -67,7 +61,7 @@ extends FsArchiveDriverTestBase<D> {
         // So the default value 'false' helps to identify potential isolation
         // issues in case this invariant is not met.
         // See http://truezip.java.net/truezip-file/usage.html#Third_Party_Access
-        if (FS_MANAGER_ISOLATE)
+        if (ISOLATE_FS_MANAGER)
             config.setManager(new FsDefaultManager());
         config.setLenient(true);
         config.setArchiveDetector(detector);
