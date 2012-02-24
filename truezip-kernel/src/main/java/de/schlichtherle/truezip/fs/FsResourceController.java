@@ -231,11 +231,6 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
-            return getBoundSocket().getLocalTarget();
-        }
-
-        @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             assert getModel().isWriteLockedByCurrentThread();
             return new AccountingReadOnlyFile(
@@ -268,11 +263,6 @@ extends FsLockModelDecoratingController<
     extends DecoratingOutputSocket<Entry> {
         Output(OutputSocket<?> output) {
             super(output);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            return getBoundSocket().getLocalTarget();
         }
 
         @Override
