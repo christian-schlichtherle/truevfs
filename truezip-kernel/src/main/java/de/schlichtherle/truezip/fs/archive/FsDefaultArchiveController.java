@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive;
 
@@ -47,9 +43,8 @@ import javax.swing.Icon;
  * archive file in its parent file system and resolves archive entry collisions,
  * for example by performing a full update of the target archive file.
  *
- * @param   <E> The type of the archive entries.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> The type of the archive entries.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class FsDefaultArchiveController<E extends FsArchiveEntry>
@@ -107,6 +102,15 @@ extends FsFileSystemArchiveController<E> {
         assert null != driver;
         assert null != parent;
         assert null != name;
+        final FsArchiveFileSystem<E> fs = getFileSystem();
+        final InputArchive<E> ia = getInputArchive();
+        final OutputArchive<E> oa = getOutputArchive();
+        assert null == ia || null != fs : "null != ia => null != fs";
+        assert null == oa || null != fs : "null != oa => null != fs";
+        assert null == fs || null != ia || null != oa : "null != fs => null != ia || null != oa";
+        // This is effectively the same than the last three assertions, but is
+        // harder to trace in the field on failure.
+        //assert null != fs == (null != ia || null != oa);
         return true;
     }
 
@@ -152,8 +156,16 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     void mount(final boolean autoCreate) throws IOException {
+        try {
+            mount0(autoCreate);
+        } finally {
+            assert invariants();
+        }
+    }
+
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    private void mount0(final boolean autoCreate) throws IOException {
         // HC SUNT DRACONES!
         FsArchiveFileSystem<E> fileSystem;
         try {
@@ -187,7 +199,7 @@ extends FsFileSystemArchiveController<E> {
             if (null == parentEntry && autoCreate) {
                 // This may fail if the container file is an RAES encrypted ZIP
                 // file and the user cancels password prompting.
-                makeOutput();
+                makeOutputArchive();
                 fileSystem = newEmptyFileSystem(driver);
             } else {
                 throw null != parentEntry && !parentEntry.isType(SPECIAL)
@@ -208,7 +220,7 @@ extends FsFileSystemArchiveController<E> {
      * 
      * @return The output archive.
      */
-    private OutputArchive<E> makeOutput() throws IOException {
+    private OutputArchive<E> makeOutputArchive() throws IOException {
         OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
             return oa;
@@ -227,7 +239,11 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     InputSocket<? extends E> getInputSocket(final String name) {
-        return getInputArchive().getInputSocket(name);
+        try {
+            return getInputArchive().getInputSocket(name);
+        } finally {
+            assert invariants();
+        }
     }
 
     @Override
@@ -241,15 +257,29 @@ extends FsFileSystemArchiveController<E> {
                 final OutputSocket<? extends E> delegate = this.delegate;
                 return null != delegate
                         ? delegate
-                        : (this.delegate = makeOutput().getOutputSocket(entry));
+                        : (this.delegate = makeOutputArchive().getOutputSocket(entry));
             }
         } // Output
 
-        return new Output();
+        try {
+            return new Output();
+        } finally {
+            assert invariants();
+        }
     }
 
     @Override
     void checkAccess(   final FsEntryName name,
+                        final @CheckForNull Access intention)
+    throws FsNeedsSyncException {
+        try {
+            checkAccess0(name, intention);
+        } finally {
+            assert invariants();
+        }
+    }
+
+    void checkAccess0(  final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsNeedsSyncException {
         // HC SUNT DRACONES!
@@ -269,7 +299,7 @@ extends FsFileSystemArchiveController<E> {
                 if (!grow
                         || null == intention && !driver.getRedundantMetaDataSupport()
                         || WRITE == intention && !driver.getRedundantContentSupport())
-                    throw FsNeedsSyncException.SINGLETON;
+                    throw FsNeedsSyncException.get();
             }
         } else {
             aen = null;
@@ -293,7 +323,7 @@ extends FsFileSystemArchiveController<E> {
             iae = null;
         }
         if (READ == intention && (null == iae || iae != oae && oae != null))
-            throw FsNeedsSyncException.SINGLETON;
+            throw FsNeedsSyncException.get();
     }
 
     @Override
@@ -302,11 +332,32 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         try {
+            sync0(options, handler);
+        } finally {
+            assert invariants();
+        }
+    }
+
+    private <X extends IOException> void
+    sync0(  final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
+    throws IOException {
+        //commence();
+        try {
             copy(options, handler);
         } finally {
             commit(options, handler);
         }
     }
+
+    /*private void commence() {
+        final InputArchive<E> ia = getInputArchive();
+        if (null != ia)
+            ia.disconnect();
+        final OutputArchive<E> oa = getOutputArchive();
+        if (null != oa)
+            oa.disconnect();
+    }*/
 
     /**
      * Synchronizes all entries in the (virtual) archive file system with the
@@ -324,8 +375,7 @@ extends FsFileSystemArchiveController<E> {
     copy(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        class FilterExceptionHandler
-        implements ExceptionHandler<IOException, X> {
+        class Filter implements ExceptionHandler<IOException, X> {
             IOException warning;
 
             @Override
@@ -356,7 +406,7 @@ extends FsFileSystemArchiveController<E> {
         copy(   getFileSystem(),
                 null != ia ? ia.getDriverProduct() : new DummyInputArchive<E>(),
                 oa.getDriverProduct(),
-                new FilterExceptionHandler());
+                new Filter());
     }
 
     private static <E extends FsArchiveEntry, X extends IOException> void
@@ -389,7 +439,7 @@ extends FsFileSystemArchiveController<E> {
                         ae.setSize(DATA, 0);
                         output.getOutputSocket(ae).newOutputStream().close();
                     }
-                } catch (IOException ex) {
+                } catch (final IOException ex) {
                     handler.warn(ex);
                 }
             }
@@ -424,9 +474,9 @@ extends FsFileSystemArchiveController<E> {
             try {
                 ia.close();
                 setInputArchive(null);
-            } catch (FsControllerException ex) {
+            } catch (final FsControllerException ex) {
                 throw ex;
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 handler.warn(new FsSyncWarningException(getModel(), ex));
             }
         }
@@ -435,9 +485,9 @@ extends FsFileSystemArchiveController<E> {
             try {
                 oa.close();
                 setOutputArchive(null);
-            } catch (FsControllerException ex) {
+            } catch (final FsControllerException ex) {
                 throw ex;
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 throw handler.fail(new FsSyncException(getModel(), ex));
             }
         }
@@ -487,6 +537,10 @@ extends FsFileSystemArchiveController<E> {
             this.driverProduct = input;
         }
 
+        /*void disconnect() {
+            ((DisconnectingInputShop) delegate).disconnect();
+        }*/
+
         /**
          * Publishes the product of the archive driver this input archive is
          * decorating.
@@ -507,6 +561,10 @@ extends FsFileSystemArchiveController<E> {
             this.driverProduct = output;
         }
 
+        /*void disconnect() {
+            ((DisconnectingOutputShop) delegate).disconnect();
+        }*/
+
         /**
          * Publishes the product of the archive driver this output archive is
          * decorating.
@@ -526,7 +584,7 @@ extends FsFileSystemArchiveController<E> {
         public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
         throws IOException {
             assert event.getSource() == getFileSystem();
-            makeOutput();
+            makeOutputArchive();
             assert isTouched();
         }
 

@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -96,11 +92,10 @@ import javax.swing.JTree;
  * system upon a call to {@code sync}.
  * </ol>
  * 
- * @param   <M> the type of the file system model.
- * @see     FsManager
- * @see     <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <M> the type of the file system model.
+ * @see    FsManager
+ * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
+ * @author Christian Schlichtherle
  */
 public abstract class FsController<M extends FsModel> {
 
