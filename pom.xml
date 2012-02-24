@@ -267,7 +267,7 @@ system space.
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <!-- Avoid the default version 2.12 because it's known to
                          conceal multithreading bugs in the classes under
-                         test. -->
+                         test - see http://java.net/jira/browse/TRUEZIP-228 -->
                     <version>2.11</version>
                     <configuration>
                         <!-- Consider 80% blocking factor for I/O. -->
