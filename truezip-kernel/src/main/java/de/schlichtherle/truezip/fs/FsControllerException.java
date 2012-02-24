@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -67,15 +63,25 @@ import javax.annotation.concurrent.Immutable;
  * }
  * }</pre>
  * 
- * @see     FsDecoratingController
- * @since   TrueZIP 7.5 (renamed from {@code FsException} and changed super
- *          type from {@code IOException} to {@code RuntimeException})
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    FsDecoratingController
+ * @since  TrueZIP 7.5 (renamed from {@code FsException} and changed super
+ *         type from {@code IOException} to {@code RuntimeException})
+ * @author Christian Schlichtherle
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public abstract class FsControllerException extends IOException {
+
+    /**
+     * Controls whether or not instances of this class have a regular stack
+     * trace or an empty stack trace.
+     * If and only if the system property with the name
+     * {@code de.schlichtherle.fs.FsControllerException.traceable} is set to
+     * {@code true} (case is ignored), then instances of this class will have a
+     * regular stack trace, otherwise their stack trace will be empty.
+     */
+    protected static final boolean TRACE = Boolean
+            .getBoolean(FsControllerException.class.getName() + ".traceable");
 
     private static final StackTraceElement[]
             EMPTY_STACK = new StackTraceElement[0];
@@ -98,8 +104,11 @@ public abstract class FsControllerException extends IOException {
      * @see <a href="http://blogs.oracle.com/jrose/entry/longjumps_considered_inexpensive">Longjumps Considered Inexpensive</a>
      */
     @Override
-    public synchronized FsControllerException fillInStackTrace() {
-        super.setStackTrace(EMPTY_STACK);
+    public FsControllerException fillInStackTrace() {
+        if (TRACE)
+            super.fillInStackTrace();
+        else
+            super.setStackTrace(EMPTY_STACK);
         return this;
     }
 }

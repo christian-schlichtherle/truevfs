@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -45,10 +41,9 @@ import javax.swing.Icon;
  * in order to provide read/write locking for multi-threaded access by its
  * clients.
  * 
- * @see     FsLockModel
- * @see     FsNeedsWriteLockException
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    FsLockModel
+ * @see    FsNeedsWriteLockException
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class FsLockController
@@ -87,7 +82,7 @@ extends FsLockModelDecoratingController<
         return this.writeLock;
     }
 
-    private <T> T readOrWriteLocked(IOOperation<T> operation)
+    <T> T readOrWriteLocked(IOOperation<T> operation)
     throws IOException {
         try {
             return readLocked(operation);
@@ -96,13 +91,11 @@ extends FsLockModelDecoratingController<
         }
     }
 
-    private <T> T
-    readLocked(IOOperation<T> operation) throws IOException {
+    <T> T readLocked(IOOperation<T> operation) throws IOException {
         return locked(operation, readLock());
     }
 
-    private <T> T
-    writeLocked(IOOperation<T> operation) throws IOException {
+    <T> T writeLocked(IOOperation<T> operation) throws IOException {
         assert !getModel().isReadLockedByCurrentThread()
                 : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
         return locked(operation, writeLock());
@@ -152,7 +145,7 @@ extends FsLockModelDecoratingController<
         final ThreadTool thread = threadTool.get();
         if (thread.locking) {
             if (!lock.tryLock())
-                throw NeedsLockRetryException.SINGLETON;
+                throw NeedsLockRetryException.get();
             try {
                 return operation.call();
             } finally {
@@ -371,7 +364,6 @@ extends FsLockModelDecoratingController<
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
@@ -386,15 +378,14 @@ extends FsLockModelDecoratingController<
 
         try {
             writeLocked(new Sync());
-        } catch (FsControllerException ex) {
+        } catch (final FsControllerException ex) {
             throw ex;
-        } catch (IOException ex) {
-            throw (X) ex;
+        } catch (final IOException ex) {
+            throw ex;
         }
     }
 
-    private void closeWriteLocked(final Closeable closeable)
-    throws IOException {
+    void closeWriteLocked(final Closeable closeable) throws IOException {
         class Close implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
@@ -461,12 +452,12 @@ extends FsLockModelDecoratingController<
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     final SeekableByteChannel sbc;
-                    //try {
+                    try {
                         sbc = getBoundSocket().newSeekableByteChannel();
-                    /*} catch (final InputClosedException ex) {
-                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                    } catch (final InputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.get());
                         throw ex;
-                    }*/
+                    }
                     return new LockSeekableByteChannel(sbc);
                 }
             } // NewSeekableByteChannel
@@ -499,12 +490,12 @@ extends FsLockModelDecoratingController<
                 @Override
                 public ReadOnlyFile call() throws IOException {
                     final ReadOnlyFile rof;
-                    //try {
+                    try {
                         rof = getBoundSocket().newReadOnlyFile();
-                    /*} catch (final InputClosedException ex) {
-                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                    } catch (final InputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.get());
                         throw ex;
-                    }*/
+                    }
                     return new LockReadOnlyFile(rof);
                 }
             } // NewReadOnlyFile
@@ -518,12 +509,12 @@ extends FsLockModelDecoratingController<
                 @Override
                 public InputStream call() throws IOException {
                     final InputStream in;
-                    //try {
+                    try {
                         in = getBoundSocket().newInputStream();
-                    /*} catch (final InputClosedException ex) {
-                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                    } catch (final InputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.get());
                         throw ex;
-                    }*/
+                    }
                     return new LockInputStream(in);
                 }
             } // NewInputStream
@@ -544,12 +535,12 @@ extends FsLockModelDecoratingController<
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     final SeekableByteChannel sbc;
-                    //try {
+                    try {
                         sbc = getBoundSocket().newSeekableByteChannel();
-                    /*} catch (final OutputClosedException ex) {
-                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                    } catch (final OutputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.get());
                         throw ex;
-                    }*/
+                    }
                     return new LockSeekableByteChannel(sbc);
                 }
             } // NewSeekableByteChannel
@@ -582,12 +573,12 @@ extends FsLockModelDecoratingController<
                 @Override
                 public OutputStream call() throws IOException {
                     final OutputStream out;
-                    //try {
+                    try {
                         out = getBoundSocket().newOutputStream();
-                    /*} catch (final OutputClosedException ex) {
-                        ex.initCause(NeedsLockRetryException.SINGLETON);
+                    } catch (final OutputClosedException ex) {
+                        ex.initCause(NeedsLockRetryException.get());
                         throw ex;
-                    }*/
+                    }
                     return new LockOutputStream(out);
                 }
             } // NewOutputStream
@@ -645,23 +636,6 @@ extends FsLockModelDecoratingController<
         LockOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
-
-        /**
-         * Calling this method may be used to try the write lock without
-         * breaking output consistency.
-         */
-        /*@Override
-        public void flush() throws IOException {
-            class Flush implements IOOperation<Void> {
-                @Override
-                public Void call() throws IOException {
-                    delegate.flush();
-                    return null;
-                }
-            } // Flush
-
-            writeLocked(new Flush());
-        }*/
 
         @Override
         public void close() throws IOException {
@@ -727,7 +701,11 @@ extends FsLockModelDecoratingController<
     @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
     private static final class NeedsLockRetryException
     extends FsControllerException {
+        static NeedsLockRetryException get() {
+            return TRACE ? new NeedsLockRetryException() : SINGLETON;
+        }
+
         static final NeedsLockRetryException
-                SINGLETON = new NeedsLockRetryException();
+                SINGLETON = TRACE ? null : new NeedsLockRetryException();
     } // NeedsLockRetryException
 }
