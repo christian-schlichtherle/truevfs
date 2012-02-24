@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.socket;
 
@@ -28,10 +24,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Decorates another input shop in order to disconnect any entry resources
  * when this input shop gets closed.
  *
- * @see     DisconnectingOutputShop
- * @param   <E> the type of the entries.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> the type of the entries.
+ * @see    DisconnectingOutputShop
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class DisconnectingInputShop<E extends Entry>
@@ -54,6 +49,10 @@ extends DecoratingInputShop<E, InputShop<E>> {
         super(input);
     }
 
+    /*public void disconnect() {
+        closed = true;
+    }*/
+
     /**
      * Closes this input shop.
      * Subsequent calls to this method will just forward the call to the
@@ -71,8 +70,12 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     void checkOpen() throws IOException {
-        if (closed)
-            throw new InputClosedException();
+        if (closed) {
+            final IOException ex = new InputClosedException();
+            /*Logger  .getLogger(DisconnectingInputShop.class.getName())
+                    .log(Level.FINE, ex.toString(), ex);*/
+            throw ex;
+        }
     }
 
     @Override
