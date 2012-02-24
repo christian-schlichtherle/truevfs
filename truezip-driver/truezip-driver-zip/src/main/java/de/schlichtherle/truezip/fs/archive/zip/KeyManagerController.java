@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
@@ -22,8 +18,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * This file system controller decorates another file system controller in
  * order to manage the keys required for accessing encrypted ZIP files.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <D> the type of the ZIP driver.
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class KeyManagerController<D extends ZipDriver>

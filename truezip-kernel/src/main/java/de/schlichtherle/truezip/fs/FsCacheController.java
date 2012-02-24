@@ -1,15 +1,10 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
@@ -37,7 +32,6 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.Icon;
 
 /**
  * A content caching file system controller implements a combined caching and
@@ -63,8 +57,7 @@ import javax.swing.Icon;
  *     entry data.
  * </ul>
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class FsCacheController
@@ -193,58 +186,6 @@ extends FsLockModelDecoratingController<
         }
     }
 
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return delegate.getClosedIcon();
-    }
-
-    @Override
-    public FsEntry getEntry(FsEntryName name) throws IOException {
-        return delegate.getEntry(name);
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return delegate.getOpenIcon();
-    }
-
-    @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
-        return delegate.isExecutable(name);
-    }
-
-    @Override
-    public boolean isReadOnly() throws IOException {
-        return delegate.isReadOnly();
-    }
-
-    @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
-        return delegate.isReadable(name);
-    }
-
-    @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
-        return delegate.isWritable(name);
-    }
-
-    @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
-        delegate.setReadOnly(name);
-    }
-
-    @Override
-    public boolean setTime(FsEntryName name, Map<Access, Long> times, BitField<FsOutputOption> options) throws IOException {
-        return delegate.setTime(name, times, options);
-    }
-
-    @Override
-    public boolean setTime(FsEntryName name, BitField<Access> types, long value, BitField<FsOutputOption> options) throws IOException {
-        return delegate.setTime(name, types, value, options);
-    }
-
     private final class Input
     extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
@@ -269,26 +210,6 @@ extends FsLockModelDecoratingController<
                 controller = new EntryController(name);
             }
             return controller.configure(options).getInputSocket().bind(this);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            return getBoundSocket().getLocalTarget();
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return getBoundSocket().newReadOnlyFile();
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            return getBoundSocket().newInputStream();
         }
     } // Input
 
@@ -318,21 +239,6 @@ extends FsLockModelDecoratingController<
                 controller = new EntryController(name);
             }
             return controller.configure(options, template).getOutputSocket().bind(this);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            return getBoundSocket().getLocalTarget();
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            return getBoundSocket().newOutputStream();
         }
     } // Output
 

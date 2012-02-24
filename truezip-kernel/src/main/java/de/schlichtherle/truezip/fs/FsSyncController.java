@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -12,20 +8,26 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
+import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.DecoratingInputSocket;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.Icon;
@@ -36,10 +38,10 @@ import javax.swing.Icon;
  * file system if and only if any decorated file system controller throws an
  * {@link FsNeedsSyncException}.
  * 
- * @see     FsNeedsSyncException
- * @since   TrueZIP 7.3
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <M> the type of the file system model.
+ * @see    FsNeedsSyncException
+ * @since  TrueZIP 7.3
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class FsSyncController<M extends FsModel>
@@ -234,13 +236,15 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     }
 
-    @Override
-    public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
-        // No sync for sync required.
-        delegate.sync(options, handler);
+    void close(final Closeable closeable) throws IOException {
+        while (true) {
+            try {
+                closeable.close();
+                return;
+            } catch (FsNeedsSyncException discard) {
+                sync();
+            }
+        }
     }
 
     @Immutable
@@ -248,15 +252,15 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    final FsSyncController<?> controller,
-                    final InputSocket<?> input) {
+                    FsSyncController<?> controller,
+                    InputSocket<?> input) {
                 return controller.new Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    final FsSyncController<?> controller,
-                    final OutputSocket<?> output) {
+                    FsSyncController<?> controller,
+                    OutputSocket<?> output) {
                 return controller.new Output(output);
             }
         },
@@ -264,26 +268,26 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    final FsSyncController<?> controller,
-                    final InputSocket<?> input) {
+                    FsSyncController<?> controller,
+                    InputSocket<?> input) {
                 return controller.new Nio2Input(input);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    final FsSyncController<?> controller,
-                    final OutputSocket<?> output) {
+                    FsSyncController<?> controller,
+                    OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
-                final FsSyncController<?> controller,
-                final InputSocket <?> input);
+                FsSyncController<?> controller,
+                InputSocket <?> input);
         
         abstract OutputSocket<?> newOutputSocket(
-                final FsSyncController<?> controller,
-                final OutputSocket <?> output);
+                FsSyncController<?> controller,
+                OutputSocket <?> output);
     } // SocketFactory
 
     private final class Nio2Input
@@ -296,7 +300,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             while (true) {
                 try {
-                    return getBoundSocket().newSeekableByteChannel();
+                    return new SyncSeekableByteChannel(
+                            getBoundSocket().newSeekableByteChannel());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -325,7 +330,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             while (true) {
                 try {
-                    return getBoundSocket().newReadOnlyFile();
+                    return new SyncReadOnlyFile(
+                            getBoundSocket().newReadOnlyFile());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -336,7 +342,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public InputStream newInputStream() throws IOException {
             while (true) {
                 try {
-                    return getBoundSocket().newInputStream();
+                    return new SyncInputStream(
+                            getBoundSocket().newInputStream());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -354,7 +361,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             while (true) {
                 try {
-                    return getBoundSocket().newSeekableByteChannel();
+                    return new SyncSeekableByteChannel(
+                            getBoundSocket().newSeekableByteChannel());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -383,11 +391,68 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public OutputStream newOutputStream() throws IOException {
             while (true) {
                 try {
-                    return getBoundSocket().newOutputStream();
+                    return new SyncOutputStream(
+                            getBoundSocket().newOutputStream());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
             }
         }
     } // Output
+
+    private final class SyncReadOnlyFile
+    extends DecoratingReadOnlyFile {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        SyncReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
+            super(rof);
+        }
+
+        @Override
+        public void close() throws IOException {
+            close(delegate);
+        }
+    } // SyncReadOnlyFile
+
+    private final class SyncSeekableByteChannel
+    extends DecoratingSeekableByteChannel {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        SyncSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public void close() throws IOException {
+            close(delegate);
+        }
+    } // SyncSeekableByteChannel
+
+    private final class SyncInputStream
+    extends DecoratingInputStream {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        SyncInputStream(@WillCloseWhenClosed InputStream in) {
+            super(in);
+        }
+
+        @Override
+        public void close() throws IOException {
+            close(delegate);
+        }
+    } // SyncInputStream
+
+    private final class SyncOutputStream
+    extends DecoratingOutputStream {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        SyncOutputStream(@WillCloseWhenClosed OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void close() throws IOException {
+            close(delegate);
+        }
+    } // SyncOutputStream
 }

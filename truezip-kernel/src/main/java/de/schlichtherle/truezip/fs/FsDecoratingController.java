@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -15,35 +11,17 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.Map;
-import javax.swing.Icon;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.swing.Icon;
 
 /**
  * An abstract decorator for a file system controller.
- * Note that any of the methods which are declared to throw an
- * {@link IOException} in the super-class are declared to also throw an
- * {@link FsControllerException} in this sub-class.
- * 
- * <h3>Stack Traces</h3>
- * <p>
- * Because I/O operations can fail anytime, it's expected that users will be
- * frequently facing stack traces which include stack frames of many file
- * system decorator classes.
- * Now because of their complex chaining, it is generally recommended that any
- * implementations go the extra boilerplate mile to make nice readable stack
- * traces, for example by avoiding to use anonymous inner classes, declaring
- * methods package private which are called from member classes and even
- * overriding unchanged methods with exactly the same code as their super class
- * wherever practical.
  *
- * @param   <M> The type of the file system model.
- * @param   <C> The type of the decorated file system controller.
- * @see     FsControllerException
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <M> the type of the file system model.
+ * @param  <C> the type of the decorated file system controller.
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class FsDecoratingController<
@@ -69,103 +47,49 @@ extends FsModelController<M> {
         return delegate.getParent();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     @Deprecated
     public Icon getOpenIcon() throws IOException {
         return delegate.getOpenIcon();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     @Deprecated
     public Icon getClosedIcon() throws IOException {
         return delegate.getClosedIcon();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public boolean isReadOnly() throws IOException {
         return delegate.isReadOnly();
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public FsEntry getEntry(FsEntryName name)
     throws IOException {
         return delegate.getEntry(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
         return delegate.isReadable(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
         return delegate.isWritable(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
         return delegate.isExecutable(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
         delegate.setReadOnly(name);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public boolean setTime(
             FsEntryName name,
@@ -175,12 +99,6 @@ extends FsModelController<M> {
         return delegate.setTime(name, times, options);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public boolean setTime(
             FsEntryName name,
@@ -191,16 +109,6 @@ extends FsModelController<M> {
         return delegate.setTime(name, types, value, options);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the returned input socket may throw
-     * {@link FsControllerException}s from any of its methods which are
-     * declared to throw an {@link IOException} for non-local flow control
-     * within a decorator chain, too.
-     * 
-     * @see <a href="#FsControllerException">File System Controller Exceptions</a>
-     */
     @Override
     public InputSocket<?>
     getInputSocket( FsEntryName name,
@@ -208,16 +116,6 @@ extends FsModelController<M> {
         return delegate.getInputSocket(name, options);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the returned output socket may throw
-     * {@link FsControllerException}s from any of its methods which are
-     * declared to throw an {@link IOException} for non-local flow control
-     * within a decorator chain, too.
-     * 
-     * @see <a href="#FsControllerException">File System Controller Exceptions</a>
-     */
     @Override
     public OutputSocket<?>
     getOutputSocket(    FsEntryName name,
@@ -226,12 +124,6 @@ extends FsModelController<M> {
         return delegate.getOutputSocket(name, options, template);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public void
     mknod(  FsEntryName name,
@@ -242,24 +134,12 @@ extends FsModelController<M> {
         delegate.mknod(name, type, options, template);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public void unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
         delegate.unlink(name, options);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @throws FsControllerException For non-local flow control within a
-     *         decorator chain.
-     */
     @Override
     public <X extends IOException> void
     sync(   BitField<FsSyncOption> options,
@@ -268,10 +148,6 @@ extends FsModelController<M> {
         delegate.sync(options, handler);
     }
 
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
     @Override
     public String toString() {
         return String.format("%s[delegate=%s]",
