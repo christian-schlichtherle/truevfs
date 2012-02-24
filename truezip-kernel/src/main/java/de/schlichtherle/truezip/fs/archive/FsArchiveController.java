@@ -18,14 +18,13 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.DelegatingInputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -182,7 +181,7 @@ extends FsLockModelController {
         return new Input(name);
     }
 
-    private final class Input extends InputSocket<FsArchiveEntry> {
+    private final class Input extends DelegatingInputSocket<FsArchiveEntry> {
         final FsEntryName name;
         boolean accessCleared;
 
@@ -208,28 +207,14 @@ extends FsLockModelController {
             return entry.getEntry();
         }
 
-        InputSocket<?> getBoundSocket() throws IOException {
+        protected InputSocket<? extends FsArchiveEntry> getDelegate()
+        throws IOException {
             accessCleared = false;
             final FsArchiveEntry entry = getLocalTarget();
             if (FILE != entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
                         name, "entry type is not a file");
             return getInputSocket(entry.getName()).bind(this);
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return getBoundSocket().newReadOnlyFile();
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            return getBoundSocket().newInputStream();
         }
     } // Input
 

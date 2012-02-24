@@ -363,22 +363,6 @@ extends FsLockModelDecoratingController<
             }
         } // EntryInput
 
-        /** An input stream proxy. */
-        final class EntryInputStream extends DecoratingInputStream {
-            @CreatesObligation
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            EntryInputStream(@WillCloseWhenClosed InputStream in) {
-                super(in);
-            }
-
-            @Override
-            public void close() throws IOException {
-                assert getModel().isWriteLockedByCurrentThread();
-                delegate.close();
-                controllers.put(name, EntryController.this);
-            }
-        } // EntryInputStream
-
         /** An output socket proxy which supports NIO.2. */
         final class Nio2EntryOutput extends EntryOutput {
             Nio2EntryOutput(OutputSocket <?> output) {
@@ -428,6 +412,22 @@ extends FsLockModelDecoratingController<
                 }
             }
         } // EntrySeekableByteChannel
+
+        /** An input stream proxy. */
+        final class EntryInputStream extends DecoratingInputStream {
+            @CreatesObligation
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            EntryInputStream(@WillCloseWhenClosed InputStream in) {
+                super(in);
+            }
+
+            @Override
+            public void close() throws IOException {
+                assert getModel().isWriteLockedByCurrentThread();
+                delegate.close();
+                controllers.put(name, EntryController.this);
+            }
+        } // EntryInputStream
 
         /** An output stream proxy. */
         final class EntryOutputStream extends DecoratingOutputStream {
