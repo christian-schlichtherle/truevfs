@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  - Copyright (C) 2004-2012 Schlichtherle IT Services
-  -
-  - All rights reserved. This program and the accompanying materials
-  - are made available under the terms of the Eclipse Public License v1.0
-  - which accompanies this distribution, and is available at
-  - http://www.eclipse.org/legal/epl-v10.html
+  - Copyright (C) 2004-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
   -->
 <project    xmlns="http://maven.apache.org/POM/4.0.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -259,6 +255,7 @@ system space.
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
+                            <de.schlichtherle.truezip.fs.FsControllerException.traceable>true</de.schlichtherle.truezip.fs.FsControllerException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
@@ -278,8 +275,9 @@ system space.
                                  it would also conceal any multithreading bugs
                                  in the classes under test, so it's generally
                                  discouraged. -->
-                            <de.schlichtherle.truezip.fs.FsManager.isolate>false</de.schlichtherle.truezip.fs.FsManager.isolate>
+                            <de.schlichtherle.truezip.file.ConfiguredClientTestBase.isolateFsManager>false</de.schlichtherle.truezip.file.ConfiguredClientTestBase.isolateFsManager>
                             <de.schlichtherle.truezip.zip.forceZip64Ext>false</de.schlichtherle.truezip.zip.forceZip64Ext>
+                            <de.schlichtherle.truezip.fs.FsControllerException.traceable>true</de.schlichtherle.truezip.fs.FsControllerException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
