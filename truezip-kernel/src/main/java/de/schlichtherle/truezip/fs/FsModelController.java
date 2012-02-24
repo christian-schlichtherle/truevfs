@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -15,9 +11,9 @@ import javax.annotation.concurrent.Immutable;
  * method so that it can forward calls to its additional protected methods to
  * this model for the convenience of sub-classes.
  *
- * @since   TrueZIP 7.2
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <M> the type of the file system model.
+ * @since  TrueZIP 7.2
+ * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class FsModelController<M extends FsModel>
