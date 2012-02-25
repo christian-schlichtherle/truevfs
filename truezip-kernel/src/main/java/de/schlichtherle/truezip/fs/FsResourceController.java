@@ -210,8 +210,7 @@ extends FsLockModelDecoratingController<
                 OutputSocket <?> output);
     } // SocketFactory
 
-    private final class Nio2Input
-    extends Input {
+    private final class Nio2Input extends Input {
         Nio2Input(InputSocket<?> input) {
             super(input);
         }
@@ -224,8 +223,7 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Input
 
-    private class Input
-    extends DecoratingInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         Input(InputSocket<?> input) {
             super(input);
         }
@@ -245,8 +243,7 @@ extends FsLockModelDecoratingController<
         }
     } // Input
 
-    private final class Nio2Output
-    extends Output {
+    private final class Nio2Output extends Output {
         Nio2Output(OutputSocket<?> output) {
             super(output);
         }
@@ -259,8 +256,7 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Output
 
-    private class Output
-    extends DecoratingOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         Output(OutputSocket<?> output) {
             super(output);
         }
