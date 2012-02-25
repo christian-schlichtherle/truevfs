@@ -186,8 +186,7 @@ extends FsLockModelDecoratingController<
         }
     }
 
-    private final class Input
-    extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
 
@@ -200,21 +199,20 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        protected InputSocket<?> getBoundSocket() throws IOException {
+        protected InputSocket<?> getDelegate() {
             assert getModel().isWriteLockedByCurrentThread();
             EntryController controller = controllers.get(name);
             if (null == controller) {
                 if (!options.get(FsInputOption.CACHE))
-                    return super.getBoundSocket(); // don't cache
+                    return delegate;
                 //checkWriteLockedByCurrentThread();
                 controller = new EntryController(name);
             }
-            return controller.configure(options).getInputSocket().bind(this);
+            return controller.configure(options).getInputSocket();
         }
     } // Input
 
-    private final class Output
-    extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
@@ -230,29 +228,20 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        protected OutputSocket<?> getBoundSocket() throws IOException {
+        protected OutputSocket<?> getDelegate() {
             assert getModel().isWriteLockedByCurrentThread();
             EntryController controller = controllers.get(name);
             if (null == controller) {
                 if (!options.get(FsOutputOption.CACHE))
-                    return super.getBoundSocket(); // don't cache
+                    return delegate;
                 controller = new EntryController(name);
             }
-            return controller.configure(options, template).getOutputSocket().bind(this);
+            return controller.configure(options, template).getOutputSocket();
         }
     } // Output
 
     @Immutable
     private enum SocketFactory {
-        OIO() {
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    EntryController controller,
-                    OutputSocket <?> output) {
-                return controller.new EntryOutput(output);
-            }
-        },
-
         NIO2() {
             @Override
             OutputSocket<?> newOutputSocket(
@@ -260,8 +249,17 @@ extends FsLockModelDecoratingController<
                     OutputSocket <?> output) {
                 return controller.new Nio2EntryOutput(output);
             }
-        };
+        },
         
+        OIO() {
+            @Override
+            OutputSocket<?> newOutputSocket(
+                    EntryController controller,
+                    OutputSocket <?> output) {
+                return controller.new EntryOutput(output);
+            }
+        };
+
         abstract OutputSocket<?> newOutputSocket(
                 EntryController controller,
                 OutputSocket <?> output);
