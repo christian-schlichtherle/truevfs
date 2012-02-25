@@ -17,7 +17,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * A lazy input socket provides proxy read only files and input streams which
  * acquire their underlying local target upon the first read access.
  *
- * @param  <E> The type of the {@link #getLocalTarget() local target}.
+ * @param  <E> the type of the {@link #getLocalTarget() local target}.
  * @see    LazyOutputSocket
  * @author Christian Schlichtherle
  */
