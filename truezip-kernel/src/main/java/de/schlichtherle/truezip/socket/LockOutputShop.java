@@ -87,7 +87,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     @Override
-    public final OutputSocket<? extends E> getOutputSocket(final E entry) {
+    public OutputSocket<? extends E> getOutputSocket(final E entry) {
         class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(LockOutputShop.super.getOutputSocket(entry));
