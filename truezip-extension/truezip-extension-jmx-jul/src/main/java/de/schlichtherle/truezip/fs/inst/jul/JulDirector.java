@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.inst.jul;
 
@@ -21,8 +17,7 @@ import de.schlichtherle.truezip.util.JSE7;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class JulDirector extends InstrumentingDirector<JulDirector> {
@@ -60,20 +55,6 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
     }
 
     private enum SocketFactory {
-        OIO() {
-            @Override
-            <E extends Entry> InputSocket<E> newInputSocket(
-                    InputSocket<E> input, JulDirector director) {
-                return new JulInputSocket<E>(input, director);
-            }
-
-            @Override
-            <E extends Entry> OutputSocket<E> newOutputSocket(
-                    OutputSocket<E> output, JulDirector director) {
-                return new JulOutputSocket<E>(output, director);
-            }
-        },
-        
         NIO() {
             @Override
             <E extends Entry> InputSocket<E> newInputSocket(
@@ -85,6 +66,20 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
             <E extends Entry> OutputSocket<E> newOutputSocket(
                     OutputSocket<E> output, JulDirector director) {
                 return new JulNio2OutputSocket<E>(output, director);
+            }
+        },
+        
+        OIO() {
+            @Override
+            <E extends Entry> InputSocket<E> newInputSocket(
+                    InputSocket<E> input, JulDirector director) {
+                return new JulInputSocket<E>(input, director);
+            }
+
+            @Override
+            <E extends Entry> OutputSocket<E> newOutputSocket(
+                    OutputSocket<E> output, JulDirector director) {
+                return new JulOutputSocket<E>(output, director);
             }
         };
         
