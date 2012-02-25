@@ -18,12 +18,11 @@ import javax.annotation.concurrent.NotThreadSafe;
 public abstract class DecoratingOutputSocket<E extends Entry>
 extends DelegatingOutputSocket<E> {
 
-    private final OutputSocket<? extends E> delegate;
+    protected final OutputSocket<? extends E> delegate;
 
     protected DecoratingOutputSocket(final OutputSocket<? extends E> delegate) {
-        if (null == delegate)
+        if (null == (this.delegate = delegate))
             throw new NullPointerException();
-        this.delegate = delegate;
     }
 
     @Override
