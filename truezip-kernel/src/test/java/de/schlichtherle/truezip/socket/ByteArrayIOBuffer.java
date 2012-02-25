@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.socket;
 
@@ -36,8 +32,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * {@link #ByteArrayIOBuffer(String, byte[])} or the method
  * {@link #setData(byte[])}.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
@@ -194,32 +189,39 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
 
     @Immutable
     private enum SocketFactory {
-        OIO() {
-            @Override
-            InputSocket<ByteArrayIOBuffer> newInputSocket(ByteArrayIOBuffer entry) {
-                return entry.new ByteArrayInputSocket();
-            }
-
-            @Override
-            OutputSocket<ByteArrayIOBuffer> newOutputSocket(ByteArrayIOBuffer entry) {
-                return entry.new ByteArrayOutputSocket();
-            }
-        },
-
         NIO2() {
             @Override
-            InputSocket<ByteArrayIOBuffer> newInputSocket(ByteArrayIOBuffer entry) {
+            InputSocket<ByteArrayIOBuffer> newInputSocket(
+                    ByteArrayIOBuffer entry) {
                 return entry.new Nio2ByteArrayInputSocket();
             }
 
             @Override
-            OutputSocket<ByteArrayIOBuffer> newOutputSocket(ByteArrayIOBuffer entry) {
+            OutputSocket<ByteArrayIOBuffer> newOutputSocket(
+                    ByteArrayIOBuffer entry) {
                 return entry.new Nio2ByteArrayOutputSocket();
             }
-        };
+        },
         
-        abstract InputSocket<ByteArrayIOBuffer> newInputSocket(ByteArrayIOBuffer entry);
-        abstract OutputSocket<ByteArrayIOBuffer> newOutputSocket(ByteArrayIOBuffer entry);
+        OIO() {
+            @Override
+            InputSocket<ByteArrayIOBuffer> newInputSocket(
+                    ByteArrayIOBuffer entry) {
+                return entry.new ByteArrayInputSocket();
+            }
+
+            @Override
+            OutputSocket<ByteArrayIOBuffer> newOutputSocket(
+                    ByteArrayIOBuffer entry) {
+                return entry.new ByteArrayOutputSocket();
+            }
+        };
+
+        abstract InputSocket<ByteArrayIOBuffer> newInputSocket(
+                ByteArrayIOBuffer entry);
+
+        abstract OutputSocket<ByteArrayIOBuffer> newOutputSocket(
+                ByteArrayIOBuffer entry);
     } // SocketFactory
 
     private final class Nio2ByteArrayInputSocket
