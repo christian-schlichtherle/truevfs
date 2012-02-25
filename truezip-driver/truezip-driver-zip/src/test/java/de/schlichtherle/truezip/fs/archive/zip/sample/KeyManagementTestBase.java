@@ -1,16 +1,14 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive.zip.sample;
 
+import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.file.TFileOutputStream;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
@@ -19,19 +17,19 @@ import java.util.logging.Logger;
 import org.junit.After;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
-public class KeyManagementTestBase {
+public abstract class KeyManagementTestBase {
 
     private static final Logger logger = Logger.getLogger(
             KeyManagementTestBase.class.getName());
 
     private static final String PREFIX = "tzp";
-    protected static final String SUFFIX = "eaff";
-    protected static final String PASSWORD = "secret";
+    private static final String SUFFIX = "eaff";
+    private static final String PASSWORD = "secret";
 
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
@@ -39,21 +37,23 @@ public class KeyManagementTestBase {
         new Random().nextBytes(DATA);
     }
 
-    protected File temp;
-    protected byte[] data;
+    private byte[] data;
+    private File temp;
+    private TFile archive;
+    
 
     @Before
     public void setUp() throws IOException {
+        data = DATA.clone();
         temp = createTempFile();
         assertTrue(temp.delete());
-        data = DATA.clone();
     }
 
     @After
     public void tearDown() throws IOException {
         try {
             try {
-                TFile.umount();
+                umount();
             } finally {
                 final File temp = this.temp;
                 this.temp = null;
@@ -74,8 +74,30 @@ public class KeyManagementTestBase {
         return File.createTempFile(PREFIX, "." + SUFFIX).getCanonicalFile();
     }
 
-    protected static void roundTripTest(final TFile archive, final byte[] data)
-    throws IOException {
+    private void umount() throws FsSyncException {
+        if (null != archive)
+            TFile.umount(archive);
+    }
+
+    @Test
+    public void testSetPasswords1() throws IOException {
+        archive = new TFile(temp, newArchiveDetector1(SUFFIX, PASSWORD));
+        roundTrip();
+    }
+
+    protected abstract TArchiveDetector newArchiveDetector1(
+            String suffix, String password);
+
+    @Test
+    public void testSetPasswords2() throws IOException {
+        archive = new TFile(temp, newArchiveDetector2(SUFFIX, PASSWORD));
+        roundTrip();
+    }
+
+    protected abstract TArchiveDetector newArchiveDetector2(
+            String suffix, String password);
+
+    private void roundTrip() throws IOException {
         final TFile file = new TFile(archive, "entry");
         final OutputStream os = new TFileOutputStream(file);
         try {
