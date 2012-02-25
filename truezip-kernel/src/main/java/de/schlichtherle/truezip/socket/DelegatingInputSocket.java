@@ -38,7 +38,7 @@ extends InputSocket<E> {
      * @return The bound delegate socket.
      * @throws IOException On any I/O failure. 
      */
-    // TODO: Rename this to getBoundDelegate()
+    // TODO: Rename this to getBoundDelegate() and declare it final!
     protected InputSocket<? extends E> getBoundSocket() throws IOException {
         return getDelegate().bind(this);
     }
