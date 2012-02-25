@@ -37,6 +37,7 @@ extends OutputSocket<E> {
      * @return The bound delegate socket.
      * @throws IOException On any I/O failure. 
      */
+    // TODO: Rename this to getBoundDelegate()
     protected OutputSocket<? extends E> getBoundSocket() throws IOException {
         return getDelegate().bind(this);
     }
