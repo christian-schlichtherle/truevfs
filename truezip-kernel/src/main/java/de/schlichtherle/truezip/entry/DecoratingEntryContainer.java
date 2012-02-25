@@ -28,9 +28,8 @@ implements EntryContainer<E> {
      * @param  delegate the entry container to decorate.
      */
     protected DecoratingEntryContainer(final C delegate) {
-        if (null == delegate)
+        if (null == (this.delegate = delegate))
             throw new NullPointerException();
-        this.delegate = delegate;
     }
 
     @Override
