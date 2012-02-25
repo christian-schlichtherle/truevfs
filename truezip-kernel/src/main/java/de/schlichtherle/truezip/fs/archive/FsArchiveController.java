@@ -207,6 +207,7 @@ extends FsLockModelController {
             return entry.getEntry();
         }
 
+        @Override
         protected InputSocket<? extends FsArchiveEntry> getDelegate()
         throws IOException {
             accessCleared = false;
