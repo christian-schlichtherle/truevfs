@@ -17,6 +17,7 @@ import java.io.IOException;
  * @see    OutputShop
  * @author Christian Schlichtherle
  */
+//TODO: Consider renaming to InputArchive
 @CleanupObligation
 public interface InputShop<E extends Entry> extends Closeable, InputService<E> {
 
