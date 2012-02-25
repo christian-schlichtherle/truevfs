@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file;
 
@@ -42,9 +38,8 @@ import org.junit.Test;
  * Performs integration testing of a particular {@link FsArchiveDriver}
  * by using the API of the TrueZIP File* module.
  *
- * @param   <D> The type of the archive driver.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <D> the type of the archive driver.
+ * @author Christian Schlichtherle
  */
 public abstract class TFileTestSuite<D extends FsArchiveDriver<?>>
 extends ConfiguredClientTestBase<D> {
