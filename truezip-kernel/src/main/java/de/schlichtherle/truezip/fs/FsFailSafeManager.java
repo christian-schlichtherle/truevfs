@@ -98,7 +98,7 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
     /** A shutdown hook thread. */
     private static class Shutdown extends Thread {
         Shutdown(final FsManager manager) {
-            super(new Sync(manager), Sync.class.getName());
+            super(new Sync(manager), Shutdown.class.getName());
             super.setPriority(Thread.MAX_PRIORITY);
         }
     } // Shutdown
