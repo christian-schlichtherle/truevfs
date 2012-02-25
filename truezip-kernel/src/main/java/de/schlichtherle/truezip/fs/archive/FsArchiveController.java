@@ -215,7 +215,7 @@ extends FsLockModelController {
             if (FILE != entry.getType())
                 throw new FsEntryNotFoundException(getModel(),
                         name, "entry type is not a file");
-            return getInputSocket(entry.getName()).bind(this);
+            return getInputSocket(entry.getName());
         }
     } // Input
 
