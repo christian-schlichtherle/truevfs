@@ -11,7 +11,7 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Indicates that the file system needs to get
  * {@linkplain FsController#sync(BitField) synced} before the operation can
- * proceed.
+ * get retried.
  *
  * @since  TrueZIP 7.3
  * @see    FsSyncController
