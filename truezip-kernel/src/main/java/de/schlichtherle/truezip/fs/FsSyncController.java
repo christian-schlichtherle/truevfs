@@ -249,22 +249,6 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Immutable
     private enum SocketFactory {
-        OIO() {
-            @Override
-            InputSocket<?> newInputSocket(
-                    FsSyncController<?> controller,
-                    InputSocket<?> input) {
-                return controller.new Input(input);
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    FsSyncController<?> controller,
-                    OutputSocket<?> output) {
-                return controller.new Output(output);
-            }
-        },
-
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
@@ -279,6 +263,22 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                     OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
             }
+        },
+
+        OIO() {
+            @Override
+            InputSocket<?> newInputSocket(
+                    FsSyncController<?> controller,
+                    InputSocket<?> input) {
+                return controller.new Input(input);
+            }
+
+            @Override
+            OutputSocket<?> newOutputSocket(
+                    FsSyncController<?> controller,
+                    OutputSocket<?> output) {
+                return controller.new Output(output);
+            }
         };
 
         abstract InputSocket<?> newInputSocket(
@@ -290,8 +290,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 OutputSocket <?> output);
     } // SocketFactory
 
-    private final class Nio2Input
-    extends Input {
+    private final class Nio2Input extends Input {
         Nio2Input(final InputSocket<?> input) {
             super(input);
         }
@@ -309,8 +308,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Input
 
-    private class Input
-    extends DecoratingInputSocket<Entry> {
+    private class Input extends DecoratingInputSocket<Entry> {
         Input(final InputSocket<?> input) {
             super(input);
         }
@@ -351,8 +349,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Input
 
-    private final class Nio2Output
-    extends Output {
+    private final class Nio2Output extends Output {
         Nio2Output(final OutputSocket<?> output) {
             super(output);
         }
@@ -370,8 +367,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Output
 
-    private class Output
-    extends DecoratingOutputSocket<Entry> {
+    private class Output extends DecoratingOutputSocket<Entry> {
         Output(final OutputSocket<?> output) {
             super(output);
         }
