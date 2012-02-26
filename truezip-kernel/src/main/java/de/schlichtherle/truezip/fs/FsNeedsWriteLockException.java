@@ -9,14 +9,14 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates that the file system needs to get write locked before the
- * operation can proceed.
+ * operation can get retried.
  *
  * @see    FsLockController
  * @author Christian Schlichtherle
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class FsNeedsWriteLockException extends FsControllerException {
+final class FsNeedsWriteLockException extends FsControllerException {
     static FsNeedsWriteLockException get() {
         return TRACEABLE ? new FsNeedsWriteLockException() : SINGLETON;
     }
