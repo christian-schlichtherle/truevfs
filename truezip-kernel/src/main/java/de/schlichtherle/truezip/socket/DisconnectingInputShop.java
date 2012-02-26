@@ -21,15 +21,18 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Decorates another input shop in order to disconnect any entry resources
- * when this input shop gets closed.
+ * Decorates another input shop in order to disconnect any resources when this
+ * input shop gets closed.
+ * Once {@linkplain #close() closed}, all methods of all products of this shop,
+ * including all sockets, streams etc. but excluding all {@link #close()}
+ * methods, throw an {@link InputClosedException} when called.
  *
  * @param  <E> the type of the entries.
  * @see    DisconnectingOutputShop
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class DisconnectingInputShop<E extends Entry>
+public class DisconnectingInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -49,10 +52,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
         super(input);
     }
 
-    /*public void disconnect() {
-        closed = true;
-    }*/
-
     /**
      * Closes this input shop.
      * Subsequent calls to this method will just forward the call to the
@@ -69,13 +68,9 @@ extends DecoratingInputShop<E, InputShop<E>> {
         delegate.close();
     }
 
-    void checkOpen() throws IOException {
-        if (closed) {
-            final IOException ex = new InputClosedException();
-            /*Logger  .getLogger(DisconnectingInputShop.class.getName())
-                    .log(Level.FINE, ex.toString(), ex);*/
-            throw ex;
-        }
+    final void checkOpen() throws IOException {
+        if (closed)
+            throw new InputClosedException();
     }
 
     @Override
@@ -86,27 +81,27 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
     @Immutable
     private enum SocketFactory {
-        OIO() {
-            @Override
-            <E extends Entry> InputSocket<? extends E> newInputSocket(
-                    final DisconnectingInputShop<E> shop,
-                    final InputSocket<? extends E> input) {
-                return shop.new Input(input);
-            }
-        },
-
         NIO2() {
             @Override
             <E extends Entry> InputSocket<? extends E> newInputSocket(
-                    final DisconnectingInputShop<E> shop,
-                    final InputSocket<? extends E> input) {
+                    DisconnectingInputShop<E> shop,
+                    InputSocket<? extends E> input) {
                 return shop.new Nio2Input(input);
+            }
+        },
+
+        OIO() {
+            @Override
+            <E extends Entry> InputSocket<? extends E> newInputSocket(
+                    DisconnectingInputShop<E> shop,
+                    InputSocket<? extends E> input) {
+                return shop.new Input(input);
             }
         };
 
         abstract <E extends Entry> InputSocket<? extends E> newInputSocket(
-                final DisconnectingInputShop<E> shop,
-                final InputSocket <? extends E> input);
+                DisconnectingInputShop<E> shop,
+                InputSocket <? extends E> input);
     } // SocketFactory
 
     private class Nio2Input extends Input {
