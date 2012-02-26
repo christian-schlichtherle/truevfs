@@ -186,7 +186,8 @@ extends FsLockModelController {
         boolean accessCleared;
 
         Input(final FsEntryName name) {
-            this.name = name;
+            if (null == (this.name = name))
+                throw new NullPointerException();
         }
 
         void checkAccess() throws IOException {
@@ -238,8 +239,10 @@ extends FsLockModelController {
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
-            this.name = name;
-            this.options = options;
+            if (null == (this.name = name))
+                throw new NullPointerException();
+            if (null == (this.options = options))
+                throw new NullPointerException();
             this.template = template;
         }
 
