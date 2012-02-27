@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.crypto.raes;
 
@@ -23,9 +19,8 @@ import org.bouncycastle.crypto.Mac;
  * An {@link OutputStream} to produce a file with data ecnrypted according
  * to the Random Access Encryption Specification (RAES).
  *
- * @see     RaesReadOnlyFile
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    RaesReadOnlyFile
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class RaesOutputStream extends CipherOutputStream {
@@ -70,7 +65,7 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      */
     @CreatesObligation
     public static RaesOutputStream getInstance(
-            final @WillCloseWhenClosed OutputStream out,
+            final @WillCloseWhenClosed OutputStream out, // TODO: Use a source instead!
             @CheckForNull RaesParameters param)
     throws IOException {
         if (null == out)
