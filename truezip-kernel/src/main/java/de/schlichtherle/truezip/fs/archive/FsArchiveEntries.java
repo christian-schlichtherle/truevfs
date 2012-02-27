@@ -1,25 +1,18 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import static de.schlichtherle.truezip.entry.Entry.ALL_ACCESS_SET;
-import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Size;
+import static de.schlichtherle.truezip.entry.Entry.*;
 import java.util.Formatter;
 
 /**
  * Provides static utility methods for {@link FsArchiveEntry} objects.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public final class FsArchiveEntries {
 
