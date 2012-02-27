@@ -109,7 +109,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            checkOpen();
             return new DisconnectingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -121,14 +120,13 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         }
 
         @Override
-        public E getLocalTarget() throws IOException {
+        protected OutputSocket<? extends E> getBoundSocket() throws IOException {
             checkOpen();
-            return getBoundSocket().getLocalTarget();
+            return getDelegate().bind(this);
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            checkOpen();
             return new DisconnectingOutputStream(
                     getBoundSocket().newOutputStream());
         }

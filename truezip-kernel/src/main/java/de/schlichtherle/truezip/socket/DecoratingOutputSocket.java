@@ -25,6 +25,7 @@ extends DelegatingOutputSocket<E> {
             throw new NullPointerException();
     }
 
+    // TODO: Declare throws IOException
     @Override
     protected OutputSocket<? extends E> getDelegate() {
         return delegate;
