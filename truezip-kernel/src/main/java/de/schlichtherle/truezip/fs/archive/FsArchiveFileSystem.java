@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive;
 
@@ -28,11 +24,11 @@ import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -40,10 +36,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Have a look at the online <a href="http://truezip.java.net/faq.html">FAQ</a>
  * to get the concept of how this works.
  * 
- * @param   <E> The type of the archive entries.
- * @see     <a href="http://truezip.java.net/faq.html">Frequently Asked Questions</a>
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> the type of the archive entries.
+ * @see    <a href="http://truezip.java.net/faq.html">Frequently Asked Questions</a>
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class FsArchiveFileSystem<E extends FsArchiveEntry>
