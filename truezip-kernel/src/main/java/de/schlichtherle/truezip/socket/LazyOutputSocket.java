@@ -47,24 +47,26 @@ extends DecoratingOutputSocket<E> {
             super(null);
         }
 
-        OutputStream getOutputStream() throws IOException {
-            final OutputStream out = delegate;
-            return null != out ? out : (delegate = getBoundSocket().newOutputStream());
+        OutputStream getDelegate() throws IOException {
+            final OutputStream delegate = this.delegate;
+            return null != delegate
+                    ? delegate
+                    : (this.delegate = getBoundSocket().newOutputStream());
         }
 
         @Override
         public void write(int b) throws IOException {
-            getOutputStream().write(b);
+            getDelegate().write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            getOutputStream().write(b, off, len);
+            getDelegate().write(b, off, len);
         }
 
         @Override
         public void flush() throws IOException {
-            getOutputStream().flush();
+            getDelegate().flush();
         }
 
         @Override
