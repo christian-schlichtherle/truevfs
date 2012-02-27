@@ -18,14 +18,16 @@ import javax.annotation.concurrent.NotThreadSafe;
 public abstract class DecoratingOutputSocket<E extends Entry>
 extends DelegatingOutputSocket<E> {
 
-    protected final OutputSocket<? extends E> delegate;
+    private final OutputSocket<? extends E> delegate;
 
     protected DecoratingOutputSocket(final OutputSocket<? extends E> delegate) {
         if (null == (this.delegate = delegate))
             throw new NullPointerException();
     }
 
-    // TODO: Declare throws IOException
+    // TODO: Either declare throws IOException or declare final and declare the
+    // delegate field protected final for symmetry with other Decorating*
+    // classes.
     @Override
     protected OutputSocket<? extends E> getDelegate() {
         return delegate;
