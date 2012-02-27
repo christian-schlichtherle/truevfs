@@ -50,10 +50,10 @@ extends DecoratingOutputSocket<E> {
         }
 
         OutputStream getDelegate() throws IOException {
-            final OutputStream delegate = this.delegate;
-            return null != delegate
-                    ? delegate
-                    : (this.delegate = getBoundSocket().newOutputStream());
+            final OutputStream out = delegate;
+            return null != out
+                    ? out
+                    : (delegate = getBoundSocket().newOutputStream());
         }
 
         @Override
