@@ -64,10 +64,10 @@ extends DecoratingInputSocket<E> {
         }
 
         ReadOnlyFile getDelegate() throws IOException {
-            final ReadOnlyFile delegate = this.delegate;
-            return null != delegate
-                    ? delegate
-                    : (this.delegate = getBoundSocket().newReadOnlyFile());
+            final ReadOnlyFile rof = delegate;
+            return null != rof
+                    ? rof
+                    : (delegate = getBoundSocket().newReadOnlyFile());
         }
 
         @Override
@@ -112,10 +112,10 @@ extends DecoratingInputSocket<E> {
         }
 
         InputStream getDelegate() throws IOException {
-            final InputStream delegate = this.delegate;
-            return null != delegate
-                    ? delegate
-                    : (this.delegate = getBoundSocket().newInputStream());
+            final InputStream in = delegate;
+            return null != in
+                    ? in
+                    : (delegate = getBoundSocket().newInputStream());
         }
 
         @Override
