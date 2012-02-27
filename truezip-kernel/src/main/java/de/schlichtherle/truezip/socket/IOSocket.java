@@ -123,19 +123,20 @@ public abstract class IOSocket<LT, PT> {
      */
     @Override
     public String toString() {
-        LT lt;
+        String lt;
         try {
-            lt = getLocalTarget();
-        } catch (IOException ex) {
-            lt = null;
+            lt = getLocalTarget().toString();
+        } catch (final IOException ex) {
+            lt = ex.toString();
         }
-        PT pt;
+        String pt;
         try {
-            pt = getPeerTarget();
-        } catch (IOException ex) {
-            pt = null;
+            pt = getPeerTarget().toString();
+        } catch (final IOException ex) {
+            pt = ex.toString();
         }
-        return String.format("%s <-> %s", lt, pt);
+        return String.format("%s[localTarget=%s, peerTarget=%s]",
+                getClass().getName(), lt, pt);
     }
 
     /**
