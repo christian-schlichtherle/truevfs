@@ -15,10 +15,12 @@ import javax.annotation.concurrent.NotThreadSafe;
  * A lazy output socket provides proxy output streams which acquire their
  * underlying local target upon the first read access.
  *
+ * @deprecated This class will vanish in TrueZIP 8!
  * @param  <E> the type of the {@link #getLocalTarget() local target}.
  * @see    LazyInputSocket
  * @author Christian Schlichtherle
  */
+@Deprecated
 @NotThreadSafe
 public final class LazyOutputSocket<E extends Entry>
 extends DecoratingOutputSocket<E> {
