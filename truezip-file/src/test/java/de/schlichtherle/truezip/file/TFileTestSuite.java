@@ -79,7 +79,7 @@ extends ConfiguredClientTestBase<D> {
                     throw new IOException(temp + " (could not delete)");
             }
         } catch (final IOException ex) {
-            logger.log(Level.INFO,
+            logger.log(Level.FINEST,
                     "Failed to clean up temporary archive file (this error may be just implied)!",
                     ex);
         } finally {
