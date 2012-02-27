@@ -111,7 +111,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            checkOpen();
             return new DisconnectingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -123,21 +122,19 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
 
         @Override
-        public E getLocalTarget() throws IOException {
+        protected InputSocket<? extends E> getBoundSocket() throws IOException {
             checkOpen();
-            return getBoundSocket().getLocalTarget();
+            return getDelegate().bind(this);
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            checkOpen();
             return new DisconnectingReadOnlyFile(
                     getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            checkOpen();
             return new DisconnectingInputStream(
                     getBoundSocket().newInputStream());
         }
