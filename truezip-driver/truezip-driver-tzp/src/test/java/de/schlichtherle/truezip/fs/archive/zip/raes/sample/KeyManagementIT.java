@@ -6,12 +6,12 @@ package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTestBase;
+import de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTestSuite;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class KeyManagementIT extends KeyManagementTestBase {
+public final class KeyManagementIT extends KeyManagementTestSuite {
 
     @Override
     protected TArchiveDetector newArchiveDetector1(String suffix, String password) {

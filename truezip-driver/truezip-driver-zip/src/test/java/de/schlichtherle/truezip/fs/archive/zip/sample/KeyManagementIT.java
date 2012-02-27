@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 /**
  * @author Christian Schlichtherle
  */
-public final class KeyManagementIT extends KeyManagementTestBase {
+public final class KeyManagementIT extends KeyManagementTestSuite {
 
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
