@@ -54,41 +54,43 @@ extends DecoratingInputSocket<E> {
     }
 
     @NotThreadSafe
-    private class ProxyReadOnlyFile extends DecoratingReadOnlyFile {
+    private final class ProxyReadOnlyFile extends DecoratingReadOnlyFile {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         ProxyReadOnlyFile() {
             super(null);
         }
 
-        ReadOnlyFile getReadOnlyFile() throws IOException {
-            final ReadOnlyFile rof = delegate;
-            return null != rof ? rof : (delegate = getBoundSocket().newReadOnlyFile());
+        ReadOnlyFile getDelegate() throws IOException {
+            final ReadOnlyFile delegate = this.delegate;
+            return null != delegate
+                    ? delegate
+                    : (this.delegate = getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public long length() throws IOException {
-            return getReadOnlyFile().length();
+            return getDelegate().length();
         }
 
         @Override
         public long getFilePointer() throws IOException {
-            return getReadOnlyFile().getFilePointer();
+            return getDelegate().getFilePointer();
         }
 
         @Override
         public void seek(long pos) throws IOException {
-            getReadOnlyFile().seek(pos);
+            getDelegate().seek(pos);
         }
 
         @Override
         public int read() throws IOException {
-            return getReadOnlyFile().read();
+            return getDelegate().read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            return getReadOnlyFile().read(b, off, len);
+            return getDelegate().read(b, off, len);
         }
 
         @Override
@@ -100,36 +102,38 @@ extends DecoratingInputSocket<E> {
     } // ProxyReadOnlyFile
 
     @NotThreadSafe
-    private class ProxyInputStream extends DecoratingInputStream {
+    private final class ProxyInputStream extends DecoratingInputStream {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         ProxyInputStream() {
             super(null);
         }
 
-        InputStream getInputStream() throws IOException {
-            final InputStream in = delegate;
-            return null != in ? in : (delegate = getBoundSocket().newInputStream());
+        InputStream getDelegate() throws IOException {
+            final InputStream delegate = this.delegate;
+            return null != delegate
+                    ? delegate
+                    : (this.delegate = getBoundSocket().newInputStream());
         }
 
         @Override
         public int read() throws IOException {
-            return getInputStream().read();
+            return getDelegate().read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            return getInputStream().read(b, off, len);
+            return getDelegate().read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
-            return getInputStream().skip(n);
+            return getDelegate().skip(n);
         }
 
         @Override
         public int available() throws IOException {
-            return getInputStream().available();
+            return getDelegate().available();
         }
 
         @Override
@@ -142,26 +146,21 @@ extends DecoratingInputSocket<E> {
         @Override
         public void mark(int readlimit) {
             try {
-                getInputStream().mark(readlimit);
+                getDelegate().mark(readlimit);
             } catch (IOException ex) {
-                // The caller should have called markSupported() before
-                // this method. If the underlying input stream isn't
-                // available, an IOException should have been thrown there.
-                // So most likely the caller did not call markSupported()
-                // before, which is a violation of the interface contract.
-                throw new AssertionError(ex);
+                throw new IllegalStateException("Could not resolve delegate!", ex);
             }
         }
 
         @Override
         public void reset() throws IOException {
-            getInputStream().reset();
+            getDelegate().reset();
         }
 
         @Override
         public boolean markSupported() {
             try {
-                return getInputStream().markSupported();
+                return getDelegate().markSupported();
             } catch (IOException ignored) {
                 return false;
             }
