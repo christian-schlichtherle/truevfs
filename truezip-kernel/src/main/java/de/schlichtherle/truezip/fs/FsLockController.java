@@ -45,6 +45,7 @@ import javax.swing.Icon;
  * 
  * @see    FsLockModel
  * @see    FsNeedsWriteLockException
+ * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @ThreadSafe
