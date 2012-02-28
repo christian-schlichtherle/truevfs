@@ -338,10 +338,10 @@ extends FsLockModelController {
             final Entry template)
     throws IOException {
         checkAccess(name, null);
-        if (name.isRoot()) {
+        if (name.isRoot()) { // TODO: Is this case differentiation required?
             try {
                 autoMount(); // detect false positives!
-            } catch (FsFalsePositiveException ex) {
+            } catch (final FsFalsePositiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
                 autoMount(true);
