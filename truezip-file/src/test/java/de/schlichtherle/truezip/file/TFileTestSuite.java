@@ -176,11 +176,11 @@ extends ConfiguredClientTestBase<D> {
         // Dito for entry.
         final TFile entry = new TFile(archive, "entry" + getSuffix());
 
-        assertTrue(archive.mkdir());
+        assertTrue(archive.toNonArchiveFile().mkdir());
         assertFalsePositive(entry);
         archive.rm();
 
-        assertTrue(archive.toNonArchiveFile().mkdir());
+        assertTrue(archive.mkdir());
         assertFalsePositive(entry);
         archive.rm();
     }
