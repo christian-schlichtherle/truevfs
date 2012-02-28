@@ -464,7 +464,7 @@ extends ConfiguredClientTestBase<D> {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
-        // Test open output streams.
+        // Test FsController.mknod().
         createFile(file1); // uses FsOutputOption.CACHE!
         umount(); // ensure file1 is really present in the archive file
         createFile(file2); // uses FsOutputOption.CACHE!
