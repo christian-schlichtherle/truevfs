@@ -36,7 +36,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        assert getModel().isWriteLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
 
         if (name.isRoot()) {
             try {
