@@ -120,11 +120,11 @@ extends ConfiguredClientTestBase<D> {
         // Dito for entry.
         final TPath entry = archive.resolve("entry" + getSuffix());
 
-        createDirectory(archive);
+        createDirectory(archive.toNonArchivePath());
         assertFalsePositive(entry);
         delete(archive);
 
-        createDirectory(archive.toNonArchivePath());
+        createDirectory(archive);
         assertFalsePositive(entry);
         delete(archive);
     }
