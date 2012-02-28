@@ -242,6 +242,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 closeable.close();
                 return;
             } catch (FsNeedsSyncException discard) {
+                assert false : discard; // unexpected in TrueZIP 7.5
                 sync();
             }
         }
