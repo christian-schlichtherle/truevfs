@@ -1,22 +1,18 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.test;
 
+import static de.schlichtherle.truezip.util.Throwables.wrap;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * @since   TrueZIP 7.5
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @since  TrueZIP 7.5
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 @CleanupObligation
@@ -80,26 +76,5 @@ public final class ThrowControl {
         final Class<?> sc = thiz.getSuperclass();
         if (null != sc)
             check(sc, throwz);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <X extends Throwable> X wrap(final X x) {
-        try {
-            return (X) x.getClass()
-                        .getConstructor(String.class)
-                        .newInstance(x.toString())
-                        .initCause(x);
-        } catch (final Exception ex) {
-            ex.initCause(x);
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
-    public static boolean contains(Throwable thiz, final Throwable that) {
-        do {
-            if (thiz == that)
-                return true;
-        } while (null != (thiz = thiz.getCause()));
-        return false;
     }
 }
