@@ -280,31 +280,11 @@ public final class IOCache implements Flushable, Closeable {
         }
 
         @Override
-        protected InputSocket<? extends Entry> getBoundSocket() throws IOException {
-            return getDelegate().bind(this);
-        }
-
-        @Override
         public Entry getLocalTarget() throws IOException {
             final Buffer buffer = this.buffer;
             return null != buffer
                     ? buffer.data
                     : new ProxyEntry(input/*.bind(this)*/.getLocalTarget()); // do NOT bind!
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return getBoundSocket().newReadOnlyFile();
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            return getBoundSocket().newInputStream();
         }
     } // Input
 
@@ -317,26 +297,11 @@ public final class IOCache implements Flushable, Closeable {
         }
 
         @Override
-        protected OutputSocket<? extends Entry> getBoundSocket() throws IOException {
-            return getDelegate().bind(this);
-        }
-
-        @Override
         public Entry getLocalTarget() throws IOException {
             final Buffer buffer = this.buffer;
             return null != buffer
                     ? buffer.data
                     : new ProxyEntry(output/*.bind(this)*/.getLocalTarget()); // do NOT bind!
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return getBoundSocket().newSeekableByteChannel();
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            return getBoundSocket().newOutputStream();
         }
     } // Output
 
@@ -560,25 +525,6 @@ public final class IOCache implements Flushable, Closeable {
             }
         } // BufferInputChannel
 
-        final class BufferInputStream extends DecoratingInputStream {
-            boolean closed;
-
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            @CreatesObligation
-            BufferInputStream(@WillCloseWhenClosed InputStream in) {
-                super(in);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                delegate.close();
-                getInputBufferPool().release(Buffer.this);
-                closed = true;
-            }
-        } // BufferInputStream
-
         final class BufferOutputChannel extends DecoratingSeekableByteChannel {
             boolean closed;
 
@@ -597,6 +543,25 @@ public final class IOCache implements Flushable, Closeable {
                 closed = true;
             }
         } // BufferOutputChannel
+
+        final class BufferInputStream extends DecoratingInputStream {
+            boolean closed;
+
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+            @CreatesObligation
+            BufferInputStream(@WillCloseWhenClosed InputStream in) {
+                super(in);
+            }
+
+            @Override
+            public void close() throws IOException {
+                if (closed)
+                    return;
+                delegate.close();
+                getInputBufferPool().release(Buffer.this);
+                closed = true;
+            }
+        } // BufferInputStream
 
         final class BufferOutputStream extends DecoratingOutputStream {
             boolean closed;
