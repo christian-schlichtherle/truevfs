@@ -1,14 +1,11 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.util.ThreadGroups;
+import static de.schlichtherle.truezip.util.Throwables.wrap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,8 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * Provides static copy methods for {@link InputStream}s and
  * {@link OutputStream}s.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class Streams {
@@ -139,8 +135,8 @@ public final class Streams {
             /** The number of buffers filled with data to be written. */
             int size;
 
-            /** The IOException that happened in this task, if any. */
-            volatile InputException exception;
+            /** The Throwable that happened in this task, if any. */
+            volatile Throwable exception;
 
             @Override
             public void run() {
@@ -180,7 +176,7 @@ public final class Streams {
                         final byte[] buf = buffer.buf;
                         read = _in.read(buf, 0, buf.length);
                     } catch (final Throwable ex) {
-                        exception = new InputException(ex);
+                        exception = ex;
                         read = -1;
                     }
                     buffer.read = read;
@@ -257,9 +253,14 @@ public final class Streams {
             }
             out.flush();
 
-            final InputException ex = reader.exception;
-            if (null != ex)
-                throw ex;
+            final Throwable ex = reader.exception;
+            if (null != ex) {
+                if (ex instanceof RuntimeException)
+                    throw wrap((RuntimeException) ex);
+                else if (ex instanceof Error)
+                    throw wrap((Error) ex);
+                throw new InputException(ex);
+            }
         } finally {
             if (interrupted)
                 Thread.currentThread().interrupt();
