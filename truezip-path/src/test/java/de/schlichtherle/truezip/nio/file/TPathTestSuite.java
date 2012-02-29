@@ -464,8 +464,7 @@ extends ConfiguredClientTestBase<D> {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
-        // Test FsController.mknod().
-        createFile(file1); // uses FsOutputOption.CACHE!
+        createFile(file1);
         umount(); // ensure file1 is really present in the archive file
         createFile(file2); // uses FsOutputOption.CACHE!
         final InputStream in1 = newInputStream(file1);
@@ -478,7 +477,9 @@ extends ConfiguredClientTestBase<D> {
                     // the garbage collector did its job.
                     copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
                     break;
-                } catch (FsSyncException ex) {
+                } catch (final FsSyncException ex) {
+                    if (!(ex.getCause() instanceof FileBusyException))
+                        throw ex;
                     // The garbage collector hasn't been collecting the open
                     // stream. Let's try to trigger it.
                     System.gc();
