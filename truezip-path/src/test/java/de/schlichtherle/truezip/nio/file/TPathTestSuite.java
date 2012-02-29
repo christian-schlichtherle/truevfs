@@ -14,6 +14,7 @@ import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.ArrayHelper;
@@ -489,16 +490,16 @@ extends ConfiguredClientTestBase<D> {
             // in1 is still open!
             try {
                 umount(); // forces closing of in1
-                fail("Expected warning exception when synchronizing a busy archive file!");
-            } catch (FsSyncWarningException ex) {
+                fail();
+            } catch (final FsSyncWarningException ex) {
                 if (!(ex.getCause() instanceof FileBusyException))
                     throw ex;
             }
             assertTrue(isRegularFile(file2));
             try {
                 copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
-                fail("Expected exception when reading from entry input stream of an unmounted archive file!");
-            } catch (IOException expected) {
+                fail();
+            } catch (InputClosedException ex) {
             }
 
             // Open file1 as stream and let the garbage collection join the stream automatically.
@@ -508,7 +509,7 @@ extends ConfiguredClientTestBase<D> {
                 // This operation may succeed without any exception if
                 // the garbage collector did its job.
                 umount(); // allow external modifications!
-            } catch (FsSyncWarningException ex) {
+            } catch (final FsSyncWarningException ex) {
                 // It may fail once if a stream was busy!
                 if (!(ex.getCause() instanceof FileBusyException))
                     throw ex;
@@ -524,14 +525,14 @@ extends ConfiguredClientTestBase<D> {
         // Cleanup.
         try {
             delete(file2);
-            fail("already deleted externally");
-        } catch (IOException expected) {
+            fail();
+        } catch (IOException alreadyDeletedExternally) {
         }
         assertFalse(exists(file2));
         try {
             delete(file1);
-            fail("already deleted externally");
-        } catch (IOException expected) {
+            fail();
+        } catch (IOException alreadyDeletedExternally) {
         }
         assertFalse(exists(file1));
     }
@@ -570,8 +571,8 @@ extends ConfiguredClientTestBase<D> {
         // out is still open!
         try {
             newOutputStream(file1).close();
-            fail("Expected synchronization exception when overwriting an unsynchronized entry of a busy archive file!");
-        } catch (FsSyncException ex) {
+            fail();
+        } catch (final FsSyncException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
                     throw ex;
         }
@@ -579,9 +580,9 @@ extends ConfiguredClientTestBase<D> {
         // out is still open!
         try {
             newOutputStream(file2).close();
-        } catch (FsSyncException ex) {
+        } catch (final FsSyncException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
-                    throw ex;
+                throw ex;
             logger.log(Level.INFO,
                     getArchiveDriver().getClass()
                         + " does not support concurrent writing of different entries in the same archive file.",
@@ -594,16 +595,16 @@ extends ConfiguredClientTestBase<D> {
         // out is still open!
         try {
             umount(); // forces closing of all streams
-            fail("Expected warning exception when synchronizing a busy archive file!");
-        } catch (FsSyncWarningException ex) {
+            fail();
+        } catch (final FsSyncWarningException ex) {
             if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
         }
         
         try {
             Streams.cat(new ByteArrayInputStream(getData()), out); // write again
-            fail("Expected exception when writing to entry output stream of an unmounted archive file!");
-        } catch (OutputClosedException expected) {
+            fail();
+        } catch (OutputClosedException ex) {
         }
         
         // The stream has been forcibly closed by TPath.update().
@@ -618,7 +619,7 @@ extends ConfiguredClientTestBase<D> {
             // This operation may succeed without any exception if
             // the garbage collector did its job.
             umount(); // allow external modifications!
-        } catch (FsSyncWarningException ex) {
+        } catch (final FsSyncWarningException ex) {
             // It may fail once if a stream was busy!
             if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
