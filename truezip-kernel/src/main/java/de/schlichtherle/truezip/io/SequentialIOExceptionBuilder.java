@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io;
 
@@ -19,10 +15,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * When the assembly is thrown or returned later, it is sorted by
  * {@link SequentialIOException#sortPriority() priority}.
  *
- * @param   <C> the type of the cause exceptions.
- * @param   <X> the type of the assembled exception.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <C> the type of the cause exceptions.
+ * @param  <X> the type of the assembled exception.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class SequentialIOExceptionBuilder<  C extends Exception,
@@ -47,8 +42,11 @@ extends AbstractExceptionBuilder<C, X> {
                 x   .getConstructor(String.class)
                     .newInstance("test")
                     .initCause(null); // fail-fast test!
+        } catch (final RuntimeException ex) {
+            // E.g. null == c || null == x || ex instanceof SecurityException
+            throw ex;
         } catch (final Exception ex) {
-            throw new IllegalArgumentException(ex);
+            throw new IllegalArgumentException(x.toString(), ex);
         }
         this.clazz = x;
     }
@@ -72,8 +70,7 @@ extends AbstractExceptionBuilder<C, X> {
                             .newInstance(cause.toString())
                             .initCause(cause));
         } catch (final Exception ex) {
-            ex.initCause(cause);
-            throw new AssertionError(ex);
+            throw new AssertionError(cause.toString(), ex);
         }
         try {
             return (X) next.initPredecessor(previous);
