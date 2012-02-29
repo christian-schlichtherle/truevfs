@@ -1,18 +1,13 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io;
 
 import de.schlichtherle.truezip.socket.ByteArrayIOBuffer;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
-import static de.schlichtherle.truezip.test.ThrowControl.contains;
-import java.io.EOFException;
+import static de.schlichtherle.truezip.util.Throwables.isOrCausedBy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,8 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public class StreamsTest {
 
@@ -100,13 +94,13 @@ public class StreamsTest {
                     Streams.cat(tis, out);
                     fail();
                 } catch (final IOException got) {
-                    if (!contains(got, expected))
+                    if (!isOrCausedBy(got, expected))
                         throw got;
                 } catch (final RuntimeException got) {
-                    if (!contains(got, expected))
+                    if (!isOrCausedBy(got, expected))
                         throw got;
                 } catch (final Error got) {
-                    if (!contains(got, expected))
+                    if (!isOrCausedBy(got, expected))
                         throw got;
                 }
                 Streams.cat(in, out);
@@ -135,13 +129,13 @@ public class StreamsTest {
                     Streams.cat(in, tos);
                     fail();
                 } catch (final IOException got) {
-                    if (!contains(got, expected))
+                    if (!isOrCausedBy(got, expected))
                         throw got;
                 } catch (final RuntimeException got) {
-                    if (!contains(got, expected))
+                    if (!isOrCausedBy(got, expected))
                         throw got;
                 } catch (final Error got) {
-                    if (!contains(got, expected))
+                    if (!isOrCausedBy(got, expected))
                         throw got;
                 }
             }

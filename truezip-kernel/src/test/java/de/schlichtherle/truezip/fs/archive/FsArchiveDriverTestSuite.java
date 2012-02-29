@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive;
 
@@ -25,8 +21,8 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
-import static de.schlichtherle.truezip.test.ThrowControl.contains;
 import de.schlichtherle.truezip.util.BitField;
+import static de.schlichtherle.truezip.util.Throwables.isOrCausedBy;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -43,10 +39,9 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * @param   <E> The type of the archive entries.
- * @param   <D> The type of the archive driver.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> The type of the archive entries.
+ * @param  <D> The type of the archive driver.
+ * @author Christian Schlichtherle
  */
 public abstract class FsArchiveDriverTestSuite<
         E extends FsArchiveEntry,
@@ -136,7 +131,7 @@ extends FsArchiveDriverTestBase<D> {
             getArchiveInputSocket();
             fail();
         } catch (final RuntimeException got) {
-            if (!contains(got, expected))
+            if (!isOrCausedBy(got, expected))
                 throw got;
         }
     }
@@ -149,7 +144,7 @@ extends FsArchiveDriverTestBase<D> {
             getArchiveOutputSocket();
             fail();
         } catch (final RuntimeException got) {
-            if (!contains(got, expected))
+            if (!isOrCausedBy(got, expected))
                 throw got;
         }
     }
@@ -201,7 +196,7 @@ extends FsArchiveDriverTestBase<D> {
                 os.close();
                 //fail();
             } catch (final IOException got) {
-                if (!contains(got, expected))
+                if (!isOrCausedBy(got, expected))
                     throw got;
             } finally {
                 clear(TestCloseable.class);
@@ -271,7 +266,7 @@ extends FsArchiveDriverTestBase<D> {
                 is.close();
                 //fail();
             } catch (final IOException got) {
-                if (!contains(got, expected))
+                if (!isOrCausedBy(got, expected))
                     throw got;
             } finally {
                 clear(TestCloseable.class);
