@@ -56,7 +56,7 @@ extends FsLockModelDecoratingController<
     }
 
     private FsResourceAccountant getAccountant() {
-        assert getModel().isWriteLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
         final FsResourceAccountant accountant = this.accountant;
         return null != accountant
                 ? accountant
@@ -83,7 +83,7 @@ extends FsLockModelDecoratingController<
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        assert getModel().isWriteLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
         waitIdle(options, handler);
         closeAll(handler);
         delegate.sync(options, handler);
@@ -169,22 +169,6 @@ extends FsLockModelDecoratingController<
 
     @Immutable
     private enum SocketFactory {
-        OIO() {
-            @Override
-            InputSocket<?> newInputSocket(
-                    FsResourceController controller,
-                    InputSocket<?> input) {
-                return controller.new Input(input);
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    FsResourceController controller,
-                    OutputSocket<?> output) {
-                return controller.new Output(output);
-            }
-        },
-
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
@@ -198,6 +182,22 @@ extends FsLockModelDecoratingController<
                     FsResourceController controller,
                     OutputSocket<?> output) {
                 return controller.new Nio2Output(output);
+            }
+        },
+
+        OIO() {
+            @Override
+            InputSocket<?> newInputSocket(
+                    FsResourceController controller,
+                    InputSocket<?> input) {
+                return controller.new Input(input);
+            }
+
+            @Override
+            OutputSocket<?> newOutputSocket(
+                    FsResourceController controller,
+                    OutputSocket<?> output) {
+                return controller.new Output(output);
             }
         };
 
@@ -217,7 +217,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -230,14 +230,14 @@ extends FsLockModelDecoratingController<
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             return new AccountingReadOnlyFile(
                     getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             return new AccountingInputStream(
                     getBoundSocket().newInputStream());
         }
@@ -250,7 +250,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -263,7 +263,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+            assert isWriteLockedByCurrentThread();
             return new AccountingOutputStream(
                     getBoundSocket().newOutputStream());
         }
@@ -310,7 +310,6 @@ extends FsLockModelDecoratingController<
         public void close() throws IOException {
             getAccountant().stopAccountingFor(this);
             delegate.close();
-            //closed = true;
         }
 
         @Override
