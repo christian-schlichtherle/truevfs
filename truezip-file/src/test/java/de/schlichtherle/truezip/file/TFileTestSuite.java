@@ -1398,7 +1398,7 @@ extends ConfiguredClientTestBase<D> {
                         if (updateIndividually)
                             TFile.umount(archive);
                         else
-                            TFile.sync(SYNC); // DON'T flush all caches!
+                            TFile.sync(SYNC); // DON'T clear cache!
                     } catch (FsSyncException ex) {
                         if (!(ex.getCause() instanceof FileBusyException))
                             throw ex;
