@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.nio.file;
 
@@ -22,9 +18,9 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -35,9 +31,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * so it could get published as a member of the package
  * {@code de.schlichtherle.truezip.file} instead if required.
  * 
- * @since   TrueZIP 7.2
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @since  TrueZIP 7.2
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class TPathScanner {
