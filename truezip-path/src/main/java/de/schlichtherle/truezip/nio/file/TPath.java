@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.nio.file;
 
@@ -100,9 +96,8 @@ import javax.annotation.concurrent.Immutable;
  * bypass or corrupt the state which gets implicitly associated with any
  * archive file by the TrueZIP Kernel module!
  * 
- * @since   TrueZIP 7.2
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @since  TrueZIP 7.2
+ * @author Christian Schlichtherle
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
@@ -603,6 +598,7 @@ public final class TPath implements Path {
      * @see    TFileSystemProvider#umount()
      * @since  TrueZIP 7.5
      */
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     public TPath toNonArchivePath() {
         final TConfig config = TConfig.push();
         try {
