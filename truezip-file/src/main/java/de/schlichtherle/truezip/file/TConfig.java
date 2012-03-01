@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file;
 
@@ -19,6 +15,7 @@ import de.schlichtherle.truezip.util.InheritableThreadLocalStack;
 import de.schlichtherle.truezip.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -236,9 +233,8 @@ public class AppTest {
  * The most important feature of this code is that it's thread-safe, which
  * enables you to run your unit tests in parallel!
  * 
- * @since   TrueZIP 7.2
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @since  TrueZIP 7.2
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 @CleanupObligation
@@ -323,6 +319,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @throws IllegalStateException If the {@link #get() current configuration}
      *         is the global configuration.
      */
+    @DischargesObligation
     public static void pop() {
         configs.popIff(get());
     }
