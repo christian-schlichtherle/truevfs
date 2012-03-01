@@ -330,27 +330,22 @@ public final class TFileSystem extends FileSystem {
             }
         } // Adapter
 
-        return  new Stream(new FilterIterator(new Adapter(), filter));
-    }
+        @NotThreadSafe
+        class FilterIterator extends FilteringIterator<Path> {
+            FilterIterator() { super(new Adapter()); }
 
-    @NotThreadSafe
-    private static final class FilterIterator extends FilteringIterator<Path> {
-        final Filter<? super Path> filter;
-
-        FilterIterator(final Iterator<Path> it, final Filter<? super Path> filter) {
-            super(it);
-            this.filter = filter;
-        }
-
-        @Override
-        protected boolean accept(Path element) {
-            try {
-                return filter.accept(element);
-            } catch (IOException ex) {
-                throw new DirectoryIteratorException(ex);
+            @Override
+            protected boolean accept(Path element) {
+                try {
+                    return filter.accept(element);
+                } catch (IOException ex) {
+                    throw new DirectoryIteratorException(ex);
+                }
             }
-        }
-    } // FilterIterator
+        } // FilterIterator
+
+        return  new Stream(new FilterIterator());
+    }
 
     @NotThreadSafe
     private static final class Stream implements DirectoryStream<Path> {
