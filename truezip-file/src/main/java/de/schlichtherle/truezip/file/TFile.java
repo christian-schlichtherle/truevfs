@@ -2515,11 +2515,11 @@ public final class TFile extends File {
         }
     }
 
-    private static Set<String> members(FsEntry entry) {
+    private static @CheckForNull Set<String> members(@CheckForNull FsEntry entry) {
         return null == entry ? null : entry.getMembers();
     }
 
-    private static List<String> list(String[] list) {
+    private static @CheckForNull List<String> list(@CheckForNull String[] list) {
         return null == list ? null : Arrays.asList(list);
     }
 
