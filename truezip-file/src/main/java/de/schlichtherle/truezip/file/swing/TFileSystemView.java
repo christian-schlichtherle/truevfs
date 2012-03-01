@@ -1,21 +1,17 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TFile;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
@@ -27,8 +23,7 @@ import javax.swing.filechooser.FileSystemView;
  * This class is used by {@link TFileTreeCellRenderer}
  * to render files and directories in a {@link TFileTree}.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 //
 // Unfortunately this is a pretty ugly piece of code.
@@ -262,12 +257,12 @@ public class TFileSystemView extends TDecoratingFileSystemView {
                     return !useFileHiding || !isHiddenFile(file);
                 }
             } // class Filter
-            return smartDir.listFiles(new Filter());
+            final File files[] = smartDir.listFiles(new Filter());
+            return null == files ? new TFile[0] : files;
         } else {
             final File files[] = delegate.getFiles(unwrap(dir), useFileHiding);
-            if (files != null)
-                for (int i = files.length; --i >= 0; )
-                    files[i] = createFileObject(files[i]);
+            for (int i = files.length; --i >= 0; )
+                files[i] = createFileObject(files[i]);
             return files;
         }
     }
