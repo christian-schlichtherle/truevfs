@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file.swing;
 
@@ -29,7 +25,6 @@ import javax.swing.tree.TreePath;
  * detect any archive files in the directory tree.
  *
  * @author Christian Schlichtherle
- * @version $Id$
  */
 public final class TFileTreeModel implements TreeModel {
 
@@ -91,15 +86,14 @@ public final class TFileTreeModel implements TreeModel {
     }
 
     @Override
-    public @Nullable TFile getChild(Object parent, int index) {
-        final TFile[] children = getChildren((TFile) parent);
-        return children != null ? children[index] : null;
+    public TFile getChild(Object parent, int index) {
+        return getChildren((TFile) parent)[index];
     }
 
     @Override
     public int getChildCount(Object parent) {
         final TFile[] children = getChildren((TFile) parent);
-        return children != null ? children.length : 0;
+        return null == children ? 0 : children.length;
     }
 
     @Override
@@ -116,7 +110,7 @@ public final class TFileTreeModel implements TreeModel {
         if (parent == null || child == null)
             return -1;
         final TFile[] children = getChildren((TFile) parent);
-        if (children == null)
+        if (null == children)
             return -1;
         for (int i = 0, l = children.length; i < l; i++)
             if (children[i].equals(child))
@@ -127,7 +121,7 @@ public final class TFileTreeModel implements TreeModel {
     private @Nullable TFile[] getChildren(final TFile parent) {
         assert parent != null;
         TFile[] children = cache.get(parent);
-        if (children == null) {
+        if (null == children) {
             if (cache.containsKey(parent))
                 return null; // parent is file or inaccessible directory
             children = parent.listFiles(filter);
@@ -140,7 +134,7 @@ public final class TFileTreeModel implements TreeModel {
             // In this case, we will simply return the unsorted result in the
             // recursion, which is then used for repainting.
             cache.put(parent, children);
-            if (children != null)
+            if (null != children)
                 Arrays.sort(children, comparator);
         }
         return children;
