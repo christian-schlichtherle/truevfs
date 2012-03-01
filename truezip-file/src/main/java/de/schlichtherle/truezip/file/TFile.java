@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file;
 
@@ -365,8 +361,7 @@ import javax.swing.filechooser.FileSystemView;
  *    return {@code false}, while {@link #exists} returns {@code true}.</li>
  * </ol>
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class TFile extends File {
@@ -2375,7 +2370,7 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the names of the members in this directory in a newly
+     * Returns the names of the members in this (virtual) directory in a newly
      * created array.
      * The returned array is <em>not</em> sorted.
      * This is the most efficient list method.
@@ -2384,6 +2379,11 @@ public final class TFile extends File {
      * this method and are never returned.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
+     * 
+     * @return A possibly empty array with the members of this (virtual)
+     *         directory or {@code null} if this instance does not refer to a
+     *         (virtual) directory or if the virtual directory is inaccessible
+     *         due to an I/O failure.
      */
     @Override
     public @Nullable String[] list() {
@@ -2412,8 +2412,10 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @return {@code null} if this is not a directory or an archive file,
-     *         a valid (but maybe empty) array otherwise.
+     * @return A possibly empty array with the members of this (virtual)
+     *         directory or {@code null} if this instance does not refer to a
+     *         (virtual) directory or if the virtual directory is inaccessible
+     *         due to an I/O failure.
      */
     @Override
     public @Nullable String[] list(final @CheckForNull FilenameFilter filter) {
@@ -2424,9 +2426,7 @@ public final class TFile extends File {
             } catch (IOException ex) {
                 return null;
             }
-            if (null == entry)
-                return null;
-            final Set<String> members = entry.getMembers();
+            final Set<String> members = members(entry);
             if (null == members)
                 return null;
             if (null == filter)
@@ -2462,8 +2462,10 @@ public final class TFile extends File {
      *
      * @param  detector The archive detector to detect any archives files in
      *         the member file names.
-     * @return {@code null} if this is not a directory or an archive file,
-     *         a valid (but maybe empty) array otherwise.
+     * @return A possibly empty array with the members of this (virtual)
+     *         directory or {@code null} if this instance does not refer to a
+     *         (virtual) directory or if the virtual directory is inaccessible
+     *         due to an I/O failure.
      */
     public @Nullable TFile[] listFiles(TArchiveDetector detector) {
         return listFiles((FilenameFilter) null, detector);
@@ -2492,8 +2494,10 @@ public final class TFile extends File {
      * @param  filter the file filter.
      * @param  detector the archive detector to detect any archives files in
      *         the member file names.
-     * @return {@code null} if this is not a directory or an archive file,
-     *         a valid (but maybe empty) array otherwise.
+     * @return A possibly empty array with the members of this (virtual)
+     *         directory or {@code null} if this instance does not refer to a
+     *         (virtual) directory or if the virtual directory is inaccessible
+     *         due to an I/O failure.
      */
     public @Nullable TFile[] listFiles(
             final @CheckForNull FilenameFilter filter,
@@ -2502,23 +2506,21 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController().getEntry(getInnerFsEntryName());
-            } catch (IOException ignored) {
+            } catch (IOException ex) {
                 return null;
             }
-            if (null == entry)
-                return null;
-            return filter(entry.getMembers(), filter, detector);
+            return filter(members(entry), filter, detector);
+        } else {
+            return filter(list(delegate.list(filter)), (FilenameFilter) null, detector);
         }
-        return filter(delegate.list(filter), (FilenameFilter) null, detector);
     }
 
-    private @Nullable TFile[] filter(
-            @CheckForNull String[] members,
-            @CheckForNull FilenameFilter filter,
-            TArchiveDetector detector) {
-        return null == members
-                ? null
-                : filter(Arrays.asList(members), filter, detector);
+    private static Set<String> members(FsEntry entry) {
+        return null == entry ? null : entry.getMembers();
+    }
+
+    private static List<String> list(String[] list) {
+        return null == list ? null : Arrays.asList(list);
     }
 
     private @Nullable TFile[] filter(
@@ -2565,8 +2567,10 @@ public final class TFile extends File {
      * @param  filter the file filter.
      * @param  detector The archive detector to detect any archives files in
      *         the member file names.
-     * @return {@code null} if this is not a directory or an archive file,
-     *         a valid (but maybe empty) array otherwise.
+     * @return A possibly empty array with the members of this (virtual)
+     *         directory or {@code null} if this instance does not refer to a
+     *         (virtual) directory or if the virtual directory is inaccessible
+     *         due to an I/O failure.
      */
     public @Nullable TFile[] listFiles(
             final @CheckForNull FileFilter filter,
@@ -2578,11 +2582,10 @@ public final class TFile extends File {
             } catch (IOException ex) {
                 return null;
             }
-            if (null == entry)
-                return null;
-            return filter(entry.getMembers(), filter, detector);
+            return filter(members(entry), filter, detector);
+        } else {
+            return filter(list(delegate.list()), filter, detector);
         }
-        return filter(Arrays.asList(delegate.list()), filter, detector);
     }
 
     private @Nullable TFile[] filter(
@@ -2591,14 +2594,22 @@ public final class TFile extends File {
             final TArchiveDetector detector) {
         if (null == members)
             return null;
-        final Collection<TFile>
-                accepted = new ArrayList<TFile>(members.size());
-        for (final String member : members) {
-            final TFile file = new TFile(this, member, detector);
-            if (null == filter || filter.accept(file))
-                accepted.add(file);
+        if (null != filter) {
+            final Collection<TFile>
+                    accepted = new ArrayList<TFile>(members.size());
+            for (final String member : members) {
+                final TFile file = new TFile(this, member, detector);
+                if (filter.accept(file))
+                    accepted.add(file);
+            }
+            return accepted.toArray(new TFile[accepted.size()]);
+        } else {
+            final TFile[] accepted = new TFile[members.size()];
+            int i = 0;
+            for (final String member : members)
+                accepted[i++] = new TFile(this, member, detector);
+            return accepted;
         }
-        return accepted.toArray(new TFile[accepted.size()]);
     }
 
     /**
