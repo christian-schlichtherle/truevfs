@@ -8,8 +8,8 @@
  */
 package de.schlichtherle.truezip.io.swing;
 
-import javax.annotation.CheckForNull;
 import java.io.File;
+import javax.annotation.CheckForNull;
 import javax.swing.JPanel;
 
 /**
