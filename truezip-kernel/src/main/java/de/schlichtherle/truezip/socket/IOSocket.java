@@ -123,17 +123,17 @@ public abstract class IOSocket<LT, PT> {
      */
     @Override
     public String toString() {
-        String lt;
+        Object lt;
         try {
-            lt = getLocalTarget().toString();
+            lt = getLocalTarget();
         } catch (final IOException ex) {
-            lt = ex.toString();
+            lt = ex;
         }
-        String pt;
+        Object pt;
         try {
-            pt = getPeerTarget().toString();
+            pt = getPeerTarget();
         } catch (final IOException ex) {
-            pt = ex.toString();
+            pt = ex;
         }
         return String.format("%s[localTarget=%s, peerTarget=%s]",
                 getClass().getName(), lt, pt);
