@@ -199,7 +199,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     super.close();
                 } finally {
-                    close(temp, null == exception);
+                    FileOutputSocket.this.close(temp, null == exception);
                 }
             }
         } // SeekableByteChannel
@@ -224,7 +224,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             @CreatesObligation
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             OutputStream() throws IOException {
-                super(newOutputStream(temp.getPath(), optionArray()));
+                super(Files.newOutputStream(temp.getPath(), optionArray()));
             }
 
             @Override
@@ -233,7 +233,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 super.close();
                 closed = true;
-                close(temp, null == exception);
+                FileOutputSocket.this.close(temp, null == exception);
             }
         } // OutputStream
 
