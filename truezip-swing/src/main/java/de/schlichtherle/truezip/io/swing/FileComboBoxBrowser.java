@@ -1,23 +1,19 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io.swing;
 
 import de.schlichtherle.truezip.swing.AbstractComboBoxBrowser;
-import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.Collator;
 import java.util.Arrays;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.filechooser.FileSystemView;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Subclasses {@code AbstractComboBoxBrowser} to complete relative and
@@ -32,8 +28,7 @@ import javax.annotation.concurrent.NotThreadSafe;
     box.setEditable(true);
  * </pre>
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
@@ -254,8 +249,8 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
         final DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) getComboBox().getModel();
         try {
             model.removeAllElements();
-            final int l = children != null ? children.length : 0;
-            if (l > 0) {
+            final int l = null == children ? 0 : children.length;
+            if (0 < l) {
                 Arrays.sort(children, Collator.getInstance()); // get nice sorting order
                 for (int i = 0; i < l; i++)
                     model.addElement(base + children[i]);
