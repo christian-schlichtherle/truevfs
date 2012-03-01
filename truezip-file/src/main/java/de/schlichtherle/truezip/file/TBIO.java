@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file;
 
@@ -31,8 +27,7 @@ import javax.annotation.concurrent.Immutable;
  * class accept plain old {@link File} objects.
  * However, full advantage is taken if a parameter is a {@link TFile} object.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @Immutable
 final class TBIO {
@@ -82,6 +77,8 @@ final class TBIO {
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new IOException(dst + " (not a directory)");
             final String[] members = src.list();
+            if (null == members)
+                throw new IOException(dst + " (cannot list directory)");
             if (!srcIsArchived && dstIsArchived) {
                 // Create sorted entries if writing a new archive file.
                 // This is courtesy only, so natural order is sufficient.
@@ -162,6 +159,8 @@ final class TBIO {
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new IOException(dst + " (not a directory)");
             final String[] members = src.list();
+            if (null == members)
+                throw new IOException(dst + " (cannot list directory)");
             if (!srcArchived && dstArchived) {
                 // Create sorted entries if writing a new archive.
                 // This is a courtesy only, so natural order is sufficient.
@@ -231,9 +230,13 @@ final class TBIO {
      */
     public static void rm_r(final File node, final TArchiveDetector detector)
     throws IOException {
-        if (node.isDirectory())
-            for (final String member : node.list())
+        if (node.isDirectory()) {
+            final String[] members = node.list();
+            if (null == members)
+                throw new IOException(node + " (cannot list directory)");
+            for (final String member : members)
                 rm_r(new TFile(node, member, detector), detector);
+        }
         TFile.rm(node);
     }
 
