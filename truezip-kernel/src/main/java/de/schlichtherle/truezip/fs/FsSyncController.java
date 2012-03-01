@@ -406,7 +406,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsSyncController.this.close(delegate);
         }
     } // SyncReadOnlyFile
 
@@ -420,7 +420,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsSyncController.this.close(delegate);
         }
     } // SyncSeekableByteChannel
 
@@ -434,7 +434,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsSyncController.this.close(delegate);
         }
     } // SyncInputStream
 
@@ -448,7 +448,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsSyncController.this.close(delegate);
         }
     } // SyncOutputStream
 }
