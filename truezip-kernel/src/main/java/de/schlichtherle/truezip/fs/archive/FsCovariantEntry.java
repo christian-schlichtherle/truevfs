@@ -42,7 +42,7 @@ implements Cloneable {
      * @param path the file system path.
      */
     public FsCovariantEntry(String path) {
-        this.name = path.toString();
+        name = path.toString();
     }
 
     /**
@@ -80,7 +80,19 @@ implements Cloneable {
 
     @Override
     public String getName() {
-        return this.name;
+        return name;
+    }
+
+    /**
+     * Returns {@code true} if and only if the name of this covariant entry
+     * identifies it as a root entry.
+     * 
+     * @return {@code true} if and only if the name of this covariant entry
+     *         identifies it as a root entry.
+     * @since  TrueZIP 7.5
+     */
+    public boolean isRoot() {
+        return name.isEmpty();
     }
 
     /**
@@ -97,7 +109,7 @@ implements Cloneable {
      *         {@link #getTime(Access)} shall get forwarded.
      */
     public @Nullable Type getKey() {
-        return this.key;
+        return key;
     }
 
     /**
@@ -113,7 +125,7 @@ implements Cloneable {
      *        {@link #getTime(Access)} shall get forwarded.
      */
     public void setKey(final @Nullable Type type) {
-        this.key = type;
+        key = type;
     }
 
     /**
@@ -126,7 +138,7 @@ implements Cloneable {
      * @return The previously mapped entry.
      */
     public @Nullable E putEntry(Type type, E entry) {
-        return this.map.put(this.key = type, entry);
+        return map.put(key = type, entry);
     }
 
     /**
@@ -136,7 +148,7 @@ implements Cloneable {
      * @return The previously mapped entry.
      */
     public @Nullable E removeEntry(Type type) {
-        return this.map.remove(type);
+        return map.remove(type);
     }
 
     /**
@@ -146,7 +158,7 @@ implements Cloneable {
      * @return The entry for the given type.
      */
     public @Nullable E getEntry(Type type) {
-        return this.map.get(type);
+        return map.get(type);
     }
 
     /**
@@ -155,7 +167,7 @@ implements Cloneable {
      * @return the archive entry mapped for the {@link #getKey() key} property.
      */
     public @Nullable E getEntry() {
-        return this.map.get(this.key);
+        return map.get(this.key);
     }
 
     /**
@@ -166,7 +178,7 @@ implements Cloneable {
      * @return a collection of the mapped entries
      */
     public Collection<E> getEntries() {
-        return this.map.values();
+        return map.values();
     }
 
     /**
@@ -178,7 +190,7 @@ implements Cloneable {
      */
     @Override
     public Set<Type> getTypes() {
-        return this.map.keySet();
+        return map.keySet();
     }
 
     /**
@@ -189,7 +201,7 @@ implements Cloneable {
      */
     @Override
     public boolean isType(Type type) {
-        return this.map.containsKey(type);
+        return map.containsKey(type);
     }
 
     /**
@@ -200,9 +212,9 @@ implements Cloneable {
      */
     @Override
     public long getSize(Size type) {
-        if (DIRECTORY == this.key)
+        if (DIRECTORY == key)
             return UNKNOWN; // TODO: Evaluate 0
-        return this.map.get(this.key).getSize(type);
+        return map.get(key).getSize(type);
     }
 
     /**
@@ -213,7 +225,7 @@ implements Cloneable {
      */
     @Override
     public long getTime(Access type) {
-        return this.map.get(this.key).getTime(type);
+        return map.get(key).getTime(type);
     }
 
     /**
@@ -227,12 +239,10 @@ implements Cloneable {
      */
     @Override
     public @Nullable Set<String> getMembers() {
-        if (!this.map.containsKey(DIRECTORY))
-            return this.members = null;
-        final Set<String> members = this.members;
-        return null != members
-                ? members
-                : (this.members = new LinkedHashSet<String>());
+        if (!map.containsKey(DIRECTORY))
+            return members = null;
+        final Set<String> m = members;
+        return null != m ? m : (members = new LinkedHashSet<String>());
     }
 
     /**
