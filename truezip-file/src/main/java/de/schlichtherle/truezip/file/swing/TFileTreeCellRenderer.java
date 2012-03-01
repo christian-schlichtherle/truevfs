@@ -1,17 +1,13 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file.swing;
 
 import de.schlichtherle.truezip.file.TFile;
+import java.awt.Component;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -21,7 +17,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * display the system icon for each node in a {@link TFileTree} if required.
  *
  * @author Christian Schlichtherle
- * @version $Id$
  */
 final class TFileTreeCellRenderer extends DefaultTreeCellRenderer {
     private static final long serialVersionUID = 1045639746091876245L;
