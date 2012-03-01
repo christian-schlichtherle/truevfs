@@ -142,7 +142,6 @@ extends FsLockModelDecoratingController<
      * @throws IOException As thrown by the operation.
      * @throws FsNeedsLockRetryException See above.
      */
-    @SuppressWarnings("unchecked")
     private static <T> T locked(final IOOperation<T> operation, final Lock lock)
     throws IOException {
         final ThreadTool thread = threadTool.get();
@@ -564,7 +563,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsLockController.this.close(delegate);
         }
     } // LockReadOnlyFile
 
@@ -578,7 +577,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsLockController.this.close(delegate);
         }
     } // LockSeekableByteChannel
 
@@ -592,7 +591,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsLockController.this.close(delegate);
         }
     } // LockInputStream
 
@@ -606,7 +605,7 @@ extends FsLockModelDecoratingController<
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            FsLockController.this.close(delegate);
         }
     } // LockOutputStream
 
