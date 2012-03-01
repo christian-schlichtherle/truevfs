@@ -133,9 +133,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     @Override
     public final @Nullable Set<String> getMembers() {
         final String[] list = file.list();
-        return null == list
-                ? null
-                : new HashSet<String>(Arrays.asList(list));
+        return null == list ? null : new HashSet<String>(Arrays.asList(list));
     }
 
     @Override
