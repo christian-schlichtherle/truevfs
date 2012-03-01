@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.nio.file;
 
@@ -40,9 +36,8 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A {@link FileSystem} implementation based on the TrueZIP Kernel module.
  * 
- * @since   TrueZIP 7.2
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @since  TrueZIP 7.2
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class TFileSystem extends FileSystem {
@@ -335,40 +330,50 @@ public final class TFileSystem extends FileSystem {
             }
         } // Adapter
 
-        @NotThreadSafe
-        class FilterIterator extends FilteringIterator<Path> {
-            FilterIterator() { super(new Adapter()); }
-
-            @Override
-            protected boolean accept(Path element) {
-                try {
-                    return filter.accept(element);
-                } catch (IOException ex) {
-                    throw new DirectoryIteratorException(ex);
-                }
-            }
-        } // FilterIterator
-
-        @NotThreadSafe
-        class Stream implements DirectoryStream<Path> {
-            boolean consumed;
-
-            @Override
-            public Iterator<Path> iterator() {
-                if (consumed)
-                    throw new IllegalStateException();
-                consumed = true;
-                return new FilterIterator();
-            }
-
-            @Override
-            public void close() {
-                consumed = true;
-            }
-        } // Stream
-
-        return new Stream();
+        return  new Stream(new FilterIterator(new Adapter(), filter));
     }
+
+    @NotThreadSafe
+    private static final class FilterIterator extends FilteringIterator<Path> {
+        final Filter<? super Path> filter;
+
+        FilterIterator(final Iterator<Path> it, final Filter<? super Path> filter) {
+            super(it);
+            this.filter = filter;
+        }
+
+        @Override
+        protected boolean accept(Path element) {
+            try {
+                return filter.accept(element);
+            } catch (IOException ex) {
+                throw new DirectoryIteratorException(ex);
+            }
+        }
+    } // FilterIterator
+
+    @NotThreadSafe
+    private static final class Stream implements DirectoryStream<Path> {
+        final Iterator<Path> it;
+        boolean consumed;
+
+        Stream(final Iterator<Path> it) {
+            this.it = it;
+        }
+        
+        @Override
+        public Iterator<Path> iterator() {
+            if (consumed)
+                throw new IllegalStateException();
+            consumed = true;
+            return it;
+        }
+
+        @Override
+        public void close() {
+            consumed = true;
+        }
+    } // Stream
 
     void createDirectory(final TPath path, final FileAttribute<?>... attrs)
     throws IOException {
