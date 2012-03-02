@@ -43,12 +43,12 @@ extends FsArchiveDriverTestSuite<E, D> {
     }
 
     @Test
-    public void charsetMustNotBeNull() {
+    public void testCharsetMustNotBeNull() {
         assert null != getArchiveDriver().getCharset();
     }
 
     @Test(expected = CharConversionException.class)
-    public void unencodableNameMustThrowCharConversionException()
+    public void testUnencodableNameMustThrowCharConversionException()
     throws CharConversionException {
         final String name = getUnencodableName();
         if (null == name)
@@ -66,13 +66,13 @@ extends FsArchiveDriverTestSuite<E, D> {
     protected abstract @CheckForNull String getUnencodableName();
 
     @Test
-    public void allUsAsciiCharactersMustBeEncodable()
+    public void testAllUsAsciiCharactersMustBeEncodable()
     throws CharConversionException {
         getArchiveDriver().assertEncodable(US_ASCII_CHARACTERS);
     }
 
     @Test
-    public void allUsAsciiCharactersMustBeEncodableWhenRunningMultithreaded()
+    public void testAllUsAsciiCharactersMustBeEncodableWhenRunningMultithreaded()
     throws Throwable {
         final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
