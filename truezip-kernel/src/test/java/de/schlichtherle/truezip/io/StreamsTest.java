@@ -154,7 +154,7 @@ public class StreamsTest {
         final TestOutputStream out = newTestOutputStream(buffer);
         Thread.currentThread().interrupt();
         Streams.copy(in, out);
-        assertTrue(Thread.interrupted());
+        assertTrue(Thread.interrupted()); // test and clear status!
         assertTrue(out.flushed);
         assertTrue(out.closed);
         assertTrue(in.closed);
@@ -198,7 +198,7 @@ public class StreamsTest {
             Thread.currentThread().interrupt();
             cat(in, out);
             assertTrue("The interrupt status should not have changed!",
-                    Thread.interrupted());
+                    Thread.interrupted()); // test and clear status!
             assertTrue(out.flushed);
             assertFalse(out.closed);
             assertFalse(in.closed);
