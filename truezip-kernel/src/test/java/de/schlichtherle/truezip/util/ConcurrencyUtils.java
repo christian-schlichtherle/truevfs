@@ -13,6 +13,7 @@ import java.util.concurrent.*;
  */
 public class ConcurrencyUtils {
 
+    /** The number of threads for doing I/O considering 90% blocking factor. */
     public static final int
             NUM_IO_THREADS = 10 * Runtime.getRuntime().availableProcessors();
 
