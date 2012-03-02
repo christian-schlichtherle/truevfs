@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
@@ -29,6 +25,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
@@ -48,10 +46,10 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * Archive drivers may wrap this class in a {@link FsMultiplexedOutputShop}
  * to overcome this limitation.
  *
- * @see     TarInputShop
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    TarInputShop
+ * @author Christian Schlichtherle
  */
+@NotThreadSafe
 public class TarOutputShop
 extends TarArchiveOutputStream
 implements OutputShop<TarDriverEntry> {
@@ -72,7 +70,9 @@ implements OutputShop<TarDriverEntry> {
     private final IOPool<?> pool;
     private boolean busy;
 
-    public TarOutputShop(final TarDriver driver, OutputStream out) {
+    @CreatesObligation
+    public TarOutputShop(   final TarDriver driver,
+                            final @WillCloseWhenClosed OutputStream out) {
         super(out);
         super.setLongFileMode(LONGFILE_GNU);
         this.pool = driver.getPool();

@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
@@ -18,6 +14,7 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -144,6 +141,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
      * {@link #newTarInputShop}.
      */
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TarInputShop newInputShop(FsModel model, InputSocket<?> input)
     throws IOException {
         if (null == model)
@@ -156,6 +154,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
         }
     }
 
+    @CreatesObligation
     protected TarInputShop newTarInputShop(
             FsModel model,
             @WillCloseWhenClosed InputStream in)
@@ -195,6 +194,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
         }
     }
 
+    @CreatesObligation
     protected TarOutputShop newTarOutputShop(
             FsModel model,
             OutputStream out,

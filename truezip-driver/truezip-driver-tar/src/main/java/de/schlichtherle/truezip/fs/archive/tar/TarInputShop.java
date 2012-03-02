@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
@@ -19,10 +15,13 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import java.util.*;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -40,10 +39,10 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
  * is no way the archive driver could predict the client application's
  * behaviour.
  *
- * @see     TarOutputShop
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    TarOutputShop
+ * @author Christian Schlichtherle
  */
+@NotThreadSafe
 public class TarInputShop
 implements InputShop<TarDriverEntry> {
 
@@ -74,7 +73,9 @@ implements InputShop<TarDriverEntry> {
      *        So it is safe and recommended to close it upon termination
      *        of this constructor.
      */
-    public TarInputShop(final TarDriver driver, final InputStream in)
+    @CreatesObligation
+    public TarInputShop(final TarDriver driver,
+                        final @WillNotClose InputStream in)
     throws IOException {
         final TarArchiveInputStream tin = newValidatedTarInputStream(in);
         final IOPool<?> pool = driver.getPool();
