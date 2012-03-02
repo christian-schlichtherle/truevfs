@@ -158,8 +158,7 @@ public final class Streams {
                         while (size >= _buffersLength) {
                             try {
                                 signal.await();
-                            } catch (InterruptedException interrupted) {
-                                // The writer thread wants us to stop reading.
+                            } catch (InterruptedException cancel) {
                                 return;
                             }
                         }
@@ -211,7 +210,7 @@ public final class Streams {
                     while (0 >= reader.size) {
                         try {
                             signal.await();
-                        } catch (InterruptedException ex) {
+                        } catch (InterruptedException ignore) {
                             interrupted = true;
                         }
                     }
@@ -263,7 +262,7 @@ public final class Streams {
             }
         } finally {
             if (interrupted)
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt(); // restore
             Buffer.release(buffers);
         }
     }
@@ -283,11 +282,11 @@ public final class Streams {
                 try {
                     result.get();
                     break;
-                } catch (CancellationException ex2) {
+                } catch (CancellationException cancelled) {
                     break;
-                } catch (ExecutionException ex2) {
-                    throw new AssertionError(ex2);
-                } catch (InterruptedException ex2) {
+                } catch (ExecutionException cannotHappen) {
+                    throw new AssertionError(cannotHappen);
+                } catch (InterruptedException ignore) {
                     interrupted = true;
                 }
             }
