@@ -151,24 +151,24 @@ extends ConfiguredClientTestBase<D> {
         Closeable resource = factory.create(entry);
         final ReferenceQueue<FsController<?>> queue
                 = new ReferenceQueue<FsController<?>>();
-        final Reference<FsController<?>> exp
+        final Reference<FsController<?>> expected
                 = new WeakReference<FsController<?>>(
                     new TFile(entry).getInnerArchive().getController(), queue);
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
-        assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
+        assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
         resource.close();
         resource = null; // leave now!
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
-        assertSame(exp.get(), new TFile(entry).getInnerArchive().getController());
+        assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
         TFile.umount(new TFile(entry).getTopLevelArchive());
-        Reference<? extends FsController<?>> ref;
+        Reference<? extends FsController<?>> got;
         do {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
-        } while (null == (ref = queue.remove(TIMEOUT_MILLIS)));
-        assert exp == ref;
-        assert null == exp.get();
+        } while (null == (got = queue.remove(TIMEOUT_MILLIS)));
+        assert expected == got;
+        assert null == expected.get();
     }
 
     @Test
@@ -529,7 +529,7 @@ extends ConfiguredClientTestBase<D> {
                 assertFalse(file2.exists()); // previous op has removed file2!
             }
 
-            // Open file1 as stream and let the garbage collection join the stream automatically.
+            // Open file1 as stream and let the garbage collection close the stream automatically.
             new TFileInputStream(file1);
 
             try {
@@ -637,10 +637,10 @@ extends ConfiguredClientTestBase<D> {
         }
         
         // The stream has been forcibly closed by TFile.update().
-        // Another join is OK, though!
+        // Another close is OK, though!
         out.close();
         
-        // Reopen stream and let the garbage collection join the stream automatically.
+        // Reopen stream and let the garbage collection close the stream automatically.
         new TFileOutputStream(file1);
         out = null;
         
@@ -1096,7 +1096,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             out.println("Hello World!");
         } finally {
-            out.close(); // ALWAYS join streams!
+            out.close(); // ALWAYS close streams!
         }
         assertRenameArchiveToTemp(archive);
     }
