@@ -619,13 +619,15 @@ extends FsLockModelDecoratingController<
         /**
          * Pauses the current thread for a random time interval between one and
          * {@link #WAIT_TIMEOUT_MILLIS} milliseconds inclusively.
-         * Interrupting the current thread immediately cancels the pause and
-         * clears the interrupt status of the current thread.
+         * Interrupting the current thread immediately cancels the pause, but
+         * leaves the interrupt status of the current thread unaltered for
+         * subsequent consumption.
          */
         void pause () {
             try {
                 Thread.sleep(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
             } catch (InterruptedException cancel) {
+                Thread.currentThread().interrupt(); // restore
             }
         }
     } // ThreadTool
