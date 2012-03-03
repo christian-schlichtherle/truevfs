@@ -39,7 +39,7 @@ final class TFileChooserOperator extends JFileChooserOperator {
 	    return waiter.waitDialog(
                     (Window) parent.getSource(),
                     new JFileChooserJDialogFinder(parent.getOutput()));
-	} catch(InterruptedException ex) {
+	} catch (InterruptedException ex) {
 	    parent.getOutput().printStackTrace(ex);
 	    return(null);
 	}
