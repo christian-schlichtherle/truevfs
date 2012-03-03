@@ -44,6 +44,7 @@ public enum FsSyncOption {
      * then the respective file system controller will not return from the
      * update until the current thread gets interrupted!
      */
+    // TODO: Merge WAIT_CLOSE_INPUT and WAIT_CLOSE_OUTPUT into WAIT_CLOSE_IO.
     WAIT_CLOSE_INPUT,
 
     /**
@@ -62,6 +63,7 @@ public enum FsSyncOption {
      * its cause is thrown to indicate
      * that the application must close all input resources first.
      */
+    // TODO: Merge FORCE_CLOSE_INPUT and FORCE_CLOSE_OUTPUT into FORCE_CLOSE_IO.
     FORCE_CLOSE_INPUT,
 
     /**
@@ -69,6 +71,7 @@ public enum FsSyncOption {
      * but applies to file system entry output resources (output streams etc.)
      * instead.
      */
+    // TODO: Merge WAIT_CLOSE_INPUT and WAIT_CLOSE_OUTPUT into WAIT_CLOSE_IO.
     WAIT_CLOSE_OUTPUT,
 
     /**
@@ -81,6 +84,7 @@ public enum FsSyncOption {
      * {@link #FORCE_CLOSE_INPUT} must be set, too.
      * Otherwise, an {@code IllegalArgumentException} is thrown.
      */
+    // TODO: Merge FORCE_CLOSE_INPUT and FORCE_CLOSE_OUTPUT into FORCE_CLOSE_IO.
     FORCE_CLOSE_OUTPUT,
 
     /**
