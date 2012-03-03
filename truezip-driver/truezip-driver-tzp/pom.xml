@@ -58,4 +58,17 @@
             <type>test-jar</type>
         </dependency>
     </dependencies>
+
+    <!--profiles>
+        <profile>
+            <id>integration-test</id>
+            <dependencies>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>truezip-extension-jmx-jul</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+       </profile>
+    </profiles-->
 </project>
