@@ -58,17 +58,4 @@
             <type>test-jar</type>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>http://www.bouncycastle.org/docs/docs1.6/</link>
-                    </links>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>
