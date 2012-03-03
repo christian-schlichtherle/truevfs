@@ -4,17 +4,18 @@
  */
 package de.schlichtherle.truezip.util;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
- * Provides static utility methods for {@link Throwable}s.
+ * Static utility methods for {@link Throwable}s.
  * 
+ * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-public final class Throwables {
+@Immutable
+public class Throwables {
 
-    /** You cannot instantiate this class. */
+    /* Can't touch this - hammer time! */
     private Throwables() { }
 
     /**

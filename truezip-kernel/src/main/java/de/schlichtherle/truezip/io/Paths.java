@@ -1,32 +1,26 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Locale;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Provides static utility methods for path names.
+ * Static utility methods for path names.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 public final class Paths {
 
-    /** You cannot instantiate this class. */
-    private Paths() {
-    }
+    /* Can't touch this - hammer time! */
+    private Paths() { }
 
     /**
      * Equivalent to

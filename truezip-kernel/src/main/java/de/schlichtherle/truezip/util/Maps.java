@@ -1,21 +1,22 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
+import javax.annotation.concurrent.Immutable;
+
 /**
- * Provides static utility methods for maps.
+ * Static utility methods for maps.
  * 
  * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
- * @version $Id$
  */
+@Immutable
 public class Maps {
+
+    /* Can't touch this - hammer time! */
+    private Maps() { }
 
     /**
      * Returns the initial capacity for a hash table with a load factor of 0.75.
@@ -23,7 +24,7 @@ public class Maps {
      * @param size the number of entries to accommodate space for.
      * @return The initial capacity for a hash table with a load factor of 0.75.
      */
-    public static int initialCapacity(int size) {
+    public static int initialCapacity(final int size) {
         return size * 4 / 3 + 1;
     }
 }
