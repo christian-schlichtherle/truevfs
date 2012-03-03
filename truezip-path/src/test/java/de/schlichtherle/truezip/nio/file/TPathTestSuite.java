@@ -502,7 +502,7 @@ extends ConfiguredClientTestBase<D> {
             } catch (InputClosedException ex) {
             }
 
-            // Open file1 as stream and let the garbage collection join the stream automatically.
+            // Open file1 as stream and let the garbage collection close the stream automatically.
             newInputStream(file1);
 
             try {
@@ -608,10 +608,10 @@ extends ConfiguredClientTestBase<D> {
         }
         
         // The stream has been forcibly closed by TPath.update().
-        // Another join is OK, though!
+        // Another close is OK, though!
         out.close();
         
-        // Reopen stream and let the garbage collection join the stream automatically.
+        // Reopen stream and let the garbage collection close the stream automatically.
         newOutputStream(file1);
         out = null;
         
@@ -1138,7 +1138,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             out.println("Hello World!");
         } finally {
-            out.close(); // ALWAYS join streams!
+            out.close(); // ALWAYS close streams!
         }
         assertRenameArchiveToTemp(archive);
     }
