@@ -23,6 +23,7 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
+import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -53,9 +54,10 @@ implements Iterable<FsCovariantEntry<E>> {
      * number of entries in order to compute the initial capacity of the
      * internal hash map.
      * 
+     * @see    Maps#initialCapacity(int)
      * @since  TrueZIP 7.3
      */
-    public static final int OVERHEAD_SIZE = 64;
+    public static final int OVERHEAD_SIZE = (64 - 1) * 3 / 4; // consider 75% load factor
 
     private static final String ROOT_PATH = ROOT.getPath();
 
