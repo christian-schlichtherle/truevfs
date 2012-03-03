@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
@@ -28,14 +24,13 @@ import java.net.URI;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
-import javax.swing.JOptionPane;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.swing.JOptionPane;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class SwingSafePbeParametersView<
@@ -288,10 +283,10 @@ extends SafePbeParametersView<P> {
             synchronized (SwingSafePbeParametersView.class) {
                 try {
                     EventQueue.invokeAndWait(task);
-                } catch (InterruptedException failure) {
-                    throw new KeyPromptingInterruptedException(failure);
-                } catch (InvocationTargetException ex) {
-                    throw new UnknownKeyException(ex);
+                } catch (InterruptedException interrupt) {
+                    throw new KeyPromptingInterruptedException(interrupt);
+                } catch (InvocationTargetException failure) {
+                    throw new UnknownKeyException(failure);
                 }
             }
         }
