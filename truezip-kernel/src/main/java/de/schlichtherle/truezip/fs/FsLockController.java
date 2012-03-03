@@ -56,10 +56,10 @@ extends FsLockModelDecoratingController<
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
-    private static final ThreadLocal<ThreadTool> threadTool = (JSE7.AVAILABLE
-            ? ThreadLocalToolFactory.NEW
-            : ThreadLocalToolFactory.OLD
-                ).newThreadLocalTool();
+    private static final ThreadLocal<ThreadUtil> threadUtil = (JSE7.AVAILABLE
+            ? ThreadLocalUtilFactory.NEW
+            : ThreadLocalUtilFactory.OLD
+                ).newThreadLocalUtil();
 
     private final ReadLock readLock;
     private final WriteLock writeLock;
@@ -144,7 +144,7 @@ extends FsLockModelDecoratingController<
      */
     private static <T> T locked(final IOOperation<T> operation, final Lock lock)
     throws IOException {
-        final ThreadTool thread = threadTool.get();
+        final ThreadUtil thread = threadUtil.get();
         if (thread.locking) {
             if (!lock.tryLock())
                 throw FsNeedsLockRetryException.get();
@@ -167,7 +167,7 @@ extends FsLockModelDecoratingController<
                 } catch (final IOException ex) {
                     if (!needsLockRetry(ex))
                         throw ex;
-                    thread.pause();
+                    thread.delay();
                 }
             }
         }
@@ -610,11 +610,11 @@ extends FsLockModelDecoratingController<
     } // LockOutputStream
 
     @NotThreadSafe
-    private static final class ThreadTool {
+    private static final class ThreadUtil {
         boolean locking;
         final Random rnd;
 
-        ThreadTool(Random rnd) { this.rnd = rnd; }
+        ThreadUtil(Random rnd) { this.rnd = rnd; }
 
         /**
          * Pauses the current thread for a random time interval between one and
@@ -623,7 +623,7 @@ extends FsLockModelDecoratingController<
          * leaves the interrupt status of the current thread unaltered for
          * subsequent consumption.
          */
-        void pause () {
+        void delay () {
             try {
                 Thread.sleep(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
             } catch (InterruptedException cancel) {
@@ -633,14 +633,14 @@ extends FsLockModelDecoratingController<
     } // ThreadTool
 
     @Immutable
-    private enum ThreadLocalToolFactory {
+    private enum ThreadLocalUtilFactory {
         OLD {
             @Override
-            ThreadLocal<ThreadTool> newThreadLocalTool() {
-                return new ThreadLocal<ThreadTool>() {
+            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
+                return new ThreadLocal<ThreadUtil>() {
                     @Override
-                    public ThreadTool initialValue() {
-                        return new ThreadTool(new Random());
+                    public ThreadUtil initialValue() {
+                        return new ThreadUtil(new Random());
                     }
                 };
             }
@@ -648,17 +648,17 @@ extends FsLockModelDecoratingController<
 
         NEW {
             @Override
-            ThreadLocal<ThreadTool> newThreadLocalTool() {
-                return new ThreadLocal<ThreadTool>() {
+            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
+                return new ThreadLocal<ThreadUtil>() {
                     @Override
-                    public ThreadTool initialValue() {
-                        return new ThreadTool(ThreadLocalRandom.current());
+                    public ThreadUtil initialValue() {
+                        return new ThreadUtil(ThreadLocalRandom.current());
                     }
                 };
             }
         };
 
-        abstract ThreadLocal<ThreadTool> newThreadLocalTool();
+        abstract ThreadLocal<ThreadUtil> newThreadLocalUtil();
     } // ThreadLocalToolFactory
 
     private interface IOOperation<T> extends Callable<T> {
