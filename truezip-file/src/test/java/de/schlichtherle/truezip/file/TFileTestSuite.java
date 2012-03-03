@@ -1257,24 +1257,24 @@ extends ConfiguredClientTestBase<D> {
     throws Exception {
         // Create test archive file.
         createTestArchive(nEntries);
-        
-        class CheckAllEntriesTask implements Callable<Void> {
-            @Override
-            public Void call() throws IOException {
-                assertArchiveEntries(archive, nEntries);
-                return null;
-            }
-        } // CheckAllEntriesTask
 
-        class CheckAllEntriesTaskFactory implements TaskFactory {
+        class CheckAllEntriesFactory implements TaskFactory {
             @Override
-            public Callable<Void> newTask(int threadNum) {
-                return new CheckAllEntriesTask();
+            public Callable<?> newTask(int threadNum) {
+                return new CheckAllEntries();
             }
-        } // CheckAllEntriesTaskFactory
+
+            class CheckAllEntries implements Callable<Void> {
+                @Override
+                public Void call() throws IOException {
+                    assertArchiveEntries(archive, nEntries);
+                    return null;
+                }
+            } // CheckAllEntries
+        } // CheckAllEntriesFactory
 
         try {
-            runConcurrent(nThreads, new CheckAllEntriesTaskFactory()).join();
+            runConcurrent(nThreads, new CheckAllEntriesFactory()).join();
         } finally {
             TFile.rm_r(archive);
         }
@@ -1329,45 +1329,40 @@ extends ConfiguredClientTestBase<D> {
     throws Exception {
         assertTrue(TFile.isLenient());
 
-        class WritingTask implements Callable<Void> {
-            final TFile entry;
-
-            WritingTask(final int no) {
-                this.entry = new TFile(archive, no + "");
-            }
-
+        class WriteFactory implements TaskFactory {
             @Override
-            public Void call() throws IOException {
-                createTestFile(entry);
-                try {
-                    TFile.umount(archive, wait, false, wait, false);
-                } catch (FsSyncException ex) {
-                    if (!(ex.getCause() instanceof FileBusyException))
-                        throw ex;
-                    // Some other thread is busy updating an archive.
-                    // If we are waiting, then this could never happen.
-                    // Otherwise, silently ignore this exception and
-                    // accept that the archive may not have been
-                    // updated to disk.
-                    // Note that no data is lost, this exception just
-                    // signals that the corresponding archive hasn't
-                    // been updated - a future call may still succeed.
-                    if (wait)
-                        throw new AssertionError(ex);
-                }
-                return null;
-            }
-        } // WritingTask
+            public Callable<?> newTask(final int threadNum) {
+                class Write implements Callable<Void> {
+                    @Override
+                    public Void call() throws IOException {
+                        final TFile entry = new TFile(archive, "" + threadNum);
+                        createTestFile(entry);
+                        try {
+                            TFile.umount(archive, wait, false, wait, false);
+                        } catch (FsSyncException ex) {
+                            if (!(ex.getCause() instanceof FileBusyException))
+                                throw ex;
+                            // Some other thread is busy updating an archive.
+                            // If we are waiting, then this could never happen.
+                            // Otherwise, silently ignore this exception and
+                            // accept that the archive may not have been
+                            // updated to disk.
+                            // Note that no data is lost, this exception just
+                            // signals that the corresponding archive hasn't
+                            // been updated - a future call may still succeed.
+                            if (wait)
+                                throw new AssertionError(ex);
+                        }
+                        return null;
+                    }
+                } // Write
 
-        class WritingTaskFactory implements TaskFactory {
-            @Override
-            public Callable<Void> newTask(int no) {
-                return new WritingTask(no);
+                return new Write();
             }
-        } // WritingTaskFactory
+        } // WriteFactory
 
         try {
-            runConcurrent(NUM_IO_THREADS, new WritingTaskFactory()).join();
+            runConcurrent(NUM_IO_THREADS, new WriteFactory()).join();
         } finally {
             assertArchiveEntries(archive, NUM_IO_THREADS);
             TFile.rm_r(archive);
@@ -1386,49 +1381,49 @@ extends ConfiguredClientTestBase<D> {
     throws Exception {
         assertTrue(TFile.isLenient());
 
-        class WritingTask implements Callable<Void> {
+        class WriteFactory implements TaskFactory {
             @Override
-            public Void call() throws IOException {
-                final TFile archive = new TFile(createTempFile());
-                archive.rm();
-                final TFile entry = new TFile(archive, "entry");
-                try {
-                    createTestFile(entry);
+            public Callable<?> newTask(int threadNum) {
+                return new Write();
+            }
+
+            class Write implements Callable<Void> {
+                @Override
+                public Void call() throws IOException {
+                    final TFile archive = new TFile(createTempFile());
+                    archive.rm();
+                    final TFile entry = new TFile(archive, "entry");
                     try {
-                        if (updateIndividually)
-                            TFile.umount(archive);
-                        else
-                            TFile.sync(SYNC); // DON'T clear cache!
-                    } catch (FsSyncException ex) {
-                        if (!(ex.getCause() instanceof FileBusyException))
-                            throw ex;
-                        // Some other thread is busy updating an archive.
-                        // If we are updating individually, then this
-                        // could never happen.
-                        // Otherwise, silently ignore this exception and
-                        // accept that the archive may not have been
-                        // updated to disk.
-                        // Note that no data is lost, this exception just
-                        // signals that the corresponding archive hasn't
-                        // been updated - a future call may still succeed.
-                        if (updateIndividually)
-                            throw new AssertionError(ex);
+                        createTestFile(entry);
+                        try {
+                            if (updateIndividually)
+                                TFile.umount(archive);
+                            else
+                                TFile.sync(SYNC); // DON'T clear cache!
+                        } catch (FsSyncException ex) {
+                            if (!(ex.getCause() instanceof FileBusyException))
+                                throw ex;
+                            // Some other thread is busy updating an archive.
+                            // If we are updating individually, then this
+                            // could never happen.
+                            // Otherwise, silently ignore this exception and
+                            // accept that the archive may not have been
+                            // updated to disk.
+                            // Note that no data is lost, this exception just
+                            // signals that the corresponding archive hasn't
+                            // been updated - a future call may still succeed.
+                            if (updateIndividually)
+                                throw new AssertionError(ex);
+                        }
+                    } finally {
+                        TFile.rm_r(archive);
                     }
-                } finally {
-                    TFile.rm_r(archive);
+                    return null;
                 }
-                return null;
-            }
-        } // WritingTask
+            } // Write
+        } // WriteFactory
 
-        class WritingTaskFactory implements TaskFactory {
-            @Override
-            public Callable<Void> newTask(int no) {
-                return new WritingTask();
-            }
-        } // WritingTaskFactory
-
-        runConcurrent(NUM_IO_THREADS, new WritingTaskFactory()).join();
+        runConcurrent(NUM_IO_THREADS, new WriteFactory()).join();
     }
 
     /**
@@ -1438,35 +1433,30 @@ extends ConfiguredClientTestBase<D> {
     public void testMultithreadedMutualArchiveCopying() throws Exception {
         assertTrue(TFile.isLenient());
 
-        class CopyingTask implements Callable<Void> {
+        class CopyFactory implements TaskFactory {
             final TFile src, dst;
 
-            CopyingTask(final TFile src, final TFile dst, final int no) {
-                this.src = new TFile(src, "src/" + no);
-                this.dst = new TFile(dst, "dst/" + no);
-            }
-
-            @Override
-            public Void call() throws IOException {
-                createTestFile(src);
-                src.cp(dst);
-                return null;
-            }
-        } // CopyingTask
-
-        class CopyingTaskFactory implements TaskFactory {
-            final TFile src, dst;
-
-            CopyingTaskFactory(final TFile src, final TFile dst) {
+            CopyFactory(final TFile src, final TFile dst) {
                 this.src = src;
                 this.dst = dst;
             }
 
             @Override
-            public Callable<Void> newTask(final int no) {
-                return new CopyingTask(src, dst, no);
+            public Callable<?> newTask(final int threadNum) {
+                class Copy implements Callable<Void> {
+                    @Override
+                    public Void call() throws IOException {
+                        final TFile srcNo = new TFile(src, "src/" + threadNum);
+                        final TFile dstNo = new TFile(dst, "dst/" + threadNum);
+                        createTestFile(srcNo);
+                        srcNo.cp(dstNo);
+                        return null;
+                    }
+                } // Copy
+
+                return new Copy();
             }
-        } // CopyingTaskFactory
+        } // CopyFactory
 
         final TFile src = archive;
         try {
@@ -1475,11 +1465,10 @@ extends ConfiguredClientTestBase<D> {
             try {
                 try {
                     final TaskJoiner join = runConcurrent(NUM_IO_THREADS,
-                            new CopyingTaskFactory(src, dst));
+                            new CopyFactory(src, dst));
                     try {
                         runConcurrent(NUM_IO_THREADS,
-                                new CopyingTaskFactory(dst, src)
-                                ).join();
+                                new CopyFactory(dst, src)).join();
                     } finally {
                         join.join();
                     }
