@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
@@ -30,8 +26,7 @@ import org.junit.Test;
 /**
  * Performs an integration test for reading and writing ZIP files.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
@@ -367,52 +362,51 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
         final ZipFile zin = newZipFile(file);
 
-        // Define task to check all entries.
-        class CheckAllEntriesTask implements Callable<Void> {
+        class CheckAllEntriesFactory implements TaskFactory {
             @Override
-            public Void call() throws IOException {
-                // Retrieve list of entries and shuffle their order.
-                @SuppressWarnings("unchecked")
-                final List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) zin.entries());
-                assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
-                Collections.shuffle(entries, rnd);
+            public Callable<?> newTask(int threadNum) {
+                return new CheckAllEntries();
+            }
 
-                // Now read in the entries in the shuffled order.
-                final byte[] buf = new byte[data.length];
-                for (final ZipEntry entry : entries) {
-                    // Read full entry and check the contents.
-                    final InputStream in = zin.getInputStream(entry.getName());
-                    try {
-                        int off = 0;
-                        int read;
-                        while (true) {
-                            read = in.read(buf);
-                            if (read < 0)
-                                break;
-                            assertTrue(read > 0);
-                            assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
-                            off += read;
+            class CheckAllEntries implements Callable<Void> {
+                @Override
+                public Void call() throws IOException {
+                    // Retrieve list of entries and shuffle their order.
+                    @SuppressWarnings("unchecked")
+                    final List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) zin.entries());
+                    assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
+                    Collections.shuffle(entries, rnd);
+
+                    // Now read in the entries in the shuffled order.
+                    final byte[] buf = new byte[data.length];
+                    for (final ZipEntry entry : entries) {
+                        // Read full entry and check the contents.
+                        final InputStream in = zin.getInputStream(entry.getName());
+                        try {
+                            int off = 0;
+                            int read;
+                            while (true) {
+                                read = in.read(buf);
+                                if (read < 0)
+                                    break;
+                                assertTrue(read > 0);
+                                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                                off += read;
+                            }
+                            assertEquals(-1, read);
+                            assertEquals(off, data.length);
+                            assertTrue(0 >= in.read(new byte[0]));
+                        } finally {
+                            in.close();
                         }
-                        assertEquals(-1, read);
-                        assertEquals(off, data.length);
-                        assertTrue(0 >= in.read(new byte[0]));
-                    } finally {
-                        in.close();
                     }
+                    return null;
                 }
-                return null;
-            }
-        } // CheckAllEntriesTask
-
-        class CheckAllEntriesTaskFactory implements TaskFactory {
-            @Override
-            public Callable<Void> newTask(int threadNum) {
-                return new CheckAllEntriesTask();
-            }
-        } // CheckAllEntriesTaskFactory
+            } // CheckAllEntries
+        } // CheckAllEntriesFactory
 
         try {
-            runConcurrent(nThreads, new CheckAllEntriesTaskFactory()).join();
+            runConcurrent(nThreads, new CheckAllEntriesFactory()).join();
         } finally {
             zin.close();
         }
