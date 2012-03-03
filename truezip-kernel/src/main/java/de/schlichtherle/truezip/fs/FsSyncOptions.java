@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -13,17 +9,16 @@ import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * A static utility class which holds common options for use with
- * {@link FsController#sync(BitField)} and its many 
- * variants and incarnations in the TrueZIP Kernel and client API modules.
+ * Provides common options for use with {@link FsController#sync(BitField)} and
+ * its many variants and incarnations in the TrueZIP Kernel and client API
+ * modules.
  * 
- * @see     FsSyncOption
- * @since   TrueZIP 7.1.1
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    FsSyncOption
+ * @since  TrueZIP 7.1.1
+ * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsSyncOptions {
+public class FsSyncOptions {
 
     /**
      * Forcibly closes all input and output resources
@@ -82,7 +77,6 @@ public final class FsSyncOptions {
     public static final BitField<FsSyncOption>
             CANCEL = BitField.of(ABORT_CHANGES);
 
-    /** You cannot instantiate this class. */
-    private FsSyncOptions() {
-    }
+    /* Can't touch this - hammer time! */
+    private FsSyncOptions() { }
 }

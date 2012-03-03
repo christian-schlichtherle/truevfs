@@ -19,16 +19,15 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
- * Provides static copy methods for {@link InputStream}s and
- * {@link OutputStream}s.
+ * Static utility methods for {@link InputStream}s and {@link OutputStream}s.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-public final class Streams {
+@Immutable
+public class Streams {
 
     /**
      * The size of the FIFO used for exchanging I/O buffers between a reader
@@ -45,9 +44,8 @@ public final class Streams {
     private static final ExecutorService executor
             = Executors.newCachedThreadPool(new ReaderThreadFactory());
 
-    /** You cannot instantiate this class. */
-    private Streams() {
-    }
+    /* Can't touch this - hammer time! */
+    private Streams() { }
 
     /**
      * Copies the data from the given input stream to the given output stream

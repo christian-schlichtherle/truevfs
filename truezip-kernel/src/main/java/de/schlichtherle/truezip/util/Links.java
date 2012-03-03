@@ -1,28 +1,23 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
 import de.schlichtherle.truezip.util.Link.Type;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
- * Provides static utility methods for links.
+ * Static utility methods for links.
  *
  * @author Christian Schlichtherle
- * @version $Id$
  */
-@ThreadSafe
+@Immutable
 public class Links {
 
-    private Links() {
-    }
+    /* Can't touch this - hammer time! */
+    private Links() { }
 
     /**
      * Returns a nullable (strong) link to the given target.

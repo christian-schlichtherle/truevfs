@@ -1,24 +1,23 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.fs.FsInputOption.*;
+import static de.schlichtherle.truezip.fs.FsInputOption.CACHE;
 import de.schlichtherle.truezip.util.BitField;
+import javax.annotation.concurrent.Immutable;
 
 /**
- * @see     FsInputOption
- * @see     FsOutputOptions
- * @since   TrueZIP 7.1.1
- * @author  Christian Schlichtherle
- * @version $Id$
+ * Provides common input options.
+ * 
+ * @see    FsInputOption
+ * @see    FsOutputOptions
+ * @since  TrueZIP 7.1.1
+ * @author Christian Schlichtherle
  */
-public final class FsInputOptions {
+@Immutable
+public class FsInputOptions {
 
     /**
      * A bit field with no input options set.
@@ -46,7 +45,6 @@ public final class FsInputOptions {
     public static final BitField<FsInputOption> INPUT_PREFERENCES_MASK
             = BitField.of(CACHE);
 
-    /** You cannot instantiate this class. */
-    private FsInputOptions() {
-    }
+    /* Can't touch this - hammer time! */
+    private FsInputOptions() { }
 }
