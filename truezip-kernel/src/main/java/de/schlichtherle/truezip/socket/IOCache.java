@@ -344,6 +344,27 @@ public final class IOCache implements Flushable, Closeable {
     } // InputBufferPool
 
     @Immutable
+    private final class WriteThroughOutputBufferPool extends OutputBufferPool {
+        @Override
+        public void release(Buffer buffer) throws IOException {
+            if (0 != buffer.writers)
+                super.release(buffer);
+        }
+    } // WriteThroughOutputBufferPool
+
+    @Immutable
+    private final class WriteBackOutputBufferPool extends OutputBufferPool {
+        @Override
+        public void release(final Buffer buffer) throws IOException {
+            if (0 != buffer.writers)
+                if (getBuffer() != buffer)
+                    setBuffer(buffer);
+                else
+                    super.release(buffer);
+        }
+    } // WriteBackOutputBufferPool
+
+    @Immutable
     private abstract class OutputBufferPool
     implements Pool<Buffer, IOException> {
         @Override
@@ -365,29 +386,6 @@ public final class IOCache implements Flushable, Closeable {
             }
         }
     } // OutputBufferPool
-
-    @Immutable
-    private final class WriteThroughOutputBufferPool extends OutputBufferPool {
-        @Override
-        public void release(Buffer buffer) throws IOException {
-            if (0 != buffer.writers)
-                super.release(buffer);
-        }
-    } // WriteThroughOutputBufferPool
-
-    @Immutable
-    private final class WriteBackOutputBufferPool extends OutputBufferPool {
-        @Override
-        public void release(final Buffer buffer) throws IOException {
-            if (0 != buffer.writers) {
-                if (getBuffer() != buffer) {
-                    setBuffer(buffer);
-                } else {
-                    super.release(buffer);
-                }
-            }
-        }
-    } // WriteBackOutputBufferPool
 
     @Immutable
     private enum BufferSocketFactory {
