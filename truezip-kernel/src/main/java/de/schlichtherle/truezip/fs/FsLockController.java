@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
+import de.schlichtherle.truezip.util.Threads;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -167,7 +168,7 @@ extends FsLockModelDecoratingController<
                 } catch (final IOException ex) {
                     if (!needsLockRetry(ex))
                         throw ex;
-                    thread.delay();
+                    thread.pause();
                 }
             }
         }
@@ -617,20 +618,14 @@ extends FsLockModelDecoratingController<
         ThreadUtil(Random rnd) { this.rnd = rnd; }
 
         /**
-         * Pauses the current thread for a random time interval between one and
+         * Delays the current thread for a random time interval between one and
          * {@link #WAIT_TIMEOUT_MILLIS} milliseconds inclusively.
-         * Interrupting the current thread immediately cancels the pause, but
-         * leaves the interrupt status of the current thread unaltered for
-         * subsequent consumption.
+         * Interrupting the current thread has no effect on this method.
          */
-        void delay () {
-            try {
-                Thread.sleep(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
-            } catch (InterruptedException cancel) {
-                Thread.currentThread().interrupt(); // restore
-            }
+        void pause() {
+            Threads.pause(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
         }
-    } // ThreadTool
+    } // ThreadUtil
 
     @Immutable
     private enum ThreadLocalUtilFactory {
