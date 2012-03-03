@@ -496,9 +496,9 @@ extends ConfiguredClientTestBase<D> {
         final TFile file1 = new TFile(archive, "file1");
         final TFile file2 = new TFile(archive, "file2");
 
-        assertTrue(file1.createNewFile()); // calls FsController.mknod()
+        assertTrue(file1.createNewFile());
         umount(); // ensure file1 is really present in the archive file
-        assertTrue(file2.createNewFile());
+        assertTrue(file2.createNewFile()); // calls FsController.mknod()
         final InputStream in1 = new TFileInputStream(file1);
         try {
             try {
@@ -571,7 +571,7 @@ extends ConfiguredClientTestBase<D> {
     throws IOException, InterruptedException {
         TFile file1 = new TFile(archive, "file1");
         TFile file2 = new TFile(archive, "file2");
-        
+
         // Ensure that there are two entries in the archive.
         // This is used later to check whether the update operation knows
         // how to deal with updating an archive for which there is still
@@ -582,19 +582,19 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-        
+
         out = new TFileOutputStream(file2);
         try {
             TFile.cat(new ByteArrayInputStream(getData()), out);
         } finally {
             out.close();
         }
-        
+
         umount(); // ensure two entries in the archive
-        
+
         out = new TFileOutputStream(file1);
         TFile.cat(new ByteArrayInputStream(getData()), out);
-        
+
         // out is still open!
         try {
             new TFileOutputStream(file1).close();
@@ -620,7 +620,7 @@ extends ConfiguredClientTestBase<D> {
 
         // out is still open!
         TFile.cat(new ByteArrayInputStream(getData()), out); // write again
-        
+
         // out is still open!
         try {
             umount(); // forces closing of all streams
@@ -629,21 +629,21 @@ extends ConfiguredClientTestBase<D> {
             if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
         }
-        
+
         try {
             TFile.cat(new ByteArrayInputStream(getData()), out); // write again
             fail();
         } catch (OutputClosedException ex) {
         }
-        
+
         // The stream has been forcibly closed by TFile.update().
         // Another close is OK, though!
         out.close();
-        
+
         // Reopen stream and let the garbage collection close the stream automatically.
         new TFileOutputStream(file1);
         out = null;
-        
+
         try {
             // This operation may succeed without any exception if
             // the garbage collector did its job.
@@ -654,7 +654,7 @@ extends ConfiguredClientTestBase<D> {
                 throw ex;
         }
         umount(); // It must not fail twice for the same reason!
-        
+
         // Cleanup.
         file2.rm();
         assertFalse(file2.exists());
