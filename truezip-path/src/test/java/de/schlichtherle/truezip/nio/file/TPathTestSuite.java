@@ -544,7 +544,7 @@ extends ConfiguredClientTestBase<D> {
     throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
         TPath file2 = archive.resolve("file2");
-        
+
         // Ensure that there are two entries in the archive.
         // This is used later to check whether the update operation knows
         // how to deal with updating an archive for which there is still
@@ -555,19 +555,19 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-        
+
         out = newOutputStream(file2);
         try {
             Streams.cat(new ByteArrayInputStream(getData()), out);
         } finally {
             out.close();
         }
-        
+
         umount(); // ensure two entries in the archive
-        
+
         out = newOutputStream(file1);
         Streams.cat(new ByteArrayInputStream(getData()), out);
-        
+
         // out is still open!
         try {
             newOutputStream(file1).close();
@@ -591,7 +591,7 @@ extends ConfiguredClientTestBase<D> {
 
         // out is still open!
         Streams.cat(new ByteArrayInputStream(getData()), out); // write again
-        
+
         // out is still open!
         try {
             umount(); // forces closing of all streams
@@ -600,21 +600,21 @@ extends ConfiguredClientTestBase<D> {
             if (!(ex.getCause() instanceof FileBusyException))
                 throw ex;
         }
-        
+
         try {
             Streams.cat(new ByteArrayInputStream(getData()), out); // write again
             fail();
         } catch (OutputClosedException ex) {
         }
-        
+
         // The stream has been forcibly closed by TPath.update().
         // Another close is OK, though!
         out.close();
-        
+
         // Reopen stream and let the garbage collection close the stream automatically.
         newOutputStream(file1);
         out = null;
-        
+
         try {
             // This operation may succeed without any exception if
             // the garbage collector did its job.
@@ -625,7 +625,7 @@ extends ConfiguredClientTestBase<D> {
                 throw ex;
         }
         umount(); // It must not fail twice for the same reason!
-        
+
         // Cleanup.
         delete(file2);
         assertFalse(exists(file2));
