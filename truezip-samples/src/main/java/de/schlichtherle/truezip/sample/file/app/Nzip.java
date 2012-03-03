@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.sample.file.app;
 
@@ -29,6 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A comprehensive command line utility which allows you to work
@@ -50,12 +47,10 @@ import java.util.ResourceBundle;
  * time searching for the Central Directory required to be present in ZIP
  * (and hence SFX) files.
  * As a conclusion, this utility should not serve as a performance benchmark.
- * <p>
- * This class is <em>not</em> thread safe.
  * 
  * @author Christian Schlichtherle
- * @version $Id$
  */
+@NotThreadSafe
 public class Nzip extends Application {
 
     private static final ResourceBundle resources
@@ -319,6 +314,7 @@ public class Nzip extends Application {
         }
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive!
     private void cpOrMv(final String[] args, final boolean mv)
     throws IllegalUsageException, IOException {
         if (args.length < 2)
