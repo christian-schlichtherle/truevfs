@@ -362,7 +362,11 @@ extends FsArchiveDriverTestBase<D> {
             if (null == resource)
                 break;
             try {
-                resource.close();
+                try {
+                    resource.close();
+                } finally {
+                    resource.close(); // must be idempotent on side effects
+                }
             } catch (final IOException ex) {
                 failure = ex;
             }
