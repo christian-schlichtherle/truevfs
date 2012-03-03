@@ -76,25 +76,25 @@ extends FsArchiveDriverTestSuite<E, D> {
     throws Throwable {
         final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
-        class TestTask implements Callable<Void> {
+        class CheckFactory implements TaskFactory {
             @Override
-            public Void call()
-            throws CharConversionException, InterruptedException {
-                start.countDown();
-                start.await();
-                for (int i = 0; i < 100000; i++)
-                    getArchiveDriver().assertEncodable(US_ASCII_CHARACTERS);
-                return null;
+            public Callable<?> newTask(int threadNum) {
+                return new Check();
             }
-        } // TestTask
 
-        class TestTaskFactory implements TaskFactory {
-            @Override
-            public Callable<Void> newTask(int threadNum) {
-                return new TestTask();
-            }
-        } // TestTaskFactory
+            class Check implements Callable<Void> {
+                @Override
+                public Void call()
+                throws CharConversionException, InterruptedException {
+                    start.countDown();
+                    start.await();
+                    for (int i = 0; i < 100000; i++)
+                        getArchiveDriver().assertEncodable(US_ASCII_CHARACTERS);
+                    return null;
+                }
+            } // Check
+        } // CheckFactory
 
-        runConcurrent(NUM_IO_THREADS, new TestTaskFactory()).join();
+        runConcurrent(NUM_IO_THREADS, new CheckFactory()).join();
     }
 }
