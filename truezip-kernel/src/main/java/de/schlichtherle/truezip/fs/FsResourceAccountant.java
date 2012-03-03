@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -43,10 +39,9 @@ import javax.annotation.concurrent.ThreadSafe;
  * In order to stop accounting for a closeable resource,
  * call {@link #stopAccountingFor(Closeable)}.
  *
- * @see     FsResourceController
- * @since   TrueZIP 7.3
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    FsResourceController
+ * @since  TrueZIP 7.3
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class FsResourceAccountant {
@@ -104,10 +99,10 @@ public final class FsResourceAccountant {
     void stopAccountingFor(final @WillNotClose Closeable resource) {
         lock.lock();
         try {
-            final Account ref = accounts.remove(resource);
-            if (null != ref) {
-                ref.clear();
-                ref.enqueue();
+            final Account account = accounts.remove(resource);
+            if (null != account) {
+                account.clear();
+                account.enqueue();
                 condition.signalAll();
             }
         } finally {
@@ -120,12 +115,19 @@ public final class FsResourceAccountant {
      * for by <em>other</em> threads get stopped accounting for or a timeout
      * occurs or the current thread gets interrupted, whatever happens first.
      * <p>
+     * Waiting for such resources can get cancelled immediately by interrupting
+     * the current thread.
+     * Note that the interrupt status of the current thread will be cleared
+     * then.
+     * If no such foreign resources exist, then interrupting the current thread
+     * does not have any effect.
+     * <p>
      * Upon return of this method, threads may immediately start accounting
-     * for closeable resources again unless the caller also locks the lock
+     * for closeable resources again unless the caller has acquired the lock
      * provided to the constructor - use with care!
      * <p>
-     * Mind that this method WILL NOT WORK if any two instances of this class
-     * share the same lock that has been provided to their constructor!
+     * Note that this method WILL NOT WORK if any two instances of this class
+     * share the same lock provided to their constructor!
      *
      * @param  timeout the number of milliseconds to await the closing of
      *         resources which have been accounted for by <em>other</em>
@@ -151,6 +153,7 @@ public final class FsResourceAccountant {
                     }
                 }
             } catch (InterruptedException cancel) {
+                // Leave interrupt status cleared.
             }
             return totalResources();
         } finally {
@@ -161,6 +164,8 @@ public final class FsResourceAccountant {
     /**
      * Returns the number of closeable resources which have been accounted for
      * by the <em>current</em> thread.
+     * Mind that this value may reduce concurrently, even while the lock is
+     * held, so it should <em>not</em> get cached!
      * <p>
      * This method <em>must not</em> get called if the {@link #lock} is not
      * acquired!
@@ -168,16 +173,16 @@ public final class FsResourceAccountant {
     int localResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final Account ref : accounts.values())
-            if (ref.owner.get() == currentThread)
+        for (final Account account : accounts.values())
+            if (account.owner.get() == currentThread)
                 n++;
         return n;
     }
 
     /**
      * Returns the number of <em>all</em> accounted closeable resources.
-     * Mind that this value may reduce instantly, even while the lock is held,
-     * so this value should <em>not</em> get cached!
+     * Mind that this value may reduce concurrently, even while the lock is
+     * held, so it should <em>not</em> get cached!
      * <p>
      * This method <em>must not</em> get called if the {@link #lock} is not
      * acquired!
@@ -288,10 +293,10 @@ public final class FsResourceAccountant {
             while (true) {
                 try {
                     final Account account = (Account) queue.remove();
-                    if (account.isEnqueuedByGC())
-                        System.runFinalization();
-                    else
+                    if (account.isEnqueuedByGC()) {
+                        //System.runFinalization();
                         account.signalAll();
+                    }
                 } catch (InterruptedException ignore) {
                 }
             }
