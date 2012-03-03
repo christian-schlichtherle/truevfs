@@ -210,7 +210,7 @@ public final class Streams {
                     while (0 >= reader.size) {
                         try {
                             signal.await();
-                        } catch (InterruptedException ignore) {
+                        } catch (InterruptedException interrupt) {
                             interrupted = true;
                         }
                     }
@@ -286,7 +286,7 @@ public final class Streams {
                     break;
                 } catch (ExecutionException cannotHappen) {
                     throw new AssertionError(cannotHappen);
-                } catch (InterruptedException ignore) {
+                } catch (InterruptedException interrupt) {
                     interrupted = true;
                 }
             }
