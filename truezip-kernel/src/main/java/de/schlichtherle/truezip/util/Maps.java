@@ -19,10 +19,10 @@ public class Maps {
     private Maps() { }
 
     /**
-     * Returns the initial capacity for a hash table with a load factor of 0.75.
+     * Returns the initial capacity for a hash table with a load factor of 75%.
      * 
      * @param size the number of entries to accommodate space for.
-     * @return The initial capacity for a hash table with a load factor of 0.75.
+     * @return The initial capacity for a hash table with a load factor of 75%.
      */
     public static int initialCapacity(final int size) {
         return size * 4 / 3 + 1;
