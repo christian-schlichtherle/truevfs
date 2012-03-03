@@ -21,37 +21,52 @@ public class ConcurrencyUtils {
     private ConcurrencyUtils() { }
 
     public static TaskJoiner runConcurrent(
-            final int nThreads,
+            final int numThreads,
             final TaskFactory factory) {
-        final List<Future<Void>> results
-                = new ArrayList<Future<Void>>(nThreads);
-        final ExecutorService executor = Executors.newFixedThreadPool(nThreads);
+        final List<Future<?>> results = new ArrayList<Future<?>>(numThreads);
+        final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try {
-            for (int i = 0; i < nThreads; i++)
-                results.add(executor.submit(factory.newTask(i)));
+            for (int threadNum = 0; threadNum < numThreads; threadNum++)
+                results.add(executor.submit(factory.newTask(threadNum)));
         } finally {
             executor.shutdown();
         }
-        return new TaskJoiner() {
+
+        class TaskJoinerImpl implements TaskJoiner {
+            @Override
+            public void cancel() {
+                //executor.shutdownNow(); // TODO: Explain why this doessn't work sometimes!
+                for (final Future<?> result : results)
+                    result.cancel(true);
+            }
+
             @Override
             public void join() throws InterruptedException, ExecutionException {
-                try {
-                    for (final Future<Void> result : results)
+                ExecutionException failure = null;
+                for (final Future<?> result : results) {
+                    try {
                         result.get(); // check exception from task
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                } finally {
-                    executor.awaitTermination(0, TimeUnit.DAYS);
+                    } catch (ExecutionException failed) {
+                        failure = failed;
+                    } catch (CancellationException cancelled) {
+                    }
                 }
+                if (null != failure)
+                    throw failure;
             }
-        };
+        } // TaskJoinerImpl
+
+        return new TaskJoinerImpl();
     }
 
+    @SuppressWarnings("PublicInnerClass")
     public interface TaskFactory {
-        Callable<Void> newTask(int threadNum);
+        Callable<?> newTask(int threadNum);
     }
 
+    @SuppressWarnings("PublicInnerClass")
     public interface TaskJoiner {
+        public void cancel();
         public void join() throws InterruptedException, ExecutionException;
     }
 }
