@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -24,8 +20,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public class FsResourceAccountantTest {
 
@@ -39,7 +34,7 @@ public class FsResourceAccountantTest {
             accountant = new FsResourceAccountant(new ReentrantLock());
 
     @Test
-    public void accounting() throws IOException {
+    public void testAccounting() throws IOException {
         final EvilResource resource = new EvilResource();
         accountant.startAccountingFor(resource);
         accountant.startAccountingFor(resource); // redundant
@@ -48,12 +43,12 @@ public class FsResourceAccountantTest {
     }
 
     @Test
-    public void multithreadedAccounting()
+    public void testMultithreadedAccounting()
     throws InterruptedException, ExecutionException {
 
         class ResourceHogFactory implements TaskFactory {
             @Override
-            public Callable<Void> newTask(int threadNum) {
+            public Callable<?> newTask(int threadNum) {
                 return new ResourceHog();
             }
         } // ResourceHogFactory
@@ -76,19 +71,21 @@ public class FsResourceAccountantTest {
     }
 
     @Test
-    public void waitLocalResources() throws InterruptedException {
+    public void testWaitLocalResources() throws InterruptedException {
         final EvilResource resource = new EvilResource();
         accountant.startAccountingFor(resource);
+        Thread.currentThread().interrupt();
         final long start = System.currentTimeMillis();
         final int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         final long time = System.currentTimeMillis() - start;
-        assertTrue("Timeout after " + time + " ms!",
-                time <= TIMEOUT_MILLIS); // be forgiving!
+        assertTrue("Unexpected timeout after " + time + " ms!",
+                time < TIMEOUT_MILLIS); // should be close to zero
+        assertTrue(Thread.interrupted()); // clear interrupt status!
         assertThat(resources, is(1));
     }
 
     @Test
-    public void waitForeignResources() throws InterruptedException {
+    public void testWaitForeignResources() throws InterruptedException {
         final Thread[] threads = new Thread[] {
             new ResourceHog(),
             new EvilResourceHog(),
@@ -99,17 +96,19 @@ public class FsResourceAccountantTest {
             threads[i].join();
             threads[i] = null;
             waitAllResources();
+            Thread.currentThread().interrupt();
             final long start = System.currentTimeMillis();
             int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
             final long time = System.currentTimeMillis() - start;
-            assertTrue("Timeout while waiting for " + clazz.getSimpleName() + " after " + time + " ms!",
-                    time <= TIMEOUT_MILLIS); // be forgiving!
+            assertTrue("Unexpected timeout while waiting for " + clazz.getSimpleName() + " after " + time + " ms!",
+                    time < TIMEOUT_MILLIS); // should be close to zero
+            assertTrue(Thread.interrupted()); // clear interrupt status!
             assertThat(resources, is(0));
         }
     }
 
     @Test
-    public void closeAllResources() throws IOException, InterruptedException {
+    public void testCloseAllResources() throws IOException, InterruptedException {
         final Thread[] threads = new Thread[] {
             new ResourceHog(),
             new EvilResourceHog(),
@@ -120,18 +119,33 @@ public class FsResourceAccountantTest {
         }
         System.gc();
         Thread.sleep(TIMEOUT_MILLIS);
-        long start = System.currentTimeMillis();
-        int resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
-        long time = System.currentTimeMillis() - start;
-        assertTrue("Premature return after " + time + " ms instead of " + TIMEOUT_MILLIS + " ms timeout with " + resources + " open resources!",
-                time >= TIMEOUT_MILLIS); // be forgiving!
-        assertTrue(resources > 0);
-        accountant.closeAllResources(SequentialIOExceptionBuilder.create());
+
+        long start, time;
+        int resources;
+
+        Thread.currentThread().interrupt();
         start = System.currentTimeMillis();
         resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
         time = System.currentTimeMillis() - start;
-        assertTrue("Timeout after " + time + " ms!",
-                time <= TIMEOUT_MILLIS); // be forgiving!
+        assertTrue("Unexpected timeout after " + time + " ms!",
+                time < TIMEOUT_MILLIS); // should be close to zero
+        assertFalse(Thread.interrupted()); // clear interrupt status anyway!
+        assertTrue(resources > 0);
+
+        start = System.currentTimeMillis();
+        resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
+        time = System.currentTimeMillis() - start;
+        assertTrue("Premature return from waiting for " + resources + " open resources after " + time + " ms instead of expected timeout after " + TIMEOUT_MILLIS + " ms!",
+                time >= TIMEOUT_MILLIS);
+        assertTrue(resources > 0);
+
+        accountant.closeAllResources(SequentialIOExceptionBuilder.create());
+
+        start = System.currentTimeMillis();
+        resources = accountant.waitForeignResources(TIMEOUT_MILLIS);
+        time = System.currentTimeMillis() - start;
+        assertTrue("Unexpected timeout after " + time + " ms!",
+                time < TIMEOUT_MILLIS); // should be close to zero
         assertThat(resources, is(0));
     }
 
