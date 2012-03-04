@@ -89,15 +89,21 @@ extends ConfiguredClientTestBase<D> {
         }
     }
 
+    /** Returns the current archive file. */
+    protected final TFile getArchive() {
+        return archive;
+    }
+
+    /** Unmounts the {@linkplain #getArchive() current archive file}. */
+    protected final void umount() throws FsSyncException {
+        if (null != archive)
+            TFile.umount(archive);
+    }
+
     private File createTempFile() throws IOException {
         // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
         return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
-    }
-
-    private void umount() throws FsSyncException {
-        if (null != archive)
-            TFile.umount(archive);
     }
 
     private void createTestFile(final TFile file) throws IOException {
@@ -107,10 +113,6 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-    }
-
-    protected final TFile getArchive() {
-        return archive;
     }
 
     @Test
