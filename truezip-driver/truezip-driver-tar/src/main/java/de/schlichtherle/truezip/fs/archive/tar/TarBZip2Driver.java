@@ -10,6 +10,7 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.STORE;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -33,7 +34,11 @@ public class TarBZip2Driver extends TarDriver {
         super(provider);
     }
 
-    public static final int BUFFER_SIZE = 4096;
+    /**
+     * The buffer size used for reading and writing.
+     * Optimized for performance.
+     */
+    public static final int BUFFER_SIZE = Streams.BUFFER_SIZE;
 
     /**
      * Returns the size of the I/O buffer.
@@ -71,13 +76,6 @@ public class TarBZip2Driver extends TarDriver {
         return controller.getOutputSocket(name, options.set(STORE), template);
     }
 
-    /**
-     * Returns a newly created and verified {@link BZip2CompressorInputStream}.
-     * This method performs a simple verification by computing the checksum
-     * for the first record only.
-     * This method is required because the {@code BZip2CompressorInputStream}
-     * unfortunately does not do sufficient verification!
-     */
     @Override
     protected TarInputShop newTarInputShop(
             final FsModel model, final InputStream in)
