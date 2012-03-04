@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.nio.file.zip.raes;
 
@@ -13,7 +9,6 @@ import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
 import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
-import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import java.io.IOException;
@@ -22,8 +17,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
 
@@ -82,13 +76,13 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
         createDirectory(archive);
         createDirectory(inner);
 
-        TFileSystemProvider.umount();
+        umount();
         view.setAction(CANCEL);
         assertTrue(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
 
-        TFileSystemProvider.umount();
+        umount();
         view.setAction(ENTER);
         assertTrue(exists(archive));
         assertTrue(isDirectory(archive));
@@ -99,14 +93,14 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
         assertFalse(isDirectory(inner));
         assertFalse(isRegularFile(inner));
 
-        TFileSystemProvider.umount();
+        umount();
         try {
             archive.toFile().rm_r();
             fail();
         } catch (IOException expected) {
         }
             
-        TFileSystemProvider.umount();
+        umount();
         view.setAction(ENTER);
         archive.toFile().rm_r();
     }

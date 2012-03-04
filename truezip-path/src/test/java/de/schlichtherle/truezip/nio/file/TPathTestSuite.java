@@ -90,15 +90,21 @@ extends ConfiguredClientTestBase<D> {
         }
     }
 
+    /** Returns the current archive file. */
+    protected final TPath getArchive() {
+        return archive;
+    }
+
+    /** Unmounts the {@linkplain #getArchive() current archive file}. */
+    protected final void umount() throws FsSyncException {
+        if (null != archive)
+            archive.getFileSystem().close();
+    }
+
     private Path createTempFile() throws IOException {
         // TODO: Removing .toRealPath() causes archive.toFile().rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
         return Files.createTempFile(TEMP_FILE_PREFIX, getSuffix()).toRealPath();
-    }
-
-    private void umount() throws FsSyncException {
-        if (null != archive)
-            archive.getFileSystem().close();
     }
 
     private void createTestFile(final TPath path) throws IOException {
@@ -108,10 +114,6 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-    }
-
-    protected final TPath getArchive() {
-        return archive;
     }
 
     @Test

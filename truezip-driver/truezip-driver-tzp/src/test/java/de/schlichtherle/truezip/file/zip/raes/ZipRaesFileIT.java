@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file.zip.raes;
 
@@ -20,8 +16,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
 
@@ -72,13 +67,13 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
         assertTrue(archive.mkdir());
         assertTrue(inner.mkdir());
 
-        TFile.umount();
+        umount();
         view.setAction(CANCEL);
         assertTrue(archive.exists());
         assertFalse(archive.isDirectory());
         assertFalse(archive.isFile());
 
-        TFile.umount();
+        umount();
         view.setAction(ENTER);
         assertTrue(archive.exists());
         assertTrue(archive.isDirectory());
@@ -89,14 +84,14 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
         assertFalse(inner.isDirectory());
         assertFalse(inner.isFile());
 
-        TFile.umount();
+        umount();
         try {
             archive.rm_r();
             fail();
         } catch (IOException expected) {
         }
             
-        TFile.umount();
+        umount();
         view.setAction(ENTER);
         archive.rm_r();
     }
