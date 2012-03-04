@@ -277,6 +277,7 @@ implements Iterable<FsCovariantEntry<E>> {
         touchListeners.remove(listener);
     }
 
+    // TODO: Consider renaming to size().
     int getSize() {
         return master.getSize();
     }
@@ -583,9 +584,13 @@ implements Iterable<FsCovariantEntry<E>> {
         if (null == ce)
             throw new FsArchiveFileSystemException(name,
                     "archive entry does not exist");
-        if (ce.isType(DIRECTORY) && 0 < ce.getMembers().size())
-            throw new FsArchiveFileSystemException(name,
-                    "directory is not empty");
+        if (ce.isType(DIRECTORY)) {
+            final int size = ce.getMembers().size();
+            if (0 != size)
+                throw new FsArchiveFileSystemException(name, String.format(
+                        "directory is not empty - it contains %d member(s)",
+                        size));
+        }
         touch();
         master.remove(path);
         {
