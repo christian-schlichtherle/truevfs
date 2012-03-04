@@ -71,7 +71,10 @@ extends KeyManagerController<ZipRaesDriver> {
                         .getPath()
                         .resolve(name)
                         .getEntryName());
-            assert null != entry;
+            // We're not holding any locks, so it's possible that someone else
+            // has concurrently modified the parent file system.
+            if (null == entry)
+                return null;
             // The entry is inaccessible for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
