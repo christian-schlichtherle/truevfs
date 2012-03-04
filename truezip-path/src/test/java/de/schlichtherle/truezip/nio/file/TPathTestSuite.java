@@ -467,10 +467,10 @@ extends ConfiguredClientTestBase<D> {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
-        createFile(file1);
-        umount(); // ensure file1 is really present in the archive file
-        createFile(file2); // uses FsOutputOption.CACHE!
+        createFile(file1); // uses FsOutputOption.CACHE!
+        umount();
         final InputStream in1 = newInputStream(file1);
+        createFile(file2); // uses FsOutputOption.CACHE!
         try {
             newInputStream(file2);
 
