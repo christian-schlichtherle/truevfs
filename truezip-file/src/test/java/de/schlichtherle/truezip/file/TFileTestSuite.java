@@ -499,9 +499,9 @@ extends ConfiguredClientTestBase<D> {
         final TFile file2 = new TFile(archive, "file2");
 
         assertTrue(file1.createNewFile());
-        umount(); // ensure file1 is really present in the archive file
-        assertTrue(file2.createNewFile()); // calls FsController.mknod()
+        umount(); // redundant
         final InputStream in1 = new TFileInputStream(file1);
+        assertTrue(file2.createNewFile()); // calls FsController.mknod()
         try {
             try {
                 new TFileInputStream(file2).close();
