@@ -363,14 +363,17 @@ extends FsLockModelController {
         checkAccess(name, null);
         final FsArchiveFileSystem<E> fileSystem = autoMount();
         if (name.isRoot()) {
-            if (!fileSystem.getEntry(ROOT).getMembers().isEmpty())
-                throw new IOException("root directory not empty");
+            int size = fileSystem.getEntry(ROOT).getMembers().size();
+            if (0 != size)
+                throw new IOException(String.format(
+                        "root directory is not empty - it contains %d member(s)",
+                        size));
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.
-            if (1 < fileSystem.getSize())
+            size = fileSystem.getSize() - 1;
+            if (0 != size)
                 logger.log(Level.WARNING, "unlink.absolute",
-                        new Object[] {  fileSystem.getSize() - 1,
-                                        getMountPoint() });
+                        new Object[] { getMountPoint(), size });
         } else {
             fileSystem.unlink(name);
         }
