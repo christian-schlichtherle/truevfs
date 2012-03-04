@@ -10,6 +10,7 @@ import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.STORE;
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -35,7 +36,11 @@ public class TarGZipDriver extends TarDriver {
         super(provider);
     }
 
-    public static final int BUFFER_SIZE = 4096;
+    /**
+     * The buffer size used for reading and writing.
+     * Optimized for performance.
+     */
+    public static final int BUFFER_SIZE = Streams.BUFFER_SIZE;
 
     /**
      * Returns the size of the I/O buffer.
@@ -57,7 +62,7 @@ public class TarGZipDriver extends TarDriver {
      * 
      * @return The compression level to use when writing a GZIP output stream.
      */
-    public final int getLevel() {
+    public int getLevel() {
         return Deflater.BEST_COMPRESSION;
     }
 
@@ -92,7 +97,7 @@ public class TarGZipDriver extends TarDriver {
     }
 
     /** Extends its super class to set the deflater level. */
-    private static class GZIPOutputStream
+    private static final class GZIPOutputStream
     extends java.util.zip.GZIPOutputStream {
         GZIPOutputStream(OutputStream out, int size, int level)
         throws IOException {
