@@ -1,26 +1,21 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -29,15 +24,11 @@ import org.junit.Test;
  * Performs integration testing of a particular {@link FsArchiveDriver}
  * by using the API of the TrueZIP File* module.
  *
- * @param   <D> The type of the archive driver.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <D> The type of the archive driver.
+ * @author Christian Schlichtherle
  */
 public abstract class ConcurrentSyncTestSuite<D extends FsArchiveDriver<?>>
 extends ConfiguredClientTestBase<D> {
-
-    private static final Logger
-            logger = Logger.getLogger(ConcurrentSyncTestSuite.class.getName());
 
     /**
      * The prefix for temporary files, which is {@value}.
@@ -49,106 +40,90 @@ extends ConfiguredClientTestBase<D> {
 
     private static final int NUM_REPEATS = 100;
 
-    private File temp;
-    private TFile archive;
-
-    @Override
-    public void setUp() throws IOException {
-        super.setUp();
-        temp = createTempFile();
-        TFile.rm(temp);
-        archive = new TFile(temp);
-    }
-
-    @Override
-    public void tearDown() {
-        try {
-            try {
-                umount();
-            } finally {
-                archive = null;
-                if (temp.exists() && !temp.delete())
-                    throw new IOException(temp + " (could not delete)");
-            }
-        } catch (final IOException ex) {
-            logger.log(Level.FINEST,
-                    "Failed to clean up temporary archive file (this error may be just implied)!",
-                    ex);
-        } finally {
-            super.tearDown();
-        }
-    }
-
     private File createTempFile() throws IOException {
         // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
         return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
-    private void umount() throws FsSyncException {
-        if (null != archive)
-            TFile.umount(archive);
-    }
-
     @Test
-    public void testConcurrentSync() throws IOException, InterruptedException, ExecutionException {
-        class SyncTask implements Callable<Void> {
+    public void testConcurrentSync() throws Exception {
+        class RoundTripFactory implements TaskFactory {
             @Override
-            public Void call() throws IOException {
-                for (int i = 0; i++ < NUM_REPEATS; )
-                    TFile.sync(SYNC);
-                return null;
-            }
-        } // SyncTask
+            public Callable<?> newTask(final int threadNum) {
+                class RoundTrip implements Callable<Void> {
+                    @Override
+                    public Void call() throws Exception {
+                        roundTrip(threadNum);
+                        return null;
+                    }
+                } // RoundTrip
 
-        class SyncTaskFactory implements TaskFactory {
+                return new RoundTrip();
+            }
+        } // RoundTripFactory
+
+        class SyncFactory implements TaskFactory {
             @Override
-            public Callable<Void> newTask(int threadNum) {
-                return new SyncTask();
-            }
-        } // SyncTaskFactory
+            public Callable<?> newTask(int threadNum) {
+                class Sync implements Callable<Void> {
+                    @Override
+                    public Void call() throws IOException {
+                        while (!Thread.interrupted()) // test and clear status!
+                            TFile.sync(SYNC);
+                        return null;
+                    }
+                } // Sync
 
-        final TaskJoiner joiner = runConcurrent(
+                return new Sync();
+            }
+        } // SyncFactory
+
+        // Trigger sync mayhem!
+        final TaskJoiner sync = runConcurrent(
+                Runtime.getRuntime().availableProcessors(),
+                new SyncFactory());
+        runConcurrent(
                 NUM_IO_THREADS,
-                new SyncTaskFactory());
+                new RoundTripFactory()).join();
+        sync.cancel();
+        sync.join(); // check exception
+    }
+
+    private void roundTrip(final int i) throws IOException {
+        final File temp = createTempFile();
+        TFile.rm(temp);
+        final TFile archive = new TFile(temp);
+        final TFile file = new TFile(archive, i + getSuffix() + "/" + i);
+        roundTrip(file);
+        archive.rm_r();
+    }
+
+    private void roundTrip(final TFile outer) throws IOException {
+        final TFile inner = new TFile(outer.getParentFile(),
+                "inner" + getSuffix() + "/" + outer.getName());
+        // This particular sequence has been selected because of its increased
+        // likeliness to fail in case the cache sync logic is not correct.
+        create(inner);
+        check(inner);
+        inner.mv(outer);
+        check(outer);
+        outer.mv(inner);
+        check(inner);
+        inner.rm();
+    }
+
+    private void create(final TFile file) throws IOException {
+        final OutputStream out = new TFileOutputStream(file);
         try {
-            for (int i = 0; i++ < NUM_REPEATS; )
-                inputOutput();
+            out.write(getData());
         } finally {
-            joiner.join();
-        }
-    }
-
-    private void inputOutput() throws IOException {
-        //assertInputOutput(archive);
-        
-        //final TFile archiveTest = new TFile(archive, "test");
-        //assertInputOutput(archiveTest);
-        
-        final TFile archiveInner = new TFile(archive, "inner" + getSuffix());
-        final TFile archiveInnerTest = new TFile(archiveInner, "test");
-        inputOutput(archiveInnerTest);
-        archiveInner.rm();
-        archive.rm();
-    }
-
-    private void inputOutput(final TFile file) throws IOException {
-        input(file);
-        output(file);
-        file.rm();
-    }
-
-    private void input(final TFile file) throws IOException {
-        final InputStream in = new ByteArrayInputStream(getData());
-        try {
-            file.input(in);
-        } finally {
-            in.close();
+            out.close();
         }
         assertEquals(getDataLength(), file.length());
     }
 
-    private void output(final TFile file) throws IOException {
+    private void check(final TFile file) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
         try {
             file.output(out);
