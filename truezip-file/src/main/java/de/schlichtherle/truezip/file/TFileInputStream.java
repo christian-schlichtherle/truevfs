@@ -5,7 +5,6 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -73,10 +72,7 @@ public final class TFileInputStream extends DecoratingInputStream {
      *
      * @param  path the path of the plain old file or entry in an archive file
      *         to read.
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional input
-     *         stream for the archive file.
-     * @throws FileNotFoundException On any other I/O related issue.
+     * @throws FileNotFoundException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -90,10 +86,7 @@ public final class TFileInputStream extends DecoratingInputStream {
      * in an archive file.
      *
      * @param  file the plain old file or entry in an archive file to read.
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional input
-     *         stream for the archive file.
-     * @throws FileNotFoundException On any other I/O related issue.
+     * @throws FileNotFoundException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
