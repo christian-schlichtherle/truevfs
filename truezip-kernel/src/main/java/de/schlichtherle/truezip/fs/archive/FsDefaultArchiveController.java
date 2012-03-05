@@ -22,13 +22,18 @@ import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
 import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.newEmptyFileSystem;
 import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.newPopulatedFileSystem;
+import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.InputException;
-import static de.schlichtherle.truezip.io.Paths.isRoot;
+import de.schlichtherle.truezip.io.OutputClosedException;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
@@ -40,8 +45,8 @@ import javax.swing.Icon;
 
 /**
  * This archive controller manages I/O to the entry which represents the target
- * archive file in its parent file system and resolves archive entry collisions,
- * for example by performing a full update of the target archive file.
+ * archive file in its parent file system and resolves archive entry collisions
+ * by performing a full update of the target archive file.
  *
  * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle
@@ -73,8 +78,8 @@ extends FsFileSystemArchiveController<E> {
      */
     private @CheckForNull OutputArchive<E> outputArchive;
 
-    private final FsArchiveFileSystemTouchListener<E> touchListener
-            = new TouchListener();
+    private final FsArchiveFileSystemTouchListener<E>
+            touchListener = new TouchListener();
 
     /**
      * Constructs a new default archive file system controller.
@@ -239,33 +244,105 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     InputSocket<? extends E> getInputSocket(final String name) {
-        try {
-            return getInputArchive().getInputSocket(name);
-        } finally {
-            assert invariants();
-        }
+        class Input extends ProxyInputSocket<E> {
+            @Override
+            protected InputSocket<? extends E> getProxiedDelegate()
+            throws IOException {
+                return getInputArchive().getInputSocket(name);
+            }
+
+            @Override
+            public E getLocalTarget() throws IOException {
+                try {
+                    return super.getLocalTarget();
+                } catch (InputClosedException discard) {
+                    throw map(discard);
+                }
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                try {
+                    return super.newReadOnlyFile();
+                } catch (InputClosedException discard) {
+                    throw map(discard);
+                }
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                try {
+                    return super.newSeekableByteChannel();
+                } catch (InputClosedException discard) {
+                    throw map(discard);
+                }
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                try {
+                    return super.newInputStream();
+                } catch (InputClosedException discard) {
+                    throw map(discard);
+                }
+            }
+
+            private IOException map(IOException discard) {
+                // DON'T try to sync() locally - this could make the state of
+                // clients inconsistent if they have cached other artifacts of
+                // this controller, e.g. the archive file system.
+                return FsNeedsSyncException.get();
+            }
+        } // Input
+
+        return new Input();
     }
 
     @Override
     OutputSocket<? extends E> getOutputSocket(final E entry) {
-        class Output extends DelegatingOutputSocket<E> {
-            @CheckForNull OutputSocket<? extends E> delegate;
+        class Output extends ProxyOutputSocket<E> {
+            @Override
+            protected OutputSocket<? extends E> getProxiedDelegate()
+            throws IOException {
+                return makeOutputArchive().getOutputSocket(entry);
+            }
 
             @Override
-            protected OutputSocket<? extends E> getDelegate()
-            throws IOException {
-                final OutputSocket<? extends E> delegate = this.delegate;
-                return null != delegate
-                        ? delegate
-                        : (this.delegate = makeOutputArchive().getOutputSocket(entry));
+            public E getLocalTarget() throws IOException {
+                try {
+                    return super.getLocalTarget();
+                } catch (OutputClosedException discard) {
+                    throw map(discard);
+                }
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                try {
+                    return super.newSeekableByteChannel();
+                } catch (OutputClosedException discard) {
+                    throw map(discard);
+                }
+            }
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                try {
+                    return super.newOutputStream();
+                } catch (OutputClosedException discard) {
+                    throw map(discard);
+                }
+            }
+
+            private IOException map(IOException discard) {
+                // DON'T try to sync() locally - this could make the state of
+                // clients inconsistent if they have cached other artifacts of
+                // this controller, e.g. the archive file system.
+                return FsNeedsSyncException.get();
             }
         } // Output
 
-        try {
-            return new Output();
-        } finally {
-            assert invariants();
-        }
+        return new Output();
     }
 
     @Override
@@ -283,12 +360,23 @@ extends FsFileSystemArchiveController<E> {
                         final @CheckForNull Access intention)
     throws FsNeedsSyncException {
         // HC SUNT DRACONES!
+
+        // If the named entry is a file system root, then always pass this test
+        // because a root entry is not accessible to the client application
+        // anyway so file system synchronization would be redundant at best.
+        if (name.isRoot())
+            return;
+
+        // Check if there exists a file system with the named entry.
         final FsArchiveFileSystem<E> f;
         final FsCovariantEntry<E> ce;
         if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
             return;
+
         Boolean grow = null;
         String aen; // archive entry name
+
+        // Check if the entry is already written to the output archive.
         final OutputArchive<E> oa = getOutputArchive();
         final E oae; // output archive entry
         if (null != oa) {
@@ -305,6 +393,8 @@ extends FsFileSystemArchiveController<E> {
             aen = null;
             oae = null;
         }
+
+        // Check if the entry is present in the input archive.
         final InputArchive<E> ia = getInputArchive();
         final E iae; // input archive entry
         if (null != ia) {
@@ -322,7 +412,11 @@ extends FsFileSystemArchiveController<E> {
         } else {
             iae = null;
         }
-        if (READ == intention && (null == iae || iae != oae && oae != null))
+
+        // Check for reading an entry which either doesn't yet exist in the
+        // input archive or has been obsoleted by a new version in the output
+        // archive.
+        if (READ == intention && (null == iae || null != oae && iae != oae))
             throw FsNeedsSyncException.get();
     }
 
@@ -342,22 +436,12 @@ extends FsFileSystemArchiveController<E> {
     sync0(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        //commence();
         try {
             copy(options, handler);
         } finally {
             commit(options, handler);
         }
     }
-
-    /*private void commence() {
-        final InputArchive<E> ia = getInputArchive();
-        if (null != ia)
-            ia.disconnect();
-        final OutputArchive<E> oa = getOutputArchive();
-        if (null != oa)
-            oa.disconnect();
-    }*/
 
     /**
      * Synchronizes all entries in the (virtual) archive file system with the
@@ -422,18 +506,17 @@ extends FsFileSystemArchiveController<E> {
                     continue; // we have already written this entry
                 try {
                     if (DIRECTORY == ae.getType()) {
-                        if (!isRoot(ce.getName())) // never write the root directory!
+                        if (!ce.isRoot()) // never write the root directory!
                             if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
                                 output.getOutputSocket(ae).newOutputStream().close();
                     } else if (null != input.getEntry(aen)) {
                         IOSocket.copy(  input.getInputSocket(aen),
                                         output.getOutputSocket(ae));
                     } else {
-                        // The file system entry is a newly created non-directory
-                        // entry which hasn't received any content yet.
-                        // Write an empty file system entry now as a marker in
-                        // order to recreate the file system entry when the file
-                        // system gets remounted from the target archive file.
+                        // The file system entry is a newly created
+                        // non-directory entry which hasn't received any
+                        // content yet, e.g. as a result of mknod()
+                        // => write an empty file system entry.
                         for (final Size size : ALL_SIZE_SET)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
@@ -537,10 +620,6 @@ extends FsFileSystemArchiveController<E> {
             this.driverProduct = input;
         }
 
-        /*void disconnect() {
-            ((DisconnectingInputShop) delegate).disconnect();
-        }*/
-
         /**
          * Publishes the product of the archive driver this input archive is
          * decorating.
@@ -560,10 +639,6 @@ extends FsFileSystemArchiveController<E> {
             super(new DisconnectingOutputShop<E>(output), new ReentrantLock());
             this.driverProduct = output;
         }
-
-        /*void disconnect() {
-            ((DisconnectingOutputShop) delegate).disconnect();
-        }*/
 
         /**
          * Publishes the product of the archive driver this output archive is
