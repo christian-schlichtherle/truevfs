@@ -330,7 +330,7 @@ public class SequentialIOException extends IOException implements Cloneable {
         if (null != predecessor) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
-                s.println("\nFollowed, but not caused by:");
+                s.println("\nFollowed, but not necessarily caused by:");
             } else {
                 s.println("\nOmitting " + predecessor.getNumExceptions() + " more exception(s) at the start of this list!");
             }
@@ -383,7 +383,7 @@ public class SequentialIOException extends IOException implements Cloneable {
         if (null != predecessor) {
             if (0 < maxExceptions) {
                 predecessor.printStackTrace(s, maxExceptions);
-                s.println("\nFollowed, but not caused by:");
+                s.println("\nFollowed, but not necessarily caused by:");
             } else {
                 s.println("\nOmitting " + predecessor.getNumExceptions() + " more exception(s) at the start of this list!");
             }
