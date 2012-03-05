@@ -157,7 +157,7 @@ extends FsDriver {
                             new FsCacheController(
                                 new FsResourceController(
                                     new FsContextController(
-                                        new FsDefaultArchiveController<E>(
+                                        new FsTargetArchiveController<E>(
                                             lockModel, parent, this))),
                                 getPool()))));
     }
