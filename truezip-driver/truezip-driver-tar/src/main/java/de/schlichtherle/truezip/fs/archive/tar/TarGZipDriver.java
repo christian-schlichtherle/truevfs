@@ -104,5 +104,5 @@ public class TarGZipDriver extends TarDriver {
             super(out, size);
             def.setLevel(level);
         }
-    }
+    } // GZIPOutputStream
 }
