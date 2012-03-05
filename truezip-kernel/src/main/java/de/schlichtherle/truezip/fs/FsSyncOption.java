@@ -8,10 +8,10 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.io.InputBusyException;
+import de.schlichtherle.truezip.io.BusyIOException;
 import de.schlichtherle.truezip.io.InputClosedException;
-import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.OutputClosedException;
+import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -52,14 +52,14 @@ public enum FsSyncOption {
      * file system entries.
      * Then if this option is set, the respective file system controller
      * proceeds to update the federated file system anyway and finally throws
-     * an {@link FsSyncWarningException} with an {@link InputBusyException} as
+     * an {@link FsSyncWarningException} with a {@link BusyIOException} as
      * its cause to indicate that any subsequent operations on these resources
      * will fail with an {@link InputClosedException} because they have been
      * forced to close.
      * <p>
      * If this option is not set however, the federated file system is
      * <em>not</em> updated, but instead
-     * an {@link FsSyncException} with an {@link InputBusyException} as
+     * an {@link FsSyncException} with a {@link BusyIOException} as
      * its cause is thrown to indicate
      * that the application must close all input resources first.
      */
@@ -78,7 +78,7 @@ public enum FsSyncOption {
      * Similar to {@link #FORCE_CLOSE_INPUT},
      * but applies to file system entry output resources (output streams etc.)
      * and may throw an {@link OutputClosedException} /
-     * {@link OutputBusyException} instead.
+     * {@link BusyIOException} instead.
      * <p>
      * If this option is set, then
      * {@link #FORCE_CLOSE_INPUT} must be set, too.
