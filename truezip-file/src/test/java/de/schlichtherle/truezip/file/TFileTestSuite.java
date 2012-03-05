@@ -969,46 +969,6 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testListPerformance() throws IOException {
-        assertTrue(archive.mkdir());
-
-        int i, j;
-        long time;
-
-        time = System.currentTimeMillis();
-        for (i = 0; i < 100; i++) {
-            TFile file = new TFile(archive, "" + i);
-            assertTrue(file.createNewFile());
-        }
-        time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{ i, time });
-
-        time = System.currentTimeMillis();
-        for (j = 0; j < 100; j++)
-            archive.listFiles((FilenameFilter) null);
-        time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{ j, time });
-
-        time = System.currentTimeMillis();
-        for (j = 0; j < 100; j++)
-            archive.listFiles((FileFilter) null);
-        time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{ j, time });
-
-        try {
-            archive.rm();
-            fail("directory not empty");
-        } catch (IOException expected) {
-        }
-        umount(); // allow external modifications!
-        TFile.rm(new File(archive.getPath())); // use plain file to delete instead!
-        assertFalse(archive.exists());
-        assertFalse(archive.isDirectory());
-        assertFalse(archive.isFile());
-        assertEquals(0, archive.length());
-    }
-
-    @Test
     public final void testIllegalDeleteEntryWithOpenStream()
     throws IOException {
         final TFile entry1 = new TFile(archive, "entry1");
@@ -1202,11 +1162,11 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public final void testList() throws IOException {
         final File dir = createTempFile();
-        final TFile dir2 = new TFile(dir);
+        final TFile tdir = new TFile(dir);
 
         assertNull(dir.listFiles());
-        assertNull(dir2.listFiles());
-        assertNull(dir2.toNonArchiveFile().listFiles());
+        assertNull(tdir.listFiles());
+        assertNull(tdir.toNonArchiveFile().listFiles());
 
         TFile.rm(dir);
 
@@ -1214,26 +1174,26 @@ extends ConfiguredClientTestBase<D> {
         assertTrue(dir.mkdir());
         for (int i = MEMBERS.length; --i >= 0; )
             assertTrue(new File(dir, MEMBERS[i]).createNewFile());
-        File[] files = dir.listFiles();
+        final File[] files = dir.listFiles();
         Arrays.sort(files);
-        assertList(files, dir2);
-        TFile.rm_r(dir2);
+        assertList(files, tdir);
+        TFile.rm_r(tdir);
 
         // Repeat test with regular archive file.
-        assertTrue(dir2.mkdir());
+        assertTrue(tdir.mkdir());
         for (int i = MEMBERS.length; --i >= 0; )
-            assertTrue(new TFile(dir2, MEMBERS[i]).createNewFile());
-        assertList(files, dir2);
-        TFile.rm_r(dir2);
+            assertTrue(new TFile(tdir, MEMBERS[i]).createNewFile());
+        assertList(files, tdir);
+        TFile.rm_r(tdir);
     }
 
-    private void assertList(final File[] refs, final TFile dir) {
-        final TFile[] files = dir.listFiles();
-        Arrays.sort(files);
-        assertEquals(refs.length, files.length);
-        for (int i = 0, l = refs.length; i < l; i++) {
-            final File ref = refs[i];
-            final TFile file = files[i];
+    private void assertList(final File[] expected, final TFile dir) {
+        final TFile[] got = dir.listFiles();
+        Arrays.sort(got);
+        assertEquals(expected.length, got.length);
+        for (int i = 0, l = expected.length; i < l; i++) {
+            final File ref = expected[i];
+            final TFile file = got[i];
             assertTrue(!(ref instanceof TFile));
             assertEquals(ref.getPath(), file.getPath());
             assertNull(file.list());
