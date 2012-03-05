@@ -25,9 +25,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.Icon;
 
 /**
- * A file system controller which decorates another file system controller in
- * order to inject the original values of selected parameters for its operation
- * in progress.
+ * Injects the original values of selected parameters of the operation in
+ * progress into its decorated controller.
  * 
  * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
