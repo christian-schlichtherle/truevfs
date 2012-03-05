@@ -237,7 +237,7 @@ implements Iterable<FsCovariantEntry<E>> {
         try {
             for (FsArchiveFileSystemTouchListener<? super E> listener : listeners)
                 listener.beforeTouch(event);
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             throw new FsArchiveFileSystemException(null, "file system touch vetoed", ex);
         }
         this.touched = true;
