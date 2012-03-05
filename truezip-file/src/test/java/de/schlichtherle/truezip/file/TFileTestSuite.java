@@ -10,7 +10,7 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.io.FileBusyException;
+import de.schlichtherle.truezip.io.BusyIOException;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputClosedException;
@@ -489,7 +489,7 @@ extends ConfiguredClientTestBase<D> {
         assertFalse(file.isFile());
         assertEquals(0, file.length());
     }
-    
+
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
@@ -508,7 +508,7 @@ extends ConfiguredClientTestBase<D> {
                 fail();
             } catch (final FileNotFoundException ex) {
                 if (!(ex.getCause() instanceof FsSyncException)
-                        || !(ex.getCause().getCause() instanceof FileBusyException))
+                        || !(ex.getCause().getCause() instanceof BusyIOException))
                     throw ex;
             }
             file2.input(in1);
@@ -518,7 +518,7 @@ extends ConfiguredClientTestBase<D> {
                 umount(); // forces closing of in1
                 fail();
             } catch (final FsSyncWarningException ex) {
-                if (!(ex.getCause() instanceof FileBusyException))
+                if (!(ex.getCause() instanceof BusyIOException))
                     throw ex;
             }
             assertTrue(file2.isFile());
@@ -540,7 +540,7 @@ extends ConfiguredClientTestBase<D> {
                 umount(); // allow external modifications!
             } catch (final FsSyncWarningException ex) {
                 // It may fail once if a stream was busy!
-                if (!(ex.getCause() instanceof FileBusyException))
+                if (!(ex.getCause() instanceof BusyIOException))
                     throw ex;
             }
             umount(); // It must not fail twice for the same reason!
@@ -603,7 +603,7 @@ extends ConfiguredClientTestBase<D> {
             fail();
         } catch (final FileNotFoundException ex) {
             if (!(ex.getCause() instanceof FsSyncException)
-                    || !(ex.getCause().getCause() instanceof FileBusyException))
+                    || !(ex.getCause().getCause() instanceof BusyIOException))
                     throw ex;
         }
 
@@ -612,7 +612,7 @@ extends ConfiguredClientTestBase<D> {
             new TFileOutputStream(file2).close();
         } catch (final FileNotFoundException ex) {
             if (!(ex.getCause() instanceof FsSyncException)
-                    || !(ex.getCause().getCause() instanceof FileBusyException))
+                    || !(ex.getCause().getCause() instanceof BusyIOException))
                     throw ex;
             logger.log(Level.INFO,
                     getArchiveDriver().getClass()
@@ -628,7 +628,7 @@ extends ConfiguredClientTestBase<D> {
             umount(); // forces closing of all streams
             fail();
         } catch (final FsSyncWarningException ex) {
-            if (!(ex.getCause() instanceof FileBusyException))
+            if (!(ex.getCause() instanceof BusyIOException))
                 throw ex;
         }
 
@@ -652,7 +652,7 @@ extends ConfiguredClientTestBase<D> {
             umount(); // allow external modifications!
         } catch (FsSyncWarningException ex) {
             // It may fail once if a stream was busy!
-            if (!(ex.getCause() instanceof FileBusyException))
+            if (!(ex.getCause() instanceof BusyIOException))
                 throw ex;
         }
         umount(); // It must not fail twice for the same reason!
@@ -969,7 +969,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testIllegalDeleteEntryWithOpenStream()
+    public final void testIllegalDeleteOfEntryWithOpenStream()
     throws IOException {
         final TFile entry1 = new TFile(archive, "entry1");
         final TFile entry2 = new TFile(archive, "entry2");
@@ -1005,7 +1005,7 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out2.close();
         }
-        final InputStream in1 = new TFileInputStream(entry1); // does an auto update!
+        final InputStream in1 = new TFileInputStream(entry1); // performs auto sync!
         try {
             final InputStream in2 = new TFileInputStream(entry2);
             try {
@@ -1302,7 +1302,7 @@ extends ConfiguredClientTestBase<D> {
                         try {
                             TFile.umount(archive, wait, false, wait, false);
                         } catch (FsSyncException ex) {
-                            if (!(ex.getCause() instanceof FileBusyException))
+                            if (!(ex.getCause() instanceof BusyIOException))
                                 throw ex;
                             // Some other thread is busy updating an archive.
                             // If we are waiting, then this could never happen.
@@ -1363,7 +1363,7 @@ extends ConfiguredClientTestBase<D> {
                             else
                                 TFile.sync(SYNC); // DON'T clear cache!
                         } catch (FsSyncWarningException ex) {
-                            if (!(ex.getCause() instanceof FileBusyException))
+                            if (!(ex.getCause() instanceof BusyIOException))
                                 throw ex;
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
@@ -1388,9 +1388,7 @@ extends ConfiguredClientTestBase<D> {
         runConcurrent(NUM_IO_THREADS, new WriteFactory()).join();
     }
 
-    /**
-     * Test for http://java.net/jira/browse/TRUEZIP-192 .
-     */
+    /** Test for http://java.net/jira/browse/TRUEZIP-192 . */
     @Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
         assertTrue(TFile.isLenient());

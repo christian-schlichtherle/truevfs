@@ -16,6 +16,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * and no other exceptional conditions apply.
  *
  * @author Christian Schlichtherle
+ * @see    ResourceBusyException
  * @deprecated This class will get removed in TrueZIP 8.
  */
 @Deprecated

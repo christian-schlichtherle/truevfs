@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.io.BusyIOException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -12,12 +13,11 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsCurrentThreadIOBusyException
-extends FsResourceIOBusyException {
-
+public final class FsSomeThreadBusyIOException extends BusyIOException {
     private static final long serialVersionUID = 1L;
 
-    FsCurrentThreadIOBusyException(int local) {
-        super("Number of open I/O resources for the current thread: %d", local);
+    FsSomeThreadBusyIOException(int total, int local) {
+        super("Total (thread local) number of open I/O resources: %d (%d)",
+                total, local);
     }
 }
