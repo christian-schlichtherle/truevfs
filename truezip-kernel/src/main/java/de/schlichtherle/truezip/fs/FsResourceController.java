@@ -118,7 +118,7 @@ extends FsLockModelDecoratingController<
         final int local = acc.localResources();
         final IOException cause;
         if (0 != local && !force) {
-            cause = new FsCurrentThreadBusyIOException(local);
+            cause = new FsBusyIOException(local, local);
             throw handler.fail(new FsSyncException(getModel(), cause));
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
@@ -127,9 +127,7 @@ extends FsLockModelDecoratingController<
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 == total)
             return;
-        cause = total != local
-                ? new FsSomeThreadBusyIOException(total, local)
-                : new FsCurrentThreadBusyIOException(local);
+        cause = new FsBusyIOException(total, local);
         if (!force)
             throw handler.fail(new FsSyncException(getModel(), cause));
         handler.warn(new FsSyncWarningException(getModel(), cause));
