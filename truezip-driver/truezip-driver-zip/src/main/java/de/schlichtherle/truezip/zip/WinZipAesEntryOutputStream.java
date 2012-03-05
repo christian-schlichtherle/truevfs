@@ -111,8 +111,7 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 keyStrengthBytes);
 
         // Init cipher.
-        final BufferedBlockCipher cipher = this.cipher;
-        cipher.init(true, aesCtrParam);
+        this.cipher.init(true, aesCtrParam);
 
         // Init MAC.
         final Mac mac = this.mac = new HMac(new SHA1Digest());
