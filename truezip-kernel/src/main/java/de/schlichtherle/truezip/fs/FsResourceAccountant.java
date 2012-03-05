@@ -133,8 +133,8 @@ public final class FsResourceAccountant {
      *         resources which have been accounted for by <em>other</em>
      *         threads once the lock has been acquired.
      *         If this is non-positive, then there is no timeout for waiting.
-     * @return The number of closeable resources accounted for by <em>all</em>
-     *         threads.
+     * @return The number of closeable resources which have been accounted for
+     *         by <em>all</em> threads.
      */
     int waitForeignResources(final long timeout) {
         lock.lock();
@@ -169,6 +169,9 @@ public final class FsResourceAccountant {
      * <p>
      * This method <em>must not</em> get called if the {@link #lock} is not
      * acquired!
+     * 
+     * @return The number of closeable resources which have been accounted for
+     *         by the <em>current</em> thread.
      */
     int localResources() {
         int n = 0;
@@ -180,14 +183,16 @@ public final class FsResourceAccountant {
     }
 
     /**
-     * Returns the number of <em>all</em> accounted closeable resources.
+     * Returns the number of closeable resources which have been accounted for
+     * by <em>all</em> threads.
      * Mind that this value may reduce concurrently, even while the lock is
      * held, so it should <em>not</em> get cached!
      * <p>
      * This method <em>must not</em> get called if the {@link #lock} is not
      * acquired!
      * 
-     * @return The number of <em>all</em> accounted closeable resources.
+     * @return The number of closeable resources which have been accounted for
+     *         by <em>all</em> threads.
      */
     private int totalResources() {
         return accounts.size();
