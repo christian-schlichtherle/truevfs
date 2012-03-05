@@ -1009,50 +1009,6 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testListPerformance() throws IOException {
-        createDirectory(archive);
-
-        int i, j;
-        long time;
-
-        time = System.currentTimeMillis();
-        for (i = 0; i < 100; i++) {
-            TPath file = archive.resolve("" + i);
-            createFile(file);
-        }
-        time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to create {0} archive file entries: {1}ms", new Object[]{ i, time });
-
-        time = System.currentTimeMillis();
-        for (j = 0; j < 100; j++)
-            listFiles(archive);
-        time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FilenameFilter: {1}ms", new Object[]{ j, time });
-
-        time = System.currentTimeMillis();
-        for (j = 0; j < 100; j++)
-            listFiles(archive);
-        time = System.currentTimeMillis() - time;
-        logger.log(Level.FINER, "Time required to list these entries {0} times using a nullary FileFilter: {1}ms", new Object[]{ j, time });
-
-        try {
-            delete(archive);
-            fail("directory not empty");
-        } catch (IOException expected) {
-        }
-        umount(); // allow external modifications!
-        delete(archive.toNonArchivePath()); // use plain file to delete instead!
-        assertFalse(exists(archive));
-        assertFalse(isDirectory(archive));
-        assertFalse(isRegularFile(archive));
-        try {
-            size(archive);
-            fail();
-        } catch (NoSuchFileException expected) {
-        }
-    }
-    
-    @Test
     public final void testIllegalDeleteEntryWithOpenStream()
     throws IOException {
         final TPath entry1 = archive.resolve("entry1");
@@ -1244,11 +1200,11 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public final void testList() throws IOException {
         final Path dir = createTempFile();
-        final TPath dir2 = new TPath(dir);
+        final TPath tdir = new TPath(dir);
 
         assertNull(listFiles(dir));
-        assertNull(listFiles(dir2));
-        assertNull(listFiles(dir2.toNonArchivePath()));
+        assertNull(listFiles(tdir));
+        assertNull(listFiles(tdir.toNonArchivePath()));
 
         delete(dir);
 
@@ -1256,30 +1212,30 @@ extends ConfiguredClientTestBase<D> {
         createDirectory(dir);
         for (int i = MEMBERS.length; --i >= 0; )
             createFile(dir.resolve(MEMBERS[i]));
-        Path[] files = listFiles(dir);
-        Arrays.sort(files);
-        assertList(files, dir2);
-        dir2.toFile().rm_r();
-
-        // Repeat test with regular archive file.
-        createDirectory(dir2);
-        for (int i = MEMBERS.length; --i >= 0; )
-            createFile(dir2.resolve(MEMBERS[i]));
-        assertList(files, dir2);
-        dir2.toFile().rm_r();
-    }
-
-    private void assertList(final Path[] refs, final TPath dir)
-    throws IOException {
         final Path[] files = listFiles(dir);
         Arrays.sort(files);
-        assertEquals(refs.length, files.length);
-        for (int i = 0, l = refs.length; i < l; i++) {
-            final Path ref = refs[i];
-            final TPath file = (TPath) files[i];
-            assertTrue(!(ref instanceof TPath));
-            assertEquals(ref.toString(), file.toString());
-            assertNull(listFiles(file));
+        assertList(files, tdir);
+        tdir.toFile().rm_r();
+
+        // Repeat test with regular archive file.
+        createDirectory(tdir);
+        for (int i = MEMBERS.length; --i >= 0; )
+            createFile(tdir.resolve(MEMBERS[i]));
+        assertList(files, tdir);
+        tdir.toFile().rm_r();
+    }
+
+    private void assertList(final Path[] expected, final TPath dir)
+    throws IOException {
+        final Path[] got = listFiles(dir);
+        Arrays.sort(got);
+        assertEquals(expected.length, got.length);
+        for (int i = 0, l = expected.length; i < l; i++) {
+            final Path e = expected[i];
+            final TPath g = (TPath) got[i];
+            assertTrue(!(e instanceof TPath));
+            assertEquals(e.toString(), g.toString());
+            assertNull(listFiles(g));
         }
     }
     
