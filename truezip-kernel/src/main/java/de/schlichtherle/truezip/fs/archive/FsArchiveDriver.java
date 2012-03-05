@@ -158,7 +158,7 @@ extends FsDriver {
                                 new FsResourceController(
                                     new FsContextController(
                                         new FsDefaultArchiveController<E>(
-                                                lockModel, parent, this))),
+                                            lockModel, parent, this))),
                                 getPool()))));
     }
 
