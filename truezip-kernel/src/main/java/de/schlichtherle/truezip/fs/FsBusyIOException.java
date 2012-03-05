@@ -9,14 +9,13 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @since   TrueZIP 7.5
- * @see     FsResourceController
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsSomeThreadBusyIOException extends BusyIOException {
+public final class FsBusyIOException extends BusyIOException {
     private static final long serialVersionUID = 1L;
 
-    FsSomeThreadBusyIOException(int total, int local) {
+    FsBusyIOException(int total, int local) {
         super("Total (thread local) number of open I/O resources: %d (%d)",
                 total, local);
     }
