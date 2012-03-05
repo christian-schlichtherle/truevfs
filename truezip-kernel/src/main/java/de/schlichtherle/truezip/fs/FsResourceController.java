@@ -19,10 +19,15 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import java.nio.channels.SeekableByteChannel;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
@@ -39,6 +44,10 @@ import javax.annotation.concurrent.NotThreadSafe;
 public final class FsResourceController
 extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
+
+    private static final Logger logger = Logger.getLogger(
+            FsResourceController.class.getName(),
+            FsResourceController.class.getName());
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
@@ -57,10 +66,8 @@ extends FsLockModelDecoratingController<
 
     private FsResourceAccountant getAccountant() {
         assert isWriteLockedByCurrentThread();
-        final FsResourceAccountant accountant = this.accountant;
-        return null != accountant
-                ? accountant
-                : (this.accountant = new FsResourceAccountant(writeLock()));
+        final FsResourceAccountant a = accountant;
+        return null != a ? a : (accountant = new FsResourceAccountant(writeLock()));
     }
 
     @Override
@@ -117,7 +124,7 @@ extends FsLockModelDecoratingController<
                 || options.get(FORCE_CLOSE_OUTPUT);
         final int local = accountant.localResources();
         final IOException cause;
-        if (!force && 0 < local) {
+        if (!force && 0 != local) {
             cause = new FsCurrentThreadIOBusyException(local);
             throw handler.fail(new FsSyncException(getModel(), cause));
         }
@@ -125,7 +132,7 @@ extends FsLockModelDecoratingController<
                 || options.get(WAIT_CLOSE_OUTPUT);
         final int total = accountant.waitForeignResources(
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
-        if (0 >= total)
+        if (0 == total)
             return;
         cause = new FsThreadsIOBusyException(total, local);
         if (!force)
@@ -165,6 +172,30 @@ extends FsLockModelDecoratingController<
         final FsResourceAccountant accountant = this.accountant;
         if (null != accountant)
             accountant.closeAllResources(new IOExceptionHandler());
+    }
+
+    private static void finalize(   final Closeable delegate,
+                                    final Boolean closed) {
+        Throwable failure = null;
+        try {
+            if (null == closed) {
+                try {
+                    delegate.close();
+                } catch (Throwable ex) {
+                    failure = ex;
+                }
+            }
+        } finally {
+            if (TRUE.equals(closed)) {
+                logger.log(Level.FINEST, "closeCleared");
+            } else if (FALSE.equals(closed)) {
+                logger.log(Level.FINER, "closeFailed");
+            } else if (null == failure) {
+                logger.log(Level.FINE, "finalizeCleared");
+            } else {
+                logger.log(Level.FINE, "finalizeFailed", failure);
+            }
+        }
     }
 
     @Immutable
@@ -217,7 +248,6 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assert isWriteLockedByCurrentThread();
             return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -230,14 +260,12 @@ extends FsLockModelDecoratingController<
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            assert isWriteLockedByCurrentThread();
             return new AccountingReadOnlyFile(
                     getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            assert isWriteLockedByCurrentThread();
             return new AccountingInputStream(
                     getBoundSocket().newInputStream());
         }
@@ -250,7 +278,6 @@ extends FsLockModelDecoratingController<
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            assert isWriteLockedByCurrentThread();
             return new AccountingSeekableByteChannel(
                     getBoundSocket().newSeekableByteChannel());
         }
@@ -263,7 +290,6 @@ extends FsLockModelDecoratingController<
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            assert isWriteLockedByCurrentThread();
             return new AccountingOutputStream(
                     getBoundSocket().newOutputStream());
         }
@@ -271,17 +297,23 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingReadOnlyFile
     extends DecoratingReadOnlyFile {
+        Boolean closed;
+
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         AccountingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
+            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
+            assert isWriteLockedByCurrentThread();
+            closed = FALSE;
             getAccountant().stopAccountingFor(this);
             delegate.close();
+            closed = TRUE;
         }
 
         @Override
@@ -290,7 +322,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                delegate.close();
+                finalize(delegate, closed);
             } finally {
                 super.finalize();
             }
@@ -299,17 +331,23 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingSeekableByteChannel
     extends DecoratingSeekableByteChannel {
+        Boolean closed;
+
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         AccountingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
+            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
+            assert isWriteLockedByCurrentThread();
+            closed = FALSE;
             getAccountant().stopAccountingFor(this);
             delegate.close();
+            closed = TRUE;
         }
 
         @Override
@@ -318,7 +356,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                delegate.close();
+                finalize(delegate, closed);
             } finally {
                 super.finalize();
             }
@@ -327,17 +365,23 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingInputStream
     extends DecoratingInputStream {
+        Boolean closed;
+
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         AccountingInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
+            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
+            assert isWriteLockedByCurrentThread();
+            closed = FALSE;
             getAccountant().stopAccountingFor(this);
             delegate.close();
+            closed = TRUE;
         }
 
         @Override
@@ -346,7 +390,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                delegate.close();
+                finalize(delegate, closed);
             } finally {
                 super.finalize();
             }
@@ -355,17 +399,23 @@ extends FsLockModelDecoratingController<
 
     private final class AccountingOutputStream
     extends DecoratingOutputStream {
+        Boolean closed;
+
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         AccountingOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
+            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
+            assert isWriteLockedByCurrentThread();
+            closed = FALSE;
             getAccountant().stopAccountingFor(this);
             delegate.close();
+            closed = TRUE;
         }
 
         @Override
@@ -374,7 +424,7 @@ extends FsLockModelDecoratingController<
             try {
                 // Superfluous - this is already done by GC!
                 //getAccountant().stopAccountingFor(this);
-                delegate.close();
+                finalize(delegate, closed);
             } finally {
                 super.finalize();
             }
