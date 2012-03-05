@@ -13,10 +13,7 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -191,17 +188,32 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<FsInputOption> options) {
-        return SOCKET_FACTORY.newInputSocket(this,
-                delegate.getInputSocket(name, options));
+        class InputProxy extends ProxyInputSocket<Entry> {
+            @Override
+            protected InputSocket<? extends Entry> getProxiedDelegate()
+            throws IOException {
+                return delegate.getInputSocket(name, options);
+            }
+        } // InputProxy
+
+        return SOCKET_FACTORY.newInputSocket(this, new InputProxy());
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
             final BitField<FsOutputOption> options,
-            final Entry template) {
-        return SOCKET_FACTORY.newOutputSocket(this,
-                delegate.getOutputSocket(name, options, template));
+            final @CheckForNull Entry template) {
+        class OutputProxy extends ProxyOutputSocket<Entry> {
+            @Override
+            protected OutputSocket<? extends Entry> getProxiedDelegate()
+            throws IOException {
+                return delegate.getOutputSocket(name, options, template);
+            }
+        } // OutputProxy
+
+        return SOCKET_FACTORY.newOutputSocket(this, new OutputProxy());
     }
 
     @Override
