@@ -9,12 +9,12 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
 /**
  * @author Christian Schlichtherle
  */
-public final class TarDriverTest
-extends FsCharsetArchiveDriverTestSuite<TarDriverEntry, TarDriver> {
+public final class TarGZipDriverTest
+extends FsCharsetArchiveDriverTestSuite<TarDriverEntry, TarGZipDriver> {
 
     @Override
-    protected TarDriver newArchiveDriver() {
-        return new TarDriver(getTestConfig().getIOPoolProvider());
+    protected TarGZipDriver newArchiveDriver() {
+        return new TarGZipDriver(getTestConfig().getIOPoolProvider());
     }
 
     @Override
