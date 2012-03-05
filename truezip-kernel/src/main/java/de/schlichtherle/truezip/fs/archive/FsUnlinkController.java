@@ -11,9 +11,9 @@ import java.io.IOException;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * A decorating file system controller which unlinks the target archive file
- * from the parent file system if and only if the virtual root directory has
- * been successfully unlinked from its federated file system before.
+ * Unlinks the target archive file from the parent file system if and only if
+ * the virtual root directory has been successfully unlinked from its federated
+ * file system before.
  * 
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
