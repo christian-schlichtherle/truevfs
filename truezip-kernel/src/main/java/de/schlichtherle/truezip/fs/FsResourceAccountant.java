@@ -194,7 +194,7 @@ public final class FsResourceAccountant {
      * @return The number of closeable resources which have been accounted for
      *         by <em>all</em> threads.
      */
-    private int totalResources() {
+    int totalResources() {
         return accounts.size();
     }
 
