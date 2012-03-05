@@ -11,12 +11,14 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Indicates that a file system entry could not get read or written
  * because the entry or its container is busy.
- * This exception is recoverable, meaning it should be possible to repeat the
- * operation successfully as soon as the entry or its container is not busy
- * anymore and unless no other exceptional condition applies.
+ * This exception should be recoverable, meaning it should be possible to
+ * successfully retry the operation as soon as the resource is not busy anymore
+ * and no other exceptional conditions apply.
  *
  * @author Christian Schlichtherle
+ * @deprecated This class will get removed in TrueZIP 8.
  */
+@Deprecated
 @ThreadSafe
 public class FileBusyException extends FileNotFoundException {
     private static final long serialVersionUID = 2056108562576389242L;

@@ -16,7 +16,9 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @see    OutputBusyException
  * @author Christian Schlichtherle
+ * @deprecated This class is not used anymore and will get removed in TrueZIP 8.
  */
+@Deprecated
 @ThreadSafe
 public class InputBusyException extends FileBusyException {
     private static final long serialVersionUID = 1983745618753823654L;
