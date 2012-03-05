@@ -6,7 +6,6 @@ package de.schlichtherle.truezip.file;
 
 import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.FileBusyException;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -75,10 +74,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *
      * @param  path the path of the plain old file or entry in an archive file
      *         to write.
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional output
-     *         stream for the archive file.
-     * @throws FileNotFoundException On any other I/O related issue.
+     * @throws FileNotFoundException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -97,10 +93,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         to write.
      * @param  append if the data shall get appended to the file rather than
      *         replacing it.
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional output
-     *         stream for the archive file.
-     * @throws FileNotFoundException On any other I/O related issue.
+     * @throws FileNotFoundException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -114,10 +107,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * in an archive file.
      *
      * @param  file the plain old file or entry in an archive file to write.
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional output
-     *         stream for the archive file.
-     * @throws FileNotFoundException On any other I/O related issue.
+     * @throws FileNotFoundException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -133,10 +123,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @param  file the plain old file or entry in an archive file to write.
      * @param  append if the data shall get appended to the file rather than
      *         replacing it.
-     * @throws FileBusyException If the path denotes an archive entry and the
-     *         archive driver does not support to create an additional output
-     *         stream for the archive file.
-     * @throws FileNotFoundException On any other I/O related issue.
+     * @throws FileNotFoundException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
