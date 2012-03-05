@@ -92,9 +92,29 @@ public class TarBZip2Driver extends TarDriver {
             final TarInputShop source)
     throws IOException {
         return super.newTarOutputShop(model,
-                new BZip2CompressorOutputStream(
+                new CompressorOutputStream(
                     new BufferedOutputStream(out, getBufferSize()),
                     getLevel()),
                 source);
     }
+
+    private static final class CompressorOutputStream
+    extends BZip2CompressorOutputStream {
+        final OutputStream delegate;
+
+        CompressorOutputStream(final OutputStream out, final int level)
+        throws IOException {
+            super(out, level);
+            this.delegate = out;
+        }
+
+        @Override
+        public void close() throws IOException {
+            // Workaround for super class implementation which is not left
+            // in a consistent state if its decorated stream throws an
+            // IOException upon close().
+            super.close();
+            delegate.close();
+        }
+    } // CompressorOutputStream
 }
