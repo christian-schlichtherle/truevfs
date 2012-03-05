@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -50,9 +51,6 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * This buffer is autosized to the largest buffer written to this stream.
      */
     private byte[] cipherOut = new byte[0];
-
-    /** Whether or not {@link #finish()} has been called in {@link #close()}. */
-    private boolean finished;
 
     /**
      * Creates a new cipher output stream.
@@ -132,18 +130,20 @@ public class CipherOutputStream extends DecoratingOutputStream {
     }
 
     /**
-     * Finishes this stream and resets it to it's initial state.
-     * Calling this method causes all remaining buffered bytes to be written,
+     * Finishes and voids this cipher output stream.
+     * Calling this method causes all remaining buffered bytes to get written,
      * padding to be added if necessary and the underlying output stream to
      * get flushed.
      * <p>
-     * Please note that subsequent calls to any write operations after this
-     * method may cause an error in the output data if padding is used!
+     * Note that after a call to this method only {@link #close()} may get
+     * called on this cipher output stream
+     * The result of calling any other method (including this one) is undefined!
      *
      * @throws IOException If out or cipher aren't properly initialized,
      *         the stream has been closed, an I/O error occured the cipher
      *         text is invalid, i.e. required padding information is missing.
      */
+    @OverridingMethodsMustInvokeSuper
     protected void finish() throws IOException {
         checkOpen();
 
@@ -158,26 +158,23 @@ public class CipherOutputStream extends DecoratingOutputStream {
         }
         delegate.write(cipherOut, 0, cipherLen);
         delegate.flush();
-        //outBuf = new byte[0];
     }
 
     /**
      * Closes this output stream and releases any resources associated with it.
-     * This method calls {@link #finish()} and then closes and nullifies
-     * the underlying output stream {@link #delegate} and the cipher
-     * {@link #cipher}.
+     * Upon the first call to this method, {@link #finish()} gets called and
+     * {@link #cipher} gets set to {@code null} upon success.
+     * Next, the {@link #delegate} gets unconditionally
+     * {@linkplain #close() closed}.
      *
-     * @throws IOException On any I/O error.
+     * @throws IOException On any I/O failure.
      */
     @Override
     public void close() throws IOException {
         if (null != cipher) {
-            if (!finished) {
-                finish();
-                finished = true;
-            }
-            delegate.close();
+            finish();
             cipher = null;
         }
+        delegate.close();
     }
 }
