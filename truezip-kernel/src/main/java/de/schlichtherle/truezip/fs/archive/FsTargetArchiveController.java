@@ -52,7 +52,7 @@ import javax.swing.Icon;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FsDefaultArchiveController<E extends FsArchiveEntry>
+final class FsTargetArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
     private static final BitField<FsInputOption>
@@ -88,7 +88,7 @@ extends FsFileSystemArchiveController<E> {
      * @param parent the parent file system
      * @param driver the archive driver.
      */
-    FsDefaultArchiveController(
+    FsTargetArchiveController(
             final FsLockModel model,
             final FsController<?> parent,
             final FsArchiveDriver<E> driver) {

@@ -33,7 +33,7 @@ import javax.swing.Icon;
  */
 @NotThreadSafe
 final class FsContextController
-extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
+extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
 
     private static final FsOperationContext
             NULL = new FsOperationContext(
@@ -44,14 +44,14 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
      *
      * @param controller the decorated file system controller.
      */
-    FsContextController(FsDefaultArchiveController<?> controller) {
+    FsContextController(FsTargetArchiveController<?> controller) {
         super(controller);
     }
 
     @Override
     @Deprecated
     public Icon getOpenIcon() throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -64,7 +64,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     @Override
     @Deprecated
     public Icon getClosedIcon() throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -76,7 +76,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public boolean isReadOnly() throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -89,7 +89,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     @Override
     public FsEntry getEntry(final FsEntryName name)
     throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -101,7 +101,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public boolean isReadable(final FsEntryName name) throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -113,7 +113,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public boolean isWritable(final FsEntryName name) throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -125,7 +125,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public boolean isExecutable(final FsEntryName name) throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -137,7 +137,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
     @Override
     public void setReadOnly(final FsEntryName name) throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -153,7 +153,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
             final Map<Access, Long> times,
             final BitField<FsOutputOption> options)
     throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(makeContext(options));
         try {
@@ -170,7 +170,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
             final long value,
             final BitField<FsOutputOption> options)
     throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(makeContext(options));
         try {
@@ -204,7 +204,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
             final BitField<FsOutputOption> options,
             final @CheckForNull Entry template)
     throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(makeContext(options));
         try {
@@ -218,7 +218,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(makeContext(options));
         try {
@@ -233,7 +233,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
     void sync(  final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        final FsDefaultArchiveController<?> delegate = this.delegate;
+        final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
@@ -261,7 +261,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            final FsDefaultArchiveController<?>
+            final FsTargetArchiveController<?>
                     delegate = FsContextController.this.delegate;
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
@@ -274,7 +274,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            final FsDefaultArchiveController<?>
+            final FsTargetArchiveController<?>
                     delegate = FsContextController.this.delegate;
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
@@ -287,7 +287,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            final FsDefaultArchiveController<?>
+            final FsTargetArchiveController<?>
                     delegate = FsContextController.this.delegate;
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
@@ -300,7 +300,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
         @Override
         public InputStream newInputStream() throws IOException {
-            final FsDefaultArchiveController<?>
+            final FsTargetArchiveController<?>
                     delegate = FsContextController.this.delegate;
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
@@ -323,7 +323,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            final FsDefaultArchiveController<?>
+            final FsTargetArchiveController<?>
                     delegate = FsContextController.this.delegate;
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(operation);
@@ -336,7 +336,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            final FsDefaultArchiveController<?>
+            final FsTargetArchiveController<?>
                     delegate = FsContextController.this.delegate;
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(operation);
@@ -349,7 +349,7 @@ extends FsLockModelDecoratingController<FsDefaultArchiveController<?>> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            final FsDefaultArchiveController<?>
+            final FsTargetArchiveController<?>
                     delegate = FsContextController.this.delegate;
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(operation);
