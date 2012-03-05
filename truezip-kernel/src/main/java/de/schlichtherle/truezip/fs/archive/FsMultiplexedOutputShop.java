@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive;
 
@@ -40,9 +36,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
- * @param   <E> The type of the archive entries.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> The type of the archive entries.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class FsMultiplexedOutputShop<E extends FsArchiveEntry>
@@ -246,8 +241,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             this.output = output;
             this.local = output.getLocalTarget();
             final Entry peer = output.getPeerTarget();
-            class ProxyInputSocket extends DecoratingInputSocket<Entry> {
-                ProxyInputSocket() {
+            class InputProxy extends DecoratingInputSocket<Entry> {
+                InputProxy() {
                     super(buffer.getInputSocket());
                 }
 
@@ -257,7 +252,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 }
             }
             this.buffer = buffer;
-            this.input = new ProxyInputSocket();
+            this.input = new InputProxy();
             final BufferedEntryOutputStream
                     old = buffers.put(local.getName(), this);
             if (null != old)
@@ -289,7 +284,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                     dst.setTime(type, src.getTime(type));
         }
 
-        boolean store(boolean discard) throws IOException {
+        boolean store(final boolean discard) throws IOException {
             if (discard)
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
