@@ -67,9 +67,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             final @WillCloseWhenClosed OutputShop<E> output,
             final IOPool<?> pool) {
         super(output);
-        if (null == pool)
+        if (null == (this.pool = pool))
             throw new NullPointerException();
-        this.pool = pool;
     }
 
     @Override
