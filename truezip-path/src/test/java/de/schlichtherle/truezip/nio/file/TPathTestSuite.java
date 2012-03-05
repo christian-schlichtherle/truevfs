@@ -1416,7 +1416,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
-            final boolean updateIndividually)
+            final boolean syncIndividually)
     throws Exception {
         assertTrue(TConfig.get().isLenient());
 
@@ -1435,11 +1435,11 @@ extends ConfiguredClientTestBase<D> {
                     try {
                         createTestFile(entry);
                         try {
-                            if (updateIndividually)
+                            if (syncIndividually)
                                 archive.getFileSystem().close();
                             else
                                 TFile.sync(SYNC); // DON'T clear the cache!
-                        } catch (FsSyncException ex) {
+                        } catch (FsSyncWarningException ex) {
                             if (!(ex.getCause() instanceof FileBusyException))
                                 throw ex;
                             // Some other thread is busy updating an archive.
@@ -1447,11 +1447,11 @@ extends ConfiguredClientTestBase<D> {
                             // could never happen.
                             // Otherwise, silently ignore this exception and
                             // accept that the archive may not have been
-                            // updated to disk.
+                            // synced to disk.
                             // Note that no data is lost, this exception just
                             // signals that the corresponding archive hasn't
                             // been updated - a future call may still succeed.
-                            if (updateIndividually)
+                            if (syncIndividually)
                                 throw new AssertionError(ex);
                         }
                     } finally {
