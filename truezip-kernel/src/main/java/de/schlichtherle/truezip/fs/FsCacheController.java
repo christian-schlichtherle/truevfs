@@ -34,9 +34,9 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * A content caching file system controller implements a combined caching and
- * buffering strategy for entry data. Decorating a concurrent file system
- * controller with this class has the following effects:
+ * Implements a combined caching and buffering strategy for entry data.
+ * Decorating a concurrent file system controller with this class has the
+ * following effects:
  * <ul>
  * <li>Caching and buffering needs to be activated by using the method
  *     {@link #getInputSocket input socket} with the input option
@@ -94,19 +94,51 @@ extends FsLockModelDecoratingController<
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<FsInputOption> options) {
-        return new Input(
-                delegate.getInputSocket(name, options),
-                name, options);
+        class Input extends DelegatingInputSocket<Entry> {
+            final InputSocket<?> delegate = FsCacheController.this.delegate
+                    .getInputSocket(name, options);
+
+            @Override
+            protected InputSocket<?> getDelegate() {
+                assert isWriteLockedByCurrentThread();
+                EntryController controller = controllers.get(name);
+                if (null == controller) {
+                    if (!options.get(FsInputOption.CACHE))
+                        return delegate;
+                    //checkWriteLockedByCurrentThread();
+                    controller = new EntryController(name);
+                }
+                return controller.configure(options).getInputSocket();
+            }
+        } // Input
+
+        return new Input();
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive!
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
             final BitField<FsOutputOption> options,
             final Entry template) {
-        return new Output(
-                delegate.getOutputSocket(name, options, template),
-                name, options, template);
+        class Output extends DelegatingOutputSocket<Entry> {
+            final OutputSocket<?> delegate = FsCacheController.this.delegate
+                    .getOutputSocket(name, options, template);
+
+            @Override
+            protected OutputSocket<?> getDelegate() {
+                assert isWriteLockedByCurrentThread();
+                EntryController controller = controllers.get(name);
+                if (null == controller) {
+                    if (!options.get(FsOutputOption.CACHE))
+                        return delegate;
+                    controller = new EntryController(name);
+                }
+                return controller.configure(options, template).getOutputSocket();
+            }
+        } // Output
+
+        return new Output();
     }
 
     @Override
@@ -115,7 +147,7 @@ extends FsLockModelDecoratingController<
                         final BitField<FsOutputOption> options,
                         final Entry template)
     throws IOException {
-        assert getModel().isWriteLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
         final EntryController controller = controllers.get(name);
         delegate.mknod(name, type, options, template);
         if (null != controller) {
@@ -128,7 +160,7 @@ extends FsLockModelDecoratingController<
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        assert getModel().isWriteLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
         final EntryController controller = controllers.get(name);
         delegate.unlink(name, options);
         if (null != controller) {
@@ -142,17 +174,18 @@ extends FsLockModelDecoratingController<
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        beforeSync(options, handler);
+        preSync(options, handler);
         // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in the model
         // instead.
         delegate.sync(options/*.clear(CLEAR_CACHE)*/, handler);
+        //postSync(options, handler);
     }
 
     private <X extends IOException> void
-    beforeSync( final BitField<FsSyncOption> options,
-                final ExceptionHandler<? super FsSyncException, X> handler)
+    preSync(final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
-        assert getModel().isWriteLockedByCurrentThread();
+        assert isWriteLockedByCurrentThread();
         if (0 >= controllers.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
@@ -186,59 +219,23 @@ extends FsLockModelDecoratingController<
         }
     }
 
-    private final class Input extends DecoratingInputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsInputOption> options;
-
-        Input(  final InputSocket<?> input,
-                final FsEntryName name,
-                final BitField<FsInputOption> options) {
-            super(input);
-            this.name = name;
-            this.options = options;
-        }
-
-        @Override
-        protected InputSocket<?> getDelegate() {
-            assert getModel().isWriteLockedByCurrentThread();
-            EntryController controller = controllers.get(name);
-            if (null == controller) {
-                if (!options.get(FsInputOption.CACHE))
-                    return delegate;
-                //checkWriteLockedByCurrentThread();
-                controller = new EntryController(name);
+    /*private <X extends IOException> void
+    postSync(   final BitField<FsSyncOption> options,
+                final ExceptionHandler<? super FsSyncException, X> handler)
+    throws FsControllerException, X {
+        assert isWriteLockedByCurrentThread();
+        assert 0 >= controllers.size()
+                || !options.get(ABORT_CHANGES) && !options.get(CLEAR_CACHE);
+        for (final EntryController controller : controllers.values()) {
+            try {
+                controller.postSync();
+            } catch (FsControllerException ex) {
+                throw ex;
+            } catch (IOException ex) {
+                handler.warn(new FsSyncWarningException(getModel(), ex));
             }
-            return controller.configure(options).getInputSocket();
         }
-    } // Input
-
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsOutputOption> options;
-        final @CheckForNull Entry template;
-
-        Output( final OutputSocket<?> output,
-                final FsEntryName name,
-                final BitField<FsOutputOption> options,
-                final @CheckForNull Entry template) {
-            super(output);
-            this.name = name;
-            this.options = options;
-            this.template = template;
-        }
-
-        @Override
-        protected OutputSocket<?> getDelegate() {
-            assert getModel().isWriteLockedByCurrentThread();
-            EntryController controller = controllers.get(name);
-            if (null == controller) {
-                if (!options.get(FsOutputOption.CACHE))
-                    return delegate;
-                controller = new EntryController(name);
-            }
-            return controller.configure(options, template).getOutputSocket();
-        }
-    } // Output
+    }*/
 
     @Immutable
     private enum SocketFactory {
@@ -290,7 +287,7 @@ extends FsLockModelDecoratingController<
         EntryController configure(  BitField<FsOutputOption> options,
                                     final @CheckForNull Entry template) {
             // Consume FsOutputOption.CACHE.
-            this.outputOptions = options = options.clear(FsOutputOption.CACHE); // consume
+            this.outputOptions = options = options.clear(FsOutputOption.CACHE);
             cache.configure(delegate.getOutputSocket(
                     name,
                     options.clear(EXCLUSIVE),
@@ -300,7 +297,11 @@ extends FsLockModelDecoratingController<
         }
 
         void flush() throws IOException {
-            cache.flush();
+            try {
+                cache.flush();
+            } catch (FsNeedsSyncException alreadyFlushed) {
+                // FIXME: Explain this!
+            }
         }
 
         void clear() throws IOException {
@@ -308,33 +309,39 @@ extends FsLockModelDecoratingController<
         }
 
         InputSocket<?> getInputSocket() {
-            final InputSocket<?> input = this.input;
-            return null != input ? input : (this.input = cache.getInputSocket());
+            final InputSocket<?> is = input;
+            return null != is ? is : (input = cache.getInputSocket());
         }
 
         OutputSocket<?> getOutputSocket() {
-            final OutputSocket<?> output = this.output;
-            return null != output
-                    ? output
-                    : (this.output = SOCKET_FACTORY
+            final OutputSocket<?> os = output;
+            return null != os
+                    ? os
+                    : (output = SOCKET_FACTORY
                         .newOutputSocket(this, cache.getOutputSocket()));
         }
 
-        void beginOutput() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
+        void preOutput() throws IOException {
+            assert isWriteLockedByCurrentThread();
             delegate.mknod(name, FILE, outputOptions, template);
-            assert isTouched();
         }
 
-        void endOutput() throws IOException {
-            assert getModel().isWriteLockedByCurrentThread();
-            //assert isTouched(); // may have been concurrently synced!
-            delegate.mknod(
-                    name,
-                    FILE,
-                    outputOptions.clear(EXCLUSIVE),
+        void postOutput() throws IOException {
+            assert isWriteLockedByCurrentThread();
+            delegate.mknod(name, FILE, outputOptions.clear(EXCLUSIVE),
                     null != template ? template : cache.getEntry());
+            //output = null;
         }
+
+        /*void postSync() throws IOException {
+            assert isWriteLockedByCurrentThread();
+            if (null != output)
+                delegate.mknod(
+                        name,
+                        FILE,
+                        outputOptions.clear(EXCLUSIVE),
+                        template);
+        }*/
 
         /** An input socket proxy. */
         final class EntryInput extends DecoratingInputSocket<Entry> {
@@ -354,7 +361,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public InputStream newInputStream() throws IOException {
-                assert getModel().isWriteLockedByCurrentThread();
+                assert isWriteLockedByCurrentThread();
                 final InputStream in = getBoundSocket().newInputStream();
                 assert isTouched();
                 return new EntryInputStream(in);
@@ -369,7 +376,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                beginOutput();
+                preOutput();
                 final SeekableByteChannel sbc = getBoundSocket().newSeekableByteChannel();
                 controllers.put(name, EntryController.this);
                 return new EntrySeekableByteChannel(sbc);
@@ -384,7 +391,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public final OutputStream newOutputStream() throws IOException {
-                beginOutput();
+                preOutput();
                 final OutputStream out = getBoundSocket().newOutputStream();
                 controllers.put(name, EntryController.this);
                 return new EntryOutputStream(out);
@@ -402,12 +409,9 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void close() throws IOException {
-                assert getModel().isWriteLockedByCurrentThread();
-                try {
-                    delegate.close();
-                } finally {
-                    endOutput();
-                }
+                assert isWriteLockedByCurrentThread();
+                delegate.close();
+                postOutput();
             }
         } // EntrySeekableByteChannel
 
@@ -421,7 +425,7 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void close() throws IOException {
-                assert getModel().isWriteLockedByCurrentThread();
+                assert isWriteLockedByCurrentThread();
                 delegate.close();
                 controllers.put(name, EntryController.this);
             }
@@ -437,12 +441,9 @@ extends FsLockModelDecoratingController<
 
             @Override
             public void close() throws IOException {
-                assert getModel().isWriteLockedByCurrentThread();
-                try {
-                    delegate.close();
-                } finally {
-                    endOutput();
-                }
+                assert isWriteLockedByCurrentThread();
+                delegate.close();
+                postOutput();
             }
         } // EntryOutputStream
     } // EntryCache
