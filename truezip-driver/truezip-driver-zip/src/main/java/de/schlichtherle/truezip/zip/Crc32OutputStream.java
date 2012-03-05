@@ -1,17 +1,13 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
-import javax.annotation.CheckForNull;
 import java.io.OutputStream;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -19,9 +15,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * Implementations cannot be thread-safe.
  *
- * @since   TrueZIP 7.3
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @since  TrueZIP 7.3
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class Crc32OutputStream extends CheckedOutputStream {

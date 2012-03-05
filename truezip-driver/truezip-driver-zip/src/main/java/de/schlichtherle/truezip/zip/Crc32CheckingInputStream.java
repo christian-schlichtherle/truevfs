@@ -19,6 +19,7 @@ import java.util.zip.CheckedInputStream;
 final class Crc32CheckingInputStream extends CheckedInputStream {
     private final ZipEntry entry;
     private final int size;
+    boolean closed;
 
     Crc32CheckingInputStream(
             final InputStream in,
@@ -48,14 +49,16 @@ final class Crc32CheckingInputStream extends CheckedInputStream {
 
     @Override
     public void close() throws IOException {
-        while (skip(Long.MAX_VALUE) > 0) {
-            // process CRC-32 until EOF
+        if (!closed) {
+            while (skip(Long.MAX_VALUE) > 0) {
+                // process CRC-32 until EOF
+            }
         }
         super.close();
+        closed = true;
         final long expected = entry.getCrc();
         final long computed = getChecksum().getValue();
-        if (expected != computed) {
+        if (expected != computed)
             throw new CRC32Exception(entry.getName(), expected, computed);
-        }
     }
 }
