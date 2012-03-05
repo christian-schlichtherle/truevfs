@@ -35,8 +35,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @Immutable
 public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
