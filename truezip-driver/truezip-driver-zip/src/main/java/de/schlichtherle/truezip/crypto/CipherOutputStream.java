@@ -131,9 +131,8 @@ public class CipherOutputStream extends DecoratingOutputStream {
 
     /**
      * Finishes and voids this cipher output stream.
-     * Calling this method causes all remaining buffered bytes to get written,
-     * padding to be added if necessary and the underlying output stream to
-     * get flushed.
+     * Calling this method causes all remaining buffered bytes to get written
+     * and padding to get added if necessary.
      * <p>
      * Note that after a call to this method only {@link #close()} may get
      * called on this cipher output stream
@@ -157,7 +156,6 @@ public class CipherOutputStream extends DecoratingOutputStream {
             throw new IOException(ex);
         }
         delegate.write(cipherOut, 0, cipherLen);
-        delegate.flush();
     }
 
     /**
