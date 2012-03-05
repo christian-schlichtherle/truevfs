@@ -40,9 +40,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.Icon;
 
 /**
- * A file system controller which decorates another file system controller
- * in order to provide read/write locking for multi-threaded access by its
- * clients.
+ * Provides read/write locking for multi-threaded access by its clients.
  * 
  * @see    FsLockModel
  * @see    FsNeedsWriteLockException
