@@ -30,8 +30,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.Icon;
 
 /**
- * A decorating file system controller which performs a
- * {@link FsController#sync(BitField) sync} operation on the
+ * Performs a {@link FsController#sync(BitField) sync} operation on the
  * file system if and only if any decorated file system controller throws an
  * {@link FsNeedsSyncException}.
  * 
