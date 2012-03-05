@@ -190,8 +190,9 @@ extends FsLockModelController {
         }
 
         FsArchiveFileSystem<E> fileSystem() throws IOException {
-            checkAccess(name, READ);
+            // HC SUNT DRACONES!
             getPeerTarget(); // may sync() if in same target archive file!
+            checkAccess(name, READ);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
             return autoMount();
