@@ -201,10 +201,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-                status = OK;
+            } catch (final FsControllerException ex) {
+                // This is a non-local control flow exception.
+                // This call may or may not get retried again later.
+                // Do NOT record the status so that finalize() will call close()
+                // on the decorated resource if this call is NOT retried again.
+                throw ex;
             } catch (final IOException ex) {
                 throw status = ex;
             }
+            status = OK;
         }
 
         @Override
@@ -232,10 +238,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-                status = OK;
+            } catch (final FsControllerException ex) {
+                // This is a non-local control flow exception.
+                // This call may or may not get retried again later.
+                // Do NOT record the status so that finalize() will call close()
+                // on the decorated resource if this call is NOT retried again.
+                throw ex;
             } catch (final IOException ex) {
                 throw status = ex;
             }
+            status = OK;
         }
 
         @Override
@@ -263,10 +275,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-                status = OK;
+            } catch (final FsControllerException ex) {
+                // This is a non-local control flow exception.
+                // This call may or may not get retried again later.
+                // Do NOT record the status so that finalize() will call close()
+                // on the decorated resource if this call is NOT retried again.
+                throw ex;
             } catch (final IOException ex) {
                 throw status = ex;
             }
+            status = OK;
         }
 
         @Override
@@ -294,10 +312,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-                status = OK;
+            } catch (final FsControllerException ex) {
+                // This is a non-local control flow exception.
+                // This call may or may not get retried again later.
+                // Do NOT record the status so that finalize() will call close()
+                // on the decorated resource if this call is NOT retried again.
+                throw ex;
             } catch (final IOException ex) {
                 throw status = ex;
             }
+            status = OK;
         }
 
         @Override
