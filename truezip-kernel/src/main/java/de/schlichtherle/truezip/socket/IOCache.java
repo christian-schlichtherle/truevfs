@@ -76,12 +76,11 @@ public final class IOCache implements Flushable, Closeable {
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
     @CreatesObligation
-    private IOCache(final Strategy strategy,
-                    final IOPool<?> pool) {
-        if (null == strategy || null == pool)
+    private IOCache(final Strategy strategy, final IOPool<?> pool) {
+        if (null == (this.strategy = strategy))
             throw new NullPointerException();
-        this.strategy = strategy;
-        this.pool = pool;
+        if (null == (this.pool = pool))
+            throw new NullPointerException();
     }
 
     /**
