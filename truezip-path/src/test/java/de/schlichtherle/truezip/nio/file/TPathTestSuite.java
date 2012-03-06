@@ -9,11 +9,11 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileTestSuite;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
+import de.schlichtherle.truezip.fs.FsResourceBusyIOException;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.io.BusyIOException;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.io.Streams;
@@ -476,13 +476,11 @@ extends ConfiguredClientTestBase<D> {
 
             while (true) {
                 try {
-                    // This operation may succeed without any exception if
-                    // the garbage collector did its job.
                     copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
                     break;
                 } catch (final FsSyncException ex) {
-                    logger.log(Level.WARNING, "FIXME: Explain this!", ex);
-                    if (!(ex.getCause() instanceof BusyIOException))
+                    assert false : ex;
+                    if (!(ex.getCause() instanceof FsResourceBusyIOException))
                         throw ex;
                     // The garbage collector hasn't been collecting the open
                     // stream. Let's try to trigger it.
@@ -495,7 +493,7 @@ extends ConfiguredClientTestBase<D> {
                 umount(); // forces closing of in1
                 fail();
             } catch (final FsSyncWarningException ex) {
-                if (!(ex.getCause() instanceof BusyIOException))
+                if (!(ex.getCause() instanceof FsResourceBusyIOException))
                     throw ex;
             }
             assertTrue(isRegularFile(file2));
@@ -514,7 +512,7 @@ extends ConfiguredClientTestBase<D> {
                 umount(); // allow external modifications!
             } catch (final FsSyncWarningException ex) {
                 // It may fail once if a stream was busy!
-                if (!(ex.getCause() instanceof BusyIOException))
+                if (!(ex.getCause() instanceof FsResourceBusyIOException))
                     throw ex;
             }
             umount(); // It must not fail twice for the same reason!
@@ -576,7 +574,7 @@ extends ConfiguredClientTestBase<D> {
             newOutputStream(file1).close();
             fail();
         } catch (final FsSyncException ex) {
-            if (!(ex.getCause() instanceof BusyIOException))
+            if (!(ex.getCause() instanceof FsResourceBusyIOException))
                     throw ex;
         }
 
@@ -584,7 +582,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             newOutputStream(file2).close();
         } catch (final FsSyncException ex) {
-            if (!(ex.getCause() instanceof BusyIOException))
+            if (!(ex.getCause() instanceof FsResourceBusyIOException))
                 throw ex;
             logger.log(Level.INFO,
                     getArchiveDriver().getClass()
@@ -600,7 +598,7 @@ extends ConfiguredClientTestBase<D> {
             umount(); // forces closing of all streams
             fail();
         } catch (final FsSyncWarningException ex) {
-            if (!(ex.getCause() instanceof BusyIOException))
+            if (!(ex.getCause() instanceof FsResourceBusyIOException))
                 throw ex;
         }
 
@@ -624,7 +622,7 @@ extends ConfiguredClientTestBase<D> {
             umount(); // allow external modifications!
         } catch (final FsSyncWarningException ex) {
             // It may fail once if a stream was busy!
-            if (!(ex.getCause() instanceof BusyIOException))
+            if (!(ex.getCause() instanceof FsResourceBusyIOException))
                 throw ex;
         }
         umount(); // It must not fail twice for the same reason!
@@ -1335,8 +1333,8 @@ extends ConfiguredClientTestBase<D> {
                         createTestFile(entry);
                         try {
                             TFile.umount(archive.toFile(), wait, false, wait, false);
-                        } catch (FsSyncException ex) {
-                            if (!(ex.getCause() instanceof BusyIOException))
+                        } catch (final FsSyncException ex) {
+                            if (!(ex.getCause() instanceof FsResourceBusyIOException))
                                 throw ex;
                             // Some other thread is busy updating an archive.
                             // If we are waiting, then this could never happen.
@@ -1396,8 +1394,8 @@ extends ConfiguredClientTestBase<D> {
                                 archive.getFileSystem().close();
                             else
                                 TFile.sync(SYNC); // DON'T clear the cache!
-                        } catch (FsSyncWarningException ex) {
-                            if (!(ex.getCause() instanceof BusyIOException))
+                        } catch (final FsSyncWarningException ex) {
+                            if (!(ex.getCause() instanceof FsResourceBusyIOException))
                                 throw ex;
                             // Some other thread is busy updating an archive.
                             // If we are updating individually, then this
