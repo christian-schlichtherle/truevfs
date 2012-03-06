@@ -99,10 +99,23 @@ public class TarGZipDriver extends TarDriver {
     /** Extends its super class to set the deflater level. */
     private static final class GZIPOutputStream
     extends java.util.zip.GZIPOutputStream {
+        final OutputStream delegate;
+
         GZIPOutputStream(OutputStream out, int size, int level)
         throws IOException {
             super(out, size);
             def.setLevel(level);
+            this.delegate = out;
+        }
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+            // Workaround for super class implementation which may not have
+            // been left in a consistent state if the decorated stream has
+            // thrown an IOException upon the first call to its close() method.
+            // See http://java.net/jira/browse/TRUEZIP-234
+            delegate.close();
         }
     } // GZIPOutputStream
 }
