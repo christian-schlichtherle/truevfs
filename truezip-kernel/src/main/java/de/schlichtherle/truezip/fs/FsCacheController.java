@@ -305,7 +305,7 @@ extends FsLockModelDecoratingController<
                     @CreatesObligation
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
-                        super(getBoundSocket().newInputStream());
+                        super(Input.super.newInputStream());
                         assert isTouched();
                     }
 
@@ -322,8 +322,8 @@ extends FsLockModelDecoratingController<
         } // Input
 
         final class Nio2Output extends Output {
-            Nio2Output( BitField<FsOutputOption> options,
-                        @CheckForNull Entry template) {
+            Nio2Output( final BitField<FsOutputOption> options,
+                        final @CheckForNull Entry template) {
                 super(options, template);
             }
 
@@ -336,7 +336,7 @@ extends FsLockModelDecoratingController<
                     @CreatesObligation
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Channel() throws IOException {
-                        super(getBoundSocket().newSeekableByteChannel());
+                        super(Nio2Output.super.newSeekableByteChannel());
                         FsCacheController.this.caches.put(name, EntryCache.this);
                     }
 
@@ -365,11 +365,12 @@ extends FsLockModelDecoratingController<
             @Override
             protected OutputSocket<? extends Entry> getProxiedDelegate()
             throws IOException {
-                return EntryCache.this.cache
-                        .configure(
+                // Do NOT unconditionally cache the decorated output socket!
+                return EntryCache.this.cache.configure(
                             FsCacheController.this.delegate.getOutputSocket(
                                 EntryCache.this.name,
-                                options.clear(EXCLUSIVE), template))
+                                options.clear(EXCLUSIVE),
+                                template))
                         .getOutputSocket();
             }
 
@@ -382,7 +383,7 @@ extends FsLockModelDecoratingController<
                     @CreatesObligation
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
-                        super(getBoundSocket().newOutputStream());
+                        super(Output.super.newOutputStream());
                         FsCacheController.this.caches.put(
                                 EntryCache.this.name,
                                 EntryCache.this);
