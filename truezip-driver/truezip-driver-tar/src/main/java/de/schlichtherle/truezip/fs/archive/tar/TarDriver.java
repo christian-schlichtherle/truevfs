@@ -145,11 +145,18 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final InputStream in = input.newInputStream();
+        TarInputShop ia = null;
+        final InputStream is = input.newInputStream();
         try {
-            return newTarInputShop(model, in);
+            return ia = newTarInputShop(model, is);
         } finally {
-            in.close();
+            try {
+                is.close();
+            } catch (final IOException ex) {
+                if (null != ia)
+                    ia.close();
+                throw ex;
+            }
         }
     }
 
@@ -178,17 +185,13 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final OutputStream out = output.newOutputStream();
+        final OutputStream os = output.newOutputStream();
         try {
             return new FsMultiplexedOutputShop<TarDriverEntry>(
-                    newTarOutputShop(model, out, (TarInputShop) source),
+                    newTarOutputShop(model, os, (TarInputShop) source),
                     getPool());
         } catch (final IOException ex) {
-            try {
-                out.close();
-            } catch (final IOException ex2) {
-                throw (IOException) ex2.initCause(ex);
-            }
+            os.close();
             throw ex;
         }
     }
