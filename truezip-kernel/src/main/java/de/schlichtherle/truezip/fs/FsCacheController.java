@@ -274,9 +274,8 @@ extends FsLockModelDecoratingController<
         }
 
         /**
-         * This class needs the lazy initialization provided by its super class.
-         * The error handling features of the super class are not required,
-         * though.
+         * This class needs the lazy initialization and exception handling
+         * provided by its super class.
          */
         final class Input extends ProxyInputSocket<Entry> {
             final BitField<FsInputOption> options;
@@ -286,7 +285,7 @@ extends FsLockModelDecoratingController<
             }
 
             @Override
-            protected InputSocket<? extends Entry> getProxiedDelegate()
+            protected InputSocket<? extends Entry> getLazyDelegate()
             throws IOException {
                 return FsCacheController.this.delegate.getInputSocket(
                         EntryCache.this.name, options);
@@ -310,8 +309,7 @@ extends FsLockModelDecoratingController<
                     @CreatesObligation
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
-                        // Don't need exception handling in ProxyInputSocket.
-                        super(getBoundSocket().newInputStream());
+                        super(Input.super.newInputStream());
                         assert isTouched();
                     }
 
@@ -342,9 +340,10 @@ extends FsLockModelDecoratingController<
                     @CreatesObligation
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Channel() throws IOException {
-                        // Don't need exception handling in ProxyOutputSocket.
-                        super(getBoundSocket().newSeekableByteChannel());
-                        FsCacheController.this.caches.put(name, EntryCache.this);
+                        super(Nio2Output.super.newSeekableByteChannel());
+                        FsCacheController.this.caches.put(
+                                EntryCache.this.name,
+                                EntryCache.this);
                     }
 
                     @Override
@@ -360,9 +359,8 @@ extends FsLockModelDecoratingController<
         } // Nio2Output
 
         /**
-         * This class needs the lazy initialization provided by its super class.
-         * The error handling features of the super class are not required,
-         * though.
+         * This class needs the lazy initialization and exception handling
+         * provided by its super class.
          */
         class Output extends ProxyOutputSocket<Entry> {
             final BitField<FsOutputOption> options;
@@ -375,7 +373,7 @@ extends FsLockModelDecoratingController<
             }
 
             @Override
-            protected OutputSocket<? extends Entry> getProxiedDelegate()
+            protected OutputSocket<? extends Entry> getLazyDelegate()
             throws IOException {
                 return EntryCache.this.cache.configure(
                             FsCacheController.this.delegate.getOutputSocket(
@@ -394,8 +392,7 @@ extends FsLockModelDecoratingController<
                     @CreatesObligation
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
-                        // Don't need exception handling in ProxyOutputSocket.
-                        super(getBoundSocket().newOutputStream());
+                        super(Output.super.newOutputStream());
                         FsCacheController.this.caches.put(
                                 EntryCache.this.name,
                                 EntryCache.this);

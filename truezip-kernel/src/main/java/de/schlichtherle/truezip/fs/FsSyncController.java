@@ -305,7 +305,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             while (true) {
                 try {
-                    return new SyncSeekableByteChannel(super.newSeekableByteChannel());
+                    return new SyncSeekableByteChannel(
+                            super.newSeekableByteChannel());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -313,6 +314,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Input
 
+    /**
+     * This class needs the lazy initialization and exception handling
+     * provided by its super class.
+     */
     private class Input extends ProxyInputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsInputOption> options;
@@ -324,8 +329,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
 
         @Override
-        protected final InputSocket<?> getProxiedDelegate()
-        throws IOException {
+        protected InputSocket<?> getLazyDelegate() throws IOException {
             return FsSyncController.this.delegate
                     .getInputSocket(name, options);
         }
@@ -375,7 +379,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             while (true) {
                 try {
-                    return new SyncSeekableByteChannel(super.newSeekableByteChannel());
+                    return new SyncSeekableByteChannel(
+                            super.newSeekableByteChannel());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -383,6 +388,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Output
 
+    /**
+     * This class needs the lazy initialization and exception handling
+     * provided by its super class.
+     */
     private class Output extends ProxyOutputSocket<Entry> {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
@@ -397,7 +406,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
 
         @Override
-        protected final OutputSocket<?> getProxiedDelegate()
+        protected final OutputSocket<?> getLazyDelegate()
         throws IOException {
             return FsSyncController.this.delegate
                     .getOutputSocket(name, options, template);

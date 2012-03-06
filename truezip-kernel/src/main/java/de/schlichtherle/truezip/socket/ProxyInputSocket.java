@@ -29,16 +29,16 @@ extends DelegatingInputSocket<E> {
     @Override
     protected final InputSocket<? extends E> getDelegate() throws IOException {
         final InputSocket<? extends E> is = delegate;
-        return null != is ? is : (delegate = getProxiedDelegate());
+        return null != is ? is : (delegate = getLazyDelegate());
     };
 
     /**
-     * Returns the proxied delegate socket.
+     * Returns the delegate socket for lazy initialization.
      * 
-     * @return The proxied delegate socket.
-     * @throws IOException On any I/O failure. 
+     * @return the delegate socket for lazy initialization.
+     * @throws IOException on any I/O failure. 
      */
-    protected abstract InputSocket<? extends E> getProxiedDelegate()
+    protected abstract InputSocket<? extends E> getLazyDelegate()
     throws IOException;
 
     @Override
