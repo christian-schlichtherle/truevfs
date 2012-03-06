@@ -18,7 +18,6 @@ import java.io.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).
@@ -92,17 +91,17 @@ public class TarBZip2Driver extends TarDriver {
             final TarInputShop source)
     throws IOException {
         return super.newTarOutputShop(model,
-                new CompressorOutputStream(
+                new BZip2CompressorOutputStream(
                     new BufferedOutputStream(out, getBufferSize()),
                     getLevel()),
                 source);
     }
 
-    private static final class CompressorOutputStream
-    extends BZip2CompressorOutputStream {
+    private static final class BZip2CompressorOutputStream
+    extends org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream {
         final OutputStream delegate;
 
-        CompressorOutputStream(final OutputStream out, final int level)
+        BZip2CompressorOutputStream(final OutputStream out, final int level)
         throws IOException {
             super(out, level);
             this.delegate = out;
@@ -110,11 +109,12 @@ public class TarBZip2Driver extends TarDriver {
 
         @Override
         public void close() throws IOException {
-            // Workaround for super class implementation which is not left
-            // in a consistent state if its decorated stream throws an
-            // IOException upon close().
             super.close();
+            // Workaround for super class implementation which may not have
+            // been left in a consistent state if the decorated stream has
+            // thrown an IOException upon the first call to its close() method.
+            // See http://java.net/jira/browse/TRUEZIP-234
             delegate.close();
         }
-    } // CompressorOutputStream
+    } // BZip2CompressorOutputStream
 }
