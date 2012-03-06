@@ -479,9 +479,9 @@ extends ConfiguredClientTestBase<D> {
                     copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
                     break;
                 } catch (final FsSyncException ex) {
-                    assert false : ex;
                     if (!(ex.getCause() instanceof FsResourceBusyIOException))
                         throw ex;
+                    assert false : ex; // FIXME: This is an endless loop because in1 is still open!
                     // The garbage collector hasn't been collecting the open
                     // stream. Let's try to trigger it.
                     System.gc();
