@@ -73,7 +73,7 @@ extends FsLockModelDecoratingController<
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
-                                            Entry template) {
+                                            @CheckForNull Entry template) {
         return SOCKET_FACTORY.newOutputSocket(this,
                 delegate.getOutputSocket(name, options, template));
     }
