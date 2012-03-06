@@ -284,7 +284,7 @@ extends FsLockModelDecoratingController<
             protected InputSocket<? extends Entry> getProxiedDelegate()
             throws IOException {
                 return FsCacheController.this.delegate.getInputSocket(
-                        name, options);
+                        EntryCache.this.name, options);
             }
 
             @Override
@@ -313,7 +313,7 @@ extends FsLockModelDecoratingController<
                     public void close() throws IOException {
                         assert isWriteLockedByCurrentThread();
                         delegate.close();
-                        caches.put(name, EntryCache.this);
+                        caches.put(EntryCache.this.name, EntryCache.this);
                     }
                 } // Stream
 
@@ -368,7 +368,8 @@ extends FsLockModelDecoratingController<
                 return EntryCache.this.cache
                         .configure(
                             FsCacheController.this.delegate.getOutputSocket(
-                                name, options.clear(EXCLUSIVE), template))
+                                EntryCache.this.name,
+                                options.clear(EXCLUSIVE), template))
                         .getOutputSocket();
             }
 
@@ -382,7 +383,9 @@ extends FsLockModelDecoratingController<
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
                         super(getBoundSocket().newOutputStream());
-                        FsCacheController.this.caches.put(name, EntryCache.this);
+                        FsCacheController.this.caches.put(
+                                EntryCache.this.name,
+                                EntryCache.this);
                     }
 
                     @Override
@@ -397,13 +400,17 @@ extends FsLockModelDecoratingController<
             }
 
             void pre() throws IOException {
-                FsCacheController.this.delegate.mknod(name, FILE,
+                FsCacheController.this.delegate.mknod(
+                        EntryCache.this.name,
+                        FILE,
                         options,
                         template);
             }
 
             void post() throws IOException {
-                FsCacheController.this.delegate.mknod(name, FILE,
+                FsCacheController.this.delegate.mknod(
+                        EntryCache.this.name,
+                        FILE,
                         options.clear(EXCLUSIVE),
                         null != template
                             ? template
