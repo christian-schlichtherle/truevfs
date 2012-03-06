@@ -425,6 +425,7 @@ extends FsFileSystemArchiveController<E> {
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
+        assert isWriteLockedByCurrentThread();
         try {
             sync0(options, handler);
         } finally {
@@ -479,7 +480,7 @@ extends FsFileSystemArchiveController<E> {
                 warning = cause;
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
-        } // FilterExceptionHandler
+        } // Filter
 
         if (options.get(ABORT_CHANGES))
             return;
