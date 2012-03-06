@@ -13,7 +13,10 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.*;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.ProxyInputSocket;
+import de.schlichtherle.truezip.socket.ProxyOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -184,18 +187,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
-            final FsEntryName name,
-            final BitField<FsInputOption> options) {
+    public InputSocket<?> getInputSocket(   FsEntryName name,
+                                            BitField<FsInputOption> options) {
         return SOCKET_FACTORY.newInputSocket(this, name, options);
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
-    public OutputSocket<?> getOutputSocket(
-            final FsEntryName name,
-            final BitField<FsOutputOption> options,
-            final @CheckForNull Entry template) {
+    public OutputSocket<?> getOutputSocket( FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
         return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
     }
 
@@ -323,7 +324,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
 
         @Override
-        protected InputSocket<?> getProxiedDelegate() throws IOException {
+        protected final InputSocket<?> getProxiedDelegate()
+        throws IOException {
             return FsSyncController.this.delegate
                     .getInputSocket(name, options);
         }
@@ -395,7 +397,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
 
         @Override
-        protected final OutputSocket<?> getProxiedDelegate() throws IOException {
+        protected final OutputSocket<?> getProxiedDelegate()
+        throws IOException {
             return FsSyncController.this.delegate
                     .getOutputSocket(name, options, template);
         }
