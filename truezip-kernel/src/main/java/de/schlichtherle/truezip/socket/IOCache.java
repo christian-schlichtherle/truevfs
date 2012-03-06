@@ -20,7 +20,6 @@ import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -52,9 +51,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
 public final class IOCache implements Flushable, Closeable {
 
-    private static final BufferSocketFactory FACTORY = JSE7.AVAILABLE
-            ? BufferSocketFactory.NIO2
-            : BufferSocketFactory.OIO;
+    private static final SocketFactory FACTORY = JSE7.AVAILABLE
+            ? SocketFactory.NIO2
+            : SocketFactory.OIO;
 
     private final Strategy strategy;
     private final IOPool<?> pool;
@@ -388,35 +387,36 @@ public final class IOCache implements Flushable, Closeable {
     } // OutputBufferPool
 
     @Immutable
-    private enum BufferSocketFactory {
+    private enum SocketFactory {
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(Buffer buffer) {
-                return buffer.new Nio2BufferInputSocket();
+                return buffer.new Nio2Input();
             }
 
             @Override
             OutputSocket<?> newOutputSocket(Buffer buffer) {
-                return buffer.new Nio2BufferOutputSocket();
+                return buffer.new Nio2Output();
             }
         },
         
         OIO() {
             @Override
             InputSocket<?> newInputSocket(Buffer buffer) {
-                return buffer.new BufferInputSocket();
+                return buffer.new Input();
             }
 
             @Override
             OutputSocket<?> newOutputSocket(Buffer buffer) {
-                return buffer.new BufferOutputSocket();
+                return buffer.new Output();
             }
         };
 
         abstract InputSocket<?> newInputSocket(Buffer buffer);
         abstract OutputSocket<?> newOutputSocket(Buffer buffer);
-    } // BufferSocketFactory
+    } // SocketFactory
 
+    /** A buffer for the contents of the cache. */
     private final class Buffer {
         final IOPool.Entry<?> data;
 
@@ -441,143 +441,133 @@ public final class IOCache implements Flushable, Closeable {
         }
 
         @Immutable
-        final class Nio2BufferInputSocket extends BufferInputSocket {
+        final class Nio2Input extends Input {
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                return new BufferInputChannel(getBoundSocket().newSeekableByteChannel());
+                class Channel extends DecoratingSeekableByteChannel {
+                    boolean closed;
+
+                    Channel() throws IOException {
+                        super(getBoundSocket().newSeekableByteChannel());
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        if (closed)
+                            return;
+                        delegate.close();
+                        getInputBufferPool().release(Buffer.this);
+                        closed = true;
+                    }
+                } // Channel
+
+                return new Channel();
             }
-        } // Nio2BufferInputSocket
+        } // Nio2Input
 
         @Immutable
-        class BufferInputSocket extends DecoratingInputSocket<Entry> {
-            BufferInputSocket() {
-                super(data.getInputSocket());
+        class Input extends DecoratingInputSocket<Entry> {
+            Input() {
+                super(Buffer.this.data.getInputSocket());
             }
 
             @Override
             public final ReadOnlyFile newReadOnlyFile() throws IOException {
-                return new BufferReadOnlyFile(getBoundSocket().newReadOnlyFile());
+                class File extends DecoratingReadOnlyFile {
+                    boolean closed;
+
+                    File() throws IOException {
+                        super(getBoundSocket().newReadOnlyFile());
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        if (closed)
+                            return;
+                        delegate.close();
+                        getInputBufferPool().release(Buffer.this);
+                        closed = true;
+                    }
+                } // File
+
+                return new File();
             }
 
             @Override
             public final InputStream newInputStream() throws IOException {
-                return new BufferInputStream(getBoundSocket().newInputStream());
+                class Stream extends DecoratingInputStream {
+                    boolean closed;
+
+                    Stream() throws IOException {
+                        super(getBoundSocket().newInputStream());
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        if (closed)
+                            return;
+                        delegate.close();
+                        getInputBufferPool().release(Buffer.this);
+                        closed = true;
+                    }
+                } // Stream
+
+                return new Stream();
             }
-        } // BufferInputSocket
+        } // Input
 
         @Immutable
-        final class Nio2BufferOutputSocket extends BufferOutputSocket {
+        final class Nio2Output extends Output {
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                return new BufferOutputChannel(getBoundSocket().newSeekableByteChannel());
+                class Channel extends DecoratingSeekableByteChannel {
+                    boolean closed;
+
+                    Channel() throws IOException {
+                        super(getBoundSocket().newSeekableByteChannel());
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        if (closed)
+                            return;
+                        delegate.close();
+                        getOutputBufferPool().release(Buffer.this);
+                        closed = true;
+                    }
+                } // Channel
+
+                return new Channel();
             }
-        } // Nio2BufferInputSocket
+        } // Nio2Output
 
         @Immutable
-        class BufferOutputSocket extends DecoratingOutputSocket<Entry> {
-            BufferOutputSocket() {
-                super(data.getOutputSocket());
+        class Output extends DecoratingOutputSocket<Entry> {
+            Output() {
+                super(Buffer.this.data.getOutputSocket());
             }
 
             @Override
             public final OutputStream newOutputStream() throws IOException {
-                return new BufferOutputStream(getBoundSocket().newOutputStream());
+                class Stream extends DecoratingOutputStream {
+                    boolean closed;
+
+                    Stream() throws IOException {
+                        super(getBoundSocket().newOutputStream());
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        if (closed)
+                            return;
+                        delegate.close();
+                        getOutputBufferPool().release(Buffer.this);
+                        closed = true;
+                    }
+                } // Stream
+
+                return new Stream();
             }
-        } // BufferOutputSocket
-
-        final class BufferReadOnlyFile extends DecoratingReadOnlyFile {
-            boolean closed;
-
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            @CreatesObligation
-            BufferReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
-                super(rof);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                delegate.close();
-                getInputBufferPool().release(Buffer.this);
-                closed = true;
-            }
-        } // BufferReadOnlyFile
-
-        final class BufferInputChannel extends DecoratingSeekableByteChannel {
-            boolean closed;
-
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            @CreatesObligation
-            BufferInputChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-                super(sbc);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                delegate.close();
-                getInputBufferPool().release(Buffer.this);
-                closed = true;
-            }
-        } // BufferInputChannel
-
-        final class BufferOutputChannel extends DecoratingSeekableByteChannel {
-            boolean closed;
-
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            @CreatesObligation
-            BufferOutputChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-                super(sbc);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                delegate.close();
-                getOutputBufferPool().release(Buffer.this);
-                closed = true;
-            }
-        } // BufferOutputChannel
-
-        final class BufferInputStream extends DecoratingInputStream {
-            boolean closed;
-
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            @CreatesObligation
-            BufferInputStream(@WillCloseWhenClosed InputStream in) {
-                super(in);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                delegate.close();
-                getInputBufferPool().release(Buffer.this);
-                closed = true;
-            }
-        } // BufferInputStream
-
-        final class BufferOutputStream extends DecoratingOutputStream {
-            boolean closed;
-
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            @CreatesObligation
-            BufferOutputStream(@WillCloseWhenClosed OutputStream out) {
-                super(out);
-            }
-
-            @Override
-            public void close() throws IOException {
-                if (closed)
-                    return;
-                delegate.close();
-                getOutputBufferPool().release(Buffer.this);
-                closed = true;
-            }
-        } // BufferOutputStream
+        } // Output
     } // Buffer
 }
