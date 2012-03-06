@@ -67,6 +67,7 @@ implements OutputShop<TarDriverEntry> {
             = new LinkedHashMap<String, TarDriverEntry>(
                     initialCapacity(OVERHEAD_SIZE));
 
+    private final OutputStream delegate;
     private final IOPool<?> pool;
     private boolean busy;
 
@@ -74,6 +75,7 @@ implements OutputShop<TarDriverEntry> {
     public TarOutputShop(   final TarDriver driver,
                             final @WillCloseWhenClosed OutputStream out) {
         super(out);
+        this.delegate = out;
         super.setLongFileMode(LONGFILE_GNU);
         this.pool = driver.getPool();
     }
@@ -139,14 +141,15 @@ implements OutputShop<TarDriverEntry> {
         return busy;
     }
 
-    /*@Override
+    @Override
     public void close() throws IOException {
-        // In case the output stream writes to an entry in an enclosing archive
-        // file, the effect of this call is to try acquiring the write lock,
-        // which may fail with an IOException in order to prevent a dead lock.
-        super.flush();
         super.close();
-    }*/
+        // Workaround for super class implementation which may not have
+        // been left in a consistent state if the decorated stream has
+        // thrown an IOException upon the first call to its close() method.
+        // See http://java.net/jira/browse/TRUEZIP-234
+        delegate.close();
+    }
 
     /**
      * This entry output stream writes directly to our subclass.
