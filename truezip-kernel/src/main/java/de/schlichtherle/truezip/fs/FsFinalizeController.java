@@ -21,15 +21,13 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import java.nio.channels.SeekableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Finalizes unclosed resources returned by its decorated controller.
@@ -38,7 +36,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
+@ThreadSafe
 public final class FsFinalizeController<M extends FsModel>
 extends FsDecoratingController<M, FsController<? extends M>> {
 
@@ -49,6 +47,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
+
+    private static final IOException OK = new IOException();
 
     /**
      * Constructs a new file system finalize controller.
@@ -75,13 +75,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     static void finalize(   final Closeable delegate,
-                            final @CheckForNull Boolean closed) {
-        if (TRUE.equals(closed)) {
+                            final @CheckForNull IOException status) {
+        if (OK.equals(status)) {
             logger.log(Level.FINEST, "closeCleared");
-        } else if (FALSE.equals(closed)) {
-            logger.log(Level.FINER, "closeFailed");
+        } else if (null != status) {
+            logger.log(Level.FINER, "closeFailed", status);
         } else {
-            assert null == closed;
             try {
                 delegate.close();
                 logger.log(Level.FINE, "finalizeCleared");
@@ -190,7 +189,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeReadOnlyFile
     extends DecoratingReadOnlyFile {
-        volatile Boolean closed; // accessed by finalizer thread!
+        volatile IOException status; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -200,16 +199,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            closed = FALSE;
-            delegate.close();
-            closed = TRUE;
+            try {
+                delegate.close();
+                status = OK;
+            } catch (final IOException ex) {
+                throw status = ex;
+            }
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, closed);
+                finalize(delegate, status);
             } finally {
                 super.finalize();
             }
@@ -218,7 +220,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        volatile Boolean closed; // accessed by finalizer thread!
+        volatile IOException status; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -228,16 +230,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            closed = FALSE;
-            delegate.close();
-            closed = TRUE;
+            try {
+                delegate.close();
+                status = OK;
+            } catch (final IOException ex) {
+                throw status = ex;
+            }
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, closed);
+                finalize(delegate, status);
             } finally {
                 super.finalize();
             }
@@ -246,7 +251,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeInputStream
     extends DecoratingInputStream {
-        volatile Boolean closed; // accessed by finalizer thread!
+        volatile IOException status; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -256,16 +261,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            closed = FALSE;
-            delegate.close();
-            closed = TRUE;
+            try {
+                delegate.close();
+                status = OK;
+            } catch (final IOException ex) {
+                throw status = ex;
+            }
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, closed);
+                finalize(delegate, status);
             } finally {
                 super.finalize();
             }
@@ -274,7 +282,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeOutputStream
     extends DecoratingOutputStream {
-        volatile Boolean closed; // accessed by finalizer thread!
+        volatile IOException status; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -284,16 +292,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
         @Override
         public void close() throws IOException {
-            closed = FALSE;
-            delegate.close();
-            closed = TRUE;
+            try {
+                delegate.close();
+                status = OK;
+            } catch (final IOException ex) {
+                throw status = ex;
+            }
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, closed);
+                finalize(delegate, status);
             } finally {
                 super.finalize();
             }
