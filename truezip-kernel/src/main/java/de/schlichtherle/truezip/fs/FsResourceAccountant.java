@@ -28,9 +28,10 @@ import javax.annotation.concurrent.ThreadSafe;
  * Accounts for {@link Closeable} resources
  * ({@link InputStream}, {@link OutputStream} etc.) which are used in multiple
  * threads.
+ * <p>
  * This class is only public so that you can easily look up the Javadoc for its
  * member thread class {@link Collector}.
- * You cannot instantiate this class outside its package, however.
+ * You cannot instantiate this class outside its package.
  * <p>
  * For synchronization, each accountant uses a lock which has to be provided
  * to its {@link #FsResourceAccountant constructor}.
