@@ -28,16 +28,16 @@ extends DelegatingOutputSocket<E> {
     @Override
     protected final OutputSocket<? extends E> getDelegate() throws IOException {
         final OutputSocket<? extends E> os = delegate;
-        return null != os ? os : (delegate = getProxiedDelegate());
+        return null != os ? os : (delegate = getLazyDelegate());
     };
 
     /**
-     * Returns the proxied delegate socket.
+     * Returns the delegate socket for lazy initialization.
      * 
-     * @return The proxied delegate socket.
-     * @throws IOException On any I/O failure. 
+     * @return the delegate socket for lazy initialization.
+     * @throws IOException on any I/O failure. 
      */
-    protected abstract OutputSocket<? extends E> getProxiedDelegate()
+    protected abstract OutputSocket<? extends E> getLazyDelegate()
     throws IOException;
 
     @Override

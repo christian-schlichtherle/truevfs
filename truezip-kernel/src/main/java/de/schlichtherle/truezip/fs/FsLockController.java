@@ -463,6 +463,10 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Input
 
+    /**
+     * This class needs the lazy initialization and exception handling
+     * provided by its super class.
+     */
     @NotThreadSafe
     private class Input extends ProxyInputSocket<Entry> {
         final FsEntryName name;
@@ -475,7 +479,7 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        protected final InputSocket<?> getProxiedDelegate()
+        protected final InputSocket<?> getLazyDelegate()
         throws IOException {
             return FsLockController.this.delegate
                     .getInputSocket(name, options);
@@ -498,8 +502,7 @@ extends FsLockModelDecoratingController<
             class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
-                    return new LockReadOnlyFile(
-                            Input.super.newReadOnlyFile());
+                    return new LockReadOnlyFile(Input.super.newReadOnlyFile());
                 }
             } // NewReadOnlyFile
 
@@ -511,8 +514,7 @@ extends FsLockModelDecoratingController<
             class NewInputStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
-                    return new LockInputStream(
-                            Input.super.newInputStream());
+                    return new LockInputStream(Input.super.newInputStream());
                 }
             } // NewInputStream
 
@@ -542,6 +544,10 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Output
 
+    /**
+     * This class needs the lazy initialization and exception handling
+     * provided by its super class.
+     */
     @NotThreadSafe
     private class Output extends ProxyOutputSocket<Entry> {
         final FsEntryName name;
@@ -557,7 +563,7 @@ extends FsLockModelDecoratingController<
         }
 
         @Override
-        protected final OutputSocket<?> getProxiedDelegate()
+        protected final OutputSocket<?> getLazyDelegate()
         throws IOException {
             return FsLockController.this.delegate
                     .getOutputSocket(name, options, template);
@@ -580,8 +586,7 @@ extends FsLockModelDecoratingController<
             class NewOutputStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
-                    return new LockOutputStream(
-                            Output.super.newOutputStream());
+                    return new LockOutputStream(Output.super.newOutputStream());
                 }
             } // NewOutputStream
 

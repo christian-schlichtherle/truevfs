@@ -246,7 +246,7 @@ extends FsFileSystemArchiveController<E> {
     InputSocket<? extends E> getInputSocket(final String name) {
         class Input extends ProxyInputSocket<E> {
             @Override
-            protected InputSocket<? extends E> getProxiedDelegate()
+            protected InputSocket<? extends E> getLazyDelegate()
             throws IOException {
                 return getInputArchive().getInputSocket(name);
             }
@@ -302,7 +302,7 @@ extends FsFileSystemArchiveController<E> {
     OutputSocket<? extends E> getOutputSocket(final E entry) {
         class Output extends ProxyOutputSocket<E> {
             @Override
-            protected OutputSocket<? extends E> getProxiedDelegate()
+            protected OutputSocket<? extends E> getLazyDelegate()
             throws IOException {
                 return makeOutputArchive().getOutputSocket(entry);
             }
