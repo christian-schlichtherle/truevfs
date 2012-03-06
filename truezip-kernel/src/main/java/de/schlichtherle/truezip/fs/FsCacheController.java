@@ -218,7 +218,7 @@ extends FsLockModelDecoratingController<
             OutputSocket<?> newOutputSocket(
                     EntryCache cache,
                     BitField<FsOutputOption> options,
-                    Entry template) {
+                    @CheckForNull Entry template) {
                 return cache.new Nio2Output(options, template);
             }
         },
@@ -228,7 +228,7 @@ extends FsLockModelDecoratingController<
             OutputSocket<?> newOutputSocket(
                     EntryCache cache,
                     BitField<FsOutputOption> options,
-                    Entry template) {
+                    @CheckForNull Entry template) {
                 return cache.new Output(options, template);
             }
         };
@@ -324,6 +324,7 @@ extends FsLockModelDecoratingController<
             }
         } // Input
 
+        @Immutable
         final class Nio2Output extends Output {
             Nio2Output( final BitField<FsOutputOption> options,
                         final @CheckForNull Entry template) {
@@ -361,6 +362,7 @@ extends FsLockModelDecoratingController<
          * This class needs the lazy initialization and exception handling
          * provided by its super class.
          */
+        @Immutable
         class Output extends ProxyOutputSocket<Entry> {
             final BitField<FsOutputOption> options;
             final @CheckForNull Entry template;
