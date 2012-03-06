@@ -39,6 +39,10 @@ extends FsModelController<FsLockModel>  {
         return getModel().writeLock();
     }
 
+    protected final boolean isWriteLockedByCurrentThread() {
+        return getModel().isWriteLockedByCurrentThread();
+    }
+
     protected final void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         getModel().checkWriteLockedByCurrentThread();
