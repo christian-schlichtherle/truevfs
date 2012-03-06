@@ -26,6 +26,7 @@ import static java.lang.Boolean.TRUE;
 import java.nio.channels.SeekableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -73,25 +74,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 delegate.getOutputSocket(name, options, template));
     }
 
-    static void finalize(final Closeable delegate, final Boolean closed) {
-        Throwable failure = null;
-        try {
-            if (null == closed) {
-                try {
-                    delegate.close();
-                } catch (Throwable ex) {
-                    failure = ex;
-                }
-            }
-        } finally {
-            if (TRUE.equals(closed)) {
-                logger.log(Level.FINEST, "closeCleared");
-            } else if (FALSE.equals(closed)) {
-                logger.log(Level.FINER, "closeFailed");
-            } else if (null == failure) {
+    static void finalize(   final Closeable delegate,
+                            final @CheckForNull Boolean closed) {
+        if (TRUE.equals(closed)) {
+            logger.log(Level.FINEST, "closeCleared");
+        } else if (FALSE.equals(closed)) {
+            logger.log(Level.FINER, "closeFailed");
+        } else {
+            assert null == closed;
+            try {
+                delegate.close();
                 logger.log(Level.FINE, "finalizeCleared");
-            } else {
-                logger.log(Level.FINE, "finalizeFailed", failure);
+            } catch (final Throwable ex) {
+                logger.log(Level.FINE, "finalizeFailed", ex);
             }
         }
     }
@@ -198,7 +193,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         Boolean closed;
 
         @CreatesObligation
-        @SuppressWarnings("LeakingThisInConstructor")
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         FinalizeReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
         }
@@ -219,14 +214,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 super.finalize();
             }
         }
-    } // AccountingReadOnlyFile
+    } // FinalizeReadOnlyFile
 
     private final class FinalizeSeekableByteChannel
     extends DecoratingSeekableByteChannel {
         Boolean closed;
 
         @CreatesObligation
-        @SuppressWarnings("LeakingThisInConstructor")
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         FinalizeSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
@@ -247,14 +242,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 super.finalize();
             }
         }
-    } // AccountingSeekableByteChannel
+    } // FinalizeSeekableByteChannel
 
     private final class FinalizeInputStream
     extends DecoratingInputStream {
         Boolean closed;
 
         @CreatesObligation
-        @SuppressWarnings("LeakingThisInConstructor")
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         FinalizeInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
@@ -275,14 +270,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 super.finalize();
             }
         }
-    } // AccountingInputStream
+    } // FinalizeInputStream
 
     private final class FinalizeOutputStream
     extends DecoratingOutputStream {
         Boolean closed;
 
         @CreatesObligation
-        @SuppressWarnings("LeakingThisInConstructor")
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         FinalizeOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
@@ -303,5 +298,5 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 super.finalize();
             }
         }
-    } // AccountingOutputStream
+    } // FinalizeOutputStream
 }
