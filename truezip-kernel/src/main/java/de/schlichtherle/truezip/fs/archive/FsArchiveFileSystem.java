@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -133,7 +134,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
     newPopulatedFileSystem( FsArchiveDriver<E> driver,
-                            EntryContainer<E> archive,
+                            @WillNotClose EntryContainer<E> archive,
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
@@ -142,7 +143,7 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     FsArchiveFileSystem(final FsArchiveDriver<E> driver,
-                        final EntryContainer<E> archive,
+                        final @WillNotClose EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
         assert !(rootTemplate instanceof FsCovariantEntry<?>);
         this.factory = driver;
