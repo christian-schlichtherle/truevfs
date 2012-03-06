@@ -99,7 +99,7 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
             fail();
         } catch (IOException expected) {
         }
-            
+
         umount();
         view.setAction(ENTER);
         archive.toFile().rm_r();
