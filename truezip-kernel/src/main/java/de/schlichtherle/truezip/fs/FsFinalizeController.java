@@ -190,7 +190,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeReadOnlyFile
     extends DecoratingReadOnlyFile {
-        Boolean closed;
+        volatile Boolean closed; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -218,7 +218,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        Boolean closed;
+        volatile Boolean closed; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -246,7 +246,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeInputStream
     extends DecoratingInputStream {
-        Boolean closed;
+        volatile Boolean closed; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -274,7 +274,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private final class FinalizeOutputStream
     extends DecoratingOutputStream {
-        Boolean closed;
+        volatile Boolean closed; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
