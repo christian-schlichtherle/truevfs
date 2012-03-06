@@ -181,19 +181,16 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
-            final FsEntryName name,
-            final BitField<FsInputOption> options) {
+    public InputSocket<?> getInputSocket(   FsEntryName name,
+                                            BitField<FsInputOption> options) {
         return new Input(delegate.getInputSocket(name, options));
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(
-            final FsEntryName name,
-            final BitField<FsOutputOption> options,
-            final Entry template) {
-        return new Output(
-                delegate.getOutputSocket(name, options, template),
+    public OutputSocket<?> getOutputSocket( FsEntryName name,
+                                            BitField<FsOutputOption> options,
+                                            @CheckForNull Entry template) {
+        return new Output(delegate.getOutputSocket(name, options, template),
                 options);
     }
 
