@@ -48,13 +48,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 // that the file system can be successfully mounted again
                 // if the target archive file gets subsequently modified to
                 // be a true archive file.
-                // FIXME: If this fails then this operation will NOT be atomic!
+                // TODO: If this fails then this operation will NOT be atomic!
                 sync(CANCEL);
             }
             // We have just removed the virtual root directory of a
             // federated file system, i.e. an archive file.
             // Now unlink the target archive file from the parent file system.
-            // FIXME: If this fails then this operation will NOT be atomic!
+            // TODO: If this fails then this operation will NOT be atomic!
             getParent().unlink(
                     getMountPoint().getPath().resolve(name).getEntryName(),
                     options);
