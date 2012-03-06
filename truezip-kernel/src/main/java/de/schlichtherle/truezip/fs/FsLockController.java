@@ -12,10 +12,10 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.socket.ProxyInputSocket;
+import de.schlichtherle.truezip.socket.ProxyOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
@@ -33,6 +33,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -55,6 +56,7 @@ extends FsLockModelDecoratingController<
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
+
     private static final ThreadLocal<ThreadUtil> threadUtil = (JSE7.AVAILABLE
             ? ThreadLocalUtilFactory.NEW
             : ThreadLocalUtilFactory.OLD
@@ -185,7 +187,6 @@ extends FsLockModelDecoratingController<
     public Icon getOpenIcon() throws IOException {
         class GetOpenIcon implements IOOperation<Icon> {
             @Override
-            @SuppressWarnings("deprecation")
             public Icon call() throws IOException {
                 return delegate.getOpenIcon();
             }
@@ -199,7 +200,6 @@ extends FsLockModelDecoratingController<
     public Icon getClosedIcon() throws IOException {
         class GetClosedIcon implements IOOperation<Icon> {
             @Override
-            @SuppressWarnings("deprecation")
             public Icon call() throws IOException {
                 return delegate.getClosedIcon();
             }
@@ -317,16 +317,14 @@ extends FsLockModelDecoratingController<
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return SOCKET_FACTORY.newInputSocket(this,
-                delegate.getInputSocket(name, options));
+        return SOCKET_FACTORY.newInputSocket(this, name, options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
-                                            Entry template) {
-        return SOCKET_FACTORY.newOutputSocket(this,
-                delegate.getOutputSocket(name, options, template));
+                                            @CheckForNull Entry template) {
+        return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
     }
 
     @Override
@@ -398,15 +396,18 @@ extends FsLockModelDecoratingController<
             @Override
             InputSocket<?> newInputSocket(
                     FsLockController controller,
-                    InputSocket<?> input) {
-                return controller.new Nio2Input(input);
+                    FsEntryName name,
+                    BitField<FsInputOption> options) {
+                return controller.new Nio2Input(name, options);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsLockController controller,
-                    OutputSocket<?> output) {
-                return controller.new Nio2Output(output);
+                    FsEntryName name,
+                    BitField<FsOutputOption> options,
+                    @CheckForNull Entry template) {
+                return controller.new Nio2Output(name, options, template);
             }
         },
 
@@ -414,31 +415,38 @@ extends FsLockModelDecoratingController<
             @Override
             InputSocket<?> newInputSocket(
                     FsLockController controller,
-                    InputSocket<?> input) {
-                return controller.new Input(input);
+                    FsEntryName name,
+                    BitField<FsInputOption> options) {
+                return controller.new Input(name, options);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsLockController controller,
-                    OutputSocket<?> output) {
-                return controller.new Output(output);
+                    FsEntryName name,
+                    BitField<FsOutputOption> options,
+                    @CheckForNull Entry template) {
+                return controller.new Output(name, options, template);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
                 FsLockController controller,
-                InputSocket <?> input);
+                FsEntryName name,
+                BitField<FsInputOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
                 FsLockController controller,
-                OutputSocket <?> output);
+                FsEntryName name,
+                BitField<FsOutputOption> options,
+                @CheckForNull Entry template);
     } // SocketFactory
 
     @NotThreadSafe
     private final class Nio2Input extends Input {
-        Nio2Input(InputSocket<?> input) {
-            super(input);
+        Nio2Input(  final FsEntryName name,
+                    final BitField<FsInputOption> options) {
+            super(name, options);
         }
 
         @Override
@@ -447,7 +455,7 @@ extends FsLockModelDecoratingController<
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            Nio2Input.super.newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -456,9 +464,21 @@ extends FsLockModelDecoratingController<
     } // Nio2Input
 
     @NotThreadSafe
-    private class Input extends DecoratingInputSocket<Entry> {
-        Input(InputSocket<?> input) {
-            super(input);
+    private class Input extends ProxyInputSocket<Entry> {
+        final FsEntryName name;
+        final BitField<FsInputOption> options;
+
+        Input(  final FsEntryName name,
+                final BitField<FsInputOption> options) {
+            this.name = name;
+            this.options = options;
+        }
+
+        @Override
+        protected final InputSocket<?> getProxiedDelegate()
+        throws IOException {
+            return FsLockController.this.delegate
+                    .getInputSocket(name, options);
         }
 
         @Override
@@ -466,7 +486,7 @@ extends FsLockModelDecoratingController<
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return getBoundSocket().getLocalTarget();
+                    return Input.super.getLocalTarget();
                 }
             } // GetLocalTarget
 
@@ -479,7 +499,7 @@ extends FsLockModelDecoratingController<
                 @Override
                 public ReadOnlyFile call() throws IOException {
                     return new LockReadOnlyFile(
-                            getBoundSocket().newReadOnlyFile());
+                            Input.super.newReadOnlyFile());
                 }
             } // NewReadOnlyFile
 
@@ -492,7 +512,7 @@ extends FsLockModelDecoratingController<
                 @Override
                 public InputStream call() throws IOException {
                     return new LockInputStream(
-                            getBoundSocket().newInputStream());
+                            Input.super.newInputStream());
                 }
             } // NewInputStream
 
@@ -502,8 +522,10 @@ extends FsLockModelDecoratingController<
 
     @NotThreadSafe
     private final class Nio2Output extends Output {
-        Nio2Output(OutputSocket<?> output) {
-            super(output);
+        Nio2Output( final FsEntryName name,
+                    final BitField<FsOutputOption> options,
+                    final @CheckForNull Entry template) {
+            super(name, options, template);
         }
 
         @Override
@@ -512,7 +534,7 @@ extends FsLockModelDecoratingController<
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            Nio2Output.super.newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -521,9 +543,24 @@ extends FsLockModelDecoratingController<
     } // Nio2Output
 
     @NotThreadSafe
-    private class Output extends DecoratingOutputSocket<Entry> {
-        Output(OutputSocket<?> output) {
-            super(output);
+    private class Output extends ProxyOutputSocket<Entry> {
+        final FsEntryName name;
+        final BitField<FsOutputOption> options;
+        final @CheckForNull Entry template;
+
+        Output( final FsEntryName name,
+                final BitField<FsOutputOption> options,
+                final @CheckForNull Entry template) {
+            this.name = name;
+            this.options = options;
+            this.template = template;
+        }
+
+        @Override
+        protected final OutputSocket<?> getProxiedDelegate()
+        throws IOException {
+            return FsLockController.this.delegate
+                    .getOutputSocket(name, options, template);
         }
 
         @Override
@@ -531,7 +568,7 @@ extends FsLockModelDecoratingController<
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return getBoundSocket().getLocalTarget();
+                    return Output.super.getLocalTarget();
                 }
             } // GetLocalTarget
 
@@ -544,7 +581,7 @@ extends FsLockModelDecoratingController<
                 @Override
                 public OutputStream call() throws IOException {
                     return new LockOutputStream(
-                            getBoundSocket().newOutputStream());
+                            Output.super.newOutputStream());
                 }
             } // NewOutputStream
 
