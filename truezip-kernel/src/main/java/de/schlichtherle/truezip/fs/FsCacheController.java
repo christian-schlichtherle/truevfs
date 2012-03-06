@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -92,16 +93,14 @@ extends FsLockModelDecoratingController<
             final FsEntryName name,
             final BitField<FsInputOption> options) {
         class Input extends DelegatingInputSocket<Entry> {
-            final InputSocket<?> delegate = FsCacheController.this.delegate
-                    .getInputSocket(name, options);
-
             @Override
             protected InputSocket<?> getDelegate() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsInputOption.CACHE))
-                        return delegate;
+                        return FsCacheController.this.delegate
+                                .getInputSocket(name, options);
                     cache = new EntryCache(name);
                 }
                 return cache.getInputSocket(options);
@@ -116,18 +115,16 @@ extends FsLockModelDecoratingController<
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
             final BitField<FsOutputOption> options,
-            final Entry template) {
+            final @CheckForNull Entry template) {
         class Output extends DelegatingOutputSocket<Entry> {
-            final OutputSocket<?> delegate = FsCacheController.this.delegate
-                    .getOutputSocket(name, options, template);
-
             @Override
             protected OutputSocket<?> getDelegate() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsOutputOption.CACHE))
-                        return delegate;
+                        return FsCacheController.this.delegate
+                                .getOutputSocket(name, options, template);
                     cache = new EntryCache(name);
                 }
                 return cache.getOutputSocket(options, template);
@@ -141,7 +138,7 @@ extends FsLockModelDecoratingController<
     public void mknod(  final FsEntryName name,
                         final Type type,
                         final BitField<FsOutputOption> options,
-                        final Entry template)
+                        final @CheckForNull Entry template)
     throws IOException {
         assert isWriteLockedByCurrentThread();
         final EntryCache cache = caches.get(name);
@@ -249,7 +246,7 @@ extends FsLockModelDecoratingController<
 
         EntryCache(final FsEntryName name) {
             this.name = name;
-            this.cache = WRITE_BACK.newCache(pool);
+            this.cache = WRITE_BACK.newCache(FsCacheController.this.pool);
         }
 
         InputSocket<?> getInputSocket(BitField<FsInputOption> options) {
@@ -305,6 +302,8 @@ extends FsLockModelDecoratingController<
                 assert isWriteLockedByCurrentThread();
 
                 class Stream extends DecoratingInputStream {
+                    @CreatesObligation
+                    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
                         super(getBoundSocket().newInputStream());
                         assert isTouched();
@@ -334,6 +333,8 @@ extends FsLockModelDecoratingController<
                 pre();
 
                 class Channel extends DecoratingSeekableByteChannel {
+                    @CreatesObligation
+                    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Channel() throws IOException {
                         super(getBoundSocket().newSeekableByteChannel());
                         FsCacheController.this.caches.put(name, EntryCache.this);
@@ -377,6 +378,8 @@ extends FsLockModelDecoratingController<
                 pre();
 
                 class Stream extends DecoratingOutputStream {
+                    @CreatesObligation
+                    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
                         super(getBoundSocket().newOutputStream());
                         FsCacheController.this.caches.put(name, EntryCache.this);
