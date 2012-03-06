@@ -296,7 +296,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 @CheckForNull Entry template);
     } // SocketFactory
 
-    @NotThreadSafe
+    @Immutable
     private final class Nio2Input extends Input {
         Nio2Input(  final FsEntryName name,
                     final BitField<FsInputOption> options) {
@@ -316,7 +316,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Input
 
-    @NotThreadSafe
+    @Immutable
     private class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<FsInputOption> options) {
@@ -360,7 +360,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Input
 
-    @NotThreadSafe
+    @Immutable
     private final class Nio2Output extends Output {
         Nio2Output( final FsEntryName name,
                     final BitField<FsOutputOption> options,
@@ -381,7 +381,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Output
 
-    @NotThreadSafe
+    @Immutable
     private class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,

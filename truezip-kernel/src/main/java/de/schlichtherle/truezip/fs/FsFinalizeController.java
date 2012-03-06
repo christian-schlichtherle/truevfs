@@ -62,16 +62,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<FsInputOption> options) {
-        return SOCKET_FACTORY.newInputSocket(this,
-                delegate.getInputSocket(name, options));
+        return SOCKET_FACTORY.newInputSocket(this, name, options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<FsOutputOption> options,
                                             @CheckForNull Entry template) {
-        return SOCKET_FACTORY.newOutputSocket(this,
-                delegate.getOutputSocket(name, options, template));
+        return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
     }
 
     static void finalize(   final Closeable delegate,
@@ -96,15 +94,18 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             @Override
             InputSocket<?> newInputSocket(
                     FsFinalizeController<?> controller,
-                    InputSocket<?> input) {
-                return controller.new Nio2Input(input);
+                    FsEntryName name,
+                    BitField<FsInputOption> options) {
+                return controller.new Nio2Input(name, options);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsFinalizeController<?> controller,
-                    OutputSocket<?> output) {
-                return controller.new Nio2Output(output);
+                    FsEntryName name,
+                    BitField<FsOutputOption> options,
+                    @CheckForNull Entry template) {
+                return controller.new Nio2Output(name, options, template);
             }
         },
 
@@ -112,30 +113,38 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             @Override
             InputSocket<?> newInputSocket(
                     FsFinalizeController<?> controller,
-                    InputSocket<?> input) {
-                return controller.new Input(input);
+                    FsEntryName name,
+                    BitField<FsInputOption> options) {
+                return controller.new Input(name, options);
             }
 
             @Override
             OutputSocket<?> newOutputSocket(
                     FsFinalizeController<?> controller,
-                    OutputSocket<?> output) {
-                return controller.new Output(output);
+                    FsEntryName name,
+                    BitField<FsOutputOption> options,
+                    @CheckForNull Entry template) {
+                return controller.new Output(name, options, template);
             }
         };
 
         abstract InputSocket<?> newInputSocket(
                 FsFinalizeController<?> controller,
-                InputSocket <?> input);
+                FsEntryName name,
+                BitField<FsInputOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
                 FsFinalizeController<?> controller,
-                OutputSocket <?> output);
+                FsEntryName name,
+                BitField<FsOutputOption> options,
+                @CheckForNull Entry template);
     } // SocketFactory
 
+    @Immutable
     private final class Nio2Input extends Input {
-        Nio2Input(InputSocket<?> input) {
-            super(input);
+        Nio2Input(  final FsEntryName name,
+                    final BitField<FsInputOption> options) {
+            super(name, options);
         }
 
         @Override
@@ -145,9 +154,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Input
 
+    @Immutable
     private class Input extends DecoratingInputSocket<Entry> {
-        Input(InputSocket<?> input) {
-            super(input);
+        Input(  final FsEntryName name,
+                final BitField<FsInputOption> options) {
+            super(FsFinalizeController.this.delegate
+                    .getInputSocket(name, options));
         }
 
         @Override
@@ -163,9 +175,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Input
 
+    @Immutable
     private final class Nio2Output extends Output {
-        Nio2Output(OutputSocket<?> output) {
-            super(output);
+        Nio2Output( final FsEntryName name,
+                    final BitField<FsOutputOption> options,
+                    final @CheckForNull Entry template) {
+            super(name, options, template);
         }
 
         @Override
@@ -175,9 +190,13 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Output
 
+    @Immutable
     private class Output extends DecoratingOutputSocket<Entry> {
-        Output(OutputSocket<?> output) {
-            super(output);
+        Output( final FsEntryName name,
+                final BitField<FsOutputOption> options,
+                final @CheckForNull Entry template) {
+            super(FsFinalizeController.this.delegate
+                    .getOutputSocket(name, options, template));
         }
 
         @Override
