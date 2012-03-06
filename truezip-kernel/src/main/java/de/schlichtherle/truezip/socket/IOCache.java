@@ -279,10 +279,9 @@ public final class IOCache implements Flushable, Closeable {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            final Buffer buffer = this.buffer;
-            return null != buffer
-                    ? buffer.data
-                    : new ProxyEntry(input/*.bind(this)*/.getLocalTarget()); // do NOT bind!
+            final Buffer b = buffer;
+            return null != b ? b.data : new ProxyEntry(
+                    input/*.bind(this)*/.getLocalTarget()); // do NOT bind!
         }
     } // Input
 
@@ -296,10 +295,9 @@ public final class IOCache implements Flushable, Closeable {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            final Buffer buffer = this.buffer;
-            return null != buffer
-                    ? buffer.data
-                    : new ProxyEntry(output/*.bind(this)*/.getLocalTarget()); // do NOT bind!
+            final Buffer b = buffer;
+            return null != b ? b.data : new ProxyEntry(
+                    output/*.bind(this)*/.getLocalTarget()); // do NOT bind!
         }
     } // Output
 
