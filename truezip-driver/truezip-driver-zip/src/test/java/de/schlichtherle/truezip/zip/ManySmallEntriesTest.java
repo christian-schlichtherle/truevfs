@@ -1,27 +1,22 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.entry.Entry.Size;
+import de.schlichtherle.truezip.socket.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -29,46 +24,35 @@ import org.junit.Test;
  *
  * @author Christian Schlichtherle
  */
-public final class ManySmallEntriesIT {
+public final class ManySmallEntriesTest {
 
-    private static final Logger logger
-            = Logger.getLogger(ManySmallEntriesIT.class.getName());
+    private static final int FIRST_ENTRY = 100000;
+    private static final int LAST_ENTRY  = 169999;
+    private static final int NUM_ENTRIES = LAST_ENTRY - FIRST_ENTRY + 1;
+    static { assert NUM_ENTRIES > 65535; /* 0xffff */ }
 
-    private static final byte[] data = "Hello World!".getBytes();
-    private static final long dataCrc = 0x1c291ca3;
-
-    private File zip;
-
-    @Before
-    public void setUp() throws IOException {
-        zip = File.createTempFile("zip", null);
-    }
-
-    @After
-    public void tearDown() {
-        assertTrue(zip.delete());
-    }
+    private static final String DATA_STRING = "Hello World!";
+    private static final Charset DATA_CHARSET = Charset.forName("US-ASCII");
+    private static final int DATA_CRC = 0x1c291ca3; // pre-computed
+    private static final int ZIP_SIZE = 7000098; // pre-computed
 
     @Test
     public void testManySmallEntries() throws IOException {
-        logger.fine("testManySmallEntries");
-        
-        final int n = 70000; // > 0xffff;
-        logger.log(Level.FINER, "Compressing {0} ZIP file entries to: {1}", new Object[]{ n, zip.getPath() });
-        logger.finer("Note that the max. number of entries supported by the ZIP File Format Spec. is 65535!");
+        final IOEntry<?> buffer = new ByteArrayIOBuffer("zip", ZIP_SIZE);
+        final byte[] data = DATA_STRING.getBytes(DATA_CHARSET);
+        final HashSet<String> set = new HashSet<String>(
+                Maps.initialCapacity(NUM_ENTRIES));
 
-        final HashSet<String> set = new HashSet<String>();
-
-        final ZipOutputStream zipOut
-                = new ZipOutputStream(new FileOutputStream(zip));
-        for (int i = 100000; i < 100000 + n; i++) {
-            String name = i + ".txt";
+        final ZipOutputStream zipOut = new ZipOutputStream(
+                buffer.getOutputSocket().newOutputStream());
+        for (int i = FIRST_ENTRY; i <= LAST_ENTRY; i++) {
+            final String name = Integer.toString(i);
             final ZipEntry entry = new ZipEntry(name);
 
             // Speed up the test a bit.
             entry.setSize(data.length);
             entry.setCompressedSize(data.length);
-            entry.setCrc(dataCrc);
+            entry.setCrc(DATA_CRC);
             entry.setMethod(STORED);
 
             zipOut.putNextEntry(entry);
@@ -76,9 +60,10 @@ public final class ManySmallEntriesIT {
             assertTrue(set.add(name));
         }
         zipOut.close();
-        logger.log(Level.FINER, "Compressed {0} ZIP file entries into {1} KB ZIP file length.", new Object[]{ n, zip.length() / 1024 });
+        assertEquals(ZIP_SIZE, buffer.getSize(Size.STORAGE));
 
-        final ZipFile zipIn = new ZipFile(zip);
+        final ZipFile zipIn = new ZipFile(
+                buffer.getInputSocket().newReadOnlyFile());
         try {
             final byte[] buf = new byte[data.length];
             for (Enumeration<? extends ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
@@ -86,7 +71,7 @@ public final class ManySmallEntriesIT {
 
                 assertEquals(data.length, entry.getSize());
 
-                InputStream in = zipIn.getInputStream(entry);
+                InputStream in = zipIn.getCheckedInputStream(entry);
                 int off = 0;
                 int read;
                 do {
@@ -109,6 +94,5 @@ public final class ManySmallEntriesIT {
         }
 
         assertTrue(set.isEmpty());
-        logger.finer("Successfully decompressed the data in all entries.");
     }
 }
