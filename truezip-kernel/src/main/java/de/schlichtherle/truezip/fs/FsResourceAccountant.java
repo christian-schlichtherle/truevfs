@@ -5,14 +5,11 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import de.schlichtherle.truezip.util.ThreadGroups;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -29,10 +26,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * ({@link InputStream}, {@link OutputStream} etc.) which are used in multiple
  * threads.
  * <p>
- * This class is only public so that you can easily look up the Javadoc for its
- * member thread class {@link Collector}.
- * You cannot instantiate this class outside its package.
- * <p>
  * For synchronization, each accountant uses a lock which has to be provided
  * to its {@link #FsResourceAccountant constructor}.
  * In order to start accounting for a closeable resource,
@@ -45,7 +38,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsResourceAccountant {
+final class FsResourceAccountant {
 
     private final Lock lock;
     private final Condition condition;
@@ -56,8 +49,8 @@ public final class FsResourceAccountant {
      * resource if there are no more references to it.
      */
     @GuardedBy("lock")
-    private final Map<Closeable, Account>
-            accounts = new WeakIdentityHashMap<Closeable, Account>();
+    private final Map<Closeable, Thread>
+            threads = new IdentityHashMap<Closeable, Thread>();
 
     /**
      * Constructs a new resource accountant with the given lock.
@@ -83,8 +76,7 @@ public final class FsResourceAccountant {
     void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
         lock.lock();
         try {
-            if (!accounts.containsKey(resource))
-                accounts.put(resource, new Account(resource));
+            threads.put(resource, Thread.currentThread());
         } finally {
             lock.unlock();
         }
@@ -100,12 +92,8 @@ public final class FsResourceAccountant {
     void stopAccountingFor(final @WillNotClose Closeable resource) {
         lock.lock();
         try {
-            final Account account = accounts.remove(resource);
-            if (null != account) {
-                account.clear();
-                account.enqueue();
+            if (null != threads.remove(resource))
                 condition.signalAll();
-            }
         } finally {
             lock.unlock();
         }
@@ -177,8 +165,8 @@ public final class FsResourceAccountant {
     int localResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final Account account : accounts.values())
-            if (account.owner.get() == currentThread)
+        for (final Thread thread : threads.values())
+            if (thread == currentThread)
                 n++;
         return n;
     }
@@ -196,7 +184,7 @@ public final class FsResourceAccountant {
      *         by <em>all</em> threads.
      */
     int totalResources() {
-        return accounts.size();
+        return threads.size();
     }
 
     /**
@@ -214,7 +202,8 @@ public final class FsResourceAccountant {
 
         lock.lock();
         try {
-            for (final Iterator<Closeable> i = accounts.keySet().iterator(); i.hasNext(); ) {
+            for (   final Iterator<Closeable> i = threads.keySet().iterator();
+                    i.hasNext(); ) {
                 final Closeable resource = i.next();
                 i.remove();
                 try {
@@ -227,85 +216,10 @@ public final class FsResourceAccountant {
                     handler.warn(ex); // may throw an exception!
                 }
             }
-            assert accounts.isEmpty();
+            assert threads.isEmpty();
         } finally {
             condition.signalAll();
             lock.unlock();
         }
     }
-
-    /**
-     * A reference to a {@link Closeable} which can notify its
-     * {@link FsResourceAccountant}.
-     */
-    private final class Account extends WeakReference<Closeable> {
-        final Reference<Thread>
-                owner = new WeakReference<Thread>(Thread.currentThread());
-        volatile boolean enqueued;
-
-        Account(final Closeable resource) {
-            super(resource, Collector.queue);
-        }
-
-        @Override
-        public boolean enqueue() {
-            // Mind the desired side effect!
-            return super.enqueue() && (this.enqueued = true);
-        }
-
-        boolean isEnqueuedByGC() {
-            return super.isEnqueued() && !this.enqueued;
-        }
-
-        /**
-         * Notifies all resource accountant waiting threads of this reference.
-         * Mind that this method is called even if accounting for the closeable
-         * resource has been properly stopped.
-         */
-        void signalAll() {
-            final Lock lock = FsResourceAccountant.this.lock;
-            lock.lock();
-            try {
-                condition.signalAll();
-            } finally {
-                lock.unlock();
-            }
-        }
-    } // Account
-
-    /**
-     * A high priority daemon thread which runs an endless loop in order to
-     * collect account references which have been picked up by the garbage
-     * collector and notify their respective resource accountant.
-     * You cannot use this class outside its package.
-     */
-    @SuppressWarnings("PublicInnerClass")
-    public static final class Collector extends Thread {
-        private static final ReferenceQueue<Closeable>
-                queue = new ReferenceQueue<Closeable>();
-
-        static {
-            new Collector().start();
-        }
-
-        private Collector() {
-            super(ThreadGroups.getServerThreadGroup(), Collector.class.getName());
-            setPriority(MAX_PRIORITY - 2);
-            setDaemon(true);
-        }
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    final Account account = (Account) queue.remove();
-                    if (account.isEnqueuedByGC()) {
-                        //System.runFinalization();
-                        account.signalAll();
-                    }
-                } catch (InterruptedException ignore) {
-                }
-            }
-        }
-    } // Collector
 }
