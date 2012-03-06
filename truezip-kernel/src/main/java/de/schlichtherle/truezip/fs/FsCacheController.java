@@ -265,7 +265,6 @@ extends FsLockModelDecoratingController<
                 // This may happen if a concurrent sync() has been conducted
                 // which failed because of an FsControllerException from the
                 // parent controller when close()ing the target archive file.
-                // FIXME: Add assertions!
             }
         }
 

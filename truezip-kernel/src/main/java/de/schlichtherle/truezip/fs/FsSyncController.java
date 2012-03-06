@@ -13,10 +13,10 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.socket.ProxyInputSocket;
-import de.schlichtherle.truezip.socket.ProxyOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.Icon;
 
@@ -59,7 +60,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         super(controller);
     }
 
-    private void sync() throws IOException {
+    void sync() throws IOException {
         delegate.sync(SYNC);
     }
 
@@ -295,6 +296,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 @CheckForNull Entry template);
     } // SocketFactory
 
+    @NotThreadSafe
     private final class Nio2Input extends Input {
         Nio2Input(  final FsEntryName name,
                     final BitField<FsInputOption> options) {
@@ -306,7 +308,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             while (true) {
                 try {
                     return new SyncSeekableByteChannel(
-                            super.newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -314,31 +316,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Input
 
-    /**
-     * This class needs the lazy initialization and exception handling
-     * provided by its super class.
-     */
-    private class Input extends ProxyInputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsInputOption> options;
-
+    @NotThreadSafe
+    private class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<FsInputOption> options) {
-            this.name = name;
-            this.options = options;
-        }
-
-        @Override
-        protected InputSocket<?> getLazyDelegate() throws IOException {
-            return FsSyncController.this.delegate
-                    .getInputSocket(name, options);
+            super(FsSyncController.this.delegate
+                    .getInputSocket(name, options));
         }
 
         @Override
         public Entry getLocalTarget() throws IOException {
             while (true) {
                 try {
-                    return super.getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -349,7 +339,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             while (true) {
                 try {
-                    return new SyncReadOnlyFile(super.newReadOnlyFile());
+                    return new SyncReadOnlyFile(
+                            getBoundSocket().newReadOnlyFile());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -360,7 +351,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public InputStream newInputStream() throws IOException {
             while (true) {
                 try {
-                    return new SyncInputStream(super.newInputStream());
+                    return new SyncInputStream(
+                            getBoundSocket().newInputStream());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -368,6 +360,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Input
 
+    @NotThreadSafe
     private final class Nio2Output extends Output {
         Nio2Output( final FsEntryName name,
                     final BitField<FsOutputOption> options,
@@ -380,7 +373,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             while (true) {
                 try {
                     return new SyncSeekableByteChannel(
-                            super.newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -388,35 +381,20 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Nio2Output
 
-    /**
-     * This class needs the lazy initialization and exception handling
-     * provided by its super class.
-     */
-    private class Output extends ProxyOutputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsOutputOption> options;
-        final @CheckForNull Entry template;
-
+    @NotThreadSafe
+    private class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
-            this.name = name;
-            this.options = options;
-            this.template = template;
-        }
-
-        @Override
-        protected final OutputSocket<?> getLazyDelegate()
-        throws IOException {
-            return FsSyncController.this.delegate
-                    .getOutputSocket(name, options, template);
+            super(FsSyncController.this.delegate
+                    .getOutputSocket(name, options, template));
         }
 
         @Override
         public Entry getLocalTarget() throws IOException {
             while (true) {
                 try {
-                    return super.getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }
@@ -427,7 +405,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public OutputStream newOutputStream() throws IOException {
             while (true) {
                 try {
-                    return new SyncOutputStream(super.newOutputStream());
+                    return new SyncOutputStream(
+                            getBoundSocket().newOutputStream());
                 } catch (FsNeedsSyncException discard) {
                     sync();
                 }

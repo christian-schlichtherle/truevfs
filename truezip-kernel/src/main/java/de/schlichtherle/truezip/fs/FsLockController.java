@@ -12,10 +12,10 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.socket.ProxyInputSocket;
-import de.schlichtherle.truezip.socket.ProxyOutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
@@ -455,7 +455,7 @@ extends FsLockModelDecoratingController<
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            Nio2Input.super.newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -463,26 +463,12 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Input
 
-    /**
-     * This class needs the lazy initialization and exception handling
-     * provided by its super class.
-     */
     @NotThreadSafe
-    private class Input extends ProxyInputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsInputOption> options;
-
+    private class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<FsInputOption> options) {
-            this.name = name;
-            this.options = options;
-        }
-
-        @Override
-        protected final InputSocket<?> getLazyDelegate()
-        throws IOException {
-            return FsLockController.this.delegate
-                    .getInputSocket(name, options);
+            super(FsLockController.this.delegate
+                    .getInputSocket(name, options));
         }
 
         @Override
@@ -490,7 +476,7 @@ extends FsLockModelDecoratingController<
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return Input.super.getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 }
             } // GetLocalTarget
 
@@ -502,7 +488,8 @@ extends FsLockModelDecoratingController<
             class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
-                    return new LockReadOnlyFile(Input.super.newReadOnlyFile());
+                    return new LockReadOnlyFile(
+                            getBoundSocket().newReadOnlyFile());
                 }
             } // NewReadOnlyFile
 
@@ -514,7 +501,8 @@ extends FsLockModelDecoratingController<
             class NewInputStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
-                    return new LockInputStream(Input.super.newInputStream());
+                    return new LockInputStream(
+                            getBoundSocket().newInputStream());
                 }
             } // NewInputStream
 
@@ -536,7 +524,7 @@ extends FsLockModelDecoratingController<
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            Nio2Output.super.newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -544,29 +532,13 @@ extends FsLockModelDecoratingController<
         }
     } // Nio2Output
 
-    /**
-     * This class needs the lazy initialization and exception handling
-     * provided by its super class.
-     */
     @NotThreadSafe
-    private class Output extends ProxyOutputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsOutputOption> options;
-        final @CheckForNull Entry template;
-
+    private class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
                 final @CheckForNull Entry template) {
-            this.name = name;
-            this.options = options;
-            this.template = template;
-        }
-
-        @Override
-        protected final OutputSocket<?> getLazyDelegate()
-        throws IOException {
-            return FsLockController.this.delegate
-                    .getOutputSocket(name, options, template);
+            super(FsLockController.this.delegate
+                    .getOutputSocket(name, options, template));
         }
 
         @Override
@@ -574,7 +546,7 @@ extends FsLockModelDecoratingController<
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return Output.super.getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 }
             } // GetLocalTarget
 
@@ -586,7 +558,8 @@ extends FsLockModelDecoratingController<
             class NewOutputStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
-                    return new LockOutputStream(Output.super.newOutputStream());
+                    return new LockOutputStream(
+                            getBoundSocket().newOutputStream());
                 }
             } // NewOutputStream
 
