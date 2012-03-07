@@ -391,7 +391,7 @@ implements Iterable<E> {
             final ZipEntry entry,
             final boolean process)
     throws ZipException {
-        // Order is important here!
+        // HC SUNT DRACONES!
         OutputMethod processor = new RawOutputMethod(process);
         if (!process) {
             assert UNKNOWN != entry.getCrc();
