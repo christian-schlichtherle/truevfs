@@ -156,10 +156,10 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private static TConfig push(Map<String, ?> env) {
         final TArchiveDetector detector = (TArchiveDetector) env.get(
                 Parameter.ARCHIVE_DETECTOR);
-        TConfig session = TConfig.push();
-        if (null != detector && detector != session.getArchiveDetector())
-            session.setArchiveDetector(detector);
-        return session;
+        final TConfig config = TConfig.push();
+        if (null != detector)
+            config.setArchiveDetector(detector);
+        return config;
     }
 
     /**
