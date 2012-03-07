@@ -642,18 +642,6 @@ extends FsLockModelDecoratingController<
 
     @Immutable
     private enum ThreadLocalUtilFactory {
-        OLD {
-            @Override
-            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
-                return new ThreadLocal<ThreadUtil>() {
-                    @Override
-                    public ThreadUtil initialValue() {
-                        return new ThreadUtil(new Random());
-                    }
-                };
-            }
-        },
-
         NEW {
             @Override
             ThreadLocal<ThreadUtil> newThreadLocalUtil() {
@@ -661,6 +649,18 @@ extends FsLockModelDecoratingController<
                     @Override
                     public ThreadUtil initialValue() {
                         return new ThreadUtil(ThreadLocalRandom.current());
+                    }
+                };
+            }
+        },
+
+        OLD {
+            @Override
+            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
+                return new ThreadLocal<ThreadUtil>() {
+                    @Override
+                    public ThreadUtil initialValue() {
+                        return new ThreadUtil(new Random());
                     }
                 };
             }
