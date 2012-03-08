@@ -28,7 +28,7 @@ Nzip - a Comprehensive Command Line Utility
     like this:
 
 +--+
-$ java -jar truezip-${project.version}-jar-with-dependencies.jar Nzip %ARGS%
+$ java -jar truezip-${project.version}-jar-with-dependencies.jar %ARGS%
 +--+
 
     Where <<<%ARGS%>>> is a variable for arbitrary command line arguments - see
@@ -51,7 +51,7 @@ rem set PROPS=-Djava.awt.headless=true
 rem set PROPS=-Djava.util.logging.config.file=logging.properties
 set JAR=%USERPROFILE%\.m2\repository\de\schlichtherle\truezip\truezip-samples\\${project.version}\truezip-samples-${project.version}-jar-with-dependencies.jar
 
-java -ea %PROPS% -jar "%JAR%" %*
+java %PROPS% -jar "%JAR%" %*
 +--+
 
     On Unix/Linux, this should be a bash script with the name <<<nzip>>>
