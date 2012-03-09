@@ -40,11 +40,10 @@ final class TempFilePool implements IOPool<FileEntry> {
     /** Constructs a new temp file pool. */
     TempFilePool(
             final @CheckForNull Path dir,
-            @CheckForNull String name) {
+            final @CheckForNull String name) {
         this.dir = null != dir ? dir : TEMP_DIR;
         // See http://java.net/jira/browse/TRUEZIP-152
-        name = null != name ? name + "." : "tzp";
-        this.name = name;
+        this.name = null != name ? name + "." : "tzp";
     }
 
     @Override
