@@ -10,6 +10,7 @@ package de.schlichtherle.truezip.zip;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.zip.ZipException;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -22,9 +23,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
-abstract class DecoratingOutputMethod
-implements OutputMethod {
-
+abstract class DecoratingOutputMethod implements OutputMethod {
     final OutputMethod delegate;
 
     DecoratingOutputMethod(final OutputMethod processor) {
@@ -33,7 +32,7 @@ implements OutputMethod {
     }
 
     @Override
-    public void init(ZipEntry entry) throws IOException {
+    public void init(ZipEntry entry) throws ZipException {
         delegate.init(entry);
     }
 
