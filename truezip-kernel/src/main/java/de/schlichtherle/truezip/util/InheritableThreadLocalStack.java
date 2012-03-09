@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
@@ -22,10 +18,9 @@ import javax.annotation.Nullable;
  * top level element of the parent's inheritable thread local stack unless the
  * parent's inheritable thread local stack is empty.
  * 
- * @param   <T> The type of the elements in the inheritable thread local stack.
- * @since   TrueZIP 7.5
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <T> The type of the elements in the inheritable thread local stack.
+ * @since  TrueZIP 7.5
+ * @author Christian Schlichtherle
  */
 public final class InheritableThreadLocalStack<T> {
     private final Stacks<T> stacks = new Stacks<T>();
