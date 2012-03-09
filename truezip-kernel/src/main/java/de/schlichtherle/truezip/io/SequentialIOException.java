@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io;
 
@@ -44,8 +40,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * This class is thread-safe.
  *
  * @author  Christian Schlichtherle
- * @version $Id$
- */
+*/
 @ThreadSafe
 public class SequentialIOException extends IOException implements Cloneable {
 
@@ -330,7 +325,7 @@ public class SequentialIOException extends IOException implements Cloneable {
         if (null != predecessor) {
             if (maxExceptions > 0) {
                 predecessor.printStackTrace(s, maxExceptions);
-                s.println("\nFollowed, but not necessarily caused by:");
+                s.println("\nFollowed, but not caused by:");
             } else {
                 s.println("\nOmitting " + predecessor.getNumExceptions() + " more exception(s) at the start of this list!");
             }
@@ -383,7 +378,7 @@ public class SequentialIOException extends IOException implements Cloneable {
         if (null != predecessor) {
             if (0 < maxExceptions) {
                 predecessor.printStackTrace(s, maxExceptions);
-                s.println("\nFollowed, but not necessarily caused by:");
+                s.println("\nFollowed, but not caused by:");
             } else {
                 s.println("\nOmitting " + predecessor.getNumExceptions() + " more exception(s) at the start of this list!");
             }
