@@ -68,7 +68,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     final FileEntry createTempFile() throws IOException {
         TempFilePool pool = this.pool;
         if (null == pool)
-            pool = this.pool = new TempFilePool(getParent(), getFileName());
+            this.pool = pool = new TempFilePool(getParent(), getFileName());
         return pool.allocate();
     }
 
