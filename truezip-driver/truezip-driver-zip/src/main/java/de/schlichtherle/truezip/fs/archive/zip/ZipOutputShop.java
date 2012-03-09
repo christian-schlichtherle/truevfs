@@ -220,12 +220,11 @@ implements OutputShop<ZipDriverEntry> {
     @Override
     public void close() throws IOException {
         super.finish();
-        final IOPool.Entry<?> postamble = this.postamble;
-        if (null != postamble) {
-            this.postamble = null;
+        final IOPool.Entry<?> pa = this.postamble;
+        if (null != pa) {
+            final InputSocket<?> is = pa.getInputSocket();
             try {
-                final InputSocket<?> input = postamble.getInputSocket();
-                final InputStream in = input.newInputStream();
+                final InputStream in = is.newInputStream();
                 try {
                     // If the output ZIP file differs in length from the
                     // input ZIP file then pad the output to the next four
@@ -233,7 +232,7 @@ implements OutputShop<ZipDriverEntry> {
                     // This might be required for self extracting files on
                     // some platforms, e.g. Windows x86.
                     final long ol = length();
-                    final long ipl = input.getLocalTarget().getSize(DATA);
+                    final long ipl = is.getLocalTarget().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
 
@@ -242,7 +241,8 @@ implements OutputShop<ZipDriverEntry> {
                     in.close();
                 }
             } finally {
-                postamble.release();
+                this.postamble = null;
+                pa.release();
             }
         }
         super.close();
