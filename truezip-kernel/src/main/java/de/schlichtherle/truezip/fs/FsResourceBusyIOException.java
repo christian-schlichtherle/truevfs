@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.io.BusyIOException;
+import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -19,11 +19,19 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsResourceBusyIOException extends BusyIOException {
+public final class FsResourceBusyIOException extends IOException {
     private static final long serialVersionUID = 1L;
 
+    final int total, local;
+
     FsResourceBusyIOException(int total, int local) {
-        super("Total (thread local) number of unclosed archive entry resources: %d (%d)",
-                total, local);
+        super("Total (thread local) number of unclosed archive entry resources: %d (%d)");
+        this.total = total;
+        this.local = local;
+    }
+
+    @Override
+    public String getMessage() {
+        return String.format(super.getMessage(), total, local);
     }
 }
