@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.io;
 import de.schlichtherle.truezip.socket.ByteArrayIOBuffer;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
-import static de.schlichtherle.truezip.util.Throwables.isOrCausedBy;
+import static de.schlichtherle.truezip.util.Throwables.contains;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -94,13 +94,13 @@ public class StreamsTest {
                     Streams.cat(tis, out);
                     fail();
                 } catch (final IOException got) {
-                    if (!isOrCausedBy(got, expected))
+                    if (!contains(got, expected))
                         throw got;
                 } catch (final RuntimeException got) {
-                    if (!isOrCausedBy(got, expected))
+                    if (!contains(got, expected))
                         throw got;
                 } catch (final Error got) {
-                    if (!isOrCausedBy(got, expected))
+                    if (!contains(got, expected))
                         throw got;
                 }
                 Streams.cat(in, out);
@@ -129,13 +129,13 @@ public class StreamsTest {
                     Streams.cat(in, tos);
                     fail();
                 } catch (final IOException got) {
-                    if (!isOrCausedBy(got, expected))
+                    if (!contains(got, expected))
                         throw got;
                 } catch (final RuntimeException got) {
-                    if (!isOrCausedBy(got, expected))
+                    if (!contains(got, expected))
                         throw got;
                 } catch (final Error got) {
-                    if (!isOrCausedBy(got, expected))
+                    if (!contains(got, expected))
                         throw got;
                 }
             }

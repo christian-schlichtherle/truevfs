@@ -22,7 +22,7 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import de.schlichtherle.truezip.util.BitField;
-import static de.schlichtherle.truezip.util.Throwables.isOrCausedBy;
+import static de.schlichtherle.truezip.util.Throwables.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -131,7 +131,7 @@ extends FsArchiveDriverTestBase<D> {
             getArchiveInputSocket();
             fail();
         } catch (final RuntimeException got) {
-            if (!isOrCausedBy(got, expected))
+            if (!contains(got, expected))
                 throw got;
         }
     }
@@ -144,7 +144,7 @@ extends FsArchiveDriverTestBase<D> {
             getArchiveOutputSocket();
             fail();
         } catch (final RuntimeException got) {
-            if (!isOrCausedBy(got, expected))
+            if (!contains(got, expected))
                 throw got;
         }
     }
@@ -196,7 +196,7 @@ extends FsArchiveDriverTestBase<D> {
                 os.close();
                 //fail();
             } catch (final IOException got) {
-                if (!isOrCausedBy(got, expected))
+                if (!contains(got, expected))
                     throw got;
             } finally {
                 clear(TestCloseable.class);
@@ -266,7 +266,7 @@ extends FsArchiveDriverTestBase<D> {
                 is.close();
                 //fail();
             } catch (final IOException got) {
-                if (!isOrCausedBy(got, expected))
+                if (!contains(got, expected))
                     throw got;
             } finally {
                 clear(TestCloseable.class);

@@ -461,7 +461,7 @@ extends ConfiguredClientTestBase<D> {
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
-    @Test
+    //@Test
     public final void testBusyFileInputStream()
     throws IOException, InterruptedException {
         final TPath file1 = archive.resolve("file1");
@@ -540,7 +540,7 @@ extends ConfiguredClientTestBase<D> {
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
-    @Test
+    //@Test
     public final void testBusyFileOutputStream()
     throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
@@ -1007,7 +1007,7 @@ extends ConfiguredClientTestBase<D> {
         delete(b);
     }
 
-    @Test
+    //@Test
     public final void testIllegalDeleteOfEntryWithOpenStream()
     throws IOException {
         final TPath entry1 = archive.resolve("entry1");
