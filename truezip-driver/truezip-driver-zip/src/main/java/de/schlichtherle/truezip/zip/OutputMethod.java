@@ -8,9 +8,12 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.zip.ZipException;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -23,17 +26,20 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @version $Id$
  */
 @NotThreadSafe
+@CleanupObligation
 interface OutputMethod {
 
     /**
      * Checks the given {@code entry} and updates it.
-     * This method may be called multiple times, so it must be reentrant!
+     * This method may be called multiple times, so it must be idempotent with
+     * respect to its side effects on {@code entry}!
      * 
      * @param  entry the ZIP entry to check and update.
-     * @throws IOException if checking the given entry failed for some reason.
+     * @param  zip the ZIP output stream to write the entry to.
+     * @throws ZipException if checking the given entry failed for
+     *         some reason.
      */
-    // TODO: Change @throws ZipException -> @throws IllegalArgumentException
-    void init(ZipEntry entry) throws IOException;
+    void init(ZipEntry entry) throws ZipException;
 
     /**
      * Starts writing the initialized ZIP entry and returns an output stream
@@ -43,6 +49,7 @@ interface OutputMethod {
      * You must not call {@link OutputStream#close()} on the returned output
      * stream!
      * 
+     * @return The decorated output stream.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
@@ -53,5 +60,6 @@ interface OutputMethod {
      *
      * @throws IOException on any I/O error.
      */
+    @DischargesObligation
     void finish() throws IOException;
 }
