@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.crypto;
 
@@ -35,9 +31,8 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  *     information about the ciphered data (e.g. a MAC).
  * </ul>
  *
- * @see     CipherReadOnlyFile
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    CipherReadOnlyFile
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class CipherOutputStream extends DecoratingOutputStream {
@@ -100,7 +95,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
         int cipherLen = cipher.getUpdateOutputSize(1);
         byte[] cipherOut = this.cipherOut;
         if (cipherLen > cipherOut.length)
-            cipherOut = this.cipherOut = new byte[cipherLen];
+            this.cipherOut = cipherOut = new byte[cipherLen];
         cipherLen = cipher.processByte((byte) b, cipherOut, 0);
         if (cipherLen > 0)
             delegate.write(cipherOut, 0, cipherLen);
@@ -124,7 +119,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
         int cipherLen = cipher.getUpdateOutputSize(len);
         byte[] cipherOut = this.cipherOut;
         if (cipherLen > cipherOut.length)
-            cipherOut = this.cipherOut = new byte[cipherLen];
+            this.cipherOut = cipherOut = new byte[cipherLen];
         cipherLen = cipher.processBytes(buf, off, len, cipherOut, 0);
         delegate.write(cipherOut, 0, cipherLen);
     }
@@ -149,7 +144,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
         int cipherLen = cipher.getOutputSize(0);
         byte[] cipherOut = this.cipherOut;
         if (cipherLen > cipherOut.length)
-            cipherOut = this.cipherOut = new byte[cipherLen];
+            this.cipherOut = cipherOut = new byte[cipherLen];
         try {
             cipherLen = cipher.doFinal(cipherOut, 0);
         } catch (InvalidCipherTextException ex) {
