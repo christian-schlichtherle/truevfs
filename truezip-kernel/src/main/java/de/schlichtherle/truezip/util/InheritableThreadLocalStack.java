@@ -75,14 +75,14 @@ public final class InheritableThreadLocalStack<T> {
     }
 
     /**
-     * Pops the top element off this stack if and only if its identical to the
-     * given element.
+     * Pops the top element off this stack if its identical to the given
+     * element.
      * 
      * @param  expected The expected top element on this stack.
      * @throws IllegalStateException If the given element is not the top
      *         element on this stack.
      */
-    public void popIff(final @Nullable T expected) {
+    public void popIf(final @Nullable T expected) {
         try {
             final @Nullable T got = pop();
             if (got != expected) {
