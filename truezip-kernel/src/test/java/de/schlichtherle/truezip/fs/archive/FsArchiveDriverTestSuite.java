@@ -478,13 +478,10 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void checkAllExceptions(final Object thiz) throws IOException {
-        getThrowControl().check(thiz, IOException.class);
-        checkUndeclaredExceptions(this);
-    }
-
-    private void checkUndeclaredExceptions(final Object thiz) {
-        getThrowControl().check(thiz, RuntimeException.class);
-        getThrowControl().check(thiz, Error.class);
+        final ThrowControl ctl = getThrowControl();
+        ctl.check(thiz, IOException.class);
+        ctl.check(thiz, RuntimeException.class);
+        ctl.check(thiz, Error.class);
     }
 
     private ThrowControl getThrowControl() {
