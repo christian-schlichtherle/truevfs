@@ -82,7 +82,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 delegate.close();
                 logger.log(Level.FINE, "finalizeCleared");
-            } catch (final Throwable ex) {
+            } catch (final Throwable ex) { // report and swallow!
                 logger.log(Level.FINE, "finalizeFailed", ex);
             }
         }
