@@ -48,14 +48,15 @@ public class Throwables {
 
     /**
      * Returns {@code true} if and only if {@code thiz} is identical to
-     * {@code that} or has been caused by it.
+     * {@code that} or has been (recursively)
+     * {@linkplain Throwable#initCause caused} by it.
      * 
      * @param  thiz the throwable to search for {@code that} throwable.
      * @param  that the throwable to look up.
      * @return {@code true} if and only if {@code thiz} is identical to
-     *         {@code that} or has been caused by it.
+     *         {@code that} or has been (recursively) caused by it.
      */
-    public static boolean isOrCausedBy(Throwable thiz, final Throwable that) {
+    public static boolean contains(Throwable thiz, final Throwable that) {
         do {
             if (thiz == that)
                 return true;
