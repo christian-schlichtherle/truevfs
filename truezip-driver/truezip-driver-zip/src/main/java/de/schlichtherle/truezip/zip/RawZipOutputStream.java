@@ -75,8 +75,6 @@ implements Iterable<E> {
 
     private boolean finished;
 
-    private boolean closed;
-
     /** Current ZIP entry. */
     private @Nullable ZipEntry entry;
 
@@ -267,14 +265,6 @@ implements Iterable<E> {
         this.method = test.getMethod();
     }
 
-    private int getBZip2BlockSize() {
-        final int level = getLevel();
-        if (BZip2CompressorOutputStream.MIN_BLOCKSIZE <= level
-                && level <= BZip2CompressorOutputStream.MAX_BLOCKSIZE)
-            return level;
-        return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
-    }
-
     /**
      * Returns the compression level for entries.
      * This property is only used if the effective compression method is
@@ -372,13 +362,12 @@ implements Iterable<E> {
         final OutputMethod method = newOutputMethod(entry, process);
         method.init(entry.clone()); // test!
         method.init(entry);
-        this.entry = entry;
-        final OutputStream out = method.start();
+        this.delegate = method.start();
         this.processor = method;
-        this.delegate = out;
         // Store entry now so that a subsequent call to getEntry(...) returns
         // it.
         this.entries.put(entry.getName(), entry);
+        this.entry = entry;
     }
 
     /**
@@ -493,10 +482,10 @@ implements Iterable<E> {
         if (null == entry)
             return;
         this.processor.finish();
+        this.delegate.flush();
         this.delegate = this.dos;
         this.processor = null;
         this.entry = null;
-        flush();
     }
 
     /**
@@ -709,18 +698,14 @@ implements Iterable<E> {
      */
     @Override
     public void close() throws IOException {
-        if (this.closed)
-            return;
         finish();
         this.delegate.close();
         this.entries.clear();
-        this.closed = true;
     }
 
     /** Adjusts the number of written bytes in the offset for appending mode. */
     private static final class AppendingLEDataOutputStream
     extends LEDataOutputStream {
-
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         AppendingLEDataOutputStream(
@@ -733,19 +718,18 @@ implements Iterable<E> {
     } // AppendingLEDataOutputStream
 
     private final class RawOutputMethod implements OutputMethod {
-
         final boolean process;
 
         /** Start of entry data. */
         private long dataStart;
+        @Nullable ZipEntry entry;
 
         RawOutputMethod(final boolean process) {
             this.process = process;
         }
 
         @Override
-        public void init(final ZipEntry entry)
-        throws ZipException {
+        public void init(final ZipEntry entry) throws ZipException {
             {
                 final long size = encode(entry.getName()).length
                                 + entry.getRawExtraFields().length
@@ -772,6 +756,7 @@ implements Iterable<E> {
                 entry.setRawPlatform(PLATFORM_FAT);
             if (UNKNOWN == entry.getTime())
                 entry.setTime(System.currentTimeMillis());
+            this.entry = entry;
         }
 
         /**
@@ -780,8 +765,8 @@ implements Iterable<E> {
         @Override
         public OutputStream start() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
-            final ZipEntry entry = RawZipOutputStream.this.entry;
             final long offset = dos.size();
+            final ZipEntry entry = this.entry;
             final boolean encrypted = entry.isEncrypted();
             final boolean dd = entry.isDataDescriptorRequired();
             // Compose General Purpose Bit Flag.
@@ -840,9 +825,8 @@ implements Iterable<E> {
         @Override
         public void finish() throws IOException {
             final LEDataOutputStream dos = RawZipOutputStream.this.dos;
-            final long csize = RawZipOutputStream.this.dos.size()
-                    - this.dataStart;
-            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final long csize = dos.size() - this.dataStart;
+            final ZipEntry entry = this.entry;
             assert UNKNOWN != entry.getCrc();
             assert UNKNOWN != entry.getSize();
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
@@ -871,21 +855,18 @@ implements Iterable<E> {
         }
     } // RawOutputMethod
 
-    private abstract class EncryptedOutputMethod
-    extends DecoratingOutputMethod {
-
+    private abstract class EncryptedOutputMethod extends DecoratingOutputMethod {
         EncryptedOutputMethod(RawOutputMethod processor) {
             super(processor);
         }
     } // EncryptedOutputMethod
 
-    private final class WinZipAesOutputMethod
-    extends EncryptedOutputMethod {
-
+    private final class WinZipAesOutputMethod extends EncryptedOutputMethod {
         final WinZipAesParameters generalParam;
-        @CheckForNull WinZipAesEntryParameters entryParam;
         boolean suppressCrc;
-        @CheckForNull WinZipAesEntryOutputStream out;
+        @Nullable WinZipAesEntryParameters entryParam;
+        @Nullable WinZipAesEntryOutputStream out;
+        @Nullable ZipEntry entry;
 
         WinZipAesOutputMethod(
                 RawOutputMethod processor,
@@ -896,11 +877,12 @@ implements Iterable<E> {
         }
 
         @Override
-        public void init(final ZipEntry entry) throws IOException {
+        public void init(final ZipEntry entry) throws ZipException {
             // HC SUNT DRACONES!
-            this.entryParam = new WinZipAesEntryParameters(this.generalParam,
-                    entry);
-            final AesKeyStrength keyStrength = this.entryParam.getKeyStrength();
+            final WinZipAesEntryParameters entryParam
+                    = new WinZipAesEntryParameters(this.generalParam, entry);
+            final AesKeyStrength keyStrength = entryParam.getKeyStrength();
+            this.entryParam = entryParam;
             WinZipAesEntryExtraField field = null;
             int method = entry.getMethod();
             long csize = entry.getCompressedSize();
@@ -939,25 +921,26 @@ implements Iterable<E> {
                 this.delegate.init(entry);
             }
             entry.setRawMethod(WINZIP_AES);
+            this.entry = entry;
         }
-        
+
         @Override
         public OutputStream start() throws IOException {
             // see DeflatedOutputMethod.finish().
-            assert null != this.entryParam;
+            final ZipEntry entry = this.entry;
+            final OutputMethod delegate = this.delegate;
+            final WinZipAesEntryParameters entryParam = this.entryParam;
+            assert null != entryParam;
             assert null == this.out;
-            if (this.suppressCrc) {
-                final ZipEntry entry = RawZipOutputStream.this.entry;
+            if (suppressCrc) {
                 final long crc = entry.getCrc();
                 entry.setRawCrc(0);
                 this.out = new WinZipAesEntryOutputStream(
-                        (LEDataOutputStream) delegate.start(),
-                        this.entryParam);
+                        (LEDataOutputStream) delegate.start(), entryParam);
                 entry.setCrc(crc);
             } else {
                 this.out = new WinZipAesEntryOutputStream(
-                        (LEDataOutputStream) delegate.start(),
-                        this.entryParam);
+                        (LEDataOutputStream) delegate.start(), entryParam);
             }
             return this.out;
         }
@@ -968,7 +951,7 @@ implements Iterable<E> {
             assert null != this.out;
             this.out.finish();
             if (this.suppressCrc) {
-                final ZipEntry entry = RawZipOutputStream.this.entry;
+                final ZipEntry entry = this.entry;
                 entry.setRawCrc(0);
                 this.delegate.finish();
                 // Set to UNKNOWN in order to signal to
@@ -981,20 +964,20 @@ implements Iterable<E> {
         }
     } // WinZipAesOutputMethod
 
-    private final class BZip2OutputMethod
-    extends DecoratingOutputMethod {
-
+    private final class BZip2OutputMethod extends DecoratingOutputMethod {
         @Nullable BZip2CompressorOutputStream cout;
         @Nullable LEDataOutputStream dout;
+        @Nullable ZipEntry entry;
 
         BZip2OutputMethod(OutputMethod processor) {
             super(processor);
         }
 
         @Override
-        public void init(ZipEntry entry) throws IOException  {
+        public void init(final ZipEntry entry) throws ZipException  {
             entry.setCompressedSize(UNKNOWN);
             this.delegate.init(entry);
+            this.entry = entry;
         }
 
         @Override
@@ -1002,37 +985,45 @@ implements Iterable<E> {
             assert null == this.cout;
             assert null == this.dout;
             OutputStream out = this.delegate.start();
-            final long size = entry.getSize();
+            final long size = this.entry.getSize();
             final int blockSize = UNKNOWN != size
                     ? BZip2CompressorOutputStream.chooseBlockSize(size)
-                    : RawZipOutputStream.this.getBZip2BlockSize();
+                    : getBZip2BlockSize();
             out = this.cout = new BZip2CompressorOutputStream(out, blockSize);
             return this.dout = new LEDataOutputStream(out);
         }
 
+        int getBZip2BlockSize() {
+            final int level = RawZipOutputStream.this.getLevel();
+            if (BZip2CompressorOutputStream.MIN_BLOCKSIZE <= level
+                    && level <= BZip2CompressorOutputStream.MAX_BLOCKSIZE)
+                return level;
+            return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
+        }
+
         @Override
-        public void finish() throws IOException {
+        public void finish()
+        throws IOException {
             this.dout.flush(); // superfluous - should not buffer
             this.cout.finish();
-            final ZipEntry entry = RawZipOutputStream.this.entry;
-            entry.setRawSize(this.dout.size());
+            this.entry.setRawSize(this.dout.size());
             this.delegate.finish();
         }
     } // BZip2OutputMethod
 
-    private final class DeflaterOutputMethod
-    extends DecoratingOutputMethod {
-
+    private final class DeflaterOutputMethod extends DecoratingOutputMethod {
         @Nullable ZipDeflaterOutputStream out;
+        @Nullable ZipEntry entry;
 
         DeflaterOutputMethod(OutputMethod processor) {
             super(processor);
         }
 
         @Override
-        public void init(ZipEntry entry) throws IOException  {
+        public void init(final ZipEntry entry) throws ZipException  {
             entry.setCompressedSize(UNKNOWN);
             this.delegate.init(entry);
+            this.entry = entry;
         }
 
         @Override
@@ -1048,7 +1039,7 @@ implements Iterable<E> {
         public void finish() throws IOException {
             this.out.finish();
             final Deflater deflater = this.out.getDeflater();
-            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final ZipEntry entry = this.entry;
             //entry.setRawCompressedSize(deflater.getBytesWritten());
             entry.setRawSize(deflater.getBytesRead());
             deflater.end();
@@ -1056,9 +1047,7 @@ implements Iterable<E> {
         }
     } // DeflaterOutputMethod
 
-    private abstract class Crc32OutputMethod
-    extends DecoratingOutputMethod {
-
+    private abstract class Crc32OutputMethod extends DecoratingOutputMethod {
         @Nullable Crc32OutputStream out;
 
         Crc32OutputMethod(OutputMethod processor) {
@@ -1075,9 +1064,7 @@ implements Iterable<E> {
         public abstract void finish() throws IOException;
     } // Crc32OutputMethod
 
-    private final class Crc32CheckingOutputMethod
-    extends Crc32OutputMethod {
-
+    private final class Crc32CheckingOutputMethod extends Crc32OutputMethod {
         Crc32CheckingOutputMethod(OutputMethod processor) {
             super(processor);
         }
@@ -1095,9 +1082,7 @@ implements Iterable<E> {
         }
     } // Crc32CheckingOutputMethod
 
-    private final class Crc32UpdatingOutputMethod
-    extends Crc32OutputMethod {
-
+    private final class Crc32UpdatingOutputMethod extends Crc32OutputMethod {
         Crc32UpdatingOutputMethod(OutputMethod processor) {
             super(processor);
         }
