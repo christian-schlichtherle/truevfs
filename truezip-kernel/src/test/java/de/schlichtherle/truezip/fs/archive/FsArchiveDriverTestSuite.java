@@ -620,13 +620,6 @@ extends FsArchiveDriverTestBase<D> {
             super(out);
         }
 
-        // Simulate IOException from FsLockController.LockOutputStream.flush()
-        /*@Override
-        public void flush() throws IOException {
-            checkAllExceptions(this);
-            delegate.flush();
-        }*/
-
         @Override
         public void close() throws IOException {
             checkAllExceptions(this);
