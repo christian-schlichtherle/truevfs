@@ -82,8 +82,9 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
         output.getLocalTarget(); // don't care for the result
         final MockArchiveDriverEntryContainer
                 n = MockArchiveDriverEntryContainer.create(config);
-        final MockArchiveDriverEntryContainer
-                o = containers.putIfAbsent(mp, n);
+        MockArchiveDriverEntryContainer o = containers.get(mp);
+        if (null == o)
+            o = containers.putIfAbsent(mp, n);
         return (null != o ? o : n).newOutputShop();
     }
 
