@@ -87,11 +87,20 @@ public abstract class FsControllerException extends IOException {
             EMPTY_STACK = new StackTraceElement[0];
 
     FsControllerException() {
-        this(null);
+        this(null, null);
+    }
+
+    FsControllerException(@CheckForNull String message) {
+        this(message, null);
     }
 
     FsControllerException(@CheckForNull Throwable cause) {
-        super(cause);
+        this(null == cause ? null : cause.toString(), cause);
+    }
+
+    FsControllerException(  @CheckForNull String message, 
+                            @CheckForNull Throwable cause) {
+        super(message, cause);
         assert !(cause instanceof FsControllerException) : cause;
     }
 
