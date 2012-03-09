@@ -244,7 +244,9 @@ public class MockController extends FsController<FsModel> {
                 checkAllExceptions(this);
                 final IOEntry<?> n = new ByteArrayIOBuffer(
                         name.toString(), config.getDataSize());
-                final IOEntry<?> o = map.putIfAbsent(name, n);
+                IOEntry<?> o = map.get(name);
+                if (null == o)
+                    o = map.putIfAbsent(name, n);
                 return (null != o ? o : n).getOutputSocket();
             }
 
