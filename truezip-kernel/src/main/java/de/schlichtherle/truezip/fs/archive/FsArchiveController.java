@@ -367,7 +367,7 @@ extends FsLockModelController {
             int size = fileSystem.getEntry(ROOT).getMembers().size();
             if (0 != size)
                 throw new IOException(String.format(
-                        "root directory is not empty - it contains %d member(s)",
+                        "root directory not empty - contains %d member(s)",
                         size));
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.
