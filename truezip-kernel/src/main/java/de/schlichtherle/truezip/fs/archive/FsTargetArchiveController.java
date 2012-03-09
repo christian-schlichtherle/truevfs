@@ -119,7 +119,7 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
-    private @Nullable InputArchive<E> getInputArchive() {
+    @Nullable InputArchive<E> getInputArchive() {
         return inputArchive;
     }
 
@@ -130,7 +130,7 @@ extends FsFileSystemArchiveController<E> {
             setTouched(true);
     }
 
-    private @Nullable OutputArchive<E> getOutputArchive() {
+    @Nullable OutputArchive<E> getOutputArchive() {
         return outputArchive;
     }
 
@@ -225,7 +225,7 @@ extends FsFileSystemArchiveController<E> {
      * 
      * @return The output archive.
      */
-    private OutputArchive<E> makeOutputArchive() throws IOException {
+    OutputArchive<E> makeOutputArchive() throws IOException {
         OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
             return oa;
