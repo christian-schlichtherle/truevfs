@@ -74,7 +74,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     static void finalize(   final Closeable delegate,
                             final @CheckForNull IOException status) {
-        if (OK.equals(status)) {
+        if (OK == status) {
             logger.log(Level.FINEST, "closeCleared");
         } else if (null != status) {
             logger.log(Level.FINER, "closeFailed", status);
