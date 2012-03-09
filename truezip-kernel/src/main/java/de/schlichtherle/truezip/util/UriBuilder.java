@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
@@ -64,13 +60,12 @@ import javax.annotation.concurrent.NotThreadSafe;
  * These identity productions apply for the method {@link #toUri()} as well as
  * the method {@link #getUri()}.
  * 
- * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">
- *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
- * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
- *      RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
- * @see UriEncoder
+ * @see    <a href="http://www.ietf.org/rfc/rfc2396.txt">
+ *         RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
+ * @see    <a href="http://www.ietf.org/rfc/rfc2732.txt">
+ *         RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
+ * @see    UriEncoder
  * @author Christian Schlichtherle
- * @version $Id$
  */
 @NotThreadSafe
 public final class UriBuilder {
@@ -104,6 +99,8 @@ public final class UriBuilder {
     /**
      * Constructs a new URI builder.
      * Equivalent to {@link #UriBuilder(URI, boolean) UriBuilder(uri, false)}.
+     * 
+     * @param uri the uri for initializing the initial state.
      */
     public UriBuilder(URI uri) {
         this(uri, false);
