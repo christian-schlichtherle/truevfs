@@ -84,12 +84,8 @@ final class FsResourceAccountant {
      * @param resource the closeable resource to start accounting for.
      */
     void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
-        lock.lock();
-        try {
+        if (null == accounts.get(resource))
             accounts.putIfAbsent(resource, new Account());
-        } finally {
-            lock.unlock();
-        }
     }
 
     /**
@@ -100,12 +96,13 @@ final class FsResourceAccountant {
      * @param resource the closeable resource to stop accounting for.
      */
     void stopAccountingFor(final @WillNotClose Closeable resource) {
-        lock.lock();
-        try {
-            if (null != accounts.remove(resource))
+        if (null != accounts.remove(resource)) {
+            lock.lock();
+            try {
                 condition.signalAll();
-        } finally {
-            lock.unlock();
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
