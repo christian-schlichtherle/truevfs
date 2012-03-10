@@ -69,8 +69,7 @@ implements Iterable<FsCovariantEntry<E>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private Set<FsArchiveFileSystemTouchListener<? super E>>
-            touchListeners = new HashSet<FsArchiveFileSystemTouchListener<? super E>>();
+    private FsArchiveFileSystemTouchListener<? super E> touchListener;
 
     /**
      * Returns a new empty archive file system and ensures its integrity.
@@ -124,7 +123,6 @@ implements Iterable<FsCovariantEntry<E>> {
      *         the population of the archive file system.
      * @param  rootTemplate The nullable template to use for the root entry of
      *         the returned archive file system.
-     *         This must not be an instance of {@link FsCovariantEntry}.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
      *         {@link FsReadOnlyArchiveFileSystemException}.
@@ -145,7 +143,6 @@ implements Iterable<FsCovariantEntry<E>> {
     FsArchiveFileSystem(final FsArchiveDriver<E> driver,
                         final @WillNotClose EntryContainer<E> archive,
                         final @CheckForNull Entry rootTemplate) {
-        assert !(rootTemplate instanceof FsCovariantEntry<?>);
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<E>(
@@ -233,16 +230,16 @@ implements Iterable<FsCovariantEntry<E>> {
         // Order is important here because of veto exceptions!
         final FsArchiveFileSystemEvent<E> event
                 = new FsArchiveFileSystemEvent<E>(this);
-        final Iterable<FsArchiveFileSystemTouchListener<? super E>> listeners
-                = getFsArchiveFileSystemTouchListeners();
+        final FsArchiveFileSystemTouchListener<? super E> listener
+                = touchListener;
         try {
-            for (FsArchiveFileSystemTouchListener<? super E> listener : listeners)
+            if (null != listener)
                 listener.beforeTouch(event);
         } catch (final IOException ex) {
             throw new FsArchiveFileSystemException(null, "file system touch vetoed", ex);
         }
         this.touched = true;
-        for (FsArchiveFileSystemTouchListener<? super E> listener : listeners)
+        if (null != listener)
             listener.afterTouch(event);
     }
 
@@ -251,9 +248,12 @@ implements Iterable<FsCovariantEntry<E>> {
      *
      * @return A clone of the set of archive file system listeners.
      */
-    Set<FsArchiveFileSystemTouchListener<? super E>>
+    @SuppressWarnings("unchecked")
+    final FsArchiveFileSystemTouchListener<? super E>[]
     getFsArchiveFileSystemTouchListeners() {
-        return new HashSet<FsArchiveFileSystemTouchListener<? super E>>(touchListeners);
+        return null == touchListener
+                ? new FsArchiveFileSystemTouchListener[0]
+                : new FsArchiveFileSystemTouchListener[] { touchListener };
     }
 
     /**
@@ -262,10 +262,13 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  listener the listener for archive file system events.
      */
     final void addFsArchiveFileSystemTouchListener(
-            FsArchiveFileSystemTouchListener<? super E> listener) {
+            final FsArchiveFileSystemTouchListener<? super E> listener)
+    throws TooManyListenersException {
         if (null == listener)
             throw new NullPointerException();
-        touchListeners.add(listener);
+        if (null != touchListener)
+            throw new TooManyListenersException();
+        touchListener = listener;
     }
 
     /**
@@ -274,8 +277,11 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  listener the listener for archive file system events.
      */
     final void removeFsArchiveFileSystemTouchListener(
-            @Nullable FsArchiveFileSystemTouchListener<? super E> listener) {
-        touchListeners.remove(listener);
+            final FsArchiveFileSystemTouchListener<? super E> listener) {
+        if (null == listener)
+            throw new NullPointerException();
+        if (touchListener == listener)
+            touchListener = null;
     }
 
     // TODO: Consider renaming to size().
@@ -300,8 +306,8 @@ implements Iterable<FsCovariantEntry<E>> {
      *         entry exists for the given name.
      */
     @Nullable
-    final FsCovariantEntry<E> getEntry(FsEntryName name) {
-        FsCovariantEntry<E> entry = master.get(name.getPath());
+    final FsCovariantEntry<E> getEntry(final FsEntryName name) {
+        final FsCovariantEntry<E> entry = master.get(name.getPath());
         return null == entry ? null : entry.clone(factory);
     }
 
@@ -319,10 +325,9 @@ implements Iterable<FsCovariantEntry<E>> {
             final String name,
             final Type type,
             final BitField<FsOutputOption> mknod,
-            @CheckForNull final Entry template) {
+            final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        assert !(template instanceof FsCovariantEntry<?>);
 
         try {
             return factory.newEntry(name, type, template, mknod);
@@ -459,7 +464,7 @@ implements Iterable<FsCovariantEntry<E>> {
             links = newSegmentLinks(1, path, type, template);
         }
 
-        @SuppressWarnings({ "unchecked", "all" })
+        @SuppressWarnings("unchecked")
         private SegmentLink<E>[] newSegmentLinks(
                 final int level,
                 final String entryName,
