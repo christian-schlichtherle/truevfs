@@ -18,8 +18,8 @@ import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntryContainer;
 import de.schlichtherle.truezip.test.TestConfig;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.UriBuilder;
+import java.util.TooManyListenersException;
 import static org.hamcrest.CoreMatchers.*;
 import org.junit.After;
 import static org.junit.Assert.*;
@@ -43,68 +43,59 @@ public class FsArchiveFileSystemTest {
     }
 
     @Test
-    public void testListeners() {
+    public void testListeners() throws TooManyListenersException {
         final FsArchiveFileSystem<?>
-                fileSystem = FsArchiveFileSystem.newEmptyFileSystem(
+                fs = FsArchiveFileSystem.newEmptyFileSystem(
                     new MockArchiveDriver());
 
         try {
-            fileSystem.addFsArchiveFileSystemTouchListener(null);
+            fs.addFsArchiveFileSystemTouchListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners(), notNullValue());
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(0));
+        assertThat(fs.getFsArchiveFileSystemTouchListeners(), notNullValue());
+        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(0));
 
-        final Listener listener1 = new Listener(fileSystem);
-        fileSystem.addFsArchiveFileSystemTouchListener(listener1);
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(1));
-
-        final Listener listener2 = new Listener(fileSystem);
-        fileSystem.addFsArchiveFileSystemTouchListener(listener2);
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(2));
-
-        fileSystem.getFsArchiveFileSystemTouchListeners().clear();
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(2));
+        final Listener listener1 = new Listener(fs);
+        fs.addFsArchiveFileSystemTouchListener(listener1);
+        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
 
         try {
-            fileSystem.removeFsArchiveFileSystemTouchListener(null);
+            fs.addFsArchiveFileSystemTouchListener(new Listener(fs));
+            fail();
+        } catch (TooManyListenersException expected) {
+        }
+        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
+
+        try {
+            fs.removeFsArchiveFileSystemTouchListener(null);
+            fail();
         } catch (NullPointerException expected) {
         }
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(2));
+        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
 
-        fileSystem.removeFsArchiveFileSystemTouchListener(listener1);
-        fileSystem.removeFsArchiveFileSystemTouchListener(listener1);
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(1));
-
-        fileSystem.removeFsArchiveFileSystemTouchListener(listener2);
-        fileSystem.removeFsArchiveFileSystemTouchListener(listener2);
-        assertThat(fileSystem.getFsArchiveFileSystemTouchListeners().size(), is(0));
+        fs.removeFsArchiveFileSystemTouchListener(listener1);
+        fs.removeFsArchiveFileSystemTouchListener(listener1);
+        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(0));
     }
 
     private static class Listener
     implements FsArchiveFileSystemTouchListener<FsArchiveEntry> {
         final FsArchiveFileSystem<?> fileSystem;
-        //int before;
-        //int after;
 
-        @SuppressWarnings("LeakingThisInConstructor")
         Listener(final FsArchiveFileSystem<?> fileSystem) {
             this.fileSystem = fileSystem;
-            fileSystem.addFsArchiveFileSystemTouchListener(this);
         }
 
         @Override
         public void beforeTouch(FsArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
-            //before++;
         }
 
         @Override
         public void afterTouch(FsArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
-            //after++;
         }
     }
 

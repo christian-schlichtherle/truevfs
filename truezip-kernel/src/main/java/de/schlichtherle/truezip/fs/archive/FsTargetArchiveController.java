@@ -36,6 +36,7 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.TooManyListenersException;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -212,7 +213,11 @@ extends FsFileSystemArchiveController<E> {
                         : new FsFalsePositiveException(ex);
             }
         }
-        fileSystem.addFsArchiveFileSystemTouchListener(touchListener);
+        try {
+            fileSystem.addFsArchiveFileSystemTouchListener(touchListener);
+        } catch (TooManyListenersException ex) {
+            throw new AssertionError(ex);
+        }
         setFileSystem(fileSystem);
     }
 
