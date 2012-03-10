@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
@@ -12,14 +8,11 @@ import de.schlichtherle.truezip.io.Streams;
 import java.nio.charset.Charset;
 
 /**
- * A package private interface with some constants for ZIP files.
- * Public classes <em>must not</em> implement this interface - otherwise the
- * constants become part of the public API!
+ * A package private class with some constants for ZIP files.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
-interface Constants {
+final class Constants {
 
     /**
      * This boolean field is set by the system property
@@ -35,29 +28,29 @@ interface Constants {
      * required.
      */
     // TODO: Rename this to forceZip64Extensions
-    boolean FORCE_ZIP64_EXT = Boolean.getBoolean(
+    static final boolean FORCE_ZIP64_EXT = Boolean.getBoolean(
             Constants.class.getPackage().getName() + ".forceZip64Ext");
 
     /** Local File Header signature. */
-    int LFH_SIG = 0x04034B50;
+    static final int LFH_SIG = 0x04034B50;
     
     /** Data Descriptor signature. */
-    int DD_SIG = 0x08074B50;
+    static final int DD_SIG = 0x08074B50;
     
     /** Central File Header signature. */
-    int CFH_SIG = 0x02014B50;
+    static final int CFH_SIG = 0x02014B50;
 
     /** Zip64 End Of Central Directory Record. */
-    int ZIP64_EOCDR_SIG = 0x06064B50;
+    static final int ZIP64_EOCDR_SIG = 0x06064B50;
 
     /** Zip64 End Of Central Directory Locator. */
-    int ZIP64_EOCDL_SIG = 0x07064B50;
+    static final int ZIP64_EOCDL_SIG = 0x07064B50;
 
     /** End Of Central Directory Record signature. */
-    int EOCDR_SIG = 0x06054B50;
+    static final int EOCDR_SIG = 0x06054B50;
 
     /** The minimum length of the Local File Header record. */
-    int LFH_MIN_LEN =
+    static final int LFH_MIN_LEN =
             /* local file header signature     */ 4 +
             /* version needed to extract       */ 2 +
             /* general purpose bit flag        */ 2 +
@@ -71,7 +64,7 @@ interface Constants {
             /* extra field length              */ 2;
 
     /** The minimum length of the Central File Header record. */
-    int CFH_MIN_LEN =
+    static final int CFH_MIN_LEN =
             /* central file header signature   */ 4 +
             /* version made by                 */ 2 +
             /* version needed to extract       */ 2 +
@@ -91,7 +84,7 @@ interface Constants {
             /* relative offset of local header */ 4;
 
     /** The minimum length of the End Of Central Directory Record. */
-    int EOCDR_MIN_LEN =
+    static final int EOCDR_MIN_LEN =
             /* end of central dir signature    */ 4 +
             /* number of this disk             */ 2 +
             /* number of the disk with the     */
@@ -107,7 +100,7 @@ interface Constants {
             /* zipfile comment length          */ 2;
 
     /** The minimum length of the Zip64 End Of Central Directory Record. */
-    int ZIP64_EOCDR_MIN_LEN =
+    static final int ZIP64_EOCDR_MIN_LEN =
             /* zip64 end of central dir        */
             /* signature                       */ 4 +
             /* size of zip64 end of central    */
@@ -127,7 +120,7 @@ interface Constants {
             /* the starting disk number        */ 8;
 
     /** The length of the Zip64 End Of Central Directory Locator. */
-    int ZIP64_EOCDL_LEN =
+    static final int ZIP64_EOCDL_LEN =
             /* zip64 end of central dir locator*/
             /* signature                       */ 4 +
             /* number of the disk with the     */
@@ -137,7 +130,7 @@ interface Constants {
             /* end of central directory record */ 8 +
             /* total number of disks           */ 4;
 
-    Charset UTF8 = Charset.forName("UTF-8");
+    static final Charset UTF8 = Charset.forName("UTF-8");
 
     /**
      * The default character set used for entry names and comments in ZIP
@@ -146,20 +139,23 @@ interface Constants {
      * Note that you should use &quot;IBM437&quot; for ordinary ZIP archive
      * files instead.
      */
-    Charset DEFAULT_CHARSET = UTF8;
+    static final Charset DEFAULT_CHARSET = UTF8;
 
     /**
      * The maximum buffer size used for deflating and inflating.
      * Optimized for performance.
      */
-    int MAX_FLATER_BUF_LENGTH = Streams.BUFFER_SIZE;
+    static final int MAX_FLATER_BUF_LENGTH = Streams.BUFFER_SIZE;
 
     /**
      * The minimum buffer size used for deflating and inflating.
      * Optimized for performance.
      */
-    int MIN_FLATER_BUF_LENGTH = MAX_FLATER_BUF_LENGTH / 8;
+    static final int MIN_FLATER_BUF_LENGTH = MAX_FLATER_BUF_LENGTH / 8;
 
     /** An empty byte array. */
-    byte[] EMPTY = new byte[0];
+    static final byte[] EMPTY = new byte[0];
+
+    /* Can't touch this - hammer time! */
+    private Constants() { }
 }
