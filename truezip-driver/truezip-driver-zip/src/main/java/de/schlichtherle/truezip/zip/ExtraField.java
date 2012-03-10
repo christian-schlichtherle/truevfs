@@ -1,14 +1,10 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
-import static de.schlichtherle.truezip.zip.Constants.*;
+import static de.schlichtherle.truezip.zip.Constants.EMPTY;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -19,8 +15,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * It defines the common properties of all Extra Fields and how to
  * serialize/deserialize them to/from byte arrays.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 abstract class ExtraField {
