@@ -60,7 +60,7 @@ public abstract class FsDriverService implements FsDriverProvider {
      *         does not hold.
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
-    protected static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
+    public static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>(
                 Maps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
