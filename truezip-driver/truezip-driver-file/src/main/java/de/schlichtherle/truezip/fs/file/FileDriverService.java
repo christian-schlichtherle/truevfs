@@ -41,6 +41,7 @@ public final class FileDriverService extends FsDriverService {
             });
 
     @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Map<FsScheme, FsDriver> get() {
         return DRIVERS;
     }
