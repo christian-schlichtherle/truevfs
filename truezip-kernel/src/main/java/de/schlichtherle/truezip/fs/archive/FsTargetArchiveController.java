@@ -37,7 +37,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.TooManyListenersException;
-import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
@@ -622,7 +621,7 @@ extends FsFileSystemArchiveController<E> {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         InputArchive(final @WillCloseWhenClosed InputShop<E> input) {
-            super(new DisconnectingInputShop<E>(input), new ReentrantLock());
+            super(new DisconnectingInputShop<E>(input));
             this.driverProduct = input;
         }
 
@@ -642,7 +641,7 @@ extends FsFileSystemArchiveController<E> {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         OutputArchive(final @WillCloseWhenClosed OutputShop<E> output) {
-            super(new DisconnectingOutputShop<E>(output), new ReentrantLock());
+            super(new DisconnectingOutputShop<E>(output));
             this.driverProduct = output;
         }
 
