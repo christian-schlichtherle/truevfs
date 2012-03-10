@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
@@ -40,10 +36,9 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  *
- * @param   <E> The type of the ZIP entries.
- * @see     RawZipFile
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> the type of the ZIP entries.
+ * @see    RawZipFile
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class RawZipOutputStream<E extends ZipEntry>
@@ -355,7 +350,6 @@ implements Iterable<E> {
      *         format specification.
      * @throws IOException On any I/O error.
      */
-    @SuppressWarnings("unchecked")
     public void putNextEntry(final E entry, final boolean process)
     throws IOException {
         closeEntry();

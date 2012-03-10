@@ -1,20 +1,17 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.swing;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.ComboBoxEditor;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
@@ -25,7 +22,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An observer for a {@link JComboBox} which provides auto completion for the
@@ -41,8 +37,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * {@code editable} property being set to {@code true}, is the default setup
  * for a vanilla {@code JComboBox}).
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param <E> the type of the elements of this combo box browser.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class AbstractComboBoxBrowser<E> implements Serializable {
@@ -79,6 +75,8 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
     /**
      * Returns the combo box which this object is auto completing.
      * The default is {@code null}.
+     * 
+     * @return The combo box which this object is auto completing.
      */
     public @Nullable JComboBox<E> getComboBox() {
         return comboBox;
@@ -95,7 +93,6 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
         changeComboBox(getComboBox(), comboBox, true);
     }
 
-    @SuppressWarnings("unchecked")
     private void changeComboBox(
             final @CheckForNull JComboBox<E> oldCB,
             final @CheckForNull JComboBox<E> newCB,
@@ -107,7 +104,7 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
         if (null != oldCB) {
             oldCB.removePropertyChangeListener("editor", listener);
             oldCBE = oldCB.getEditor();
-            oldCB.setEditor(((DecoratingComboBoxEditor) oldCBE).getEditor());
+            oldCB.setEditor(((AbstractComboBoxBrowser<?>.DecoratingComboBoxEditor) oldCBE).getEditor());
         }
 
         this.comboBox = newCB;

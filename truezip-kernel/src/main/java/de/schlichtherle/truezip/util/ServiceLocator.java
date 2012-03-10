@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
@@ -38,7 +34,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * results.
  *
  * @author Christian Schlichtherle
- * @version $Id$
  */
 @ThreadSafe
 public final class ServiceLocator {
@@ -116,7 +111,6 @@ public final class ServiceLocator {
      * @throws ServiceConfigurationError if locating, instantiating or casting
      *         the service fails for some reason.
      */
-    @SuppressWarnings("unchecked")
     public @Nullable <S> S
     getService(Class<S> service, @CheckForNull Class<? extends S> def) {
         String name = System.getProperty(   service.getName(),
@@ -124,7 +118,7 @@ public final class ServiceLocator {
         if (null == name)
             return null;
         try {
-            return ((Class<? extends S>) getClass(name)).newInstance();
+            return def.cast(getClass(name).newInstance());
         } catch (ClassCastException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
         } catch (InstantiationException ex) {
@@ -208,7 +202,6 @@ public final class ServiceLocator {
      * @throws IllegalArgumentException if any promotion step fails.
      * @since  TrueZIP 7.2
      */
-    @SuppressWarnings("unchecked")
     public static @CheckForNull <T> T promote(
             @CheckForNull Object object,
             final Class<T> type) {
@@ -227,8 +220,10 @@ public final class ServiceLocator {
         } catch (IllegalAccessException ex) {
             throw new IllegalArgumentException(ex);
         }
-        if (null != object && !type.isInstance(object))
-            throw new IllegalArgumentException();
-        return (T) object;
+        try {
+            return type.cast(object);
+        } catch (ClassCastException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 }

@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.http;
 
@@ -23,8 +19,6 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +27,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -45,7 +41,6 @@ import org.apache.http.client.methods.HttpUriRequest;
  * An HTTP(S) entry.
  *
  * @author Christian Schlichtherle
- * @version $Id$
  */
 @Immutable
 public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {

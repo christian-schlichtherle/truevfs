@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
@@ -14,8 +10,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Provides static utility methods for ZIP parameters.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 final class ZipParametersUtils {
@@ -34,15 +29,14 @@ final class ZipParametersUtils {
      * @throws ZipParametersException if {@code param} is {@code null} or
      *         no suitable parameters can get found.
      */
-    @SuppressWarnings("unchecked")
     static <P extends ZipParameters> P parameters(
             final Class<P> type,
             @CheckForNull ZipParameters param)
     throws ZipParametersException {
         while (null != param) {
             // Order is important here to support multiple interface implementations!
-            if (type.isAssignableFrom(param.getClass())) {
-                return (P) param;
+            if (type.isInstance(param)) {
+                return type.cast(param);
             } else if (param instanceof ZipParametersProvider) {
                 param = ((ZipParametersProvider) param).get(type);
             } else {
