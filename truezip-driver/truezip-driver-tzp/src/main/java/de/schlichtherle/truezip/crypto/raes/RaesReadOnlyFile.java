@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.crypto.raes;
 
@@ -59,9 +55,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * you should synchronize their file pointers using the pattern as described
  * in the base class {@link DecoratingReadOnlyFile}.
  *
- * @see     RaesOutputStream
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    RaesOutputStream
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
@@ -165,15 +160,14 @@ public abstract class RaesReadOnlyFile extends CipherReadOnlyFile {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private static <P extends RaesParameters> P parameters(
             final Class<P> type,
             @CheckForNull RaesParameters param)
     throws RaesParametersException {
         while (null != param) {
             // Order is important here to support multiple interface implementations!
-            if (type.isAssignableFrom(param.getClass())) {
-                return (P) param;
+            if (type.isInstance(param)) {
+                return type.cast(param);
             } else if (param instanceof RaesParametersProvider) {
                 param = ((RaesParametersProvider) param).get(type);
             } else {

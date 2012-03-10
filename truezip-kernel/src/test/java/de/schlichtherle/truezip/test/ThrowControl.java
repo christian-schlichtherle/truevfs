@@ -57,14 +57,13 @@ public final class ThrowControl {
         check(thiz.getClass(), throwz);
     }
 
-    @SuppressWarnings("unchecked")
     private <X extends Throwable> void check(   final Class<?> thiz,
                                                 final Class<X> throwz)
     throws X {
         final Throwable toThrow = throwables.remove(thiz);
         if (null != toThrow)
-            if (throwz.isAssignableFrom(toThrow.getClass()))
-                throw wrap((X) toThrow);
+            if (throwz.isInstance(toThrow))
+                throw wrap(throwz.cast(toThrow));
             else
                 throwables.put(thiz, toThrow); // restore
 

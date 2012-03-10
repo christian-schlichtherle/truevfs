@@ -1,25 +1,20 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
-import java.util.logging.Logger;
 import de.schlichtherle.truezip.util.UriEncoder.Encoding;
+import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
+import static java.util.logging.Level.FINE;
+import java.util.logging.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
-import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
-import static java.util.logging.Level.*;
-import static org.junit.Assert.*;
-
 /**
  * @author Christian Schlichtherle
- * @version $Id$
  */
 public class UriCodecTest {
 

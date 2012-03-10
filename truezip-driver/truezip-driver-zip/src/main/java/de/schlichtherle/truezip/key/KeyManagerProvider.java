@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.key;
 
@@ -15,8 +11,7 @@ import java.util.ServiceConfigurationError;
  * <p>
  * Implementations must be thread-safe.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public interface KeyManagerProvider {
 
@@ -25,7 +20,7 @@ public interface KeyManagerProvider {
      * Subsequent calls must return the same key manager for the same secret
      * key class.
      *
-     * @param  <K> the type of the secret key class.
+     * @param  <K> the type of the secret keys.
      * @param  type the class for the secret key type.
      * @return the key manager for the given secret key class.
      * @throws ServiceConfigurationError if no appropriate key manager is

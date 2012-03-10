@@ -437,26 +437,24 @@ public final class TFileSystem extends FileSystem {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Nullable
     <V extends FileAttributeView> V getFileAttributeView(
             TPath path,
             Class<V> type,
             LinkOption... options) {
-        if (!type.isAssignableFrom(BasicFileAttributeView.class))
-            return null;
-        return (V) new FsEntryAttributeView(path);
+        if (type.isAssignableFrom(BasicFileAttributeView.class))
+            return type.cast(new FsEntryAttributeView(path));
+        return null;
     }
 
-    @SuppressWarnings("unchecked")
     <A extends BasicFileAttributes> A readAttributes(
             TPath path,
             Class<A> type,
             LinkOption... options)
     throws IOException {
-        if (!type.isAssignableFrom(BasicFileAttributes.class))
-            throw new UnsupportedOperationException();
-        return (A) new FsEntryAttributes(path);
+        if (type.isAssignableFrom(BasicFileAttributes.class))
+            return type.cast(new FsEntryAttributes(path));
+        throw new UnsupportedOperationException();
     }
 
     private final class FsEntryAttributeView

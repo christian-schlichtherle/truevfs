@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
@@ -28,9 +24,8 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToByte
  * <p>
  * The current implementation supports only {@link WinZipAesParameters}.
  *
- * @since   TrueZIP 7.3
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @since  TrueZIP 7.3
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class KeyManagerZipCryptoParameters
@@ -78,10 +73,9 @@ implements ZipParametersProvider, ZipCryptoParameters {
      * Otherwise, {@code null} gets returned.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <P extends ZipParameters> P get(Class<P> type) {
         if (type.isAssignableFrom(WinZipAesParameters.class))
-            return (P) new WinZipAes();
+            return type.cast(new WinZipAes());
         return null;
     }
 
