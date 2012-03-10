@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.GuardedBy;
@@ -33,7 +34,18 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     private final Lock lock;
 
     /**
-     * Constructs a concurrent output shop.
+     * Constructs a new concurrent output shop.
+     * 
+     * @param output the shop to decorate.
+     */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public LockOutputShop(@WillCloseWhenClosed OutputShop<E> output) {
+        this(output, new ReentrantLock());
+    }
+
+    /**
+     * Constructs a new concurrent output shop.
      * 
      * @param output the shop to decorate.
      * @param lock The lock to use. 
