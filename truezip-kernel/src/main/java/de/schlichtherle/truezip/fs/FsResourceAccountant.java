@@ -5,13 +5,15 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
+import de.schlichtherle.truezip.util.Maps;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
@@ -40,8 +42,13 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 final class FsResourceAccountant {
 
-    private final Lock lock;
-    private final Condition condition;
+    /**
+     * The initial capacity for the hash map accounts for the number of
+     * available processors, a 90% blocking factor for typical I/O and a 2/3
+     * map resize threshold.
+     */
+    private static final int INITIAL_CAPACITY = Maps.initialCapacity(
+            Runtime.getRuntime().availableProcessors() * 10);
 
     /**
      * The pool of all accounted closeable resources.
@@ -49,8 +56,11 @@ final class FsResourceAccountant {
      * resource if there are no more references to it.
      */
     @GuardedBy("lock")
-    private final Map<Closeable, Thread>
-            threads = new IdentityHashMap<Closeable, Thread>();
+    private static final ConcurrentMap<Closeable, Account> accounts
+            = new ConcurrentHashMap<Closeable, Account>(INITIAL_CAPACITY);
+
+    private final Lock lock;
+    private final Condition condition;
 
     /**
      * Constructs a new resource accountant with the given lock.
@@ -76,7 +86,7 @@ final class FsResourceAccountant {
     void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
         lock.lock();
         try {
-            threads.put(resource, Thread.currentThread());
+            accounts.putIfAbsent(resource, new Account());
         } finally {
             lock.unlock();
         }
@@ -92,7 +102,7 @@ final class FsResourceAccountant {
     void stopAccountingFor(final @WillNotClose Closeable resource) {
         lock.lock();
         try {
-            if (null != threads.remove(resource))
+            if (null != accounts.remove(resource))
                 condition.signalAll();
         } finally {
             lock.unlock();
@@ -165,8 +175,9 @@ final class FsResourceAccountant {
     int localResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
-        for (final Thread thread : threads.values())
-            if (thread == currentThread)
+        for (final Account account : accounts.values())
+            if (account.getAccountant() == this
+                    && account.owner == currentThread)
                 n++;
         return n;
     }
@@ -184,7 +195,11 @@ final class FsResourceAccountant {
      *         by <em>all</em> threads.
      */
     int totalResources() {
-        return threads.size();
+        int n = 0;
+        for (final Account account : accounts.values())
+            if (account.getAccountant() == this)
+                n++;
+        return n;
     }
 
     /**
@@ -202,24 +217,35 @@ final class FsResourceAccountant {
 
         lock.lock();
         try {
-            for (   final Iterator<Closeable> i = threads.keySet().iterator();
+            for (   final Iterator<Entry<Closeable, Account>>
+                        i = accounts.entrySet().iterator();
                     i.hasNext(); ) {
-                final Closeable resource = i.next();
+                final Entry<Closeable, Account> entry = i.next();
+                final Account account = entry.getValue();
+                if (account.getAccountant() != this)
+                    continue;
                 i.remove();
                 try {
                     // This should trigger another attempt to remove the
                     // closeable from the map, but this should cause no
                     // ConcurrentModificationException because the closeable
                     // has already been removed.
-                    resource.close();
+                    entry.getKey().close();
                 } catch (IOException ex) {
                     handler.warn(ex); // may throw an exception!
                 }
             }
-            assert threads.isEmpty();
         } finally {
             condition.signalAll();
             lock.unlock();
         }
     }
+
+    private final class Account {
+        final Thread owner = Thread.currentThread();
+
+        FsResourceAccountant getAccountant() {
+            return FsResourceAccountant.this;
+        }
+    } // Account
 }
