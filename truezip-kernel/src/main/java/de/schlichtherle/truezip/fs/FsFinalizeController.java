@@ -37,7 +37,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsFinalizeController<M extends FsModel>
+final class FsFinalizeController<M extends FsModel>
 extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final Logger logger = Logger.getLogger(
@@ -48,14 +48,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
-    private static final IOException OK = new IOException();
+    private static final IOException OK = new IOException((Throwable) null);
 
     /**
      * Constructs a new file system finalize controller.
      *
      * @param controller the decorated file system controller.
      */
-    public FsFinalizeController(FsController<? extends M> controller) {
+    FsFinalizeController(FsController<? extends M> controller) {
         super(controller);
     }
 
@@ -83,7 +83,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 delegate.close();
                 logger.log(Level.FINE, "finalizeCleared");
             } catch (final Throwable ex) { // report and swallow!
-                logger.log(Level.FINE, "finalizeFailed", ex);
+                logger.log(Level.INFO, "finalizeFailed", ex);
             }
         }
     }
@@ -206,7 +206,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // Output
 
-    private final class FinalizeReadOnlyFile
+    private static final class FinalizeReadOnlyFile
     extends DecoratingReadOnlyFile {
         volatile IOException status; // accessed by finalizer thread!
 
@@ -243,7 +243,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // FinalizeReadOnlyFile
 
-    private final class FinalizeSeekableByteChannel
+    private static final class FinalizeSeekableByteChannel
     extends DecoratingSeekableByteChannel {
         volatile IOException status; // accessed by finalizer thread!
 
@@ -280,7 +280,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // FinalizeSeekableByteChannel
 
-    private final class FinalizeInputStream
+    private static final class FinalizeInputStream
     extends DecoratingInputStream {
         volatile IOException status; // accessed by finalizer thread!
 
@@ -317,7 +317,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     } // FinalizeInputStream
 
-    private final class FinalizeOutputStream
+    private static final class FinalizeOutputStream
     extends DecoratingOutputStream {
         volatile IOException status; // accessed by finalizer thread!
 
