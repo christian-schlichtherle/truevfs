@@ -210,8 +210,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @Override
         public void flush() throws IOException {
-            if (!closed)
-                delegate.flush();
+            checkOpen();
+            delegate.flush();
         }
 
         @Override
