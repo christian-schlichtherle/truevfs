@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.entry.Entry.Access;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import de.schlichtherle.truezip.entry.Entry.Size;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
@@ -2301,8 +2301,8 @@ public final class TFile extends File {
             }
             if (null == entry)
                 return 0;
-            final long size = entry.getSize(DATA);
-            return UNKNOWN == size ? 0 : size;
+            final long size = entry.getSize(Size.DATA);
+            return UNKNOWN != size ? size : 0;
         }
         return delegate.length();
     }
@@ -2330,7 +2330,7 @@ public final class TFile extends File {
             if (null == entry)
                 return 0;
             final long time = entry.getTime(Access.WRITE);
-            return 0 <= time ? time : 0;
+            return UNKNOWN != time ? time : 0;
         }
         return delegate.lastModified();
     }
