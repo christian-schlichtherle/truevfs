@@ -262,9 +262,9 @@ extends FsLockModelDecoratingController<
             try {
                 cache.flush();
             } catch (FsNeedsSyncException alreadyFlushed) {
-                // This may happen if a concurrent sync() has been conducted
-                // which failed because of an FsControllerException from the
-                // parent controller when close()ing the target archive file.
+                // This may happen if a previous sync() failed because of an
+                // FsControllerException from the parent controller when
+                // close()ing the target archive file.
             }
         }
 
