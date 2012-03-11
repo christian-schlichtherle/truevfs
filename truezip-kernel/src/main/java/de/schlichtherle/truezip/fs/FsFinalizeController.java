@@ -82,7 +82,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 delegate.close();
                 logger.log(Level.FINE, "finalizeCleared");
-            } catch (final Throwable ex) { // report and swallow!
+            } catch (final FsControllerException ex) {  // report and swallow
+                logger.log(Level.WARNING, "finalizeFailed",
+                        new AssertionError("This should NEVER happen in a finalizer thread!", ex));
+            } catch (final Throwable ex) {              // report and swallow
                 logger.log(Level.INFO, "finalizeFailed", ex);
             }
         }
