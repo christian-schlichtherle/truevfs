@@ -177,7 +177,7 @@ implements Iterable<E>, Closeable {
                   && ZIP64_EOCDR_SIG != signature
                   && EOCDR_SIG != signature)
             throw new ZipException(
-                    "A valid ZIP file must start with a Local File Header or a (ZIP64) End Of Central Directory Record iff it's empty!");
+                    "Expectede Local File Header or (ZIP64) End Of Central Directory Record!");
     }
 
     /**
