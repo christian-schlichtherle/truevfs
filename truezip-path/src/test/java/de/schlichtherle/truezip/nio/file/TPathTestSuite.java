@@ -437,7 +437,7 @@ extends ConfiguredClientTestBase<D> {
         assertFalse(isDirectory(file));
         assertTrue(isRegularFile(file));
         assertEquals(message.length, size(file));
-        
+
         try {
             createFile(file);
             fail();
@@ -447,7 +447,7 @@ extends ConfiguredClientTestBase<D> {
         assertFalse(isDirectory(file));
         assertTrue(isRegularFile(file));
         assertEquals(message.length, size(file));
-        
+
         delete(file);
         assertFalse(exists(file));
         assertFalse(isDirectory(file));
