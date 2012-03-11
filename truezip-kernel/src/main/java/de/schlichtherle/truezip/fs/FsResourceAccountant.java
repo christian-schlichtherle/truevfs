@@ -113,8 +113,9 @@ final class FsResourceAccountant {
      * <p>
      * Waiting for such resources can get cancelled immediately by interrupting
      * the current thread.
-     * Note that the interrupt status of the current thread will be cleared
-     * then.
+     * Unless the number of closeable resources which have been accounted for
+     * by <em>all</em> threads is zero, this will leave the interrupt status of
+     * the current thread cleared.
      * If no such foreign resources exist, then interrupting the current thread
      * does not have any effect.
      * <p>
@@ -137,8 +138,9 @@ final class FsResourceAccountant {
         try {
             try {
                 long toWait = TimeUnit.MILLISECONDS.toNanos(timeout);
-                // Note that local resources may get picked up by the garbage
-                // collector, so we MUST check this on each loop cycle!
+                // Note that even local resources may get stopped accounting
+                // for by a different thread, e.g. the finalizer thread, so
+                // this MUST get checked on each iteration!
                 while (localResources() < totalResources()) {
                     if (0 < timeout) {
                         if (0 >= toWait)
@@ -149,7 +151,12 @@ final class FsResourceAccountant {
                     }
                 }
             } catch (InterruptedException cancel) {
-                // Leave interrupt status cleared.
+                // Fix rare racing condition between Thread.interrupt() and
+                // Condition.signalAll() events.
+                final int tr = totalResources();
+                if (0 == tr)
+                    Thread.currentThread().interrupt();
+                return tr;
             }
             return totalResources();
         } finally {
@@ -208,7 +215,8 @@ final class FsResourceAccountant {
      * provided to the constructor - use with care!
      */
     <X extends Exception>
-    void closeAllResources(final ExceptionHandler<? super IOException, X> handler)
+    void closeAllResources(
+            final ExceptionHandler<? super IOException, X> handler)
     throws X {
         assert null != handler;
 
