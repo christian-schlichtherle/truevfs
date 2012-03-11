@@ -480,13 +480,13 @@ extends ConfiguredClientTestBase<D> {
         assertFalse(file.isDirectory());
         assertTrue(file.isFile());
         assertEquals(message.length, file.length());
-        
+
         assertFalse(file.createNewFile());
         assertTrue(file.exists());
         assertFalse(file.isDirectory());
         assertTrue(file.isFile());
         assertEquals(message.length, file.length());
-        
+
         file.rm();
         assertFalse(file.exists());
         assertFalse(file.isDirectory());
