@@ -64,7 +64,8 @@ public final class FsDefaultManager extends FsManager {
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
             model.setController(controller = new FsFalsePositiveController(
-                    driver.newController(model, parent)));
+                    new FsFinalizeController<FsModel>(
+                        driver.newController(model, parent))));
         }
         return controller;
     }
