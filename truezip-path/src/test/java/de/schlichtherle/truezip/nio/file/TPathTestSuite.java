@@ -1252,19 +1252,19 @@ extends ConfiguredClientTestBase<D> {
         // Create test archive file.
         createTestArchive(nEntries);
 
+        class CheckAllEntries implements Callable<Void> {
+            @Override
+            public Void call() throws IOException {
+                assertArchiveEntries(archive, nEntries);
+                return null;
+            }
+        } // CheckAllEntries
+
         class CheckAllEntriesFactory implements TaskFactory {
             @Override
             public Callable<?> newTask(int threadNum) {
                 return new CheckAllEntries();
             }
-
-            class CheckAllEntries implements Callable<Void> {
-                @Override
-                public Void call() throws IOException {
-                    assertArchiveEntries(archive, nEntries);
-                    return null;
-                }
-            } // CheckAllEntries
         } // CheckAllEntriesFactory
 
         try {
@@ -1376,46 +1376,46 @@ extends ConfiguredClientTestBase<D> {
     throws Exception {
         assertTrue(TConfig.get().isLenient());
 
+        class Write implements Callable<Void> {
+            @Override
+            public Void call() throws IOException {
+                final TPath archive = new TPath(createTempFile());
+                delete(archive);
+                final TPath entry = archive.resolve("entry");
+                try {
+                    createTestFile(entry);
+                    try {
+                        if (syncIndividually)
+                            archive.getFileSystem().close();
+                        else
+                            TFile.sync(SYNC); // DON'T clear the cache!
+                    } catch (final FsSyncWarningException ex) {
+                        if (!(ex.getCause() instanceof FsResourceBusyIOException))
+                            throw ex;
+                        // Some other thread is busy updating an archive.
+                        // If we are updating individually, then this
+                        // could never happen.
+                        // Otherwise, silently ignore this exception and
+                        // accept that the archive may not have been
+                        // synced to disk.
+                        // Note that no data is lost, this exception just
+                        // signals that the corresponding archive hasn't
+                        // been updated - a future call may still succeed.
+                        if (syncIndividually)
+                            throw new AssertionError(ex);
+                    }
+                } finally {
+                    archive.toFile().rm_r();
+                }
+                return null;
+            }
+        } // Write
+
         class WriteFactory implements TaskFactory {
             @Override
             public Callable<?> newTask(int threadNum) {
                 return new Write();
             }
-
-            class Write implements Callable<Void> {
-                @Override
-                public Void call() throws IOException {
-                    final TPath archive = new TPath(createTempFile());
-                    delete(archive);
-                    final TPath entry = archive.resolve("entry");
-                    try {
-                        createTestFile(entry);
-                        try {
-                            if (syncIndividually)
-                                archive.getFileSystem().close();
-                            else
-                                TFile.sync(SYNC); // DON'T clear the cache!
-                        } catch (final FsSyncWarningException ex) {
-                            if (!(ex.getCause() instanceof FsResourceBusyIOException))
-                                throw ex;
-                            // Some other thread is busy updating an archive.
-                            // If we are updating individually, then this
-                            // could never happen.
-                            // Otherwise, silently ignore this exception and
-                            // accept that the archive may not have been
-                            // synced to disk.
-                            // Note that no data is lost, this exception just
-                            // signals that the corresponding archive hasn't
-                            // been updated - a future call may still succeed.
-                            if (syncIndividually)
-                                throw new AssertionError(ex);
-                        }
-                    } finally {
-                        archive.toFile().rm_r();
-                    }
-                    return null;
-                }
-            } // Write
         } // WriteFactory
 
         runConcurrent(NUM_IO_THREADS, new WriteFactory()).join();
