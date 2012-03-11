@@ -200,6 +200,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
 
         @Override
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
         public OutputStream newOutputStream() throws IOException {
             return new FinalizeOutputStream(
                     getBoundSocket().newOutputStream());
