@@ -4,7 +4,9 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.util.BitField;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
@@ -21,10 +23,24 @@ import javax.annotation.concurrent.Immutable;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public final class FsNeedsSyncException extends FsControllerException {
 
-    public static FsNeedsSyncException get() {
-        return TRACEABLE ? new FsNeedsSyncException() : SINGLETON;
+    private static final @Nullable FsNeedsSyncException SINGLETON = TRACEABLE
+            ? null
+            : new FsNeedsSyncException((String) null, null);
+
+    public static FsNeedsSyncException get(FsEntryName name, @CheckForNull Access intention) {
+        return TRACEABLE ? new FsNeedsSyncException(name, intention) : SINGLETON;
     }
 
-    private static final @Nullable FsNeedsSyncException
-            SINGLETON = TRACEABLE ? null : new FsNeedsSyncException();
+    private FsNeedsSyncException(FsEntryName name, @CheckForNull Access intention) {
+        this(name + " (intention: " + intention + ")", null);
+    }
+
+    public static FsNeedsSyncException get(String name, Throwable cause) {
+        return TRACEABLE ? new FsNeedsSyncException(name, cause) : SINGLETON;
+    }
+
+    private FsNeedsSyncException(   @CheckForNull String message,
+                                    @CheckForNull Throwable cause) {
+        super(message, cause);
+    }
 }
