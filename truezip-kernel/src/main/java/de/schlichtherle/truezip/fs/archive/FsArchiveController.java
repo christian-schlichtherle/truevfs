@@ -200,11 +200,11 @@ extends FsLockModelController {
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
-            final FsCovariantEntry<E> ce = fileSystem().getEntry(name);
-            if (null == ce)
+            final FsCovariantEntry<E> fse = fileSystem().getEntry(name);
+            if (null == fse)
                 throw new FsEntryNotFoundException(getModel(),
                         name, "no such entry");
-            return ce.getEntry();
+            return fse.getEntry();
         }
 
         @Override
