@@ -38,7 +38,7 @@ extends ConfiguredClientTestBase<D> {
      */
     private static final String TEMP_FILE_PREFIX = "tzp-sync";
 
-    private static final int NUM_REPEATS = 100;
+    private static final int NUM_REPEATS = 10;
 
     private File createTempFile() throws IOException {
         // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
@@ -54,7 +54,8 @@ extends ConfiguredClientTestBase<D> {
                 class RoundTrip implements Callable<Void> {
                     @Override
                     public Void call() throws Exception {
-                        roundTrip(threadNum);
+                        for (int i = 0; i < NUM_REPEATS; i++)
+                            roundTrip(threadNum);
                         return null;
                     }
                 } // RoundTrip
