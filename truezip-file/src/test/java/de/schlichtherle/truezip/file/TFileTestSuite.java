@@ -157,17 +157,21 @@ extends ConfiguredClientTestBase<D> {
                 = new WeakReference<FsController<?>>(
                     new TFile(entry).getInnerArchive().getController(), queue);
         System.gc();
+        System.runFinalization();
         assertNull(queue.remove(TIMEOUT_MILLIS));
         assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
         resource.close();
         resource = null; // leave now!
         System.gc();
+        System.runFinalization();
         assertNull(queue.remove(TIMEOUT_MILLIS));
         assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
         TFile.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController<?>> got;
         do {
-            System.gc(); // triggering GC in a loop seems to help with concurrency!
+            // triggering GC and finalizer in a loop seems to help with concurrency!
+            System.gc();
+            System.runFinalization();
         } while (null == (got = queue.remove(TIMEOUT_MILLIS)));
         assert expected == got;
         assert null == expected.get();

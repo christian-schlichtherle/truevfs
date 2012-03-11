@@ -485,6 +485,7 @@ extends ConfiguredClientTestBase<D> {
                     // The garbage collector hasn't been collecting the open
                     // stream. Let's try to trigger it.
                     System.gc();
+                    System.runFinalization();
                 }
             }
 
