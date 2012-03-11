@@ -91,7 +91,7 @@ implements Iterable<FsCovariantEntry<E>> {
         this.factory = driver;
         final E root = newEntryUnchecked(ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, null);
         final long time = System.currentTimeMillis();
-        for (Access access : ALL_ACCESS_SET)
+        for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
         final EntryTable<E> master = new EntryTable<E>(
                 initialCapacity(OVERHEAD_SIZE));
@@ -451,7 +451,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final boolean createParents;
         final BitField<FsOutputOption> options;
         final SegmentLink<E>[] links;
-        long time = -1;
+        long time = UNKNOWN;
 
         PathLink(   final String path,
                     final Entry.Type type,
@@ -518,8 +518,9 @@ implements Iterable<FsCovariantEntry<E>> {
                 final E entryAE = entryCE.getEntry();
                 final String member = link.base;
                 master.add(entryCE.getName(), entryAE);
-                if (master.get(parentCE.getName()).add(member) && UNKNOWN != parentAE.getTime(Access.WRITE)) // never touch ghosts!
-                    parentAE.setTime(Access.WRITE, getCurrentTimeMillis());
+                if (master.get(parentCE.getName()).add(member)
+                        && UNKNOWN != parentAE.getTime(WRITE)) // never touch ghosts!
+                    parentAE.setTime(WRITE, getCurrentTimeMillis());
                 parentCE = entryCE;
                 parentAE = entryAE;
             }
@@ -528,7 +529,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
 
         private long getCurrentTimeMillis() {
-            return 0 <= time ? time : (time = System.currentTimeMillis());
+            return UNKNOWN != time ? time : (time = System.currentTimeMillis());
         }
 
         @Override
@@ -607,9 +608,9 @@ implements Iterable<FsCovariantEntry<E>> {
             // This signal will be ignored by drivers which do no support a
             // central directory (TAR).
             final E ae = ce.getEntry();
-            for (Size type : ALL_SIZE_SET)
+            for (final Size type : ALL_SIZE_SET)
                 ae.setSize(type, UNKNOWN);
-            for (Access type : ALL_ACCESS_SET)
+            for (final Access type : ALL_ACCESS_SET)
                 ae.setTime(type, UNKNOWN);
         }
         splitter.split(path);
@@ -621,8 +622,8 @@ implements Iterable<FsCovariantEntry<E>> {
         assert ok : "The parent directory of \"" + name.toString()
                     + "\" does not contain this entry - archive file system is corrupted!";
         final E pae = pce.getEntry(DIRECTORY);
-        if (UNKNOWN != pae.getTime(Access.WRITE)) // never touch ghosts!
-            pae.setTime(Access.WRITE, System.currentTimeMillis());
+        if (UNKNOWN != pae.getTime(WRITE)) // never touch ghosts!
+            pae.setTime(WRITE, System.currentTimeMillis());
     }
 
     boolean setTime(
@@ -641,7 +642,7 @@ implements Iterable<FsCovariantEntry<E>> {
         touch();
         final E ae = ce.getEntry();
         boolean ok = true;
-        for (Access type : types)
+        for (final Access type : types)
             ok &= ae.setTime(type, value);
         return ok;
     }
@@ -658,7 +659,7 @@ implements Iterable<FsCovariantEntry<E>> {
         touch();
         final E ae = ce.getEntry();
         boolean ok = true;
-        for (Map.Entry<Access, Long> time : times.entrySet()) {
+        for (final Map.Entry<Access, Long> time : times.entrySet()) {
             final long value = time.getValue();
             ok &= 0 <= value && ae.setTime(time.getKey(), value);
         }
