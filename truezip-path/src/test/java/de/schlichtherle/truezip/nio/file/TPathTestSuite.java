@@ -472,22 +472,7 @@ extends ConfiguredClientTestBase<D> {
         final InputStream in1 = newInputStream(file1);
         createFile(file2); // uses FsOutputOption.CACHE!
         try {
-            newInputStream(file2);
-
-            while (true) {
-                try {
-                    copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
-                    break;
-                } catch (final FsSyncException ex) {
-                    if (!(ex.getCause() instanceof FsResourceBusyIOException))
-                        throw ex;
-                    assert false : ex; // FIXME: This is an endless loop because in1 is still open!
-                    // The garbage collector hasn't been collecting the open
-                    // stream. Let's try to trigger it.
-                    System.gc();
-                    System.runFinalization();
-                }
-            }
+            copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
 
             // in1 is still open!
             try {
