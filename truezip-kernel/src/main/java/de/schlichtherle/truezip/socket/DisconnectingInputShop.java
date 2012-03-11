@@ -285,11 +285,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
         }
 
         @Override
-        public boolean markSupported() {
-            return !closed && delegate.markSupported();
-        }
-
-        @Override
         public void close() throws IOException {
             if (!closed)
                 delegate.close();
