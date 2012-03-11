@@ -200,21 +200,21 @@ extends FsLockModelController {
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
-            final FsCovariantEntry<E> entry = fileSystem().getEntry(name);
-            if (null == entry)
+            final FsCovariantEntry<E> ce = fileSystem().getEntry(name);
+            if (null == ce)
                 throw new FsEntryNotFoundException(getModel(),
                         name, "no such entry");
-            return entry.getEntry();
+            return ce.getEntry();
         }
 
         @Override
         protected InputSocket<? extends FsArchiveEntry> getDelegate()
         throws IOException {
-            final FsArchiveEntry entry = getLocalTarget();
-            if (FILE != entry.getType())
+            final FsArchiveEntry ae = getLocalTarget();
+            if (FILE != ae.getType())
                 throw new FsEntryNotFoundException(getModel(),
                         name, "entry type is not a file");
-            return getInputSocket(entry.getName());
+            return getInputSocket(ae.getName());
         }
     } // Input
 
@@ -256,21 +256,21 @@ extends FsLockModelController {
 
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
-            final E entry = mknod().getTarget().getEntry();
+            final E ae = mknod().getTarget().getEntry();
             if (options.get(APPEND)) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
                 // change the contents of the transferred data accordingly.
                 // This would not work when APPENDing.
-                return new ProxyEntry(entry);
+                return new ProxyEntry(ae);
             }
-            return entry;
+            return ae;
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
             final FsArchiveFileSystemOperation<E> mknod = mknod();
-            final E entry = mknod.getTarget().getEntry();
+            final E ae = mknod.getTarget().getEntry();
             InputStream in = null;
             if (options.get(APPEND)) {
                 try {
@@ -281,10 +281,10 @@ extends FsLockModelController {
                 }
             }
             try {
-                final OutputSocket<? extends E> output = getOutputSocket(entry);
+                final OutputSocket<? extends E> os = getOutputSocket(ae);
                 if (null == in) // do NOT bind when appending!
-                    output.bind(this);
-                final OutputStream out = output.newOutputStream();
+                    os.bind(this);
+                final OutputStream out = os.newOutputStream();
                 try {
                     mknod.run();
                     if (in != null)
@@ -362,21 +362,21 @@ extends FsLockModelController {
                         final BitField<FsOutputOption> options)
     throws IOException {
         checkAccess(name, null);
-        final FsArchiveFileSystem<E> fileSystem = autoMount();
+        final FsArchiveFileSystem<E> fs = autoMount();
         if (name.isRoot()) {
-            int size = fileSystem.getEntry(ROOT).getMembers().size();
+            int size = fs.getEntry(ROOT).getMembers().size();
             if (0 != size)
                 throw new IOException(String.format(
                         "root directory not empty - contains %d member(s)",
                         size));
             // Check for any archive entries with absolute entry names.
             // Subtract one for the ROOT entry.
-            size = fileSystem.getSize() - 1;
+            size = fs.getSize() - 1;
             if (0 != size)
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] { getMountPoint(), size });
         } else {
-            fileSystem.unlink(name);
+            fs.unlink(name);
         }
     }
 
