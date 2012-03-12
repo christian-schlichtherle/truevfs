@@ -73,14 +73,14 @@ extends ExceptionBuilderTestSuite<
 
     @Test
     public void testWarnIdempotence() {
+        builder.warn(newCause());
         try {
-            builder.warn(newCause());
             builder.check();
             fail();
         } catch (final SequentialIOException ex) {
             assertTrue(clazz.isInstance(ex));
+            builder.warn(ex);
             try {
-                builder.warn(ex);
                 builder.check();
                 fail();
             } catch (final SequentialIOException ex2) {
