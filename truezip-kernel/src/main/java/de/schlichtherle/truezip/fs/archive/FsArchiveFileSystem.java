@@ -69,7 +69,8 @@ implements Iterable<FsCovariantEntry<E>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private FsArchiveFileSystemTouchListener<? super E> touchListener;
+    private @CheckForNull FsArchiveFileSystemTouchListener<? super E>
+            touchListener;
 
     /**
      * Returns a new empty archive file system and ensures its integrity.
