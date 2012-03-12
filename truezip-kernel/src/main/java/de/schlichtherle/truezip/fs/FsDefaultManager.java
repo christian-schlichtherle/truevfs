@@ -70,6 +70,27 @@ public final class FsDefaultManager extends FsManager {
         return controller;
     }
 
+    @Override
+    public synchronized int getSize() {
+        return schedulers.size();
+    }
+
+    @Override
+    public Iterator<FsController<?>> iterator() {
+        return getControllers().iterator();
+    }
+
+    private synchronized Set<FsController<?>> getControllers() {
+        final Set<FsController<?>> snapshot
+                = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
+        for (final Link<FsFalsePositiveController> link : schedulers.values()) {
+            final FsController<?> controller = getTarget(link);
+            if (null != controller)
+                snapshot.add(controller);
+        }
+        return snapshot;
+    }
+
     /**
      * A model which schedules its controller for
      * {@link #sync(BitField) synchronization} by &quot;observing&quot; its
@@ -118,27 +139,6 @@ public final class FsDefaultManager extends FsManager {
             }
         }
     } // ScheduledModel
-
-    @Override
-    public synchronized int getSize() {
-        return schedulers.size();
-    }
-
-    @Override
-    public Iterator<FsController<?>> iterator() {
-        return getControllers().iterator();
-    }
-
-    private synchronized Set<FsController<?>> getControllers() {
-        final Set<FsController<?>> snapshot
-                = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
-        for (final Link<FsFalsePositiveController> link : schedulers.values()) {
-            final FsController<?> controller = getTarget(link);
-            if (null != controller)
-                snapshot.add(controller);
-        }
-        return snapshot;
-    }
 
     /**
      * Orders file system controllers so that all file systems appear before
