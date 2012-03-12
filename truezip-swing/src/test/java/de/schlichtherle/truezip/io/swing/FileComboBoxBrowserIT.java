@@ -26,8 +26,8 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
  */
 public final class FileComboBoxBrowserIT extends JemmyUtils {
 
-    private static final Logger logger
-            = Logger.getLogger(FileComboBoxBrowserIT.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(FileComboBoxBrowserIT.class.getName());
 
     @Test
     public void testDirectory() {

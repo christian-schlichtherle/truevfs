@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io;
 
@@ -15,8 +11,7 @@ import org.junit.Test;
 /**
  * Tests the class {@link SequentialIOException}.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public final class SequentialIOExceptionTest {
 
@@ -39,7 +34,7 @@ public final class SequentialIOExceptionTest {
         assertEquals(max - 1, maxIndex);
         final Check indexCheck = new Check() {
             @Override
-			public boolean equals(SequentialIOException e1, SequentialIOException e2) {
+            public boolean equals(SequentialIOException e1, SequentialIOException e2) {
                 //return Exception0.INDEX_COMP.compare(e1, e2) == 0;
                 return e1 == e2;
             }
@@ -52,7 +47,7 @@ public final class SequentialIOExceptionTest {
 
         final Check priorityCheck = new Check() {
             @Override
-			public boolean equals(SequentialIOException e1, SequentialIOException e2) {
+            public boolean equals(SequentialIOException e1, SequentialIOException e2) {
                 return SequentialIOException.PRIORITY_COMP.compare(e1, e2) == 0;
             }
         };

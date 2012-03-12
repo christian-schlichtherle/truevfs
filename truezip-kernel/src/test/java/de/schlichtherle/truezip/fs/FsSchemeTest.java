@@ -1,39 +1,29 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.net.URISyntaxException;
 import java.util.Locale;
-import org.junit.Test;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
- * @version $Id$
  */
 public class FsSchemeTest {
 
-    private static final Logger logger
-            = Logger.getLogger(FsSchemeTest.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(FsSchemeTest.class.getName());
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
@@ -60,7 +50,7 @@ public class FsSchemeTest {
                 oos.writeObject(original);
                 oos.close();
 
-                logger.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+                logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final ObjectInputStream ois = new ObjectInputStream(bis);
@@ -79,7 +69,7 @@ public class FsSchemeTest {
                 enc.writeObject(original);
                 enc.close();
 
-                logger.log(Level.FINE, bos.toString("UTF-8"));
+                logger.log(Level.FINEST, bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final XMLDecoder dec = new XMLDecoder(bis);

@@ -34,8 +34,8 @@ import org.junit.Test;
  */
 public class TFileTest extends MockArchiveDriverTestBase {
 
-    private static final Logger logger
-            = Logger.getLogger(TFileTest.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(TFileTest.class.getName());
 
     private TFile archive;
 
@@ -493,7 +493,7 @@ public class TFileTest extends MockArchiveDriverTestBase {
                 oos.writeObject(original);
                 oos.close();
 
-                logger.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+                logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final ObjectInputStream ois = new ObjectInputStream(bis);
@@ -511,7 +511,7 @@ public class TFileTest extends MockArchiveDriverTestBase {
                 enc.writeObject(original);
                 enc.close();
 
-                logger.log(Level.FINE, bos.toString("UTF-8"));
+                logger.log(Level.FINEST, bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final XMLDecoder dec = new XMLDecoder(bis);

@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
@@ -23,12 +19,11 @@ import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
- * @version $Id$
  */
 public class BitFieldTest {
 
-    private static final Logger logger
-            = Logger.getLogger(BitFieldTest.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(BitFieldTest.class.getName());
 
     @Test
     public void testSetOne() {
@@ -130,7 +125,7 @@ public class BitFieldTest {
                 oos.writeObject(original);
                 oos.close();
 
-                logger.log(Level.FINE, "Number of serialized bytes: {0}", bos.size());
+                logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final ObjectInputStream ois = new ObjectInputStream(bis);
@@ -148,7 +143,7 @@ public class BitFieldTest {
                 enc.writeObject(original);
                 enc.close();
 
-                logger.log(Level.FINE, bos.toString("UTF-8"));
+                logger.log(Level.FINEST, bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final XMLDecoder dec = new XMLDecoder(bis);

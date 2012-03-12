@@ -78,8 +78,14 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
     @After
     public void tearDown() {
-        if (file.exists() && !file.delete())
-            logger.log(Level.WARNING, "{0} (could not delete)", file);
+        try {
+            if (file.exists() && !file.delete())
+                throw new IOException(file + " (could not delete)");
+        } catch (final IOException ex) {
+            logger.log(Level.FINEST,
+                    "Failed to clean up test file (this may be just an aftermath):",
+                    ex);
+        }
     }
 
     @Override

@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.util;
 
 import de.schlichtherle.truezip.util.UriEncoder.Encoding;
 import static de.schlichtherle.truezip.util.UriEncoder.Encoding.*;
-import static java.util.logging.Level.FINE;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -20,8 +20,8 @@ public class UriCodecTest {
 
     private static final BitField<Encoding>
             ENCODING_MASK = BitField.allOf(Encoding.class);
-    private static final Logger logger
-            = Logger.getLogger(UriCodecTest.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(UriCodecTest.class.getName());
 
     private UriEncoder encoder;
     private UriDecoder decoder;
@@ -71,7 +71,7 @@ public class UriCodecTest {
                 decoder.decode(test[0]);
                 fail();
             } catch (IllegalArgumentException ex) {
-                logger.log(FINE, ex.toString(), ex);
+                logger.log(Level.FINEST, ex.toString(), ex);
             }
         }
     }

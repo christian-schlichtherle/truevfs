@@ -1,25 +1,20 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.logging.Level;
+import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.logging.Level.*;
-import static org.junit.Assert.*;
-
 /**
  * @author Christian Schlichtherle
- * @version $Id$
  */
 public class UriBuilderTest {
 
@@ -163,7 +158,7 @@ public class UriBuilderTest {
                 builder.getString();
                 fail();
             } catch (URISyntaxException expected) {
-                logger.log(FINE, expected.toString(), expected);
+                logger.log(Level.FINEST, expected.toString(), expected);
             }
             try {
                 builder.toString();

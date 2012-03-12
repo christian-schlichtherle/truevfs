@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.rof;
 
@@ -18,13 +14,12 @@ import org.junit.After;
 import org.junit.Before;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public final class IntervalReadOnlyFileIT extends ReadOnlyFileTestSuite {
 
-    private static final Logger logger = Logger.getLogger(
-            IntervalReadOnlyFileIT.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(IntervalReadOnlyFileIT.class.getName());
 
     private File temp2;
 
@@ -42,9 +37,9 @@ public final class IntervalReadOnlyFileIT extends ReadOnlyFileTestSuite {
                 out.close();
             }
             assert 3 * DATA.length == temp2.length();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             if (!temp2.delete())
-                logger.log(Level.WARNING, "{0} (File.delete() failed)", temp2);
+                throw new IOException(temp2 + " (could not delete)", ex);
             throw ex;
         }
         super.setUp(); // calls newReadOnlyFile(File)
@@ -61,14 +56,16 @@ public final class IntervalReadOnlyFileIT extends ReadOnlyFileTestSuite {
     @Override
     public void tearDown() {
         try {
+            super.tearDown();
+        } finally {
             try {
-                super.tearDown();
-            } finally {
                 if (temp2.exists() && !temp2.delete())
                     throw new IOException(temp2 + " (could not delete)");
+            } catch (IOException ex) {
+                logger.log(Level.FINEST,
+                        "Failed to clean up test file (this may be just an aftermath):",
+                        ex);
             }
-        } catch (IOException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
         }
     }
 }

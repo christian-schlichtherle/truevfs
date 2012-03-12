@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.rof;
 
@@ -25,13 +21,12 @@ import org.junit.Test;
  * Performs an integration test for an implementation of {@link ReadOnlyFile}.
  * Some tests use Las Vegas algorithms, so the run time may vary.
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public abstract class ReadOnlyFileTestSuite {
 
-    private static final Logger logger = Logger.getLogger(
-            ReadOnlyFileTestSuite.class.getName());
+    private static final Logger
+            logger = Logger.getLogger(ReadOnlyFileTestSuite.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -68,9 +63,9 @@ public abstract class ReadOnlyFileTestSuite {
             assert DATA.length == temp.length();
             rrof = new DefaultReadOnlyFile(temp);
             trof = newReadOnlyFile(temp);
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             if (!temp.delete())
-                logger.log(Level.WARNING, "{0} (File.delete() failed)", temp);
+                throw new IOException(temp + " (could not delete)", ex);
             throw ex;
         }
         data = DATA.clone();
@@ -98,8 +93,10 @@ public abstract class ReadOnlyFileTestSuite {
                 if (temp.exists() && !temp.delete())
                     throw new IOException(temp + " (could not delete)");
             }
-        } catch (IOException ex) {
-            logger.log(Level.INFO, ex.toString(), ex);
+        } catch (final IOException ex) {
+            logger.log(Level.FINEST,
+                    "Failed to clean up test file (this may be just an aftermath):",
+                    ex);
         }
     }
 
