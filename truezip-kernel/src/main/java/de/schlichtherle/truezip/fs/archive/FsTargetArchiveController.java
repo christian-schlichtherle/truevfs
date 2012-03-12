@@ -310,7 +310,6 @@ extends FsFileSystemArchiveController<E> {
             }
 
             IOException map(IOException ex) {
-                assert false;
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
@@ -358,7 +357,6 @@ extends FsFileSystemArchiveController<E> {
             }
 
             IOException map(IOException ex) {
-                assert false;
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
@@ -523,7 +521,7 @@ extends FsFileSystemArchiveController<E> {
         // We MUST use the driver products because there is a chance that a
         // previous attempt to sync() failed because of an
         // FsNeedsLockRetryException from the parent controller when the input
-        // or output archive has already been closed.
+        // archive has already been closed.
         // Directly accessing the input and output archives via the driver
         // products is safe because the FsResourceController has already shut
         // down all concurrent access by closing the respective resources
