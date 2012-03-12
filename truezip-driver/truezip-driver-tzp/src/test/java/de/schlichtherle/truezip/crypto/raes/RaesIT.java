@@ -41,7 +41,7 @@ public final class RaesIT extends ReadOnlyFileTestSuite {
                         new FileOutputStream(cipherFile),
                         newRaesParameters());
                 Streams.copy(in, out);
-                logger.log(Level.FINE,
+                logger.log(Level.FINEST,
                         "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PKCS#12v1",
                         new Object[]{ plainFile.length(), out.getKeyStrength().getBits() });
                 // Open cipherFile for random access decryption.
@@ -70,7 +70,9 @@ public final class RaesIT extends ReadOnlyFileTestSuite {
                     throw new IOException(cipherFile + " (could not delete)");
             }
         } catch (IOException ex) {
-            logger.log(Level.WARNING, ex.toString(), ex);
+            logger.log(Level.FINEST,
+                    "Failed to clean up test file (this may be just an aftermath):",
+                    ex);
         }
     }
 }
