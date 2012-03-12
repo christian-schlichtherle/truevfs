@@ -27,6 +27,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -61,6 +63,10 @@ import javax.annotation.concurrent.NotThreadSafe;
 public final class FsCacheController
 extends FsLockModelDecoratingController<
         FsController<? extends FsLockModel>> {
+
+    private static final Logger logger = Logger.getLogger(
+            FsCacheController.class.getName(),
+            FsCacheController.class.getName());
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
@@ -261,10 +267,10 @@ extends FsLockModelDecoratingController<
         void flush() throws IOException {
             try {
                 cache.flush();
-            } catch (FsNeedsSyncException alreadyFlushed) {
-                // This may happen if a previous sync() failed because of an
-                // FsControllerException from the parent controller when
-                // close()ing the target archive file.
+            } catch (FsNeedsSyncException alreadyPresent) {
+                logger.log(Level.FINER,
+                        FsNeedsSyncException.class.getSimpleName(),
+                        alreadyPresent);
             }
         }
 
@@ -411,21 +417,35 @@ extends FsLockModelDecoratingController<
             }
 
             void pre() throws IOException {
-                FsCacheController.this.delegate.mknod(
-                        EntryCache.this.name,
-                        FILE,
-                        options,
-                        template);
+                try {
+                    FsCacheController.this.delegate.mknod(
+                            EntryCache.this.name,
+                            FILE,
+                            options,
+                            template);
+                } catch (FsNeedsSyncException alreadyPresent) {
+                    if (options.get(EXCLUSIVE))
+                        throw alreadyPresent;
+                    logger.log(Level.FINER,
+                            FsNeedsSyncException.class.getSimpleName(),
+                            alreadyPresent);
+                }
             }
 
             void post() throws IOException {
-                FsCacheController.this.delegate.mknod(
-                        EntryCache.this.name,
-                        FILE,
-                        options.clear(EXCLUSIVE),
-                        null != template
-                            ? template
-                            : EntryCache.this.cache.getEntry());
+                try {
+                    FsCacheController.this.delegate.mknod(
+                            EntryCache.this.name,
+                            FILE,
+                            options.clear(EXCLUSIVE),
+                            null != template
+                                ? template
+                                : EntryCache.this.cache.getEntry());
+                } catch (FsNeedsSyncException alreadyPresent) {
+                    logger.log(Level.FINER,
+                            FsNeedsSyncException.class.getSimpleName(),
+                            alreadyPresent);
+                }
             }
         } // Output
     } // EntryCache
