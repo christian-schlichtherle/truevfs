@@ -89,7 +89,6 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final Set<Type> getTypes() {
         if (file.isFile())
             return FILE_TYPE_SET;
@@ -98,7 +97,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         else if (file.exists())
             return SPECIAL_TYPE_SET;
         else
-            return Collections.EMPTY_SET;
+            return Collections.emptySet();
     }
 
     @Override
