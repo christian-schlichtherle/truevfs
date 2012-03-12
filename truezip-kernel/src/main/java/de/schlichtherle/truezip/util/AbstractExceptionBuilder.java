@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
@@ -16,10 +12,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Subclasses must implement {@link #update(Exception, Exception)} and may
  * override {@link #post(Exception)}.
  *
- * @param   <C> the type of the cause exception.
- * @param   <X> the type of the assembled exception.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <C> the type of the cause exceptions.
+ * @param  <X> the type of the assembled exceptions.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class AbstractExceptionBuilder< C extends Exception,
@@ -32,8 +27,7 @@ implements ExceptionBuilder<C, X> {
      * This method is called to update the given {@code previous} result of
      * the assembly with the given {@code cause}.
      * 
-     * @param  cause A(nother) non-{@code null} cause exception to add to the
-     *         assembly.
+     * @param  cause A(nother) cause exception to add to the assembly.
      * @param  previous The previous result of the assembly or {@code null} if
      *         this is the first call since the creation of this instance or the
      *         last assembly has been checked out.
@@ -72,6 +66,9 @@ implements ExceptionBuilder<C, X> {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Note that the implementation in the class
+     * {@link AbstractExceptionBuilder} does <em>not</em> throw an exception.
      *
      * @see #update(Exception, Exception)
      */

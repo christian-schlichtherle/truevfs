@@ -179,7 +179,7 @@ public class SequentialIOException extends IOException implements Cloneable {
      *         this instance or has not been initialized with a predecessor
      *         itself.
      */
-    public final synchronized SequentialIOException initPredecessor(
+    public synchronized SequentialIOException initPredecessor(
             @CheckForNull SequentialIOException predecessor) {
         setPredecessor(predecessor);
         predecessor = getPredecessor();

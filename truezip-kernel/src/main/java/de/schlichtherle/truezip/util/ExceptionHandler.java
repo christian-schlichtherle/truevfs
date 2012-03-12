@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.util;
 
@@ -83,10 +79,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * TODO: Consider allowing {@link Throwable} as type parameters.
  * 
- * @param   <C> the type of the cause exception.
- * @param   <X> the type of the thrown exception.
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <C> the type of the cause exceptions.
+ * @param  <X> the type of the thrown exceptions.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public interface ExceptionHandler<C extends Exception, X extends Exception> {
@@ -114,7 +109,7 @@ public interface ExceptionHandler<C extends Exception, X extends Exception> {
      * If the implementation maintains a state, it must be updated
      * so that this instance can be reused to handle more exceptions.
      *
-     * @param  cause the exception to handle - {@code null} is not permitted.
+     * @param  cause the exception to handle.
      * @throws X if the implementation wants the caller to abort its task.
      */
     void warn(C cause) throws X;
