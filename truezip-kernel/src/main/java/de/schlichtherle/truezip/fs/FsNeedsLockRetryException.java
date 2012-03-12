@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
@@ -20,11 +21,17 @@ import javax.annotation.concurrent.Immutable;
 public final class FsNeedsLockRetryException extends FsControllerException {
 
     private static final @Nullable FsNeedsLockRetryException
-            SINGLETON = TRACEABLE ? null : new FsNeedsLockRetryException();
+            SINGLETON = TRACEABLE ? null : new FsNeedsLockRetryException(null);
 
     static FsNeedsLockRetryException get() {
-        return TRACEABLE ? new FsNeedsLockRetryException() : SINGLETON;
+        return get(null);
     }
 
-    private FsNeedsLockRetryException() { }
+    static FsNeedsLockRetryException get(Throwable cause) {
+        return TRACEABLE ? new FsNeedsLockRetryException(cause) : SINGLETON;
+    }
+
+    private FsNeedsLockRetryException(@CheckForNull Throwable cause) {
+        super(cause);
+    }
 }

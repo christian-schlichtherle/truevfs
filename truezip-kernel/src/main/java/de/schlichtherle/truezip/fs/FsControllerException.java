@@ -101,7 +101,6 @@ public abstract class FsControllerException extends IOException {
     FsControllerException(  @CheckForNull String message, 
                             @CheckForNull Throwable cause) {
         super(message, cause);
-        assert !(cause instanceof FsControllerException) : cause;
     }
 
     /**
