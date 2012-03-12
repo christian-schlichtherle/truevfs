@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.crypto.raes;
 
@@ -15,8 +11,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class MockType0RaesParameters implements Type0RaesParameters {
@@ -39,7 +34,7 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
     public char[] getReadPassword(boolean invalid) {
         assertTrue(secondTry || !invalid);
         if (secondTry) {
-            logger.finer("First returned password was wrong, providing the right one now!");
+            logger.finest("First returned password was wrong, providing the right one now!");
             return PASSWD.toCharArray();
         } else {
             secondTry = true;
@@ -52,7 +47,7 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
     @Override
     public KeyStrength getKeyStrength() {
         keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
-        logger.log(Level.FINE, "Using {0} bits cipher key.", keyStrength.getBits());
+        logger.log(Level.FINEST, "Using {0} bits cipher key.", keyStrength.getBits());
         return keyStrength;
     }
 

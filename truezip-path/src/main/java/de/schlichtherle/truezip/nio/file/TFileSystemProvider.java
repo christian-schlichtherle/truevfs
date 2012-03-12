@@ -28,7 +28,7 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import static java.util.logging.Level.CONFIG;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -100,8 +100,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
         synchronized (TFileSystemProvider.class) {
             providers.put(scheme, this);
         }
-        Logger  .getLogger(TFileSystemProvider.class.getName())
-                .log(CONFIG, "Installed TrueZIP file system provider instance.");
+        Logger  .getLogger( TFileSystemProvider.class.getName(),
+                            TFileSystemProvider.class.getName())
+                .log(Level.CONFIG, "installed");
     }
 
     private TFileSystemProvider(final String scheme, final URI root) {
