@@ -100,14 +100,13 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Set<Type> getTypes() {
         try {
             if (null != executeHead())
                 return FILE_TYPE_SET;
         } catch (IOException ex) {
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override

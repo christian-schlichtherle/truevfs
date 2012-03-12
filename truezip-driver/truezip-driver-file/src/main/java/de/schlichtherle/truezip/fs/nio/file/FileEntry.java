@@ -98,7 +98,6 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final Set<Type> getTypes() {
         try {
             final BasicFileAttributes attr = readBasicFileAttributes();
@@ -113,7 +112,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
         }
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 
     @Override
