@@ -27,11 +27,15 @@ public final class FsNeedsSyncException extends FsControllerException {
             ? null
             : new FsNeedsSyncException((String) null, null);
 
-    public static FsNeedsSyncException get(FsEntryName name, @CheckForNull Access intention) {
-        return TRACEABLE ? new FsNeedsSyncException(name, intention) : SINGLETON;
+    public static FsNeedsSyncException get( FsEntryName name,
+                                            @CheckForNull Access intention) {
+        return TRACEABLE
+                ? new FsNeedsSyncException(name, intention)
+                : SINGLETON;
     }
 
-    private FsNeedsSyncException(FsEntryName name, @CheckForNull Access intention) {
+    private FsNeedsSyncException(   FsEntryName name,
+                                    @CheckForNull Access intention) {
         this(name + " (intention: " + intention + ")", null);
     }
 
