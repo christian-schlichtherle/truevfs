@@ -518,14 +518,12 @@ extends FsFileSystemArchiveController<E> {
         if (null == oa)
             return;
         final InputArchive<E> ia = getInputArchive();
-        // We MUST use the driver products because there is a chance that a
-        // previous attempt to sync() failed because of an
-        // FsNeedsLockRetryException from the parent controller when the input
-        // archive has already been closed.
-        // Directly accessing the input and output archives via the driver
-        // products is safe because the FsResourceController has already shut
-        // down all concurrent access by closing the respective resources
-        // (streams, channels etc).
+        // Directly copying data from the input archive to the output archive
+        // via the driver products is safe because the FsResourceController has
+        // already shut down all concurrent access by closing the respective
+        // resources (streams, channels etc).
+        // The desired effect is some performance gain because no locking is
+        // used.
         copy(   getFileSystem(),
                 null != ia ? ia.getDriverProduct() : new DummyInputArchive<E>(),
                 oa.getDriverProduct(),
