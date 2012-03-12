@@ -52,7 +52,7 @@ final class TBIO {
      * @throws IOException if the source path contains the destination path
      *         or an elementary operation fails for any reason.
      */
-    public static void
+    static void
     mv(final File src, final File dst, final TArchiveDetector detector)
     throws IOException {
         if (dst.exists())
@@ -128,7 +128,7 @@ final class TBIO {
      * @throws IOException if the source path contains the destination path
      *         or any I/O failure.
      */
-    public static void
+    static void
     cp_r(   final boolean preserve,
             final File src,
             final File dst,
@@ -202,7 +202,7 @@ final class TBIO {
      * @throws IOException if the source path contains the destination path
      *         or an elementary operation fails for any reason.
      */
-    public static void
+    static void
     cp(final boolean preserve, final File src, final File dst)
     throws IOException {
         checkContains(src, dst);
@@ -228,7 +228,7 @@ final class TBIO {
      * @param  node the file or directory tree to delete recursively.
      * @throws IOException if an elementary operation fails for any reason.
      */
-    public static void rm_r(final File node, final TArchiveDetector detector)
+    static void rm_r(final File node, final TArchiveDetector detector)
     throws IOException {
         if (node.isDirectory()) {
             final String[] members = node.list();
