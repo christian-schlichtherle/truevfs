@@ -57,7 +57,8 @@ final class FsResourceAccountant {
      */
     @GuardedBy("lock")
     private static final ConcurrentMap<Closeable, Account> accounts
-            = new ConcurrentHashMap<Closeable, Account>(INITIAL_CAPACITY);
+            = new ConcurrentHashMap<Closeable, Account>(
+                INITIAL_CAPACITY, 0.75f, INITIAL_CAPACITY);
 
     private final Lock lock;
     private final Condition condition;
