@@ -113,9 +113,9 @@ public interface Entry {
      * Returns the size of the given type for this entry.
      * This method may not be meaningful for non-{@link Type#FILE} entries.
      *
-     * @param type the type of the size to return.
+     * @param  type the type of the size to return.
      * @return The size of the given size type for this entry in bytes,
-     * or {@link #UNKNOWN} if not specified or the type is unsupported.
+     *         or {@link #UNKNOWN} if not specified or the type is unsupported.
      */
     long getSize(Size type);
 
@@ -138,7 +138,7 @@ public interface Entry {
     /**
      * Returns the time of the given access type for this entry.
      *
-     * @param type the type of the access time to return.
+     * @param  type the type of the access time to return.
      * @return The time of the given access type for this entry in
      *         milliseconds since the epoch or {@value #UNKNOWN} if not
      *         specified or the type is unsupported.
