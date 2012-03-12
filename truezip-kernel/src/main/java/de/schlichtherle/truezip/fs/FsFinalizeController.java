@@ -225,6 +225,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 delegate.close();
             } catch (final FsControllerException ex) {
+                assert ex instanceof FsNeedsLockRetryException;
                 // This is a non-local control flow exception.
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
@@ -262,6 +263,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 delegate.close();
             } catch (final FsControllerException ex) {
+                assert ex instanceof FsNeedsLockRetryException;
                 // This is a non-local control flow exception.
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
@@ -299,6 +301,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 delegate.close();
             } catch (final FsControllerException ex) {
+                assert ex instanceof FsNeedsLockRetryException;
                 // This is a non-local control flow exception.
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
@@ -336,6 +339,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 delegate.close();
             } catch (final FsControllerException ex) {
+                assert ex instanceof FsNeedsLockRetryException;
                 // This is a non-local control flow exception.
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
