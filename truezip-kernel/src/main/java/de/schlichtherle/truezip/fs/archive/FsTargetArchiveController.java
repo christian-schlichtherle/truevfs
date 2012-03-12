@@ -123,10 +123,10 @@ extends FsFileSystemArchiveController<E> {
         return inputArchive;
     }
 
-    private void setInputArchive(final @CheckForNull InputArchive<E> inputArchive) {
-        assert null == inputArchive || null == this.inputArchive;
-        this.inputArchive = inputArchive;
-        if (null != inputArchive)
+    private void setInputArchive(final @CheckForNull InputArchive<E> ia) {
+        assert null == ia || null == this.inputArchive;
+        this.inputArchive = ia;
+        if (null != ia)
             setTouched(true);
     }
 
@@ -134,10 +134,10 @@ extends FsFileSystemArchiveController<E> {
         return outputArchive;
     }
 
-    private void setOutputArchive(final @CheckForNull OutputArchive<E> outputArchive) {
-        assert null == outputArchive || null == this.outputArchive;
-        this.outputArchive = outputArchive;
-        if (null != outputArchive)
+    private void setOutputArchive(final @CheckForNull OutputArchive<E> oa) {
+        assert null == oa || null == this.outputArchive;
+        this.outputArchive = oa;
+        if (null != oa)
             setTouched(true);
     }
 
@@ -172,52 +172,63 @@ extends FsFileSystemArchiveController<E> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private void mount0(final boolean autoCreate) throws IOException {
         // HC SUNT DRACONES!
-        FsArchiveFileSystem<E> fileSystem;
+        
+        // Check parent file system entry.
+        final FsEntry pe; // parent entry
         try {
-            // readOnly must be set first because the parent archive controller
-            // could be a FileController and on Windows this property changes
-            // to TRUE once a file is opened for reading!
-            final boolean readOnly = !parent.isWritable(name);
-            final InputSocket<?> socket = driver.getInputSocket(
-                    parent, name, MOUNT_INPUT_OPTIONS);
-            final Entry rootTemplate = socket.getLocalTarget();
-            final InputArchive<E> archive = new InputArchive<E>(
-                    driver.newInputShop(getModel(), socket));
-            setInputArchive(archive);
-            fileSystem = newPopulatedFileSystem(
-                    driver, archive.getDriverProduct(), rootTemplate, readOnly);
-        } catch (FsControllerException nonLocalFlowControl) {
-            assert !(nonLocalFlowControl instanceof FsFalsePositiveException);
+            pe = parent.getEntry(name);
+        } catch (final FsControllerException nonLocalFlowControl) {
+            assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
             throw nonLocalFlowControl;
-        } catch (final IOException ex) {
-            final FsEntry parentEntry;
-            try {
-                parentEntry = parent.getEntry(name);
-            } catch (FsControllerException nonLocalFlowControl) {
-                assert !(nonLocalFlowControl instanceof FsFalsePositiveException);
-                throw nonLocalFlowControl;
-            } catch (final IOException inaccessibleEntry) {
-                throw autoCreate
-                        ? inaccessibleEntry
-                        : new FsFalsePositiveException(inaccessibleEntry);
-            }
-            if (null == parentEntry && autoCreate) {
-                // This may fail if the container file is an RAES encrypted ZIP
-                // file and the user cancels password prompting.
+        } catch (final IOException inaccessibleEntry) {
+            throw autoCreate
+                    ? inaccessibleEntry
+                    : new FsFalsePositiveException(inaccessibleEntry);
+        }
+
+        // Obtain file system by creating or loading it from the parent entry.
+        final FsArchiveFileSystem<E> fs;
+        if (null == pe) {
+            if (autoCreate) {
+                // This may fail e.g. if the container file is an RAES
+                // encrypted ZIP file and the user cancels password prompting.
                 makeOutputArchive();
-                fileSystem = newEmptyFileSystem(driver);
+                fs = newEmptyFileSystem(driver);
             } else {
-                throw null != parentEntry && !parentEntry.isType(SPECIAL)
-                        ? new FsPersistentFalsePositiveException(ex)
-                        : new FsFalsePositiveException(ex);
+                throw new FsFalsePositiveException(
+                        new FsEntryNotFoundException(parent.getModel(),
+                            name, "no such entry"));
+            }
+        } else {
+            try {
+                // readOnly must be set first because the parent archive controller
+                // could be a FileController and on Windows this property changes
+                // to TRUE once a file is opened for reading!
+                final boolean ro = !parent.isWritable(name);
+                final InputSocket<?> is = driver.getInputSocket(
+                        parent, name, MOUNT_INPUT_OPTIONS);
+                final InputArchive<E> ia = new InputArchive<E>(
+                        driver.newInputShop(getModel(), is));
+                fs = newPopulatedFileSystem(
+                        driver, ia.getDriverProduct(), pe, ro);
+                setInputArchive(ia);
+            } catch (final FsControllerException nonLocalFlowControl) {
+                assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
+                throw nonLocalFlowControl;
+            } catch (final IOException ex) {
+                throw pe.isType(SPECIAL)
+                        ? new FsFalsePositiveException(ex)
+                        : new FsPersistentFalsePositiveException(ex);
             }
         }
+
+        // Register file system.
         try {
-            fileSystem.addFsArchiveFileSystemTouchListener(touchListener);
-        } catch (TooManyListenersException ex) {
+            fs.addFsArchiveFileSystemTouchListener(touchListener);
+        } catch (final TooManyListenersException ex) {
             throw new AssertionError(ex);
         }
-        setFileSystem(fileSystem);
+        setFileSystem(fs);
     }
 
     /**
@@ -229,6 +240,8 @@ extends FsFileSystemArchiveController<E> {
      * 
      * @return The output archive.
      */
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     OutputArchive<E> makeOutputArchive() throws IOException {
         OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
@@ -237,11 +250,16 @@ extends FsFileSystemArchiveController<E> {
                 .getOutputOptions()
                 .and(OUTPUT_PREFERENCES_MASK)
                 .set(CACHE);
-        final OutputSocket<?> socket = driver.getOutputSocket(
+        final OutputSocket<?> os = driver.getOutputSocket(
                 parent, name, options, null);
         final InputArchive<E> ia = getInputArchive();
-        oa = new OutputArchive<E>(driver.newOutputShop(
-                getModel(), socket, null == ia ? null : ia.getDriverProduct()));
+        try {
+            oa = new OutputArchive<E>(driver.newOutputShop(
+                    getModel(), os, null == ia ? null : ia.getDriverProduct()));
+        } catch (final FsControllerException nonLocalFlowControl) {
+            assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
+            throw nonLocalFlowControl;
+        }
         setOutputArchive(oa);
         return oa;
     }
@@ -259,8 +277,8 @@ extends FsFileSystemArchiveController<E> {
             public E getLocalTarget() throws IOException {
                 try {
                     return super.getLocalTarget();
-                } catch (InputClosedException discard) {
-                    throw map(discard);
+                } catch (InputClosedException ex) {
+                    throw map(ex);
                 }
             }
 
@@ -268,8 +286,8 @@ extends FsFileSystemArchiveController<E> {
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 try {
                     return super.newReadOnlyFile();
-                } catch (InputClosedException discard) {
-                    throw map(discard);
+                } catch (InputClosedException ex) {
+                    throw map(ex);
                 }
             }
 
@@ -277,8 +295,8 @@ extends FsFileSystemArchiveController<E> {
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 try {
                     return super.newSeekableByteChannel();
-                } catch (InputClosedException discard) {
-                    throw map(discard);
+                } catch (InputClosedException ex) {
+                    throw map(ex);
                 }
             }
 
@@ -286,16 +304,17 @@ extends FsFileSystemArchiveController<E> {
             public InputStream newInputStream() throws IOException {
                 try {
                     return super.newInputStream();
-                } catch (InputClosedException discard) {
-                    throw map(discard);
+                } catch (InputClosedException ex) {
+                    throw map(ex);
                 }
             }
 
-            private IOException map(IOException discard) {
+            IOException map(IOException ex) {
+                assert false;
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
-                return FsNeedsSyncException.get();
+                return FsNeedsSyncException.get(name, ex);
             }
         } // Input
 
@@ -315,8 +334,8 @@ extends FsFileSystemArchiveController<E> {
             public E getLocalTarget() throws IOException {
                 try {
                     return super.getLocalTarget();
-                } catch (OutputClosedException discard) {
-                    throw map(discard);
+                } catch (OutputClosedException ex) {
+                    throw map(ex);
                 }
             }
 
@@ -324,8 +343,8 @@ extends FsFileSystemArchiveController<E> {
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 try {
                     return super.newSeekableByteChannel();
-                } catch (OutputClosedException discard) {
-                    throw map(discard);
+                } catch (OutputClosedException ex) {
+                    throw map(ex);
                 }
             }
 
@@ -333,16 +352,17 @@ extends FsFileSystemArchiveController<E> {
             public OutputStream newOutputStream() throws IOException {
                 try {
                     return super.newOutputStream();
-                } catch (OutputClosedException discard) {
-                    throw map(discard);
+                } catch (OutputClosedException ex) {
+                    throw map(ex);
                 }
             }
 
-            private IOException map(IOException discard) {
+            IOException map(IOException ex) {
+                assert false;
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
-                return FsNeedsSyncException.get();
+                return FsNeedsSyncException.get(entry.getName(), ex);
             }
         } // Output
 
@@ -372,56 +392,67 @@ extends FsFileSystemArchiveController<E> {
             return;
 
         // Check if there exists a file system with the named entry.
-        final FsArchiveFileSystem<E> f;
-        final FsCovariantEntry<E> ce;
-        if (null == (f = getFileSystem()) || null == (ce = f.getEntry(name)))
-            return;
+        final FsCovariantEntry<E> fse; // file system entry
+        {
+            final FsArchiveFileSystem<E> fs;
+            if (null == (fs = getFileSystem()) || null == (fse = fs.getEntry(name)))
+                return;
+        }
 
         Boolean grow = null;
         String aen; // archive entry name
 
         // Check if the entry is already written to the output archive.
-        final OutputArchive<E> oa = getOutputArchive();
         final E oae; // output archive entry
-        if (null != oa) {
-            aen = ce.getEntry().getName();
-            oae = oa.getEntry(aen);
-            if (null != oae) {
-                grow = getContext().get(GROW);
-                if (!grow
-                        || null == intention && !driver.getRedundantMetaDataSupport()
-                        || WRITE == intention && !driver.getRedundantContentSupport())
-                    throw FsNeedsSyncException.get();
+        {
+            final OutputArchive<E> oa = getOutputArchive();
+            if (null != oa) {
+                aen = fse.getEntry().getName();
+                oae = oa.getEntry(aen);
+                if (null != oae) {
+                    grow = getContext().get(GROW);
+                    if (!grow)
+                        throw FsNeedsSyncException.get(name, intention);
+                    if (null == intention && !driver.getRedundantMetaDataSupport())
+                        throw FsNeedsSyncException.get(name, null);
+                    if (WRITE == intention && !driver.getRedundantContentSupport())
+                        throw FsNeedsSyncException.get(name, WRITE);
+                }
+            } else {
+                aen = null;
+                oae = null;
             }
-        } else {
-            aen = null;
-            oae = null;
         }
 
         // Check if the entry is present in the input archive.
-        final InputArchive<E> ia = getInputArchive();
         final E iae; // input archive entry
-        if (null != ia) {
-            if (null == aen)
-                aen = ce.getEntry().getName();
-            iae = ia.getEntry(aen);
-            if (null != iae) {
-                if (null == grow)
-                    grow = getContext().get(GROW);
-                if (!grow) {
-                    assert null == oae;
-                    return;
+        {
+            final InputArchive<E> ia = getInputArchive();
+            if (null != ia) {
+                if (null == aen)
+                    aen = fse.getEntry().getName();
+                iae = ia.getEntry(aen);
+                if (null != iae) {
+                    if (null == grow)
+                        grow = getContext().get(GROW);
+                    if (!grow) {
+                        assert null == oae;
+                        return;
+                    }
                 }
+            } else {
+                iae = null;
             }
-        } else {
-            iae = null;
         }
 
-        // Check for reading an entry which either doesn't yet exist in the
-        // input archive or has been obsoleted by a new version in the output
-        // archive.
-        if (READ == intention && (null == iae || null != oae && iae != oae))
-            throw FsNeedsSyncException.get();
+        // Check for reading an entry which either only exists in the file
+        // system or has already been written to the output archive.
+        if (READ == intention) {
+            if (null == iae)
+                throw FsNeedsSyncException.get(name, READ);
+            if (null != oae && iae != oae)
+                throw FsNeedsSyncException.get(name, READ);
+        }
     }
 
     @Override
@@ -441,11 +472,8 @@ extends FsFileSystemArchiveController<E> {
     sync0(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        try {
-            copy(options, handler);
-        } finally {
-            commit(options, handler);
-        }
+        copy(options, handler);
+        commit(options, handler);
     }
 
     /**
@@ -492,6 +520,14 @@ extends FsFileSystemArchiveController<E> {
         if (null == oa)
             return;
         final InputArchive<E> ia = getInputArchive();
+        // We MUST use the driver products because there is a chance that a
+        // previous attempt to sync() failed because of an
+        // FsNeedsLockRetryException from the parent controller when the input
+        // or output archive has already been closed.
+        // Directly accessing the input and output archives via the driver
+        // products is safe because the FsResourceController has already shut
+        // down all concurrent access by closing the respective resources
+        // (streams, channels etc).
         copy(   getFileSystem(),
                 null != ia ? ia.getDriverProduct() : new DummyInputArchive<E>(),
                 oa.getDriverProduct(),
@@ -499,24 +535,24 @@ extends FsFileSystemArchiveController<E> {
     }
 
     private static <E extends FsArchiveEntry, X extends IOException> void
-    copy(   final FsArchiveFileSystem<E> fileSystem,
-            final InputService<E> input,
-            final OutputService<E> output,
+    copy(   final FsArchiveFileSystem<E> fs,
+            final InputService<E> is,
+            final OutputService<E> os,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        for (final FsCovariantEntry<E> ce : fileSystem) {
-            for (final E ae : ce.getEntries()) {
+        for (final FsCovariantEntry<E> fse : fs) {
+            for (final E ae : fse.getEntries()) {
                 final String aen = ae.getName();
-                if (null != output.getEntry(aen))
+                if (null != os.getEntry(aen))
                     continue; // we have already written this entry
                 try {
                     if (DIRECTORY == ae.getType()) {
-                        if (!ce.isRoot()) // never write the root directory!
+                        if (!fse.isRoot()) // never write the root directory!
                             if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
-                                output.getOutputSocket(ae).newOutputStream().close();
-                    } else if (null != input.getEntry(aen)) {
-                        IOSocket.copy(  input.getInputSocket(aen),
-                                        output.getOutputSocket(ae));
+                                os.getOutputSocket(ae).newOutputStream().close();
+                    } else if (null != is.getEntry(aen)) {
+                        IOSocket.copy(  is.getInputSocket(aen),
+                                        os.getOutputSocket(ae));
                     } else {
                         // The file system entry is a newly created
                         // non-directory entry which hasn't received any
@@ -525,7 +561,7 @@ extends FsFileSystemArchiveController<E> {
                         for (final Size size : ALL_SIZE_SET)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
-                        output.getOutputSocket(ae).newOutputStream().close();
+                        os.getOutputSocket(ae).newOutputStream().close();
                     }
                 } catch (final IOException ex) {
                     handler.warn(ex);
@@ -557,27 +593,30 @@ extends FsFileSystemArchiveController<E> {
     commit( final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
+        // HC SUNT DRACONES!
         final InputArchive<E> ia = getInputArchive();
         if (null != ia) {
             try {
                 ia.close();
-                setInputArchive(null);
-            } catch (final FsControllerException ex) {
-                throw ex;
+            } catch (final FsControllerException nonLocalFlowControl) {
+                assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
+                throw nonLocalFlowControl;
             } catch (final IOException ex) {
                 handler.warn(new FsSyncWarningException(getModel(), ex));
             }
+            setInputArchive(null);
         }
         final OutputArchive<E> oa = getOutputArchive();
         if (null != oa) {
             try {
                 oa.close();
-                setOutputArchive(null);
-            } catch (final FsControllerException ex) {
-                throw ex;
+            } catch (final FsControllerException nonLocalFlowControl) {
+                assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
+                throw nonLocalFlowControl;
             } catch (final IOException ex) {
                 throw handler.fail(new FsSyncException(getModel(), ex));
             }
+            setOutputArchive(null);
         }
         setFileSystem(null);
         // TODO: Remove a condition and clear a flag in the model
@@ -654,10 +693,7 @@ extends FsFileSystemArchiveController<E> {
         }
     } // OutputArchive
 
-    /**
-     * An archive file system listener which makes the output before it
-     * touches the file system model.
-     */
+    /** An archive file system listener which makes the output archive. */
     private final class TouchListener
     implements FsArchiveFileSystemTouchListener<E> {
         @Override
