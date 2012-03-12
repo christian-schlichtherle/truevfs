@@ -16,7 +16,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * {@link SequentialIOException#sortPriority() priority}.
  *
  * @param  <C> the type of the cause exceptions.
- * @param  <X> the type of the assembled exception.
+ * @param  <X> the type of the assembled exceptions.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
