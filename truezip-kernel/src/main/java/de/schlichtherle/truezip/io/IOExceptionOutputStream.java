@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.io;
 
@@ -17,12 +13,11 @@ import javax.annotation.WillCloseWhenClosed;
 
 /**
  * A decorating output stream which saves the last {@link IOException}
- * in a {@link #exception protected field} for later use.
+ * in a {@linkplain #exception protected field} for later use.
  *
- * @since   TrueZIP 7.3.2
- * @author  Christian Schlichtherle
+ * @since  TrueZIP 7.3.2
+ * @author Christian Schlichtherle
  * @deprecated This class will be removed in TrueZIP 8.
- * @version $Id$
  */
 public class IOExceptionOutputStream extends DecoratingOutputStream {
 
