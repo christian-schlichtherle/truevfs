@@ -177,13 +177,14 @@ extends FsFileSystemArchiveController<E> {
         final FsEntry pe; // parent entry
         try {
             pe = parent.getEntry(name);
-        } catch (final FsControllerException nonLocalFlowControl) {
-            assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
-            throw nonLocalFlowControl;
+        } catch (final FsControllerException ex) {
+            assert ex instanceof FsNeedsLockRetryException;
+            throw ex;
         } catch (final IOException inaccessibleEntry) {
             throw autoCreate
                     ? inaccessibleEntry
-                    : new FsFalsePositiveException(inaccessibleEntry);
+                    : new FsFalsePositiveException(getModel(),
+                        inaccessibleEntry);
         }
 
         // Obtain file system by creating or loading it from the parent entry.
@@ -195,7 +196,7 @@ extends FsFileSystemArchiveController<E> {
                 makeOutputArchive();
                 fs = newEmptyFileSystem(driver);
             } else {
-                throw new FsFalsePositiveException(
+                throw new FsFalsePositiveException(getModel(),
                         new FsEntryNotFoundException(parent.getModel(),
                             name, "no such entry"));
             }
@@ -212,13 +213,13 @@ extends FsFileSystemArchiveController<E> {
                 fs = newPopulatedFileSystem(
                         driver, ia.getDriverProduct(), pe, ro);
                 setInputArchive(ia);
-            } catch (final FsControllerException nonLocalFlowControl) {
-                assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
-                throw nonLocalFlowControl;
+            } catch (final FsControllerException ex) {
+                assert ex instanceof FsNeedsLockRetryException;
+                throw ex;
             } catch (final IOException ex) {
                 throw pe.isType(SPECIAL)
-                        ? new FsFalsePositiveException(ex)
-                        : new FsPersistentFalsePositiveException(ex);
+                        ? new FsFalsePositiveException(getModel(), ex)
+                        : new FsPersistentFalsePositiveException(getModel(), ex);
             }
         }
 
@@ -256,9 +257,9 @@ extends FsFileSystemArchiveController<E> {
         try {
             oa = new OutputArchive<E>(driver.newOutputShop(
                     getModel(), os, null == ia ? null : ia.getDriverProduct()));
-        } catch (final FsControllerException nonLocalFlowControl) {
-            assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
-            throw nonLocalFlowControl;
+        } catch (final FsControllerException ex) {
+            assert ex instanceof FsNeedsLockRetryException;
+            throw ex;
         }
         setOutputArchive(oa);
         return oa;
@@ -266,7 +267,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     InputSocket<? extends E> getInputSocket(final String name) {
-        class Input extends ProxyInputSocket<E> {
+        class Input extends ClutchInputSocket<E> {
             @Override
             protected InputSocket<? extends E> getLazyDelegate()
             throws IOException {
@@ -313,7 +314,7 @@ extends FsFileSystemArchiveController<E> {
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
-                return FsNeedsSyncException.get(name, ex);
+                return FsNeedsSyncException.get(getModel(), name, ex);
             }
         } // Input
 
@@ -322,7 +323,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     OutputSocket<? extends E> getOutputSocket(final E entry) {
-        class Output extends ProxyOutputSocket<E> {
+        class Output extends ClutchOutputSocket<E> {
             @Override
             protected OutputSocket<? extends E> getLazyDelegate()
             throws IOException {
@@ -360,7 +361,7 @@ extends FsFileSystemArchiveController<E> {
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
-                return FsNeedsSyncException.get(entry.getName(), ex);
+                return FsNeedsSyncException.get(getModel(), entry.getName(), ex);
             }
         } // Output
 
@@ -410,11 +411,11 @@ extends FsFileSystemArchiveController<E> {
                 if (null != oae) {
                     grow = getContext().get(GROW);
                     if (!grow)
-                        throw FsNeedsSyncException.get(name, intention);
+                        throw FsNeedsSyncException.get(getModel(), name, intention);
                     if (null == intention && !driver.getRedundantMetaDataSupport())
-                        throw FsNeedsSyncException.get(name, null);
+                        throw FsNeedsSyncException.get(getModel(), name, null);
                     if (WRITE == intention && !driver.getRedundantContentSupport())
-                        throw FsNeedsSyncException.get(name, WRITE);
+                        throw FsNeedsSyncException.get(getModel(), name, WRITE);
                 }
             } else {
                 aen = null;
@@ -447,9 +448,9 @@ extends FsFileSystemArchiveController<E> {
         // system or has already been written to the output archive.
         if (READ == intention) {
             if (null == iae)
-                throw FsNeedsSyncException.get(name, READ);
+                throw FsNeedsSyncException.get(getModel(), name, READ);
             if (null != oae && iae != oae)
-                throw FsNeedsSyncException.get(name, READ);
+                throw FsNeedsSyncException.get(getModel(), name, READ);
         }
     }
 
@@ -457,7 +458,7 @@ extends FsFileSystemArchiveController<E> {
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    throws FsControllerException, X {
         assert isWriteLockedByCurrentThread();
         try {
             sync0(options, handler);
@@ -469,7 +470,7 @@ extends FsFileSystemArchiveController<E> {
     private <X extends IOException> void
     sync0(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    throws FsControllerException, X {
         copy(options, handler);
         commit(options, handler);
     }
@@ -518,15 +519,17 @@ extends FsFileSystemArchiveController<E> {
         if (null == oa)
             return;
         final InputArchive<E> ia = getInputArchive();
-        // Directly copying data from the input archive to the output archive
-        // via the driver products is safe because the FsResourceController has
-        // already shut down all concurrent access by closing the respective
-        // resources (streams, channels etc).
-        // The desired effect is some performance gain because no locking is
-        // used.
+        // Skip Lock(In|Out)putShop for better performance.
+        // This is safe because the FsResourceController has already shut down
+        // all concurrent access by closing the respective resources (streams,
+        // channels etc).
+        // The Disconnecting(In|Out)putShop should not get skipped however:
+        // If these actually throw an (In|Out)putClosedException, then this is
+        // a sign of a bug.
         copy(   getFileSystem(),
-                null != ia ? ia.getDriverProduct() : new DummyInputArchive<E>(),
-                oa.getDriverProduct(),
+                null != ia  ? ia.getDisconnectingInputShop()
+                            : new DummyInputArchive<E>(),
+                oa.getDisconnectingOutputShop(),
                 new Filter());
     }
 
@@ -660,6 +663,10 @@ extends FsFileSystemArchiveController<E> {
             this.driverProduct = input;
         }
 
+        DisconnectingInputShop<E> getDisconnectingInputShop() {
+            return (DisconnectingInputShop<E>) delegate;
+        }
+
         /**
          * Publishes the product of the archive driver this input archive is
          * decorating.
@@ -678,6 +685,10 @@ extends FsFileSystemArchiveController<E> {
         OutputArchive(final @WillCloseWhenClosed OutputShop<E> output) {
             super(new DisconnectingOutputShop<E>(output));
             this.driverProduct = output;
+        }
+
+        DisconnectingOutputShop<E> getDisconnectingOutputShop() {
+            return (DisconnectingOutputShop<E>) delegate;
         }
 
         /**

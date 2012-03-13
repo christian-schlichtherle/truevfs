@@ -116,7 +116,7 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
         public void run() {
             try {
                 manager.sync(FsSyncOptions.UMOUNT);
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 // Logging doesn't work in a shutdown hook!
                 ex.printStackTrace();
             }

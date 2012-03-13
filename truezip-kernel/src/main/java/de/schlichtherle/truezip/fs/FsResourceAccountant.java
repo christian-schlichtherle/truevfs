@@ -161,6 +161,7 @@ final class FsResourceAccountant {
             }
             return totalResources();
         } finally {
+            condition.signalAll(); // FIXME: Should not be required at all.
             lock.unlock();
         }
     }

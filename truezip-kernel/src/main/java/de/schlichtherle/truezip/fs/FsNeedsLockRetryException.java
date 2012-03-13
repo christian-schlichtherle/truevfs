@@ -21,17 +21,16 @@ import javax.annotation.concurrent.Immutable;
 public final class FsNeedsLockRetryException extends FsControllerException {
 
     private static final @Nullable FsNeedsLockRetryException
-            SINGLETON = TRACEABLE ? null : new FsNeedsLockRetryException(null);
+            SINGLETON = TRACEABLE ? null : new FsNeedsLockRetryException();
 
-    static FsNeedsLockRetryException get() {
-        return get(null);
+    static FsNeedsLockRetryException get(FsModel model) {
+        return TRACEABLE    ? new FsNeedsLockRetryException(model, null)
+                            : SINGLETON;
     }
 
-    static FsNeedsLockRetryException get(Throwable cause) {
-        return TRACEABLE ? new FsNeedsLockRetryException(cause) : SINGLETON;
-    }
+    private FsNeedsLockRetryException() { }
 
-    private FsNeedsLockRetryException(@CheckForNull Throwable cause) {
-        super(cause);
+    private FsNeedsLockRetryException(FsModel model, @CheckForNull Throwable cause) {
+        super(model, null, cause);
     }
 }

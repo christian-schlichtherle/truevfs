@@ -173,10 +173,19 @@ extends FsLockModelDecoratingController<
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        preSync(options, handler);
-        // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in the model
-        // instead.
-        delegate.sync(options/*.clear(CLEAR_CACHE)*/, handler);
+        for (boolean preSync = false; !preSync; ) {
+            try {
+                preSync(options, handler);
+                preSync = true;
+            } catch (final FsNeedsSyncException alreadyPresent) {
+                logger.log(Level.FINE,
+                        FsNeedsSyncException.class.getSimpleName(),
+                        alreadyPresent);
+            }
+            // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in
+            // the model instead.
+            delegate.sync(options/*.clear(CLEAR_CACHE)*/, handler);
+        }
     }
 
     private <X extends IOException> void
@@ -187,18 +196,19 @@ extends FsLockModelDecoratingController<
         if (0 >= caches.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
-        final boolean clear = !flush || options.get(CLEAR_CACHE);
+        boolean clear = !flush || options.get(CLEAR_CACHE);
         assert flush || clear;
-        final Iterator<EntryCache> i = caches.values().iterator();
-        while (i.hasNext()) {
+        for (   final Iterator<EntryCache> i = caches.values().iterator();
+                i.hasNext(); ) {
             final EntryCache cache = i.next();
             try {
                 if (flush) {
                     try {
                         cache.flush();
-                    } catch (FsControllerException ex) {
+                    } catch (final FsControllerException ex) {
+                        clear = false;
                         throw ex;
-                    } catch (IOException ex) {
+                    } catch (final IOException ex) {
                         throw handler.fail(new FsSyncException(getModel(), ex));
                     }
                 }
@@ -207,9 +217,10 @@ extends FsLockModelDecoratingController<
                     i.remove();
                     try {
                         cache.clear();
-                    } catch (FsControllerException ex) {
+                    } catch (final FsControllerException ex) {
+                        assert false;
                         throw ex;
-                    } catch (IOException ex) {
+                    } catch (final IOException ex) {
                         handler.warn(new FsSyncWarningException(getModel(), ex));
                     }
                 }
@@ -265,13 +276,7 @@ extends FsLockModelDecoratingController<
         }
 
         void flush() throws IOException {
-            try {
-                cache.flush();
-            } catch (FsNeedsSyncException alreadyPresent) {
-                logger.log(Level.FINER,
-                        FsNeedsSyncException.class.getSimpleName(),
-                        alreadyPresent);
-            }
+            cache.flush();
         }
 
         void clear() throws IOException {
@@ -282,7 +287,7 @@ extends FsLockModelDecoratingController<
          * This class needs the lazy initialization and exception handling
          * provided by its super class.
          */
-        final class Input extends ProxyInputSocket<Entry> {
+        final class Input extends ClutchInputSocket<Entry> {
             final BitField<FsInputOption> options;
 
             Input(final BitField<FsInputOption> options) {
@@ -369,7 +374,7 @@ extends FsLockModelDecoratingController<
          * provided by its super class.
          */
         @Immutable
-        class Output extends ProxyOutputSocket<Entry> {
+        class Output extends ClutchOutputSocket<Entry> {
             final BitField<FsOutputOption> options;
             final @CheckForNull Entry template;
 
@@ -417,22 +422,25 @@ extends FsLockModelDecoratingController<
             }
 
             void pre() throws IOException {
+                // HC SUNT DRACONES!
                 try {
                     FsCacheController.this.delegate.mknod(
                             EntryCache.this.name,
                             FILE,
                             options,
                             template);
-                } catch (FsNeedsSyncException alreadyPresent) {
-                    if (options.get(EXCLUSIVE))
-                        throw alreadyPresent;
-                    logger.log(Level.FINER,
+                } catch (final FsNeedsSyncException alreadyPresent) {
+                    final boolean exclusive = options.get(EXCLUSIVE);
+                    logger.log(exclusive ? Level.FINER : Level.FINEST,
                             FsNeedsSyncException.class.getSimpleName(),
                             alreadyPresent);
+                    if (exclusive)
+                        throw alreadyPresent;
                 }
             }
 
             void post() throws IOException {
+                // HC SUNT DRACONES!
                 try {
                     FsCacheController.this.delegate.mknod(
                             EntryCache.this.name,
@@ -441,10 +449,11 @@ extends FsLockModelDecoratingController<
                             null != template
                                 ? template
                                 : EntryCache.this.cache.getEntry());
-                } catch (FsNeedsSyncException alreadyPresent) {
+                } catch (final FsNeedsSyncException alreadyPresent) {
                     logger.log(Level.FINER,
                             FsNeedsSyncException.class.getSimpleName(),
                             alreadyPresent);
+                    throw alreadyPresent;
                 }
             }
         } // Output

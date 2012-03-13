@@ -23,28 +23,31 @@ import javax.annotation.concurrent.Immutable;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 public final class FsNeedsSyncException extends FsControllerException {
 
-    private static final @Nullable FsNeedsSyncException SINGLETON = TRACEABLE
-            ? null
-            : new FsNeedsSyncException((String) null, null);
+    private static final @Nullable FsNeedsSyncException
+            SINGLETON = TRACEABLE ? null : new FsNeedsSyncException();
 
-    public static FsNeedsSyncException get( FsEntryName name,
-                                            @CheckForNull Access intention) {
-        return TRACEABLE
-                ? new FsNeedsSyncException(name, intention)
-                : SINGLETON;
+    public static FsNeedsSyncException get( final FsModel model,
+                                            final FsEntryName name,
+                                            final @CheckForNull Access access) {
+        return TRACEABLE    ? new FsNeedsSyncException(model,
+                                (null == access ? "touch" : access.toString())
+                                    + ' ' + name,
+                                null)
+                            : SINGLETON;
     }
 
-    private FsNeedsSyncException(   FsEntryName name,
-                                    @CheckForNull Access intention) {
-        this(name + " (intention: " + intention + ")", null);
+    public static FsNeedsSyncException get( final FsModel model,
+                                            final String name,
+                                            final Throwable cause) {
+        return TRACEABLE    ? new FsNeedsSyncException(model, name, cause)
+                            : SINGLETON;
     }
 
-    public static FsNeedsSyncException get(String name, Throwable cause) {
-        return TRACEABLE ? new FsNeedsSyncException(name, cause) : SINGLETON;
-    }
+    private FsNeedsSyncException() { }
 
-    private FsNeedsSyncException(   @CheckForNull String message,
-                                    @CheckForNull Throwable cause) {
-        super(message, cause);
+    private FsNeedsSyncException(   final FsModel model,
+                                    final String message,
+                                    final @CheckForNull Throwable cause) {
+        super(model, message, cause);
     }
 }

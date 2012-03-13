@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
-import de.schlichtherle.truezip.util.Throwables;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -62,14 +61,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     void sync(final FsNeedsSyncException trigger) throws IOException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        final FsSyncWarningException
+                fuse = new FsSyncWarningException(getModel(), trigger);
         try {
-            builder.warn(trigger);                              // charge fuse
+            builder.warn(fuse);                                 // charge fuse
             delegate.sync(SYNC, builder);                       // charge load
             builder.check();                                    // pull trigger
             throw new AssertionError("Expected an instance of the " + FsSyncException.class);
-        } catch (final FsSyncException ex) {
-            if (!Throwables.contains(ex.getCause(), trigger))   // check debris
+        } catch (final FsSyncWarningException ex) {
+            // Check debris.
+            if (ex != fuse) {
+                assert !(ex.getCause() instanceof FsControllerException) : ex.getCause();
                 throw ex;
+            }
         }
     }
 

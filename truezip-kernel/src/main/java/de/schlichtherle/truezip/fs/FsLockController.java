@@ -143,12 +143,12 @@ extends FsLockModelDecoratingController<
      * @throws IOException As thrown by the operation.
      * @throws FsNeedsLockRetryException See above.
      */
-    private static <T> T locked(final IOOperation<T> operation, final Lock lock)
+    private <T> T locked(final IOOperation<T> operation, final Lock lock)
     throws IOException {
         final ThreadUtil thread = threadUtil.get();
         if (thread.locking) {
             if (!lock.tryLock())
-                throw FsNeedsLockRetryException.get();
+                throw FsNeedsLockRetryException.get(getModel());
             try {
                 return operation.call();
             } finally {

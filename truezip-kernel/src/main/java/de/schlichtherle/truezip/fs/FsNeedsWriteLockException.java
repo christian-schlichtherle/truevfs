@@ -21,9 +21,13 @@ final class FsNeedsWriteLockException extends FsControllerException {
     private static final @Nullable FsNeedsWriteLockException
             SINGLETON = TRACEABLE ? null : new FsNeedsWriteLockException();
 
-    static FsNeedsWriteLockException get() {
-        return TRACEABLE ? new FsNeedsWriteLockException() : SINGLETON;
+    static FsNeedsWriteLockException get(FsModel model) {
+        return TRACEABLE ? new FsNeedsWriteLockException(model) : SINGLETON;
     }
 
     private FsNeedsWriteLockException() { }
+
+    private FsNeedsWriteLockException(FsModel model) {
+        super(model, null, null);
+    }
 }
