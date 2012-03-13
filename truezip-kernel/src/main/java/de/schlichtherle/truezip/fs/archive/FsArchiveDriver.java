@@ -152,20 +152,15 @@ extends FsDriver {
                 ? (FsLockModel) model
                 : new FsLockModel(model);
         // HC SUNT DRACONES!
-        // FIXME: The chain of clutch controllers is insane!
-        return  new FsLockController(
-                    new FsClutchController<FsLockModel>(
-                        new FsSyncController<FsLockModel>(
-                            new FsClutchController<FsLockModel>(
-                                new FsUnlinkController(
-                                    new FsCacheController(
-                                        new FsClutchController<FsLockModel>(
-                                            new FsResourceController(
-                                                new FsClutchController<FsLockModel>(
-                                                    new FsContextController(
-                                                        new FsTargetArchiveController<E>(
-                                                            lockModel, parent, this))))),
-                                        getPool()))))));
+        return  new FsSyncController<FsLockModel>(
+                    new FsLockController(
+                        new FsUnlinkController(
+                            new FsCacheController(
+                                new FsResourceController(
+                                    new FsContextController(
+                                        new FsTargetArchiveController<E>(
+                                            lockModel, parent, this))),
+                                getPool()))));
     }
 
     /**
