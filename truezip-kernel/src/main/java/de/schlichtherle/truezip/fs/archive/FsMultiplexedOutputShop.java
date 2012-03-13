@@ -174,18 +174,17 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             return;
 
         final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
-                = new SequentialIOExceptionBuilder<IOException, SequentialIOException>(
-                    IOException.class, SequentialIOException.class);
+                = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
         final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
         while (i.hasNext()) {
             final BufferedEntryOutputStream out = i.next();
             boolean remove = true;
             try {
                 remove = out.store(false);
-            } catch (InputException ex) {
-                builder.warn(ex); // let's continue anyway...
-            } catch (IOException ex) {
-                throw builder.fail(ex); // something's wrong writing this MultiplexedOutputStream!
+            } catch (final InputException ex) {
+                builder.warn(ex);
+            } catch (final IOException ex) {
+                throw builder.fail(ex);
             } finally {
                 if (remove)
                     i.remove();
