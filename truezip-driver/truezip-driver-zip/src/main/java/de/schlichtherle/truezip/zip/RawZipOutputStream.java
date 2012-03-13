@@ -694,7 +694,6 @@ implements Iterable<E> {
     public void close() throws IOException {
         finish();
         this.delegate.close();
-        this.entries.clear();
     }
 
     /** Adjusts the number of written bytes in the offset for appending mode. */
