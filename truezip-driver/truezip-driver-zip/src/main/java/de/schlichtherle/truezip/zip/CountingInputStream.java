@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
@@ -17,10 +13,9 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * A decorating input stream which counts the number of bytes read.
+ * A decorating input stream which counts the number of bytes read or skipped!
  *
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class CountingInputStream extends DecoratingInputStream {
@@ -43,14 +38,16 @@ final class CountingInputStream extends DecoratingInputStream {
     public int read(final byte[] b, final int off, final int len)
     throws IOException {
         final int read = delegate.read(b, off, len);
-        this.bytesRead += (read >= 0) ? read : 0;
+        if (read > 0)
+            this.bytesRead += read;
         return read;
     }
 
     @Override
     public int read() throws IOException {
         final int read = delegate.read();
-        this.bytesRead += -1 != read ? 1 : 0;
+        if (read != -1)
+            this.bytesRead++;
         return read;
     }
 
@@ -63,9 +60,5 @@ final class CountingInputStream extends DecoratingInputStream {
 
     public long getBytesRead() {
         return this.bytesRead;
-    }
-
-    public void resetBytesRead() {
-        this.bytesRead = 0;
     }
 }
