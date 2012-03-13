@@ -33,7 +33,17 @@ extends AbstractExceptionBuilder<C, X> {
      */
     public static SequentialIOExceptionBuilder<Exception, SequentialIOException>
     create() {
-        return new SequentialIOExceptionBuilder<Exception, SequentialIOException>(Exception.class, SequentialIOException.class);
+        return create(Exception.class, SequentialIOException.class);
+    }
+
+    public static <C extends Exception> SequentialIOExceptionBuilder<C, SequentialIOException>
+    create(Class<C> clazz) {
+        return create(clazz, SequentialIOException.class);
+    }
+
+    public static <C extends Exception, X extends SequentialIOException> SequentialIOExceptionBuilder<C, X>
+    create(Class<C> cause, Class<X> assembly) {
+        return new SequentialIOExceptionBuilder<C, X>(cause, assembly);
     }
 
     public SequentialIOExceptionBuilder(final Class<C> c, final Class<X> x) {
