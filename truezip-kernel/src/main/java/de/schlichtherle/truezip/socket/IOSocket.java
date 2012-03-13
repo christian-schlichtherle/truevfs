@@ -68,6 +68,7 @@ public abstract class IOSocket<LT, PT> {
      * @return The peer target for I/O operations.
      * @throws IOException On any I/O failure. 
      */
+    // TODO: Consider renaming to getRemoteTarget() in TrueZIP 8.
     public abstract @CheckForNull PT getPeerTarget() throws IOException;
 
     /**
