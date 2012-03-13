@@ -375,18 +375,18 @@ extends FsFileSystemArchiveController<E> {
     }
 
     @Override
-    void checkAccess(   final FsEntryName name,
+    void checkSync(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsNeedsSyncException {
         try {
-            checkAccess0(name, intention);
+            checkSync0(name, intention);
         } finally {
             assert invariants();
         }
     }
 
-    void checkAccess0(  final FsEntryName name,
-                        final @CheckForNull Access intention)
+    void checkSync0(final FsEntryName name,
+                    final @CheckForNull Access intention)
     throws FsNeedsSyncException {
         // HC SUNT DRACONES!
 
