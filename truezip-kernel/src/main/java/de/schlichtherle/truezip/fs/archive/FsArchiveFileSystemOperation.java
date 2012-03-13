@@ -12,11 +12,11 @@ import de.schlichtherle.truezip.util.Link;
 
 /**
  * Represents an operation on a chain of one or more archive entries.
- * The operation is run by its {@link #run} method and the head of the
+ * The operation is commit by its {@link #commit} method and the head of the
  * chain can be obtained by its {@link #getTarget} method.
  * <p>
  * Note that the state of the archive file system will not change until
- * the {@link #run} method is called!
+ * the {@link #commit} method is called!
  * <p>
  * Implementations do <em>not</em> need to be thread-safe.
  *
@@ -29,5 +29,5 @@ interface FsArchiveFileSystemOperation<E extends FsArchiveEntry>
 extends Link<FsCovariantEntry<E>> {
 
     /** Executes this archive file system operation. */
-    void run() throws FsArchiveFileSystemException;
+    void commit() throws FsArchiveFileSystemException;
 }

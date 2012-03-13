@@ -373,7 +373,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * this archive file system.
      * <p>
      * To commit the transaction, you need to call
-     * {@link FsArchiveFileSystemOperation#run} on the returned object, which
+     * {@link FsArchiveFileSystemOperation#commit} on the returned object, which
      * will mark this archive file system as touched and set the last
      * modification time of the created and linked archive file system entries
      * to the system's current time at the moment of the call to this method.
@@ -408,7 +408,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @return A new archive file system operation on a chain of one or more
      *         archive file system entries for the given path name which will
      *         be linked into this archive file system upon a call to its
-     *         {@link FsArchiveFileSystemOperation#run} method.
+     *         {@link FsArchiveFileSystemOperation#commit} method.
      */
     FsArchiveFileSystemOperation<E> mknod(
             final FsEntryName name,
@@ -442,7 +442,7 @@ implements Iterable<FsCovariantEntry<E>> {
     /**
      * TODO: This implementation yields a potential issue: The state of the
      * file system may be altered between the construction of an instance and
-     * the call to the {@link #run} method, which may render the operation
+     * the call to the {@link #commit} method, which may render the operation
      * illegal and corrupt the file system.
      * As long as only the ArchiveControllers in the package
      * de.schlichtherle.truezip.fs.archive are used, this should not
@@ -506,7 +506,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
 
         @Override
-        public void run() throws FsArchiveFileSystemException {
+        public void commit() throws FsArchiveFileSystemException {
             assert 2 <= links.length;
 
             touch();

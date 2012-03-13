@@ -160,7 +160,7 @@ extends FsLockModelController {
                                     Map<Access, Long> times,
                                     BitField<FsOutputOption> options)
     throws IOException {
-        checkAccess(name, null);
+        checkSync(name, null);
         return autoMount().setTime(name, times);
     }
 
@@ -170,7 +170,7 @@ extends FsLockModelController {
                                     long value,
                                     BitField<FsOutputOption> options)
     throws IOException {
-        checkAccess(name, null);
+        checkSync(name, null);
         return autoMount().setTime(name, types, value);
     }
 
@@ -190,11 +190,8 @@ extends FsLockModelController {
         }
 
         FsArchiveFileSystem<E> fileSystem() throws IOException {
-            // HC SUNT DRACONES!
             getPeerTarget(); // may sync() if in same target archive file!
-            checkAccess(name, READ);
-            // Start creating or overwriting the archive entry.
-            // This will fail if the entry already exists as a directory.
+            checkSync(name, READ);
             return autoMount();
         }
 
@@ -244,7 +241,7 @@ extends FsLockModelController {
         }
 
         FsArchiveFileSystem<E> fileSystem() throws IOException {
-            checkAccess(name, WRITE);
+            checkSync(name, WRITE);
             return autoMount(!name.isRoot() && options.get(CREATE_PARENTS));
         }
 
@@ -286,7 +283,7 @@ extends FsLockModelController {
                     os.bind(this);
                 final OutputStream out = os.newOutputStream();
                 try {
-                    mknod.run();
+                    mknod.commit();
                     if (in != null)
                         Streams.cat(in, out);
                 } catch (IOException ex) {
@@ -338,7 +335,6 @@ extends FsLockModelController {
             final BitField<FsOutputOption> options,
             final Entry template)
     throws IOException {
-        checkAccess(name, null);
         if (name.isRoot()) { // TODO: Is this case differentiation required?
             try {
                 autoMount(); // detect false positives!
@@ -351,9 +347,10 @@ extends FsLockModelController {
             throw new FsEntryNotFoundException(getModel(),
                     name, "directory entry exists already");
         } else {
+            checkSync(name, null);
             autoMount(options.get(CREATE_PARENTS))
                     .mknod(name, type, options, template)
-                    .run();
+                    .commit();
         }
     }
 
@@ -361,7 +358,7 @@ extends FsLockModelController {
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        checkAccess(name, null);
+        checkSync(name, null);
         final FsArchiveFileSystem<E> fs = autoMount();
         if (name.isRoot()) {
             int size = fs.getEntry(ROOT).getMembers().size();
@@ -393,6 +390,6 @@ extends FsLockModelController {
      *         is intended.
      * @throws FsNeedsSyncException If a sync operation is required.
      */
-    abstract void checkAccess(FsEntryName name, @CheckForNull Access intention)
+    abstract void checkSync(FsEntryName name, @CheckForNull Access intention)
     throws FsNeedsSyncException;
 }
