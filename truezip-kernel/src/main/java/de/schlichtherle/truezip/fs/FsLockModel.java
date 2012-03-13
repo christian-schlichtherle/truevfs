@@ -70,6 +70,6 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
     public void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         if (!isWriteLockedByCurrentThread())
-            throw FsNeedsWriteLockException.get();
+            throw FsNeedsWriteLockException.get(this);
     }
 }

@@ -6,6 +6,7 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
+import de.schlichtherle.truezip.fs.FsModel;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -26,7 +27,7 @@ import javax.annotation.concurrent.Immutable;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 final class FsPersistentFalsePositiveException extends FsFalsePositiveException {
 
-    FsPersistentFalsePositiveException(IOException cause) {
-        super(cause);
+    FsPersistentFalsePositiveException(FsModel model, IOException cause) {
+        super(model, cause);
     }
 }

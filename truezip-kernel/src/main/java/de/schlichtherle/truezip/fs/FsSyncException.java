@@ -46,7 +46,6 @@ public class FsSyncException extends SequentialIOException {
 
     FsSyncException(FsModel model, IOException cause, int priority) {
         super(model.getMountPoint().toString(), cause, priority);
-        assert !(cause instanceof FsControllerException) : cause;
     }
 
     @Override

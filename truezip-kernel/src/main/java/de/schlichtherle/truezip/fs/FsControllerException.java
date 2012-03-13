@@ -86,21 +86,17 @@ public abstract class FsControllerException extends IOException {
     private static final StackTraceElement[]
             EMPTY_STACK = new StackTraceElement[0];
 
-    FsControllerException() {
-        this(null, null);
-    }
+    FsControllerException() { }
 
-    FsControllerException(@CheckForNull String message) {
-        this(message, null);
-    }
-
-    FsControllerException(@CheckForNull Throwable cause) {
-        this(null == cause ? null : cause.toString(), cause);
-    }
-
-    FsControllerException(  @CheckForNull String message, 
-                            @CheckForNull Throwable cause) {
-        super(message, cause);
+    FsControllerException(  final FsModel model,
+                            final @CheckForNull String message, 
+                            final @CheckForNull Throwable cause) {
+        super(  TRACEABLE
+                    ? null == message
+                        ? model.getMountPoint().toString()
+                        : model.getMountPoint() + " (" + message + ')'
+                    : null,
+                cause);
     }
 
     /**

@@ -5,30 +5,31 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An output socket which obtains its delegate lazily and {@link #reset()}s it
+ * An input socket which obtains its delegate lazily and {@link #reset()}s it
  * upon any {@link Throwable}.
  *
- * @see    ProxyInputSocket
+ * @see    ClutchOutputSocket
  * @param  <E> the type of the {@link #getLocalTarget() local target}.
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class ProxyOutputSocket<E extends Entry>
-extends DelegatingOutputSocket<E> {
-    @CheckForNull OutputSocket<? extends E> delegate;
+public abstract class ClutchInputSocket<E extends Entry>
+extends DelegatingInputSocket<E> {
+    @CheckForNull InputSocket<? extends E> delegate;
 
     @Override
-    protected final OutputSocket<? extends E> getDelegate() throws IOException {
-        final OutputSocket<? extends E> os = delegate;
-        return null != os ? os : (delegate = getLazyDelegate());
+    protected final InputSocket<? extends E> getDelegate() throws IOException {
+        final InputSocket<? extends E> is = delegate;
+        return null != is ? is : (delegate = getLazyDelegate());
     };
 
     /**
@@ -37,13 +38,22 @@ extends DelegatingOutputSocket<E> {
      * @return the delegate socket for lazy initialization.
      * @throws IOException on any I/O failure. 
      */
-    protected abstract OutputSocket<? extends E> getLazyDelegate()
+    protected abstract InputSocket<? extends E> getLazyDelegate()
     throws IOException;
 
     @Override
     public E getLocalTarget() throws IOException {
         try {
             return getBoundSocket().getLocalTarget();
+        } catch (Throwable ex) {
+            throw reset(ex);
+        }
+    }
+
+    @Override
+    public ReadOnlyFile newReadOnlyFile() throws IOException {
+        try {
+            return getBoundSocket().newReadOnlyFile();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -60,9 +70,9 @@ extends DelegatingOutputSocket<E> {
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
+    public InputStream newInputStream() throws IOException {
         try {
-            return getBoundSocket().newOutputStream();
+            return getBoundSocket().newInputStream();
         } catch (Throwable ex) {
             throw reset(ex);
         }
