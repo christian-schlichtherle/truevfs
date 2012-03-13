@@ -73,11 +73,11 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     static void finalize(   final Closeable delegate,
-                            final @CheckForNull IOException status) {
-        if (OK == status) {
+                            final @CheckForNull IOException close) {
+        if (OK == close) {
             logger.log(Level.FINEST, "closeCleared");
-        } else if (null != status) {
-            logger.log(Level.FINER, "closeFailed", status);
+        } else if (null != close) {
+            logger.log(Level.FINER, "closeFailed", close);
         } else {
             try {
                 delegate.close();
@@ -212,7 +212,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final class FinalizeReadOnlyFile
     extends DecoratingReadOnlyFile {
-        volatile IOException status; // accessed by finalizer thread!
+        volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -232,16 +232,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 // on the decorated resource if this call is NOT retried again.
                 throw ex;
             } catch (final IOException ex) {
-                throw status = ex;
+                throw close = ex;
             }
-            status = OK;
+            close = OK;
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, status);
+                finalize(delegate, close);
             } finally {
                 super.finalize();
             }
@@ -250,7 +250,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final class FinalizeSeekableByteChannel
     extends DecoratingSeekableByteChannel {
-        volatile IOException status; // accessed by finalizer thread!
+        volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -270,16 +270,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 // on the decorated resource if this call is NOT retried again.
                 throw ex;
             } catch (final IOException ex) {
-                throw status = ex;
+                throw close = ex;
             }
-            status = OK;
+            close = OK;
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, status);
+                finalize(delegate, close);
             } finally {
                 super.finalize();
             }
@@ -288,7 +288,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final class FinalizeInputStream
     extends DecoratingInputStream {
-        volatile IOException status; // accessed by finalizer thread!
+        volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -308,16 +308,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 // on the decorated resource if this call is NOT retried again.
                 throw ex;
             } catch (final IOException ex) {
-                throw status = ex;
+                throw close = ex;
             }
-            status = OK;
+            close = OK;
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, status);
+                finalize(delegate, close);
             } finally {
                 super.finalize();
             }
@@ -326,7 +326,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final class FinalizeOutputStream
     extends DecoratingOutputStream {
-        volatile IOException status; // accessed by finalizer thread!
+        volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -346,16 +346,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 // on the decorated resource if this call is NOT retried again.
                 throw ex;
             } catch (final IOException ex) {
-                throw status = ex;
+                throw close = ex;
             }
-            status = OK;
+            close = OK;
         }
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, status);
+                finalize(delegate, close);
             } finally {
                 super.finalize();
             }
