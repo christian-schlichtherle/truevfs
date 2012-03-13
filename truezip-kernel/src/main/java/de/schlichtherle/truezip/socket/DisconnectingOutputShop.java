@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -22,13 +23,15 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Decorates another output shop in order to disconnect any resources when this
  * output shop gets closed.
  * Once {@linkplain #close() closed}, all methods of all products of this shop,
- * including all sockets, streams etc. but excluding all {@link #close()}
- * methods, throw an {@link OutputClosedException} when called.
+ * including all sockets, streams etc. but excluding {@link #getOutputSocket}
+ * and all {@link #close()} methods, will throw an
+ * {@link OutputClosedException} when called.
  *
  * @param  <E> the type of the entries.
  * @see    DisconnectingInputShop
  * @author Christian Schlichtherle
  */
+// TODO: Consider renaming this to ClutchOutputArchive in TrueZIP 8.
 @NotThreadSafe
 public class DisconnectingOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
@@ -50,6 +53,44 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         super(output);
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void assertOpen() {
+        if (isClosed())
+            throw new IllegalStateException(new OutputClosedException());
+    }
+
+    public void checkOpen() throws IOException {
+        if (isClosed())
+            throw new OutputClosedException();
+    }
+
+    @Override
+    public int getSize() {
+        assertOpen();
+        return delegate.getSize();
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        assertOpen();
+        return delegate.iterator();
+    }
+
+    @Override
+    public E getEntry(String name) {
+        assertOpen();
+        return delegate.getEntry(name);
+    }
+
+    @Override
+    public final OutputSocket<? extends E> getOutputSocket(E entry) {
+        return SOCKET_FACTORY
+                .newOutputSocket(this, delegate.getOutputSocket(entry));
+    }
+
     /**
      * Closes this output shop.
      * Subsequent calls to this method will just forward the call to the
@@ -64,17 +105,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     public void close() throws IOException {
         closed = true;
         delegate.close();
-    }
-
-    final void checkOpen() throws IOException {
-        if (closed)
-            throw new OutputClosedException();
-    }
-
-    @Override
-    public final OutputSocket<? extends E> getOutputSocket(E entry) {
-        return SOCKET_FACTORY
-                .newOutputSocket(this, delegate.getOutputSocket(entry));
     }
 
     @Immutable
