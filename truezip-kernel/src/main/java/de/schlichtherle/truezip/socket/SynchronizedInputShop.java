@@ -23,8 +23,8 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @see        SynchronizedOutputShop
  * @param      <E> the type of the entries.
- * @deprecated Use {@link LockInputShop} instead.
  * @author     Christian Schlichtherle
+ * @deprecated This class will be removed in TrueZIP 8.
  */
 @Deprecated
 @ThreadSafe
