@@ -57,12 +57,12 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         return closed;
     }
 
-    public void assertOpen() {
+    final void assertOpen() {
         if (isClosed())
             throw new IllegalStateException(new OutputClosedException());
     }
 
-    public void checkOpen() throws IOException {
+    final void checkOpen() throws IOException {
         if (isClosed())
             throw new OutputClosedException();
     }
