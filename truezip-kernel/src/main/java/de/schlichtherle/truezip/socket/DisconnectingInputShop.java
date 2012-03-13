@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -24,13 +25,15 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Decorates another input shop in order to disconnect any resources when this
  * input shop gets closed.
  * Once {@linkplain #close() closed}, all methods of all products of this shop,
- * including all sockets, streams etc. but excluding all {@link #close()}
- * methods, throw an {@link InputClosedException} when called.
+ * including all sockets, streams etc. but excluding {@link #getInputSocket}
+ * and all {@link #close()} methods, will throw an
+ * {@link InputClosedException} when called.
  *
  * @param  <E> the type of the entries.
  * @see    DisconnectingOutputShop
  * @author Christian Schlichtherle
  */
+// TODO: Consider renaming this to ClutchInputArchive in TrueZIP 8.
 @NotThreadSafe
 public class DisconnectingInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
@@ -52,6 +55,44 @@ extends DecoratingInputShop<E, InputShop<E>> {
         super(input);
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void assertOpen() {
+        if (isClosed())
+            throw new IllegalStateException(new InputClosedException());
+    }
+
+    public void checkOpen() throws IOException {
+        if (isClosed())
+            throw new InputClosedException();
+    }
+
+    @Override
+    public int getSize() {
+        assertOpen();
+        return delegate.getSize();
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        assertOpen();
+        return delegate.iterator();
+    }
+
+    @Override
+    public E getEntry(String name) {
+        assertOpen();
+        return delegate.getEntry(name);
+    }
+
+    @Override
+    public InputSocket<? extends E> getInputSocket(String name) {
+        return SOCKET_FACTORY
+                .newInputSocket(this, delegate.getInputSocket(name));
+    }
+
     /**
      * Closes this input shop.
      * Subsequent calls to this method will just forward the call to the
@@ -66,17 +107,6 @@ extends DecoratingInputShop<E, InputShop<E>> {
     public void close() throws IOException {
         closed = true;
         delegate.close();
-    }
-
-    final void checkOpen() throws IOException {
-        if (closed)
-            throw new InputClosedException();
-    }
-
-    @Override
-    public InputSocket<? extends E> getInputSocket(String name) {
-        return SOCKET_FACTORY
-                .newInputSocket(this, delegate.getInputSocket(name));
     }
 
     @Immutable
