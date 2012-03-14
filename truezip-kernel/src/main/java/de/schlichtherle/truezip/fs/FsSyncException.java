@@ -36,7 +36,7 @@ public class FsSyncException extends SequentialIOException {
      *             access - do <em>not</em> call it directly!
      */
     @Deprecated
-    public FsSyncException(String message) {
+    public FsSyncException(@CheckForNull String message) {
         super(message);
     }
 
