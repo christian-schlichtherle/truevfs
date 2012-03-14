@@ -177,10 +177,38 @@ extends FsLockModelDecoratingController<
             try {
                 preSync(options, handler);
                 preSync = true;
-            } catch (final FsNeedsSyncException alreadyPresent) {
-                logger.log(Level.FINE,
-                        FsNeedsSyncException.class.getSimpleName(),
-                        alreadyPresent);
+            } catch (final FsNeedsSyncException invalidState) {
+                // The target archive controller is in an invalid state because
+                // it reports to need a sync() while the current thread is
+                // actually doing a sync().
+                // This is expected to be a volatile event which may have been
+                // caused by the following scenario:
+                // Another thread attempted to sync() the nested target archive
+                // file but initially failed because the parent file system
+                // controller has thrown an FsNeedsLockRetryException when
+                // trying to close() the input or output resources for the
+                // target archive file.
+                // The other thread has then released all its file system write
+                // locks and is now retrying the operation but lost the race
+                // for the file system write lock against this thread which has
+                // now detected the invalid state.
+                
+                // Note that this is not the only possible scenario, so the
+                // following assertions sometimes fails!
+                //assert null != getParent().getParent() : invalidState;
+
+                // In an attempt to recover from this invalid state, the
+                // current thread could just step back in order to give the
+                // other thread a chance to complete its sync().
+                //throw FsNeedsLockRetryException.get(getModel());
+
+                // However, this will unnecessarily defer the current thread
+                // and might result in yet another thread to discover the
+                // invalid state, which reduces the overall performance.
+                // So instead, the current thread will now attempt to resolve
+                // the invalid state by sync()ing the target archive controller
+                // before sync()ing the cache again.
+                logger.log(Level.FINE, "recovering", invalidState);
             }
             // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in
             // the model instead.
@@ -206,7 +234,7 @@ extends FsLockModelDecoratingController<
                     try {
                         cache.flush();
                     } catch (final FsControllerException ex) {
-                        clear = false;
+                            clear = false;
                         throw ex;
                     } catch (final IOException ex) {
                         throw handler.fail(new FsSyncException(getModel(), ex));
@@ -297,8 +325,7 @@ extends FsLockModelDecoratingController<
             @Override
             protected InputSocket<? extends Entry> getLazyDelegate()
             throws IOException {
-                return FsCacheController.this.delegate.getInputSocket(
-                        EntryCache.this.name, options);
+                return delegate.getInputSocket(name, options);
             }
 
             @Override
@@ -327,7 +354,7 @@ extends FsLockModelDecoratingController<
                     public void close() throws IOException {
                         assert isWriteLockedByCurrentThread();
                         delegate.close();
-                        caches.put(EntryCache.this.name, EntryCache.this);
+                        caches.put(name, EntryCache.this);
                     }
                 } // Stream
 
@@ -352,9 +379,7 @@ extends FsLockModelDecoratingController<
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Channel() throws IOException {
                         super(Nio2Output.super.newSeekableByteChannel());
-                        FsCacheController.this.caches.put(
-                                EntryCache.this.name,
-                                EntryCache.this);
+                        caches.put(name, EntryCache.this);
                     }
 
                     @Override
@@ -387,12 +412,11 @@ extends FsLockModelDecoratingController<
             @Override
             protected OutputSocket<? extends Entry> getLazyDelegate()
             throws IOException {
-                return EntryCache.this.cache.configure(
-                            FsCacheController.this.delegate.getOutputSocket(
-                                EntryCache.this.name,
-                                options.clear(EXCLUSIVE),
-                                template))
-                        .getOutputSocket();
+                return cache.configure( delegate.getOutputSocket(
+                                            name,
+                                            options.clear(EXCLUSIVE),
+                                            template))
+                            .getOutputSocket();
             }
 
             @Override
@@ -405,9 +429,7 @@ extends FsLockModelDecoratingController<
                     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                     Stream() throws IOException {
                         super(Output.super.newOutputStream());
-                        FsCacheController.this.caches.put(
-                                EntryCache.this.name,
-                                EntryCache.this);
+                        caches.put(name, EntryCache.this);
                     }
 
                     @Override
@@ -422,39 +444,64 @@ extends FsLockModelDecoratingController<
             }
 
             void pre() throws IOException {
-                // HC SUNT DRACONES!
-                try {
-                    FsCacheController.this.delegate.mknod(
-                            EntryCache.this.name,
-                            FILE,
-                            options,
-                            template);
-                } catch (final FsNeedsSyncException alreadyPresent) {
-                    final boolean exclusive = options.get(EXCLUSIVE);
-                    logger.log(exclusive ? Level.FINER : Level.FINEST,
-                            FsNeedsSyncException.class.getSimpleName(),
-                            alreadyPresent);
-                    if (exclusive)
-                        throw alreadyPresent;
-                }
+                //while (true) {
+                    try {
+                        delegate.mknod(name, FILE, options, template);
+                        //return;
+                    } catch (final FsNeedsSyncException ex) {
+                        // In this context, this exception means that the entry
+                        // has already been written to the output archive for
+                        // the target archive file.
+                        if (options.get(EXCLUSIVE)) {
+                            // We can't tolerate this, so pass the exception on
+                            // to the caller.
+                            throw ex;
+                        }
+
+                        /*if (null != delegate.getEntry(name))
+                            return;
+                        try {
+                            delegate.sync(FsSyncOptions.SYNC); // try recovery
+                        } catch (final FsSyncException sync) {
+                            // Recovering the issue failed.
+                            if (sync.getCause() instanceof FsResourceBusyIOException) {
+                                // The current thread is holding open resources
+                                // so we can't resolve the initial issue.
+                                if (null == delegate.getEntry(name)) {
+                                    // The entry does not exist
+                                    throw mknod;
+                                }
+                            }
+                            logger.log(Level.FINE, "ignoring", sync);
+                            throw mknod;
+                        }*/
+
+                        // Recovering from this exception may fail because this
+                        // might be an attempt to acquire an output stream for
+                        // a copy operation and the input stream may have been
+                        // acquired already and accessing the same archive file.
+                        // The sync() would then fail with an FsSyncException
+                        // because the target archive file is busy with this
+                        // input stream.
+
+                        // Passing this exception would only defer the sync()
+                        // which may fail for the same reason.
+                        //throw ex;
+
+                        // Mapping this exception might create an endless loop.
+                        //throw FsNeedsLockRetryException.get(getModel());
+
+                        // Ignoring this exception is OK because ???
+                        logger.log(Level.FINE, "ignoring", ex);
+                        
+                        //throw ex;
+                    }
+                //}
             }
 
             void post() throws IOException {
-                // HC SUNT DRACONES!
-                try {
-                    FsCacheController.this.delegate.mknod(
-                            EntryCache.this.name,
-                            FILE,
-                            options.clear(EXCLUSIVE),
-                            null != template
-                                ? template
-                                : EntryCache.this.cache.getEntry());
-                } catch (final FsNeedsSyncException alreadyPresent) {
-                    logger.log(Level.FINER,
-                            FsNeedsSyncException.class.getSimpleName(),
-                            alreadyPresent);
-                    throw alreadyPresent;
-                }
+                delegate.mknod(name, FILE, options.clear(EXCLUSIVE),
+                        null != template ? template : cache.getEntry());
             }
         } // Output
     } // EntryCache
