@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.CANCEL;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Unlinks the target archive file from the parent file system if and only if
@@ -18,7 +18,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
+@ThreadSafe
 final class FsUnlinkController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
