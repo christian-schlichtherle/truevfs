@@ -6,8 +6,6 @@
 
 About TrueZIP
 
-* Welcome to the TrueZIP&#160;User&#160;Website!
-
     TrueZIP is a Java based plug-in framework for virtual file systems
     (VFS) which enables client applications to perform CRUD (Create,
     Read, Update, Delete) operations on archive files as if they were
@@ -16,7 +14,7 @@ About TrueZIP
     The most recent version is TrueZIP&#160;${project.version} - see
     {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
 
-** Supported File System Types
+* Supported File System Types
 
     TrueZIP ships with the following pluggable file system driver modules:
 
@@ -38,7 +36,7 @@ About TrueZIP
     make their file system drivers available for service location in the client
     API modules - see below.
 
-** Using TrueZIP
+* Using TrueZIP
 
     As a library, TrueZIP provides simple, uniform, transparent,
     thread-safe, read/write access to archive files as if they were
@@ -58,7 +56,7 @@ About TrueZIP
     Have a look at the {{{./usecases/index.html}Use Cases}} for some samples
     using the API of the module TrueZIP&#160;File*.
 
-** Extending TrueZIP
+* Extending TrueZIP
 
     As a framework, TrueZIP provides the interfaces and classes to
     write file system drivers which plug-in to its federated file
