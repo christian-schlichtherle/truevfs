@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.TooManyListenersException;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.Icon;
@@ -118,7 +119,7 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
-    @CheckForNull InputArchive<E> getCheckedInputArchive()
+    @Nullable InputArchive<E> getCheckedInputArchive()
     throws FsNeedsSyncException {
         final InputArchive<E> ia = inputArchive;
         if (null != ia && ia.isClosed())
@@ -133,7 +134,7 @@ extends FsFileSystemArchiveController<E> {
             setTouched(true);
     }
 
-    @CheckForNull OutputArchive<E> getCheckedOutputArchive()
+    @Nullable OutputArchive<E> getCheckedOutputArchive()
     throws FsNeedsSyncException {
         final OutputArchive<E> oa = outputArchive;
         if (null != oa && oa.isClosed())
