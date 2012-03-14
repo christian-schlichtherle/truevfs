@@ -8,6 +8,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipException;
@@ -37,6 +38,7 @@ abstract class DecoratingOutputMethod implements OutputMethod {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public OutputStream start() throws IOException {
         return delegate.start();
     }
