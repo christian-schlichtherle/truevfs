@@ -918,6 +918,7 @@ implements Iterable<E> {
         }
 
         @Override
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             // see DeflatedOutputMethod.finish().
             final ZipEntry entry = this.entry;
@@ -974,6 +975,7 @@ implements Iterable<E> {
         }
 
         @Override
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             assert null == this.cout;
             assert null == this.dout;
@@ -1020,6 +1022,7 @@ implements Iterable<E> {
         }
 
         @Override
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             assert null == this.out;
             return this.out = new ZipDeflaterOutputStream(
@@ -1048,6 +1051,7 @@ implements Iterable<E> {
         }
 
         @Override
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             assert null == this.out;
             return this.out = new Crc32OutputStream(this.delegate.start());
