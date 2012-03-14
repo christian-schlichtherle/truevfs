@@ -57,10 +57,8 @@ extends FsLockModelDecoratingController<
 
     private FsResourceAccountant getAccountant() {
         assert isWriteLockedByCurrentThread();
-        final FsResourceAccountant acc = accountant;
-        return null != acc
-                ? acc
-                : (accountant = new FsResourceAccountant(writeLock()));
+        final FsResourceAccountant a = accountant;
+        return null != a ? a : (accountant = new FsResourceAccountant(writeLock()));
     }
 
     @Override
@@ -108,20 +106,20 @@ extends FsLockModelDecoratingController<
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // HC SUNT DRACONES!
-        final FsResourceAccountant acc = accountant;
-        if (null == acc)
+        final FsResourceAccountant a = accountant;
+        if (null == a)
             return;
         final boolean force = options.get(FORCE_CLOSE_INPUT)
                 || options.get(FORCE_CLOSE_OUTPUT);
-        final int local = acc.localResources();
+        final int local = a.localResources();
         final IOException cause;
         if (0 != local && !force) {
-            cause = new FsResourceBusyIOException(acc.totalResources(), local);
+            cause = new FsResourceBusyIOException(a.totalResources(), local);
             throw handler.fail(new FsSyncException(getModel(), cause));
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
                 || options.get(WAIT_CLOSE_OUTPUT);
-        final int total = acc.waitForeignResources(
+        final int total = a.waitForeignResources(
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 == total)
             return;
