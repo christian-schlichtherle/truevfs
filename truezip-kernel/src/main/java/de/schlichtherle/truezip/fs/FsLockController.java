@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -61,6 +62,8 @@ extends FsLockModelDecoratingController<
             ? ThreadLocalUtilFactory.NEW
             : ThreadLocalUtilFactory.OLD
                 ).newThreadLocalUtil();
+
+    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE = SYNC.not();
 
     private final ReadLock readLock;
     private final WriteLock writeLock;
@@ -367,10 +370,30 @@ extends FsLockModelDecoratingController<
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
+        // MUST not initialize within IOOperation => would always be true!
+        final boolean locking = threadUtil.get().locking;
+
         class Sync implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                delegate.sync(options, handler);
+                if (locking && !options.and(SYNC).isEmpty()) {
+                    // Prevent potential dead locks by using a half busy loop.
+                    // Note that a sync in a parent file system is a rare event
+                    // so that this should not create performance problems,
+                    // even when accessing deeply nested archive files in the
+                    // integration tests.
+                    try {
+                        delegate.sync(options.and(NOT_WAIT_CLOSE), handler);
+                    } catch (final FsSyncWarningException ex) {
+                        throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
+                    } catch (final FsSyncException ex) {
+                        if (ex.getCause() instanceof FsResourceBusyIOException)
+                            throw FsNeedsLockRetryException.get(getModel());
+                        throw ex;
+                    }
+                } else {
+                    delegate.sync(options, handler);
+                }
                 return null;
             }
         } // Sync
