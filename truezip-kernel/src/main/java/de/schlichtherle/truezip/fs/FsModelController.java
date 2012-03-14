@@ -27,9 +27,8 @@ extends FsController<M>  {
      * @param model the file system model.
      */
     protected FsModelController(final M model) {
-        if (null == model)
+        if (null == (this.model = model))
             throw new NullPointerException();
-        this.model = model;
     }
 
     @Override
