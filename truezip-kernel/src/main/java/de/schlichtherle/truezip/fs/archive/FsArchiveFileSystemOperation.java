@@ -1,14 +1,11 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.util.Link;
+import java.io.IOException;
 
 /**
  * Represents an operation on a chain of one or more archive entries.
@@ -20,14 +17,13 @@ import de.schlichtherle.truezip.util.Link;
  * <p>
  * Implementations do <em>not</em> need to be thread-safe.
  *
- * @param   <E> The type of the archive entries.
- * @see     FsArchiveFileSystem#mknod
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @param  <E> The type of the archive entries.
+ * @see    FsArchiveFileSystem#mknod
+ * @author Christian Schlichtherle
  */
 interface FsArchiveFileSystemOperation<E extends FsArchiveEntry>
 extends Link<FsCovariantEntry<E>> {
 
     /** Executes this archive file system operation. */
-    void commit() throws FsArchiveFileSystemException;
+    void commit() throws IOException;
 }

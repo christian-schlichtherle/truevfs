@@ -12,6 +12,7 @@ import static de.schlichtherle.truezip.entry.Entry.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
+import de.schlichtherle.truezip.fs.FsControllerException;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.FsOutputOption;
@@ -90,7 +91,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.factory = driver;
-        final E root = newEntryUnchecked(ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, null);
+        final E root = newEntry(ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -163,7 +164,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
-        master.add(ROOT_PATH, newEntryUnchecked(
+        master.add(ROOT_PATH, newEntry(
                 ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, rootTemplate));
         this.master = master;
         // Now perform a file system check to create missing parent directories
@@ -197,7 +198,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final String memberName = splitter.getMemberName();
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
-            parent = master.add(parentPath, newEntryUnchecked(
+            parent = master.add(parentPath, newEntry(
                     parentPath, DIRECTORY, NO_OUTPUT_OPTIONS, null));
         parent.add(memberName);
         fix(parentPath);
@@ -225,23 +226,18 @@ implements Iterable<FsCovariantEntry<E>> {
      * @throws FsArchiveFileSystemException If the listener vetoed the beforeTouch
      *         operation for any reason.
      */
-    private void touch() throws FsArchiveFileSystemException {
-        if (this.touched)
+    private void touch() throws IOException {
+        if (touched)
             return;
         // Order is important here because of veto exceptions!
-        final FsArchiveFileSystemEvent<E> event
-                = new FsArchiveFileSystemEvent<E>(this);
-        final FsArchiveFileSystemTouchListener<? super E> listener
-                = touchListener;
-        try {
-            if (null != listener)
-                listener.beforeTouch(event);
-        } catch (final IOException ex) {
-            throw new FsArchiveFileSystemException(null, "file system touch vetoed", ex);
-        }
-        this.touched = true;
-        if (null != listener)
-            listener.afterTouch(event);
+        final FsArchiveFileSystemEvent<E>
+                e = new FsArchiveFileSystemEvent<E>(this);
+        final FsArchiveFileSystemTouchListener<? super E> tl = touchListener;
+        if (null != tl)
+            tl.beforeTouch(e);
+        touched = true;
+        if (null != tl)
+            tl.afterTouch(e);
     }
 
     /**
@@ -313,7 +309,7 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * Like {@link #newEntryChecked newEntryChecked(path, type, null)},
+     * Like {@link #newCheckedEntry newEntryChecked(path, type, null)},
      * but wraps any {@link CharConversionException} in an
      * {@link AssertionError}.
      *
@@ -322,7 +318,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  template the nullable template for the archive entry to create.
      * @return A new archive entry.
      */
-    private E newEntryUnchecked(
+    private E newEntry(
             final String name,
             final Type type,
             final BitField<FsOutputOption> mknod,
@@ -339,8 +335,8 @@ implements Iterable<FsCovariantEntry<E>> {
 
     /**
      * Returns a new archive entry.
-     * This is only a factory method, i.e. the returned file system entry is
-     * not yet linked into this (virtual) archive file system.
+     * This is just a factory method and the returned file system entry is not
+     * (yet) linked into this (virtual) archive file system.
      *
      * @see    #mknod
      * @param  name the archive entry name.
@@ -350,15 +346,14 @@ implements Iterable<FsCovariantEntry<E>> {
      * @throws FsArchiveFileSystemException if a {@link CharConversionException}
      *         occurs as its cause.
      */
-    private E newEntryChecked(
+    private E newCheckedEntry(
             final String name,
             final Type type,
             final BitField<FsOutputOption> mknod,
-            @CheckForNull final Entry template)
+            final @CheckForNull Entry template)
     throws FsArchiveFileSystemException {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        assert !(template instanceof FsCovariantEntry<?>);
 
         try {
             return factory.newEntry(name, type, template, mknod);
@@ -488,14 +483,14 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements[0] = new SegmentLink<E>(null, parentEntry);
                 newEntry = new FsCovariantEntry<E>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(entryName, entryType, options, template));
+                        newCheckedEntry(entryName, entryType, options, template));
                 elements[1] = new SegmentLink<E>(memberName, newEntry);
             } else if (createParents) {
                 elements = newSegmentLinks(
                         level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<E>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(entryName, entryType, options, template));
+                        newCheckedEntry(entryName, entryType, options, template));
                 elements[elements.length - level]
                         = new SegmentLink<E>(memberName, newEntry);
             } else {
@@ -506,7 +501,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
 
         @Override
-        public void commit() throws FsArchiveFileSystemException {
+        public void commit() throws IOException {
             assert 2 <= links.length;
 
             touch();
@@ -583,7 +578,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *         reason.
      */
     void unlink(final FsEntryName name)
-    throws FsArchiveFileSystemException {
+    throws IOException {
         if (name.isRoot())
             throw new FsArchiveFileSystemException(name,
                     "root directory cannot get unlinked");
@@ -631,7 +626,7 @@ implements Iterable<FsCovariantEntry<E>> {
             final FsEntryName name,
             final BitField<Access> types,
             final long value)
-    throws FsArchiveFileSystemException {
+    throws IOException {
         if (0 > value)
             throw new IllegalArgumentException(name.toString()
                     + " (negative access time)");
@@ -651,7 +646,7 @@ implements Iterable<FsCovariantEntry<E>> {
     boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times)
-    throws FsArchiveFileSystemException {
+    throws IOException {
         final FsCovariantEntry<E> ce = master.get(name.getPath());
         if (null == ce)
             throw new FsArchiveFileSystemException(name,
