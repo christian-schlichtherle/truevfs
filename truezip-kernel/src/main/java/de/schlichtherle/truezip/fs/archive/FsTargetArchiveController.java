@@ -118,7 +118,7 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
-    @CheckForNull InputArchive<E> getInputArchive()
+    @CheckForNull InputArchive<E> getCheckedInputArchive()
     throws FsNeedsSyncException {
         final InputArchive<E> ia = inputArchive;
         if (null != ia && ia.isClosed())
@@ -133,7 +133,7 @@ extends FsFileSystemArchiveController<E> {
             setTouched(true);
     }
 
-    @CheckForNull OutputArchive<E> getOutputArchive()
+    @CheckForNull OutputArchive<E> getCheckedOutputArchive()
     throws FsNeedsSyncException {
         final OutputArchive<E> oa = outputArchive;
         if (null != oa && oa.isClosed())
@@ -250,7 +250,7 @@ extends FsFileSystemArchiveController<E> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     OutputArchive<E> makeOutputArchive() throws IOException {
-        OutputArchive<E> oa = getOutputArchive();
+        OutputArchive<E> oa = getCheckedOutputArchive();
         if (null != oa)
             return oa;
         final BitField<FsOutputOption> options = getContext()
@@ -259,7 +259,7 @@ extends FsFileSystemArchiveController<E> {
                 .set(CACHE);
         final OutputSocket<?> os = driver.getOutputSocket(
                 parent, name, options, null);
-        final InputArchive<E> ia = getInputArchive();
+        final InputArchive<E> ia = getCheckedInputArchive();
         try {
             oa = new OutputArchive<E>(driver.newOutputShop(
                     getModel(), os, null == ia ? null : ia.getArchive()));
@@ -277,7 +277,7 @@ extends FsFileSystemArchiveController<E> {
             @Override
             protected InputSocket<? extends E> getLazyDelegate()
             throws IOException {
-                return getInputArchive().getInputSocket(name);
+                return getCheckedInputArchive().getInputSocket(name);
             }
 
             @Override
@@ -378,25 +378,24 @@ extends FsFileSystemArchiveController<E> {
     void checkSync(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsNeedsSyncException {
-        try {
-            checkSync0(name, intention);
-        } finally {
-            assert invariants();
-        }
-    }
-
-    void checkSync0(final FsEntryName name,
-                    final @CheckForNull Access intention)
-    throws FsNeedsSyncException {
         // HC SUNT DRACONES!
 
-        // If the named entry is a file system root, then always pass this test
-        // because a root entry is not accessible to the client application
-        // anyway so file system synchronization would be redundant at best.
-        if (name.isRoot())
-            return;
+        // If GROWing and the driver supports the respective access method,
+        // then pass the test.
+        if (getContext().get(GROW)) {
+            if (null == intention) {
+                if (driver.getRedundantMetaDataSupport())
+                    return;
+            } else if (WRITE == intention) {
+                if (driver.getRedundantContentSupport()) {
+                    getCheckedOutputArchive();
+                    return;
+                }
+            }
+        }
 
-        // Check if there exists a file system with the named entry.
+        // If no file system exists or does not contain an entry with the given
+        // name, then pass the test.
         final FsCovariantEntry<E> fse; // file system entry
         {
             final FsArchiveFileSystem<E> fs;
@@ -404,60 +403,44 @@ extends FsFileSystemArchiveController<E> {
                 return;
         }
 
-        Boolean grow = null;
+        // If the entry name addresses the file system root, then pass the test
+        // because the root entry is not present in the input or output archive
+        // anyway.
+        if (name.isRoot())
+            return;
+
         String aen; // archive entry name
 
         // Check if the entry is already written to the output archive.
-        final E oae; // output archive entry
         {
-            final OutputArchive<E> oa = getOutputArchive();
+            final OutputArchive<E> oa = getCheckedOutputArchive();
             if (null != oa) {
                 aen = fse.getEntry().getName();
-                oae = oa.getEntry(aen);
-                if (null != oae) {
-                    grow = getContext().get(GROW);
-                    if (!grow)
-                        throw FsNeedsSyncException.get(getModel(), name, intention);
-                    if (null == intention && !driver.getRedundantMetaDataSupport())
-                        throw FsNeedsSyncException.get(getModel(), name, null);
-                    if (WRITE == intention && !driver.getRedundantContentSupport())
-                        throw FsNeedsSyncException.get(getModel(), name, WRITE);
-                }
+                if (null != oa.getEntry(aen))
+                    throw FsNeedsSyncException.get(getModel(), name, intention);
             } else {
                 aen = null;
-                oae = null;
             }
         }
+
+        // If our intention is not reading the entry then pass the test.
+        if (READ != intention)
+            return;
 
         // Check if the entry is present in the input archive.
         final E iae; // input archive entry
         {
-            final InputArchive<E> ia = getInputArchive();
+            final InputArchive<E> ia = getCheckedInputArchive();
             if (null != ia) {
                 if (null == aen)
                     aen = fse.getEntry().getName();
                 iae = ia.getEntry(aen);
-                if (null != iae) {
-                    if (null == grow)
-                        grow = getContext().get(GROW);
-                    if (!grow) {
-                        assert null == oae;
-                        return;
-                    }
-                }
             } else {
                 iae = null;
             }
         }
-
-        // Check for reading an entry which either only exists in the file
-        // system or has already been written to the output archive.
-        if (READ == intention) {
-            if (null == iae)
-                throw FsNeedsSyncException.get(getModel(), name, READ);
-            if (null != oae && iae != oae)
-                throw FsNeedsSyncException.get(getModel(), name, READ);
-        }
+        if (null == iae)
+            throw FsNeedsSyncException.get(getModel(), name, READ);
     }
 
     @Override

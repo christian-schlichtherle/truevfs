@@ -388,7 +388,8 @@ extends FsLockModelController {
      *         If {@code null}, then only an update to the archive entry meta
      *         data (i.e. a pure virtual file system operation with no I/O)
      *         is intended.
-     * @throws FsNeedsSyncException If a sync operation is required.
+     * @throws FsNeedsSyncException If a sync operation is required before the
+     *         intended access could succeed.
      */
     abstract void checkSync(FsEntryName name, @CheckForNull Access intention)
     throws FsNeedsSyncException;
