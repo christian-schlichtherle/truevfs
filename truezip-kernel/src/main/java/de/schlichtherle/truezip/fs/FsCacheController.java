@@ -443,7 +443,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
 
             void mknod( final BitField<FsOutputOption> options,
-                        final Entry template)
+                        final @CheckForNull Entry template)
             throws IOException {
                 while (true) {
                     try {
