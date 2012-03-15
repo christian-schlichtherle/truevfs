@@ -138,17 +138,17 @@ public final class IOCache implements Flushable, Closeable {
     }
 
     /**
-     * Discards the entry data in this buffer.
+     * Clears the entry data from this cache without flushing it.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O failure.
      */
     public void clear() throws IOException {
         setBuffer(null);
     }
 
     /**
-     * {@linkplain #flush() Flushes} and finally {@linkplain #clear() clears}
-     * this cache.
+     * {@linkplain #flush() Flushes} and finally {@linkplain #clear() evicts}
+     * the cached entry data.
      */
     @Override
     @DischargesObligation
