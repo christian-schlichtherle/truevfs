@@ -461,8 +461,9 @@ extends FsFileSystemArchiveController<E> {
     sync0(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
-        copy(options, handler);
-        commit(options, handler);
+        if (!options.get(ABORT_CHANGES))
+            copy(options, handler);
+        close(options, handler);
     }
 
     /**
@@ -502,9 +503,6 @@ extends FsFileSystemArchiveController<E> {
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
         } // Filter
-
-        if (options.get(ABORT_CHANGES))
-            return;
 
         // Skip (In|Out)putArchive for better performance.
         // This is safe because the FsResourceController has already shut down
@@ -590,7 +588,7 @@ extends FsFileSystemArchiveController<E> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    commit( final BitField<FsSyncOption> options,
+    close( final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
         // HC SUNT DRACONES!
