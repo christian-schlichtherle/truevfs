@@ -346,7 +346,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @return     The file system manager.
      * @since      TrueZIP 7.5 (package private before)
      * @deprecated This public class property is solely intended to be used by
-     *             the TrueZIP&nbsp;Path module and should never be used by
+     *             the TrueZIP&nbsp;Path module and should never get used by
      *             client applications.
      */
     @Deprecated
