@@ -31,7 +31,7 @@ public enum FsOutputOption {
 
     /**
      * Whether or not the entry data read by an input socket shall get
-     * temporarily cached for subsequent access.
+     * cached for subsequent access.
      * As a desired side effect, caching allows a file system controller to
      * {@link FsController#sync} the entry data to the backing storage
      * (e.g. a parent file system) while some client is still busy on reading
