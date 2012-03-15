@@ -147,7 +147,7 @@ public final class IOCache implements Flushable, Closeable {
     }
 
     /**
-     * {@linkplain #flush() Flushes} and finally {@linkplain #clear() evicts}
+     * {@linkplain #flush() Flushes} and finally {@linkplain #clear() clears}
      * the cached entry data.
      */
     @Override
