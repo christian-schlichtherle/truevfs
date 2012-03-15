@@ -462,8 +462,12 @@ extends FsFileSystemArchiveController<E> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
         if (!options.get(ABORT_CHANGES))
-            copy(options, handler);
-        close(options, handler);
+            copy(handler);
+        close(handler);
+        // TODO: Remove a condition and clear a flag in the model
+        // instead.
+        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+            setTouched(false);
     }
 
     /**
@@ -479,8 +483,7 @@ extends FsFileSystemArchiveController<E> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    copy(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
+    copy(final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         class Filter implements ExceptionHandler<IOException, X> {
             IOException warning;
@@ -542,10 +545,10 @@ extends FsFileSystemArchiveController<E> {
             for (final E ae : fse.getEntries()) {
                 final String aen = ae.getName();
                 if (null != os.getEntry(aen))
-                    continue; // we have already written this entry
+                    continue; // entry has already been output
                 try {
                     if (DIRECTORY == ae.getType()) {
-                        if (!fse.isRoot()) // never write the root directory!
+                        if (!fse.isRoot()) // never output the root directory!
                             if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
                                 os.getOutputSocket(ae).newOutputStream().close();
                     } else if (null != is.getEntry(aen)) {
@@ -555,7 +558,7 @@ extends FsFileSystemArchiveController<E> {
                         // The file system entry is a newly created
                         // non-directory entry which hasn't received any
                         // content yet, e.g. as a result of mknod()
-                        // => write an empty file system entry.
+                        // => output an empty file system entry.
                         for (final Size size : ALL_SIZE_SET)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
@@ -588,8 +591,7 @@ extends FsFileSystemArchiveController<E> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    close( final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
+    close(final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
@@ -617,10 +619,6 @@ extends FsFileSystemArchiveController<E> {
             setOutputArchive(null);
         }
         setFileSystem(null);
-        // TODO: Remove a condition and clear a flag in the model
-        // instead.
-        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-            setTouched(false);
     }
 
     /**
