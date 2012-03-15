@@ -51,8 +51,7 @@ import javax.swing.Icon;
  */
 @ThreadSafe
 public final class FsLockController
-extends FsLockModelDecoratingController<
-        FsController<? extends FsLockModel>> {
+extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
@@ -387,7 +386,7 @@ extends FsLockModelDecoratingController<
                     } catch (final FsSyncWarningException ex) {
                         throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
                     } catch (final FsSyncException ex) {
-                        if (ex.getCause() instanceof FsResourceBusyIOException)
+                        if (ex.getCause() instanceof FsOpenIOResourcesException)
                             throw FsNeedsLockRetryException.get(getModel());
                         throw ex;
                     }
