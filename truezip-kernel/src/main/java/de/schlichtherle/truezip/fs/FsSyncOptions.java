@@ -21,12 +21,12 @@ import javax.annotation.concurrent.Immutable;
 public class FsSyncOptions {
 
     /**
-     * Forcibly closes all input and output resources
-     * (input and output streams etc.) for any file system entries
-     * and clears the selective entry cache
-     * before synchronizing the federated file system with its parent file
-     * system.
-     * Equivalent to
+     * Forcibly closes all I/O resources (i.e. streams, channels etc) for any
+     * entries of the file system, flushes and clears its selective entry cache,
+     * commits all changes to its parent file system (if any) and makes its
+     * controller eligible for garbage collection unless any strong references
+     * are held by the client application.
+     * This is equivalent to
      * {@code BitField.of(FsSyncOption.FORCE_CLOSE_INPUT, FsSyncOption.FORCE_CLOSE_OUTPUT, FsSyncOption.CLEAR_CACHE)}.
      * <p>
      * These options should be used if an application wants to
@@ -44,12 +44,13 @@ public class FsSyncOptions {
                                     CLEAR_CACHE);
 
     /**
-     * Waits for other threads to close their input and output resources
-     * (input and output streams etc.) for any file system entries
-     * before synchronizing the federated file system with its parent file
-     * system.
-     * Equivalent to
-     * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT)}.
+     * Waits for all other threads to close their I/O resources (i.e. streams,
+     * channels etc) for any entries of the file system, flushes its selective
+     * entry cache without clearing it, commits all changes to its parent file
+     * system (if any) and makes its controller eligible for garbage collection
+     * unless any strong references are held by the client application.
+     * This is equivalent to
+     * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT, FsSyncOptions.CLEAR_CACHE)}.
      * <p>
      * These options should be used if a multithreaded application wants to
      * synchronize all mounted archive files without affecting any I/O to
@@ -61,21 +62,26 @@ public class FsSyncOptions {
      * @since TrueZIP 7.5
      */
     public static final BitField<FsSyncOption>
-            SYNC = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT);
+            SYNC = BitField.of( WAIT_CLOSE_INPUT,
+                                WAIT_CLOSE_OUTPUT/*,
+                                CLEAR_CACHE*/); // TODO: Check if this should work - right now it creates incomprehensible failures of the integration tests.
 
     /**
-     * Cancels all pending changes.
-     * This option is only meaningful immediately before the federated file
-     * system itself gets deleted.
-     * Equivalent to
+     * Aborts all pending changes for the federated file system, clears the
+     * selective cache without flushing it and makes the file system controller
+     * eligible for garbage collection unless any strong references are held by
+     * the client application.
+     * This is equivalent to
      * {@code BitField.of(FsSyncOption.ABORT_CHANGES)}.
      * <p>
-     * These options should not normally be used by applications.
+     * These options are only meaningful immediately before the federated file
+     * system itself gets deleted and should not get used by client
+     * applications.
      * 
      * @since TrueZIP 7.5
      */
     public static final BitField<FsSyncOption>
-            CANCEL = BitField.of(ABORT_CHANGES);
+            RESET = BitField.of(ABORT_CHANGES);
 
     /* Can't touch this - hammer time! */
     private FsSyncOptions() { }
