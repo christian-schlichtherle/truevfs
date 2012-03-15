@@ -103,8 +103,8 @@ extends FsArchiveController<E> {
             }
 
             assert this != mountState;
-            // DON'T just call autoMounter.getFileSystem()!
-            // This would return null if autoMounter is an instance of
+            // DON'T just call mountState.getFileSystem()!
+            // This would return null if mountState is an instance of
             // FalsePositiveFileSystem.
             return mountState.autoMount(autoCreate);
         }
