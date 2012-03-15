@@ -70,10 +70,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             throw new AssertionError("Expected an instance of the " + FsSyncException.class);
         } catch (final FsSyncWarningException ex) {
             // Check debris.
-            if (ex != fuse) {
-                assert !(ex.getCause() instanceof FsControllerException) : ex.getCause();
+            if (ex != fuse)
                 throw ex;
-            }
         }
     }
 
