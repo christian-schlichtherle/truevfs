@@ -7,7 +7,8 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
+import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_OUTPUT;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -62,7 +63,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             : ThreadLocalUtilFactory.OLD
                 ).newThreadLocalUtil();
 
-    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE = SYNC.not();
+    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE
+            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT).not();
 
     private final ReadLock readLock;
     private final WriteLock writeLock;
@@ -370,28 +372,29 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         // MUST not initialize within IOOperation => would always be true!
-        final boolean locking = threadUtil.get().locking;
+        final BitField<FsSyncOption> sync = threadUtil.get().locking
+                ? options.and(NOT_WAIT_CLOSE) // may be == options!
+                : options;
 
         class Sync implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                if (locking && !options.and(SYNC).isEmpty()) {
-                    // Prevent potential dead locks by using a half busy loop.
-                    // Note that a sync in a parent file system is a rare event
-                    // so that this should not create performance problems,
-                    // even when accessing deeply nested archive files in the
-                    // integration tests.
-                    try {
-                        delegate.sync(options.and(NOT_WAIT_CLOSE), handler);
-                    } catch (final FsSyncWarningException ex) {
-                        throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
-                    } catch (final FsSyncException ex) {
-                        if (ex.getCause() instanceof FsOpenIOResourcesException)
-                            throw FsNeedsLockRetryException.get(getModel());
-                        throw ex;
-                    }
-                } else {
-                    delegate.sync(options, handler);
+                // Prevent potential dead locks by performing a timed wait for
+                // open I/O resources if the current thread is already holding
+                // a file system lock.
+                // Note that a sync in a parent file system is a rare event
+                // so that this should not create performance problems, even
+                // when accessing deeply nested archive files, e.g. for the
+                // integration tests.
+                try {
+                    delegate.sync(sync, handler);
+                } catch (final FsSyncWarningException ex) {
+                    throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
+                } catch (final FsSyncException ex) {
+                    if (sync != options // OK, see contract for BitField.and()!
+                            && ex.getCause() instanceof FsOpenIOResourcesException)
+                        throw FsNeedsLockRetryException.get(getModel());
+                    throw ex;
                 }
                 return null;
             }
@@ -599,7 +602,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            FsLockController.this.close(delegate);
+            close(delegate);
         }
     } // LockReadOnlyFile
 
@@ -613,7 +616,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            FsLockController.this.close(delegate);
+            close(delegate);
         }
     } // LockSeekableByteChannel
 
@@ -627,7 +630,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            FsLockController.this.close(delegate);
+            close(delegate);
         }
     } // LockInputStream
 
@@ -641,7 +644,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            FsLockController.this.close(delegate);
+            close(delegate);
         }
     } // LockOutputStream
 
