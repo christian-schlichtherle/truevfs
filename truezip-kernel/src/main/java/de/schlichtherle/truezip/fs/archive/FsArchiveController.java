@@ -12,7 +12,6 @@ import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
-import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
@@ -360,20 +359,13 @@ extends FsLockModelController {
     throws IOException {
         checkSync(name, null);
         final FsArchiveFileSystem<E> fs = autoMount();
+        fs.unlink(name);
         if (name.isRoot()) {
-            int size = fs.getEntry(ROOT).getMembers().size();
-            if (0 != size)
-                throw new IOException(String.format(
-                        "root directory not empty - contains %d member(s)",
-                        size));
             // Check for any archive entries with absolute entry names.
-            // Subtract one for the ROOT entry.
-            size = fs.getSize() - 1;
+            final int size = fs.getSize() - 1; // mind the ROOT entry
             if (0 != size)
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] { getMountPoint(), size });
-        } else {
-            fs.unlink(name);
         }
     }
 

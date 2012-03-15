@@ -565,11 +565,12 @@ implements Iterable<FsCovariantEntry<E>> {
     } // class SegmentLink
 
     /**
-     * If this method returns, the file system entry identified by the given
-     * {@code path} has been successfully deleted from this archive file
-     * system.
-     * If the file system entry is a directory, it must be empty for successful
-     * deletion.
+     * Tests the named file system entry and then - unless its the file system
+     * root - notifies the listener and deletes the entry.
+     * For the file system root, only the tests are performed but the listener
+     * does not get notified and the entry does not get deleted.
+     * For the tests to succeed, the named file system entry must exist and
+     * directory entries (including the file system root) must be empty.
      *
      * @param  name the archive file system entry name.
      * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
@@ -579,9 +580,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     void unlink(final FsEntryName name)
     throws IOException {
-        if (name.isRoot())
-            throw new FsArchiveFileSystemException(name,
-                    "root directory cannot get unlinked");
+        // Test.
         final String path = name.getPath();
         final FsCovariantEntry<E> ce = master.get(path);
         if (null == ce)
@@ -591,9 +590,13 @@ implements Iterable<FsCovariantEntry<E>> {
             final int size = ce.getMembers().size();
             if (0 != size)
                 throw new FsArchiveFileSystemException(name, String.format(
-                        "directory is not empty - it contains %d member(s)",
+                        "directory not empty - contains %d member(s)",
                         size));
         }
+        if (name.isRoot())
+            return;
+
+        // Notify listener and modify.
         touch();
         master.remove(path);
         {
