@@ -184,9 +184,9 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 // for the file system write lock against this thread which has
                 // now detected the invalid state.
                 
-                // FIXME: This is not the only possible scenario, so this
-                // assertion sometimes fails!
-                assert null != getParent().getParent() : invalidState;
+                // TODO: This is not the only possible scenario, so this
+                // assertion may fail!
+                //assert null != getParent().getParent() : invalidState;
 
                 // In an attempt to recover from this invalid state, the
                 // current thread could just step back in order to give the
@@ -377,7 +377,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     @Override
                     public void close() throws IOException {
                         delegate.close();
-                        mknodPost();
+                        assert isWriteLockedByCurrentThread();
+                        //caches.put(name, EntryCache.this); // evt. re-install after clear
+                        if (EntryCache.this == caches.get(name)) // check for clear
+                            mknodPost();
                     }
                 } // Channel
 
@@ -426,7 +429,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     @Override
                     public void close() throws IOException {
                         delegate.close();
-                        mknodPost();
+                        assert isWriteLockedByCurrentThread();
+                        //caches.put(name, EntryCache.this); // evt. re-install after clear
+                        if (EntryCache.this == caches.get(name)) // check for clear
+                            mknodPost();
                     }
                 } // Stream
 
@@ -445,10 +451,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             void mknod( final BitField<FsOutputOption> options,
                         final @CheckForNull Entry template)
             throws IOException {
-                while (true) {
-                    try {
+                /*while (true) {
+                    try {*/
                         delegate.mknod(name, FILE, options, template);
-                    } catch (final FsNeedsSyncException mknodEx) {
+                    /*} catch (final FsNeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
                         // has already been written to the output archive for
                         // the target archive file.
@@ -494,7 +500,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         logger.log(Level.WARNING, "ignoring", mknodEx);
                     }
                     break;
-                }
+                }*/
             }
         } // Output
     } // EntryCache
