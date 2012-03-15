@@ -47,13 +47,13 @@ public enum FsSyncOption {
      * Then if this option is set, the respective file system controller
      * proceeds to update the federated file system anyway and finally throws
      * an {@link FsSyncWarningException} with a
-     * {@link FsResourceBusyIOException} as its cause to indicate that any
+     * {@link FsOpenIOResourcesException} as its cause to indicate that any
      * subsequent operations on these resources will fail with an
      * {@link InputClosedException} because they have been forced to close.
      * <p>
      * If this option is not set however, the federated file system is
      * <em>not</em> updated, but instead
-     * an {@link FsSyncException} with a {@link FsResourceBusyIOException} as
+     * an {@link FsSyncException} with a {@link FsOpenIOResourcesException} as
      * its cause is thrown to indicate
      * that the application must close all input resources first.
      */
