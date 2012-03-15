@@ -286,13 +286,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
-            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -304,13 +302,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
-            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -322,13 +318,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
-            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
@@ -340,13 +334,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
-            assert isWriteLockedByCurrentThread();
             getAccountant().startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
-            assert isWriteLockedByCurrentThread();
             getAccountant().stopAccountingFor(this);
             delegate.close();
         }
