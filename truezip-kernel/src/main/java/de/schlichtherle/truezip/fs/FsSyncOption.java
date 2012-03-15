@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -19,9 +15,8 @@ import javax.annotation.concurrent.Immutable;
  * systems via the methods {@link FsController#sync(BitField)} and its many
  * variants and incarnations in the TrueZIP Kernel and client API modules.
  *
- * @see     FsSyncOptions
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    FsSyncOptions
+ * @author Christian Schlichtherle
  */
 @Immutable
 public enum FsSyncOption {
@@ -96,8 +91,7 @@ public enum FsSyncOption {
      * Suppose a controller for a federated file system has selectively cached
      * entry contents.
      * Then if this option is set when the file system gets synchronized,
-     * the entry contents get flushed to the file system and finally the cache
-     * gets cleared.
+     * the entry contents get cleared.
      */
     CLEAR_CACHE,
 }
