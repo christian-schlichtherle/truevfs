@@ -14,7 +14,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * 
  * @author Christian Schlichtherle
  */
-// TODO: Remove this exception type.
 @ThreadSafe
 public class FsArchiveFileSystemException extends IOException {
     private static final long serialVersionUID = 4652084652223428651L;
@@ -32,12 +31,12 @@ public class FsArchiveFileSystemException extends IOException {
         this.path = path;
     }
 
-    FsArchiveFileSystemException(String path, IOException cause) {
+    FsArchiveFileSystemException(@CheckForNull String path, Throwable cause) {
         super(cause);
         this.path = path;
     }
 
-    FsArchiveFileSystemException(@CheckForNull String path, String message, IOException cause) {
+    FsArchiveFileSystemException(@CheckForNull String path, String message, Throwable cause) {
         super(message, cause);
         this.path = path;
     }
@@ -45,12 +44,12 @@ public class FsArchiveFileSystemException extends IOException {
     @Override
     public String getMessage() {
         final String m = super.getMessage();
-        return null != path ?
-                new StringBuilder(path)
+        return null == path
+                ? m
+                : new StringBuilder(path.isEmpty() ? "<file system root>" : path)
                     .append(" (")
                     .append(m)
                     .append(")")
-                    .toString()
-                : m;
+                    .toString();
     }
 }
