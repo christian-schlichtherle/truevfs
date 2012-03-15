@@ -50,7 +50,7 @@ public class FsSyncOptions {
      * system (if any) and makes its controller eligible for garbage collection
      * unless any strong references are held by the client application.
      * This is equivalent to
-     * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT, FsSyncOptions.CLEAR_CACHE)}.
+     * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT)}.
      * <p>
      * These options should be used if a multithreaded application wants to
      * synchronize all mounted archive files without affecting any I/O to
