@@ -258,43 +258,6 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
         }
     } // ByteArrayInputSocket
 
-    private class DataInputChannel extends SeekableByteBufferChannel {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DataInputChannel() {
-            super(ByteBuffer.wrap(data).asReadOnlyBuffer());
-        }
-
-        @Override
-        public void close() throws IOException {
-            super.close();
-            times.put(READ, System.currentTimeMillis());
-        }
-    } // DataInputChannel
-
-    private class DataReadOnlyFile extends ByteArrayReadOnlyFile {
-        DataReadOnlyFile() {
-            super(data);
-        }
-
-        @Override
-        public void close() throws IOException {
-            super.close();
-            times.put(READ, System.currentTimeMillis());
-        }
-    } // DataReadOnlyFile
-
-    private class DataInputStream extends ByteArrayInputStream {
-        DataInputStream() {
-            super(data);
-        }
-
-        @Override
-        public void close() throws IOException {
-            super.close();
-            times.put(READ, System.currentTimeMillis());
-        }
-    } // DataInputStream
-
     private final class Nio2ByteArrayOutputSocket
     extends ByteArrayOutputSocket {
         @Override
@@ -321,7 +284,44 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
         }
     } // ByteArrayOutputSocket
 
+    private class DataReadOnlyFile extends ByteArrayReadOnlyFile {
+        boolean closed;
+
+        DataReadOnlyFile() {
+            super(data);
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (closed)
+                return;
+            super.close();
+            times.put(READ, System.currentTimeMillis());
+            closed = true;
+        }
+    } // DataReadOnlyFile
+
+    private class DataInputChannel extends SeekableByteBufferChannel {
+        boolean closed;
+
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DataInputChannel() {
+            super(ByteBuffer.wrap(data).asReadOnlyBuffer());
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (closed)
+                return;
+            super.close();
+            times.put(READ, System.currentTimeMillis());
+            closed = true;
+        }
+    } // DataInputChannel
+
     private class DataOutputChannel extends SeekableByteBufferChannel {
+        boolean closed;
+
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         DataOutputChannel() {
             super((ByteBuffer) ByteBuffer.allocate(initialCapacity).limit(0));
@@ -329,23 +329,48 @@ public class ByteArrayIOBuffer implements IOEntry<ByteArrayIOBuffer> {
 
         @Override
         public void close() throws IOException {
+            if (closed)
+                return;
             super.close();
             times.put(WRITE, System.currentTimeMillis());
             final ByteBuffer buffer = getByteBuffer();
             data = Arrays.copyOf(buffer.array(), buffer.limit());
+            closed = true;
         }
     } // DataOutputChannel
 
+    private class DataInputStream extends ByteArrayInputStream {
+        boolean closed;
+
+        DataInputStream() {
+            super(data);
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (closed)
+                return;
+            super.close();
+            times.put(READ, System.currentTimeMillis());
+            closed = true;
+        }
+    } // DataInputStream
+
     private class DataOutputStream extends ByteArrayOutputStream {
+        boolean closed;
+
         DataOutputStream() {
             super(initialCapacity);
         }
 
         @Override
         public void close() throws IOException {
+            if (closed)
+                return;
             super.close();
             times.put(WRITE, System.currentTimeMillis());
             data = toByteArray();
+            closed = true;
         }
     } // DataOutputStream
 }
