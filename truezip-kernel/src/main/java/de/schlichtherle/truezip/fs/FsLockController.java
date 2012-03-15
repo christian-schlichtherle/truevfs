@@ -39,7 +39,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.Icon;
 
 /**
@@ -50,7 +49,7 @@ import javax.swing.Icon;
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 public final class FsLockController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
