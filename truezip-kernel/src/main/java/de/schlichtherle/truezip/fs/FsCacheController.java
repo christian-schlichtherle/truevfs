@@ -322,12 +322,21 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             caches.put(name, this);
         }
 
-        /** This class requires EAGER INITIALIZATION of its delegate! */
+        /**
+         * This class requires LAZY INITIALIZATION of its delegate and
+         * automatic decoupling on exceptions!
+         */
         @Immutable
-        final class Input extends DecoratingInputSocket<Entry> {
-            Input(BitField<FsInputOption> options) {
-                super(delegate.getInputSocket(name,
-                        options.clear(FsInputOption.CACHE)));
+        final class Input extends ClutchInputSocket<Entry> {
+            final BitField<FsInputOption> options;
+
+            Input(final BitField<FsInputOption> options) {
+                this.options = options.clear(FsInputOption.CACHE); // consume
+            }
+
+            @Override
+            protected InputSocket<? extends Entry> getLazyDelegate() {
+                return delegate.getInputSocket(name, options);
             }
 
             @Override
@@ -349,7 +358,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @CreatesObligation
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
-                    super(getBoundSocket().newInputStream());
+                    super(Input.super.newInputStream());
                     assert isTouched();
                 }
 
@@ -361,7 +370,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             } // Stream
         } // Input
 
-        /** This class requires LAZY INITIALIZATION of its delegate! */
+        /**
+         * This class requires LAZY INITIALIZATION of its delegate, but NO
+         * automatic decoupling on exceptions!
+         */
         @Immutable
         final class Nio2Output extends Output {
             Nio2Output( BitField<FsOutputOption> options,
@@ -395,7 +407,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             } // Channel
         } // Nio2Output
 
-        /** This class requires LAZY INITIALIZATION of its delegate! */
+        /**
+         * This class requires LAZY INITIALIZATION of its delegate, but NO
+         * automatic decoupling on exceptions!
+         */
         @Immutable
         class Output extends ClutchOutputSocket<Entry> {
             final BitField<FsOutputOption> options;
