@@ -363,7 +363,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                mknodPre();
+                preOutput();
 
                 class Channel extends DecoratingSeekableByteChannel {
                     @CreatesObligation
@@ -377,10 +377,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     @Override
                     public void close() throws IOException {
                         delegate.close();
-                        assert isWriteLockedByCurrentThread();
-                        //caches.put(name, EntryCache.this); // evt. re-install after clear
-                        if (EntryCache.this == caches.get(name)) // check for clear
-                            mknodPost();
+                        postOutput();
                     }
                 } // Channel
 
@@ -415,7 +412,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
             @Override
             public final OutputStream newOutputStream() throws IOException {
-                mknodPre();
+                preOutput();
 
                 class Stream extends DecoratingOutputStream {
                     @CreatesObligation
@@ -429,32 +426,32 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     @Override
                     public void close() throws IOException {
                         delegate.close();
-                        assert isWriteLockedByCurrentThread();
-                        //caches.put(name, EntryCache.this); // evt. re-install after clear
-                        if (EntryCache.this == caches.get(name)) // check for clear
-                            mknodPost();
+                        postOutput();
                     }
                 } // Stream
 
                 return new Stream();
             }
 
-            void mknodPre() throws IOException {
+            void preOutput() throws IOException {
                 mknod(options, template);
             }
 
-            void mknodPost() throws IOException {
+            void postOutput() throws IOException {
                 mknod(  options.clear(EXCLUSIVE),
                         null != template ? template : cache.getEntry());
+                assert isWriteLockedByCurrentThread();
+                caches.put(name, EntryCache.this); // may re-install after clear
             }
 
             void mknod( final BitField<FsOutputOption> options,
                         final @CheckForNull Entry template)
             throws IOException {
-                /*while (true) {
-                    try {*/
+                while (true) {
+                    try {
                         delegate.mknod(name, FILE, options, template);
-                    /*} catch (final FsNeedsSyncException mknodEx) {
+                        break;
+                    } catch (final FsNeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
                         // has already been written to the output archive for
                         // the target archive file.
@@ -468,7 +465,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // input stream.
                         try {
                             delegate.sync(FsSyncOptions.SYNC);
-                            continue; // recovery succeeded, now repeat mknod
                         } catch (final FsSyncException syncEx) {
                             if (!(syncEx.getCause() instanceof FsOpenIOResourcesException)) {
                                 // This indicates an issue which is more
@@ -478,29 +474,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             }
                             // We couldn't recover the mknod failure because
                             // the current thread is holding open I/O resources.
-
-                            if (options.get(EXCLUSIVE)) {
-                                // We can't tolerate this, so pass the original
-                                // exception on to the caller and let's hope
-                                // that this will not create an endless loop.
-                                throw mknodEx;
-                            }
+                            throw mknodEx;
                         }
-
-                        // Passing this exception would trigger another sync()
-                        // which may fail for the same reason und thus create
-                        // an endless loop
-                        //throw mknodEx;
-
-                        // Dito for mapping the exception.
-                        //throw FsNeedsLockRetryException.get(getModel());
-
-                        // So we can't do anything about this issue until the
-                        // next sync().
-                        logger.log(Level.WARNING, "ignoring", mknodEx);
                     }
-                    break;
-                }*/
+                }
             }
         } // Output
     } // EntryCache
