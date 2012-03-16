@@ -78,19 +78,6 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     }
 
     /**
-     * Clears {@link FsInputOption#CACHE} in {@code options} before
-     * forwarding the call to {@code controller}.
-     */
-    @Override
-    public InputSocket<?> getInputSocket(   FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsInputOption> options) {
-        return controller.getInputSocket(
-                name,
-                options.clear(FsInputOption.CACHE));
-    }
-
-    /**
      * Sets {@link FsOutputOption#COMPRESS} in {@code options} before
      * forwarding the call to {@code controller}.
      */
