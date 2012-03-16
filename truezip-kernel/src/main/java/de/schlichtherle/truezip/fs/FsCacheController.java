@@ -456,40 +456,56 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // has already been written to the output archive for
                         // the target archive file.
 
-                        // Recovering from this exception may fail because this
-                        // might be an attempt to acquire an output stream for
-                        // a copy operation and the input stream may have been
-                        // acquired already and accessing the same archive file.
-                        // The sync() would then fail with an FsSyncException
-                        // because the target archive file is busy with this
-                        // input stream.
+                        // Even if we were asked to create the entry
+                        // EXCLUSIVEly, first we must try to get the cache in
+                        // sync() with the virtual file system again and retry
+                        // the mknod().
                         try {
                             delegate.sync(FsSyncOptions.SYNC);
-                            continue; // recovery succeeded, now repeat mknod
+                            continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
+                            // sync() failed, maybe just because the current
+                            // thread has already acquired some open I/O
+                            // resources for the same target archive file, e.g.
+                            // an input stream for a copy operation and this
+                            // is an artifact of an attempt to acquire the
+                            // output stream for a child file system.
                             if (!(syncEx.getCause() instanceof FsOpenIOResourcesException)) {
-                                // This indicates an issue which is more
-                                // serious than just some open resources, so
-                                // pass it on.
+                                // Too bad, sync() failed because of more
+                                // serious issue than just some open resources.
+                                // Let's rethrow the sync exception.
                                 throw syncEx;
                             }
-                            // We couldn't recover the mknod failure because
-                            // the current thread is holding open I/O resources.
 
-                            // Passing this exception would trigger another sync()
-                            // which may fail for the same reason und thus create
-                            // an endless loop
+                            // OK, we couldn't sync() because the current
+                            // thread has acquired open I/O resources for the
+                            // same target archive file.
+                            // Normally, we would be expected to rethrow the
+                            // mknod exception to trigger another sync(), but
+                            // this would fail for the same reason und create
+                            // an endless loop, so we can't do this.
                             //throw mknodEx;
 
                             // Dito for mapping the exception.
                             //throw FsNeedsLockRetryException.get(getModel());
 
-                            // So we can just log this issue.
-                            // It's expected to be volatile and should vanish
-                            // upon the next sync().
-                            logger.log(options.get(EXCLUSIVE)   ? Level.WARNING
-                                                                : Level.INFO,
-                                    "ignoring", mknodEx);
+                            if (options.get(EXCLUSIVE)) {
+                                // We've been asked not to tolerate the
+                                // original event but we can't just rethrow the
+                                // mknod exception, so let's rethrow the sync
+                                // exception instead.
+                                throw syncEx;
+                            }
+
+                            // Finally, the mknod failed because the entry
+                            // has already been output to the target archive
+                            // file - so what?!
+                            // This should mark only a volatile issue because
+                            // the next sync() will sort it out once all the
+                            // open I/O resources have been closed.
+                            // So let's just log the mknod exception and
+                            // continue anyway...
+                            logger.log(Level.FINE, "ignoring", mknodEx);
                             break;
                         }
                     }
