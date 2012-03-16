@@ -169,20 +169,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         lock.unlock();
                     }
                 } catch (final IOException ex) {
-                    if (!needsLockRetry(ex))
+                    if (!(ex instanceof FsNeedsLockRetryException))
                         throw ex;
                     thread.pause();
                 }
             }
         }
-    }
-
-    private static boolean needsLockRetry(Throwable t) {
-        do {
-            if (t instanceof FsNeedsLockRetryException)
-                return true;
-        } while (null != (t = t.getCause()));
-        return false;
     }
 
     @Override
