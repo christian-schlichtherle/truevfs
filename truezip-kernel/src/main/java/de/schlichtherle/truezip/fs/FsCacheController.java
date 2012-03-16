@@ -444,13 +444,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 caches.put(name, EntryCache.this); // may re-install after clear
             }
 
+
             void mknod( final BitField<FsOutputOption> options,
                         final @CheckForNull Entry template)
             throws IOException {
                 while (true) {
                     try {
                         delegate.mknod(name, FILE, options, template);
-                        break;
                     } catch (final FsNeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
                         // has already been written to the output archive for
@@ -465,6 +465,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // input stream.
                         try {
                             delegate.sync(FsSyncOptions.SYNC);
+                            continue; // recovery succeeded, now repeat mknod
                         } catch (final FsSyncException syncEx) {
                             if (!(syncEx.getCause() instanceof FsOpenIOResourcesException)) {
                                 // This indicates an issue which is more
@@ -474,9 +475,28 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             }
                             // We couldn't recover the mknod failure because
                             // the current thread is holding open I/O resources.
-                            throw mknodEx;
+
+                            if (options.get(EXCLUSIVE)) {
+                                // We can't tolerate this, so pass the original
+                                // exception on to the caller and let's hope
+                                // that this will not create an endless loop.
+                                throw mknodEx;
+                            }
                         }
+
+                        // Passing this exception would trigger another sync()
+                        // which may fail for the same reason und thus create
+                        // an endless loop
+                        //throw mknodEx;
+
+                        // Dito for mapping the exception.
+                        //throw FsNeedsLockRetryException.get(getModel());
+
+                        // So we can't do anything about this issue until the
+                        // next sync().
+                        logger.log(Level.WARNING, "ignoring", mknodEx);
                     }
+                    break;
                 }
             }
         } // Output
