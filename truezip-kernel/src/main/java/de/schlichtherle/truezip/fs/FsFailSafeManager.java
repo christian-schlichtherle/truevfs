@@ -36,7 +36,7 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
 
-    private volatile @CheckForNull Shutdown shutdown;
+    private volatile @CheckForNull ShutdownHook shutdownHook;
 
     public FsFailSafeManager(FsManager manager) {
         super(manager);
@@ -54,13 +54,13 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
     getController(  final FsMountPoint mountPoint,
                     final FsCompositeDriver driver) {
         FsController<?> controller = delegate.getController(mountPoint, driver);
-        if (null == this.shutdown) { // DCL does work with volatile fields since JSE 5!
+        if (null == this.shutdownHook) { // DCL does work with volatile fields since JSE 5!
             synchronized (this) {
-                Shutdown shutdown = this.shutdown;
+                ShutdownHook shutdown = this.shutdownHook;
                 if (null == shutdown) {
-                    shutdown = new Shutdown(delegate);
+                    shutdown = new ShutdownHook(delegate);
                     RUNTIME.addShutdownHook(shutdown);
-                    this.shutdown = shutdown;
+                    this.shutdownHook = shutdown;
                 }
             }
         }
@@ -83,12 +83,12 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        if (null != this.shutdown) {
+        if (null != this.shutdownHook) {
             synchronized (this) {
-                final Shutdown shutdown = this.shutdown;
-                if (null != shutdown) {
-                    this.shutdown = null;
-                    RUNTIME.removeShutdownHook(shutdown);
+                final ShutdownHook shutdownHook = this.shutdownHook;
+                if (null != shutdownHook) {
+                    this.shutdownHook = null;
+                    RUNTIME.removeShutdownHook(shutdownHook);
                 }
             }
         }
@@ -96,18 +96,12 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
     }
 
     /** A shutdown hook thread. */
-    private static class Shutdown extends Thread {
-        Shutdown(final FsManager manager) {
-            super(new Sync(manager), Shutdown.class.getName());
-            super.setPriority(Thread.MAX_PRIORITY);
-        }
-    } // Shutdown
-
-    /** A runnable which commits all unsynchronized changes to file systems. */
-    private static class Sync implements Runnable {
+    private static class ShutdownHook extends Thread {
         private final FsManager manager;
 
-        Sync(final FsManager manager) {
+        ShutdownHook(final FsManager manager) {
+            super(ShutdownHook.class.getName());
+            super.setPriority(Thread.MAX_PRIORITY);
             this.manager = manager;
         }
 
@@ -121,5 +115,5 @@ public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
                 ex.printStackTrace();
             }
         }
-    } // Sync
+    } // ShutdownHook
 }
