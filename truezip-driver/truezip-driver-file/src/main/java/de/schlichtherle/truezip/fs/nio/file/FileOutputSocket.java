@@ -130,7 +130,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             if (commit) {
                 try {
                     move(tempFile, entryFile, REPLACE_EXISTING);
-                } catch (IOException ex) {
+                } catch (final IOException ex) {
                     // Slow.
                     /*Files.copy(tempFile, entryFile,
                             StandardCopyOption.REPLACE_EXISTING);*/
@@ -194,7 +194,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 try {
                     super.close();
                 } finally {
-                    FileOutputSocket.this.close(temp, null == exception);
+                    close(temp, null == exception);
                 }
             }
         } // SeekableByteChannel
@@ -228,7 +228,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 super.close();
                 closed = true;
-                FileOutputSocket.this.close(temp, null == exception);
+                close(temp, null == exception);
             }
         } // OutputStream
 
