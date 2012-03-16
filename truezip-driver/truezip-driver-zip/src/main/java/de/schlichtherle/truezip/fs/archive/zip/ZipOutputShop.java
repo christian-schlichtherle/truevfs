@@ -219,7 +219,7 @@ implements OutputShop<ZipDriverEntry> {
      */
     @Override
     public void close() throws IOException {
-        super.finish();
+        finish();
         final IOPool.Entry<?> pa = this.postamble;
         if (null != pa) {
             this.postamble = null;
