@@ -150,7 +150,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     return;
                 super.close();
                 closed = true;
-                FileOutputSocket.this.close(temp, null == exception);
+                close(temp, null == exception);
             }
         } // OutputStream
 
