@@ -62,7 +62,10 @@ public class FsSyncOptions {
      * @since TrueZIP 7.5
      */
     // Note that setting CLEAR_CACHE may cause endless loops when working with
-    // nested archive files.
+    // nested archive files and there are copy operations where an input stream
+    // has been successfully acquired and then acquiring the output stream
+    // would require an automatic sync() of the same target archive file from
+    // which the input stream is reading.
     public static final BitField<FsSyncOption>
             SYNC = BitField.of( WAIT_CLOSE_INPUT,
                                 WAIT_CLOSE_OUTPUT);
