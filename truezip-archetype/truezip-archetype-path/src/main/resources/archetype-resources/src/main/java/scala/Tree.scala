@@ -20,8 +20,7 @@ import scala.collection.JavaConversions._
  * and this file actually exists as a ZIP file, then the tree graph of the
  * directory structure of this ZIP file gets printed.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 object Tree extends Application {
   private val defaultPrefix  = "|-- "

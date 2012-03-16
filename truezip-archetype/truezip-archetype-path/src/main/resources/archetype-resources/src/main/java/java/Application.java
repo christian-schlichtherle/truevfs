@@ -10,8 +10,7 @@ import de.schlichtherle.truezip.file.TApplication;
 /**
  * An abstract class which configures the TrueZIP Path module.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 abstract class Application<E extends Exception> extends TApplication<E> {
 
