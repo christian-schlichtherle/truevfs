@@ -61,10 +61,11 @@ public class FsSyncOptions {
      * 
      * @since TrueZIP 7.5
      */
+    // Note that setting CLEAR_CACHE may cause endless loops when working with
+    // nested archive files.
     public static final BitField<FsSyncOption>
             SYNC = BitField.of( WAIT_CLOSE_INPUT,
-                                WAIT_CLOSE_OUTPUT/*,
-                                CLEAR_CACHE*/); // TODO: Check if this should work - right now it creates incomprehensible failures of the integration tests.
+                                WAIT_CLOSE_OUTPUT);
 
     /**
      * Aborts all pending changes for the federated file system, clears the
