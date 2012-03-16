@@ -417,6 +417,14 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
 
             @Override
+            public Entry getLocalTarget() throws IOException {
+                // Note that the super class implementation MUST get
+                // bypassed because the delegate MUST get kept even upon an
+                // exception!
+                return getBoundSocket().getLocalTarget();
+            }
+
+            @Override
             public final OutputStream newOutputStream() throws IOException {
                 preOutput();
                 return new Stream();
