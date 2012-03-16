@@ -22,8 +22,7 @@ import static java.nio.file.StandardCopyOption.*;
  * {@code archive.zip}, a ZIP file with this name gets created unless it
  * already exists.
  * 
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @author Christian Schlichtherle
  */
 public class Copy extends Application<IOException> {
 
