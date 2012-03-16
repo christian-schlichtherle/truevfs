@@ -267,7 +267,7 @@ system space.
                          test - see http://java.net/jira/browse/TRUEZIP-228 -->
                     <version>2.11</version>
                     <configuration>
-                        <!-- Consider 80% blocking factor for I/O. -->
+                        <!-- Consider 90% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
                         <systemPropertyVariables>
                             <!-- While running the tests with isolated
