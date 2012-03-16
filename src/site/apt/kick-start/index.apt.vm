@@ -1,23 +1,60 @@
     -----------------------
-    Kick-Starting TrueZIP
+    Getting Started
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Kick-Starting TrueZIP
+Getting Started
 
-    This section shows how to kick-start a TrueZIP application by generating
-    it from a Maven archetype.
-    Each client API features its own Maven archetype:
+    To get you started quickly, the following resources are available:
 
-    * The TrueZIP File* API features an archetype with the following Maven
+    * The section {{Kick-Starting}} below shows you how to generate, build
+      and run your first application for the two client APIs TrueZIP&#160;File*
+      and TrueZIP&#160;Path in about ten minutes!
+
+    * If you are looking for more sample code and applications, please
+      {{{../source-repository.html}check out}} or
+      {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+      the source code of the
+      {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+
+    * If you need help, please read the {{{../faq.html}FAQ}}
+      before subscribing and posting to the
+      {{{../mail-lists.html}User Mailing List}}.
+      If you have an account on {{{http://java.net}java.net}}, your subscription will be
+      automatically accepted, otherwise you'll have to wait until it gets
+      manually accepted (~ 1 day without guarantee).
+
+    * Last, but not least, please read the comprehensive
+      {{{../apidocs/index.html}Javadoc}}.
+
+    []
+
+    Note that the documentation on this site is generally split across modules,
+    so please check the section <<Sub-Modules>> in the navigation bar on the
+    left of this page, too.
+
+    If you're still not fed up, you might also want to check out
+    {{{http://truezip.schlichtherle.de}The&#160;TrueZIP&#160;Blog}}
+    or the
+    {{{http://java.net/projects/truezip}TrueZIP&#160;Developer&#160;Website}}.
+
+* Kick-Starting
+
+    This section shows you how to generate an application from TrueZIP's
+    archetypes for {{{http://maven.apache.org}Maven}} projects.
+    Each client API features its own archetype:
+
+    * The client API {{{../truezip-file/index.html}TrueZIP File*}}
+      (requires JSE 6+) features an archetype with the following Maven
       coordinates:
 
     Group Id: <<de.schlichtherle.truezip>>\
     Artifact Id: <<truezip-archetype-file>>\
     Version: <<${project.version}>>
     
-    * The TrueZIP Path API features an archetype with the following Maven
+    * The client API {{{../truezip-path/index.html}TrueZIP Path}}
+      (requires JSE 7+) features an archetype with the following Maven
       coordinates:
 
     Group Id: <<de.schlichtherle.truezip>>\

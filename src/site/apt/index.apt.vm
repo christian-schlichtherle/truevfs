@@ -6,12 +6,16 @@
 
 About TrueZIP
 
+*Welcome!
+
     TrueZIP is a Java based plug-in framework for virtual file systems
     (VFS) which enables client applications to perform CRUD (Create,
     Read, Update, Delete) operations on archive files as if they were
     virtual directories, even with nested archive files in
     multithreaded environments - see {{{./features.html}Key Features}}.
-    The most recent version is TrueZIP&#160;${project.version} - see
+    TrueZIP is Open Source Software and is covered by the
+    {{{./license.html}Eclipse Public License, Version 1.0}}.
+    The most recent release is <<TrueZIP&#160;${project.version}>> - see
     {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
 
 * Supported File System Types
@@ -53,8 +57,9 @@ About TrueZIP
 *--+--+--+
 
     Writing an application for either API is really easy:
-    Have a look at the {{{./usecases/index.html}Use Cases}} for some samples
-    using the API of the module TrueZIP&#160;File*.
+    Please have a look at the page {{{./kick-start/index.html}Getting Started}}
+    to learn how to generate a TrueZIP client application from a Maven
+    archetype in about ten minutes.
 
 * Extending TrueZIP
 
@@ -83,38 +88,3 @@ About TrueZIP
     {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
     the source code of this project and consult the file system driver
     implementations which ship with TrueZIP, e.g. TrueZIP Driver FILE or TrueZIP Driver ZIP.
-
-* Getting Started
-
-    [[1]] Read the
-          {{{./kick-start/index.html}Kick-Start}} section in order to generate,
-          build and run a TrueZIP File* or TrueZIP Path application in about
-          ten minutes!
-
-    [[1]] If you are looking for more sample code and applications, please
-          {{{./source-repository.html}check out}} or
-          {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
-          the source code of the
-          {{{./truezip-samples/index.html}TrueZIP Samples}} module.
-
-    [[1]] If you need help, please read the {{{./faq.html}FAQ}}
-          before subscribing and posting to the
-          {{{./mail-lists.html}User Mailing List}}.
-
-    [[1]] Last, but not least, please read the
-          {{{./apidocs/index.html}Javadoc}}.
-
-    []
-
-    Note that the documentation on this site is generally split across modules,
-    so please check the section <Project Modules> in the navigation bar on
-    this page, too.
-
-    If you're still not fed up, you might also want to check out
-    {{{http://truezip.schlichtherle.de}The&#160;TrueZIP&#160;Blog}}
-    or the
-    {{{http://java.net/projects/truezip}TrueZIP&#160;Developer&#160;Website}}.
-
-* Migration from TrueZIP&#160;6
-
-    There's an {{{./migration.html}article}} for this here, too!
