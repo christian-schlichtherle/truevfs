@@ -222,6 +222,7 @@ implements OutputShop<ZipDriverEntry> {
         super.finish();
         final IOPool.Entry<?> pa = this.postamble;
         if (null != pa) {
+            this.postamble = null;
             final InputSocket<?> is = pa.getInputSocket();
             try {
                 final InputStream in = is.newInputStream();
@@ -241,7 +242,6 @@ implements OutputShop<ZipDriverEntry> {
                     in.close();
                 }
             } finally {
-                this.postamble = null;
                 pa.release();
             }
         }
