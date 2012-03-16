@@ -46,9 +46,8 @@ public class FsSyncOptions {
     /**
      * Waits for all other threads to close their I/O resources (i.e. streams,
      * channels etc) for any entries of the file system, flushes its selective
-     * entry cache without clearing it, commits all changes to its parent file
-     * system (if any) and makes its controller eligible for garbage collection
-     * unless any strong references are held by the client application.
+     * entry cache without clearing it and commits all changes to its parent
+     * file system (if any).
      * This is equivalent to
      * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT)}.
      * <p>
