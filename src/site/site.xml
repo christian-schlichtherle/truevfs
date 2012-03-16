@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  - Copyright (C) 2004-2012 Schlichtherle IT Services
-  -
-  - All rights reserved. This program and the accompanying materials
-  - are made available under the terms of the Eclipse Public License v1.0
-  - which accompanies this distribution, and is available at
-  - http://www.eclipse.org/legal/epl-v10.html
+  - Copyright (C) 2004-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
   -->
 <project    xmlns="http://maven.apache.org/DECORATION/1.1.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -54,16 +50,17 @@
                 <item name="Software Build Tool" href="usecases/sbt.html"/>
                 <item name="Search Engine" href="usecases/se.html"/>
             </item>
-            <item name="Kick-Start" href="kick-start/index.html" collapse="true">
+            <item name="Download" href="download.html"/>
+            <item name="Getting Started" href="kick-start/index.html" collapse="true">
                 <item name="In Eclipse" href="kick-start/file/eclipse.html"/>
                 <item name="In NetBeans" href="kick-start/file/netbeans.html"/>
                 <item name="In a Shell" href="kick-start/file/shell.html"/>
                 <item name="Without Maven" href="kick-start/no-maven.html"/>
             </item>
-            <item name="Migration" href="migration.html"/>
             <item name="Concepts" href="concepts.html"/>
             <item name="Glossary" href="glossary.html"/>
             <item name="FAQ" href="faq.html"/>
+            <item name="Migration" href="migration.html"/>
             <item name="TrueZIP 6 (Obsolete)" href="6/index.html" collapse="true">
                 <item name="Tutorial" href="6/tutorial.html"/>
                 <item name="News Archive" href="6/news/index.html" collapse="true">
