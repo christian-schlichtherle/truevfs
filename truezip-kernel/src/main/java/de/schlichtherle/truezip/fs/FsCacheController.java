@@ -461,7 +461,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            delegate.sync(FsSyncOptions.SYNC);
+                            delegate.sync(mknodEx);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             // sync() failed, maybe just because the current
@@ -502,10 +502,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // file - so what?!
                             // This should mark only a volatile issue because
                             // the next sync() will sort it out once all the
-                            // open I/O resources have been closed.
-                            // So let's just log the mknod exception and
+                            // I/O resources have been closed.
+                            // Let's log the sync exception - mind that it has
+                            // the mknod exception as its predecessor - and
                             // continue anyway...
-                            logger.log(Level.FINE, "ignoring", mknodEx);
+                            logger.log(Level.FINE, "ignoring", syncEx);
                             break;
                         }
                     }

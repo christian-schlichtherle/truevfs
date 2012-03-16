@@ -7,7 +7,6 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -57,22 +56,6 @@ extends FsDecoratingController<M, FsController<? extends M>> {
      */
     public FsSyncController(FsController<? extends M> controller) {
         super(controller);
-    }
-
-    void sync(final FsNeedsSyncException trigger) throws IOException {
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        final FsSyncWarningException
-                fuse = new FsSyncWarningException(getModel(), trigger);
-        try {
-            builder.warn(fuse);                                 // charge fuse
-            delegate.sync(SYNC, builder);                       // charge load
-            builder.check();                                    // pull trigger
-            throw new AssertionError("Expected an instance of the " + FsSyncException.class);
-        } catch (final FsSyncWarningException ex) {
-            // Check debris.
-            if (ex != fuse)
-                throw ex;
-        }
     }
 
     @Override
