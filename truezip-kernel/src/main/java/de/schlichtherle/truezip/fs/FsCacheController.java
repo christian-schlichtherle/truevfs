@@ -34,11 +34,12 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * A selective cache for file system entry contents.
- * Decorating a concurrent file system controller with this class has the
- * following effects:
+ * A selective cache for file system entries.
+ * Decorating a file system controller with this class has the following
+ * effects:
  * <ul>
- * <li>Caching and buffering needs to be activated by using the method
+ * <li>Caching and buffering for an entry needs to get activated by using the
+ *     method
  *     {@link #getInputSocket input socket} with the input option
  *     {@link FsInputOption#CACHE} or the method
  *     {@link #getOutputSocket output socket} with the output option
@@ -47,7 +48,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  *     data gets copied from the backing store for buffering purposes only.
  * <li>Upon a successful write operation, the entry data gets cached for
  *     subsequent read operations until the file system gets
- *     {@link #sync synced}.
+ *     {@link #sync synced} again.
  * <li>Entry data written to the cache is not written to the backing store
  *     until the file system gets {@link #sync synced} - this is a
  *     <i>write back</i> strategy.
@@ -56,7 +57,17 @@ import javax.annotation.concurrent.NotThreadSafe;
  *     while some clients are still busy on reading or writing the copied
  *     entry data.
  * </ul>
- *
+ * <p>
+ * <strong>TO THE FUTURE ME:</strong>
+ * FOR TRUEZIP 7.5, IT TOOK ME TWO MONTHS OF CONSECUTIVE CODING, TESTING,
+ * DEBUGGING, ANALYSIS AND SWEATING TO GET THIS DAMN BEAST WORKING STRAIGHT!
+ * DON'T EVEN THINK YOU COULD CHANGE A SINGLE CHARACTER IN THIS CODE AND EASILY
+ * GET AWAY WITH IT!
+ * <strong>YOU HAVE BEEN WARNED!</strong>
+ * <p>
+ * Well, if you really feel like changing something, run the integration test
+ * suite at least ten times to make sure your changes really work - I mean it!
+ * 
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -94,6 +105,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<FsInputOption> options) {
+        /** This class requires ON-DEMAND LOOKUP of its delegate! */
         class Input extends DelegatingInputSocket<Entry> {
             @Override
             protected InputSocket<?> getDelegate() {
@@ -117,6 +129,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             final FsEntryName name,
             final BitField<FsOutputOption> options,
             final @CheckForNull Entry template) {
+        /** This class requires ON-DEMAND LOOKUP of its delegate! */
         class Output extends DelegatingOutputSocket<Entry> {
             @Override
             protected OutputSocket<?> getDelegate() {
@@ -304,22 +317,17 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             cache.clear();
         }
 
-        /**
-         * This class needs the lazy initialization and exception handling
-         * provided by its super class.
-         */
+        void register() {
+            assert isWriteLockedByCurrentThread();
+            caches.put(name, this);
+        }
+
+        /** This class requires EAGER INITIALIZATION of its delegate! */
         @Immutable
-        final class Input extends ClutchInputSocket<Entry> {
-            final BitField<FsInputOption> options;
-
-            Input(final BitField<FsInputOption> options) {
-                this.options = options.clear(FsInputOption.CACHE); // consume
-            }
-
-            @Override
-            protected InputSocket<? extends Entry> getLazyDelegate()
-            throws IOException {
-                return delegate.getInputSocket(name, options);
+        final class Input extends DecoratingInputSocket<Entry> {
+            Input(BitField<FsInputOption> options) {
+                super(delegate.getInputSocket(name,
+                        options.clear(FsInputOption.CACHE)));
             }
 
             @Override
@@ -334,61 +342,60 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
             @Override
             public InputStream newInputStream() throws IOException {
-                class Stream extends DecoratingInputStream {
-                    @CreatesObligation
-                    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-                    Stream() throws IOException {
-                        super(Input.super.newInputStream());
-                        assert isTouched();
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        delegate.close();
-                        assert isWriteLockedByCurrentThread();
-                        caches.put(name, EntryCache.this);
-                    }
-                } // Stream
-
                 return new Stream();
             }
+
+            final class Stream extends DecoratingInputStream {
+                @CreatesObligation
+                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+                Stream() throws IOException {
+                    super(getBoundSocket().newInputStream());
+                    assert isTouched();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    delegate.close();
+                    register();
+                }
+            } // Stream
         } // Input
 
+        /** This class requires LAZY INITIALIZATION of its delegate! */
         @Immutable
         final class Nio2Output extends Output {
-            Nio2Output( final BitField<FsOutputOption> options,
-                        final @CheckForNull Entry template) {
+            Nio2Output( BitField<FsOutputOption> options,
+                        @CheckForNull Entry template) {
                 super(options, template);
             }
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 preOutput();
-
-                class Channel extends DecoratingSeekableByteChannel {
-                    @CreatesObligation
-                    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-                    Channel() throws IOException {
-                        super(Nio2Output.super.newSeekableByteChannel());
-                        assert isWriteLockedByCurrentThread();
-                        caches.put(name, EntryCache.this);
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        delegate.close();
-                        postOutput();
-                    }
-                } // Channel
-
                 return new Channel();
             }
+
+            final class Channel extends DecoratingSeekableByteChannel {
+                @CreatesObligation
+                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+                Channel() throws IOException {
+                    // Note that the super class implementation MUST get
+                    // bypassed because the delegate MUST get kept even upon an
+                    // exception!
+                    //super(Nio2Output.super.newSeekableByteChannel());
+                    super(getBoundSocket().newSeekableByteChannel());
+                    register();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    delegate.close();
+                    postOutput();
+                }
+            } // Channel
         } // Nio2Output
 
-        /**
-         * This class needs the lazy initialization and exception handling
-         * provided by its super class.
-         */
+        /** This class requires LAZY INITIALIZATION of its delegate! */
         @Immutable
         class Output extends ClutchOutputSocket<Entry> {
             final BitField<FsOutputOption> options;
@@ -401,8 +408,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
 
             @Override
-            protected OutputSocket<? extends Entry> getLazyDelegate()
-            throws IOException {
+            protected OutputSocket<? extends Entry> getLazyDelegate() {
                 return cache.configure( delegate.getOutputSocket(
                                             name,
                                             options.clear(EXCLUSIVE),
@@ -413,25 +419,27 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             @Override
             public final OutputStream newOutputStream() throws IOException {
                 preOutput();
-
-                class Stream extends DecoratingOutputStream {
-                    @CreatesObligation
-                    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-                    Stream() throws IOException {
-                        super(Output.super.newOutputStream());
-                        assert isWriteLockedByCurrentThread();
-                        caches.put(name, EntryCache.this);
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        delegate.close();
-                        postOutput();
-                    }
-                } // Stream
-
                 return new Stream();
             }
+
+            final class Stream extends DecoratingOutputStream {
+                @CreatesObligation
+                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+                Stream() throws IOException {
+                    // Note that the super class implementation MUST get
+                    // bypassed because the delegate MUST get kept even upon an
+                    // exception!
+                    //super(Output.super.newOutputStream());
+                    super(getBoundSocket().newOutputStream());
+                    register();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    delegate.close();
+                    postOutput();
+                }
+            } // Stream
 
             void preOutput() throws IOException {
                 mknod(options, template);
@@ -440,8 +448,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             void postOutput() throws IOException {
                 mknod(  options.clear(EXCLUSIVE),
                         null != template ? template : cache.getEntry());
-                assert isWriteLockedByCurrentThread();
-                caches.put(name, EntryCache.this); // may re-install after clear
+                register();
             }
 
             void mknod( final BitField<FsOutputOption> options,
