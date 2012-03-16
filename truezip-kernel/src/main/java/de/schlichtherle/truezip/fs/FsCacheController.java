@@ -476,13 +476,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // We couldn't recover the mknod failure because
                             // the current thread is holding open I/O resources.
 
-                            if (options.get(EXCLUSIVE)) {
-                                // We can't tolerate this, so pass the original
-                                // exception on to the caller and let's hope
-                                // that this will not create an endless loop.
-                                throw mknodEx;
-                            }
-
                             // Passing this exception would trigger another sync()
                             // which may fail for the same reason und thus create
                             // an endless loop
@@ -491,9 +484,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // Dito for mapping the exception.
                             //throw FsNeedsLockRetryException.get(getModel());
 
-                            // So we can't do anything about this issue until the
-                            // next sync().
-                            logger.log(Level.WARNING, "ignoring", mknodEx);
+                            // So we can just log this issue.
+                            // It's expected to be volatile and should vanish
+                            // upon the next sync().
+                            logger.log(options.get(EXCLUSIVE)   ? Level.WARNING
+                                                                : Level.INFO,
+                                    "ignoring", mknodEx);
                             break;
                         }
                     }
