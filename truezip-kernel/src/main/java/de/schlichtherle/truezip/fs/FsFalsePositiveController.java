@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -460,32 +461,27 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
         } // Mknod
 
-        mknod(new Mknod(), name);
+        if (name.isRoot())
+            mknodRoot(new Mknod());
+        else
+            call(new Mknod(), name);
     }
 
-    private <T> T mknod(final IOOperation<T> operation,
-                        final @CheckForNull FsEntryName name)
+    private <T> T mknodRoot(final IOOperation<T> operation)
     throws IOException {
-        final State state = name.isRoot()
-                ? this.state = new Delegate()
-                : this.state;
+        final State state = this.state = new Delegate();
         try {
-            return state.call(operation, name);
-        } catch (final FsPersistentFalsePositiveException ex) {
-            assert state instanceof Delegate : ex;
-            return (name.isRoot()
-                    ? new Parent(ex)
-                    : (this.state = new Parent(ex)))
-                    .call(operation, name);
+            return state.call(operation, ROOT);
         } catch (final FsFalsePositiveException ex) {
             assert state instanceof Delegate : ex;
-            return new Parent(ex).call(operation, name);
+            return new Parent(ex).call(operation, ROOT);
         }
     }
 
     @Override
-    public void unlink( final FsEntryName name,
-                        final BitField<FsOutputOption> options)
+    public void unlink(
+            final FsEntryName name,
+            final BitField<FsOutputOption> options)
     throws IOException {
         class Unlink implements IOOperation<Void> {
             @Override
@@ -508,26 +504,20 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
         } // Unlink
 
-        unlink(new Unlink(), name);
+        if (name.isRoot())
+            unlinkRoot(new Unlink());
+        else
+            call(new Unlink(), name);
     }
 
-    private <T> T unlink(   final IOOperation<T> operation,
-                            final @CheckForNull FsEntryName name)
+    private <T> T unlinkRoot(final IOOperation<T> operation)
     throws IOException {
-        final State state = name.isRoot()
-                ? this.state = new Delegate()
-                : this.state;
+        final State state = this.state = new Delegate();
         try {
-            return state.call(operation, name);
-        } catch (final FsPersistentFalsePositiveException ex) {
-            assert state instanceof Delegate : ex;
-            return (name.isRoot()
-                    ? new Parent(ex)
-                    : (this.state = new Parent(ex)))
-                    .call(operation, name);
+            return state.call(operation, ROOT);
         } catch (final FsFalsePositiveException ex) {
             assert state instanceof Delegate : ex;
-            return new Parent(ex).call(operation, name);
+            return new Parent(ex).call(operation, ROOT);
         }
     }
 
