@@ -406,6 +406,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         writeLocked(new Close());
     }
 
+    private interface IOOperation<T> {
+        T call() throws IOException;
+    } // IOOperation
+
     @Immutable
     private enum SocketFactory {
         NIO2() {
@@ -684,8 +688,4 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         abstract ThreadLocal<ThreadUtil> newThreadLocalUtil();
     } // ThreadLocalToolFactory
-
-    private interface IOOperation<T> extends Callable<T> {
-        @Override T call() throws IOException;
-    } // IOOperation
 }
