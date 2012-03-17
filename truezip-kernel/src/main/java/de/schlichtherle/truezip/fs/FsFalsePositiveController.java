@@ -96,8 +96,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         assert null != super.getParent();
     }
 
-    <T> T call( final IOOperation<T> operation,
-                final @CheckForNull FsEntryName name)
+    @Nullable <T> T call(   final IOOperation<T> operation,
+                            final FsEntryName name)
     throws IOException {
         try {
             return state.call(operation, name);
@@ -129,13 +129,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         class GetOpenIcon implements IOOperation<Icon> {
             @Override
             public Icon call(   final FsController<?> controller,
-                                final @Nullable FsEntryName name)
+                                final FsEntryName name)
             throws IOException {
                 return controller.getOpenIcon();
             }
         } // GetOpenIcon
 
-        return call(new GetOpenIcon(), null);
+        return call(new GetOpenIcon(), ROOT);
     }
 
     @Override
@@ -144,13 +144,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         class GetClosedIcon implements IOOperation<Icon> {
             @Override
             public Icon call(   final FsController<?> controller,
-                                final @Nullable FsEntryName name)
+                                final FsEntryName name)
             throws IOException {
                 return controller.getClosedIcon();
             }
         } // GetClosedIcon
 
-        return call(new GetClosedIcon(), null);
+        return call(new GetClosedIcon(), ROOT);
     }
 
     @Override
@@ -158,13 +158,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         class IsReadOnly implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
-                                final @Nullable FsEntryName name)
+                                final FsEntryName name)
             throws IOException {
                 return controller.isReadOnly();
             }
         } // IsReadOnly
 
-        return call(new IsReadOnly(), null);
+        return call(new IsReadOnly(), ROOT);
     }
 
     @Override
@@ -186,7 +186,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         class IsReadable implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
-                                final @Nullable FsEntryName name)
+                                final FsEntryName name)
             throws IOException {
                 return controller.isReadable(name);
             }
@@ -200,7 +200,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         class IsWritable implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
-                                final @Nullable FsEntryName name)
+                                final FsEntryName name)
             throws IOException {
                 return controller.isWritable(name);
             }
@@ -214,7 +214,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         class IsExecutable implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
-                                final @Nullable FsEntryName name)
+                                final FsEntryName name)
             throws IOException {
                 return controller.isExecutable(name);
             }
@@ -282,9 +282,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @NotThreadSafe
         class Input extends InputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
-            @CheckForNull InputSocket<? extends Entry> delegate;
+            @Nullable InputSocket<? extends Entry> delegate;
 
-            InputSocket<?> getBoundSocket(  final FsController<?> controller,
+            InputSocket<?> getBoundDelegate(final FsController<?> controller,
                                             final FsEntryName name) {
                 return (lastController == controller
                         ? delegate
@@ -302,7 +302,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             final FsController<?> controller,
                             final FsEntryName name)
                     throws IOException {
-                        return getBoundSocket(controller, name)
+                        return getBoundDelegate(controller, name)
                                 .getLocalTarget();
                     }
                 } // GetLocalTarget
@@ -319,7 +319,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             final FsController<?> controller,
                             final FsEntryName name)
                     throws IOException {
-                        return getBoundSocket(controller, name)
+                        return getBoundDelegate(controller, name)
                                 .newReadOnlyFile();
                     }
                 } // NewReadOnlyFile
@@ -337,7 +337,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             final FsController<?> controller,
                             final FsEntryName name)
                     throws IOException {
-                        return getBoundSocket(controller, name)
+                        return getBoundDelegate(controller, name)
                                 .newSeekableByteChannel();
                     }
                 } // NewSeekableByteChannel
@@ -354,7 +354,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             final FsController<?> controller,
                             final FsEntryName name)
                     throws IOException {
-                        return getBoundSocket(controller, name)
+                        return getBoundDelegate(controller, name)
                                 .newInputStream();
                     }
                 } // NewInputStream
@@ -367,6 +367,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
             final BitField<FsOutputOption> options,
@@ -374,10 +375,10 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @NotThreadSafe
         class Output extends OutputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
-            @CheckForNull OutputSocket<? extends Entry> delegate;
+            @Nullable OutputSocket<? extends Entry> delegate;
 
-            OutputSocket<?> getBoundSocket( final FsController<?> controller,
-                                            final FsEntryName name) {
+            OutputSocket<?> getBoundDelegate(final FsController<?> controller,
+                                             final FsEntryName name) {
                 return (lastController == controller
                         ? delegate
                         : (delegate = (lastController = controller)
@@ -394,7 +395,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             final FsController<?> controller,
                             final FsEntryName name)
                     throws IOException {
-                        return getBoundSocket(controller, name)
+                        return getBoundDelegate(controller, name)
                                 .getLocalTarget();
                     }
                 } // GetLocalTarget
@@ -412,7 +413,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             final FsController<?> controller,
                             final FsEntryName name)
                     throws IOException {
-                        return getBoundSocket(controller, name)
+                        return getBoundDelegate(controller, name)
                                 .newSeekableByteChannel();
                     }
                 } // NewSeekableByteChannel
@@ -429,7 +430,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             final FsController<?> controller,
                             final FsEntryName name)
                     throws IOException {
-                        return getBoundSocket(controller, name)
+                        return getBoundDelegate(controller, name)
                                 .newOutputStream();
                     }
                 } // NewOutputStream
@@ -442,6 +443,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public void mknod(
             final FsEntryName name,
             final Type type,
@@ -516,12 +518,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     private interface IOOperation<T> {
-        T call(FsController<?> controller, @Nullable FsEntryName name)
+        @Nullable T call(FsController<?> controller, FsEntryName name)
         throws IOException;
     } // IOOperation
 
     private interface State {
-        <T> T call(IOOperation<T> operation, @Nullable FsEntryName name)
+        @Nullable <T> T call(IOOperation<T> operation, FsEntryName name)
         throws IOException;
     } // Strategy
 
