@@ -30,12 +30,12 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -407,7 +407,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     private interface IOOperation<T> {
-        T call() throws IOException;
+        @Nullable T call() throws IOException;
     } // IOOperation
 
     @Immutable
