@@ -58,8 +58,11 @@ extends IOSocket<E, Entry> {
      *
      * @param  to the output socket with the peer target to inherit.
      * @return {@code this}
+     * @throws IllegalArgumentException if {@code this} == {@code to}.
      */
     public final OutputSocket<E> bind(final OutputSocket<?> to) {
+        if (this == to)
+            throw new IllegalArgumentException();
         this.peer = to.peer;
         return this;
     }
