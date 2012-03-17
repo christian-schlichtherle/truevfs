@@ -77,7 +77,7 @@ import javax.swing.Icon;
 final class FsFalsePositiveController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
-    private volatile State state = new Delegate();
+    private volatile State state = new TryChild();
 
     // These fields don't need to be volatile because reads and writes of
     // references are always atomic.
@@ -99,15 +99,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     <T> T call( final IOOperation<T> operation,
                 final @CheckForNull FsEntryName name)
     throws IOException {
-        State state = this.state;
         try {
             return state.call(operation, name);
         } catch (final FsPersistentFalsePositiveException ex) {
-            assert state instanceof Delegate : ex;
-            return (this.state = new Parent(ex)).call(operation, name);
+            return (state = new TryParent(ex)).call(operation, name);
         } catch (final FsFalsePositiveException ex) {
-            assert state instanceof Delegate : ex;
-            return new Parent(ex).call(operation, name);
+            return new TryParent(ex).call(operation, name);
         }
     }
 
@@ -461,21 +458,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
         } // Mknod
 
-        if (name.isRoot())
-            mknodRoot(new Mknod());
-        else
-            call(new Mknod(), name);
-    }
-
-    private <T> T mknodRoot(final IOOperation<T> operation)
-    throws IOException {
-        final State state = this.state = new Delegate();
-        try {
-            return state.call(operation, ROOT);
-        } catch (final FsFalsePositiveException ex) {
-            assert state instanceof Delegate : ex;
-            return new Parent(ex).call(operation, ROOT);
-        }
+        call(new Mknod(), name);
     }
 
     @Override
@@ -510,14 +493,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             call(new Unlink(), name);
     }
 
-    private <T> T unlinkRoot(final IOOperation<T> operation)
+    private void unlinkRoot(final IOOperation<Void> operation)
     throws IOException {
-        final State state = this.state = new Delegate();
         try {
-            return state.call(operation, ROOT);
+            (state = new TryChild()).call(operation, ROOT);
         } catch (final FsFalsePositiveException ex) {
-            assert state instanceof Delegate : ex;
-            return new Parent(ex).call(operation, ROOT);
+            new TryParent(ex).call(operation, ROOT);
         }
     }
 
@@ -531,7 +512,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             throw new AssertionError(ex);
         }
-        state = new Delegate();
+        state = new TryChild();
     }
 
     private interface IOOperation<T> {
@@ -545,7 +526,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     } // Strategy
 
     @Immutable
-    private final class Delegate implements State {
+    private final class TryChild implements State {
         @Override
         public <T> T call(  final IOOperation<T> operation,
                             final FsEntryName name)
@@ -555,10 +536,10 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     } // DelegateController
 
     @Immutable
-    private final class Parent implements State {
+    private final class TryParent implements State {
         final IOException originalCause;
 
-        Parent(final FsFalsePositiveException ex) {
+        TryParent(final FsFalsePositiveException ex) {
             this.originalCause = ex.getCause();
         }
 
