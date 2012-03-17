@@ -48,9 +48,9 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 // removed or it's a false positive archive file.
                 // In either case the selective cache needs to get cleared now
                 // without flushing it.
-                // For a false positive archive file, the effect will be that
-                // the mount state gets reset so that the file system can get
-                // subsequently mounted if the target archive file has been
+                // For a false positive archive file, the only effect will be
+                // that the mount state gets reset so that the file system can
+                // get subsequently mounted if the target archive file has been
                 // modified to be a true archive file meanwhile.
                 delegate.sync(RESET);
             }
