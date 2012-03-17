@@ -6,6 +6,7 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsLockModel;
+import de.schlichtherle.truezip.fs.FsPersistentFalsePositiveException;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
