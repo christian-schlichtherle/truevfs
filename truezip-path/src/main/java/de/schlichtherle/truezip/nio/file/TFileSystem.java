@@ -273,7 +273,7 @@ public final class TFileSystem extends FileSystem {
                 return controller
                         .getOutputSocket(name, o, null)
                         .newSeekableByteChannel();
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 if (o.get(EXCLUSIVE) && null != controller.getEntry(name))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
