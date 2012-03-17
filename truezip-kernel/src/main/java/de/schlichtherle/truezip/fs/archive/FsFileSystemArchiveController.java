@@ -4,9 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive;
 
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
 import de.schlichtherle.truezip.fs.FsLockModel;
-import de.schlichtherle.truezip.fs.FsPersistentFalsePositiveException;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -71,54 +69,39 @@ extends FsArchiveController<E> {
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
-    private static abstract class MountState<E extends FsArchiveEntry> {
-        abstract FsArchiveFileSystem<E> autoMount(boolean autoCreate)
+    private interface MountState<E extends FsArchiveEntry> {
+        FsArchiveFileSystem<E> autoMount(boolean autoCreate)
         throws IOException;
 
-        @Nullable FsArchiveFileSystem<E> getFileSystem() {
-            return null;
-        }
+        @Nullable FsArchiveFileSystem<E> getFileSystem();
 
-        abstract void setFileSystem(@CheckForNull FsArchiveFileSystem<E> fileSystem);
+        void setFileSystem(@CheckForNull FsArchiveFileSystem<E> fileSystem);
     } // MountState
 
-    private final class ResetFileSystem extends MountState<E> {
+    private final class ResetFileSystem implements MountState<E> {
         @Override
-        FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
+        public FsArchiveFileSystem<E> autoMount(final boolean autoCreate)
         throws IOException {
             checkWriteLockedByCurrentThread();
-            try {
-                mount(autoCreate);
-            } catch (FsPersistentFalsePositiveException ex) {
-                // Cache exception for false positive file system.
-                //   The state is reset when unlink() is called on the false
-                // positive file system or sync().
-                //   This is an important optimization: When accessing a false
-                // positive archive file, a client application might perform
-                // a lot of tests on it (isDirectory(), isFile(), isExisting(),
-                // getLength(), etc). If the exception were not cached, each call
-                // would run the file system initialization again, only to
-                // result in another instance of the same exception type again.
-                mountState = new FalsePositiveFileSystem(ex);
-                //throw ex;
-            }
-
+            mount(autoCreate);
             assert this != mountState;
-            // DON'T just call mountState.getFileSystem()!
-            // This would return null if mountState is an instance of
-            // FalsePositiveFileSystem.
             return mountState.autoMount(autoCreate);
         }
 
         @Override
-        void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
+        public FsArchiveFileSystem<E> getFileSystem() {
+            return null;
+        }
+
+        @Override
+        public void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
             // Passing in null may happen by sync(*).
             if (fileSystem != null)
                 mountState = new MountedFileSystem(fileSystem);
         }
     } // ResetFileSystem
 
-    private final class MountedFileSystem extends MountState<E> {
+    private final class MountedFileSystem implements MountState<E> {
         private final FsArchiveFileSystem<E> fileSystem;
 
         MountedFileSystem(final FsArchiveFileSystem<E> fileSystem) {
@@ -128,43 +111,20 @@ extends FsArchiveController<E> {
         }
 
         @Override
-        FsArchiveFileSystem<E> autoMount(boolean autoCreate) {
+        public FsArchiveFileSystem<E> autoMount(boolean autoCreate) {
             return fileSystem;
         }
 
         @Override
-        FsArchiveFileSystem<E> getFileSystem() {
+        public FsArchiveFileSystem<E> getFileSystem() {
             return fileSystem;
         }
 
         @Override
-        void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
+        public void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
             if (null != fileSystem)
                 throw new IllegalArgumentException("File system already mounted!");
             mountState = new ResetFileSystem();
         }
     } // MountedFileSystem
-
-    private final class FalsePositiveFileSystem extends MountState<E> {
-        private FsFalsePositiveException exception;
-
-        private FalsePositiveFileSystem(final FsFalsePositiveException exception) {
-            if (null == exception)
-                throw new NullPointerException();
-            this.exception = exception;
-        }
-
-        @Override
-        FsArchiveFileSystem<E> autoMount(boolean autoCreate)
-        throws FsFalsePositiveException {
-            throw exception;
-        }
-
-        @Override
-        void setFileSystem(final FsArchiveFileSystem<E> fileSystem) {
-            mountState = null != fileSystem
-                    ? new MountedFileSystem(fileSystem)
-                    : new ResetFileSystem();
-        }
-    } // FalsePositiveFileSystem
 }
