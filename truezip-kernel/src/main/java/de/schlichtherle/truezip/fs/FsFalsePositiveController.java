@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs;
 
@@ -12,8 +8,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -24,6 +18,9 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.Icon;
 
@@ -59,26 +56,27 @@ import javax.swing.Icon;
  *     by a more competent caller.
  * </ol>
  * <p>
- * As an example consider the case of accessing a RAES encrypted ZIP file.
- * When an archive file of this type gets mounted, the user is typically
- * prompted for a password.
+ * As an example consider accessing a RAES encrypted ZIP file:
+ * With the default driver configuration of the module TrueZIP ZIP.RAES,
+ * whenever a ZIP.RAES file gets mounted, the user is prompted for a password.
  * If the user cancels the password prompting dialog, then an appropriate
  * exception gets thrown.
- * Some other class in the TrueZIP Kernel would then catch this exception and
- * flag the archive file as a false positive by wrapping the exception in a
+ * The target archive controller would then catch this exception and flag the
+ * archive file as a false positive by wrapping this exception in a
  * {@link FsFalsePositiveException}.
  * This class would then catch this false positive exception and try to resolve
  * the issue by using the parent file system controller.
  * Failing that, the initial exception would get rethrown in order to signal
  * to the caller that the user had cancelled password prompting.
  *
- * @see     FsFalsePositiveException
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    FsFalsePositiveException
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 final class FsFalsePositiveController
 extends FsDecoratingController<FsModel, FsController<?>> {
+
+    private volatile State state = new Delegate();
 
     // These fields don't need to be volatile because reads and writes of
     // references are always atomic.
@@ -97,13 +95,28 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         assert null != super.getParent();
     }
 
+    <T> T call( final IOOperation<T> operation,
+                final @CheckForNull FsEntryName name)
+    throws IOException {
+        State state = this.state;
+        try {
+            return state.call(operation, name);
+        } catch (final FsPersistentFalsePositiveException ex) {
+            assert state instanceof Delegate : ex;
+            return (this.state = new Parent(ex)).call(operation, name);
+        } catch (final FsFalsePositiveException ex) {
+            assert state instanceof Delegate : ex;
+            return new Parent(ex).call(operation, name);
+        }
+    }
+
     @Override
     public FsController<?> getParent() {
         final FsController<?> parent = this.parent;
         return null != parent ? parent : (this.parent = delegate.getParent());
     }
 
-    private FsEntryName resolveParent(FsEntryName name) {
+    FsEntryName resolveParent(FsEntryName name) {
         return getPath().resolve(name).getEntryName();
     }
 
@@ -115,131 +128,116 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     @Deprecated
     public Icon getOpenIcon() throws IOException {
-        try {
-            return delegate.getOpenIcon();
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().getOpenIcon();
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class GetOpenIcon implements IOOperation<Icon> {
+            @Override
+            public Icon call(   final FsController<?> controller,
+                                final @Nullable FsEntryName name)
+            throws IOException {
+                return controller.getOpenIcon();
             }
-        }
+        } // GetOpenIcon
+
+        return call(new GetOpenIcon(), null);
     }
 
     @Override
     @Deprecated
     public Icon getClosedIcon() throws IOException {
-        try {
-            return delegate.getClosedIcon();
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().getClosedIcon();
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class GetClosedIcon implements IOOperation<Icon> {
+            @Override
+            public Icon call(   final FsController<?> controller,
+                                final @Nullable FsEntryName name)
+            throws IOException {
+                return controller.getClosedIcon();
             }
-        }
+        } // GetClosedIcon
+
+        return call(new GetClosedIcon(), null);
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
-        try {
-            return delegate.isReadOnly();
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().isReadOnly();
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class IsReadOnly implements IOOperation<Boolean> {
+            @Override
+            public Boolean call(final FsController<?> controller,
+                                final @Nullable FsEntryName name)
+            throws IOException {
+                return controller.isReadOnly();
             }
-        }
+        } // IsReadOnly
+
+        return call(new IsReadOnly(), null);
     }
 
     @Override
     public FsEntry getEntry(final FsEntryName name) throws IOException {
-        try {
-            return delegate.getEntry(name);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().getEntry(resolveParent(name));
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class GetEntry implements IOOperation<FsEntry> {
+            @Override
+            public FsEntry call(final FsController<?> controller,
+                                final FsEntryName name)
+            throws IOException {
+                return controller.getEntry(name);
             }
-        }
+        } // GetEntry
+
+        return call(new GetEntry(), name);
     }
 
     @Override
     public boolean isReadable(final FsEntryName name) throws IOException {
-        try {
-            return delegate.isReadable(name);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().isReadable(resolveParent(name));
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class IsReadable implements IOOperation<Boolean> {
+            @Override
+            public Boolean call(final FsController<?> controller,
+                                final @Nullable FsEntryName name)
+            throws IOException {
+                return controller.isReadable(name);
             }
-        }
+        } // IsReadable
+
+        return call(new IsReadable(), name);
     }
 
     @Override
     public boolean isWritable(final FsEntryName name) throws IOException {
-        try {
-            return delegate.isWritable(name);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().isWritable(resolveParent(name));
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class IsWritable implements IOOperation<Boolean> {
+            @Override
+            public Boolean call(final FsController<?> controller,
+                                final @Nullable FsEntryName name)
+            throws IOException {
+                return controller.isWritable(name);
             }
-        }
+        } // IsWritable
+
+        return call(new IsWritable(), name);
     }
 
     @Override
     public boolean isExecutable(final FsEntryName name) throws IOException {
-        try {
-            return delegate.isExecutable(name);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().isExecutable(resolveParent(name));
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class IsExecutable implements IOOperation<Boolean> {
+            @Override
+            public Boolean call(final FsController<?> controller,
+                                final @Nullable FsEntryName name)
+            throws IOException {
+                return controller.isExecutable(name);
             }
-        }
+        } // IsWritable
+
+        return call(new IsExecutable(), name);
     }
 
     @Override
     public void setReadOnly(final FsEntryName name) throws IOException {
-        try {
-            delegate.setReadOnly(name);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                getParent().setReadOnly(resolveParent(name));
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class SetReadOnly implements IOOperation<Void> {
+            @Override
+            public Void call(   final FsController<?> controller,
+                                final FsEntryName name)
+            throws IOException {
+                controller.setReadOnly(name);
+                return null;
             }
-        }
+        } // SetReadOnly
+
+        call(new SetReadOnly(), name);
     }
 
     @Override
@@ -248,18 +246,16 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final Map<Access, Long> times,
             final BitField<FsOutputOption> options)
     throws IOException {
-        try {
-            return delegate.setTime(name, times, options);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().setTime(resolveParent(name), times, options);
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class SetTime implements IOOperation<Boolean> {
+            @Override
+            public Boolean call(final FsController<?> controller,
+                                final FsEntryName name)
+            throws IOException {
+                return controller.setTime(name, times, options);
             }
-        }
+        } // SetTime
+
+        return call(new SetTime(), name);
     }
 
     @Override
@@ -269,26 +265,107 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final long value,
             final BitField<FsOutputOption> options)
     throws IOException {
-        try {
-            return delegate.setTime(name, types, value, options);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                return getParent().setTime(resolveParent(name), types, value, options);
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class SetTime implements IOOperation<Boolean> {
+            @Override
+            public Boolean call(final FsController<?> controller,
+                                final FsEntryName name)
+            throws IOException {
+                return controller.setTime(name, types, value, options);
             }
-        }
+        } // SetTime
+
+        return call(new SetTime(), name);
     }
 
     @Override
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<FsInputOption> options) {
-        return new Input(   delegate.getInputSocket(name, options),
-                            name, options);
+        @NotThreadSafe
+        class Input extends InputSocket<Entry> {
+            @CheckForNull FsController<?> lastController;
+            @CheckForNull InputSocket<? extends Entry> delegate;
+
+            InputSocket<?> getBoundSocket(  final FsController<?> controller,
+                                            final FsEntryName name) {
+                return (lastController == controller
+                        ? delegate
+                        : (delegate = (lastController = controller)
+                            .getInputSocket(name, options)))
+                        .bind(this);
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {                
+                class GetLocalTarget
+                implements IOOperation<Entry> {
+                    @Override
+                    public Entry call(
+                            final FsController<?> controller,
+                            final FsEntryName name)
+                    throws IOException {
+                        return getBoundSocket(controller, name)
+                                .getLocalTarget();
+                    }
+                } // GetLocalTarget
+
+                return call(new GetLocalTarget(), name);
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                class NewReadOnlyFile
+                implements IOOperation<ReadOnlyFile> {
+                    @Override
+                    public ReadOnlyFile call(
+                            final FsController<?> controller,
+                            final FsEntryName name)
+                    throws IOException {
+                        return getBoundSocket(controller, name)
+                                .newReadOnlyFile();
+                    }
+                } // NewReadOnlyFile
+
+                return call(new NewReadOnlyFile(), name);
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel()
+            throws IOException {
+                class NewSeekableByteChannel
+                implements IOOperation<SeekableByteChannel> {
+                    @Override
+                    public SeekableByteChannel call(
+                            final FsController<?> controller,
+                            final FsEntryName name)
+                    throws IOException {
+                        return getBoundSocket(controller, name)
+                                .newSeekableByteChannel();
+                    }
+                } // NewSeekableByteChannel
+
+                return call(new NewSeekableByteChannel(), name);
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
+                class NewInputStream
+                implements IOOperation<InputStream> {
+                    @Override
+                    public InputStream call(
+                            final FsController<?> controller,
+                            final FsEntryName name)
+                    throws IOException {
+                        return getBoundSocket(controller, name)
+                                .newInputStream();
+                    }
+                } // NewInputStream
+
+                return call(new NewInputStream(), name);
+            }
+        } // Input
+
+        return new Input();
     }
 
     @Override
@@ -296,8 +373,74 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final FsEntryName name,
             final BitField<FsOutputOption> options,
             final @CheckForNull Entry template) {
-        return new Output(  delegate.getOutputSocket(name, options, template),
-                            name, options, template);
+        @NotThreadSafe
+        class Output extends OutputSocket<Entry> {
+            @CheckForNull FsController<?> lastController;
+            @CheckForNull OutputSocket<? extends Entry> delegate;
+
+            OutputSocket<?> getBoundSocket( final FsController<?> controller,
+                                            final FsEntryName name) {
+                return (lastController == controller
+                        ? delegate
+                        : (delegate = (lastController = controller)
+                            .getOutputSocket(name, options, template)))
+                        .bind(this);
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {                
+                class GetLocalTarget
+                implements IOOperation<Entry> {
+                    @Override
+                    public Entry call(
+                            final FsController<?> controller,
+                            final FsEntryName name)
+                    throws IOException {
+                        return getBoundSocket(controller, name)
+                                .getLocalTarget();
+                    }
+                } // GetLocalTarget
+
+                return call(new GetLocalTarget(), name);
+            }
+
+            @Override
+            public SeekableByteChannel newSeekableByteChannel()
+            throws IOException {
+                class NewSeekableByteChannel
+                implements IOOperation<SeekableByteChannel> {
+                    @Override
+                    public SeekableByteChannel call(
+                            final FsController<?> controller,
+                            final FsEntryName name)
+                    throws IOException {
+                        return getBoundSocket(controller, name)
+                                .newSeekableByteChannel();
+                    }
+                } // NewSeekableByteChannel
+
+                return call(new NewSeekableByteChannel(), name);
+            }
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                class NewOutputStream
+                implements IOOperation<OutputStream> {
+                    @Override
+                    public OutputStream call(
+                            final FsController<?> controller,
+                            final FsEntryName name)
+                    throws IOException {
+                        return getBoundSocket(controller, name)
+                                .newOutputStream();
+                    }
+                } // NewOutputStream
+
+                return call(new NewOutputStream(), name);
+            }
+        } // Output
+
+        return new Output();
     }
 
     @Override
@@ -307,17 +450,36 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final BitField<FsOutputOption> options,
             final @CheckForNull Entry template)
     throws IOException {
-        try {
-            delegate.mknod(name, type, options, template);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                getParent().mknod(resolveParent(name), type, options, template);
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class Mknod implements IOOperation<Void> {
+            @Override
+            public Void call(final FsController<?> controller,
+                             final FsEntryName name)
+            throws IOException {
+                controller.mknod(name, type, options, template);
+                return null;
             }
+        } // Mknod
+
+        mknod(new Mknod(), name);
+    }
+
+    private <T> T mknod(final IOOperation<T> operation,
+                        final @CheckForNull FsEntryName name)
+    throws IOException {
+        final State state = name.isRoot()
+                ? this.state = new Delegate()
+                : this.state;
+        try {
+            return state.call(operation, name);
+        } catch (final FsPersistentFalsePositiveException ex) {
+            assert state instanceof Delegate : ex;
+            return (name.isRoot()
+                    ? new Parent(ex)
+                    : (this.state = new Parent(ex)))
+                    .call(operation, name);
+        } catch (final FsFalsePositiveException ex) {
+            assert state instanceof Delegate : ex;
+            return new Parent(ex).call(operation, name);
         }
     }
 
@@ -325,17 +487,47 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public void unlink( final FsEntryName name,
                         final BitField<FsOutputOption> options)
     throws IOException {
-        try {
-            delegate.unlink(name, options);
-        } catch (FsFalsePositiveException ex) {
-            try {
-                getParent().unlink(resolveParent(name), options);
-            } catch (FsControllerException ex2) {
-                assert !(ex2 instanceof FsFalsePositiveException);
-                throw ex2;
-            } catch (IOException discard) {
-                throw ex.getCause();
+        class Unlink implements IOOperation<Void> {
+            @Override
+            public Void call(final FsController<?> controller,
+                             final FsEntryName name)
+            throws IOException {
+                controller.unlink(name, options);
+                if (name.isRoot()) {
+                    assert controller == delegate;
+                    // We have successfully removed the virtual root directory
+                    // of a federated file system, i.e. an archive file.
+                    // Now unlink the target archive file from the parent file
+                    // system.
+                    // Note that this makes an unlink operation NOT atomic
+                    // because the lock for the parent file system is not
+                    // acquired!
+                    getParent().unlink(resolveParent(name), options);
+                }
+                return null;
             }
+        } // Unlink
+
+        unlink(new Unlink(), name);
+    }
+
+    private <T> T unlink(   final IOOperation<T> operation,
+                            final @CheckForNull FsEntryName name)
+    throws IOException {
+        final State state = name.isRoot()
+                ? this.state = new Delegate()
+                : this.state;
+        try {
+            return state.call(operation, name);
+        } catch (final FsPersistentFalsePositiveException ex) {
+            assert state instanceof Delegate : ex;
+            return (name.isRoot()
+                    ? new Parent(ex)
+                    : (this.state = new Parent(ex)))
+                    .call(operation, name);
+        } catch (final FsFalsePositiveException ex) {
+            assert state instanceof Delegate : ex;
+            return new Parent(ex).call(operation, name);
         }
     }
 
@@ -349,167 +541,49 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         } catch (FsFalsePositiveException ex) {
             throw new AssertionError(ex);
         }
+        state = new Delegate();
     }
 
-    private final class Input extends DecoratingInputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsInputOption> options;
+    private interface IOOperation<T> {
+        T call(FsController<?> controller, @Nullable FsEntryName name)
+        throws IOException;
+    } // IOOperation
 
-        Input(  final InputSocket<?> input,
-                final FsEntryName name,
-                final BitField<FsInputOption> options) {
-            super(input);
-            this.name = name;
-            this.options = options;
+    private interface State {
+        <T> T call(IOOperation<T> operation, @Nullable FsEntryName name)
+        throws IOException;
+    } // Strategy
+
+    @Immutable
+    private final class Delegate implements State {
+        @Override
+        public <T> T call(  final IOOperation<T> operation,
+                            final FsEntryName name)
+        throws IOException {
+            return operation.call(delegate, name);
+        }
+    } // DelegateController
+
+    @Immutable
+    private final class Parent implements State {
+        final IOException originalCause;
+
+        Parent(final FsFalsePositiveException ex) {
+            this.originalCause = ex.getCause();
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
+        public <T> T call(  final IOOperation<T> operation,
+                            final FsEntryName name)
+        throws IOException {
             try {
-                return getBoundSocket().getLocalTarget();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    return getParent()
-                            .getInputSocket(resolveParent(name), options)
-                            .bind(this)
-                            .getLocalTarget();
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (IOException discard) {
-                    throw ex.getCause();
-                }
+                return operation.call(getParent(), resolveParent(name));
+            } catch (final FsControllerException ex) {
+                assert !(ex instanceof FsFalsePositiveException);
+                throw ex;
+            } catch (final IOException ignored) {
+                throw originalCause;
             }
         }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            try {
-                return getBoundSocket().newReadOnlyFile();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    return getParent()
-                            .getInputSocket(resolveParent(name), options)
-                            .bind(this)
-                            .newReadOnlyFile();
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (IOException discard) {
-                    throw ex.getCause();
-                }
-            }
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    return getParent()
-                            .getInputSocket(resolveParent(name), options)
-                            .bind(this)
-                            .newSeekableByteChannel();
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (IOException discard) {
-                    throw ex.getCause();
-                }
-            }
-        }
-
-        @Override
-        public InputStream newInputStream() throws IOException {
-            try {
-                return getBoundSocket().newInputStream();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    return getParent()
-                            .getInputSocket(resolveParent(name), options)
-                            .bind(this)
-                            .newInputStream();
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (IOException discard) {
-                    throw ex.getCause();
-                }
-            }
-        }
-    } // Input
-
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        final FsEntryName name;
-        final BitField<FsOutputOption> options;
-        final @CheckForNull Entry template;
-
-        Output( final OutputSocket<?> output,
-                final FsEntryName name,
-                final BitField<FsOutputOption> options,
-                final @CheckForNull Entry template) {
-            super(output);
-            this.name = name;
-            this.options = options;
-            this.template = template;
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            try {
-                return getBoundSocket().getLocalTarget();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    return getParent()
-                            .getOutputSocket(resolveParent(name), options, template)
-                            .bind(this)
-                            .getLocalTarget();
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (IOException discard) {
-                    throw ex.getCause();
-                }
-            }
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            try {
-                return getBoundSocket().newSeekableByteChannel();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    return getParent()
-                            .getOutputSocket(resolveParent(name), options, template)
-                            .bind(this)
-                            .newSeekableByteChannel();
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (IOException discard) {
-                    throw ex.getCause();
-                }
-            }
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            try {
-                return getBoundSocket().newOutputStream();
-            } catch (FsFalsePositiveException ex) {
-                try {
-                    return getParent()
-                            .getOutputSocket(resolveParent(name), options, template)
-                            .bind(this)
-                            .newOutputStream();
-                } catch (FsControllerException ex2) {
-                    assert !(ex2 instanceof FsFalsePositiveException);
-                    throw ex2;
-                } catch (IOException discard) {
-                    throw ex.getCause();
-                }
-            }
-        }
-    } // Output
+    } // ParentController
 }

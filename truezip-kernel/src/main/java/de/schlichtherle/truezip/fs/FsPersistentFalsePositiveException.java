@@ -2,11 +2,8 @@
  * Copyright (C) 2004-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsFalsePositiveException;
-import de.schlichtherle.truezip.fs.FsModel;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -28,7 +25,7 @@ import javax.annotation.concurrent.Immutable;
 public final class FsPersistentFalsePositiveException
 extends FsFalsePositiveException {
 
-    FsPersistentFalsePositiveException(FsModel model, IOException cause) {
+    public FsPersistentFalsePositiveException(FsModel model, IOException cause) {
         super(model, cause);
     }
 }
