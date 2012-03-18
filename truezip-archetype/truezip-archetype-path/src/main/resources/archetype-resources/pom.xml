@@ -135,6 +135,16 @@
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
         </dependency>
+
+        <!-- This is only required for the Scala compiler.
+             If you are not using Scala in your project, then you can remove
+             this dependency. -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>2.0.0</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
