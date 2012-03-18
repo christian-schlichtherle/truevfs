@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.rof;
@@ -12,7 +12,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * An abstract read only file which implements the common boilerplate.
  *
  * @author  Christian Schlichtherle
- * @version $Id$
+ * @version $Id: AbstractReadOnlyFile.java b7943e37136d 2012/03/17 10:04:57 christian $
  */
 @NotThreadSafe
 public abstract class AbstractReadOnlyFile implements ReadOnlyFile {
