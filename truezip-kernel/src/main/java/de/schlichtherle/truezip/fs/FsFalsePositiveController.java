@@ -126,125 +126,125 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     @Deprecated
     public Icon getOpenIcon() throws IOException {
-        class GetOpenIcon implements IOOperation<Icon> {
-            @Override
-            public Icon call(   final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                return controller.getOpenIcon();
-            }
-        } // GetOpenIcon
-
         return call(new GetOpenIcon(), ROOT);
     }
+
+    final class GetOpenIcon implements IOOperation<Icon> {
+        @Override
+        public Icon call(   final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            return controller.getOpenIcon();
+        }
+    } // GetOpenIcon
 
     @Override
     @Deprecated
     public Icon getClosedIcon() throws IOException {
-        class GetClosedIcon implements IOOperation<Icon> {
-            @Override
-            public Icon call(   final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                return controller.getClosedIcon();
-            }
-        } // GetClosedIcon
-
         return call(new GetClosedIcon(), ROOT);
     }
 
+    private final class GetClosedIcon implements IOOperation<Icon> {
+        @Override
+        public Icon call(   final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            return controller.getClosedIcon();
+        }
+    } // GetClosedIcon
+
     @Override
     public boolean isReadOnly() throws IOException {
-        class IsReadOnly implements IOOperation<Boolean> {
-            @Override
-            public Boolean call(final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                return controller.isReadOnly();
-            }
-        } // IsReadOnly
-
         return call(new IsReadOnly(), ROOT);
     }
 
+    private final class IsReadOnly implements IOOperation<Boolean> {
+        @Override
+        public Boolean call(final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            return controller.isReadOnly();
+        }
+    } // IsReadOnly
+    
     @Override
     public FsEntry getEntry(final FsEntryName name) throws IOException {
-        class GetEntry implements IOOperation<FsEntry> {
-            @Override
-            public FsEntry call(final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                return controller.getEntry(name);
-            }
-        } // GetEntry
-
         return call(new GetEntry(), name);
     }
 
+    private final class GetEntry implements IOOperation<FsEntry> {
+        @Override
+        public FsEntry call(final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            return controller.getEntry(name);
+        }
+    } // GetEntry
+
     @Override
     public boolean isReadable(final FsEntryName name) throws IOException {
-        class IsReadable implements IOOperation<Boolean> {
-            @Override
-            public Boolean call(final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                return controller.isReadable(name);
-            }
-        } // IsReadable
-
         return call(new IsReadable(), name);
     }
 
+    private final class IsReadable implements IOOperation<Boolean> {
+        @Override
+        public Boolean call(final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            return controller.isReadable(name);
+        }
+    } // IsReadable
+    
     @Override
     public boolean isWritable(final FsEntryName name) throws IOException {
-        class IsWritable implements IOOperation<Boolean> {
-            @Override
-            public Boolean call(final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                return controller.isWritable(name);
-            }
-        } // IsWritable
-
         return call(new IsWritable(), name);
     }
 
+    private final class IsWritable implements IOOperation<Boolean> {
+        @Override
+        public Boolean call(final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            return controller.isWritable(name);
+        }
+    } // IsWritable
+
     @Override
     public boolean isExecutable(final FsEntryName name) throws IOException {
-        class IsExecutable implements IOOperation<Boolean> {
-            @Override
-            public Boolean call(final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                return controller.isExecutable(name);
-            }
-        } // IsWritable
-
         return call(new IsExecutable(), name);
     }
 
+    private final class IsExecutable implements IOOperation<Boolean> {
+        @Override
+        public Boolean call(final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            return controller.isExecutable(name);
+        }
+    } // IsWritable
+    
     @Override
     public void setReadOnly(final FsEntryName name) throws IOException {
-        class SetReadOnly implements IOOperation<Void> {
-            @Override
-            public Void call(   final FsController<?> controller,
-                                final FsEntryName name)
-            throws IOException {
-                controller.setReadOnly(name);
-                return null;
-            }
-        } // SetReadOnly
-
         call(new SetReadOnly(), name);
     }
 
+    private final class SetReadOnly implements IOOperation<Void> {
+        @Override
+        public Void call(   final FsController<?> controller,
+                            final FsEntryName name)
+        throws IOException {
+            controller.setReadOnly(name);
+            return null;
+        }
+    } // SetReadOnly
+    
     @Override
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
             final BitField<FsOutputOption> options)
     throws IOException {
-        class SetTime implements IOOperation<Boolean> {
+        final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName name)
@@ -263,7 +263,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final long value,
             final BitField<FsOutputOption> options)
     throws IOException {
-        class SetTime implements IOOperation<Boolean> {
+        final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName name)
@@ -280,7 +280,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final FsEntryName name,
             final BitField<FsInputOption> options) {
         @NotThreadSafe
-        class Input extends InputSocket<Entry> {
+        final class Input extends InputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
             @Nullable InputSocket<? extends Entry> delegate;
 
@@ -295,72 +295,72 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public Entry getLocalTarget() throws IOException {                
-                class GetLocalTarget
-                implements IOOperation<Entry> {
-                    @Override
-                    public Entry call(
-                            final FsController<?> controller,
-                            final FsEntryName name)
-                    throws IOException {
-                        return getBoundDelegate(controller, name)
-                                .getLocalTarget();
-                    }
-                } // GetLocalTarget
-
                 return call(new GetLocalTarget(), name);
             }
 
+            final class GetLocalTarget
+            implements IOOperation<Entry> {
+                @Override
+                public Entry call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .getLocalTarget();
+                }
+            } // GetLocalTarget
+
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                class NewReadOnlyFile
-                implements IOOperation<ReadOnlyFile> {
-                    @Override
-                    public ReadOnlyFile call(
-                            final FsController<?> controller,
-                            final FsEntryName name)
-                    throws IOException {
-                        return getBoundDelegate(controller, name)
-                                .newReadOnlyFile();
-                    }
-                } // NewReadOnlyFile
-
                 return call(new NewReadOnlyFile(), name);
             }
+
+            final class NewReadOnlyFile
+            implements IOOperation<ReadOnlyFile> {
+                @Override
+                public ReadOnlyFile call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newReadOnlyFile();
+                }
+            } // NewReadOnlyFile
 
             @Override
             public SeekableByteChannel newSeekableByteChannel()
             throws IOException {
-                class NewSeekableByteChannel
-                implements IOOperation<SeekableByteChannel> {
-                    @Override
-                    public SeekableByteChannel call(
-                            final FsController<?> controller,
-                            final FsEntryName name)
-                    throws IOException {
-                        return getBoundDelegate(controller, name)
-                                .newSeekableByteChannel();
-                    }
-                } // NewSeekableByteChannel
-
                 return call(new NewSeekableByteChannel(), name);
             }
 
+            final class NewSeekableByteChannel
+            implements IOOperation<SeekableByteChannel> {
+                @Override
+                public SeekableByteChannel call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newSeekableByteChannel();
+                }
+            } // NewSeekableByteChannel
+
             @Override
             public InputStream newInputStream() throws IOException {
-                class NewInputStream
-                implements IOOperation<InputStream> {
-                    @Override
-                    public InputStream call(
-                            final FsController<?> controller,
-                            final FsEntryName name)
-                    throws IOException {
-                        return getBoundDelegate(controller, name)
-                                .newInputStream();
-                    }
-                } // NewInputStream
-
                 return call(new NewInputStream(), name);
             }
+
+            final class NewInputStream
+            implements IOOperation<InputStream> {
+                @Override
+                public InputStream call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newInputStream();
+                }
+            } // NewInputStream
         } // Input
 
         return new Input();
@@ -373,7 +373,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final BitField<FsOutputOption> options,
             final @CheckForNull Entry template) {
         @NotThreadSafe
-        class Output extends OutputSocket<Entry> {
+        final class Output extends OutputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
             @Nullable OutputSocket<? extends Entry> delegate;
 
@@ -388,55 +388,55 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public Entry getLocalTarget() throws IOException {                
-                class GetLocalTarget
-                implements IOOperation<Entry> {
-                    @Override
-                    public Entry call(
-                            final FsController<?> controller,
-                            final FsEntryName name)
-                    throws IOException {
-                        return getBoundDelegate(controller, name)
-                                .getLocalTarget();
-                    }
-                } // GetLocalTarget
-
                 return call(new GetLocalTarget(), name);
             }
+
+            final class GetLocalTarget
+            implements IOOperation<Entry> {
+                @Override
+                public Entry call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .getLocalTarget();
+                }
+            } // GetLocalTarget
 
             @Override
             public SeekableByteChannel newSeekableByteChannel()
             throws IOException {
-                class NewSeekableByteChannel
-                implements IOOperation<SeekableByteChannel> {
-                    @Override
-                    public SeekableByteChannel call(
-                            final FsController<?> controller,
-                            final FsEntryName name)
-                    throws IOException {
-                        return getBoundDelegate(controller, name)
-                                .newSeekableByteChannel();
-                    }
-                } // NewSeekableByteChannel
-
                 return call(new NewSeekableByteChannel(), name);
             }
 
+            final class NewSeekableByteChannel
+            implements IOOperation<SeekableByteChannel> {
+                @Override
+                public SeekableByteChannel call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newSeekableByteChannel();
+                }
+            } // NewSeekableByteChannel
+
             @Override
             public OutputStream newOutputStream() throws IOException {
-                class NewOutputStream
-                implements IOOperation<OutputStream> {
-                    @Override
-                    public OutputStream call(
-                            final FsController<?> controller,
-                            final FsEntryName name)
-                    throws IOException {
-                        return getBoundDelegate(controller, name)
-                                .newOutputStream();
-                    }
-                } // NewOutputStream
-
                 return call(new NewOutputStream(), name);
             }
+
+            final class NewOutputStream
+            implements IOOperation<OutputStream> {
+                @Override
+                public OutputStream call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newOutputStream();
+                }
+            } // NewOutputStream
         } // Output
 
         return new Output();
@@ -450,7 +450,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final BitField<FsOutputOption> options,
             final @CheckForNull Entry template)
     throws IOException {
-        class Mknod implements IOOperation<Void> {
+        final class Mknod implements IOOperation<Void> {
             @Override
             public Void call(final FsController<?> controller,
                              final FsEntryName name)
@@ -468,7 +468,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final FsEntryName name,
             final BitField<FsOutputOption> options)
     throws IOException {
-        class Unlink implements IOOperation<Void> {
+        final class Unlink implements IOOperation<Void> {
             @Override
             public Void call(final FsController<?> controller,
                              final FsEntryName name)
