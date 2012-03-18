@@ -62,7 +62,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             : ThreadLocalUtilFactory.OLD
                 ).newThreadLocalUtil();
 
-    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE
+    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
             = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT).not();
 
     private final ReadLock readLock;
@@ -364,7 +364,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     throws IOException {
         // MUST not initialize within IOOperation => would always be true!
         final BitField<FsSyncOption> sync = threadUtil.get().locking
-                ? options.and(NOT_WAIT_CLOSE) // may be == options!
+                ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
                 : options;
 
         class Sync implements IOOperation<Void> {
@@ -383,7 +383,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
                 } catch (final FsSyncException ex) {
                     if (sync != options // OK, see contract for BitField.and()!
-                            && ex.getCause() instanceof FsOpenIOResourcesException)
+                            && ex.getCause() instanceof FsResourceOpenException)
                         throw FsNeedsLockRetryException.get(getModel());
                     throw ex;
                 }
