@@ -59,16 +59,34 @@
         </dependency>
     </dependencies>
 
-    <!--profiles>
+    <profiles>
         <profile>
-            <id>integration-test</id>
-            <dependencies>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>truezip-extension-jmx-jul</artifactId>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
+            <id>no-jse7-tests</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <excludes>
+                                    <exclude>**/*DriverTest.class</exclude>
+                                </excludes>
+                            </configuration>
+                        </plugin>
+                        <plugin>
+                            <artifactId>maven-failsafe-plugin</artifactId>
+                            <configuration>
+                                <excludes>
+                                    <exclude>**/*PathIT.class</exclude>
+                                </excludes>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
        </profile>
-    </profiles-->
+    </profiles>
 </project>
