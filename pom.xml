@@ -82,8 +82,10 @@ system space.
              tested and is probably not producing exactly the same results. -->
         <maven.enforcer.requireMavenVersion>3.0.4</maven.enforcer.requireMavenVersion>
         <!-- Most modules require JSE 7 at compile time.
-             Note that at run time, only JSE 6 is required though. -->
-        <maven.enforcer.requireJavaVersion>1.7</maven.enforcer.requireJavaVersion>
+             At run time however, most modules require only JSE 6.
+             So while you can't compile TrueZIP with JSE 6, you can still run
+             the integration tests with it. -->
+        <maven.enforcer.requireJavaVersion>1.6</maven.enforcer.requireJavaVersion>
 
         <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
         <maven.compiler.source>1.6</maven.compiler.source>
@@ -92,7 +94,11 @@ system space.
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
 
         <!-- maven-surefire-plugin && maven-failsafe-plugin -->
-        <argLine>-server</argLine>
+        <!-- The server VM is expected to be less tolerant against
+             multithreading bugs when running the tests.
+             512 MB is required to run the integration tests which use BZIP2
+             compression. -->
+        <argLine>-server -Xmx512m</argLine>
         <parallel>both</parallel>
 
         <!-- maven-javadoc-plugin -->
@@ -120,10 +126,21 @@ system space.
         <module>truezip-extension</module>
         <module>truezip-file</module>
         <module>truezip-kernel</module>
-        <module>truezip-path</module>
         <module>truezip-samples</module>
         <module>truezip-swing</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>jse7-modules</id>
+            <activation>
+                <jdk>[1.7,)</jdk>
+            </activation>
+            <modules>
+                <module>truezip-path</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <dependencyManagement>
         <dependencies>
