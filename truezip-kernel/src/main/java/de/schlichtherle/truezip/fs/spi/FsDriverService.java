@@ -65,8 +65,8 @@ public abstract class FsDriverService implements FsDriverProvider {
                 Maps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = toSchemes(param[0]);
-            final FsDriver newDriver = ServiceLocator.promote(
-                    param[1], FsDriver.class);
+            final FsDriver newDriver = ServiceLocator
+                    .promote(param[1], FsDriver.class);
             if (schemes.isEmpty())
                 throw new IllegalArgumentException("No file system schemes for " + newDriver);
             for (final FsScheme scheme : schemes) {

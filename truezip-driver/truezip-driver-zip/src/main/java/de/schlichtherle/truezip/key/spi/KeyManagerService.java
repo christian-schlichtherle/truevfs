@@ -62,7 +62,8 @@ public abstract class KeyManagerService extends AbstractKeyManagerProvider {
                     Maps.initialCapacity(config.length));
         for (final Object[] param : config) {
             final Class<?> type = ServiceLocator.promote(param[0], Class.class);
-            final KeyManager<?> newManager = ServiceLocator.promote(param[1], KeyManager.class);
+            final KeyManager<?> newManager = ServiceLocator
+                    .promote(param[1], KeyManager.class);
             final KeyManager<?> oldManager = managers.put(type, newManager);
             if (null != oldManager && null != newManager
                     && oldManager.getPriority() > newManager.getPriority())
