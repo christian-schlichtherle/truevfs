@@ -15,11 +15,9 @@ import javax.annotation.concurrent.ThreadSafe;
  * successfully retry the operation as soon as the resource is not busy anymore
  * and no other exceptional conditions apply.
  *
- * @author Christian Schlichtherle
  * @see    ResourceBusyException
- * @deprecated This class will get removed in TrueZIP 8.
+ * @author Christian Schlichtherle
  */
-@Deprecated
 @ThreadSafe
 public class FileBusyException extends FileNotFoundException {
     private static final long serialVersionUID = 2056108562576389242L;
@@ -29,7 +27,7 @@ public class FileBusyException extends FileNotFoundException {
     }
 
     public FileBusyException(@CheckForNull Throwable cause) {
-        super(null != cause ? cause.toString() : null);
+        super(null == cause ? null : cause.toString());
         super.initCause(cause);
     }
 }
