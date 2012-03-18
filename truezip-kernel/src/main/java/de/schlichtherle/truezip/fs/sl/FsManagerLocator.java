@@ -62,7 +62,6 @@ public final class FsManagerLocator implements FsManagerProvider {
             final Logger logger = Logger.getLogger(
                     FsManagerLocator.class.getName(),
                     FsManagerLocator.class.getName());
-            logger.info("banner");
             final ServiceLocator locator = new ServiceLocator(
                     FsManagerLocator.class.getClassLoader());
             FsManagerService
