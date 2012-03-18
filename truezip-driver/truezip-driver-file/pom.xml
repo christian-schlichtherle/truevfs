@@ -26,4 +26,27 @@
         make its file system drivers available for service location in the
         client API modules.
     </description>
+
+    <profiles>
+        <profile>
+            <id>no-jse7-tests</id>
+            <activation>
+                <jdk>1.6</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <configuration>
+                                <excludes>
+                                    <exclude>**/nio/file/*Test.class</exclude>
+                                </excludes>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+       </profile>
+    </profiles>
 </project>
