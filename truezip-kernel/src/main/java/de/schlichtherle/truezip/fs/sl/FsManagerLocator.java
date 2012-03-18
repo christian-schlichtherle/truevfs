@@ -1,10 +1,6 @@
 /*
- * Copyright 2004-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.sl;
 
@@ -39,11 +35,10 @@ import javax.annotation.concurrent.Immutable;
  * {@code new FsFailSafeManager(new FsDefaultManager())} is used to create the
  * file system manager in this container.
  *
- * @see     FsFailSafeManager
- * @see     FsDefaultManager
- * @see     FsManagerService
- * @author  Christian Schlichtherle
- * @version $Id$
+ * @see    FsFailSafeManager
+ * @see    FsDefaultManager
+ * @see    FsManagerService
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class FsManagerLocator implements FsManagerProvider {
@@ -67,6 +62,7 @@ public final class FsManagerLocator implements FsManagerProvider {
             final Logger logger = Logger.getLogger(
                     FsManagerLocator.class.getName(),
                     FsManagerLocator.class.getName());
+            logger.info("banner");
             final ServiceLocator locator = new ServiceLocator(
                     FsManagerLocator.class.getClassLoader());
             FsManagerService
