@@ -91,7 +91,7 @@ extends ConfiguredClientTestBase<D> {
         sync.join(); // check exception
     }
 
-    private void roundTrip(final int i) throws IOException {
+    void roundTrip(final int i) throws IOException {
         final File temp = createTempFile();
         TFile.rm(temp);
         final TFile archive = new TFile(temp);
