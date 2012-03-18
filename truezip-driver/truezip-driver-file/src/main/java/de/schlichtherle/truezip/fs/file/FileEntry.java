@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2012 Schlichtherle IT Services.
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.file;
