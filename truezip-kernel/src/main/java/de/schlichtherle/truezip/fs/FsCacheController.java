@@ -500,7 +500,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // an input stream for a copy operation and this
                             // is an artifact of an attempt to acquire the
                             // output stream for a child file system.
-                            if (!(syncEx.getCause() instanceof FsOpenIOResourcesException)) {
+                            if (!(syncEx.getCause() instanceof FsResourceOpenException)) {
                                 // Too bad, sync() failed because of more
                                 // serious issue than just some open resources.
                                 // Let's rethrow the sync exception.

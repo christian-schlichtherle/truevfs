@@ -113,7 +113,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final int local = a.localResources();
         final IOException cause;
         if (0 != local && !force) {
-            cause = new FsOpenIOResourcesException(a.totalResources(), local);
+            cause = new FsResourceOpenException(a.totalResources(), local);
             throw handler.fail(new FsSyncException(getModel(), cause));
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
@@ -122,7 +122,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 == total)
             return;
-        cause = new FsOpenIOResourcesException(total, local);
+        cause = new FsResourceOpenException(total, local);
         if (!force)
             throw handler.fail(new FsSyncException(getModel(), cause));
         handler.warn(new FsSyncWarningException(getModel(), cause));
