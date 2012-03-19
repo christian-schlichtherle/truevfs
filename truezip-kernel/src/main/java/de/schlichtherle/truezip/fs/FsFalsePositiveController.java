@@ -132,7 +132,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new GetOpenIcon(), ROOT);
     }
 
-    final class GetOpenIcon implements IOOperation<Icon> {
+    final static class GetOpenIcon implements IOOperation<Icon> {
         @Override
         public Icon call(   final FsController<?> controller,
                             final FsEntryName name)
@@ -147,7 +147,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new GetClosedIcon(), ROOT);
     }
 
-    private final class GetClosedIcon implements IOOperation<Icon> {
+    private static final class GetClosedIcon implements IOOperation<Icon> {
         @Override
         public Icon call(   final FsController<?> controller,
                             final FsEntryName name)
@@ -161,7 +161,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new IsReadOnly(), ROOT);
     }
 
-    private final class IsReadOnly implements IOOperation<Boolean> {
+    private static final class IsReadOnly implements IOOperation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -175,7 +175,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new GetEntry(), name);
     }
 
-    private final class GetEntry implements IOOperation<FsEntry> {
+    private static final class GetEntry implements IOOperation<FsEntry> {
         @Override
         public FsEntry call(final FsController<?> controller,
                             final FsEntryName name)
@@ -189,7 +189,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new IsReadable(), name);
     }
 
-    private final class IsReadable implements IOOperation<Boolean> {
+    private static final class IsReadable implements IOOperation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -203,7 +203,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new IsWritable(), name);
     }
 
-    private final class IsWritable implements IOOperation<Boolean> {
+    private static final class IsWritable implements IOOperation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -217,7 +217,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new IsExecutable(), name);
     }
 
-    private final class IsExecutable implements IOOperation<Boolean> {
+    private static final class IsExecutable implements IOOperation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -231,7 +231,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         call(new SetReadOnly(), name);
     }
 
-    private final class SetReadOnly implements IOOperation<Void> {
+    private static final class SetReadOnly implements IOOperation<Void> {
         @Override
         public Void call(   final FsController<?> controller,
                             final FsEntryName name)
@@ -528,7 +528,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     private interface State {
         @Nullable <T> T call(IOOperation<T> operation, FsEntryName name)
         throws IOException;
-    } // Strategy
+    } // State
 
     @Immutable
     private final class TryChild implements State {
@@ -538,7 +538,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         throws IOException {
             return operation.call(delegate, name);
         }
-    } // DelegateController
+    } // TryChild
 
     @Immutable
     private final class UseParent implements State {
@@ -561,5 +561,5 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 throw originalCause;
             }
         }
-    } // ParentController
+    } // UseParent
 }
