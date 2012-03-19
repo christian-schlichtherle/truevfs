@@ -1102,7 +1102,9 @@ public final class TFile extends File {
      * @since  TrueZIP 7.5
      */
     public TFile toNonArchiveFile() {
-        return new TFile(getParentFile(), getName(), TArchiveDetector.NULL);
+        return isArchive()
+                ? new TFile(getParentFile(), getName(), TArchiveDetector.NULL)
+                : this;
     }
 
     /**
