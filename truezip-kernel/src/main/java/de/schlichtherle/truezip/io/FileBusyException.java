@@ -15,7 +15,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * successfully retry the operation as soon as the resource is not busy anymore
  * and no other exceptional conditions apply.
  *
- * @see    ResourceBusyException
  * @author Christian Schlichtherle
  */
 @ThreadSafe
