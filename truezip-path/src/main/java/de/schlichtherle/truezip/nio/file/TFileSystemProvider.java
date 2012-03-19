@@ -9,8 +9,8 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
+import de.schlichtherle.truezip.file.TVFS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -112,27 +112,11 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     *
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to set the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
+     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount()}.
      */
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static void umount() throws FsSyncException {
-        TConfig.get().getFsManager().sync(UMOUNT);
+        TVFS.umount();
     }
 
     /**

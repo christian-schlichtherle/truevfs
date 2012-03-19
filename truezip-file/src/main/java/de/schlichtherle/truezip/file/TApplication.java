@@ -256,7 +256,7 @@ public abstract class TApplication<E extends Exception> {
      * application.
      * <p>
      * The implementation in the class {@link TApplication} simply calls
-     * {@link TFile#umount()}.
+     * {@link TVFS#umount()}.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
@@ -268,6 +268,6 @@ public abstract class TApplication<E extends Exception> {
      *         This implies loss of data!
      */
     protected void sync() throws FsSyncException {
-        TFile.umount();
+        TVFS.umount();
     }
 }

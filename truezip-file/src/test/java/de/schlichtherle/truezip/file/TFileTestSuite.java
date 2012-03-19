@@ -5,9 +5,10 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsResourceOpenException;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
+import de.schlichtherle.truezip.fs.FsResourceOpenException;
 import de.schlichtherle.truezip.fs.FsSyncException;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
@@ -15,6 +16,7 @@ import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
@@ -97,7 +99,7 @@ extends ConfiguredClientTestBase<D> {
     /** Unmounts the {@linkplain #getArchive() current archive file}. */
     protected final void umount() throws FsSyncException {
         if (null != archive)
-            TFile.umount(archive);
+            TVFS.umount(archive);
     }
 
     private File createTempFile() throws IOException {
@@ -149,7 +151,7 @@ extends ConfiguredClientTestBase<D> {
         final String entry = archive.getPath() + "/entry";
         archive = null;
         assertTrue(new TFile(entry).createNewFile());
-        TFile.umount(new TFile(entry).getTopLevelArchive());
+        TVFS.umount(new TFile(entry).getTopLevelArchive());
         Closeable resource = factory.create(entry);
         final ReferenceQueue<FsController<?>> queue
                 = new ReferenceQueue<FsController<?>>();
@@ -166,7 +168,7 @@ extends ConfiguredClientTestBase<D> {
         System.runFinalization();
         assertNull(queue.remove(TIMEOUT_MILLIS));
         assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
-        TFile.umount(new TFile(entry).getTopLevelArchive());
+        TVFS.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController<?>> got;
         do {
             // triggering GC and finalizer in a loop seems to help with concurrency!
@@ -1304,7 +1306,10 @@ extends ConfiguredClientTestBase<D> {
                         final TFile entry = new TFile(archive, "" + threadNum);
                         createTestFile(entry);
                         try {
-                            TFile.umount(archive, wait, false, wait, false);
+                            TVFS.sync(archive,
+                                    BitField.of(CLEAR_CACHE)
+                                            .set(WAIT_CLOSE_INPUT, wait)
+                                            .set(WAIT_CLOSE_OUTPUT, wait));
                         } catch (final FsSyncException ex) {
                             if (!(ex.getCause() instanceof FsResourceOpenException))
                                 throw ex;
@@ -1357,9 +1362,9 @@ extends ConfiguredClientTestBase<D> {
                     createTestFile(entry);
                     try {
                         if (syncIndividually)
-                            TFile.umount(archive);
+                            TVFS.umount(archive);
                         else
-                            TFile.sync(SYNC); // DON'T clear cache!
+                            TVFS.sync(SYNC); // DON'T clear cache!
                     } catch (final FsSyncWarningException ex) {
                         if (!(ex.getCause() instanceof FsResourceOpenException))
                             throw ex;
@@ -1437,13 +1442,13 @@ extends ConfiguredClientTestBase<D> {
                         join.join();
                     }
                 } finally {
-                    TFile.umount(dst);
+                    TVFS.umount(dst);
                 }
             } finally {
                 dst.toNonArchiveFile().rm();
             }
         } finally {
-            TFile.umount(src);
+            TVFS.umount(src);
         }
         // src alias archive gets deleted by the test fixture.
     }

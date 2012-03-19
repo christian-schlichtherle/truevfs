@@ -13,9 +13,8 @@ import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -136,18 +135,18 @@ import javax.swing.filechooser.FileSystemView;
  * <pre><code>
  * TFile src = ...;
  * TFile dst = ...;
- * TFile.umount(); // commit changes and purge any cached data
+ * TVFS.umount(); // commit changes and purge any cached data
  * TFile.cp_rp(src, dst, TArchiveDetector.NULL);
  * </code></pre>
  * <p>
- * However, the call to {@code TFile.umount()} may unmount more archive files
+ * However, the call to {@code TVFS.umount()} may unmount more archive files
  * than required for the copying operation.
  * You can selectively unmount archive files by using this instead:
  * <pre><code>
  * TFile src = ...;
  * TFile dst = ...;
- * if (src.isTopLevelArchive) TFile.umount(src); // unmount selectively
- * if (dst.isTopLevelArchive) TFile.umount(dst); // dito
+ * if (src.isTopLevelArchive) TVFS.umount(src); // unmount selectively
+ * if (dst.isTopLevelArchive) TVFS.umount(dst); // dito
  * TFile.cp_rp(src, dst, TArchiveDetector.NULL);
  * </code></pre>
  * <p>
@@ -159,8 +158,8 @@ import javax.swing.filechooser.FileSystemView;
  * <pre><code>
  * TFile src = ...;
  * TFile dst = ...;
- * if (src.isTopLevelArchive) TFile.umount(src); // unmount selectively
- * if (dst.isTopLevelArchive) TFile.umount(dst); // dito
+ * if (src.isTopLevelArchive) TVFS.umount(src); // unmount selectively
+ * if (dst.isTopLevelArchive) TVFS.umount(dst); // dito
  * src.toNonArchiveFile().cp_rp(dst.toNonArchiveFile());
  * </code></pre>
  * 
@@ -941,338 +940,107 @@ public final class TFile extends File {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     *
-     * @param  options a bit field of synchronization options.
-     * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
+     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
      */
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncException {
-        TConfig.get().getFsManager().sync(options);
+        TVFS.sync(options);
     }
 
-    
     /**
-     * Commits all unsynchronized changes to the contents of the federated file
-     * system (i.e. prospective archive files) identified by {@code archive}
-     * and all its member federated file systems to their respective parent
-     * file system, releases the associated resources (i.e. target archive
-     * files) for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     * <p>
-     * If a client application needs to sync an individual archive file,
-     * the following idiom could be used:
-     * <pre>{@code
-     * if (file.isArchive() && file.getEnclArchive() == null) // filter top level federated file system
-     *   if (file.isDirectory()) // ignore false positives
-     *     TFile.sync(file); // sync federated file system and all its members
-     * }</pre>
-     * Again, this will also sync all federated file systems which are
-     * located within the file system referred to by {@code file}.
-     *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
-     * @param  options a bit field of synchronization options.
-     * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated (archive) file system or the combination of
-     *         synchronization options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is set.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(BitField)
-     * @see    #getTopLevelArchive()
+     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(TFile, BitField)}.
      */
-    @SuppressWarnings("deprecation")
-    public static void sync(
-            final TFile archive,
-            final BitField<FsSyncOption> options)
+    @Deprecated
+    public static void sync(TFile archive, BitField<FsSyncOption> options)
     throws FsSyncException {
-        if (!archive.isTopLevelArchive())
-            throw new IllegalArgumentException(archive + " (not a top level archive file)");
-        new FsFilteringManager(
-                TConfig.get().getFsManager(),
-                archive.getController().getModel().getMountPoint()
-                ).sync(options);
+        TVFS.sync(archive, options);
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     * <p>
-     * Calling this method is equivalent to
-     * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
-     *
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(BitField)
+     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount()}.
      */
-    // TODO: Refactor this to something like TControl.umount() and refactor all
-    // other variants and incarnations accordingly.
+    @Deprecated
     public static void umount()
     throws FsSyncException {
-        sync(UMOUNT);
+        TVFS.umount();
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     * <p>
-     * Calling this method is equivalent to
-     * {@link #sync(BitField)
-     *  sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
-     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
-     * }.
-     *
-     * @param  forceCloseInputAndOutput see
-     *         {@link FsSyncOption#FORCE_CLOSE_INPUT}
-     *         and {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(BitField)
+     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
      */
+    @Deprecated
     public static void umount(boolean forceCloseInputAndOutput)
     throws FsSyncException {
-        sync(   BitField.of(CLEAR_CACHE)
-                    .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-                    .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
+        TVFS.sync(BitField  .of(CLEAR_CACHE)
+                            .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                            .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems (i.e. prospective archive files) to their respective parent file
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     * <p>
-     * Calling this method is equivalent to
-     * {@link #sync(BitField)
-     *  sync(   BitField.of(FsSyncOption.CLEAR_CACHE)
-     *          .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
-     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
-     *          .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
-     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
-     * }.
-     *
-     * @param  waitCloseInput see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
-     * @param  forceCloseInput see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
-     * @param  waitCloseOutput see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
-     * @param  forceCloseOutput see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
-     * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(BitField)
+     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
      */
+    @Deprecated
     public static void umount(
             boolean waitCloseInput, boolean forceCloseInput,
             boolean waitCloseOutput, boolean forceCloseOutput)
     throws FsSyncException {
-        sync(   BitField.of(CLEAR_CACHE)
-                    .set(WAIT_CLOSE_INPUT, waitCloseInput)
-                    .set(FORCE_CLOSE_INPUT, forceCloseInput)
-                    .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
-                    .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
+        TVFS.sync(BitField  .of(CLEAR_CACHE)
+                            .set(WAIT_CLOSE_INPUT, waitCloseInput)
+                            .set(FORCE_CLOSE_INPUT, forceCloseInput)
+                            .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                            .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of the federated file
-     * system (i.e. prospective archive files) identified by {@code archive}
-     * and all its member federated file systems to their respective parent
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     * <p>
-     * Calling this method is equivalent to
-     * {@link #sync(BitField) sync(archive, FsSyncOptions.UMOUNT)}.
-     *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
-     * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated (archive) file system.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(TFile, BitField)
-     * @see    #getTopLevelArchive()
+     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount(TFile)}.
      */
+    @Deprecated
     public static void umount(TFile archive)
     throws FsSyncException {
-        sync(archive, UMOUNT);
+        TVFS.umount(archive);
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of the federated file
-     * system (i.e. prospective archive files) identified by {@code archive}
-     * and all its member federated file systems to their respective parent
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     * <p>
-     * Calling this method is equivalent to
-     * {@link #sync(BitField)
-     *  sync(   archive,
+     * @deprecated Calling this method is equivalent to
+     * {@link TVFS#sync(TFile, BitField)
+     *  TVFS.sync(archive,
      *          BitField.of(FsSyncOption.CLEAR_CACHE)
-     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
+     *                  .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+     *                  .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
      * }.
-     *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
-     * @param  forceCloseInputAndOutput see
-     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} and
-     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
-     * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated (archive) file system.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(TFile, BitField)
-     * @see    #getTopLevelArchive()
      */
+    @Deprecated
     public static void umount(TFile archive, boolean forceCloseInputAndOutput)
     throws FsSyncException {
-        sync(   archive,
+        TVFS.sync(archive,
                 BitField.of(CLEAR_CACHE)
-                    .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-                    .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
+                        .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                        .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of the federated file
-     * system (i.e. prospective archive files) identified by {@code archive}
-     * and all its member federated file systems to their respective parent
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
-     * <p>
-     * Calling this method is equivalent to
-     * {@link #sync(BitField)
-     *  sync(   archive,
+     * @deprecated Calling this method is equivalent to
+     * {@link TVFS#sync(TFile, BitField)
+     *  TVFS.sync(archive,
      *          BitField.of(FsSyncOption.CLEAR_CACHE)
-     *          .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
-     *          .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
-     *          .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
-     *          .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
+     *                  .set(FsSyncOption.WAIT_CLOSE_INPUT, waitCloseInput)
+     *                  .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInput)
+     *                  .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
+     *                  .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
      * }.
-     *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
-     * @param  waitCloseInput see {@link FsSyncOption#WAIT_CLOSE_INPUT}.
-     * @param  forceCloseInput see {@link FsSyncOption#FORCE_CLOSE_INPUT}.
-     * @param  waitCloseOutput see {@link FsSyncOption#WAIT_CLOSE_OUTPUT}.
-     * @param  forceCloseOutput see {@link FsSyncOption#FORCE_CLOSE_OUTPUT}.
-     * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated (archive) file system or the combination of
-     *         synchronization options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, e.g. a failure to set the last
-     *         modification time of the the target archive file in its parent
-     *         file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(TFile, BitField)
-     * @see    #getTopLevelArchive()
      */
+    @Deprecated
     public static void umount(TFile archive,
             boolean waitCloseInput, boolean forceCloseInput,
             boolean waitCloseOutput, boolean forceCloseOutput)
     throws FsSyncException {
-        sync(   archive,
+        TVFS.sync(archive,
                 BitField.of(CLEAR_CACHE)
-                    .set(WAIT_CLOSE_INPUT, waitCloseInput)
-                    .set(FORCE_CLOSE_INPUT, forceCloseInput)
-                    .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
-                    .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
+                        .set(WAIT_CLOSE_INPUT, waitCloseInput)
+                        .set(FORCE_CLOSE_INPUT, forceCloseInput)
+                        .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                        .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
     }
 
     /**
@@ -3823,8 +3591,8 @@ public final class TFile extends File {
 
                 // Unmount both archive files so we can delete and move them
                 // safely and fast like regular files.
-                umount(grown);
-                umount(compact);
+                TVFS.umount(grown);
+                TVFS.umount(compact);
 
                 // Move the compacted archive file over to the grown archive
                 // file like a regular file.

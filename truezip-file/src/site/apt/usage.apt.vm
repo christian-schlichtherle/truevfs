@@ -122,9 +122,9 @@ Using TrueZIP File*
     Archive file synchronization is performed semi-automatic:
 
     * <Manual synchronization> happens when the application calls
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}},
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}},
         which calls
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField<FsSyncOption>)>>>}},
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}},
         or any of their many variants and incarnations.
 
     * <Automatic synchronization> happens when the JVM terminates (in a JVM
@@ -138,15 +138,15 @@ Using TrueZIP File*
     Manual synchronization is required to support third-party access to an
     archive file (see {{{Third_Party_Access}below}}).
     It also enables some control over any exceptions thrown:
-    <<<TFile.umount()>>>
+    <<<TVFS.umount()>>>
     or
-    <<<TFile.sync(BitField<FsSyncOption>)>>>
+    <<<TVFS.sync(BitField<FsSyncOption>)>>>
     may throw an
     {{{../apidocs/de/schlichtherle/truezip/fs/FsSyncException.html}<<<FsSyncException>>>}}.
     An application may catch these exceptions and act on them individually
     (see {{{Exception_Handling}below}}).
 
-    However, calling <<<TFile.sync(BitField<FsSyncOption>)>>> too often may
+    However, calling <<<TVFS.sync(BitField<FsSyncOption>)>>> too often may
     increase the overall runtime:
     With the full update strategy, if an application is manually synchronizing
     a mounted archive file after each modification, then this results in an
@@ -177,7 +177,7 @@ Using TrueZIP File*
     This archive file is then said to be <mounted>.
     The TrueZIP Kernel manages the associated state until the archive file gets
     <unmounted> again, e.g. by a call to
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}.
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
 
     Due to this strategy, the TrueZIP Kernel assumes exclusive access to any
     mounted archive files.
@@ -209,10 +209,10 @@ Using TrueZIP File*
     <<<TArchiveDetector>>> parameter.
 
     If these restrictions cannot be respected for some reason, an application
-    may call <<<TFile.umount()>>>,
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount(de.schlichtherle.truezip.file.TFile)}<<<TFile.umount(TFile)>>>}}
+    may call <<<TVFS.umount()>>>,
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount(de.schlichtherle.truezip.file.TFile)}<<<TVFS.umount(TFile)>>>}}
     or any of their many variants and incarnations (e.g.
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.fs.FsSyncOption)}<<<TFile.sync(BitField<FsSyncOption>)>>>}}).
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.fs.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
     in order to commit all changes and finally unmount the archive files.
     A third party can then safely access them.
     Likewise, the    application must make sure not to access an archive file or
@@ -220,9 +220,9 @@ Using TrueZIP File*
 
 ** Exception Handling
 
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
     and
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
     and their many variants and incarnations are guaranteed to process <all>
     archive files which are mounted or have been updated by an application.
     However, processing some of these archive files may fail for any I/O
@@ -310,9 +310,9 @@ Using TrueZIP File*
 %{snippet|id=performance2|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/file/sample/Usage.java}
 
     In essence: If at all, an application should never call
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
     or
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
     in a loop which modifies an archive file.
 
     The situation gets more complicated with implicit remounting:
@@ -363,15 +363,15 @@ Using TrueZIP File*
     control:
 
     [[1]] When the JVM terminates, calling
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
         or
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
         is recommended in order to handle exceptions explicitly.
 
     [[2]] Otherwise, in order to achieve best performance,
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#umount()}<<<TFile.umount()>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
         or
-        {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TFile.sync(BitField)>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
         should not get called unless either third party access or explicit
         exception handling is required.
 

@@ -6,6 +6,7 @@ package de.schlichtherle.truezip.file.sample;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
+import de.schlichtherle.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import java.io.IOException;
@@ -55,7 +56,7 @@ abstract class Usage {
     void umount1() {
 // START SNIPPET: umount1
         try {
-            TFile.umount(); // with or without parameters
+            TVFS.umount(); // with or without parameters
         } catch (FsSyncException ouch) {
             // Print the sequential I/O exception chain in order of descending
             // priority and ascending appearance.
@@ -69,7 +70,7 @@ abstract class Usage {
     void umount2() {
 // START SNIPPET: umount2
         try {
-            TFile.umount(); // with or without parameters
+            TVFS.umount(); // with or without parameters
         } catch (FsSyncException ouch) {
             // Print the sequential I/O exception chain strictly in order of
             // ascending appearance instead.
@@ -81,7 +82,7 @@ abstract class Usage {
     void umount3() {
 // START SNIPPET: umount3
         try {
-            TFile.umount(); // with or without parameters
+            TVFS.umount(); // with or without parameters
         } catch (FsSyncWarningException oops) {
             // Only objects of the class FsSyncWarningException exist in
             // the exception chain - we ignore this.
@@ -104,7 +105,7 @@ abstract class Usage {
         for (int i = 0; i < n; i++) { // n * ...
             TFile entry = new TFile("archive.zip", names[i]); // O(1)
             entry.createNewFile(); // O(1)
-            TFile.umount(); // O(i + 1) !!
+            TVFS.umount(); // O(i + 1) !!
         }
         // Overall: O(n*n) !!!
 // END SNIPPET: performance1
@@ -118,7 +119,7 @@ abstract class Usage {
             TFile entry = new TFile("archive.zip", names[i]); // O(1)
             entry.createNewFile(); // O(1)
         }
-        TFile.umount(); // new file: O(1); modified: O(n)
+        TVFS.umount(); // new file: O(1); modified: O(n)
         // Overall: O(n)
 // END SNIPPET: performance2
     }

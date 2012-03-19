@@ -12,6 +12,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.*;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import de.schlichtherle.truezip.file.TConfig;
+import de.schlichtherle.truezip.file.TVFS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import de.schlichtherle.truezip.fs.*;
@@ -93,79 +94,60 @@ public final class TFileSystem extends FileSystem {
     }
 
     /**
-     * Commits all unsynchronized changes to the contents of this federated
-     * file system (i.e. prospective archive file)
-     * and all its member federated file systems to their respective parent
-     * file system, releases the associated resources (i.e. target archive
-     * files) for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
+     * Commits all pending changes for this federated file system and all its
+     * federated child file systems to their respective parent file system,
+     * closes their associated target (archive) file in order to allow access
+     * by third parties (e.g. other processes), cleans up any temporary
+     * allocated resources (e.g. temporary files) and purges any cached data.
      * <p>
-     * If a client application needs to sync an individual archive file,
-     * the following idiom could be used:
-     * <pre>{@code
-     * if (file.isArchive() && file.getEnclArchive() == null) // filter top level federated file system
-     *   if (file.isDirectory()) // ignore false positives
-     *     TFile.sync(file); // sync federated file system and all its members
-     * }</pre>
-     * Again, this will also sync all federated file systems which are
-     * located within the file system referred to by {@code file}.
-     *
-     * @param  options a bit field of synchronization options.
-     * @throws IllegalArgumentException if {@code archive} is not a top level
-     *         federated file system or the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is consumed or if the
-     *         synchronization option {@code FsSyncOption.ABORT_CHANGES} is consumed.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
-     *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to consumed the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. archive file) in its parent file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
-     * @see    #sync(BitField)
-     */
-    @SuppressWarnings("deprecation")
-    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
-        new FsFilteringManager(TConfig.get().getFsManager(), getMountPoint())
-                .sync(options);
-    }
-
-    /**
-     * Commits all unsynchronized changes to the contents of this federated
-     * file system (i.e. prospective archive files)
-     * and all its member federated file systems to their respective parent
-     * system, releases the associated resources (i.e. target archive files)
-     * for access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * Note that temporary files may get used even if the archive files where
-     * accessed read-only.
+     * Note that temporary files may get used even for read-only access to
+     * archive files, so calling this operation is essential.
+     * However, if the client application never calls this operation, then it
+     * gets performed by a shutdown hook.
+     * The shutdown hook gets removed as soon as this operation gets called in
+     * order to leak no memory.
      * <p>
-     * This method is equivalent to calling
+     * Calling this method is equivalent to
      * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
-     * <p>
-     * Note that the file system stays open (!) after this call and can get
-     * used subsequently.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         occur.
+     *         apply.
      *         This implies that the respective parent file system has been
-     *         updated with constraints, such as a failure to consumed the last
-     *         modification time of the entry for the federated file system
-     *         (i.e. prospective archive file) in its parent file system.
-     * @throws FsSyncException if any error conditions occur.
-     *         This implies loss of data!
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream was forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
+     *         This implies some loss of data!
      * @see    #sync(BitField)
      */
     @Override
     public void close() throws FsSyncException {
         sync(UMOUNT);
+    }
+
+    /**
+     * Commits all pending changes for this federated file system and all its
+     * federated child file systems to their respective parent file system with
+     * respect to the given options.
+     *
+     * @param  options a bit field of options for the synchronization operation.
+     * @throws IllegalArgumentException if the combination of synchronization
+     *         options is illegal, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
+     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if
+     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
+     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         archive entry stream is forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
+     *         This implies some loss of data!
+     */
+    @SuppressWarnings("deprecation")
+    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
+        TVFS.sync(getMountPoint(), options);
     }
 
     /**

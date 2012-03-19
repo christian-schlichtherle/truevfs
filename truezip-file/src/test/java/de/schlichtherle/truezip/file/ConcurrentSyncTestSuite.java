@@ -71,7 +71,7 @@ extends ConfiguredClientTestBase<D> {
                     @Override
                     public Void call() throws IOException {
                         while (!Thread.interrupted()) // test and clear status!
-                            TFile.sync(SYNC);
+                            TVFS.sync(SYNC);
                         return null;
                     }
                 } // Sync
