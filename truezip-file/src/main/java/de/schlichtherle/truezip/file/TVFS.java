@@ -304,17 +304,16 @@ public final class TVFS {
      * <p>
      * You could use the following idiom to sync an individual archive file:
      * <pre>{@code
-     * if (file.isTopLevelArchive()) // filter archive file
+     * if (file.isArchive()) // filter archive file
      *   TVFS.sync(file, options); // sync archive file and all its nested archive files
      * }</pre>
      * <p>
      * Again, this will also sync all archive files which are nested within
      * the archive file referred to by {@code archive}.
      *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
+     * @param  archive a federated file system, i.e. a prospective archive file.
      * @param  options a bit field of options for the synchronization operation.
-     * @throws IllegalArgumentException if {@code archive} is not a top level
+     * @throws IllegalArgumentException if {@code archive} is not a prospective
      *         archive file or the combination of synchronization options is
      *         illegal, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
@@ -334,8 +333,8 @@ public final class TVFS {
     public static void sync(TFile archive,
                             BitField<FsSyncOption> options)
     throws FsSyncException {
-        if (!archive.isTopLevelArchive())
-            throw new IllegalArgumentException(archive + " (not a top level archive file)");
+        if (!archive.isArchive())
+            throw new IllegalArgumentException(archive + " (not an archive file)");
         sync(archive.getController().getModel().getMountPoint(), options);
     }
 
