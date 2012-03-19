@@ -1,10 +1,6 @@
 /*
- * Copyright (C) 2005-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.crypto.raes;
 
@@ -21,7 +17,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html">PKCS #5</a>
  * @see     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html">PKCS #12</a>
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 public interface Type0RaesParameters extends RaesParameters {
 

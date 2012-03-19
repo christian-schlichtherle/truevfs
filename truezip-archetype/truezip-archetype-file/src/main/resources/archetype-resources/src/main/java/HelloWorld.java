@@ -17,7 +17,6 @@ import java.nio.charset.Charset;
  * If present, any other ZIP file entries will remain unchanged.
  * 
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 public class HelloWorld extends Application<IOException> {
 
