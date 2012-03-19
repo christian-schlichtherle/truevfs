@@ -143,7 +143,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     private <X extends IOException> void
     closeAll(final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        class IOExceptionHandler
+        final class IOExceptionHandler
         implements ExceptionHandler<IOException, X> {
             @Override
             public X fail(IOException shouldNotHappen) {
