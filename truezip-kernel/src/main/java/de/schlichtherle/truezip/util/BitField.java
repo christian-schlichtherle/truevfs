@@ -17,12 +17,11 @@ import javax.annotation.concurrent.Immutable;
  * field, i.e. a set of predefined bits.
  * As an immutable class, it's inherently thread-safe.
  * All modifying methods return a modified clone of this instance.
- * <p>
- * <b>TODO:</b> Add more modifying methods.
  *
  * @param   <E> The type of {@link Enum} objects contained in this set.
  * @author  Christian Schlichtherle
  */
+// TODO: Add more modifying methods.
 @Immutable
 public final class BitField<E extends Enum<E>>
 implements Iterable<E>, Serializable {
