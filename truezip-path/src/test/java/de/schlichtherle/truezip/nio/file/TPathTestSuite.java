@@ -4,13 +4,11 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.ConfiguredClientTestBase;
-import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.fs.FsResourceOpenException;
+import de.schlichtherle.truezip.file.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
+import de.schlichtherle.truezip.fs.FsResourceOpenException;
 import de.schlichtherle.truezip.fs.FsSyncException;
+import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
@@ -18,6 +16,7 @@ import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.ArrayHelper;
+import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
@@ -1318,7 +1317,10 @@ extends ConfiguredClientTestBase<D> {
                         final TPath entry = archive.resolve("" + threadNum);
                         createTestFile(entry);
                         try {
-                            TFile.umount(archive.toFile(), wait, false, wait, false);
+                            TVFS.sync(archive.getFileSystem().getMountPoint(),
+                                    BitField.of(CLEAR_CACHE)
+                                            .set(WAIT_CLOSE_INPUT, wait)
+                                            .set(WAIT_CLOSE_OUTPUT, wait));
                         } catch (final FsSyncException ex) {
                             if (!(ex.getCause() instanceof FsResourceOpenException))
                                 throw ex;
@@ -1373,7 +1375,7 @@ extends ConfiguredClientTestBase<D> {
                         if (syncIndividually)
                             archive.getFileSystem().close();
                         else
-                            TFile.sync(SYNC); // DON'T clear the cache!
+                            TVFS.sync(SYNC); // DON'T clear the cache!
                     } catch (final FsSyncWarningException ex) {
                         if (!(ex.getCause() instanceof FsResourceOpenException))
                             throw ex;

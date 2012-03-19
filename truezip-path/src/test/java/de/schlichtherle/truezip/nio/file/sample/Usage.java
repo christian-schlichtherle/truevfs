@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.nio.file.sample;
 
+import de.schlichtherle.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.nio.file.TFileSystemProvider;
 import de.schlichtherle.truezip.nio.file.TPath;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +63,7 @@ abstract class Usage {
     void umount1() {
 // START SNIPPET: umount1
         try {
-            TFileSystemProvider.umount(); // with or without parameters
+            TVFS.umount(); // with or without parameters
         } catch (SequentialIOException ouch) {
             // Print the sequential I/O exception chain in order of
             // descending priority and ascending appearance.
@@ -76,7 +76,7 @@ abstract class Usage {
     void umount2() {
 // START SNIPPET: umount2
         try {
-            TFileSystemProvider.umount(); // with or without parameters
+            TVFS.umount(); // with or without parameters
         } catch (SequentialIOException ouch) {
             // Print the sequential I/O exception chain in order of
             // appearance instead.
@@ -88,7 +88,7 @@ abstract class Usage {
     void umount3() {
 // START SNIPPET: umount3
         try {
-            TFileSystemProvider.umount(); // with or without parameters
+            TVFS.umount(); // with or without parameters
         } catch (FsSyncWarningException oops) {
             // Only objects of the class FsSyncWarningException exist in
             // the exception chain - we ignore this.

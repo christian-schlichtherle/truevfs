@@ -4,10 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip.sample;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileInputStream;
-import de.schlichtherle.truezip.file.TFileOutputStream;
+import de.schlichtherle.truezip.file.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.*;
 import java.util.Arrays;
@@ -76,7 +73,7 @@ public abstract class KeyManagementTestSuite {
 
     private void umount() throws FsSyncException {
         if (null != archive)
-            TFile.umount(archive);
+            TVFS.umount(archive);
     }
 
     @Test

@@ -32,9 +32,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 final class TBIO {
 
-    /** You cannot instantiate this class. */
-    private TBIO() {
-    }
+    /* Can't touch this - hammer time! */
+    private TBIO() { }
 
     /**
      * Moves the source file or directory tree to the destination file or

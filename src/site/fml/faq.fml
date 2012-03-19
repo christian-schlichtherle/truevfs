@@ -308,7 +308,7 @@ TFile archive = new TFile("archive.zip");
 ... // there may be some I/O here
 TFile file = newNonArchiveFile(archive);
 if (archive.isArchive()) // prospective archive file?
-    TFile.umount(archive); // unmount it
+    TVFS.umount(archive); // unmount it
 // Now you can safely do any I/O to $file.
 // Mind that it may refer to an entry in another archive file,
 // so make sure to use a TFileInputStream.
@@ -349,10 +349,10 @@ try {
                     Committing any unsynchronized changes to all archive files
                     is easy - just call...
                 </p>
-                <source>TFile.umount();</source>
+                <source>TVFS.umount();</source>
                 <p>
                     Please have a look at the method's
-                    <a href="apidocs/de/schlichtherle/truezip/file/TFile.html#umount()">Javadoc</a>
+                    <a href="apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()">Javadoc</a>
                     for more options.
                 </p>
             </answer>
