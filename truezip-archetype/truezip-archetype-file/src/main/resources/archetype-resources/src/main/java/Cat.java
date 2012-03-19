@@ -12,7 +12,6 @@ import java.io.IOException;
  * 
  * @see     <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 public class Cat extends Application<IOException> {
 

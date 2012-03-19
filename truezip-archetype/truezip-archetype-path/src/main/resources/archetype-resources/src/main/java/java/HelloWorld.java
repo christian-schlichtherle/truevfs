@@ -18,7 +18,6 @@ import static java.nio.file.Files.*;
  * If present, any other ZIP file entries will remain unchanged.
  * 
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 public class HelloWorld extends Application<IOException> {
 

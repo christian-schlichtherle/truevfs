@@ -26,7 +26,6 @@ import java.util.TreeSet;
  * directory structure of this ZIP file gets printed.
  * 
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 public class Tree extends Application<RuntimeException> {
 

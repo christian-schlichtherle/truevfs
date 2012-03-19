@@ -1,10 +1,6 @@
 /*
- * Copyright (C) 2005-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
@@ -51,7 +47,6 @@ import javax.annotation.concurrent.Immutable;
  *
  * @see     <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part1.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 1: OpenDocument Schema; Appendix C: MIME Types and File Name Extensions (Non Normative)</a>
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 @Immutable
 public final class ZipDriverService extends FsDriverService {

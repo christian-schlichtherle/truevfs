@@ -1,10 +1,6 @@
 /*
- * Copyright (C) 2005-2012 Schlichtherle IT Services
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package de.schlichtherle.truezip.zip;
 
@@ -34,7 +30,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @see     <a href="http://www.ietf.org/rfc/rfc2898.txt">RFC 2898: PKCS #5: Password-Based Cryptography Specification Version 2.0 (IETF et al.)</a>
  * @see     RawZipOutputStream$WinZipAesOutputMethod
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 @NotThreadSafe
 final class WinZipAesEntryOutputStream extends CipherOutputStream {

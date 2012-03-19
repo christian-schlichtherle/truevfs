@@ -20,7 +20,6 @@ import java.io.IOException;
  * already exists.
  * 
  * @author  Christian Schlichtherle
- * @version $Id$
  */
 public class Copy extends Application<IOException> {
 
