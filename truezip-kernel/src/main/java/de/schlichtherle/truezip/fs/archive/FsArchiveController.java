@@ -182,30 +182,30 @@ extends FsLockModelController {
 
     private final class Input extends DelegatingInputSocket<FsArchiveEntry> {
         final FsEntryName name;
+        @CheckForNull FsArchiveEntry localTarget;
 
         Input(final FsEntryName name) {
             if (null == (this.name = name))
                 throw new NullPointerException();
         }
 
-        FsArchiveFileSystem<E> fileSystem() throws IOException {
-            getPeerTarget(); // may sync() if in same target archive file!
-            checkSync(name, READ);
-            return autoMount();
-        }
-
         @Override
         public FsArchiveEntry getLocalTarget() throws IOException {
-            final FsCovariantEntry<E> fse = fileSystem().getEntry(name);
+            if (null != localTarget)
+                return localTarget;
+            getPeerTarget(); // may sync() if in same target archive file!
+            checkSync(name, READ);
+            final FsCovariantEntry<E> fse = autoMount().getEntry(name);
             if (null == fse)
                 throw new FsEntryNotFoundException(getModel(),
                         name, "no such entry");
-            return fse.getEntry();
+            return localTarget = fse.getEntry();
         }
 
         @Override
         protected InputSocket<? extends FsArchiveEntry> getDelegate()
         throws IOException {
+            localTarget = null;
             final FsArchiveEntry ae = getLocalTarget();
             if (FILE != ae.getType())
                 throw new FsEntryNotFoundException(getModel(),
@@ -228,6 +228,7 @@ extends FsLockModelController {
         final FsEntryName name;
         final BitField<FsOutputOption> options;
         final @CheckForNull Entry template;
+        @CheckForNull FsArchiveFileSystemOperation<E> mknod;
 
         Output( final FsEntryName name,
                 final BitField<FsOutputOption> options,
@@ -239,15 +240,14 @@ extends FsLockModelController {
             this.template = template;
         }
 
-        FsArchiveFileSystem<E> fileSystem() throws IOException {
-            checkSync(name, WRITE);
-            return autoMount(!name.isRoot() && options.get(CREATE_PARENTS));
-        }
-
         FsArchiveFileSystemOperation<E> mknod() throws IOException {
+            if (null != mknod)
+                return mknod;
+            checkSync(name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return fileSystem().mknod(name, FILE, options, template);
+            return mknod = autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
+                    .mknod(name, FILE, options, template);
         }
 
         @Override
@@ -265,6 +265,7 @@ extends FsLockModelController {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
+            mknod = null;
             final FsArchiveFileSystemOperation<E> mknod = mknod();
             final E ae = mknod.getTarget().getEntry();
             InputStream in = null;
