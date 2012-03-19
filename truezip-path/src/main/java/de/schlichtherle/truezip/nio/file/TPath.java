@@ -600,14 +600,13 @@ public final class TPath implements Path {
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     public TPath toNonArchivePath() {
+        if (!isArchive())
+            return this;
         final TConfig config = TConfig.push();
         try {
             config.setArchiveDetector(TArchiveDetector.NULL);
             final TPath fileName = getFileName();
-            if (null == fileName) {
-                assert toString().isEmpty();
-                return this;
-            }
+            assert null != fileName : "an archive file must not have an empty path name!";
             return resolveSibling(fileName);
         } finally {
             config.close();
