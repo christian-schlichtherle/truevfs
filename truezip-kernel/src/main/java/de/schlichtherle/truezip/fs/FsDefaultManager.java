@@ -57,7 +57,8 @@ public final class FsDefaultManager extends FsManager {
             final FsModel model = new FsDefaultModel(mountPoint, null);
             return driver.newController(model, null);
         }
-        FsFalsePositiveController controller = getTarget(schedulers.get(mountPoint));
+        FsFalsePositiveController
+                controller = getTarget(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
                 parent = getController(mountPoint.getParent(), null, driver);
