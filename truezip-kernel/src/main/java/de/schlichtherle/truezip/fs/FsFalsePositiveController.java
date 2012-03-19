@@ -99,12 +99,15 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Nullable <T> T call(   final IOOperation<T> operation,
                             final FsEntryName name)
     throws IOException {
+        final State state = this.state;
         try {
             return state.call(operation, name);
         } catch (final FsPersistentFalsePositiveException ex) {
-            return (state = new TryParent(ex)).call(operation, name);
+            assert state instanceof TryChild;
+            return (this.state = new UseParent(ex)).call(operation, name);
         } catch (final FsFalsePositiveException ex) {
-            return new TryParent(ex).call(operation, name);
+            assert state instanceof TryChild;
+            return new UseParent(ex).call(operation, name);
         }
     }
 
@@ -500,7 +503,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         try {
             (state = new TryChild()).call(operation, ROOT);
         } catch (final FsFalsePositiveException ex) {
-            new TryParent(ex).call(operation, ROOT);
+            new UseParent(ex).call(operation, ROOT);
         }
     }
 
@@ -538,10 +541,10 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     } // DelegateController
 
     @Immutable
-    private final class TryParent implements State {
+    private final class UseParent implements State {
         final IOException originalCause;
 
-        TryParent(final FsFalsePositiveException ex) {
+        UseParent(final FsFalsePositiveException ex) {
             this.originalCause = ex.getCause();
         }
 
