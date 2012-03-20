@@ -6,56 +6,68 @@
 
 Getting Started
 
-    To get you started quickly, the following section shows you how to
-    generate, build and run your first TrueZIP application for the two client
-    APIs TrueZIP&#160;File* and TrueZIP&#160;Path in about ten minutes!
+* Using Maven
 
-    If you are looking for more sample code and applications, please
-    {{{../source-repository.html}check out}} or
-    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
-    the source code of the
-    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+    TrueZIP is a multi-module project which is built by
+    {{{http://maven.apache.org}Apache Maven}}, so all its artifacts are hosted
+    on {{{http://search.maven.org}Maven Central}}.
 
-* Kick-Starting
-
-    This section shows you how to generate an application from TrueZIP's
-    archetypes for {{{http://maven.apache.org}Maven}} projects.
+    If you are using Maven too, then you you can generate, build and run your
+    first TrueZIP application for the two client APIs TrueZIP&#160;File* or
+    TrueZIP&#160;Path in about ten minutes!
+    Otherwise you can safely skip this section.
     Each client API features its own archetype:
 
-    * The client API {{{../truezip-file/index.html}TrueZIP File*}}
-      (requires JSE 6+) features an archetype with the following Maven
-      coordinates:
+*--*--*
+ Group Id | <<de.schlichtherle.truezip>>
+*--*--*
+ Artifact Id | <<truezip-archetype-file>>
+*--*--*
+ Version | <<${project.version}>>
+*--*--*
+Maven archetype coordinates for the {{{../truezip-file/index.html}TrueZIP File*}}
+API (requires JSE 6+).
 
-    Group Id: <<de.schlichtherle.truezip>>\
-    Artifact Id: <<truezip-archetype-file>>\
-    Version: <<${project.version}>>
-    
-    * The client API {{{../truezip-path/index.html}TrueZIP Path}}
-      (requires JSE 7+) features an archetype with the following Maven
-      coordinates:
+    and:
 
-    Group Id: <<de.schlichtherle.truezip>>\
-    Artifact Id: <<truezip-archetype-path>>\
-    Version: <<${project.version}>>
-
-    []
+*--*--*
+ Group Id|<<de.schlichtherle.truezip>>|
+*--*--*
+ Artifact Id|<<truezip-archetype-path>>|
+*--*--*
+ Version|<<${project.version}>>|
+*--*--*
+Maven archetype coordinates for the {{{../truezip-path/index.html}TrueZIP Path}}
+API (requires JSE 7+).
 
     The following guides are written with the archetype for the TrueZIP File*
     API in mind.
     However, they work the same way with the archetype for the TrueZIP Path
     API - you just need to use the appropriate Maven coordinates from the
-    above list:
+    above tables:
 
-    [[1]] Kick-Starting TrueZIP applications from a Maven archetype with...
+    [[1]] {{{./file/eclipse.html}Kick-Starting TrueZIP Applications With Eclipse}}
 
-        [[a]] {{{./file/eclipse.html}Eclipse}},
+    [[1]] {{{./file/netbeans.html}Kick-Starting TrueZIP Applications With NetBeans}}
 
-        [[a]] {{{./file/netbeans.html}NetBeans}} or a
-
-        [[a]] {{{./file/shell.html}shell}}.
-
-    [[1]] If you do not want to use Maven, you can still use TrueZIP once
-          you've read this guide:
-          {{{./no-maven.html}Using TrueZIP Without Maven}}.
+    [[1]] {{{./file/shell.html}Kick-Starting TrueZIP Applications With a Shell}}
 
     []
+
+* Manual Download
+
+    If you do not want to use Maven, then you need to manually download the
+    TrueZIP artifacts from Maven Central by following this guide:
+    {{{./no-maven.html}Using TrueZIP Without Maven}}.
+
+    If you are looking for more sample code and applications, then please
+    {{{../source-repository.html}check out}} or
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    the source code of the
+    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+
+* Tutorial (new)
+
+    There is a new {{{./tutorial.html}mini tutorial}} for the TrueZIP File* API.
+    This tutorial does not require to use Maven, but it assumes you have
+    already setup an application skeleton.

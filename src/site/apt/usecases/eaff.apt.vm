@@ -124,4 +124,4 @@ new TFile("file.fox").rm_r();
     directory, which cannot get deleted using similar methods like
     <<<delete()>>> or <<<rm()>>> unless it's empty.
 
-#committing()
+#cleaningUp()

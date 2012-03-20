@@ -50,22 +50,23 @@
                 <item name="Software Build Tool" href="usecases/sbt.html"/>
                 <item name="Search Engine" href="usecases/se.html"/>
             </item>
-            <item name="Download" href="download.html"/>
             <item name="Getting Started" href="kick-start/index.html" collapse="true">
-                <item name="With Eclipse" href="kick-start/file/eclipse.html"/>
-                <item name="With NetBeans" href="kick-start/file/netbeans.html"/>
-                <item name="With a Shell" href="kick-start/file/shell.html"/>
-                <item name="Without Maven" href="kick-start/no-maven.html"/>
+                <item name="with Eclipse" href="kick-start/file/eclipse.html"/>
+                <item name="with NetBeans" href="kick-start/file/netbeans.html"/>
+                <item name="with a Shell" href="kick-start/file/shell.html"/>
+                <item name="without Maven" href="kick-start/no-maven.html"/>
+                <item name="Mini Tutorial" href="kick-start/tutorial.html"/>
             </item>
             <item name="Getting Help" href="help.html" collapse="true">
+                <item name="Javadoc" href="apidocs/index.html"/>
                 <item name="Frequently Asked Questions" href="faq.html"/>
                 <item name="Mailing Lists" href="mail-lists.html"/>
                 <item name="Issue Tracking" href="issue-tracking.html"/>
             </item>
             <item name="Concepts" href="concepts.html"/>
             <item name="Glossary" href="glossary.html"/>
-            <item name="Migration" href="migration.html"/>
             <item name="TrueZIP 6 (Obsolete)" href="6/index.html" collapse="true">
+                <item name="Migration" href="migration.html"/>
                 <item name="Tutorial" href="6/tutorial.html"/>
                 <item name="News Archive" href="6/news/index.html" collapse="true">
                     <item name="6.8 Release" href="6/news/20100831.html"/>
