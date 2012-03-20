@@ -474,7 +474,8 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    void fireTreeNodesChanged(final TreeModelEvent evt) {
+    // TODO: Declare this package private.
+    protected void fireTreeNodesChanged(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeNodesChanged(evt);
@@ -485,7 +486,8 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    void fireTreeNodesInserted(final TreeModelEvent evt) {
+    // TODO: Declare this package private.
+    protected void fireTreeNodesInserted(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeNodesInserted(evt);
@@ -496,7 +498,8 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    void fireTreeNodesRemoved(final TreeModelEvent evt) {
+    // TODO: Declare this package private.
+    protected void fireTreeNodesRemoved(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeNodesRemoved(evt);
@@ -507,7 +510,8 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      * May be used to tell the listeners about a change in the file system.
      */
-    void fireTreeStructureChanged(final TreeModelEvent evt) {
+    // TODO: Declare this package private.
+    protected void fireTreeStructureChanged(final TreeModelEvent evt) {
         final EventListener[] l = listeners.getListeners(TreeModelListener.class);
         for (int i = 0, ll = l.length; i < ll; i++)
             ((TreeModelListener) l[i]).treeStructureChanged(evt);
