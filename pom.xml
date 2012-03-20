@@ -125,6 +125,9 @@ system space.
             <!-- Header text -->
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
+
+        <!-- clirr-maven-plugin -->
+        <comparisonVersion>7.0</comparisonVersion>
     </properties>
 
     <modules>
