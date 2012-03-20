@@ -269,12 +269,12 @@ final class TBIO {
     static InputSocket<?>
     getInputSocket(final File src, final BitField<FsInputOption> options) {
         if (src instanceof TFile) {
-            final TFile file = (TFile) src;
-            final TFile archive = file.getInnerArchive();
+            final TFile tsrc = (TFile) src;
+            final TFile archive = tsrc.getInnerArchive();
             if (null != archive)
-                return archive.getController().getInputSocket(
-                        file.getInnerFsEntryName(),
-                        options);
+                return archive  .getController()
+                                .getInputSocket(tsrc.getInnerFsEntryName(),
+                                                options);
         }
         final FsPath path = new FsPath(src);
         return  TConfig
@@ -299,13 +299,13 @@ final class TBIO {
                     final BitField<FsOutputOption> options,
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
-            final TFile file = (TFile) dst;
-            final TFile archive = file.getInnerArchive();
+            final TFile tdst = (TFile) dst;
+            final TFile archive = tdst.getInnerArchive();
             if (null != archive)
-                return archive.getController().getOutputSocket(
-                        file.getInnerFsEntryName(),
-                        options,
-                        template);
+                return archive  .getController()
+                                .getOutputSocket(   tdst.getInnerFsEntryName(),
+                                                    options,
+                                                    template);
         }
         final FsPath path = new FsPath(dst);
         return  TConfig
