@@ -152,8 +152,7 @@ final class TBIO {
                     && null != ((TFile) src).getInnerArchive();
             final boolean dstArchived = dst instanceof TFile
                     && null != ((TFile) dst).getInnerArchive();
-            final boolean srcIsGhost = srcArchived
-                    && 0 >= srcLastModified;
+            final boolean srcIsGhost = srcArchived && 0 >= srcLastModified;
             if (!srcIsGhost || !dstArchived || !TConfig.get().isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new IOException(dst + " (not a directory)");
@@ -161,7 +160,8 @@ final class TBIO {
             if (null == members)
                 throw new IOException(dst + " (cannot list directory)");
             if (!srcArchived && dstArchived) {
-                // Create sorted entries if writing a new archive.
+                // Create sorted entries if copying an ordinary directory to a
+                // new archive.
                 // This is a courtesy only, so natural order is sufficient.
                 Arrays.sort(members);
             }
