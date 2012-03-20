@@ -25,8 +25,7 @@
  * File file = new TFile("archive.tar.gz/README.TXT");
  * Writer out = new TFileWriter(file);
  * try {
- *     // Write archive entry contents here.
- *     ...
+ *     out.write("Hello world!\n");
  * } finally {
  *     out.close();
  * }
