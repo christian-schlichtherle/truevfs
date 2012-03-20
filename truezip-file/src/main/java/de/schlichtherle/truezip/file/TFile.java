@@ -116,52 +116,37 @@ import javax.swing.filechooser.FileSystemView;
  * copying archive files (e.g. ZIP entries won't get recompressed thanks to
  * <a href="#RDC">RDC</a>).
  * 
- * <a name="copy"><h4>Copying Or Moving Directory Trees</h4></a>
+ * <a name="verbatimCopy"><h4>Making Verbatim Copies of Directory Trees</h4></a>
  * <p>
- * Using {@code TArchiveDetector.ALL} results in <i>structural copies</i>
- * rather than <i>verbatim copies</i> (byte-by-byte copies) of any archive
- * files within the source directory tree.
- * However, sometimes you may want verbatim copies, e.g. when comparing hash
+ * Using the default {@code TArchiveDetector.ALL} results in <i>structural
+ * copies</i> rather than <i>verbatim copies</i> (byte-by-byte copies) of any
+ * archive files within the source directory tree.
+ * This saves you from accidentally bypassing the virtual file system state
+ * which is managed by the TrueZIP Kernel.
+ * <p>
+ * However, sometimes you may need verbatim copies, e.g. when comparing hash
  * sums for archive files.
- * <p>
  * In this case, you need to unmount any archive file in the source and
- * destination directory trees first, e.g. by calling {@link #umount()},
- * before you can proceed with the operation.
- * For the subsequent traversal of the directory trees, you can use one of the
- * methods which accept additional {@code TArchiveDetector} parameter(s) and
- * pass it {@link TArchiveDetector#NULL} in order to inhibit the detection of
- * prospective archive files.
+ * destination directory trees first, e.g. by calling {@link TVFS#umount()} or
+ * {@link TVFS#umount(TFile)} before you can copy the directory trees.
+ * For the subsequent traversal of the directory trees, you need use
+ * {@code TFile} objects which do <em>not</em> recognize prospective archive
+ * files.
  * For example, to make a recursive <em>verbatim</em> copy, you could use this:
  * <pre><code>
- * TFile src = ...;
- * TFile dst = ...;
- * TVFS.umount(); // commit changes and purge any cached data
- * TFile.cp_rp(src, dst, TArchiveDetector.NULL);
- * </code></pre>
- * <p>
- * However, the call to {@code TVFS.umount()} may unmount more archive files
- * than required for the copying operation.
- * You can selectively unmount archive files by using this instead:
- * <pre><code>
- * TFile src = ...;
- * TFile dst = ...;
- * if (src.isTopLevelArchive) TVFS.umount(src); // unmount selectively
- * if (dst.isTopLevelArchive) TVFS.umount(dst); // dito
- * TFile.cp_rp(src, dst, TArchiveDetector.NULL);
- * </code></pre>
- * <p>
- * Finally, the additional {@code TArchiveDetector.NULL} parameter to
- * {@code TFile.cp_rp()} is only applied to any <em>members</em> of {@code src}
- * and {@code dst}.
- * If these objects may address archive files themselves, you could use this
- * instead:
- * <pre><code>
- * TFile src = ...;
- * TFile dst = ...;
- * if (src.isTopLevelArchive) TVFS.umount(src); // unmount selectively
- * if (dst.isTopLevelArchive) TVFS.umount(dst); // dito
+ * TFile src = ...; // any
+ * TFile dst = ...; // dito
+ * ... // any I/O operations
+ * TVFS.umount(src.toFsPath().getMountPoint()); // unmount selectively
+ * TVFS.umount(dst.toFsPath().getMountPoint()); // dito
  * src.toNonArchiveFile().cp_rp(dst.toNonArchiveFile());
  * </code></pre>
+ * <p>
+ * The calls to {@link TVFS#umount(TFile)} selectively unmount any archive
+ * files within the source and destination directory trees and the calls to
+ * {@link #toNonArchiveFile()} ensure that prospective archive file detection
+ * is inhibited when recursively copying the source and destination directory
+ * trees.
  * 
  * <a name="falsePositives"/><h3>Detecting Archive Files and False Positives</h3>
  * <p>
