@@ -22,8 +22,8 @@
         <module>truezip-driver-file</module>
         <module>truezip-driver-http</module>
         <module>truezip-driver-tar</module>
-        <module>truezip-driver-tzp</module>
         <module>truezip-driver-zip</module>
+        <module>truezip-driver-tzp</module>
     </modules>
 
     <dependencyManagement>
