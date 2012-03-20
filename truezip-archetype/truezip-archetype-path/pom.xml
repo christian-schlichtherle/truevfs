@@ -17,4 +17,9 @@
 
     <name>TrueZIP Archetype Path</name>
     <description>TrueZIP Path module application - requires JSE 7.</description>
+
+    <properties>
+        <!-- clirr-maven-plugin -->
+        <comparisonVersion>7.2</comparisonVersion>
+    </properties>
 </project>
