@@ -6,9 +6,9 @@
 
 Getting Started
 
-    To get you started quickly, the section {{Kick-Starting}} below shows you
-    how to generate, build and run your first TrueZIP application for the two
-    client APIs TrueZIP&#160;File* and TrueZIP&#160;Path in about ten minutes!
+    To get you started quickly, the following section shows you how to
+    generate, build and run your first TrueZIP application for the two client
+    APIs TrueZIP&#160;File* and TrueZIP&#160;Path in about ten minutes!
 
     If you are looking for more sample code and applications, please
     {{{../source-repository.html}check out}} or
