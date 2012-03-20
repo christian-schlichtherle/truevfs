@@ -77,7 +77,7 @@ import javax.swing.filechooser.FileSystemView;
  * In particular, both the source and destination parameters must either
  * represent a file or a directory - mixing file and directory parameters will
  * not work.
- * This limitation is designed to prevent ambiguous method semantics.
+ * This constraint is meant to prevent ambiguous method semantics.
  *
  * <a name="directDataCopying"/><a name="RDC"/><h4>Raw Data Copying (RDC)</h4>
  * <p>
