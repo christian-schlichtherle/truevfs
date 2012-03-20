@@ -170,7 +170,7 @@ src.cp_rp(dst);
                     however, you can do so easily using the following statement:
                 </p>
 <source>
-TFile.setDefaultArchiveDetector(new TArchiveDetector("zip"));
+TConfig.get().setArchiveDetector(new TArchiveDetector("zip"));
 </source>
                 <p>
                     Check the
@@ -186,15 +186,6 @@ TFile.setDefaultArchiveDetector(new TArchiveDetector("zip"));
             <answer>
                 <p>
                     Make the following call early in your application:
-                </p>
-<source>
-TFile.setDefaultArchiveDetector(
-        new TArchiveDetector(
-            TArchiveDetector.NULL,
-            "zip", new ZipDriver(IOPoolLocator.SINGLETON)));
-</source>
-                <p>
-                    or
                 </p>
 <source>
 TConfig.get().setArchiveDetector(
@@ -214,7 +205,8 @@ TConfig.get().setArchiveDetector(
                     archive file suffixes to get detected, hence the use of
                     <a href="apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
                     as the decorated archive detector.
-                    The TArchiveDetector class has many different constructors.
+                    The class <code>TArchiveDetector</code> has many different
+                    constructors.
                     Check the
                     <a href="apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html">Javadoc</a>
                     to make sure you get what you need.
@@ -235,7 +227,7 @@ TConfig.get().setArchiveDetector(
                     application:
                 </p>
 <source>
-TFile.setDefaultArchiveDetector(
+TConfig.get().setArchiveDetector(
         new TArchiveDetector(
             TArchiveDetector.NULL,
             new Object[][] {
@@ -268,57 +260,45 @@ TFile.setDefaultArchiveDetector(
                     <code>File.length()</code>.
                     However, if the <code>File</code> object is an instance of
                     the <code>TFile</code> class and the path has been detected
-                    to name a valid archive file, then this method always
-                    returns 0.
+                    to name a valid archive file, then this method would always
+                    return zero.
+                    This is because you might have changed the archive file and
+                    then it would be impossible to return a precise result
+                    until the changes have been committed to the target archive
+                    file.
                 </p>
                 <p>
-                    You can change this behavior easily by creating a
-                    <code>TFile</code> with <code>TArchiveDetector.NULL</code>
-                    as an additional constructor parameter.
-                    For example, you could use the following method to convert
-                    an archive-detecting <code>TFile</code> to
-                    a non-archive-detecting <code>TFile</code>:
+                    You can easily solve this issue by committing any pending
+                    changes and then calling <code>length()</code> on a new
+                    <code>TFile</code> object which has been instructed to
+                    ignore an archive file name suffix in the last path element.
+                    This could look as follows:
                 </p>
 <source>
-static TFile newNonArchiveFile(TFile file) {
-    return new TFile(file.getParentFile(), file.getName(),
-                     TArchiveDetector.NULL);
-}
-</source>
-                <p>
-                    Here, <code>TArchiveDetector.NULL</code> is used to scan
-                    only the file name of the parameter <code>file</code>.
-                    Because this archive detector never detects a prospective
-                    archive file, any prospective archive file will get ignored.
-                    This will work even in the parent directory is an archive
-                    file or a directory within an archive file.
-                </p>
-                <p>
-                    Mind you that using the resulting <code>TFile</code> object
-                    for any I/O bypasses any state associated with the archive
-                    file in the TrueZIP Kernel module.
-                    This may result in an inconsistent state of the federated
-                    file system space and may even incur <em>loss of data</em>!
-                    In order to avoid this, it's a good idea to unmount the
-                    archive file like this before accessing the resulting
-                    <code>TFile</code> object:
-                </p>
-<source>
-TFile archive = new TFile("archive.zip");
+// Note that the actual path may refer to anything, even a nested archive file.
+TFile inner = new TFile("outer.zip/inner.zip");
+TFile file = inner.toNonArchiveFile(); // convert - since TrueZIP 7.5
 ... // there may be some I/O here
-TFile file = newNonArchiveFile(archive);
-if (archive.isArchive()) // prospective archive file?
-    TVFS.umount(archive); // unmount it
+if (inner.isArchive()) // prospective archive file?
+    TVFS.umount(inner); // unmount it
 // Now you can safely do any I/O to $file.
-// Mind that it may refer to an entry in another archive file,
-// so make sure to use a TFileInputStream.
-InputStream in = new TFileInputStream(file);
-try {
-    ... // read the archive file like a plain file here
-} finally {
-    in.close();
-}
+long length = file.length();
 </source>
+                <p>
+                    Note that the path <code>outer.zip/inner.zip</code> refers
+                    to a nested archive file, so using the <code>TFile*</code>
+                    classes is required to access it.
+                </p>
+                <p>
+                    Last but not least, using the object <code>file</code>
+                    for any I/O bypasses any state associated with the path
+                    <code>outer.zip/inner.zip</code> in the TrueZIP Kernel.
+                    This could result in an inconsistent state of the federated
+                    file system space and may even incur <em>loss of data</em>!
+                    In order to avoid this, it's a good idea <em>not</em> to
+                    access the object <code>inner</code> again until you are
+                    done with the object <code>file</code>.
+                </p>
             </answer>
         </faq>
         <faq id="corruptedArchive">
@@ -417,7 +397,7 @@ try {
             <answer>
                 <p>
                     Absolutely yes, because both module APIs are just facades
-                    for the module TrueZIP Kernel.
+                    for the TrueZIP Kernel.
                     The NIO.2 API defines some methods for the interoperability
                     of <code>File</code> and <code>Path</code> objects:
                 </p>
@@ -534,69 +514,54 @@ TFile.cp(src.toFile(), dst.toFile());
                     For example, when trying to obtain the length of the
                     archive file in bytes.
                     You would normally do this by calling the method
-                    <code>Files.size(Path path)</code>.
+                    <code>Files.size(Path)</code>.
                     However, if the <code>Path</code> object is an instance of
                     the <code>TPath</code> class and the path has been detected
-                    to name a valid archive file, then this method always
-                    returns 0.
+                    to name a valid archive file, then this method would always
+                    return zero.
+                    This is because you might have changed the archive file and
+                    then it would be impossible to return a precise result
+                    until the changes have been committed to the target archive
+                    file.
                 </p>
                 <p>
-                    You can change this behavior easily by creating a
-                    <code>TPath</code> with <code>TArchiveDetector.NULL</code>
-                    in the current configuration on the inheritable thread
-                    local stack.
-                    For example, you could use the following method to convert
-                    an archive-detecting <code>TPath</code> to
-                    a non-archive-detecting <code>TPath</code>:
+                    You can easily solve this issue by committing any pending
+                    changes and then calling <code>Files.size(Path)</code> with
+                    a new <code>TPath</code> object which has been instructed to
+                    ignore an archive file name suffix in the last path element.
+                    This could look as follows:
                 </p>
 <source>
-static TPath newNonArchivePath(TPath file) {
-    TConfig config = TConfig.push();
-    try {
-        config.setArchiveDetector(TArchiveDetector.NULL);
-        return path.resolveSibling(path.getFileName());
-    } finally {
-        config.close();
-    }
-}
-</source>
-                <p>
-                    Here, <code>TArchiveDetector.NULL</code> is used to scan
-                    only the file name of the parameter <code>file</code>.
-                    Because this archive detector never detects a prospective
-                    archive file, any prospective archive file will get ignored.
-                    This will work even in the parent directory is an archive
-                    file or a directory within an archive file.
-                </p>
-                <p>
-                    Mind you that using the resulting <code>TFile</code> object
-                    for any I/O bypasses any state associated with the archive
-                    file in the TrueZIP Kernel module.
-                    This may result in an inconsistent state of the federated
-                    file system space and may even incur <em>loss of data</em>!
-                    In order to avoid this, it's a good idea to unmount the
-                    archive file like this before accessing the resulting
-                    <code>TPath</code> object:
-                </p>
-<source>
-TPath archive = new TPath("archive.zip");
+TPath inner = new TPath("outer.zip/inner.zip");
+TPath path = inner.toNonArchivePath(); // convert - since TrueZIP 7.5
 ... // there may be some I/O here
-TPath path = newNonArchivePath(archive);
-archive.getFileSystem().close(); // unmount prospective archive file
+if (inner.isArchive()) // prospective archive file?
+    inner.getFileSystem().close(); // unmount it
 // Now you can safely do any I/O to $path.
-// Mind that it may refer to an entry in another archive file,
-// so make sure to use a TFileInputStream.
-try (InputStream in = Files.newInputStream(path)) {
-    ... // read the archive file like a plain file here
-}
+long size = Files.size(path);
 </source>
+                <p>
+                    Note that the path <code>outer.zip/inner.zip</code> refers
+                    to a nested archive file, so using the <code>TPath</code>
+                    class is required to access it.
+                </p>
+                <p>
+                    Last but not least, using the object <code>path</code>
+                    for any I/O bypasses any state associated with the path
+                    <code>outer.zip/inner.zip</code> in the TrueZIP Kernel.
+                    This could result in an inconsistent state of the federated
+                    file system space and may even incur <em>loss of data</em>!
+                    In order to avoid this, it's a good idea <em>not</em> to
+                    access the object <code>inner</code> again until you are
+                    done with the object <code>path</code>.
+                </p>
             </answer>
         </faq>
     </part>
     <part id="general">
         <title>General Questions</title>
         <faq id="whereAreNews">
-            <question>Where are the latest News?</question>
+            <question>Where are the latest news and announcements?</question>
             <answer>
                 <p>
                     Starting from version 7.0, the TrueZIP project has it's
@@ -822,8 +787,8 @@ try (InputStream in = Files.newInputStream(path)) {
                     to it.
                     The User Mailing List is your direct connection to the
                     community.
-                    My response time is usually less than a day - without
-                    warranties!
+                    My response time is usually less than a day - this goes
+                    without warranties!
                 </p>
                 <p>
                     Once your question or issue has been approved as a bug

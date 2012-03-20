@@ -52,14 +52,18 @@
             </item>
             <item name="Download" href="download.html"/>
             <item name="Getting Started" href="kick-start/index.html" collapse="true">
-                <item name="In Eclipse" href="kick-start/file/eclipse.html"/>
-                <item name="In NetBeans" href="kick-start/file/netbeans.html"/>
-                <item name="In a Shell" href="kick-start/file/shell.html"/>
+                <item name="With Eclipse" href="kick-start/file/eclipse.html"/>
+                <item name="With NetBeans" href="kick-start/file/netbeans.html"/>
+                <item name="With a Shell" href="kick-start/file/shell.html"/>
                 <item name="Without Maven" href="kick-start/no-maven.html"/>
+            </item>
+            <item name="Getting Help" href="help.html" collapse="true">
+                <item name="Frequently Asked Questions" href="faq.html"/>
+                <item name="Mailing Lists" href="mail-lists.html"/>
+                <item name="Issue Tracking" href="issue-tracking.html"/>
             </item>
             <item name="Concepts" href="concepts.html"/>
             <item name="Glossary" href="glossary.html"/>
-            <item name="FAQ" href="faq.html"/>
             <item name="Migration" href="migration.html"/>
             <item name="TrueZIP 6 (Obsolete)" href="6/index.html" collapse="true">
                 <item name="Tutorial" href="6/tutorial.html"/>

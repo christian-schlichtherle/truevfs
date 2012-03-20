@@ -63,8 +63,9 @@ Key Features
 
     [Robust]
         The TrueZIP&#160;Kernel properly recognizes false positive archive
-        files, so it does not get confused by an arbitrary file which
-        inadvertenly uses a detectable archive file suffix, e.g. <<<.zip>>>.
+        files, so it does not get confused by an arbitrary file or directory
+        which inadvertenly uses a detectable archive file suffix, e.g.
+        <<<.zip>>>.
 
     [Thread-Safe]
         The TrueZIP&#160;Kernel applies fine grained locking, caching and

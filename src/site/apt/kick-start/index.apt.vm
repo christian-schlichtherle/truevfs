@@ -6,38 +6,15 @@
 
 Getting Started
 
-    To get you started quickly, the following resources are available:
+    To get you started quickly, the section {{Kick-Starting}} below shows you
+    how to generate, build and run your first TrueZIP application for the two
+    client APIs TrueZIP&#160;File* and TrueZIP&#160;Path in about ten minutes!
 
-    * The section {{Kick-Starting}} below shows you how to generate, build
-      and run your first application for the two client APIs TrueZIP&#160;File*
-      and TrueZIP&#160;Path in about ten minutes!
-
-    * If you are looking for more sample code and applications, please
-      {{{../source-repository.html}check out}} or
-      {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
-      the source code of the
-      {{{../truezip-samples/index.html}TrueZIP Samples}} module.
-
-    * If you need help, please read the {{{../faq.html}FAQ}}
-      before subscribing and posting to the
-      {{{../mail-lists.html}User Mailing List}}.
-      If you have an account on {{{http://java.net}java.net}}, your subscription will be
-      automatically accepted, otherwise you'll have to wait until it gets
-      manually accepted (~ 1 day without guarantee).
-
-    * Last, but not least, please read the comprehensive
-      {{{../apidocs/index.html}Javadoc}}.
-
-    []
-
-    Note that the documentation on this site is generally split across modules,
-    so please check the section <<Sub-Modules>> in the navigation bar on the
-    left of this page, too.
-
-    If you're still not fed up, you might also want to check out
-    {{{http://truezip.schlichtherle.de}The&#160;TrueZIP&#160;Blog}}
-    or the
-    {{{http://java.net/projects/truezip}TrueZIP&#160;Developer&#160;Website}}.
+    If you are looking for more sample code and applications, please
+    {{{../source-repository.html}check out}} or
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    the source code of the
+    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
 
 * Kick-Starting
 
@@ -69,7 +46,7 @@ Getting Started
     API - you just need to use the appropriate Maven coordinates from the
     above list:
 
-    [[1]] Kick-Starting TrueZIP applications from a Maven archetype in...
+    [[1]] Kick-Starting TrueZIP applications from a Maven archetype with...
 
         [[a]] {{{./file/eclipse.html}Eclipse}},
 
@@ -79,6 +56,6 @@ Getting Started
 
     [[1]] If you do not want to use Maven, you can still use TrueZIP once
           you've read this guide:
-          {{{./no-maven.html}Using TrueZIP without Maven}}.
+          {{{./no-maven.html}Using TrueZIP Without Maven}}.
 
     []
