@@ -1,10 +1,10 @@
     -----------------------
-    Kick-Starting TrueZIP Applications In a Shell
+    Kick-Starting TrueZIP Applications With a Shell
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Kick-Starting TrueZIP Applications In a Shell
+Kick-Starting TrueZIP Applications With a Shell
 
     This guide shows how to kick-start a TrueZIP application in a command line
     shell with the help of a Maven archetype.
