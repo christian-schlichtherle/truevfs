@@ -59,4 +59,4 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
    {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
    need",
   "<<<truezip-driver-tar>>> and <<<truezip-driver-zip>>>")
-#committing()
+#cleaningUp()

@@ -50,4 +50,4 @@ new TFile("archive.jar/META-INF/MANIFEST.MF").rm();
    {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
    needs",
   "<<<truezip-driver-zip>>>")
-#committing()
+#cleaningUp()
