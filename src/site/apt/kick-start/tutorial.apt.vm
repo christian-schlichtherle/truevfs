@@ -1,11 +1,11 @@
 #parse("../common.vm")
     -----------------------
-    Mini Tutorial
+    Tutorial
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Mini Tutorial
+Tutorial
 
     TrueZIP provides CRUD (Create, Read, Update, Delete) operations for archive
     files while maintaining an easy-to-use file system API.
