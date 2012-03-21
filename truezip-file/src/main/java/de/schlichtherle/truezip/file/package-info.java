@@ -22,12 +22,12 @@
  * For example, an application could access an entry within an archive file
  * using a {@code TFile} like this:
  * <pre>{@code 
- * File file = new TFile("archive.tar.gz/README.TXT");
- * Writer out = new TFileWriter(file);
+ * File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+ * Writer writer = new TFileWriter(entry);
  * try {
- *     out.write("Hello world!\n");
+ *     writer.write("Hello world!\n");
  * } finally {
- *     out.close();
+ *     writer.close();
  * }
  * }</pre>
  * <p>
