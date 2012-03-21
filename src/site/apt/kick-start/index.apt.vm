@@ -68,6 +68,6 @@ API (requires JSE 7+).
 
 * Tutorial (new)
 
-    There is a new {{{./tutorial.html}mini tutorial}} for the TrueZIP File* API.
+    There is a new {{{./tutorial.html}tutorial}} for the TrueZIP File* API.
     This tutorial does not require to use Maven, but it assumes you have
     already setup an application skeleton.
