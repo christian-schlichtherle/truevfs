@@ -30,20 +30,19 @@ About TrueZIP File*
     like this:
 
 +--+
-File file = new TFile("archive.tar.gz/README.TXT");
-OutputStream Out = new TFileOutputStream(file);
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+Writer writer = new TFileWriter(entry);
 try {
-    // Write archive entry contents here.
-    ...
+    writer.write("Hello world!\n");
 } finally {
-    out.close();
+    writer.close();
 }
 +--+
 
     This example presumes that the JARs of the driver modules
     {{{../truezip-driver/truezip-driver-file/index.html}TrueZIP Driver FILE}}
     and
-    {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
+    {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
     are present on the run time class path.
 
     For more examples, please use the Maven archetype for TrueZIP File* module
