@@ -12,14 +12,14 @@ Use Cases
     Note that these stories have been written with the TrueZIP File* API in
     mind, but using the TrueZIP Path API would be equally possible:
 
-    * {{{./aff.html}Application File Format}}
-
-    * {{{./eaff.html}Encrypted Application File Format}}
-
-    * {{{./ide.html}Integrated Development Environment}}
-
     * {{{./sbt.html}Software Build Tool}}
 
     * {{{./se.html}Search Engine}}
+
+    * {{{./ide.html}Integrated Development Environment}}
+
+    * {{{./aff.html}Application File Format}}
+
+    * {{{./eaff.html}Encrypted Application File Format}}
 
     []
