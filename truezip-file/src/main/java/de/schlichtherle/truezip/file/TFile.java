@@ -15,6 +15,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
@@ -137,8 +138,8 @@ import javax.swing.filechooser.FileSystemView;
  * TFile src = ...; // any
  * TFile dst = ...; // dito
  * ... // any I/O operations
- * TVFS.umount(src.toFsPath().getMountPoint()); // unmount selectively
- * TVFS.umount(dst.toFsPath().getMountPoint()); // dito
+ * TVFS.umount(src); // unmount selectively
+ * TVFS.umount(dst); // dito
  * src.toNonArchiveFile().cp_rp(dst.toNonArchiveFile());
  * </code></pre>
  * <p>
@@ -939,6 +940,10 @@ public final class TFile extends File {
     @Deprecated
     public static void sync(TFile archive, BitField<FsSyncOption> options)
     throws FsSyncException {
+        if (!archive.isArchive())
+            throw new IllegalArgumentException(archive + " (not an archive file)");
+        if (null != archive.getEnclArchive())
+            throw new IllegalArgumentException(archive + " (not a top level archive file)");
         TVFS.sync(archive, options);
     }
 
@@ -983,7 +988,7 @@ public final class TFile extends File {
     @Deprecated
     public static void umount(TFile archive)
     throws FsSyncException {
-        TVFS.umount(archive);
+        sync(archive, UMOUNT);
     }
 
     /**
@@ -998,10 +1003,10 @@ public final class TFile extends File {
     @Deprecated
     public static void umount(TFile archive, boolean forceCloseInputAndOutput)
     throws FsSyncException {
-        TVFS.sync(archive,
+        sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                        .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-                        .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
+                    .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                    .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
     }
 
     /**
@@ -1020,12 +1025,12 @@ public final class TFile extends File {
             boolean waitCloseInput, boolean forceCloseInput,
             boolean waitCloseOutput, boolean forceCloseOutput)
     throws FsSyncException {
-        TVFS.sync(archive,
+        sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                        .set(WAIT_CLOSE_INPUT, waitCloseInput)
-                        .set(FORCE_CLOSE_INPUT, forceCloseInput)
-                        .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
-                        .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
+                    .set(WAIT_CLOSE_INPUT, waitCloseInput)
+                    .set(FORCE_CLOSE_INPUT, forceCloseInput)
+                    .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                    .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
     }
 
     /**
