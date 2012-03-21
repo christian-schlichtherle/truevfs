@@ -32,14 +32,14 @@ public final class TVFS {
     /**
      * Commits all pending changes for all federated file systems (i.e.
      * prospective archive files) to their respective parent file system,
-     * closes their associated target (archive) file in order to allow access
+     * closes their associated target archive file in order to allow access
      * by third parties (e.g. other processes), cleans up any temporary
      * allocated resources (e.g. temporary files) and purges any cached data.
      * <p>
      * Note that temporary files may get used even for read-only access to
      * archive files, so calling this operation is essential.
      * However, if the client application never calls this operation, then it
-     * gets performed by a shutdown hook.
+     * gets called by a shutdown hook.
      * The shutdown hook gets removed as soon as this operation gets called in
      * order to leak no memory.
      * <p>
@@ -66,18 +66,9 @@ public final class TVFS {
      * temporary allocated resources (e.g. temporary files) and purges any
      * cached data.
      * <p>
-     * Note that temporary files may get used even for read-only access to
-     * archive files, so calling this operation is essential.
-     * However, if the client application never calls this operation, then it
-     * gets performed by a shutdown hook.
-     * The shutdown hook gets removed as soon as this operation gets called in
-     * order to leak no memory.
-     * <p>
-     * You could use the following idiom to unmount an individual archive file:
-     * <pre>{@code
-     * if (file.isTopLevelArchive()) // filter archive file
-     *   TVFS.umount(file); // unmount archive file and all its nested archive files
-     * }</pre>
+     * You could use the following idiom to unmount a particular archive file
+     * and all its nested archive files:
+     * {@code if (file.isArchive()) TVFS.umount(file);}
      * <p>
      * Calling this method is equivalent to
      * {@link #sync(TFile, BitField) sync(archive, FsSyncOptions.UMOUNT)}.
@@ -105,16 +96,13 @@ public final class TVFS {
      * Commits all pending changes for the federated file system (i.e.
      * prospective archive files) identified by {@code mountPoint} and all its
      * federated child file systems to their respective parent file system,
-     * closes their associated target (archive) file in order to allow access
+     * closes their associated target archive file in order to allow access
      * by third parties (e.g. other processes), cleans up any temporary
      * allocated resources (e.g. temporary files) and purges any cached data.
      * <p>
-     * Note that temporary files may get used even for read-only access to
-     * archive files, so calling this operation is essential.
-     * However, if the client application never calls this operation, then it
-     * gets performed by a shutdown hook.
-     * The shutdown hook gets removed as soon as this operation gets called in
-     * order to leak no memory.
+     * You could use the following idiom to unmount all archive files within a
+     * particular directory tree:
+     * {@code TVFS.umount(file.toFsPath().getMountPoint());}
      * <p>
      * Calling this method is equivalent to
      * {@link #sync(FsMountPoint, BitField) sync(mountPoint, FsSyncOptions.UMOUNT)}.
