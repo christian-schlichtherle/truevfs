@@ -44,11 +44,11 @@
             <item name="About" href="index.html"/>
             <item name="Key Features" href="features.html"/>
             <item name="Use Cases" href="usecases/index.html" collapse="true">
-                <item name="Application File Format" href="usecases/aff.html"/>
-                <item name="Encrypted Application File Format" href="usecases/eaff.html"/>
-                <item name="Integrated Development Environment" href="usecases/ide.html"/>
                 <item name="Software Build Tool" href="usecases/sbt.html"/>
                 <item name="Search Engine" href="usecases/se.html"/>
+                <item name="Integrated Development Environment" href="usecases/ide.html"/>
+                <item name="Application File Format" href="usecases/aff.html"/>
+                <item name="Encrypted Application File Format" href="usecases/eaff.html"/>
             </item>
             <item name="Getting Started" href="kick-start/index.html" collapse="true">
                 <item name="with Eclipse" href="kick-start/file/eclipse.html"/>
