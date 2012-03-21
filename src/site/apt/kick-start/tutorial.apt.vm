@@ -114,7 +114,7 @@ try {
     Actually, it's a typical issue for long running Java applications to run
     out of file descriptors because the programmers haven't ensured to properly
     close their I/O resources.
-    So please make  sure you always close your I/O resources in a finally-block.
+    So please make sure you always close your I/O resources in a finally-block.
     In case you need some aid to check your code for this issue, I recommend to
     use {{{http://findbugs.sourceforge.net}FindBugs}}.
 
