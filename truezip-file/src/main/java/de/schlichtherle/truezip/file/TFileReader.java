@@ -41,7 +41,16 @@ public final class TFileReader extends InputStreamReader {
 	super(new TFileInputStream(file));
     }
 
-    @Deprecated
+    /**
+     * Constructs a new {@code TFile} reader.
+     * This reader uses the default character set for decoding bytes to
+     * characters.
+     * <p>
+     * TODO: Remove this redundant constructor in TrueZIP 8.
+     * 
+     * @param  file a file to read.
+     * @throws FileNotFoundException on any I/O failure.
+     */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings({
         "DM_DEFAULT_ENCODING", "OBL_UNSATISFIED_OBLIGATION"
@@ -79,7 +88,15 @@ public final class TFileReader extends InputStreamReader {
 	super(new TFileInputStream(file), decoder);
     }
 
-    @Deprecated
+    /**
+     * Constructs a new {@code TFile} reader.
+     * <p>
+     * TODO: Remove this redundant constructor in TrueZIP 8.
+     * 
+     * @param  file a file to read.
+     * @param  decoder a decoder for decoding bytes to characters.
+     * @throws FileNotFoundException on any I/O failure.
+     */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileReader(TFile file, CharsetDecoder decoder)
