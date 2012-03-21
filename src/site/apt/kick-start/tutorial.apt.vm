@@ -90,12 +90,12 @@ dir.mkdirs(); // don't do this!
     within this archive file first:
 
 +--+
-File entry = new TFile("archive.zip/dir/README.TXT");
-Writer out = new TFileWriter(entry);
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+Writer writer = new TFileWriter(entry);
 try {
-    out.write("Hello world!\n");
+    writer.write("Hello world!\n");
 } finally {
-    out.close();
+    writer.close();
 }
 +--+
 
@@ -126,13 +126,13 @@ try {
     and point it to the archive entry:
     
 +--+
-File entry = new TFile("archive.zip/dir/README.TXT");
-Reader in = new TFileReader(entry);
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+Reader reader = new TFileReader(entry);
 try {
     // Do the processing here
     ...
 } finally {
-    in.close();
+    reader.close();
 }
 +--+
 
@@ -175,7 +175,7 @@ for (String member : archive.list())
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}.
 
 +--+
-File entry = new TFile("archive.zip/dir/README.TXT");
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
 entry.setLastModified(System.currentTimeMillis()); // sub-optimal!
 +--+
 
@@ -194,7 +194,7 @@ entry.setLastModified(System.currentTimeMillis()); // sub-optimal!
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
 
 +--+
-File entry = new TFile("archive.zip/dir/README.TXT");
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
 boolean ok = entry.delete(); // sub-optimal!
 +--+
 
@@ -204,7 +204,7 @@ boolean ok = entry.delete(); // sub-optimal!
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#rm()}<<<TFile.rm()>>>}}.
 
 +--+
-new TFile("archive.zip/dir/README.TXT").rm();
+new TFile("archive.zip/dir/HälloWörld.txt").rm();
 +--+
 
     This method returns <<<this>>> for fluent programming and throws an
