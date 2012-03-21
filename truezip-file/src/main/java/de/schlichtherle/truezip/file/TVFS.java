@@ -10,6 +10,8 @@ import de.schlichtherle.truezip.util.BitField;
 
 /**
  * Static utility methods for virtual file system operations with global scope.
+ * If you are not sure which method you should use, try {@link #umount()} -
+ * it does the right thing for most use cases.
  * <p>
  * The primary purpose of this class is to consolidate the many variants and
  * incarnations of {@link TFile#umount} alias {@link TFile#sync} alias ... into
@@ -17,9 +19,6 @@ import de.schlichtherle.truezip.util.BitField;
  * i.e. TrueZIP File* or TrueZIP Path.
  * All other variants and incarnations now forward the call to this class and
  * are declared to be deprecated.
- * <p>
- * If you are not sure which method you should use, try {@link #umount()} -
- * it does the right thing for most use cases.
  * 
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
@@ -30,11 +29,11 @@ public final class TVFS {
     private TVFS() { }
 
     /**
-     * Commits all pending changes for all federated file systems (i.e.
-     * prospective archive files) to their respective parent file system,
-     * closes their associated target archive file in order to allow access
-     * by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
+     * Commits all pending changes for all (nested) archive files to their
+     * respective parent file system, closes their associated target archive
+     * file in order to allow access by third parties
+     * (e.g.&#160;other processes), cleans up any temporary allocated resources
+     * (e.g.&#160;temporary files) and purges any cached data.
      * <p>
      * Note that temporary files may get used even for read-only access to
      * archive files, so calling this operation is essential.
@@ -59,22 +58,18 @@ public final class TVFS {
     }
 
     /**
-     * Commits all pending changes for the prospective archive file identified
-     * by {@code archive} and all its nested archive files to their respective
-     * parent file system, closes their associated target archive file in order
-     * to allow access by third parties (e.g. other processes), cleans up any
-     * temporary allocated resources (e.g. temporary files) and purges any
-     * cached data.
-     * <p>
-     * You could use the following idiom to unmount a particular archive file
-     * and all its nested archive files:
-     * {@code if (file.isArchive()) TVFS.umount(file);}
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system, closes their
+     * associated target archive file in order to allow access by third parties
+     * (e.g.&#160;other processes), cleans up any temporary allocated resources
+     * (e.g.&#160;temporary files) and purges any cached data.
      * <p>
      * Calling this method is equivalent to
      * {@link #sync(TFile, BitField) sync(archive, FsSyncOptions.UMOUNT)}.
      *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
+     * @param  mountPoint the prospective mount point of a (federated) file
+     *         system, i.e. any (virtual) file system entry.
      * @throws IllegalArgumentException if {@code archive} is not a top level
      *         archive file.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
@@ -88,21 +83,17 @@ public final class TVFS {
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
      */
-    public static void umount(TFile archive) throws FsSyncException {
-        sync(archive, UMOUNT);
+    public static void umount(TFile mountPoint) throws FsSyncException {
+        sync(mountPoint, UMOUNT);
     }
 
     /**
-     * Commits all pending changes for the federated file system (i.e.
-     * prospective archive files) identified by {@code mountPoint} and all its
-     * federated child file systems to their respective parent file system,
-     * closes their associated target archive file in order to allow access
-     * by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
-     * <p>
-     * You could use the following idiom to unmount all archive files within a
-     * particular directory tree:
-     * {@code TVFS.umount(file.toFsPath().getMountPoint());}
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system, closes their
+     * associated target archive file in order to allow access by third parties
+     * (e.g.&#160;other processes), cleans up any temporary allocated resources
+     * (e.g.&#160;temporary files) and purges any cached data.
      * <p>
      * Calling this method is equivalent to
      * {@link #sync(FsMountPoint, BitField) sync(mountPoint, FsSyncOptions.UMOUNT)}.
@@ -122,9 +113,8 @@ public final class TVFS {
     }
 
     /**
-     * Commits all pending changes for all federated file systems (i.e.
-     * prospective archive files) to their respective parent file system with
-     * respect to the given option.
+     * Commits all pending changes for all (nested) archive files to their
+     * respective parent file system with respect to the given option.
      *
      * @param  option an option for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
@@ -148,9 +138,8 @@ public final class TVFS {
     }
 
     /**
-     * Commits all pending changes for all federated file systems (i.e.
-     * prospective archive files) to their respective parent file system with
-     * respect to the given options.
+     * Commits all pending changes for all (nested) archive files to their
+     * respective parent file system with respect to the given options.
      *
      * @param  option an option for the synchronization operation.
      * @param  options an array of additional options for the synchronization
@@ -176,9 +165,8 @@ public final class TVFS {
     }
 
     /**
-     * Commits all pending changes for all federated file systems (i.e.
-     * prospective archive files) to their respective parent file system with
-     * respect to the given options.
+     * Commits all pending changes for all (nested) archive files to their
+     * respective parent file system with respect to the given options.
      *
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
@@ -203,21 +191,13 @@ public final class TVFS {
     }
 
     /**
-     * Commits all pending changes for the prospective archive file identified
-     * by {@code archive} and all its nested archive files to their respective
-     * parent file system with respect to the given options.
-     * <p>
-     * You could use the following idiom to sync an individual archive file:
-     * <pre>{@code
-     * if (file.isTopLevelArchive()) // filter archive file
-     *   TVFS.sync(file, option); // sync archive file and all its nested archive files
-     * }</pre>
-     * <p>
-     * Again, this will also sync all archive files which are nested within
-     * the archive file referred to by {@code archive}.
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system with respect
+     * to the given option.
      *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
+     * @param  mountPoint the prospective mount point of a (federated) file
+     *         system, i.e. any (virtual) file system entry.
      * @param  option an option for the synchronization operation.
      * @throws IllegalArgumentException if {@code archive} is not a top level
      *         archive file or the combination of synchronization options is
@@ -236,28 +216,20 @@ public final class TVFS {
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
      */
-    public static void sync(TFile archive,
+    public static void sync(TFile mountPoint,
                             FsSyncOption option)
     throws FsSyncException {
-        sync(archive, BitField.of(option));
+        sync(mountPoint, BitField.of(option));
     }
 
     /**
-     * Commits all pending changes for the prospective archive file identified
-     * by {@code archive} and all its nested archive files to their respective
-     * parent file system with respect to the given options.
-     * <p>
-     * You could use the following idiom to sync an individual archive file:
-     * <pre>{@code
-     * if (file.isTopLevelArchive()) // filter archive file
-     *   TVFS.sync(file, option, options); // sync archive file and all its nested archive files
-     * }</pre>
-     * <p>
-     * Again, this will also sync all archive files which are nested within
-     * the archive file referred to by {@code archive}.
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system with respect
+     * to the given options.
      *
-     * @param  archive a top level federated file system, i.e. a prospective
-     *         archive file.
+     * @param  mountPoint the prospective mount point of a (federated) file
+     *         system, i.e. any (virtual) file system entry.
      * @param  option an option for the synchronization operation.
      * @param  options an array of additional options for the synchronization
      *         operation.
@@ -278,28 +250,20 @@ public final class TVFS {
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
      */
-    public static void sync(TFile archive,
+    public static void sync(TFile mountPoint,
                             FsSyncOption option,
                             FsSyncOption... options)
     throws FsSyncException {
-        sync(archive, BitField.of(option, options));
+        sync(mountPoint, BitField.of(option, options));
     }
 
     /**
-     * Commits all pending changes for the prospective archive file identified
-     * by {@code archive} and all its nested archive files to their respective
-     * parent file system with respect to the given options.
-     * <p>
-     * You could use the following idiom to sync an individual archive file:
-     * <pre>{@code
-     * if (file.isArchive()) // filter archive file
-     *   TVFS.sync(file, options); // sync archive file and all its nested archive files
-     * }</pre>
-     * <p>
-     * Again, this will also sync all archive files which are nested within
-     * the archive file referred to by {@code archive}.
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system with respect
+     * to the given options.
      *
-     * @param  archive a federated file system, i.e. a prospective archive file.
+     * @param  mountPoint a federated file system, i.e. a prospective archive file.
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if {@code archive} is not a prospective
      *         archive file or the combination of synchronization options is
@@ -318,22 +282,20 @@ public final class TVFS {
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
      */
-    public static void sync(TFile archive,
+    public static void sync(TFile mountPoint,
                             BitField<FsSyncOption> options)
     throws FsSyncException {
-        if (!archive.isArchive())
-            throw new IllegalArgumentException(archive + " (not an archive file)");
-        sync(archive.getController().getModel().getMountPoint(), options);
+        sync(mountPoint.toFsPath().getMountPoint(), options);
     }
 
     /**
-     * Commits all pending changes for the federated file system (i.e.
-     * prospective archive files) identified by {@code mountPoint} and all its
-     * federated child file systems to their respective parent file system with
-     * respect to the given option.
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system with respect
+     * to the given option.
      *
-     * @param  mountPoint the mount point of a federated file system, i.e. a
-     *         prospective archive file.
+     * @param  mountPoint the prospective mount point of a (federated) file
+     *         system, i.e. any (virtual) file system entry.
      * @param  option an option for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if
@@ -357,13 +319,13 @@ public final class TVFS {
     }
 
     /**
-     * Commits all pending changes for the federated file system (i.e.
-     * prospective archive files) identified by {@code mountPoint} and all its
-     * federated child file systems to their respective parent file system with
-     * respect to the given options.
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system with respect
+     * to the given options.
      *
-     * @param  mountPoint the mount point of a federated file system, i.e. a
-     *         prospective archive file.
+     * @param  mountPoint the prospective mount point of a (federated) file
+     *         system, i.e. any (virtual) file system entry.
      * @param  option an option for the synchronization operation.
      * @param  options an array of additional options for the synchronization
      *         operation.
@@ -390,13 +352,13 @@ public final class TVFS {
     }
 
     /**
-     * Commits all pending changes for the federated file system (i.e.
-     * prospective archive files) identified by {@code mountPoint} and all its
-     * federated child file systems to their respective parent file system with
-     * respect to the given options.
+     * Commits all pending changes for all (nested) archive files within the
+     * (virtual) directory tree referenced by the (prospective)
+     * {@code mountPoint} to their respective parent file system with respect
+     * to the given options.
      *
-     * @param  mountPoint the mount point of a federated file system, i.e. a
-     *         prospective archive file.
+     * @param  mountPoint the prospective mount point of a (federated) file
+     *         system, i.e. any (virtual) file system entry.
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if

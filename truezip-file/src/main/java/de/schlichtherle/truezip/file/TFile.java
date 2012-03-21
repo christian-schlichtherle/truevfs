@@ -1005,8 +1005,8 @@ public final class TFile extends File {
     throws FsSyncException {
         sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                    .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
-                    .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
+                        .set(FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
+                        .set(FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput));
     }
 
     /**
@@ -1027,10 +1027,10 @@ public final class TFile extends File {
     throws FsSyncException {
         sync(   archive,
                 BitField.of(CLEAR_CACHE)
-                    .set(WAIT_CLOSE_INPUT, waitCloseInput)
-                    .set(FORCE_CLOSE_INPUT, forceCloseInput)
-                    .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
-                    .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
+                        .set(WAIT_CLOSE_INPUT, waitCloseInput)
+                        .set(FORCE_CLOSE_INPUT, forceCloseInput)
+                        .set(WAIT_CLOSE_OUTPUT, waitCloseOutput)
+                        .set(FORCE_CLOSE_OUTPUT, forceCloseOutput));
     }
 
     /**
