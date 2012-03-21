@@ -279,8 +279,7 @@ TConfig.get().setArchiveDetector(
 TFile inner = new TFile("outer.zip/inner.zip");
 TFile file = inner.toNonArchiveFile(); // convert - since TrueZIP 7.5
 ... // there may be some I/O here
-if (inner.isArchive()) // prospective archive file?
-    TVFS.umount(inner); // unmount it
+TVFS.umount(inner); // unmount potential archive file
 // Now you can safely do any I/O to $file.
 long length = file.length();
 </source>
@@ -535,8 +534,7 @@ TFile.cp(src.toFile(), dst.toFile());
 TPath inner = new TPath("outer.zip/inner.zip");
 TPath path = inner.toNonArchivePath(); // convert - since TrueZIP 7.5
 ... // there may be some I/O here
-if (inner.isArchive()) // prospective archive file?
-    inner.getFileSystem().close(); // unmount it
+inner.getFileSystem().close(); // unmount potential archive file
 // Now you can safely do any I/O to $path.
 long size = Files.size(path);
 </source>
