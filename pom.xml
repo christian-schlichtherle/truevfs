@@ -22,11 +22,10 @@
 
     <name>TrueZIP</name>
     <description>
-TrueZIP is a Java based plug-in framework for virtual file systems
-(VFS) which enables client applications to perform CRUD (Create,
-Read, Update, Delete) operations on archive files as if they were
-virtual directories, even with nested archive files in
-multithreaded environments.
+TrueZIP is a Java based virtual file system (VFS) which enables
+client applications to perform CRUD (Create, Read, Update, Delete)
+operations on archive files as if they were virtual directories,
+even with nested archive files in multithreaded environments.
 
 As a library, TrueZIP provides simple, uniform, transparent,
 thread-safe, read/write access to archive files as if they were
