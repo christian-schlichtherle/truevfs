@@ -94,18 +94,12 @@ public final class TFileSystem extends FileSystem {
     }
 
     /**
-     * Commits all pending changes for this federated file system and all its
+     * Commits all pending changes for this (federated) file system and all its
      * federated child file systems to their respective parent file system,
      * closes their associated target (archive) file in order to allow access
-     * by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
-     * <p>
-     * Note that temporary files may get used even for read-only access to
-     * archive files, so calling this operation is essential.
-     * However, if the client application never calls this operation, then it
-     * gets performed by a shutdown hook.
-     * The shutdown hook gets removed as soon as this operation gets called in
-     * order to leak no memory.
+     * by third parties (e.g.&#160;other processes), cleans up any temporary
+     * allocated resources (e.g.&#160;temporary files) and purges any cached
+     * data.
      * <p>
      * Calling this method is equivalent to
      * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
@@ -114,7 +108,7 @@ public final class TFileSystem extends FileSystem {
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream was forcibly closed.
+     *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      * @see    #sync(BitField)
@@ -125,7 +119,7 @@ public final class TFileSystem extends FileSystem {
     }
 
     /**
-     * Commits all pending changes for this federated file system and all its
+     * Commits all pending changes for this (federated) file system and all its
      * federated child file systems to their respective parent file system with
      * respect to the given options.
      *
@@ -141,7 +135,7 @@ public final class TFileSystem extends FileSystem {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
