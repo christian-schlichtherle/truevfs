@@ -3,11 +3,12 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.file.TConfig;
+import de.schlichtherle.truezip.nio.file.TPath;
 import java.io.IOException;
 import java.nio.file.Files;
-import static java.nio.file.StandardCopyOption.*;
+import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * This command line utility non-recursively copies the first file or directory

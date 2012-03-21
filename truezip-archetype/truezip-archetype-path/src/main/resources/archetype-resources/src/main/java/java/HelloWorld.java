@@ -3,10 +3,11 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.schlichtherle.truezip.nio.file.*;
-import java.io.*;
+import de.schlichtherle.truezip.nio.file.TPath;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
-import static java.nio.file.Files.*;
+import static java.nio.file.Files.newBufferedWriter;
 
 /**
  * Creates a ZIP file with the name {@code "archive.zip"} in the current
@@ -32,10 +33,10 @@ public class HelloWorld extends Application<IOException> {
         // This can be changed by configuring the respective archive driver,
         // see Javadoc for TApplication.setup().
         final Writer writer = newBufferedWriter(
-                new TPath("archive.zip/HälloWörld.txt"),
+                new TPath("archive.zip/dir/HälloWörld.txt"),
                 Charset.defaultCharset());
         try {
-            writer.write("Hello World!\n");
+            writer.write("Hello world!\n");
         } finally {
             writer.close();
         }
