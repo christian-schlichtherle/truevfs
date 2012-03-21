@@ -49,7 +49,7 @@ public final class TVFS {
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream was forcibly closed.
+     *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
@@ -78,7 +78,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
@@ -104,7 +104,7 @@ public final class TVFS {
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream was forcibly closed.
+     *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
@@ -128,7 +128,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
@@ -155,7 +155,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
@@ -180,7 +180,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
@@ -211,7 +211,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
@@ -245,7 +245,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
@@ -277,7 +277,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      * @see    TFile#isTopLevelArchive()
@@ -308,7 +308,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
@@ -340,7 +340,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
@@ -371,7 +371,7 @@ public final class TVFS {
      *         synchronized with constraints, e.g. if
      *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
      *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream is forcibly closed.
+     *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
