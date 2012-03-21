@@ -40,7 +40,7 @@ Encrypted Application File Format
     with an instance of an archive driver class like this:
 
 +-------------------------------------------------+
-TFile.setDefaultArchiveDetector(
+TConfig.get().setArchiveDetector(
     new TArchiveDetector(
         "fox|bax",
         new SafeZipRaesDriver(  IOPoolLocator.SINGLETON,
