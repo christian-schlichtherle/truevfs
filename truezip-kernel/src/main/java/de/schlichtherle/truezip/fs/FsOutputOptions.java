@@ -17,24 +17,31 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class FsOutputOptions {
+public final class FsOutputOptions {
 
     /**
      * A bit field with no output options set.
      * 
-     * @since TrueZIP 7.2
+     * @since TrueZIP 7.5
      */
     public static final BitField<FsOutputOption>
-            NO_OUTPUT_OPTIONS = BitField.noneOf(FsOutputOption.class);
+            NONE = BitField.noneOf(FsOutputOption.class);
+
+    /**
+     * @deprecated
+     * @since TrueZIP 7.2
+     * @see #NONE
+     */
+    @Deprecated
+    public static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS = NONE;
 
     /**
      * @deprecated
      * @since TrueZIP 7.1.1
-     * @see #NO_OUTPUT_OPTIONS
+     * @see #NONE
      */
     @Deprecated
-    public static final BitField<FsOutputOption>
-            NO_OUTPUT_OPTION = NO_OUTPUT_OPTIONS;
+    public static final BitField<FsOutputOption> NO_OUTPUT_OPTION = NONE;
 
     /**
      * The mask of output preferences, which is
@@ -44,6 +51,17 @@ public class FsOutputOptions {
      */
     public static final BitField<FsOutputOption> OUTPUT_PREFERENCES_MASK
             = BitField.of(CACHE, CREATE_PARENTS, STORE, COMPRESS, GROW, ENCRYPT);
+
+    /**
+     * Converts the given array to a bit field of output options.
+     * 
+     * @param  options an array of output options.
+     * @return A bit field of output options.
+     * @since  TrueZIP 7.5
+     */
+    public static BitField<FsOutputOption> of(FsOutputOption... options) {
+        return 0 == options.length ? NONE : BitField.of(options[0], options);
+    }
 
     /* Can't touch this - hammer time! */
     private FsOutputOptions() { }

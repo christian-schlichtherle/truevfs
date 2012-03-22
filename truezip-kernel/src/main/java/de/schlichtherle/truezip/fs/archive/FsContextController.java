@@ -36,8 +36,7 @@ final class FsContextController
 extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
 
     private static final FsOperationContext
-            NULL = new FsOperationContext(
-                FsOutputOptions.NO_OUTPUT_OPTIONS);
+            NULL = new FsOperationContext(FsOutputOptions.NONE);
 
     /**
      * Constructs a new file system context controller.

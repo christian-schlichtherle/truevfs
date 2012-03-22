@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.io.Paths;
 import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
@@ -1020,7 +1019,7 @@ public final class TPath implements Path {
     }
 
     BitField<FsOutputOption> mapOutput(final Set<? extends OpenOption> options) {
-        final EnumSet<FsOutputOption> set = NO_OUTPUT_OPTIONS.toEnumSet();
+        final EnumSet<FsOutputOption> set = EnumSet.noneOf(FsOutputOption.class);
         for (final OpenOption option : options) {
             if (!(option instanceof StandardOpenOption))
                 throw new UnsupportedOperationException(option.toString());

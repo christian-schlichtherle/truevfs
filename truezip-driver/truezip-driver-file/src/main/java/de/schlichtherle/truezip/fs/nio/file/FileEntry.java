@@ -9,7 +9,7 @@ import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
+import de.schlichtherle.truezip.fs.FsOutputOptions;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -186,7 +186,7 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(this, NO_OUTPUT_OPTIONS, null);
+        return new FileOutputSocket(this, FsOutputOptions.NONE, null);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(

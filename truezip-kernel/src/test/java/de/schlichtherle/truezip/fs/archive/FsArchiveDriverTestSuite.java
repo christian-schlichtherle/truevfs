@@ -239,7 +239,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private OutputSocket<?> getArchiveOutputSocket() {
         return getArchiveDriver().getOutputSocket(parent, name,
-                FsOutputOptions.NO_OUTPUT_OPTIONS, null);
+                FsOutputOptions.NONE, null);
     }
 
     private void input() throws IOException {
@@ -353,7 +353,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private InputSocket<?> getArchiveInputSocket() {
         return getArchiveDriver().getInputSocket(parent, name,
-                FsInputOptions.NO_INPUT_OPTIONS);
+                FsInputOptions.NONE);
     }
 
     private static void close(final Closeable[] resources) throws IOException {

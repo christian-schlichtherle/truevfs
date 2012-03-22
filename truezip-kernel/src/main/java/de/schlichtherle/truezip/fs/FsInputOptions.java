@@ -17,24 +17,31 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class FsInputOptions {
+public final class FsInputOptions {
 
     /**
      * A bit field with no input options set.
      * 
-     * @since TrueZIP 7.2
+     * @since TrueZIP 7.5
      */
     public static final BitField<FsInputOption>
-            NO_INPUT_OPTIONS = BitField.noneOf(FsInputOption.class);
+            NONE = BitField.noneOf(FsInputOption.class);
+
+    /**
+     * @deprecated
+     * @since TrueZIP 7.2
+     * @see #NONE
+     */
+    @Deprecated
+    public static final BitField<FsInputOption> NO_INPUT_OPTIONS = NONE;
 
     /**
      * @deprecated
      * @since TrueZIP 7.1.1
-     * @see #NO_INPUT_OPTIONS
+     * @see #NONE
      */
     @Deprecated
-    public static final BitField<FsInputOption>
-            NO_INPUT_OPTION = NO_INPUT_OPTIONS;
+    public static final BitField<FsInputOption> NO_INPUT_OPTION = NONE;
 
     /**
      * The mask of input preferences, which is
@@ -44,6 +51,17 @@ public class FsInputOptions {
      */
     public static final BitField<FsInputOption> INPUT_PREFERENCES_MASK
             = BitField.of(CACHE);
+
+    /**
+     * Converts the given array to a bit field of input options.
+     * 
+     * @param  options an array of input options.
+     * @return A bit field of input options.
+     * @since  TrueZIP 7.5
+     */
+    public static BitField<FsInputOption> of(FsInputOption... options) {
+        return 0 == options.length ? NONE : BitField.of(options[0], options);
+    }
 
     /* Can't touch this - hammer time! */
     private FsInputOptions() { }

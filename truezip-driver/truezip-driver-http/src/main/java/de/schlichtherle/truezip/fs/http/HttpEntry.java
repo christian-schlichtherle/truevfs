@@ -8,12 +8,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import static de.schlichtherle.truezip.fs.FsInputOptions.NO_INPUT_OPTIONS;
-import de.schlichtherle.truezip.fs.FsOutputOption;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
+import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -156,7 +151,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     @Override
     public InputSocket<HttpEntry> getInputSocket() {
-        return newInputSocket(NO_INPUT_OPTIONS);
+        return newInputSocket(FsInputOptions.NONE);
     }
 
     protected InputSocket<HttpEntry> newInputSocket(BitField<FsInputOption> options) {
@@ -165,7 +160,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     @Override
     public OutputSocket<HttpEntry> getOutputSocket() {
-        return newOutputSocket(NO_OUTPUT_OPTIONS, null);
+        return newOutputSocket(FsOutputOptions.NONE, null);
     }
 
     protected OutputSocket<HttpEntry> newOutputSocket(
