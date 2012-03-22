@@ -1,0 +1,62 @@
+#parse("common.vm")
+#leadIn("Software Build Tool (SBT)",
+  "Suppose you're writing a plug-in for the next generation SBT
+   which shall create assemblies of all project artifacts.",
+  "true",
+  "Copying Archive Files")
+
+    See how easy "tarring" a directory can be:
+
++--+
+new TFile("directory").cp_rp(new TFile("archive.tar.gz"));
++--+
+
+    The name of the method <<<TFile.cp_rp(*)>>> is modeled after the Unix
+    command line <<<cp -rp>>> which copies its arguments recursively and
+    preserves all file attributes.
+
+    However, in order to prevent ambiguities, unlike the <<<cp>>> command line
+    utility, TrueZIP does not support auto-completion of path names or mixing
+    file and directory parameters.
+    So you must provide <complete path names> for both the source and the
+    destination.
+    E.g. in order to copy a single file to an archive file, you would have to
+    call something like this:
+
++--+
+new TFile("file").cp_rp(new TFile("archive.tar.gz/file"));
++--+
+
+    The <<<TFile>>> class provides many alternative constructors and methods to
+    ease the tasks of constructing complete path names and copy files or
+    directories - please consult the
+    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}Javadoc}}
+    for more information.
+    
+    The type of the prospective archive file is detected by its
+    suffix in a path name.
+    In this case <<<.tar.gz>>> was used, but you could use any other
+    registered archive file suffix, too (see below).
+    And of course, archive files can not only be used as the destination of a
+    copy method, but also as the source or both.
+    So here's how to unzip a ZIP file to a directory:
+
++--+
+new TFile("archive.zip").cp_rp(new TFile("directory"));
++--+
+
+    And here's how to "transform" a ZIP file into a TAR.GZ file:
+
++--+
+new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
++--+
+
+#configuring("<<<tar.gz>>> or <<<zip>>>",
+  "TAR.GZ or ZIP",
+  "modules
+   {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
+   and
+   {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+   need",
+  "<<<truezip-driver-tar>>> and <<<truezip-driver-zip>>>")
+#cleaningUp()

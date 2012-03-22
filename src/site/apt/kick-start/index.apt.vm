@@ -1,0 +1,56 @@
+    -----------------------
+    Getting Started
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Getting Started
+
+* Using Maven
+
+    TrueZIP is a multi-module project which is built by
+    {{{http://maven.apache.org}Apache Maven}}, so all its artifacts are hosted
+    on {{{http://search.maven.org}Maven Central}}.
+    If you are using Maven too, then you you can generate, build and run your
+    first TrueZIP application for the two client APIs TrueZIP&#160;File* or
+    TrueZIP&#160;Path in about ten minutes by following these guides:
+
+    [[1]] {{{./file/eclipse.html}Kick-Starting TrueZIP Applications With Eclipse}}.
+
+    [[1]] {{{./file/netbeans.html}Kick-Starting TrueZIP Applications With NetBeans}}.
+
+    [[1]] {{{./file/shell.html}Kick-Starting TrueZIP Applications With a Shell}}.
+
+    []
+
+    These guides were written with the archetype for the TrueZIP File*
+    API in mind.
+    However, they work the same way with the archetype for the TrueZIP Path
+    API - just pick the Maven archetype coordinates for your preferred client
+    API from the following table:
+
+*--+--+--+--+--+
+|| Client API || Requires || Archetype Group Id || Archetype Artifact Id || Archetype Version
+*--+--+--+--+--+
+| {{{../truezip-file/index.html}TrueZIP File*}} | JSE&#160;6 | <<<de.schlichtherle.truezip>>> | <<<truezip-archetype-file>>> | <<<${project.version}>>>
+*--+--+--+--+--+
+| {{{../truezip-path/index.html}TrueZIP Path}} | JSE&#160;7 | <<<de.schlichtherle.truezip>>> | <<<truezip-archetype-path>>> | <<<${project.version}>>>
+*--+--+--+--+--+
+
+* Manual Download
+
+    If you do not want to use Maven, then you need to manually download the
+    TrueZIP artifacts from Maven Central by following this guide:
+    {{{./no-maven.html}Using TrueZIP Without Maven}}.
+
+    If you are looking for more sample code and applications, then please
+    {{{../source-repository.html}check out}} or
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    the source code of the
+    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+
+* Tutorial (new)
+
+    A short {{{./tutorial.html}tutorial}} is available for the TrueZIP File* API.
+    It does not require you to use Maven, but it assumes you have
+    already setup an application skeleton.

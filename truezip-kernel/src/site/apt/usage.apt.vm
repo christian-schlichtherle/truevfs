@@ -1,0 +1,150 @@
+    ---
+    TrueZIP Kernel Usage
+    ---
+    Christian Schlichtherle
+    ---
+
+TrueZIP Kernel Usage
+
+* Abstract
+
+    This article showcases the TrueZIP&#160;Kernel API in contrast to the
+    {{{../truezip-file/index.html}TrueZIP File*}} API.
+
+* Design
+
+    In contrast to the modules
+    {{{../truezip-path/index.html}TrueZIP Path}}
+    or
+    {{{../truezip-file/index.html}TrueZIP File*}},
+    the API of this module is more complex to use, yet very extensible because
+    it relies on Dependency Injection for the resolution of
+    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}}
+    and
+    {{{./apidocs/de/schlichtherle/truezip/socket/IOPool.html}I/O entry pools}}.
+    It also provides service locators for
+    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system driver providers}}
+    and
+    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}I/O entry pool providers}}
+    in order to enable applications to resolve these dependencies easily at
+    runtime.
+
+* TrueZIP Kernel versus TrueZIP File*
+
+    The API of the TrueZIP Kernel module is considerably different to the API
+    of the TrueZIP File* module:
+    While the File* API primarily aims to "make simple things easy",
+    the Kernel API primarily aims to "make complex things possible".
+
+    This means that while the Kernel API offers more features than the File*
+    API, it also requires more coding to get a job done.
+    So when is it appropriate to code against the Kernel API instead of the
+    File* API?
+
+    * If you don't want to rely on the service locator pattern which is
+        employed by the File* API in order to enumerate the set of file
+        system drivers which are available on the class path at run-time.
+
+    * If the type of the top level file system your application needs to
+        access is not a platform file system (adressed by the "file" scheme),
+        but any other file system type, e.g. a web service
+        (adressed by the "http" scheme).
+
+    * If you need to access file system specific entry properties,
+        e.g. the comment of an entry in a ZIP file.
+
+    * If you want to reduce the number of kernel calls required to query
+        a set of properties for the same file system entry.
+
+    []
+
+* Basic Operations
+
+    Suppose you'ld like to imitate the functionality of the <<<cat(1)>>> Unix
+    command line utility.
+    This utility simply concatenates the contents of each parameter path name
+    on the standard output.
+    E.g. the shell command...
+
++--
+$ cat fileA fileB
++--
+
+    ...would print the contents of <<<fileA>>> and then <<<fileB>>> to standard
+    output.
+
+    Here's how to copy the contents of the path name parameter <<<resource>>>
+    to the standard output using the API of the module TrueZIP File*:
+
+%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/PathCat.java}
+
+    Suppose that the modules TrueZIP Driver ZIP
+    (Maven artifactId <<<truezip-driver-zip>>>) and TrueZIP Driver File
+    (<<<truezip-driver-file>>>) are present on the class path at run-time.
+    Furthermore, if the current directory is the root directory and the file
+    <<<file>>> exists and the file <<<archive.zip>>> is a valid ZIP file,
+    then the following path names could be addressed with the code above:
+
+    * <<<file>>>
+
+    * <<</file>>>
+
+    * <<<archive.zip/entry>>>
+
+    * <<</archive.zip/entry>>>
+
+    []
+
+    Basically any valid path name could be addressed with this code.
+    If an application needs to address URIs, too, then the following code
+    could be used instead:
+
+%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/UriCat.java}
+
+    Using the same configuration like before, the following URIs could now be
+    addressed with the code above:
+
+    * <<<file>>>
+
+    * <<</file>>>
+
+    * <<<file:/file>>>
+
+    * <<<archive.zip/entry>>>
+
+    * <<</archive.zip/entry>>>
+
+    * <<<zip:file:/archive.zip!/entry>>>
+
+    []
+
+    This adds a lot of flexibility, but the File* API still has one limitation:
+    All URIs must be file-based, i.e. the scheme of their top level file system
+    must be <<<file>>>.
+    In particular, it's not possible to access a resource via HTTP(S).
+
+    Now for comparison, let's implement the same functionality using the API
+    of the module TrueZIP Kernel.
+
+%{snippet|id=cat|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/fs/sample/Cat.java}
+
+    Using the same configuration like before, this code could access the same
+    URIs than before.
+    However, this could access <any> URI scheme for which a file system driver
+    is present on the class path at run-time, too.
+    E.g. if the module TrueZIP Driver HTTP(S) (<<<truezip-driver-http>>>) is
+    present on the class path at run-time, even http(s)-based URIs could get
+    accessed.
+
+    Just for fun, try the code above with the following URI:
+
+---
+zip:zip:zip:zip:zip:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/this.zip!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
+---
+
+    And for even more fun, try the code above with the following URI and
+    provide the top secret password <<<test1234>>> when prompted:
+
+---
+zip:zip:zip:zip:tzp:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/test1234.tzp!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
+---

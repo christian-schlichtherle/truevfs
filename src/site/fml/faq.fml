@@ -1,0 +1,804 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<faqs   xmlns="http://maven.apache.org/FML/1.0.1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/FML/1.0.1 http://maven.apache.org/xsd/fml-1.0.1.xsd"
+        title="Frequently Asked Questions"
+        toplink="false">
+    <part id="file">
+        <title>TrueZIP File* API</title>
+        <faq id="cannotReadArchive">
+            <question>
+                When trying to read an archive file, I get an exception saying
+                I cannot read directories.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    When configured correctly, the File* API will treat an
+                    archive file like a virtual directory (that's what TrueZIP
+                    is all about).
+                    Like with plain directories, applications cannot read or
+                    write virtual directories using an input or output stream.
+                </p>
+                <p>
+                    Use one of the 
+                    <code>list*(*)</code> methods in the
+                    <code>TFile</code> class instead.
+                </p>
+                <p>
+                    For example, to list the contents of the top level
+                    (virtual) directory of the archive file
+                    <code>archive.zip</code>, you could use...
+                </p>
+                <source>TFile[] entries = new TFile("archive.zip").listFiles();</source>
+            </answer>
+        </faq>
+        <faq id="cannotWriteArchive">
+            <question>
+                When trying to write an archive file, I get an exception saying
+                I cannot write directories.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    When configured correctly, the File* API will treat an
+                    archive file like a virtual directory (that's what TrueZIP
+                    is all about).
+                    Like with plain directories, applications cannot read or
+                    write virtual directories using an input or output stream.
+                </p>
+                <p>
+                    Use one of the 
+                    <code>mkdir*(*)</code> methods in the
+                    <code>TFile</code> class or directly write to the entry
+                    within the archive file using a
+                    <code>TFileOutputStream</code> instead.
+                    For example, to (over)write the entry 
+                    <code>entry</code> within the archive file
+                    <code>archive.zip</code>, you could use...
+                </p>
+<source>
+OutputStream out = new TFileOutputStream("archive.zip/entry");
+try {
+    ... // write something here
+} finally {
+    out.close();
+}
+</source>
+                <p>
+                    This would work even if
+                    <code>archive.zip</code> would not initially exist unless
+                    <code>TFile.setLenient(false)</code> had been called by
+                    your application before.
+                    In this case, you would need to create the archive file
+                    <code>archive.zip</code> in advance by using...
+                </p>
+                <source>new TFile("archive.zip").mkdir(false);</source>
+            </answer>
+        </faq>
+        <faq id="cannotCopyFileToArchive">
+            <question>
+                Copying a file to an archive file does not seem to work.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    Users often assume that when copying a file to an archive
+                    file, the File* API would automatically complete the path
+                    name of the destination archive file so that it ends with
+                    the base name of the source file.
+                    This is probably assumed because that's how it works with
+                    command line utilities like 
+                    <code>cp</code> on POSIX or
+                    <code>copy</code> on Windows.
+                    However, this is not true:
+                    The File* API does 
+                    <em>never</em> do path name completion.
+                    Hence, the following code may behave unexpectedly:
+                </p>
+<source>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+src.cp_rp(dst);
+</source>
+                <p>
+                    If successful, this would only result in a verbatim copy of 
+                    <code>file</code> to 
+                    <code>archive.zip</code>, which is probably unexpected.
+                    However, the way the copy command line utilities work can
+                    be easily emulated by using the following instead:
+                </p>
+<source>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+if (TFile.isLenient() &amp;&amp; dst.isArchive() || dst.isDirectory())
+    dst = new TFile(dst, src.getName());
+src.cp_rp(dst);
+</source>
+                <p>
+                    This will append the base name of the source path to the
+                    destination path if either the destination path name ends
+                    with a recognized archive file suffix like e.g. ".zip" or
+                    if the destination file system entry already exists as a
+                    directory.
+                    If 
+                    <code>TFile.setLenient(false)</code> is never called by
+                    your application, then you could shorten this to...
+                </p>
+<source>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+if (dst.isArchive() || dst.isDirectory())
+    dst = new TFile(dst, src.getName());
+src.cp_rp(dst);
+</source>
+                <p>
+                    If you don't like path name completion for non-existent
+                    files which just look like archive files according to their
+                    file name, then you could even shorten this to...
+                </p>
+<source>
+TFile src = new TFile(string1); // e.g. "file"
+TFile dst = new TFile(string2); // e.g. "archive.zip"
+if (dst.isDirectory())
+    dst = new TFile(dst, src.getName());
+src.cp_rp(dst);
+</source>
+            </answer>
+        </faq>
+        <faq id="filterTArchiveDetector">
+            <question>
+                The set of detected suffixes for archive files is too large.
+                How can I change it?
+            </question>
+            <answer>
+                <p>
+                    You can easily filter the set of canonical suffixes
+                    installed by the file system driver modules on the run time
+                    class path.
+                    For example, the TrueZIP Driver ZIP module will install a
+                    large set of canonical file suffixes for ZIP files.
+                    If all you want is to detect <code>*.zip</code> files
+                    however, you can do so easily using the following statement:
+                </p>
+<source>
+TConfig.get().setArchiveDetector(new TArchiveDetector("zip"));
+</source>
+                <p>
+                    Check the
+                    <a href="kick-start/index.html">Maven archetypes</a> for
+                    more options and to help you get started with this quickly.
+                </p>
+            </answer>
+        </faq>
+        <faq id="installDriverFile">
+            <question>
+                How to install a (custom) file system driver?
+            </question>
+            <answer>
+                <p>
+                    Make the following call early in your application:
+                </p>
+<source>
+TConfig.get().setArchiveDetector(
+        new TArchiveDetector(
+            TArchiveDetector.NULL,
+            "zip", new ZipDriver(IOPoolLocator.SINGLETON)));
+</source>
+                <p>
+                    This example presumes that you are going to map the file
+                    suffix <code>.zip</code> to the <code>ZipDriver</code>.
+                    This is actually the default if you add the JAR artifact of
+                    the module TrueZIP&nbsp;Driver&nbsp;ZIP to the run time
+                    class path.
+                </p>
+                <p>
+                    Furthermore, this example presumes that you want no other
+                    archive file suffixes to get detected, hence the use of
+                    <a href="apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
+                    as the decorated archive detector.
+                    The class <code>TArchiveDetector</code> has many different
+                    constructors.
+                    Check the
+                    <a href="apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html">Javadoc</a>
+                    to make sure you get what you need.
+                </p>
+            </answer>
+        </faq>
+        <faq id="cannotListArchive">
+            <question>
+                The API is not detecting an archive file as a virtual directory.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    Most likely the TrueZIP File* module is not set up
+                    correctly in order to detect the file suffix of the archive
+                    type you want to access.
+                    To make sure it does, make the following call early in your
+                    application:
+                </p>
+<source>
+TConfig.get().setArchiveDetector(
+        new TArchiveDetector(
+            TArchiveDetector.NULL,
+            new Object[][] {
+                { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
+                { "tgz|tar.gz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
+                { "tbz|tb2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
+                { "zip", new ZipDriver(IOPoolLocator.SINGLETON)},
+            }));
+</source>
+                <p>
+                    Check the
+                    <a href="kick-start/index.html">Maven archetypes</a> for
+                    more options and to help you get started with this quickly.
+                </p>
+            </answer>
+        </faq>
+        <faq id="ignoreArchiveFile">
+            <question>
+                The API should <em>not</em> detect an individual archive file
+                as a virtual directory.
+                How can I do this?
+            </question>
+            <answer>
+                <p>
+                    Every now and then you might want to treat an archive file
+                    like a regular file rather than a virtual directory.
+                    For example, when trying to obtain the length of the
+                    archive file in bytes.
+                    You would normally do this by calling the method
+                    <code>File.length()</code>.
+                    However, if the <code>File</code> object is an instance of
+                    the <code>TFile</code> class and the path has been detected
+                    to name a valid archive file, then this method would always
+                    return zero.
+                    This is because you might have changed the archive file and
+                    then it would be impossible to return a precise result
+                    until the changes have been committed to the target archive
+                    file.
+                </p>
+                <p>
+                    You can easily solve this issue by committing any pending
+                    changes and then calling <code>length()</code> on a new
+                    <code>TFile</code> object which has been instructed to
+                    ignore an archive file name suffix in the last path element.
+                    This could look as follows:
+                </p>
+<source>
+// Note that the actual path may refer to anything, even a nested archive file.
+TFile inner = new TFile("outer.zip/inner.zip");
+TFile file = inner.toNonArchiveFile(); // convert - since TrueZIP 7.5
+... // there may be some I/O here
+TVFS.umount(inner); // unmount potential archive file
+// Now you can safely do any I/O to $file.
+long length = file.length();
+</source>
+                <p>
+                    Note that the path <code>outer.zip/inner.zip</code> refers
+                    to a nested archive file, so using the <code>TFile*</code>
+                    classes is required to access it.
+                </p>
+                <p>
+                    Last but not least, using the object <code>file</code>
+                    for any I/O bypasses any state associated with the path
+                    <code>outer.zip/inner.zip</code> in the TrueZIP Kernel.
+                    This could result in an inconsistent state of the federated
+                    file system space and may even incur <em>loss of data</em>!
+                    In order to avoid this, it's a good idea <em>not</em> to
+                    access the object <code>inner</code> again until you are
+                    done with the object <code>file</code>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="corruptedArchive">
+            <question>
+                When I create or update archive entries,
+                the modified archive file gets corrupted.
+                What's wrong?
+            </question>
+            <answer>
+                <p>
+                    The TrueZIP Kernel module applies neat caching and
+                    buffering strategies for archive entries.
+                    So whenever your application creates or updates archive
+                    entries, the changes need to get committed to the archive
+                    file when done.
+                    On certain events, e.g. whenever the JVM terminates
+                    normally with or without a throwable (= doesn't crash),
+                    this happens automatically.
+                    However, in a long running application you may want to do
+                    this manually in order to allow <i>third parties</i> to
+                    access the archive file.
+                    The term <i>third party</i> in this context includes any
+                    other process in the operating system, the plain
+                    <code>File*</code> API and even a <code>TFile</code> object
+                    which uses <code>TArchiveDetector.NULL</code>.
+                </p>
+                <p>
+                    Committing any unsynchronized changes to all archive files
+                    is easy - just call...
+                </p>
+                <source>TVFS.umount();</source>
+                <p>
+                    Please have a look at the method's
+                    <a href="apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()">Javadoc</a>
+                    for more options.
+                </p>
+            </answer>
+        </faq>
+        <faq id="http">
+            <question>
+                How can I access an archive file via HTTP(S)?
+            </question>
+            <answer>
+                <p>
+                    The TrueZIP File* API can only access the platform file
+                    system because the <code>TFile</code> class extends the
+                    <code>File</code> class.
+                    To access an archive file via HTTP(S) or any other procotol
+                    scheme, you have two options:
+                </p>
+                <ul>
+                <li>If your application uses a JSE&#160;7 compliant JVM,
+                    you can simply use the API of the
+                    <a href="truezip-path/index.html">TrueZIP Path</a>
+                    module.</li>
+                <li>Otherwise, you can use the API of the
+                    <a href="truezip-kernel/index.html">TrueZIP Kernel</a>
+                    module.
+                </li>
+                </ul>
+            </answer>
+        </faq>
+        <faq id="accessAbsoluteEntryName">
+            <question>
+                How can I access entries with absolute entry names in archive
+                files?
+            </question>
+            <answer>
+                <p>
+                    You can't because there is no addressing scheme for this.
+                    For example, the expression
+                    <code>new TFile("archive.zip/entry")</code> gets decomposed
+                    into the file system path <code>archive.zip</code> as the
+                    mount point of the archive file and the relative entry name
+                    <code>entry</code> as the entry name within this archive
+                    file.
+                    There's no expression to address the absolute entry name
+                    <code>/entry</code> within the archive file instead.
+                    Even if you tried
+                    <code>new TFile("archive.zip//entry")</code>, it would
+                    just get normalized to the previous expression.
+                </p>
+                <p>
+                    See also <a href="#absoluteEntryName">here</a>.
+                </p>
+            </answer>
+        </faq>
+    </part>
+    <part id="path">
+        <title>TrueZIP Path API</title>
+        <faq id="interoperability">
+            <question>
+                Can I use the APIs of the modules TrueZIP Path and
+                TrueZIP File* concurrently?
+            </question>
+            <answer>
+                <p>
+                    Absolutely yes, because both module APIs are just facades
+                    for the TrueZIP Kernel.
+                    The NIO.2 API defines some methods for the interoperability
+                    of <code>File</code> and <code>Path</code> objects:
+                </p>
+                <ul>
+                    <li>
+                        <code>Path.toFile()</code> returns a <code>File</code>
+                        object for this <code>Path</code>.
+                        However, according to the interface contract for this
+                        method, it's supposed to work with the default file
+                        system provider only (e.g. if it's a
+                        <code>WindowsPath</code>).
+                    </li>
+                    <li>
+                        <code>File.toPath()</code> returns a <code>Path</code>
+                        object for this <code>File</code>.
+                        However, according to the interface contract for this
+                        method, the returned object is associated with the
+                        default file system provider (e.g. it's a
+                        <code>WindowsPath</code>).
+                        Furthermore, this method puts a compile time dependency
+                        on the NIO.2 API.
+                    </li>
+                </ul>
+                <p>
+                    To solve these issues, in TrueZIP this is implemented as
+                    follows:
+                </p>
+                <ul>
+                    <li>
+                        <code>TPath.toFile()</code> returns a <code>TFile</code>
+                        object for this <code>TPath</code>.
+                        This works for any (virtual) file system.
+                    </li>
+                    <li>
+                        To avoid a compile time dependency in the TrueZIP File*
+                        module on the TrueZIP Path module,
+                        <code>TFile.toPath()</code> throws an
+                        <code>UnsupportedOperationException</code>.
+                        To create a <code>TPath</code> from a
+                        <code>File</code> object, call
+                        <code>new TPath(File)</code> instead.
+                        Note that this works for plain <code>File</code>
+                        objects too, not just <code>TFile</code> objects.
+                    </li>
+                </ul>
+             </answer>
+        </faq>
+        <faq id="whichCopy">
+            <question>
+                The NIO.2 API and the TrueZIP File* API both provide a copy
+                method. Which one should I use?
+            </question>
+            <answer>
+                <p>
+                    Currently, the NIO.2 API supports only the copying of a
+                    single file: <code>Files.copy(Path, Path, CopyOption)</code>.
+                    Unfortunately, these methods use a simple
+                    read-then-write-in-a-loop implementation which results in
+                    bad performance.
+                    Furthermore, there are no methods for recursive copying of
+                    directory trees, so you'ld have to write this yourselve.
+                </p>
+                <p>
+                    With TrueZIP however, you can easily &quot;back out&quot;
+                    from a <code>TPath</code> object to a <code>TFile</code>
+                    object to use the advanced copy methods of the TrueZIP
+                    File* API.
+                    So instead of calling...
+                </p>
+<source>
+Path src = ...
+Path dst = ...
+Files.copy(src, dst, REPLACE_EXISTING);
+</source>
+                <p>
+                    You could call...
+                </p>
+<source>
+Path src = ...
+Path dst = ...
+TFile.cp(src.toFile(), dst.toFile());
+</source>
+                <p>
+                    in order to benefit from its superior performance.
+                    Likewise, you could call any other
+                    <code>TFile.cp*(*)</code> method, e.g.
+                    <code>TFile.cp_r(File src, File dst, TArchiveDetector detector)</code>
+                    for recursive copying of a directory tree.
+                </p>
+            </answer>
+        </faq>
+        <faq id="installDriverPath">
+            <question>
+                How to install a (custom) file system driver?
+            </question>
+            <answer>
+                <p>
+                    In exactly the same way as with the module
+                    TrueZIP&nbsp;File*,
+                    see <a href="#installDriverFile">here</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="ignoreArchivePath">
+            <question>
+                The API should <em>not</em> detect an individual archive file
+                as a virtual directory.
+                How can I do this?
+            </question>
+            <answer>
+                <p>
+                    Every now and then you might want to treat an archive file
+                    like a regular file rather than a virtual directory.
+                    For example, when trying to obtain the length of the
+                    archive file in bytes.
+                    You would normally do this by calling the method
+                    <code>Files.size(Path)</code>.
+                    However, if the <code>Path</code> object is an instance of
+                    the <code>TPath</code> class and the path has been detected
+                    to name a valid archive file, then this method would always
+                    return zero.
+                    This is because you might have changed the archive file and
+                    then it would be impossible to return a precise result
+                    until the changes have been committed to the target archive
+                    file.
+                </p>
+                <p>
+                    You can easily solve this issue by committing any pending
+                    changes and then calling <code>Files.size(Path)</code> with
+                    a new <code>TPath</code> object which has been instructed to
+                    ignore an archive file name suffix in the last path element.
+                    This could look as follows:
+                </p>
+<source>
+TPath inner = new TPath("outer.zip/inner.zip");
+TPath path = inner.toNonArchivePath(); // convert - since TrueZIP 7.5
+... // there may be some I/O here
+inner.getFileSystem().close(); // unmount potential archive file
+// Now you can safely do any I/O to $path.
+long size = Files.size(path);
+</source>
+                <p>
+                    Note that the path <code>outer.zip/inner.zip</code> refers
+                    to a nested archive file, so using the <code>TPath</code>
+                    class is required to access it.
+                </p>
+                <p>
+                    Last but not least, using the object <code>path</code>
+                    for any I/O bypasses any state associated with the path
+                    <code>outer.zip/inner.zip</code> in the TrueZIP Kernel.
+                    This could result in an inconsistent state of the federated
+                    file system space and may even incur <em>loss of data</em>!
+                    In order to avoid this, it's a good idea <em>not</em> to
+                    access the object <code>inner</code> again until you are
+                    done with the object <code>path</code>.
+                </p>
+            </answer>
+        </faq>
+    </part>
+    <part id="general">
+        <title>General Questions</title>
+        <faq id="whereAreNews">
+            <question>Where are the latest news and announcements?</question>
+            <answer>
+                <p>
+                    Starting from version 7.0, the TrueZIP project has it's
+                    own blog for announcements, release notes, feature show
+                    cases and more named
+                    <a href="http://truezip.schlichtherle.de">The TrueZIP Blog</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="no-maven">
+            <question>Do I have to use Maven to use TrueZIP?</question>
+            <answer>
+                <p>
+                    Absolutely not!
+                    To learn about your options, please read the article
+                    <a href="kick-start/no-maven.html">Using TrueZIP Without Maven</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="whereIsJavadoc">
+            <question>Where is the Javadoc?</question>
+            <answer>
+                <p>
+                    You can find the Javadoc for the entire TrueZIP API
+                    including all modules in the navigation bar by clicking
+                    <i>Project Reports</i> -> <i>Project Reports</i> ->
+                    <i>JavaDocs</i>, or you could simply click
+                    <a href="apidocs/index.html">here</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="binaryCompatibility">
+            <question>
+                How does TrueZIP deal with binary compatibility?
+            </question>
+            <answer>
+                <p>
+                    TrueZIP uses the same version numbering scheme like Maven,
+                    i.e.
+                    <code>&lt;major&gt;.&lt;minor&gt;.&lt;incremental&gt;-&lt;qualifier&gt;</code>.
+                    Within the same major version number, binary compatibility
+                    should be retained so that recompilation of a client
+                    application should not be necessary.
+                </p>
+                <p>
+                    However, there is one exception:
+                    Binary compatibility may be broken in a subsquent release
+                    if all of the following conditions apply:
+                </p>
+                <ol>
+                <li>A feature's design is broken.</li>
+                <li>The feature is assumed to be rarely used by client
+                    applications or the implications of not changing it are
+                    considered to be unacceptable.</li>
+                <li>This issue is documented as a ticket in the project's
+                    <a href="http://java.net/jira/browse/TRUEZIP">Issue Tracking System</a>
+                    (ITS) with the tag <code>binary-compatibility</code>.</li>
+                <li>A workaround is explained in the ITS ticket.</li>
+                <li>The ITS ticket is referenced in the Release Notes.</li>
+                </ol>
+                <p>
+                    In case your client application is affected by a change and
+                    the documented workaround is unacceptable for any reason,
+                    please address this using the ITS at
+                    <a href="http://java.net/jira/browse/TRUEZIP">http://java.net/jira/browse/TRUEZIP</a>.
+                </p>
+            </answer>
+        </faq>
+        <faq id="nestedArchives">
+            <question>
+                How does TrueZIP deal with the compression of nested archive
+                files like e.g. <code>app.war/WEB-INF/lib/lib.jar</code>?
+            </question>
+            <answer>
+                <p>
+                    With the advent of release 7.1, TrueZIP implements a new
+                    strategy to avoid compressing already compressed archive
+                    files in an enclosing archive file again.
+                    In contrast, the old stragegy of TrueZIP 7.0 and earlier
+                    was to compress everything - even if it was already
+                    compressed.
+                </p>
+                <p>
+                    The new strategy results in a better overall compression
+                    ratio than the old strategy because compressing already
+                    compressed data again just inflates the data a bit because
+                    of some algorithm specific overhead.
+                </p>
+                <p>
+                    For the example in the question, the new strategy uses the
+                    DEFLATE method to compress the entries of the inner archive
+                    file <code>lib.jar</code> while it uses the STORE method
+                    for the corresponding entry <code>WEB-INF/lib/lib.jar</code>
+                    within the outer archive file <code>app.war</code>.
+                    This behavior is in conformance to the JEE specs.
+                </p>
+                <p>
+                    The new strategy is implemented by the archive drivers, so
+                    it works best with all supported archive types.
+                    For example, when storing a TAR file within a ZIP file,
+                    the ZIP entry for the TAR file would use the DEFLATE
+                    method because the TAR driver knows that plain TAR
+                    files are not compressed.
+                    In contrast, when storing a TAR.GZ file within a ZIP file,
+                    the ZIP entry for the TAR.GZ file would use the STORE
+                    method because the TAR.GZ driver knows that TAR.GZ
+                    files are already compressed.
+                </p>
+            </answer>
+        </faq>
+        <faq id="absoluteEntryName">
+            <question>
+                How does TrueZIP deal with entries with absolute entry names in
+                archive files?
+            </question>
+            <answer>
+                <p>
+                    As answered <a href="#accessAbsoluteEntryName">here</a>,
+                    you cannot access entries with absolute entry names in
+                    archive files.
+                    This implies that you cannot create archive files which
+                    contain entries with absolute entry names.
+                </p>
+                <p>
+                    However, you can use TrueZIP to read, modify or delete
+                    archive files which contain entries with absolute entry
+                    names:
+                    If you use TrueZIP to modify an archive file which
+                    contains entries with absolute entry names, these entry 
+                    names are preserved.
+                    Likewise, an archive file can get deleted like any empty
+                    directory if it contains only entries with absolute entry
+                    names.
+                </p>
+            </answer>
+        </faq>
+        <faq id="normalizeEntryName">
+            <question>
+                How does TrueZIP deal with entries with dot <code>"."</code>
+                or dot-dot <code>".."</code> segments in archive files?
+            </question>
+            <answer>
+                <p>
+                    Wherever possible, redundant segments are removed by a
+                    normalization of the entry name
+                    before the corresponding archive entry is mounted into the
+                    file system.
+                    When updating the archive file however, the original
+                    archive entry name is preserved.
+                    If a dot-dot segment remains at the start of the entry name,
+                    the corresponding entry will not be accessible by the
+                    application, but preserved with its original entry name
+                    upon an update of its archive file.
+                </p>
+            </answer>
+        </faq>
+        <faq id="windowsSeparator">
+            <question>
+                How does TrueZIP deal with entries which use <code>"\"</code>
+                as the separator character in archive files?
+            </question>
+            <answer>
+                <p>
+                    Any occurence of this illegal separator character is
+                    replaced by the correct separator character <code>"/"</code>
+                    before the entry name is
+                    <a href="#normalizeEntryName">normalized</a> and the
+                    corresponding archive entry is mounted into the file system.
+                    When updating the archive file however, the original
+                    archive entry name is preserved.
+                </p>
+            </answer>
+        </faq>
+        <faq id="duplicateEntries">
+            <question>
+                How does TrueZIP deal with duplicate entries in archive files?
+            </question>
+            <answer>
+                <p>
+                    When mounting an archive file system, TrueZIP 7.1 and later
+                    use <i>covariant file system entries</i> in order to enable
+                    an application to access archive entries of different types
+                    (FILE, DIRECTORY, SYMLINK or SPECIAL) which share the same
+                    <a href="#normalizeEntryName">normalized</a> entry name.
+                </p>
+                <p>
+                    For example, the ZIP and TAR file formats use a trailing
+                    slash <code>'/'</code> character in entry names to indicate
+                    a directory entry.
+                    In case an archive file contains two entries which, after
+                    normalization of their name, differ only in a trailing
+                    slash character, then both archive entries are mounted into
+                    a covariant file system entry for the otherwise equal
+                    normalized entry name.
+                    Then, an application can read the contents of the file
+                    entry by using e.g.
+                    <a href="apidocs/de/schlichtherle/truezip/file/TFileInputStream.html"><code>TFileInputStream</code></a>
+                    and list the members of the directory entry by using
+                    <a href="apidocs/de/schlichtherle/truezip/file/TFile.html#listFiles()"><code>TFile.listFiles()</code></a>.
+                </p>
+                <p>
+                    Note that this feature solely exists to enable applications
+                    to read the contents of all archive files, even if they
+                    have a strange directory layout.
+                    Note again that a TrueZIP application cannot create a
+                    covariant archive entry because this is considered to be a
+                    bad practice.
+                </p>
+            </answer>
+        </faq>
+        <faq id="support">
+            <question>
+                I have another question or issue.
+                How do I get it responded and resolved?
+            </question>
+            <answer>
+                <p>
+                    For any bug report, improvement request, feature request,
+                    task request, help request etc. please
+                    <a href="mailto:users@truezip.java.net">post</a>
+                    it to the User Mailing List once you have
+                    <a href="mailto:sympa@truezip.java.net?subject=subscribe%20users">subscribed</a>
+                    to it.
+                    The User Mailing List is your direct connection to the
+                    community.
+                    My response time is usually less than a day - this goes
+                    without warranties!
+                </p>
+                <p>
+                    Once your question or issue has been approved as a bug
+                    report, improvement request, feature request or task
+                    request it gets tracked in
+                    <a href="http://java.net/jira/browse/TRUEZIP">JIRA</a>.
+                    You can then use JIRA to monitor and discuss its progress,
+                    vote for it, add file attachments to it etc.
+                    JIRA is now also used to schedule new TrueZIP versions and
+                    prepare their Release Notes.
+                </p>
+            </answer>
+        </faq>
+    </part>
+</faqs>
