@@ -45,19 +45,19 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
             assert params[0].length == 1;
 
             final FsManager manager = new FsDefaultManager(STRONG);
-            for (String param : params[1])
+            for (final String param : params[1])
                 manager.getController(  FsMountPoint.create(URI.create(param)),
                                         driver);
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();
-            for (String param : params[2])
+            for (final String param : params[2])
                 set.add(FsMountPoint.create(URI.create(param)));
 
             final FsManager filter = new FsFilteringManager(
                     manager, FsMountPoint.create(URI.create(params[0][0])));
             assertThat(filter.getSize(), is(params[2].length));
-            for (FsController<?> controller : filter)
+            for (final FsController<?> controller : filter)
                 assertTrue(set.contains(controller.getModel().getMountPoint()));
         }
     }
