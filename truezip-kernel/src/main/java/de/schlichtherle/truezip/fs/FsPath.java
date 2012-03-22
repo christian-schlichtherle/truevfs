@@ -432,7 +432,8 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     /**
      * Returns a URI which is recursively transformed from the URI of this
      * path so that it's absolute and hierarchical.
-     * If this path is already in hierarchical form, its URI is returned.
+     * If this path is already in absolute and hierarchical form, its URI gets
+     * returned.
      * <p>
      * For example, the path URIs {@code zip:file:/archive!/entry} and
      * {@code tar:file:/archive!/entry} would both produce the hierarchical URI

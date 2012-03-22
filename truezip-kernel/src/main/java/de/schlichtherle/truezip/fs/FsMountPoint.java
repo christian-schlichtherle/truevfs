@@ -426,7 +426,8 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Returns a URI which is recursively transformed from the URI of this
      * mount point so that it's absolute and hierarchical.
-     * If this mount point is already in hierarchical form, its URI is returned.
+     * If this mount point is already in absolute and hierarchical form, its
+     * URI gets returned.
      * <p>
      * For example, the mount point URIs {@code zip:file:/archive!/} and
      * {@code tar:file:/archive!/} would both produce the hierarchical URI
