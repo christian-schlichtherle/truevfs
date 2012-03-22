@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.fs.archive.zip.sample;
 
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsModel;
@@ -41,7 +41,7 @@ public final class KeyManagement {
 
     static void install(TArchiveDetector detector) {
 // START SNIPPET: install
-        TFile.setDefaultArchiveDetector(detector);
+        TConfig.get().setArchiveDetector(detector);
 // END SNIPPET: install
     }
 

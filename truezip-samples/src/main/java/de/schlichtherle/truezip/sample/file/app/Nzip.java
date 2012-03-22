@@ -143,10 +143,10 @@ public class Nzip extends Application {
         final String cmd = args[0].toLowerCase(Locale.ENGLISH);
         args = lshift(args);
 
-        final TArchiveDetector oldDetector = TFile.getDefaultArchiveDetector();
+        final TArchiveDetector oldDetector = TConfig.get().getArchiveDetector();
         try {
             // Install custom archive detector.
-            TFile.setDefaultArchiveDetector(newArchiveDetector());
+            TConfig.get().setArchiveDetector(newArchiveDetector());
 
             if ("ls".equals(cmd)) {
                 ls(args, false, false);
@@ -186,7 +186,7 @@ public class Nzip extends Application {
                 throw new IllegalUsageException();
             }
         } finally {
-            TFile.setDefaultArchiveDetector(oldDetector);
+            TConfig.get().setArchiveDetector(oldDetector);
         }
 
         return 0;
@@ -363,7 +363,7 @@ public class Nzip extends Application {
         else if (utf8in)
             srcDetector = newArchiveDetector(Charset.forName("UTF-8"));
         else
-            srcDetector = TFile.getDefaultArchiveDetector();
+            srcDetector = TConfig.get().getArchiveDetector();
 
         final TArchiveDetector dstDetector;
         if (unzip)
@@ -373,7 +373,7 @@ public class Nzip extends Application {
         else if (utf8out)
             dstDetector = newArchiveDetector(Charset.forName("UTF-8"));
         else
-            dstDetector = TFile.getDefaultArchiveDetector();
+            dstDetector = TConfig.get().getArchiveDetector();
 
         final int dstI = args.length - 1;
         final TFile dst = new TFile(args[dstI], dstDetector);

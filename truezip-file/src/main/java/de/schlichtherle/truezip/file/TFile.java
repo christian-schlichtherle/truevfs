@@ -414,7 +414,7 @@ public final class TFile extends File {
      *        This parameter is ignored if and only if {@code file} is an
      *        instance of this class.
      *        Otherwise, if this parameter is {@code null}, then the
-     *        {@linkplain #getDefaultArchiveDetector() default archive detector}
+     *        {@linkplain TConfig#getArchiveDetector default archive detector}
      *        is used instead.
      */
     public TFile(   final File file,
@@ -431,7 +431,7 @@ public final class TFile extends File {
             this.controller = tfile.controller;
         } else {
             this.delegate = file;
-            this.detector = null != detector ? detector : getDefaultArchiveDetector();
+            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
             scan(null);
         }
 
@@ -442,7 +442,7 @@ public final class TFile extends File {
      * Equivalent to {@link #TFile(String, TArchiveDetector)
      * new TFile(path, (TArchiveDetector) null)}.
      * <p>
-     * The {@link #getDefaultArchiveDetector() default archive detector}
+     * The {@linkplain TConfig#getArchiveDetector default archive detector}
      * is used to scan the path name for prospective archive files.
      * 
      * @param path the path name.
@@ -460,7 +460,7 @@ public final class TFile extends File {
      * @param detector the archive detector to use for scanning the path name
      *        for prospective archive files.
      *        If this parameter is {@code null}, then the
-     *        {@linkplain #getDefaultArchiveDetector() default archive detector}
+     *        {@linkplain TConfig#getArchiveDetector default archive detector}
      *        is used instead.
      */
     public TFile(   final String path,
@@ -468,7 +468,7 @@ public final class TFile extends File {
         super(path);
 
         this.delegate = new File(path);
-        this.detector = null != detector ? detector : getDefaultArchiveDetector();
+        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         scan(null);
 
         assert invariants();
@@ -478,7 +478,7 @@ public final class TFile extends File {
      * Equivalent to {@link #TFile(String, String, TArchiveDetector)
      * new TFile(parent, child, null)}.
      * <p>
-     * The {@link #getDefaultArchiveDetector() default archive detector}
+     * The {@linkplain TConfig#getArchiveDetector default archive detector}
      * is used to scan the <em>entire path name</em> for prospective archive
      * files.
      *
@@ -499,7 +499,7 @@ public final class TFile extends File {
      * @param detector the archive detector to use for scanning the path name
      *        for prospective archive files.
      *        If this parameter is {@code null}, then the
-     *        {@linkplain #getDefaultArchiveDetector() default archive detector}
+     *        {@linkplain TConfig#getArchiveDetector default archive detector}
      *        is used instead.
      */
     public TFile(   final @CheckForNull String parent,
@@ -508,7 +508,7 @@ public final class TFile extends File {
         super(parent, member);
 
         this.delegate = new File(parent, member);
-        this.detector = null != detector ? detector : getDefaultArchiveDetector();
+        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         scan(null);
 
         assert invariants();
@@ -523,7 +523,7 @@ public final class TFile extends File {
      *        detector is used to scan only the <em>member path name</em>
      *        for prospective archive files.
      *        Otherwise, the
-     *        {@linkplain #getDefaultArchiveDetector() default archive detector}
+     *        {@linkplain TConfig#getArchiveDetector default archive detector}
      *        is used to to scan the <em>entire path name</em>
      *        for prospective archive files.
      * @param member the member path name.
@@ -547,7 +547,7 @@ public final class TFile extends File {
      * then {@code detector} is used to scan the <em>entire path name</em>
      * for prospective archive files.
      * If {@code detector} is {@code null}, then the
-     * {@linkplain #getDefaultArchiveDetector() default archive detector}
+     * {@linkplain TConfig#getArchiveDetector default archive detector}
      * is used instead.
      * 
      * @param parent the parent directory.
@@ -555,7 +555,7 @@ public final class TFile extends File {
      * @param detector the archive detector to use for scanning the path name
      *        for prospective archive files.
      *        If this parameter is {@code null}, then the
-     *        {@linkplain #getDefaultArchiveDetector() default archive detector}
+     *        {@linkplain TConfig#getArchiveDetector default archive detector}
      *        is used instead.
      */
     public TFile(   final @CheckForNull File parent,
@@ -569,7 +569,7 @@ public final class TFile extends File {
             this.detector = null != detector ? detector : p.detector;
             scan(p);
         } else {
-            this.detector = null != detector ? detector : getDefaultArchiveDetector();
+            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
             scan(null);
         }
 
@@ -583,7 +583,7 @@ public final class TFile extends File {
      *
      * @param  uri an absolute URI which has a scheme component which is
      *         known by the
-     *         {@link #getDefaultArchiveDetector() default archive detector}.
+     *         {@linkplain TConfig#getArchiveDetector default archive detector}.
      * @throws IllegalArgumentException if the given URI does not conform to
      *         the syntax constraints for {@link FsPath}s or
      *         {@link File#File(URI)}.
@@ -602,7 +602,7 @@ public final class TFile extends File {
      * @param  path a path with an absolute
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
      *         scheme component which is known by the
-     *         {@link #getDefaultArchiveDetector() default archive detector}.
+     *         {@linkplain TConfig#getArchiveDetector default archive detector}.
      * @throws IllegalArgumentException if the
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} of the given
      *         path does not conform to the syntax constraints for
@@ -636,7 +636,7 @@ public final class TFile extends File {
      * @param  detector the archive detector to look up archive file system
      *         drivers for the named URI scheme components.
      *         If this parameter is {@code null}, then the
-     *         {@linkplain #getDefaultArchiveDetector() default archive detector}
+     *         {@linkplain TConfig#getArchiveDetector default archive detector}.
      *         is used instead.
      * @throws IllegalArgumentException if the
      *         {@link FsPath#toHierarchicalUri() hierarchical URI} of the given
@@ -648,7 +648,7 @@ public final class TFile extends File {
     public TFile(   final FsPath path,
                     final @CheckForNull TArchiveDetector detector) {
         super(path.toHierarchicalUri());
-        parse(path, null != detector ? detector : getDefaultArchiveDetector());
+        parse(path, null != detector ? detector : TConfig.get().getArchiveDetector());
     }
 
     private void parse( final FsPath path,
@@ -883,7 +883,7 @@ public final class TFile extends File {
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
         parse(  FsPath.create((URI) in.readObject(), CANONICALIZE),
-                getDefaultArchiveDetector());
+                TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -927,6 +927,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void sync(BitField<FsSyncOption> options)
@@ -936,6 +937,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(TFile, BitField)}.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void sync(TFile archive, BitField<FsSyncOption> options)
@@ -949,6 +951,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount()}.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void umount()
@@ -958,6 +961,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void umount(boolean forceCloseInputAndOutput)
@@ -969,6 +973,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void umount(
@@ -984,6 +989,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount(TFile)}.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void umount(TFile archive)
@@ -999,6 +1005,7 @@ public final class TFile extends File {
      *                  .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
      *                  .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
      * }.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void umount(TFile archive, boolean forceCloseInputAndOutput)
@@ -1019,6 +1026,7 @@ public final class TFile extends File {
      *                  .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
      *                  .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
      * }.
+     * @see http://java.net/jira/browse/TRUEZIP-236
      */
     @Deprecated
     public static void umount(TFile archive,
@@ -1034,41 +1042,41 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to
+     * @deprecated Calling this method is equivalent to
      * {@link TConfig#isLenient TConfig.get().isLenient()}.
-     * 
-     * @see #setLenient(boolean)
+     * @see http://java.net/jira/browse/TRUEZIP-238
      */
+    @Deprecated
     public static boolean isLenient() {
         return TConfig.get().isLenient();
     }
 
     /**
-     * Equivalent to
+     * @deprecated Calling this method is equivalent to
      * {@link TConfig#setLenient TConfig.get().setLenient(lenient)}.
-     * 
-     * @see #isLenient()
+     * @see http://java.net/jira/browse/TRUEZIP-238
      */
+    @Deprecated
     public static void setLenient(boolean lenient) {
         TConfig.get().setLenient(lenient);
     }
 
     /**
-     * Equivalent to
+     * @deprecated Calling this method is equivalent to
      * {@link TConfig#getArchiveDetector TConfig.get().getArchiveDetector()}.
-     * 
-     * @see #setDefaultArchiveDetector(TArchiveDetector)
+     * @see http://java.net/jira/browse/TRUEZIP-238
      */
+    @Deprecated
     public static TArchiveDetector getDefaultArchiveDetector() {
         return TConfig.get().getArchiveDetector();
     }
 
     /**
-     * Equivalent to
+     * @deprecated Calling this method is equivalent to
      * {@link TConfig#setArchiveDetector TConfig.get().setArchiveDetector(detector)}.
-     * 
-     * @see #getDefaultArchiveDetector()
+     * @see http://java.net/jira/browse/TRUEZIP-238
      */
+    @Deprecated
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
         TConfig.get().setArchiveDetector(detector);
     }
@@ -1635,8 +1643,9 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().toHierarchicalUri().equals(new TFile("FILE").toFsPath().toHierarchicalUri())}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
-     * @see #hashCode()
-     * @see #compareTo(File)
+     * @param that the object to get compared with this object
+     * @see   #hashCode()
+     * @see   #compareTo(File)
      */
     @Override
     @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
@@ -1657,9 +1666,9 @@ public final class TFile extends File {
      * {@code "file:/archive/entry"}.
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
-     * Then if the expression
+     * Now if the expression
      * {@code a.toFsPath().toHierarchicalUri().compareTo(b.toFsPath().toHierarchicalUri()) == 0}
-     * is true, the expression {@code a.compareTo(b) == 0} is also true.
+     * is true, then the expression {@code a.compareTo(b) == 0} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
@@ -1667,11 +1676,12 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().toHierarchicalUri().compareTo(new TFile("FILE").toFsPath().toHierarchicalUri()) == 0}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
+     * @param that the file object to get compared with this object
      * @see   #equals(Object)
      */
     @Override
-    public int compareTo(File other) {
-        return delegate.compareTo(other);
+    public int compareTo(File that) {
+        return delegate.compareTo(that);
     }
 
     @Override
@@ -2424,8 +2434,8 @@ public final class TFile extends File {
      * creating their entries.
      * Example:
      * {@code new TFileOutputStream("archive.zip/README");}
-     * This assumes the default configuration where {@link #isLenient} returns
-     * {@code true}.
+     * This assumes the default configuration where
+     * {@link TConfig#isLenient TConfig.get().isLenient()} is true.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */

@@ -48,7 +48,7 @@ public abstract class TApplication<E extends Exception> {
      * (i.e. archive files) get committed to their respective parent file
      * system, even if {@link #work} throws an exception.
      * 
-     * @throws Exception At the discretion of the {@link #work} method.
+     * @throws E At the discretion of the {@link #work} method.
      * @throws FsSyncException At the discretion of the {@link #sync} method.
      */
     protected final int run(String[] args) throws E, FsSyncException {
@@ -94,14 +94,13 @@ public abstract class TApplication<E extends Exception> {
      * As the most simple use case, a client application might want to filter
      * the initial setup for the archive file suffixes it wants to detect.
      * This is done as follows:
-     * <pre><code>
-     * TFile.setDefaultArchiveDetector(
-     *         new TArchiveDetector("ear|jar|war"));
-     * </code></pre>
+     * <pre>{@code
+     * TConfig.get().setArchiveDetector(new TArchiveDetector("ear|jar|war"));
+     * }</pre>
      * <p>
      * This will filter all file system drivers found on the class path in the
-     * initial setup so that only files with the pattern <code>*.ear</code>,
-     * <code>*.jar</code> or <code>*.war</code> (case ignoring) are detected
+     * initial setup so that only files with the pattern {@code *.ear},
+     * {@code *.jar} or {@code *.war} (case ignoring) are detected
      * as prospective archive files.
      * If no file system driver is present for a named suffix in the initial
      * setup, an {@link IllegalArgumentException} is thrown.
@@ -132,8 +131,8 @@ public abstract class TApplication<E extends Exception> {
      * This requires the JARs for the archive driver modules
      * {@code truezip-driver-tar} and {@code truezip-driver-zip} to be present
      * on the class path at compile time:
-     * <pre><code>
-     * TFile.setDefaultArchiveDetector(
+     * <pre>{@code
+     * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             TArchiveDetector.NULL,
      *             new Object[][] {
@@ -142,23 +141,23 @@ public abstract class TApplication<E extends Exception> {
      *                 { "tbz|tb2|tar.bz2", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
      *                 { "zip", new ZipDriver(IOPoolLocator.SINGLETON)},
      *             }));
-     * </code></pre>
+     * }</pre>
      * <p>
      * Another typical use case is to recognize only Java artifacts.
-     * <pre><code>
-     * TFile.setDefaultArchiveDetector(
+     * <pre>{@code
+     * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "ear|jar|war",
      *             new JarDriver(IOPoolLocator.SINGLETON)));
-     * </code></pre>
+     * }</pre>
      * <p>
      * ... or an application file format.
-     * <pre><code>
-     * TFile.setDefaultArchiveDetector(
+     * <pre>{@code
+     * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "foo",
      *             new JarDriver(IOPoolLocator.SINGLETON)));
-     * </code></pre>
+     * }</pre>
      * <p>
      * ... or an encrypted application file format.
      * This driver authenticates input archive files up to 512 KB using the
@@ -169,14 +168,14 @@ public abstract class TApplication<E extends Exception> {
      * However, it should not be feasible to make an undetectable modification.
      * The driver also uses unencrypted temporary files for archive entries
      * whenever required.
-     * <pre><code>
-     * TFile.setDefaultArchiveDetector(
+     * <pre>{@code
+     * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "bar",
      *             new SafeZipRaesDriver(
      *                 IOPoolLocator.SINGLETON,
      *                 KeyManagerLocator.SINGLETON)));
-     * </code></pre>
+     * }</pre>
      * <p>
      * If you're a bit paranoid, then you could use the following driver
      * instead:
@@ -185,14 +184,14 @@ public abstract class TApplication<E extends Exception> {
      * makes it comparably slow.
      * The driver also uses unencrypted temporary files for archive entries
      * whenever required.
-     * <pre><code>
-     * TFile.setDefaultArchiveDetector(
+     * <pre>{@code
+     * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "bar",
      *             new ParanoidZipRaesDriver(
      *                 IOPoolLocator.SINGLETON,
      *                 KeyManagerLocator.SINGLETON)));
-     * </code></pre>
+     * }</pre>
      * <p>
      * And finally, if you're quite paranoid, then this driver is for you:
      * This driver authenticates every input archive file using the Message
@@ -203,22 +202,22 @@ public abstract class TApplication<E extends Exception> {
      * If you were completely paranoid, you would even want to use encrypted
      * byte arrays or wipe them with nulls after use.
      * However, then you would have to write this yourself! ;-)
-     * <pre><code>
-     * TFile.setDefaultArchiveDetector(
+     * <pre>{@code
+     * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "bar",
      *             new ParanoidZipRaesDriver(
      *                 new ByteArrayIOPoolService(2048),
      *                 KeyManagerLocator.SINGLETON)));
-     * </code></pre>
+     * }</pre>
      * <p>
      * Last but not least, the following class property controls whether
      * archive files and their member directories get automatically created
      * whenever required.
      * The default value of this class property is {@code true}!
-     * <pre><code>
-     * TFile.setLenient(false);
-     * </code></pre>
+     * <pre>{@code
+     * TConfig.get().setLenient(false);
+     * }</pre>
      */
     protected void setup() {
     }
@@ -256,7 +255,7 @@ public abstract class TApplication<E extends Exception> {
      * application.
      * <p>
      * The implementation in the class {@link TApplication} simply calls
-     * {@link TVFS#umount()}.
+     * {@link TVFS#umount() TVFS.umount()}.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         occur.
