@@ -8,9 +8,9 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
