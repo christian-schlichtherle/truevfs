@@ -14,29 +14,25 @@
         <googleCustomSearchId>003580521944097984334:0t01zxsxy6y</googleCustomSearchId>
         <paypalButton>
             <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-                <div style="margin: 5px">
+                <div class="paypalButton">
                     <input type="hidden" name="cmd" value="_s-xclick"/>
                     <input type="hidden" name="hosted_button_id" value="2QSQY9ECYES9E"/>
                     <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" style="border: 0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
                 </div>
             </form>
         </paypalButton>
+        <sourceLineNumbersEnabled>false</sourceLineNumbersEnabled>
     </custom>
     <publishDate position="bottom"/>
     <skin>
         <groupId>${project.groupId}</groupId>
         <artifactId>truezip-skin</artifactId>
         <version>6</version>
-    </skin>
+     </skin>
     <body>
         <head>
             <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed" href="http://truezip.schlichtherle.de/category/announcements/feed/"/>
         </head>
-        <links>
-            <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
-            <item name="Change Log" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
-            <item name="Developer Website" href="http://java.net/projects/truezip"/>
-        </links>
         <breadcrumbs>
             <item name="TrueZIP" href="index.html"/>
         </breadcrumbs>
@@ -106,6 +102,11 @@
                     <item name="6.0" href="6/relnotes/release-6_0.html"/>
                 </item>
             </item>
+        </menu>
+        <menu name="External Resources">
+            <item name="Change Log" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
+            <item name="Developer Site" href="http://java.net/projects/truezip"/>
+            <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
         </menu>
         <menu name="Reports" ref="reports" inherit="bottom"/>
         <menu name="Sub-Modules" ref="modules" inherit="bottom"/>
