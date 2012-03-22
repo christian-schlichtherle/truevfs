@@ -1443,9 +1443,7 @@ public final class TFile extends File {
      * archive file, or {@code null} otherwise.
      * <p>
      * TODO: Consider making this public in order to enable applications to
-     * get access to archive entry properties like this:
-     * <pre><code>
-     * </code></pre>
+     * get access to archive entry properties.
      * 
      * @return A file system controller if and only if the path denotes an
      *         archive file, or {@code null} otherwise.
