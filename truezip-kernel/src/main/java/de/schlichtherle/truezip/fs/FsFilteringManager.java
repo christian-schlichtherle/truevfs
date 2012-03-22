@@ -64,6 +64,7 @@ extends FsDecoratingManager<FsManager> {
 
         @Override
         protected boolean accept(final FsController<?> controller) {
+            assert null != controller : "null elements are not allowed in this collection!";
             final URI mp = controller.getModel().getMountPoint().toHierarchicalUri();
             final String mpp;
             return mp.getScheme().equals(ps)
