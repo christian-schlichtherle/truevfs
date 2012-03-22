@@ -104,6 +104,7 @@
             </item>
         </menu>
         <menu name="External Resources">
+            <item name="Road Map" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:roadmap-panel"/>
             <item name="Change Log" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
             <item name="Developer Site" href="http://java.net/projects/truezip"/>
             <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
