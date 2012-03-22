@@ -9,7 +9,7 @@
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
         <artifactId>truezip</artifactId>
-        <version>7.5</version>
+        <version>8-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-extension</artifactId>
