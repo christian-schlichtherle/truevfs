@@ -43,8 +43,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * A {@link Path} implementation
- * based on the TrueZIP Kernel module.
+ * A {@link Path} implementation based on the TrueZIP Kernel module.
  * Applications should directly instantiate this class to overcome the
  * <a href="package-summary.html#fspsl">restrictions</a> of the file system
  * provider service location in the NIO.2 API for JSE&nbsp;7.
@@ -64,7 +63,7 @@ import javax.annotation.concurrent.Immutable;
  * <p>
  * Unless otherwise noted, when an instance of this class is created, the
  * resulting path name gets scanned for prospective archive files using the
- * {@link #getDefaultArchiveDetector() default archive detector}.
+ * {@linkplain TConfig#getArchiveDetector default archive detector}.
  * To change this, wrap the object creation in a code block which
  * {@link TConfig#push() pushes} a temporary configuration on the inheritbale
  * thread local stack of configurations as follows:
@@ -123,7 +122,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@link TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * the {@linkplain TConfig#getArchiveDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -165,7 +164,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@link TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@link #getDefaultArchiveDetector() default archive detector}.
+     * the {@linkplain TConfig#getArchiveDetector default archive detector}.
      * 
      * @param fileSystem the file system to access.
      * @param first the first sub path string.
@@ -197,7 +196,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@link URI#getPath() path component} of
      * the URI to detect prospective archive files using the
-     * {@link #getDefaultArchiveDetector() default archive detector}.
+     * {@linkplain TConfig#getArchiveDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -249,7 +248,7 @@ public final class TPath implements Path {
      * <p>
      * Otherwise, this constructor scans the {@link File#getPath() path name}
      * of the file to detect prospective archive files using the
-     * {@link #getDefaultArchiveDetector() default archive detector}.
+     * {@linkplain TConfig#getArchiveDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -298,7 +297,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@link Path#toString() path name} of the
      * given path to detect prospective archive files using the
-     * {@link #getDefaultArchiveDetector() default archive detector}.
+     * {@linkplain TConfig#getArchiveDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>

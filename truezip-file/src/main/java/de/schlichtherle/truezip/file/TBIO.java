@@ -320,6 +320,6 @@ final class TBIO {
     private static TArchiveDetector getDetector(File file) {
         return file instanceof TFile
                 ? ((TFile) file).getArchiveDetector()
-                : TFile.getDefaultArchiveDetector();
+                : TConfig.get().getArchiveDetector();
     }
 }

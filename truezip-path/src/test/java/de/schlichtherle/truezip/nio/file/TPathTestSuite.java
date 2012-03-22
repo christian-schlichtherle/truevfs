@@ -4,7 +4,10 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.*;
+import de.schlichtherle.truezip.file.ConfiguredClientTestBase;
+import de.schlichtherle.truezip.file.TConfig;
+import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.file.TVFS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsResourceOpenException;
 import de.schlichtherle.truezip.fs.FsSyncException;
@@ -1306,7 +1309,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
             final boolean wait)
     throws Exception {
-        assertTrue(TConfig.get().isLenient());
+        assert TConfig.get().isLenient();
 
         class WriteFactory implements TaskFactory {
             @Override
@@ -1361,7 +1364,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
             final boolean syncIndividually)
     throws Exception {
-        assertTrue(TConfig.get().isLenient());
+        assert TConfig.get().isLenient();
 
         class Write implements Callable<Void> {
             @Override
@@ -1411,7 +1414,7 @@ extends ConfiguredClientTestBase<D> {
     /** Test for http://java.net/jira/browse/TRUEZIP-192 . */
     @Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
-        assertTrue(TConfig.get().isLenient());
+        assert TConfig.get().isLenient();
 
         class CopyFactory implements TaskFactory {
             final TPath src, dst;

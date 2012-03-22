@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.zip.raes.sample;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTestSuite;
 
 /**
@@ -16,7 +16,7 @@ public final class KeyManagementIT extends KeyManagementTestSuite {
     @Override
     protected TArchiveDetector newArchiveDetector1(String suffix, String password) {
         return KeyManagement.newArchiveDetector1(
-                TFile.getDefaultArchiveDetector(),
+                TConfig.get().getArchiveDetector(),
                 suffix,
                 password.toCharArray());
     }
@@ -24,7 +24,7 @@ public final class KeyManagementIT extends KeyManagementTestSuite {
     @Override
     protected TArchiveDetector newArchiveDetector2(String suffix, String password) {
         return KeyManagement.newArchiveDetector2(
-                TFile.getDefaultArchiveDetector(),
+                TConfig.get().getArchiveDetector(),
                 suffix,
                 password.toCharArray());
     }

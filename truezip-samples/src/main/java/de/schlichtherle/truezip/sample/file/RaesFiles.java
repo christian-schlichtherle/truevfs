@@ -8,10 +8,7 @@ import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
 import de.schlichtherle.truezip.crypto.raes.RaesParameters;
 import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
 import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileInputStream;
-import de.schlichtherle.truezip.file.TFileOutputStream;
+import de.schlichtherle.truezip.file.*;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -19,7 +16,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.annotation.WillClose;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
@@ -47,7 +43,7 @@ public class RaesFiles {
             final String plainFilePath,
             final String raesFilePath)
     throws IOException {
-        encrypt(plainFilePath, raesFilePath, TFile.getDefaultArchiveDetector());
+        encrypt(plainFilePath, raesFilePath, TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -92,7 +88,7 @@ public class RaesFiles {
             final boolean strongAuthentication)
     throws IOException {
         decrypt(raesFilePath, plainFilePath, strongAuthentication,
-                TFile.getDefaultArchiveDetector());
+                TConfig.get().getArchiveDetector());
     }
 
     /**
