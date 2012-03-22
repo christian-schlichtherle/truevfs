@@ -45,6 +45,7 @@ implements Iterable<FsController<?>> {
      *
      * @return The number of federated file systems managed by this instance.
      */
+    // TODO: Rename this to size().
     public abstract int getSize();
 
     /**
