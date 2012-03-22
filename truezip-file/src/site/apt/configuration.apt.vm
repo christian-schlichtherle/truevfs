@@ -120,10 +120,11 @@ TArchiveDetector ad = new TArchiveDetector(
     If you don't provide a <<<TArchiveDetector>>> parameter to a <<<TFile>>>
     constructor or constructing method, then the class property called
     <default archive detector> is used.
-    This class property is initially set to <<<TArchiveDetector.ALL>>>, which
-    is why the following simple code for the standard use case of extracting a
-    ZIP file to a directory works as expected if the JAR of the module TrueZIP
-    Driver ZIP is present on the class path:
+    This class property is initially set to
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}},
+    which is why the following simple code for the standard use case of
+    extracting a ZIP file to a directory works as expected if the JAR of the
+    module TrueZIP Driver ZIP is present on the class path:
 
 +--+
 // Use default archive detector, which is initially TArchiveDetector.ALL.
@@ -132,25 +133,30 @@ TFile dst = new TFile("directory");
 src.cp_rp(dst); // copy "archive.zip" as a virtual directory!
 +--+
 
-    To get or set the default archive detector, call the static methods
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#getDefaultArchiveDetector()}<<<TFile.getDefaultArchiveDetector()>>>}}
+    To get or set the default archive detector, call
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector}<<<TConfig.get().getArchiveDetector()>>>}}
     or
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#setDefaultArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TFile.setDefaultArchiveDetector(TArchiveDetector detector)>>>}}
-    respectively.
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(detector)>>>}}
+    respectively - see {{{The class TConfig}below}}.
+
     Mind that a change of the default archive detector affects only
     subsequently constructed <<<TFile>>> objects.
-    For comparison, in order to disable the archive detection and copy
-    <<<archive.zip>>> as a plain old file, you could call:
+    Consider the following example:
 
 +--+
 // MIND THAT THIS IS NOT THREAD-SAFE!!!
-TFile.setDefaultArchiveDetector(TArchiveDetector.NULL);
+TConfig.get().setArchiveDetector(TArchiveDetector.NULL);
 ...
-// Use default archive detector, which is TArchiveDetector.NULL.
+// Use default archive detector, which is now TArchiveDetector.NULL.
 TFile src = new TFile("archive.zip");
 TFile dst = new TFile("file");
 src.cp_rp(dst); // copy "archive.zip" as a plain old file!
 +--+
+
+    Here,
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#NULL}<<<TArchiveDetector.NULL>>>}}
+    is used to disable archive detection and copy <<<archive.zip>>> as a plain
+    old file.
 
     However, there is one problem with this code:
     Because the default archive detector is a class property, the code is not
@@ -199,7 +205,6 @@ try {
     // Change the default archive detector and use it subsequently.
     config.setArchiveDetector(TArchiveDetector.NULL);
     //TConfig.get().setArchiveDetector(TArchiveDetector.NULL); // equivalent
-    //TFile.setDefaultArchiveDetector(TArchiveDetector.NULL); // equivalent
     TFile src = new TFile("archive.zip");
     TFile dst = new TFile("file");
     src.cp_rp(dst); // copy "archive.zip" as a plain old file!
@@ -222,7 +227,6 @@ try (TConfig config = TConfig.push()) {
     // Change the default archive detector and use it subsequently.
     config.setArchiveDetector(TArchiveDetector.NULL);
     //TConfig.get().setArchiveDetector(TArchiveDetector.NULL); // equivalent
-    //TFile.setDefaultArchiveDetector(TArchiveDetector.NULL); // equivalent
     TFile src = new TFile("archive.zip");
     TFile dst = new TFile("file");
     src.cp_rp(dst); // copy "archive.zip" as a plain old file!
@@ -230,15 +234,16 @@ try (TConfig config = TConfig.push()) {
 +--+
 
     To understand why these examples are thread-safe, you first need to know
-    that <<<TFile.getDefaultArchiveDetector()>>>
-    queries the <current configuration> by forwarding the call to
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector()}<<<TConfig.get().getArchiveDetector()>>>}},
-    where
+    that a call to
     {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#get()}<<<TConfig.get()>>>}}
-    returns the current configuration.
-    Similarly, <<<TFile.setDefaultArchiveDetector(TArchiveDetector detector)>>>
-    updates the current configuration by forwarding the call to
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(TArchiveDetector detector)>>>}}.
+    returns the <current configuration>, which may be global or inheritable
+    thread local.
+    So
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector()}<<<TConfig.get().getArchiveDetector()>>>}}
+    returns the archive detector of the current configuration.
+    Similarly,
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(TArchiveDetector detector)>>>}}
+    updates the archive detector of the current configuration.
 
     Second, the call to
     {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#push()}<<<TConfig.push()>>>}}
@@ -257,24 +262,13 @@ try (TConfig config = TConfig.push()) {
     This implies that the new thread could pop at most one current
     configuration off the inheritable thread local stack.
 
-    What is the current configuration returned by <<<TConfig.get()>>> if there
-    had been no previous call to <<<TConfig.push()>>>?
-    In this case, the current configuration is the <global configuration>
-    which is shared by all threads.
-    Again, <<<TConfig.get()>>> is called by
-    <<<TFile.get/setDefaultArchiveDetector>>>,
-    so this state can be assumed for the second example of the previous
-    section, too.
-    However, you could not be sure because calls to <<<TConfig.push/close>>>
-    could be nested across the call stack.
-    If this would be the case, then in turn this example would be thread-safe,
-    too.
-
-    You may wonder why should <<<TConfig.get()>>> be used without a
-    <<<TConfig.push()>>> at all?
-    Because <<<TConfig>>> contains some options which may need to get
-    configured with a global scope and which are not otherwise configurable by
-    the client APIs.
+    What would be the current configuration returned by <<<TConfig.get()>>> if
+    there had been no previous call to <<<TConfig.push()>>>?
+    In this case, the current configuration would be the <global configuration>
+    which, as the name implies, is shared by all threads.
+    This configuration should get accessed only during application startup to
+    configure those aspects of TrueZIP which shall affect the entire
+    application.
 
 * The class <<<TApplication>>>
 
