@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsInputOption;
-import static de.schlichtherle.truezip.fs.FsInputOptions.NO_INPUT_OPTIONS;
+import de.schlichtherle.truezip.fs.FsInputOptions;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.util.BitField;
@@ -138,7 +138,7 @@ public class TConfigTest {
             assertThat(c.getInputPreferences(), is(BitField.of(FsInputOption.CACHE)));
             assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            c.setInputPreferences(NO_INPUT_OPTIONS);
+            c.setInputPreferences(FsInputOptions.NONE);
 
             assertTrue(c.isLenient());
             assertTrue(c.getInputPreferences().isEmpty());

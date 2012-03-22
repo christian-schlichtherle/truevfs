@@ -6,7 +6,6 @@ package de.schlichtherle.truezip.fs.archive;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
@@ -272,7 +271,7 @@ extends FsDriver {
 
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.entry.Entry.Type, de.schlichtherle.truezip.entry.Entry, de.schlichtherle.truezip.util.BitField)
-     * newEntry(name, type, template, FsOutputOptions.NO_OUTPUT_OPTIONS)}.
+     * newEntry(name, type, template, FsOutputOptions.NONE)}.
      * 
      * @param  name an entry name.
      * @param  type an entry type.
@@ -285,7 +284,7 @@ extends FsDriver {
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template)
     throws CharConversionException {
-        return newEntry(name, type, template, NO_OUTPUT_OPTIONS);
+        return newEntry(name, type, template, FsOutputOptions.NONE);
     }
 
     /**

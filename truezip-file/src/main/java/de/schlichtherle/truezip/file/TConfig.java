@@ -5,7 +5,6 @@
 package de.schlichtherle.truezip.file;
 
 import static de.schlichtherle.truezip.fs.FsInputOptions.INPUT_PREFERENCES_MASK;
-import static de.schlichtherle.truezip.fs.FsInputOptions.NO_INPUT_OPTIONS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
@@ -245,12 +244,12 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     /**
      * The default value of the
      * {@link #getInputPreferences input preferences} property, which is
-     * {@link FsInputOptions#NO_INPUT_OPTIONS}.
+     * {@link FsInputOptions#NONE}.
      * 
      * @since TrueZIP 7.3
      */
     public static final BitField<FsInputOption>
-            DEFAULT_INPUT_PREFERENCES = NO_INPUT_OPTIONS;
+            DEFAULT_INPUT_PREFERENCES = FsInputOptions.NONE;
 
     private static final BitField<FsInputOption>
             INPUT_PREFERENCES_COMPLEMENT_MASK = INPUT_PREFERENCES_MASK.not();

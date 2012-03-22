@@ -18,7 +18,15 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class FsSyncOptions {
+public final class FsSyncOptions {
+
+    /**
+     * A bit field with no synchronization options set.
+     * 
+     * @since TrueZIP 7.5
+     */
+    static final BitField<FsSyncOption>
+            NONE = BitField.noneOf(FsSyncOption.class);
 
     /**
      * Forcibly closes all I/O resources (i.e. streams, channels etc) for any
@@ -78,13 +86,24 @@ public class FsSyncOptions {
      * {@code BitField.of(FsSyncOption.ABORT_CHANGES)}.
      * <p>
      * These options are only meaningful immediately before the federated file
-     * system itself gets deleted and should not get used by client
+     * system itself gets deleted and should not of used by client
      * applications.
      * 
      * @since TrueZIP 7.5
      */
     public static final BitField<FsSyncOption>
             RESET = BitField.of(ABORT_CHANGES);
+
+    /**
+     * Converts the given array to a bit field of synchronization options.
+     * 
+     * @param  options an array of synchronization options.
+     * @return A bit field of synchronization options.
+     * @since  TrueZIP 7.5
+     */
+    public static BitField<FsSyncOption> of(FsSyncOption... options) {
+        return 0 == options.length ? NONE : BitField.of(options[0], options);
+    }
 
     /* Can't touch this - hammer time! */
     private FsSyncOptions() { }

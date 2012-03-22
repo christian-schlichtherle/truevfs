@@ -12,13 +12,12 @@ import static de.schlichtherle.truezip.entry.Entry.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
-import de.schlichtherle.truezip.fs.FsControllerException;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.FsOutputOption;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.NO_OUTPUT_OPTIONS;
+import de.schlichtherle.truezip.fs.FsOutputOptions;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
@@ -91,7 +90,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.factory = driver;
-        final E root = newEntry(ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, null);
+        final E root = newEntry(ROOT_PATH, DIRECTORY, FsOutputOptions.NONE, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -165,7 +164,7 @@ implements Iterable<FsCovariantEntry<E>> {
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
         master.add(ROOT_PATH, newEntry(
-                ROOT_PATH, DIRECTORY, NO_OUTPUT_OPTIONS, rootTemplate));
+                ROOT_PATH, DIRECTORY, FsOutputOptions.NONE, rootTemplate));
         this.master = master;
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this must be done
@@ -199,7 +198,7 @@ implements Iterable<FsCovariantEntry<E>> {
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
             parent = master.add(parentPath, newEntry(
-                    parentPath, DIRECTORY, NO_OUTPUT_OPTIONS, null));
+                    parentPath, DIRECTORY, FsOutputOptions.NONE, null));
         parent.add(memberName);
         fix(parentPath);
     }
