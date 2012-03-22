@@ -90,11 +90,11 @@ public final class KeyManagement {
             // model.getMountPoint().toUri().
             // If you need a more user friendly form of this URI, then call
             // model.getMountPoint().toHierarchicalUri().
-
+            
             // Let's not use the key manager but instead our custom parameters.
             return param;
         }
-
+        
         @Override
         public FsController<?> newController(
                 FsModel model,
@@ -107,7 +107,7 @@ public final class KeyManagement {
             // file system controller chain instead.
             return superNewController(model, parent);
         }
-
+        
         @Override
         protected boolean process(
                 ZipDriverEntry input,
@@ -116,12 +116,12 @@ public final class KeyManagement {
             // of our custom archive file format we do NOT need to process the
             // entries according to the following pipeline when copying them:
             // decrypt(inputKey) -> inflate() -> deflate() -> encrypt(outputKey)
-
+            
             // This reduces the processing pipeline to a simple copy operation
             // and is a DRASTIC performance improvement, e.g. when compacting
             // an archive file.
             return false;
-
+            
             // This is the default implementation - try to see the difference.
             //return input.isEncrypted() || output.isEncrypted();
         }
@@ -134,13 +134,13 @@ public final class KeyManagement {
         CustomWinZipAesParameters(final byte[] password) {
             this.password = password.clone();
         }
-
+        
         @Override
         public byte[] getWritePassword(String name)
         throws ZipKeyException {
             return password.clone();
         }
-
+        
         @Override
         public byte[] getReadPassword(String name, boolean invalid)
         throws ZipKeyException {
@@ -148,13 +148,13 @@ public final class KeyManagement {
                 throw new ZipKeyException(name + " (invalid password)");
             return password.clone();
         }
-
+        
         @Override
         public AesKeyStrength getKeyStrength(String arg0)
         throws ZipKeyException {
             return AesKeyStrength.BITS_128;
         }
-
+        
         @Override
         public void setKeyStrength(String name, AesKeyStrength keyStrength)
         throws ZipKeyException {
@@ -201,7 +201,7 @@ public final class KeyManagement {
             this.provider = new PromptingKeyManagerService(
                     new CustomView(password));
         }
-
+        
         @Override
         protected KeyManagerProvider getKeyManagerProvider() {
             return provider;
@@ -215,7 +215,7 @@ public final class KeyManagement {
         CustomView(char[] password) {
             this.password = password.clone();
         }
-
+        
         /**
          * You need to create a new key because the key manager may eventually
          * reset it when the archive file gets moved or deleted.
