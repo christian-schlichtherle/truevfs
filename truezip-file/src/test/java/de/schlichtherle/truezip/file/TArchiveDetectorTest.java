@@ -4,10 +4,10 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;
 import java.util.Locale;

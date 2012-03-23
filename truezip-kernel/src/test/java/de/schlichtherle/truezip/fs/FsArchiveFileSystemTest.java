@@ -2,17 +2,22 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.FsArchiveFileSystem;
+import de.schlichtherle.truezip.fs.FsArchiveFileSystemEvent;
+import de.schlichtherle.truezip.fs.FsArchiveFileSystemTouchListener;
+import de.schlichtherle.truezip.fs.FsArchiveEntry;
+import de.schlichtherle.truezip.fs.FsCovariantEntry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntry;
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntryContainer;
+import de.schlichtherle.truezip.fs.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.mock.MockArchiveDriverEntry;
+import de.schlichtherle.truezip.fs.mock.MockArchiveDriverEntryContainer;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.util.TooManyListenersException;
