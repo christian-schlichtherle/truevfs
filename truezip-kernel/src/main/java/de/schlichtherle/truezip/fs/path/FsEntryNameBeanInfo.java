@@ -7,15 +7,18 @@ package de.schlichtherle.truezip.fs.path;
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.beans.*;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Provides a persistence delegate to support
  * {@link XMLEncoder}/{@link XMLDecoder}.
  *
+ * @see    FsEntryName
  * @author Christian Schlichtherle
  */
+@Immutable
 @DefaultAnnotation(Nullable.class)
-public class FsEntryNameBeanInfo extends SimpleBeanInfo {
+public final class FsEntryNameBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.fs.path.FsEntryName.class , null ); // NOI18N

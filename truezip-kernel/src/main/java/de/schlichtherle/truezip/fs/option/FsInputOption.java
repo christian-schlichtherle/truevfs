@@ -17,9 +17,7 @@ import javax.annotation.concurrent.Immutable;
  * If an option is not available or illegal, an {@link IOException} must get
  * thrown.
  *
- * @see     FsOutputOption
- * @see     FsInputOptions
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public enum FsInputOption {

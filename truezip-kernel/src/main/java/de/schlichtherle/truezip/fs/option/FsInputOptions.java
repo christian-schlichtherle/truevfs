@@ -9,11 +9,9 @@ import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Provides common input options.
+ * Provides common bit fields of input options.
  * 
  * @see    FsInputOption
- * @see    FsOutputOptions
- * @since  TrueZIP 7.1.1
  * @author Christian Schlichtherle
  */
 @Immutable
