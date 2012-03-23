@@ -10,7 +10,6 @@ import de.schlichtherle.truezip.util.Pool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -228,11 +227,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         this.name = rof.toString();
     }
 
-    @Override
-    public void recoverLostEntries() throws IOException {
-        super.recoverLostEntries();
-    }
-
     /**
      * Returns the {@link Object#toString() string representation} of whatever
      * input source object was used to construct this ZIP file.
@@ -306,11 +300,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     @Override
-    public boolean busy() {
-        return super.busy();
-    }
-
-    @Override
     public @Nullable ZipCryptoParameters getCryptoParameters() {
         return cryptoParameters;
     }
@@ -325,11 +314,6 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     public void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {
         this.cryptoParameters = cryptoParameters;
-    }
-
-    @Override
-    public void close() throws IOException {
-        super.close();
     }
 
     /**

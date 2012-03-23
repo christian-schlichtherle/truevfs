@@ -37,8 +37,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**
- * Provides unsafe (raw) access to a ZIP file using unsynchronized methods and
- * shared {@link ZipEntry} instances.
+ * Provides unsafe (raw) access to a ZIP file using shared {@link ZipEntry}
+ * instances.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!

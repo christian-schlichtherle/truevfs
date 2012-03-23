@@ -19,7 +19,10 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
@@ -30,8 +33,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
- * Provides unsafe (raw) access to a ZIP file using unsynchronized
- * methods and shared {@link ZipEntry} instances.
+ * Provides unsafe (raw) access to a ZIP file using shared {@link ZipEntry}
+ * instances.
  * <p>
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
@@ -157,20 +160,6 @@ implements Iterable<E> {
      */
     public int size() {
         return entries.size();
-    }
-
-    /**
-     * Returns an enumeration of all entries written to this ZIP file
-     * so far.
-     * Note that the enumerated entries are shared with this class.
-     * It is illegal to put more entries into this ZIP output stream
-     * concurrently or modify the state of the enumerated entries.
-     *
-     * @deprecated Use {@link #iterator()} instead.
-     */
-    @Deprecated
-    public Enumeration<? extends ZipEntry> entries() {
-        return Collections.enumeration(entries.values());
     }
 
     /**
