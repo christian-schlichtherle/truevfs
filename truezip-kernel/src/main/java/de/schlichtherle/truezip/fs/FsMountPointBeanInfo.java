@@ -35,7 +35,7 @@ public class FsMountPointBeanInfo extends SimpleBeanInfo {
                     mountPoint.getClass(),
                     "new", // NOI18N
                     new Object[] {
-                        mountPoint.toString(),
+                        mountPoint.toUri(),
                     });
             }
         };

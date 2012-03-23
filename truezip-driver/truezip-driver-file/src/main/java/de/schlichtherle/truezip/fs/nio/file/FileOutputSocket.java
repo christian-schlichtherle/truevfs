@@ -179,7 +179,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         final FileEntry temp = begin();
 
-        class SeekableByteChannel extends de.schlichtherle.truezip.io.IOExceptionSeekableByteChannel {
+        class SeekableByteChannel extends IOExceptionSeekableByteChannel {
             boolean closed;
 
             SeekableByteChannel() throws IOException {
@@ -213,7 +213,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        class OutputStream extends de.schlichtherle.truezip.io.IOExceptionOutputStream {
+        class OutputStream extends de.schlichtherle.truezip.fs.file.IOExceptionOutputStream {
             boolean closed;
 
             @CreatesObligation

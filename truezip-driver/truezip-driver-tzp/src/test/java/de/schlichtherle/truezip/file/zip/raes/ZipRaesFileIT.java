@@ -99,10 +99,7 @@ public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
     /**
      * Skipped because appending to RAES encrypted ZIP files is not possible
      * by design.
-     * 
-     * @deprecated 
      */
-    @Deprecated
     @Override
     public void testGrowing() {
     }

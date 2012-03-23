@@ -85,12 +85,10 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * URI {@link #getScheme() scheme} {@value #DEFAULT_SCHEME} for accessing
      * any path within the {@link #getRoot() root mount point} URI
      * {@value #DEFAULT_ROOT_MOUNT_POINT}.
-     * <p>
-     * Do <em>NOT</em> call this constructor directly - it's solely provided in
-     * order to use this file system provider class with the service location
-     * feature of the NIO.2 API!
      * 
-     * @deprecated Do <em>NOT</em> call this constructor directly!
+     * @deprecated This constructor is solely provided in order to use this
+     * file system provider class with the service location feature of the
+     * NIO.2 API!
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @SuppressWarnings("LeakingThisInConstructor")
@@ -109,14 +107,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
         assert null != scheme;
         this.scheme = scheme;
         this.root = FsPath.create(root);
-    }
-
-    /**
-     * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount()}.
-     */
-    @Deprecated
-    public static void umount() throws FsSyncException {
-        TVFS.umount();
     }
 
     /**

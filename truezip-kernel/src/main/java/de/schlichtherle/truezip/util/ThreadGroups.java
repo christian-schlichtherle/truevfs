@@ -76,12 +76,5 @@ public class ThreadGroups {
         }
         return tg;
     }
-
-    /**
-     * @deprecated Use {@link #getServerThreadGroup()} instead.
-     */
-    public static ThreadGroup getTopLevel() {
-        return getServerThreadGroup();
-    }
 }
 

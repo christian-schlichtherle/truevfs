@@ -180,10 +180,7 @@ public final class ZipRaesIT extends ZipTestSuite {
 
     /**
      * Skipped because the test is specific to plain ZIP files.
-     * 
-     * @deprecated 
      */
-    @Deprecated
     @Override
     public void testBadGetCheckedInputStream() {
     }
@@ -191,10 +188,7 @@ public final class ZipRaesIT extends ZipTestSuite {
     /**
      * Skipped because appending to RAES encrypted ZIP files is not possible
      * by design.
-     * 
-     * @deprecated 
      */
-    @Deprecated
     @Override
     public void testAppending() {
     }

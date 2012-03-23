@@ -4,15 +4,16 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
 import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.MOUNT_POINT;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -153,46 +154,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
 
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
-     * 
-     * @deprecated This method does not quote characters with a special meaning
-     *             in a URI - use the method variant with the URI parameter
-     *             instead.
-     */
-    @Deprecated
-    public static FsMountPoint
-    create(String uri) {
-        return create(uri, NULL);
-    }
-
-    /**
-     * Constructs a new mount point by constructing a new URI from
-     * the given string representation and parsing the result.
-     * This static factory method calls
-     * {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, modifier)}
-     * and wraps any thrown {@link URISyntaxException} in an
-     * {@link IllegalArgumentException}.
-     *
-     * @param  uri the URI string representation.
-     * @param  modifier the URI modifier.
-     * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for mount points.
-     * @return A new mount point.
-     * @deprecated This method does not quote characters with a special meaning
-     *             in a URI - use the method variant with the URI parameter
-     *             instead.
-     */
-    @Deprecated
-    public static FsMountPoint
-    create(String uri, FsUriModifier modifier) {
-        try {
-            return new FsMountPoint(uri, modifier);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
-    /**
-     * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
     public static FsMountPoint
     create(URI uri) {
@@ -242,36 +203,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
-    }
-
-    /**
-     * Equivalent to {@link #FsMountPoint(String, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
-     * 
-     * @deprecated This constructor does not quote characters with a special
-     *             meaning in a URI - use the constructor variant with the URI
-     *             parameter instead.
-     */
-    @Deprecated
-    public FsMountPoint(String uri) throws URISyntaxException {
-        parse(new URI(uri), NULL);
-    }
-
-    /**
-     * Constructs a new path by calling
-     * {@link URI#URI(String) new URI(uri)} and parsing the resulting URI.
-     *
-     * @param  uri the URI string representation.
-     * @param  modifier the URI modifier.
-     * @throws URISyntaxException if {@code uri} does not conform to the
-     *         syntax constraints for mount points.
-     * @deprecated This constructor does not quote characters with a special
-     *             meaning in a URI - use the constructor variant with the URI
-     *             parameter instead.
-     */
-    @Deprecated
-    public FsMountPoint(String uri, FsUriModifier modifier)
-    throws URISyntaxException {
-        parse(new URI(uri), modifier);
     }
 
     /**
@@ -415,15 +346,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * @deprecated
-     * @see #toUri()
-     */
-    @Deprecated
-    public URI getUri() {
-        return uri;
-    }
-
-    /**
      * Returns a URI which is recursively transformed from the URI of this
      * mount point so that it's absolute and hierarchical.
      * If this mount point is already in absolute and hierarchical form, its
@@ -444,15 +366,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 : (this.hierarchical = uri.isOpaque()
                     ? path.toHierarchicalUri()
                     : uri);
-    }
-
-    /**
-     * @deprecated
-     * @see #toHierarchicalUri()()
-     */
-    @Deprecated
-    public URI getHierarchicalUri() {
-        return toHierarchicalUri();
     }
 
     /**

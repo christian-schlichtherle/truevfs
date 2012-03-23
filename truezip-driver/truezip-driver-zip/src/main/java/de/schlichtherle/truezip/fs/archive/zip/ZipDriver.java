@@ -325,12 +325,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * The implementation in the class {@link ZipDriver}
      * returns {@code ZipOutputStream#OVERHEAD_SIZE}.
      * 
-     * @since      TrueZIP 7.3
-     * @return     {@code ZipOutputStream#OVERHEAD_SIZE}
-     * @deprecated This method is reserved for future use - do <em>not</em> use
-     *             or override this method!
+     * @since  TrueZIP 7.3
+     * @return {@code ZipOutputStream#OVERHEAD_SIZE}
      */
-    @Deprecated
     @Override
     public int getOverheadSize() {
         return ZipOutputStream.OVERHEAD_SIZE;

@@ -2,12 +2,14 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +26,10 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @Deprecated
 @NotThreadSafe
-public final class LazyInputSocket<E extends Entry>
+final class LazyInputSocket<E extends Entry>
 extends DecoratingInputSocket<E> {
 
-    public LazyInputSocket(InputSocket<? extends E> input) {
+    LazyInputSocket(InputSocket<? extends E> input) {
         super(input);
     }
 
