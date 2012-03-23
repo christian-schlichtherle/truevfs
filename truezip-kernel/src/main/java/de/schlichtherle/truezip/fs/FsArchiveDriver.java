@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;

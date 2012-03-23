@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.mock;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsArchiveEntries;
 import de.schlichtherle.truezip.fs.FsArchiveEntry;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import java.io.IOException;
 import java.util.EnumMap;
 import javax.annotation.CheckForNull;
@@ -23,7 +23,7 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             sizes = new EnumMap<Size, Long>(Size.class);
     private final EnumMap<Access, Long>
             times = new EnumMap<Access, Long>(Access.class);
-    private @CheckForNull IOPool.Buffer<?> buffer;
+    private @CheckForNull IOPool.IOBuffer<?> buffer;
 
     public MockArchiveDriverEntry(  final String name,
                                     final Type type,
@@ -46,8 +46,8 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
         }
     }
 
-    IOPool.Buffer<?> getBuffer(final IOPool<?> ioPool) throws IOException {
-        final IOPool.Buffer<?> buffer = this.buffer;
+    IOPool.IOBuffer<?> getBuffer(final IOPool<?> ioPool) throws IOException {
+        final IOPool.IOBuffer<?> buffer = this.buffer;
         return null != buffer ? buffer : (this.buffer = ioPool.allocate());
     }
 

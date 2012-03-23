@@ -9,7 +9,7 @@ import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
 import de.schlichtherle.truezip.fs.archive.zip.ZipInputService;
 import de.schlichtherle.truezip.fs.archive.zip.ZipOutputService;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
 import de.schlichtherle.truezip.entry.OutputService;
 import java.io.IOException;
 import java.io.OutputStream;

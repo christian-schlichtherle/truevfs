@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.fs.inst;
 
 import de.schlichtherle.truezip.entry.DecoratingEntry;
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPool.Buffer;
+import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public class InstrumentingIOPool<
-        E extends Buffer<E>,
+        E extends IOBuffer<E>,
         D extends InstrumentingDirector<D>>
 implements IOPool<E> {
 
@@ -34,21 +34,21 @@ implements IOPool<E> {
     }
 
     @Override
-    public Buffer<E> allocate() throws IOException {
+    public IOBuffer<E> allocate() throws IOException {
         return new InstrumentingBuffer(delegate.allocate());
     }
 
     @Override
-    public void release(Buffer<E> resource) throws IOException {
+    public void release(IOBuffer<E> resource) throws IOException {
         resource.release();
     }
 
     @SuppressWarnings("PublicInnerClass")
     public class InstrumentingBuffer
-    extends DecoratingEntry<Buffer<E>>
-    implements Buffer<E> {
+    extends DecoratingEntry<IOBuffer<E>>
+    implements IOBuffer<E> {
 
-        protected InstrumentingBuffer(Buffer<E> delegate) {
+        protected InstrumentingBuffer(IOBuffer<E> delegate) {
             super(delegate);
         }
 
@@ -66,5 +66,5 @@ implements IOPool<E> {
         public void release() throws IOException {
             delegate.release();
         }
-    } // Buffer
+    } // IOBuffer
 }

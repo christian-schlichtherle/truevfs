@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.fs.archive.zip.KeyProviderSyncStrategy;
 import de.schlichtherle.truezip.key.MockView;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle

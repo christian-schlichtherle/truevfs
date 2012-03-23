@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket.sl;
+package de.schlichtherle.truezip.entry.sl;
 
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.spi.IOPoolService;
+import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
+import de.schlichtherle.truezip.entry.spi.IOPoolService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -22,13 +22,13 @@ import javax.annotation.concurrent.Immutable;
  * whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "de.schlichtherle.truezip.socket.spi.IOPoolService"}
+ * with the class name {@code "de.schlichtherle.truezip.entry.spi.IOPoolService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.socket.spi.IOPoolService"}.
+ * {@code "META-INF/services/de.schlichtherle.truezip.entry.spi.IOPoolService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>

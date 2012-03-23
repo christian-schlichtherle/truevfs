@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.fs.inst.jul;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -38,7 +38,7 @@ extends DecoratingReadOnlyFile {
     throws IOException {
         super(socket.newReadOnlyFile());
         this.target = target;
-        Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
+        Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
         logger.log(level, "Randomly reading " + target, new NeverThrowable());
     }
 
@@ -47,7 +47,7 @@ extends DecoratingReadOnlyFile {
         try {
             delegate.close();
         } finally {
-            Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
+            Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }

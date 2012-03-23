@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket.spi;
+package de.schlichtherle.truezip.entry.spi;
 
-import de.schlichtherle.truezip.socket.ByteArrayIOBuffer;
-import de.schlichtherle.truezip.socket.ByteArrayIOPool;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.entry.ByteArrayIOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import javax.annotation.concurrent.Immutable;
 
 /**

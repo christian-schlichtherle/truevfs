@@ -2,16 +2,21 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.READ;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.IOCache.Strategy;
-import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_BACK;
-import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_THROUGH;
+import de.schlichtherle.truezip.fs.FsCache.Strategy;
+import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.entry.ByteArrayIOPool;
+import de.schlichtherle.truezip.socket.IOSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
+import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_BACK;
+import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_THROUGH;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -24,7 +29,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class IOCacheTest {
+public final class FsCacheTest {
 
     private static final int INITIAL_CAPACITY = 32;
     private static final String MOCK_ENTRY_NAME = "mock";
@@ -44,7 +49,7 @@ public final class IOCacheTest {
             WRITE_THROUGH,
             WRITE_BACK,
         }) {
-            final IOCache cache = strategy.newCache(pool);
+            final FsCache cache = strategy.newCache(pool);
             ByteArrayIOBuffer front;
             ByteArrayIOBuffer back;
 

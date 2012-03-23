@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket.spi;
+package de.schlichtherle.truezip.entry.spi;
 
-import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
+import de.schlichtherle.truezip.entry.sl.IOPoolLocator;
 
 /**
  * An abstract locatable service for an I/O buffer pool.

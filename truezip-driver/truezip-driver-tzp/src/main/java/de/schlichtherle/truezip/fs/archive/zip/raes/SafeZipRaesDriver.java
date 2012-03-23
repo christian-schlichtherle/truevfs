@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.key.KeyManagerProvider;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 

@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
 import javax.annotation.concurrent.Immutable;
 
 /**

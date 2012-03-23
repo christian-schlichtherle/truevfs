@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.entry.FsMultiplexedOutputService;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

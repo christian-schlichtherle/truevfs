@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.archive.tar;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.addr.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
+import de.schlichtherle.truezip.entry.sl.IOPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 

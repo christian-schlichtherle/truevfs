@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
@@ -18,7 +19,7 @@ import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_BACK;
+import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_BACK;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
@@ -296,7 +297,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Immutable
     private final class EntryCache {
         final FsEntryName name;
-        final IOCache cache;
+        final FsCache cache;
 
         EntryCache(final FsEntryName name) {
             this.name = name;

@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.fs.inst.jul;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -37,7 +37,7 @@ extends DecoratingOutputStream {
     throws IOException {
         super(socket.newOutputStream());
         this.target = target;
-        Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
+        Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
         logger.log(level, "Stream writing " + target, new NeverThrowable());
     }
 
@@ -46,7 +46,7 @@ extends DecoratingOutputStream {
         try {
             delegate.close();
         } finally {
-            Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
+            Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }

@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import java.io.IOException;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.deleteIfExists;
@@ -52,7 +52,7 @@ final class TempFilePool implements IOPool<FileEntry> {
     }
 
     @Override
-    public void release(Buffer<FileEntry> resource) throws IOException {
+    public void release(IOBuffer<FileEntry> resource) throws IOException {
         resource.release();
     }
 
@@ -60,7 +60,7 @@ final class TempFilePool implements IOPool<FileEntry> {
     @NotThreadSafe
     private static final class FileBuffer
     extends FileEntry
-    implements Buffer<FileEntry> {
+    implements IOBuffer<FileEntry> {
 
         FileBuffer(Path file, final TempFilePool pool) {
             super(file);
@@ -93,5 +93,5 @@ final class TempFilePool implements IOPool<FileEntry> {
                 super.finalize();
             }
         }
-    } // Buffer
+    } // IOBuffer
 }

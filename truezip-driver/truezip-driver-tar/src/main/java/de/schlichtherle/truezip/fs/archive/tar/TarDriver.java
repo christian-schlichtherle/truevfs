@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
 import de.schlichtherle.truezip.entry.InputService;
 import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.entry.Entry;

@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
+import de.schlichtherle.truezip.entry.IOPool;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -36,14 +37,14 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     }
 
     @Override
-    public Buffer<ByteArrayIOBuffer> allocate() {
+    public IOBuffer<ByteArrayIOBuffer> allocate() {
         ByteBuffer entry = new ByteBuffer(total.getAndIncrement());
         active.getAndIncrement();
         return entry;
     }
 
     @Override
-    public void release(Buffer<ByteArrayIOBuffer> entry) throws IOException {
+    public void release(IOBuffer<ByteArrayIOBuffer> entry) throws IOException {
         entry.release();
     }
 
@@ -61,7 +62,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     @NotThreadSafe
     private final class ByteBuffer
     extends ByteArrayIOBuffer
-    implements de.schlichtherle.truezip.socket.IOPool.Buffer<ByteArrayIOBuffer> {
+    implements de.schlichtherle.truezip.entry.IOPool.IOBuffer<ByteArrayIOBuffer> {
         private boolean released;
 
         ByteBuffer(int i) {

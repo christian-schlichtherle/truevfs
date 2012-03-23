@@ -11,7 +11,7 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.STORE;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.entry.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.*;
