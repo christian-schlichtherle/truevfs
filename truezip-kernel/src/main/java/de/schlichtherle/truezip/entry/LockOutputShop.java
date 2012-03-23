@@ -2,15 +2,17 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
+import de.schlichtherle.truezip.entry.DecoratingOutputShop;
+import de.schlichtherle.truezip.entry.OutputShop;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.LockInputStream;
-import de.schlichtherle.truezip.rof.LockReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.io.LockOutputStream;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
@@ -21,44 +23,44 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Decorates another input shop to allow concurrent access which is
+ * Decorates another output shop to allow concurrent access which is
  * synchronized by a {@link Lock} object provided to its constructor.
  *
  * @param  <E> the type of the entries.
- * @see    LockOutputShop
+ * @see    LockInputShop
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class LockInputShop<E extends Entry>
-extends DecoratingInputShop<E, InputShop<E>> {
+public class LockOutputShop<E extends Entry>
+extends DecoratingOutputShop<E, OutputShop<E>> {
 
     /** The lock on which this object synchronizes. */
     protected final Lock lock;
 
     /**
-     * Constructs a new concurrent input shop.
-     *
-     * @param input the shop to decorate.
+     * Constructs a new concurrent output shop.
+     * 
+     * @param output the shop to decorate.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public LockInputShop(@WillCloseWhenClosed InputShop<E> input) {
-        this(input, new ReentrantLock());
+    public LockOutputShop(@WillCloseWhenClosed OutputShop<E> output) {
+        this(output, new ReentrantLock());
     }
 
     /**
-     * Constructs a new concurrent input shop.
-     *
-     * @param input the shop to decorate.
+     * Constructs a new concurrent output shop.
+     * 
+     * @param output the shop to decorate.
      * @param lock The lock to use. 
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public LockInputShop(
-            final @WillCloseWhenClosed InputShop<E> input,
+    public LockOutputShop(
+            final @WillCloseWhenClosed OutputShop<E> output,
             final Lock lock) {
-        super(input);
+        super(output);
         if (null == (this.lock = lock))
             throw new NullPointerException();
     }
@@ -98,14 +100,14 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("This returned iterator would not be thread-safe!");
+        throw new UnsupportedOperationException("The returned iterator would not be thread-safe!");
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(final String name) {
-        class Input extends DecoratingInputSocket<E> {
-            Input() {
-                super(LockInputShop.super.getInputSocket(name));
+    public OutputSocket<? extends E> getOutputSocket(final E entry) {
+        class Output extends DecoratingOutputSocket<E> {
+            Output() {
+                super(LockOutputShop.super.getOutputSocket(entry));
             }
 
             @Override
@@ -113,23 +115,10 @@ extends DecoratingInputShop<E, InputShop<E>> {
             public E getLocalTarget() throws IOException {
                 lock.lock();
                 try {
-                    return getBoundSocket().getLocalTarget();
+                    return entry;
                 } finally {
                     lock.unlock();
                 }
-            }
-
-            @Override
-            @GuardedBy("lock")
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                final ReadOnlyFile rof;
-                lock.lock();
-                try {
-                    rof = getBoundSocket().newReadOnlyFile();
-                } finally {
-                    lock.unlock();
-                }
-                return new LockReadOnlyFile(rof, lock);
             }
 
             @Override
@@ -139,18 +128,18 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
             @Override
             @GuardedBy("lock")
-            public InputStream newInputStream() throws IOException {
-                final InputStream in;
+            public OutputStream newOutputStream() throws IOException {
+                final OutputStream out;
                 lock.lock();
                 try {
-                    in = getBoundSocket().newInputStream();
+                    out = getBoundSocket().newOutputStream();
                 } finally {
                     lock.unlock();
                 }
-                return new LockInputStream(in, lock);
+                return new LockOutputStream(out, lock);
             }
-        } // Input
+        } // Output
 
-        return new Input();
+        return new Output();
     }
 }

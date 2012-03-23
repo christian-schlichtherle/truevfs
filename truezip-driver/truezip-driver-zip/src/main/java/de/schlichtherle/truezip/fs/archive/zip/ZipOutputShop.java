@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.entry.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;

@@ -4,7 +4,9 @@
  */
 package de.schlichtherle.truezip.socket;
 
+import de.schlichtherle.truezip.entry.DecoratingOutputShop;
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.OutputShop;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
