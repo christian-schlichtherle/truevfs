@@ -4,23 +4,40 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.InputContainer;
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
- * A closable input service.
+ * A service for reading entries from a container.
  *
  * @param  <E> the type of the entries.
  * @see    OutputShop
  * @author Christian Schlichtherle
  */
-//TODO: Consider renaming to InputArchive
 @CleanupObligation
-public interface InputShop<E extends Entry> extends Closeable, InputContainer<E> {
+public interface InputShop<E extends Entry>
+extends Closeable, EntryContainer<E> {
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The iterator returned by this method must be unmodifiable.
+     */
+    @Override
+    Iterator<E> iterator();
+
+    /**
+     * Returns an input socket for reading from the entry with the given name.
+     *
+     * @param  name an {@link Entry#getName() entry name}.
+     * @return An input socket for reading from the entry with the given name.
+     */
+    // TODO: This should return InputSocket<E>.
+    InputSocket<? extends E> getInputSocket(String name);
 
     @Override
     @DischargesObligation

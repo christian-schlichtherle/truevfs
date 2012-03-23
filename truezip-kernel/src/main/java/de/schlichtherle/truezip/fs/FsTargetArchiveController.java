@@ -502,7 +502,7 @@ extends FsFileSystemArchiveController<E> {
         // The Disconnecting(In|Out)putShop should not get skipped however:
         // If these would throw an (In|Out)putClosedException, then this would
         // be an artifact of a bug.
-        final OutputContainer<E> os;
+        final OutputShop<E> os;
         {
             final OutputArchive<E> oa = outputArchive;
             if (null == oa || oa.isClosed())
@@ -511,7 +511,7 @@ extends FsFileSystemArchiveController<E> {
             os = oa.getClutch();
         }
 
-        final InputContainer<E> is;
+        final InputShop<E> is;
         {
             final InputArchive<E> ia = inputArchive;
             if (null != ia && ia.isClosed())
@@ -525,8 +525,8 @@ extends FsFileSystemArchiveController<E> {
 
     private static <E extends FsArchiveEntry, X extends IOException> void
     copy(   final FsArchiveFileSystem<E> fs,
-            final InputContainer<E> is,
-            final OutputContainer<E> os,
+            final InputShop<E> is,
+            final OutputShop<E> os,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
         for (final FsCovariantEntry<E> fse : fs) {
@@ -615,7 +615,7 @@ extends FsFileSystemArchiveController<E> {
      * @param <E> The type of the entries.
      */
     private static final class DummyInputService<E extends Entry>
-    implements InputContainer<E> {
+    implements InputShop<E> {
         @Override
         public int getSize() {
             return 0;
@@ -633,6 +633,11 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public InputSocket<? extends E> getInputSocket(String name) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void close() throws IOException {
             throw new UnsupportedOperationException();
         }
     } // DummyInputService
