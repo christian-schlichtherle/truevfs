@@ -6,11 +6,6 @@ package de.schlichtherle.truezip.file;
 
 import static de.schlichtherle.truezip.file.TVFS.mountPoint;
 import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
-import de.schlichtherle.truezip.util.BitField;
 import java.net.URI;
 import java.net.URISyntaxException;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,9 +21,9 @@ public class TVFSTest extends MockArchiveDriverTestBase {
     public void testMountPoint() throws URISyntaxException {
         for (final String[] params : new String[][] {
             // { $file, $mountPoint }
-            { "foo.mok/bar", CURRENT_DIRECTORY + "foo.mok/bar/" },
-            { "foo.mok", "mok:" + CURRENT_DIRECTORY + "foo.mok!/" },
-            { "foo", CURRENT_DIRECTORY + "foo/" },
+            { "fö ö.mok/b är", CURRENT_DIRECTORY + "fö%20ö.mok/b%20är/" },
+            { "fö ö.mok", "mok:" + CURRENT_DIRECTORY + "fö%20ö.mok!/" },
+            { "fö ö", CURRENT_DIRECTORY + "fö%20ö/" },
             { ".", CURRENT_DIRECTORY.toString() },
             { "", CURRENT_DIRECTORY.toString() },
         }) {
