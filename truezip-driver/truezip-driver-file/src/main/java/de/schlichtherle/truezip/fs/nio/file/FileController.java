@@ -4,13 +4,16 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
+import de.schlichtherle.truezip.fs.option.FsInputOption;
+import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.EXCLUSIVE;
 import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;

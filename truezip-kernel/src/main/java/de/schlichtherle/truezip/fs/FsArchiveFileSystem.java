@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.option.FsOutputOptions;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
@@ -11,8 +12,9 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
 import static de.schlichtherle.truezip.fs.FsEntryName.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
-import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.CREATE_PARENTS;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.EXCLUSIVE;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;

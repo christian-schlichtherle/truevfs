@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.sample.file.app;
 
 import de.schlichtherle.truezip.file.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
 import de.schlichtherle.truezip.fs.archive.tar.TarDriver;

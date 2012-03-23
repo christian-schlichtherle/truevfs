@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.APPEND;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

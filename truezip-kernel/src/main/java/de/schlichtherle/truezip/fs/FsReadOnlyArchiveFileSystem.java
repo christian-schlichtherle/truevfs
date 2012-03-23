@@ -8,6 +8,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Map;
 import javax.annotation.CheckForNull;

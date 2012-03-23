@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.file;
 
-import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.GROW;
+import static de.schlichtherle.truezip.fs.option.FsSyncOption.*;
+import static de.schlichtherle.truezip.fs.option.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.InputException;

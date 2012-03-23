@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
+import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;

@@ -4,6 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
+import de.schlichtherle.truezip.fs.option.FsSyncOption;
+import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;

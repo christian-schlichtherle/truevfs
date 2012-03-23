@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;

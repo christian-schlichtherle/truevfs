@@ -5,10 +5,10 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsInputOption;
-import de.schlichtherle.truezip.fs.FsInputOptions;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.option.FsInputOption;
+import de.schlichtherle.truezip.fs.option.FsInputOptions;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.NoSuchElementException;
 import static org.hamcrest.CoreMatchers.is;
