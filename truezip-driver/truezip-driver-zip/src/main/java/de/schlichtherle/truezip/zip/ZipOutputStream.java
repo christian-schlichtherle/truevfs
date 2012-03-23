@@ -6,10 +6,11 @@ package de.schlichtherle.truezip.zip;
 
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
@@ -111,42 +112,6 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
             throw new NullPointerException();
     }
 
-    @Override
-    public synchronized int size() {
-        return super.size();
-    }
-
-    /**
-     * Returns a safe enumeration of clones for all entries written so far.
-     * This method takes a snapshot of the collection of all entries and
-     * enumerates their clones, so concurrent modifications or state changes
-     * do not affect this instance, the returned enumeration or the
-     * enumerated ZIP entries.
-     *
-     * @deprecated Use {@link #iterator()} instead.
-     */
-    @SuppressWarnings("dep-ann")
-	@Override
-    public synchronized Enumeration<? extends ZipEntry> entries() {
-        class CloneEnumeration implements Enumeration<ZipEntry> {
-            final Enumeration<? extends ZipEntry> e
-                    = Collections.enumeration(Collections.list(
-                        ZipOutputStream.super.entries()));
-
-            @Override
-            public boolean hasMoreElements() {
-                return e.hasMoreElements();
-            }
-
-            @Override
-            public ZipEntry nextElement() {
-                return e.nextElement().clone();
-            }
-        } // class CloneEnumeration
-
-        return new CloneEnumeration();
-    }
-
     /**
      * Returns a safe iteration of clones for all entries written to this ZIP
      * file so far.
@@ -157,8 +122,8 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * The iteration does not support element removal.
      */
     @Override
-    public synchronized Iterator<ZipEntry> iterator() {
-        class EntryIterator implements Iterator<ZipEntry> {
+    public Iterator<ZipEntry> iterator() {
+        final class EntryIterator implements Iterator<ZipEntry> {
             final Iterator<ZipEntry> i;
 
             EntryIterator() {
@@ -195,53 +160,13 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * @param name the name of the ZIP entry.
      */
     @Override
-    public synchronized ZipEntry getEntry(String name) {
+    public ZipEntry getEntry(String name) {
         final ZipEntry entry = super.getEntry(name);
         return entry != null ? entry.clone() : null;
     }
 
     @Override
-    public synchronized void setComment(String comment) {
-        super.setComment(comment);
-    }
-
-    @Override
-    public synchronized String getComment() {
-        return super.getComment();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The initial value is {@code ZipEntry#DEFLATED}.
-     */
-    @Override
-    public synchronized int getMethod() {
-        return super.getMethod();
-    }
-
-    @Override
-    public synchronized void setMethod(int method) {
-        super.setMethod(method);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The initial value is {@code Deflater#DEFAULT_COMPRESSION}.
-     */
-    @Override
-    public synchronized int getLevel() {
-        return super.getLevel();
-    }
-    
-    @Override
-    public synchronized void setLevel(int level) {
-        super.setLevel(level);
-    }
-
-    @Override
-    public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
+    public @Nullable ZipCryptoParameters getCryptoParameters() {
         return cryptoParameters;
     }
 
@@ -255,53 +180,8 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      *        of entries.
      * @since TrueZIP 7.3
      */
-    public synchronized void setCryptoParameters(
+    public void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {
         this.cryptoParameters = cryptoParameters;
-    }
-
-    @Override
-    public synchronized long length() {
-        return super.length();
-    }
-
-    @Override
-    public synchronized final boolean isBusy() {
-        return super.isBusy();
-    }
-
-    @Override
-    public synchronized void putNextEntry(
-            final ZipEntry entry,
-            final boolean process)
-    throws IOException {
-        super.putNextEntry(entry, process);
-    }
-
-    @Override
-    public synchronized void write(int b)
-    throws IOException {
-        super.write(b);
-    }
-
-    @Override
-    public synchronized void write(final byte[] b, final int off, final int len)
-    throws IOException {
-        super.write(b, off, len);
-    }
-
-    @Override
-    public synchronized void closeEntry() throws IOException {
-        super.closeEntry();
-    }
-
-    @Override
-    public synchronized void finish() throws IOException {
-        super.finish();
-    }
-
-    @Override
-    public synchronized void close() throws IOException {
-        super.close();
     }
 }
