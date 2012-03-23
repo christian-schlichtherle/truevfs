@@ -47,22 +47,22 @@ final class TempFilePool implements IOPool<FileEntry> {
     }
 
     @Override
-    public Buffer allocate() throws IOException {
-        return new Buffer(createTempFile(dir, name, null), this);
+    public FileBuffer allocate() throws IOException {
+        return new FileBuffer(createTempFile(dir, name, null), this);
     }
 
     @Override
-    public void release(Entry<FileEntry> resource) throws IOException {
+    public void release(Buffer<FileEntry> resource) throws IOException {
         resource.release();
     }
 
     /** A temp file pool entry. */
     @NotThreadSafe
-    private static final class Buffer
+    private static final class FileBuffer
     extends FileEntry
-    implements Entry<FileEntry> {
+    implements Buffer<FileEntry> {
 
-        Buffer(Path file, final TempFilePool pool) {
+        FileBuffer(Path file, final TempFilePool pool) {
             super(file);
             assert null != file;
             assert null != pool;

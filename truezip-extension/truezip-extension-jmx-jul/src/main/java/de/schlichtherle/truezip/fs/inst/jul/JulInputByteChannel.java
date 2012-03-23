@@ -37,7 +37,7 @@ extends DecoratingSeekableByteChannel {
             throw new NullPointerException();
         this.socket = socket;
         E target = socket.getLocalTarget();
-        Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
+        Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
         logger.log(level, "Randomly reading " + target, new NeverThrowable());
     }
 
@@ -47,7 +47,7 @@ extends DecoratingSeekableByteChannel {
             delegate.close();
         } finally {
             E target = socket.getLocalTarget();
-            Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
+            Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }

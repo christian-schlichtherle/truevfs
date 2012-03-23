@@ -6,17 +6,17 @@ package de.schlichtherle.truezip.fs.inst.jul;
 
 import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
+import de.schlichtherle.truezip.socket.IOPool.Buffer;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
-final class JulIOPool<E extends Entry<E>>
+final class JulIOPool<E extends Buffer<E>>
 extends InstrumentingIOPool<E, JulDirector> {
 
     private static final Logger
@@ -27,14 +27,14 @@ extends InstrumentingIOPool<E, JulDirector> {
     }
 
     @Override
-    public Entry<E> allocate() throws IOException {
-        return new Buffer(delegate.allocate());
+    public Buffer<E> allocate() throws IOException {
+        return new JulBuffer(delegate.allocate());
     }
 
-    private final class Buffer
-    extends InstrumentingIOPool<E, JulDirector>.Buffer {
+    private final class JulBuffer
+    extends InstrumentingIOPool<E, JulDirector>.InstrumentingBuffer {
 
-        Buffer(Entry<E> model) {
+        JulBuffer(Buffer<E> model) {
             super(model);
             logger.log(FINE, "Allocated " + delegate, new NeverThrowable());
         }

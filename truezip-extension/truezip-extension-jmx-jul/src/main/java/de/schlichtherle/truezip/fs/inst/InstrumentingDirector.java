@@ -10,18 +10,19 @@ import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.socket.IOPool.Buffer;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @param   <D> the type of the instrumenting driver.
- * @author  Christian Schlichtherle
+ * @param  <D> the type of the instrumenting driver.
+ * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> {
 
-    public abstract <E extends IOPool.Entry<E>> IOPool<E> instrument(IOPool<E> pool);
+    public abstract <E extends IOPool.Buffer<E>> IOPool<E> instrument(IOPool<E> pool);
 
     public FsManager instrument(FsManager manager) {
         return new InstrumentingManager(manager, this);
@@ -39,7 +40,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
 
     public abstract FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context);
 
-    public <E extends IOPool.Entry<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, D>.Buffer context) {
+    public <E extends Buffer<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, D>.InstrumentingBuffer context) {
         return instrument(input);
     }
 
@@ -51,7 +52,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
         return input; //new InstrumentingInputSocket<E>(input, this);
     }
 
-    public <E extends IOPool.Entry<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, D>.Buffer context) {
+    public <E extends Buffer<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, D>.InstrumentingBuffer context) {
         return instrument(output);
     }
 

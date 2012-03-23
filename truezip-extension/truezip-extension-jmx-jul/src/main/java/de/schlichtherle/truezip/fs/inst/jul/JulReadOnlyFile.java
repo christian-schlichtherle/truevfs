@@ -38,7 +38,7 @@ extends DecoratingReadOnlyFile {
     throws IOException {
         super(socket.newReadOnlyFile());
         this.target = target;
-        Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
+        Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
         logger.log(level, "Randomly reading " + target, new NeverThrowable());
     }
 
@@ -47,7 +47,7 @@ extends DecoratingReadOnlyFile {
         try {
             delegate.close();
         } finally {
-            Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
+            Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }

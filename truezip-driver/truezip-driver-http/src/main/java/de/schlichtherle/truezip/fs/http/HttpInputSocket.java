@@ -43,7 +43,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        final IOPool.Entry<?> temp;
+        final IOPool.Buffer<?> temp;
         final InputStream in = entry.getInputStream();
         try {
             temp = entry.getPool().allocate();
@@ -72,7 +72,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
             @CreatesObligation
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             TempReadOnlyFile() throws IOException {
-                super(temp.getInputSocket().newReadOnlyFile()); // bind(*) is considered redundant for IOPool.Entry
+                super(temp.getInputSocket().newReadOnlyFile()); // bind(*) is considered redundant for IOPool.Buffer
             }
 
             @Override

@@ -6,20 +6,20 @@ package de.schlichtherle.truezip.fs.inst;
 
 import de.schlichtherle.truezip.entry.DecoratingEntry;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
+import de.schlichtherle.truezip.socket.IOPool.Buffer;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @param   <E> the type of the I/O buffers.
- * @param   <D> the type of the instrumenting director.
- * @author  Christian Schlichtherle
+ * @param  <E> the type of the I/O buffers.
+ * @param  <D> the type of the instrumenting director.
+ * @author Christian Schlichtherle
  */
 @Immutable
 public class InstrumentingIOPool<
-        E extends Entry<E>,
+        E extends Buffer<E>,
         D extends InstrumentingDirector<D>>
 implements IOPool<E> {
 
@@ -34,21 +34,21 @@ implements IOPool<E> {
     }
 
     @Override
-    public Entry<E> allocate() throws IOException {
-        return new Buffer(delegate.allocate());
+    public Buffer<E> allocate() throws IOException {
+        return new InstrumentingBuffer(delegate.allocate());
     }
 
     @Override
-    public void release(Entry<E> resource) throws IOException {
+    public void release(Buffer<E> resource) throws IOException {
         resource.release();
     }
 
     @SuppressWarnings("PublicInnerClass")
-    public class Buffer
-    extends DecoratingEntry<Entry<E>>
-    implements Entry<E> {
+    public class InstrumentingBuffer
+    extends DecoratingEntry<Buffer<E>>
+    implements Buffer<E> {
 
-        protected Buffer(Entry<E> delegate) {
+        protected InstrumentingBuffer(Buffer<E> delegate) {
             super(delegate);
         }
 

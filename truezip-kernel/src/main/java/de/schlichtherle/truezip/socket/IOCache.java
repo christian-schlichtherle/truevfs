@@ -415,7 +415,7 @@ public final class IOCache implements Flushable, Closeable {
 
     /** A buffer for the contents of the cache. */
     private final class Buffer {
-        final IOPool.Entry<?> data;
+        final IOPool.Buffer<?> data;
 
         int readers, writers; // max one writer!
 

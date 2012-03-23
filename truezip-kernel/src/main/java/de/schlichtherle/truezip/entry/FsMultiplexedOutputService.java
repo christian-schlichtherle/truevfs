@@ -140,7 +140,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     private BufferedEntryOutputStream newBufferedEntryOutputStream(
             final OutputSocket<? extends E> output)
     throws IOException {
-        final IOPool.Entry<?> buffer = pool.allocate();
+        final IOPool.Buffer<?> buffer = pool.allocate();
         try {
             return new BufferedEntryOutputStream(buffer, output);
         } catch (final IOException ex) {
@@ -218,21 +218,21 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     /**
      * This entry output stream writes the archive entry to an
-     * {@link de.schlichtherle.truezip.socket.IOPool.Entry I/O pool entry}.
+     * {@link de.schlichtherle.truezip.socket.IOPool.Buffer I/O pool entry}.
      * When the stream gets closed, the I/O pool entry is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
     private class BufferedEntryOutputStream extends DecoratingOutputStream {
         final InputSocket<Entry> input;
         final OutputSocket<? extends E> output;
-        final IOPool.Entry<?> buffer;
+        final IOPool.Buffer<?> buffer;
         final E local;
         boolean closed;
 
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        BufferedEntryOutputStream(  final IOPool.Entry<?> buffer,
+        BufferedEntryOutputStream(  final IOPool.Buffer<?> buffer,
                                     final OutputSocket<? extends E> output)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
@@ -291,7 +291,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             assert null != input;
             final OutputSocket<? extends E> output = this.output;
             assert null != output;
-            final IOPool.Entry<?> buffer = this.buffer;
+            final IOPool.Buffer<?> buffer = this.buffer;
             assert null != buffer;
             try {
                 if (!discard)

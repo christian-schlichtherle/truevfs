@@ -37,7 +37,7 @@ extends DecoratingInputStream {
     throws IOException {
         super(socket.newInputStream());
         this.target = target;
-        Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
+        Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
         logger.log(level, "Stream reading " + target, new NeverThrowable());
     }
 
@@ -46,7 +46,7 @@ extends DecoratingInputStream {
         try {
             delegate.close();
         } finally {
-            Level level = target instanceof IOPool.Entry ? Level.FINER : Level.FINEST;
+            Level level = target instanceof IOPool.Buffer ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }
