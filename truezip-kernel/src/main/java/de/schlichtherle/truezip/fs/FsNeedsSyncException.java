@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.path.FsEntryName;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.CheckForNull;

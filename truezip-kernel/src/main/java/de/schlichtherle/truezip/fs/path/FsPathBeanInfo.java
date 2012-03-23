@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.path;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.beans.*;
@@ -15,10 +15,10 @@ import javax.annotation.Nullable;
  * @author  Christian Schlichtherle
  */
 @DefaultAnnotation(Nullable.class)
-public class FsMountPointBeanInfo extends SimpleBeanInfo {
+public class FsPathBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
-    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.fs.FsMountPoint.class , null ); // NOI18N
+    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.fs.path.FsPath.class , null ); // NOI18N
 
     private static BeanDescriptor getBdescriptor(){
         return beanDescriptor;
@@ -29,13 +29,13 @@ public class FsMountPointBeanInfo extends SimpleBeanInfo {
         final PersistenceDelegate pd = new PersistenceDelegate() {
             @Override
             protected Expression instantiate(Object oldInstance, Encoder out) {
-                final FsMountPoint mountPoint = (FsMountPoint) oldInstance;
+                final FsPath path = (FsPath) oldInstance;
                 return new Expression(
-                    mountPoint,
-                    mountPoint.getClass(),
+                    path,
+                    path.getClass(),
                     "new", // NOI18N
                     new Object[] {
-                        mountPoint.toUri(),
+                        path.toUri(),
                     });
             }
         };

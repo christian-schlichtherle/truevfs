@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
+import de.schlichtherle.truezip.fs.path.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import de.schlichtherle.truezip.entry.Entry;

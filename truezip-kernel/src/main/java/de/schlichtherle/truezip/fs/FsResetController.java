@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.path.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsSyncOptions.RESET;
 import de.schlichtherle.truezip.util.BitField;

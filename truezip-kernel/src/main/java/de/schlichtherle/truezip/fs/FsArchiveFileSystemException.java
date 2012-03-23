@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.path.FsEntryName;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;

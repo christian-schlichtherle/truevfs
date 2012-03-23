@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.inst;
 
+import de.schlichtherle.truezip.fs.path.FsMountPoint;
 import de.schlichtherle.truezip.fs.*;
 import javax.annotation.concurrent.Immutable;
 

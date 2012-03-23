@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.path.FsScheme;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 
