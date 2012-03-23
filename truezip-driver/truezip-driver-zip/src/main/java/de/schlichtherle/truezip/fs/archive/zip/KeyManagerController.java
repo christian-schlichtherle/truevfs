@@ -4,7 +4,12 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.entry.Entry;
+import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
+import de.schlichtherle.truezip.fs.archive.FsCovariantEntry;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.SafeKeyManager;
@@ -24,6 +29,8 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public abstract class KeyManagerController<D extends ZipDriver>
 extends FsDecoratingController<FsModel, FsController<?>> {
+
+    private static final String ROOT_PATH = ROOT.getPath();
 
     protected final D driver;
     private volatile KeyManager<?> manager;
@@ -57,6 +64,38 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
+    public FsEntry getEntry(final FsEntryName name)
+    throws IOException {
+        try {
+            return delegate.getEntry(name);
+        } catch (final FsFalsePositiveException ex) {
+            if (!(getKeyExceptionType().isInstance(ex.getCause())))
+                throw ex;
+            if (!name.isRoot())
+                return null;
+            Entry entry = getParent().getEntry(
+                    getModel()
+                        .getMountPoint()
+                        .getPath()
+                        .resolve(name)
+                        .getEntryName());
+            // We're not holding any locks, so it's possible that someone else
+            // has concurrently modified the parent file system.
+            if (null == entry)
+                return null;
+            // The entry is inaccessible for some reason.
+            // This may be because the cipher key is not available.
+            // Now mask the entry as a special file.
+            while (entry instanceof FsCovariantEntry<?>)
+                entry = ((FsCovariantEntry<?>) entry).getEntry();
+            final FsCovariantEntry<FsArchiveEntry>
+                    special = new FsCovariantEntry<FsArchiveEntry>(ROOT_PATH);
+            special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
+            return special;
+        }
+    }
+
+    @Override
     public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
     throws IOException {
         try {
@@ -69,8 +108,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             // encrypted ZIP file just because e.g. the user has cancelled key
             // prompting.
             final IOException cause = ex.getCause();
-            if (null != cause
-                    && getKeyExceptionType().isAssignableFrom(cause.getClass()))
+            if (null != cause && getKeyExceptionType().isInstance(cause))
                 throw cause;
             throw ex;
         }
