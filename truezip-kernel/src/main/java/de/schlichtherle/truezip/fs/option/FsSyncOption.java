@@ -16,7 +16,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Defines options for (federated) file systems synchronization.
+ * Defines options for (federated) file system synchronization.
  *
  * @see    FsController#sync(BitField)
  * @see    FsController#sync(BitField, ExceptionHandler) 
