@@ -7,8 +7,6 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,11 +15,12 @@ import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.zip.ZipException;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Drop-in replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
- * <p>
+ * Reads a ZIP file.
  * Where the constructors of this class accept a {@code charset}
  * parameter, this is used to decode comments and entry names in the ZIP file.
  * However, if an entry has bit 11 set in its General Purpose Bit Flag,
@@ -35,13 +34,11 @@ import javax.annotation.concurrent.ThreadSafe;
  * Note that the entries returned by this class are instances of
  * {@code de.schlichtherle.truezip.io.zip.ZipEntry} instead of
  * {@code java.util.zip.ZipEntry}.
- * <p>
- * This class is thread-safe.
  *
- * @see     ZipOutputStream
- * @author  Christian Schlichtherle
+ * @see    ZipOutputStream
+ * @author Christian Schlichtherle
  */
-@ThreadSafe
+@NotThreadSafe
 public class ZipFile extends RawZipFile<ZipEntry> {
 
     private @CheckForNull ZipCryptoParameters cryptoParameters;
@@ -232,7 +229,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     @Override
-    public synchronized void recoverLostEntries() throws IOException {
+    public void recoverLostEntries() throws IOException {
         super.recoverLostEntries();
     }
 
@@ -250,7 +247,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *
      * @see #iterator()
      */
-    public synchronized Enumeration<? extends ZipEntry> entries() {
+    public Enumeration<? extends ZipEntry> entries() {
         class CloneEnumeration implements Enumeration<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
@@ -273,7 +270,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * The iteration does not support element removal.
      */
     @Override
-    public synchronized Iterator<ZipEntry> iterator() {
+    public Iterator<ZipEntry> iterator() {
         class EntryIterator implements Iterator<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
@@ -303,32 +300,18 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @param name the name of the ZIP entry.
      */
     @Override
-    public synchronized ZipEntry getEntry(String name) {
+    public ZipEntry getEntry(String name) {
         final ZipEntry ze = super.getEntry(name);
         return ze != null ? ze.clone() : null;
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public synchronized InputStream getPreambleInputStream() throws IOException {
-        return new de.schlichtherle.truezip.io.SynchronizedInputStream(super.getPreambleInputStream(),
-                this);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public synchronized InputStream getPostambleInputStream() throws IOException {
-        return new de.schlichtherle.truezip.io.SynchronizedInputStream(super.getPostambleInputStream(),
-                this);
-    }
-
-    @Override
-    public synchronized boolean busy() {
+    public boolean busy() {
         return super.busy();
     }
 
     @Override
-    public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
+    public @Nullable ZipCryptoParameters getCryptoParameters() {
         return cryptoParameters;
     }
 
@@ -339,22 +322,13 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        of entries.
      * @since TrueZIP 7.3
      */
-    public synchronized void setCryptoParameters(
+    public void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {
         this.cryptoParameters = cryptoParameters;
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    protected synchronized InputStream getInputStream(
-            String name, Boolean check, boolean process)
-    throws  IOException {
-        final InputStream in = super.getInputStream(name, check, process);
-        return in == null ? null : new de.schlichtherle.truezip.io.SynchronizedInputStream(in, this);
-    }
-
-    @Override
-    public synchronized void close() throws IOException {
+    public void close() throws IOException {
         super.close();
     }
 
