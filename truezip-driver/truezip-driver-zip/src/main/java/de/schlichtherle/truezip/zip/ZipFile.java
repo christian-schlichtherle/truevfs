@@ -4,22 +4,27 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.io.LockInputStream;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.Pool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Reads a ZIP file.
+ * Drop-in replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
+ * <p>
  * Where the constructors of this class accept a {@code charset}
  * parameter, this is used to decode comments and entry names in the ZIP file.
  * However, if an entry has bit 11 set in its General Purpose Bit Flag,
@@ -37,12 +42,14 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    ZipOutputStream
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
+@ThreadSafe
 public class ZipFile extends RawZipFile<ZipEntry> {
 
-    private @CheckForNull ZipCryptoParameters cryptoParameters;
+    private final Lock lock = new ReentrantLock();
 
     private final String name;
+    
+    private volatile @CheckForNull ZipCryptoParameters cryptoParameters;
 
     /**
      * Equivalent to {@link #ZipFile(String, Charset, boolean, boolean)
@@ -227,6 +234,16 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         this.name = rof.toString();
     }
 
+    @Override
+    public void recoverLostEntries() throws IOException {
+        lock.lock();
+        try {
+            super.recoverLostEntries();
+        } finally {
+            lock.unlock();
+        }
+    }
+
     /**
      * Returns the {@link Object#toString() string representation} of whatever
      * input source object was used to construct this ZIP file.
@@ -242,7 +259,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @see #iterator()
      */
     public Enumeration<? extends ZipEntry> entries() {
-        class CloneEnumeration implements Enumeration<ZipEntry> {
+        final class CloneEnumeration implements Enumeration<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             @Override
@@ -256,7 +273,12 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             }
         } // CloneEnumeration
 
-        return new CloneEnumeration();
+        lock.lock();
+        try {
+            return new CloneEnumeration();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -265,7 +287,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      */
     @Override
     public Iterator<ZipEntry> iterator() {
-        class EntryIterator implements Iterator<ZipEntry> {
+        final class EntryIterator implements Iterator<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
             @Override
@@ -284,7 +306,12 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             }
         } // EntryIterator
 
-        return new EntryIterator();
+        lock.lock();
+        try {
+            return new EntryIterator();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -295,8 +322,50 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      */
     @Override
     public ZipEntry getEntry(String name) {
-        final ZipEntry ze = super.getEntry(name);
+        final ZipEntry ze;
+        lock.lock();
+        try {
+            ze = super.getEntry(name);
+        } finally {
+            lock.unlock();
+        }
         return ze != null ? ze.clone() : null;
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public InputStream getPreambleInputStream() throws IOException {
+        final InputStream in;
+        lock.lock();
+        try {
+            in = super.getPreambleInputStream();
+        } finally {
+            lock.unlock();
+        }
+        return new LockInputStream(in, lock);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public InputStream getPostambleInputStream() throws IOException {
+        final InputStream in;
+        lock.lock();
+        try {
+            in = super.getPostambleInputStream();
+        } finally {
+            lock.unlock();
+        }
+        return new LockInputStream(in, lock);
+    }
+
+    @Override
+    public boolean busy() {
+        lock.lock();
+        try {
+            return super.busy();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -314,6 +383,31 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     public void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {
         this.cryptoParameters = cryptoParameters;
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    protected InputStream getInputStream(
+            String name, Boolean check, boolean process)
+    throws  IOException {
+        final InputStream in;
+        lock.lock();
+        try {
+            in = super.getInputStream(name, check, process);
+        } finally {
+            lock.unlock();
+        }
+        return in == null ? null : new LockInputStream(in, lock);
+    }
+
+    @Override
+    public void close() throws IOException {
+        lock.lock();
+        try {
+            super.close();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
