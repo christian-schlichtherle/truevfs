@@ -28,22 +28,6 @@ public final class FsInputOptions {
             NONE = BitField.noneOf(FsInputOption.class);
 
     /**
-     * @deprecated
-     * @since TrueZIP 7.2
-     * @see #NONE
-     */
-    @Deprecated
-    public static final BitField<FsInputOption> NO_INPUT_OPTIONS = NONE;
-
-    /**
-     * @deprecated
-     * @since TrueZIP 7.1.1
-     * @see #NONE
-     */
-    @Deprecated
-    public static final BitField<FsInputOption> NO_INPUT_OPTION = NONE;
-
-    /**
      * The mask of input preferences, which is
      * <code>{@link BitField}.of({@link FsInputOption#CACHE})</code>.
      * 
