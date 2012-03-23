@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
+import de.schlichtherle.truezip.fs.mock.MockArchiveDriver;
 
 /**
  * @author  Christian Schlichtherle

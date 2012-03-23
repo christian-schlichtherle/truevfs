@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.file.tar;
 
 import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.FsArchiveDriver;
 
 /**
  * @param  <D> The type of the archive driver.

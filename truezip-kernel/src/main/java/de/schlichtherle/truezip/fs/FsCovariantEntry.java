@@ -2,10 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
-import de.schlichtherle.truezip.fs.FsEntry;
 import java.io.CharConversionException;
 import java.util.*;
 import javax.annotation.Nullable;

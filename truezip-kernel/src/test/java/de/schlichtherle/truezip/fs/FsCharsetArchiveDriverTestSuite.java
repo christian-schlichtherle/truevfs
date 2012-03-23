@@ -2,8 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.archive;
+package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.FsArchiveEntry;
+import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;

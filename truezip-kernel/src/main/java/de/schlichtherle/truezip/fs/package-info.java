@@ -4,8 +4,8 @@
  */
 /**
  * Provides access to (possibly federated virtual) file systems.
- * This package is the nexus between file system applications and file system
- * drivers.
+ * This package is a nexus between client applications and file system drivers
+ * and is really the heart of the module TrueZIP Kernel.
  * 
  * @author Christian Schlichtherle
  */

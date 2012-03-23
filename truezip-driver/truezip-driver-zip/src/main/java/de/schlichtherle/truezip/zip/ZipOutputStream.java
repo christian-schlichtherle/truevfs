@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
+import de.schlichtherle.truezip.fs.FsArchiveFileSystem;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.OutputStream;
 import java.nio.charset.Charset;

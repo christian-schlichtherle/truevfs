@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.nio.file.tar;
 
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.FsArchiveDriver;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 
 /**
