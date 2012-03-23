@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsLockModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;

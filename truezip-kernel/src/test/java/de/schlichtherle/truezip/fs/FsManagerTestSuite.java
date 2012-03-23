@@ -22,7 +22,7 @@ import org.junit.Test;
 public abstract class FsManagerTestSuite {
 
     private final FsCompositeDriver driver
-            = new FsDefaultDriver(new MockDriverService("file|zip"));
+            = new FsSimpleCompositeDriver(new MockDriverService("file|zip"));
     private FsManager manager;
 
     @Before

@@ -71,7 +71,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class FsCacheController
+final class FsCacheController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final Logger logger = Logger.getLogger(
@@ -93,9 +93,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * @param controller the decorated file system controller.
      * @param pool the pool of I/O buffers to hold the cached entry contents.
      */
-    public FsCacheController(
-            final FsController<? extends FsLockModel> controller,
-                                final IOPool<?> pool) {
+    FsCacheController(  final FsController<? extends FsLockModel> controller,
+                        final IOPool<?> pool) {
         super(controller);
         if (null == (this.pool = pool))
             throw new NullPointerException();

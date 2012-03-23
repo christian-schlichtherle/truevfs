@@ -49,7 +49,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsLockController
+final class FsLockController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -72,7 +72,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      *
      * @param controller the decorated file system controller.
      */
-    public FsLockController(FsController<? extends FsLockModel> controller) {
+    FsLockController(FsController<? extends FsLockModel> controller) {
         super(controller);
         this.readLock = getModel().readLock();
         this.writeLock = getModel().writeLock();

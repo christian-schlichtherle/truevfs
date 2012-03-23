@@ -7,7 +7,6 @@ package de.schlichtherle.truezip.fs.archive.tar;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.fs.FsArchiveFileSystem;
 import de.schlichtherle.truezip.fs.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
@@ -15,6 +14,7 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -60,7 +60,7 @@ implements OutputShop<TarDriverEntry> {
      * 
      * @since  TrueZIP 7.3
      */
-    public static final int OVERHEAD_SIZE = FsArchiveFileSystem.OVERHEAD_SIZE;
+    public static final int OVERHEAD_SIZE = Maps.OVERHEAD_SIZE;
 
     /** Maps entry names to tar entries [String -> TarDriverEntry]. */
     private final Map<String, TarDriverEntry> entries

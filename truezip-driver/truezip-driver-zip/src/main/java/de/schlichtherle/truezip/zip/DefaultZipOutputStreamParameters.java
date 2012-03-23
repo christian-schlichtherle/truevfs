@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.util.Maps;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import javax.annotation.concurrent.ThreadSafe;
@@ -27,11 +28,11 @@ implements ZipOutputStreamParameters {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link DefaultZipOutputStreamParameters}
-     * returns {@code ZipOutputStream#OVERHEAD_SIZE}.
+     * returns {@code Maps#OVERHEAD_SIZE}.
      */
     @Override
     public int getOverheadSize() {
-        return ZipOutputStream.OVERHEAD_SIZE;
+        return Maps.OVERHEAD_SIZE;
     }
 
     /**

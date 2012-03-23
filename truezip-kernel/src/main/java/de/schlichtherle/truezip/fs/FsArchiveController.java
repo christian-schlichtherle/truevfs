@@ -12,7 +12,6 @@ import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
-import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.APPEND;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 import de.schlichtherle.truezip.io.InputException;

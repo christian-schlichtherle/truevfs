@@ -18,34 +18,34 @@ import javax.annotation.concurrent.Immutable;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public abstract class FsLockModelDecoratingController<
+abstract class FsLockModelDecoratingController<
         C extends FsController<? extends FsLockModel>>
 extends FsDecoratingController<FsLockModel, C>  {
 
-    protected static final int WAIT_TIMEOUT_MILLIS = 100;
+    static final int WAIT_TIMEOUT_MILLIS = 100;
 
     /**
      * Constructs a new decorating file system controller.
      * 
      * @param controller the decorated file system controller.
      */
-    protected FsLockModelDecoratingController(C controller) {
+    FsLockModelDecoratingController(C controller) {
         super(controller);
     }
 
-    protected ReadLock readLock() {
+    ReadLock readLock() {
         return getModel().readLock();
     }
 
-    protected WriteLock writeLock() {
+    WriteLock writeLock() {
         return getModel().writeLock();
     }
 
-    protected final boolean isWriteLockedByCurrentThread() {
+    final boolean isWriteLockedByCurrentThread() {
         return getModel().isWriteLockedByCurrentThread();
     }
 
-    protected final void checkWriteLockedByCurrentThread()
+    final void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         getModel().checkWriteLockedByCurrentThread();
     }

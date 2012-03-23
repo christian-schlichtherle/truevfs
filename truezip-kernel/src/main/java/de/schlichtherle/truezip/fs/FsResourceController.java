@@ -36,7 +36,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class FsResourceController
+final class FsResourceController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -50,7 +50,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      *
      * @param controller the decorated file system controller.
      */
-    public FsResourceController(FsController<? extends FsLockModel> controller) {
+    FsResourceController(FsController<? extends FsLockModel> controller) {
         super(controller);
     }
 

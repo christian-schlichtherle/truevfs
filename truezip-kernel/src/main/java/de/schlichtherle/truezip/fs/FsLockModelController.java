@@ -18,7 +18,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsLockModelController
+abstract class FsLockModelController
 extends FsModelController<FsLockModel>  {
 
     /**
@@ -27,23 +27,23 @@ extends FsModelController<FsLockModel>  {
      * 
      * @param model the concurrent file system model.
      */
-    protected FsLockModelController(FsLockModel model) {
+    FsLockModelController(FsLockModel model) {
         super(model);
     }
 
-    protected ReadLock readLock() {
+    ReadLock readLock() {
         return getModel().readLock();
     }
 
-    protected WriteLock writeLock() {
+    WriteLock writeLock() {
         return getModel().writeLock();
     }
 
-    protected final boolean isWriteLockedByCurrentThread() {
+    final boolean isWriteLockedByCurrentThread() {
         return getModel().isWriteLockedByCurrentThread();
     }
 
-    protected final void checkWriteLockedByCurrentThread()
+    final void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         getModel().checkWriteLockedByCurrentThread();
     }
