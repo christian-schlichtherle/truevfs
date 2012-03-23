@@ -132,7 +132,7 @@ public class FsArchiveFileSystemTest {
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
             final MockArchiveDriverEntry ae = driver.newEntry(aen, type, null);
             assertEquals(aen, ae.getName());
-            container   .newOutputShop()
+            container   .newOutputService()
                         .getOutputSocket(ae)
                         .newOutputStream()
                         .close();

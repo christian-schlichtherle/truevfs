@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPool.Entry;
-import de.schlichtherle.truezip.entry.InputShop;
+import de.schlichtherle.truezip.entry.InputService;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -39,12 +39,12 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
  * is no way the archive driver could predict the client application's
  * behaviour.
  *
- * @see    TarOutputShop
+ * @see    TarOutputService
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class TarInputShop
-implements InputShop<TarDriverEntry> {
+public class TarInputService
+implements InputService<TarDriverEntry> {
 
     /** Default record size */
     private static final int DEFAULT_RCDSIZE = 512;
@@ -60,7 +60,7 @@ implements InputShop<TarDriverEntry> {
     /** Maps entry names to I/O pool entries. */
     private final Map<String, TarDriverEntry>
             entries = new LinkedHashMap<String, TarDriverEntry>(
-                    initialCapacity(TarOutputShop.OVERHEAD_SIZE));
+                    initialCapacity(TarOutputService.OVERHEAD_SIZE));
 
     /**
      * Extracts the entire TAR input stream into a temporary directory in order
@@ -74,7 +74,7 @@ implements InputShop<TarDriverEntry> {
      *        of this constructor.
      */
     @CreatesObligation
-    public TarInputShop(final TarDriver driver,
+    public TarInputService(final TarDriver driver,
                         final @WillNotClose InputStream in)
     throws IOException {
         final TarArchiveInputStream tin = newValidatedTarInputStream(in);

@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.entry.InputShop;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.InputService;
+import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.entry.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.entry.FsMultiplexedOutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
@@ -143,18 +143,18 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
      * <p>
      * The implementation in the class {@link TarDriver} acquires an input
      * stream from the given socket and forwards the call to
-     * {@link #newTarInputShop}.
+     * {@link #newTarInputService}.
      */
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public TarInputShop newInputShop(FsModel model, InputSocket<?> input)
+    public TarInputService newInputService(FsModel model, InputSocket<?> input)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        TarInputShop ia = null;
+        TarInputService ia = null;
         final InputStream is = input.newInputStream();
         try {
-            return ia = newTarInputShop(model, is);
+            return ia = newTarInputService(model, is);
         } finally {
             try {
                 is.close();
@@ -167,12 +167,12 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     }
 
     @CreatesObligation
-    protected TarInputShop newTarInputShop(
+    protected TarInputService newTarInputService(
             FsModel model,
             @WillCloseWhenClosed InputStream in)
     throws IOException {
         assert null != model;
-        return new TarInputShop(this, in);
+        return new TarInputService(this, in);
     }
 
     /**
@@ -180,21 +180,21 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
      * <p>
      * The implementation in the class {@link TarDriver} acquires an output
      * stream from the given socket, forwards the call to
-     * {@link #newTarOutputShop} and wraps the result in a new
-     * {@link FsMultiplexedOutputShop}.
+     * {@link #newTarOutputService} and wraps the result in a new
+     * {@link FsMultiplexedOutputService}.
      */
     @Override
-    public OutputShop<TarDriverEntry> newOutputShop(
+    public OutputService<TarDriverEntry> newOutputService(
             final FsModel model,
             final OutputSocket<?> output,
-            final InputShop<TarDriverEntry> source)
+            final InputService<TarDriverEntry> source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
         final OutputStream os = output.newOutputStream();
         try {
-            return new FsMultiplexedOutputShop<TarDriverEntry>(
-                    newTarOutputShop(model, os, (TarInputShop) source),
+            return new FsMultiplexedOutputService<TarDriverEntry>(
+                    newTarOutputService(model, os, (TarInputService) source),
                     getPool());
         } catch (final IOException ex) {
             os.close();
@@ -203,12 +203,12 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     }
 
     @CreatesObligation
-    protected TarOutputShop newTarOutputShop(
+    protected TarOutputService newTarOutputService(
             FsModel model,
             OutputStream out,
-            @CheckForNull @WillNotClose TarInputShop source)
+            @CheckForNull @WillNotClose TarInputService source)
     throws IOException {
         assert null != model;
-        return new TarOutputShop(this, out);
+        return new TarOutputService(this, out);
     }
 }

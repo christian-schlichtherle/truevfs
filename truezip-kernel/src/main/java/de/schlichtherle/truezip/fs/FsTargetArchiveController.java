@@ -205,7 +205,7 @@ extends FsFileSystemArchiveController<E> {
                 final InputSocket<?> is = driver.getInputSocket(
                         parent, name, MOUNT_INPUT_OPTIONS);
                 final InputArchive<E> ia = new InputArchive<E>(
-                        driver.newInputShop(getModel(), is));
+                        driver.newInputService(getModel(), is));
                 fs = newPopulatedFileSystem(driver, ia.getArchive(), pe, ro);
                 setInputArchive(ia);
             } catch (final FsControllerException ex) {
@@ -250,7 +250,7 @@ extends FsFileSystemArchiveController<E> {
                 parent, name, options, null);
         final InputArchive<E> ia = getCheckedInputArchive();
         try {
-            oa = new OutputArchive<E>(driver.newOutputShop(
+            oa = new OutputArchive<E>(driver.newOutputService(
                     getModel(), os, null == ia ? null : ia.getArchive()));
         } catch (final FsControllerException ex) {
             assert ex instanceof FsNeedsLockRetryException;
@@ -499,10 +499,10 @@ extends FsFileSystemArchiveController<E> {
         // This is safe because the FsResourceController has already shut down
         // all concurrent access by closing the respective resources (streams,
         // channels etc).
-        // The Disconnecting(In|Out)putShop should not get skipped however:
+        // The Disconnecting(In|Out)putService should not get skipped however:
         // If these would throw an (In|Out)putClosedException, then this would
         // be an artifact of a bug.
-        final OutputShop<E> os;
+        final OutputService<E> os;
         {
             final OutputArchive<E> oa = outputArchive;
             if (null == oa || oa.isClosed())
@@ -511,7 +511,7 @@ extends FsFileSystemArchiveController<E> {
             os = oa.getClutch();
         }
 
-        final InputShop<E> is;
+        final InputService<E> is;
         {
             final InputArchive<E> ia = inputArchive;
             if (null != ia && ia.isClosed())
@@ -525,8 +525,8 @@ extends FsFileSystemArchiveController<E> {
 
     private static <E extends FsArchiveEntry, X extends IOException> void
     copy(   final FsArchiveFileSystem<E> fs,
-            final InputShop<E> is,
-            final OutputShop<E> os,
+            final InputService<E> is,
+            final OutputService<E> os,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
         for (final FsCovariantEntry<E> fse : fs) {
@@ -615,7 +615,7 @@ extends FsFileSystemArchiveController<E> {
      * @param <E> The type of the entries.
      */
     private static final class DummyInputService<E extends Entry>
-    implements InputShop<E> {
+    implements InputService<E> {
         @Override
         public int getSize() {
             return 0;
@@ -643,13 +643,13 @@ extends FsFileSystemArchiveController<E> {
     } // DummyInputService
 
     private static final class InputArchive<E extends FsArchiveEntry>
-    extends LockInputShop<E> {
-        final InputShop<E> archive;
+    extends LockInputService<E> {
+        final InputService<E> archive;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        InputArchive(final @WillCloseWhenClosed InputShop<E> input) {
-            super(new DisconnectingInputShop<E>(input));
+        InputArchive(final @WillCloseWhenClosed InputService<E> input) {
+            super(new DisconnectingInputService<E>(input));
             this.archive = input;
         }
 
@@ -657,34 +657,34 @@ extends FsFileSystemArchiveController<E> {
             return getClutch().isClosed();
         }
 
-        DisconnectingInputShop<E> getClutch() {
-            return (DisconnectingInputShop<E>) delegate;
+        DisconnectingInputService<E> getClutch() {
+            return (DisconnectingInputService<E>) delegate;
         }
 
         /**
          * Publishes the product of the archive driver this input archive is
          * decorating.
          */
-        InputShop<E> getArchive() {
+        InputService<E> getArchive() {
             assert !isClosed();
             return archive;
         }
     } // InputArchive
 
     private static final class OutputArchive<E extends FsArchiveEntry>
-    extends LockOutputShop<E> {
+    extends LockOutputService<E> {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        OutputArchive(final @WillCloseWhenClosed OutputShop<E> output) {
-            super(new DisconnectingOutputShop<E>(output));
+        OutputArchive(final @WillCloseWhenClosed OutputService<E> output) {
+            super(new DisconnectingOutputService<E>(output));
         }
 
         boolean isClosed() {
             return getClutch().isClosed();
         }
 
-        DisconnectingOutputShop<E> getClutch() {
-            return (DisconnectingOutputShop<E>) delegate;
+        DisconnectingOutputService<E> getClutch() {
+            return (DisconnectingOutputService<E>) delegate;
         }
     } // OutputArchive
 

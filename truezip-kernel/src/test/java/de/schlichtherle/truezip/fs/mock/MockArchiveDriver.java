@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
-import de.schlichtherle.truezip.entry.InputShop;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.InputService;
+import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
@@ -61,7 +61,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    public InputShop<MockArchiveDriverEntry> newInputShop(
+    public InputService<MockArchiveDriverEntry> newInputService(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
@@ -71,14 +71,14 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
                 c = containers.get(mp);
         if (null == c)
             throw new FileNotFoundException(mp.toString());
-        return c.newInputShop();
+        return c.newInputService();
     }
 
     @Override
-    public OutputShop<MockArchiveDriverEntry> newOutputShop(
+    public OutputService<MockArchiveDriverEntry> newOutputService(
             FsModel model,
             OutputSocket<?> output,
-            InputShop<MockArchiveDriverEntry> source)
+            InputService<MockArchiveDriverEntry> source)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         output.getLocalTarget(); // don't care for the result
@@ -87,7 +87,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
         MockArchiveDriverEntryContainer o = containers.get(mp);
         if (null == o)
             o = containers.putIfAbsent(mp, n);
-        return (null != o ? o : n).newOutputShop();
+        return (null != o ? o : n).newOutputService();
     }
 
     @Override

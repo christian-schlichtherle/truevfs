@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.entry.InputShop;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.InputService;
+import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
@@ -192,10 +192,10 @@ extends FsDriver {
     }
 
     /**
-     * Creates a new input shop for reading the archive entries for the
+     * Creates a new input service for reading the archive entries for the
      * given {@code model} from the given {@code input} socket's target.
      * <p>
-     * Note that the returned input shop does <em>not</em> need to be
+     * Note that the returned input service does <em>not</em> need to be
      * thread-safe.
      * 
      * @param  model the file system model.
@@ -203,7 +203,7 @@ extends FsDriver {
      *         archive file from its target.
      *         This is guaranteed to be the product of this driver's
      *         {@link #getInputSocket} method.
-     * @return A new input shop.
+     * @return A new input service.
      * @throws IOException on any I/O error.
      *         If the file system entry for the given model exists in the
      *         parent file system and is <em>not</em> a {@link Type#SPECIAL}
@@ -217,8 +217,8 @@ extends FsDriver {
      *         get cached.
      */
     @CreatesObligation
-    public abstract InputShop<E>
-    newInputShop(   FsModel model,
+    public abstract InputService<E>
+    newInputService(FsModel model,
                     InputSocket<?> input)
     throws IOException;
 
@@ -248,10 +248,10 @@ extends FsDriver {
     }
 
     /**
-     * Creates a new output shop for writing archive entries for the
+     * Creates a new output service for writing archive entries for the
      * given {@code model} to the given {@code output} socket's target.
      * <p>
-     * Note that the returned output shop does <em>not</em> need to be
+     * Note that the returned output service does <em>not</em> need to be
      * thread-safe.
      * 
      * @param  model the file system model.
@@ -259,21 +259,21 @@ extends FsDriver {
      *         archive file to its target.
      *         This is guaranteed to be the product of this driver's
      *         {@link #getOutputSocket} method.
-     * @param  source the {@link InputShop} if {@code archive} is going to get
-     *         updated.
+     * @param  source the {@link InputService} if {@code archive} is going to
+     *         get updated.
      *         If not {@code null}, this is guaranteed to be the product
-     *         of this driver's {@link #newInputShop} factory method.
+     *         of this driver's {@link #newInputService} factory method.
      *         This feature could get used to copy some meta data which is
      *         specific to the type of archive this driver supports,
      *         e.g. the comment of a ZIP file.
-     * @return A new output shop.
+     * @return A new output service.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public abstract OutputShop<E>
-    newOutputShop(  FsModel model,
-                    OutputSocket<?> output,
-                    @CheckForNull @WillNotClose InputShop<E> source)
+    public abstract OutputService<E>
+    newOutputService(   FsModel model,
+                        OutputSocket<?> output,
+                        @CheckForNull @WillNotClose InputService<E> source)
     throws IOException;
 
     /**

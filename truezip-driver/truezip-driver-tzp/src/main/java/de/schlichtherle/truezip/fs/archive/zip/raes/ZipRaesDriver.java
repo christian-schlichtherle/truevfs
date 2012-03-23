@@ -17,15 +17,15 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.OptionOutputSocket;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
-import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
+import de.schlichtherle.truezip.fs.archive.zip.ZipInputService;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.entry.InputShop;
+import de.schlichtherle.truezip.entry.InputService;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -133,10 +133,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected abstract long getAuthenticationTrigger();
 
     @Override
-    protected final boolean check(ZipInputShop input, ZipDriverEntry entry) {
+    protected final boolean check(ZipInputService input, ZipDriverEntry entry) {
         // Optimization: If the cipher text alias the encrypted ZIP file is
         // smaller than the authentication trigger, then its entire cipher text
-        // has already been authenticated by {@link ZipRaesDriver#newInputShop}.
+        // has already been authenticated by {@link ZipRaesDriver#newInputService}.
         // Hence, checking the CRC-32 value of the entry is redundant.
         return input.length() > getAuthenticationTrigger();
     }
@@ -205,8 +205,8 @@ public abstract class ZipRaesDriver extends JarDriver {
      * class implementation.
      */
     @Override
-    public final InputShop<ZipDriverEntry>
-    newInputShop(   final FsModel model,
+    public final InputService<ZipDriverEntry>
+    newInputService(   final FsModel model,
                     final InputSocket<?> input)
     throws IOException {
         if (null == model)
@@ -218,7 +218,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                     rof, raesParameters(model));
             if (rrof.length() <= getAuthenticationTrigger()) // compare rrof, not rof!
                 rrof.authenticate();
-            return newInputShop(model, rrof);
+            return newInputService(model, rrof);
         } catch (IOException ex) {
             rof.close();
             throw ex;
@@ -246,10 +246,10 @@ public abstract class ZipRaesDriver extends JarDriver {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputShop<ZipDriverEntry> newOutputShop(
+    protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final OptionOutputSocket output,
-            final ZipInputShop source)
+            final ZipInputService source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
@@ -258,7 +258,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         try {
             final RaesOutputStream ros = RaesOutputStream.getInstance(
                     out, raesParameters(model));
-            return newOutputShop(model, ros, source);
+            return newOutputService(model, ros, source);
         } catch (IOException ex) {
             out.close();
             throw ex;

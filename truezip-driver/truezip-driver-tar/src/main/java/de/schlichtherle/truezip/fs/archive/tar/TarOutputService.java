@@ -11,7 +11,7 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
@@ -29,7 +29,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
- * An implementation of {@link OutputShop} to write TAR archives.
+ * An implementation of {@link OutputService} to write TAR archives.
  * <p>
  * Because the TAR file format needs to know each entry's length in advance,
  * entries from an unknown source are actually written to temp files and copied
@@ -43,13 +43,13 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * <p>
  * This output archive can only write one entry concurrently.
  *
- * @see    TarInputShop
+ * @see    TarInputService
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class TarOutputShop
+public class TarOutputService
 extends TarArchiveOutputStream
-implements OutputShop<TarDriverEntry> {
+implements OutputService<TarDriverEntry> {
 
     /**
      * The number of entries which can be initially accomodated by
@@ -69,7 +69,7 @@ implements OutputShop<TarDriverEntry> {
     private boolean busy;
 
     @CreatesObligation
-    public TarOutputShop(   final TarDriver driver,
+    public TarOutputService(   final TarDriver driver,
                             final @WillCloseWhenClosed OutputStream out) {
         super(out);
         this.delegate = out;
@@ -162,7 +162,7 @@ implements OutputShop<TarDriverEntry> {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final TarDriverEntry entry)
         throws IOException {
-            super(TarOutputShop.this);
+            super(TarOutputService.this);
             putArchiveEntry(entry);
             entries.put(entry.getName(), entry);
             busy = true;
@@ -223,7 +223,7 @@ implements OutputShop<TarDriverEntry> {
             final TarDriverEntry entry = this.entry;
             assert null != entry;
 
-            TarOutputShop.this.busy = false;
+            TarOutputService.this.busy = false;
             try {
                 final InputStream in = buffer.getInputSocket().newInputStream();
                 try {
@@ -232,7 +232,7 @@ implements OutputShop<TarDriverEntry> {
                         entry.setModTime(System.currentTimeMillis());
                     putArchiveEntry(entry);
                     try {
-                        Streams.cat(in, TarOutputShop.this);
+                        Streams.cat(in, TarOutputService.this);
                     } finally {
                         closeArchiveEntry();
                     }

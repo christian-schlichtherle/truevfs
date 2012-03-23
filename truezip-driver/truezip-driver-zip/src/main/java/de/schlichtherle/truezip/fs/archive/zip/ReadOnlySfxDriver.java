@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.OutputService;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -49,10 +49,10 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    protected final OutputShop<ZipDriverEntry> newOutputShop(
+    protected final OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final OptionOutputSocket output,
-            final ZipInputShop source)
+            final ZipInputService source)
     throws IOException {
         assert null != model;
         assert null != output;

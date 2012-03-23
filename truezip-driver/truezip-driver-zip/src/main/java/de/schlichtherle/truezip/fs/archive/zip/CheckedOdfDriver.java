@@ -38,7 +38,7 @@ public class CheckedOdfDriver extends OdfDriver {
      * @return {@code true}
      */
     @Override
-    protected boolean check(ZipInputShop input, ZipDriverEntry entry) {
+    protected boolean check(ZipInputService input, ZipDriverEntry entry) {
         return true;
     }
 }

@@ -6,11 +6,11 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
-import de.schlichtherle.truezip.fs.archive.zip.ZipInputShop;
-import de.schlichtherle.truezip.fs.archive.zip.ZipOutputShop;
+import de.schlichtherle.truezip.fs.archive.zip.ZipInputService;
+import de.schlichtherle.truezip.fs.archive.zip.ZipOutputService;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.OutputService;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
@@ -47,17 +47,17 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
     }
 
     /**
-     * This implementation returns a new {@link ZipOutputShop}.
+     * This implementation returns a new {@link ZipOutputService}.
      * This restricts the number of concurrent output entry streams to one in
      * order to inhibit writing unencrypted temporary files for buffering the
      * written entries.
      */
     @Override
-    protected OutputShop<ZipDriverEntry> newOutputShop(
+    protected OutputService<ZipDriverEntry> newOutputService(
             FsModel model,
             OutputStream out,
-            ZipInputShop source)
+            ZipInputService source)
     throws IOException {
-        return new ZipOutputShop(this, model, out, source);
+        return new ZipOutputService(this, model, out, source);
     }
 }
