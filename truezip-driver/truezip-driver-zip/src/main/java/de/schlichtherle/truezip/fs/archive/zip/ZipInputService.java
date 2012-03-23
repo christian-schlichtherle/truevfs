@@ -5,9 +5,9 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.InputService;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.entry.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.zip.RawZipFile;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
@@ -19,15 +19,15 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An input shop for reading ZIP files.
+ * An input service for reading ZIP files.
  *
- * @see    ZipOutputShop
+ * @see    ZipOutputService
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class ZipInputShop
+public class ZipInputService
 extends RawZipFile<ZipDriverEntry>
-implements InputShop<ZipDriverEntry> {
+implements InputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
     private final FsModel model;
@@ -36,7 +36,7 @@ implements InputShop<ZipDriverEntry> {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ZipInputShop(
+    public ZipInputService(
             final ZipDriver driver,
             final FsModel model,
             final @WillCloseWhenClosed ReadOnlyFile rof)
@@ -69,7 +69,7 @@ implements InputShop<ZipDriverEntry> {
     /**
      * Returns {@code true} if and only if the target archive file gets entries
      * appended to it.
-     * Note that the implementation in the class {@link ZipInputShop} does not
+     * Note that the implementation in the class {@link ZipInputService} does not
      * use this property.
      * 
      * @return {@code true} if and only if the target archive file gets entries
@@ -121,11 +121,11 @@ implements InputShop<ZipDriverEntry> {
                 final ZipDriverEntry zpt = pt instanceof ZipDriverEntry
                         ? (ZipDriverEntry) pt
                         : null;
-                final ZipDriver driver = ZipInputShop.this.driver;
+                final ZipDriver driver = ZipInputService.this.driver;
                 return getInputStream(
                         lt.getName(),
-                        driver.check(ZipInputShop.this, lt),
-                        null == zpt || driver.process(ZipInputShop.this, lt, zpt));
+                        driver.check(ZipInputService.this, lt),
+                        null == zpt || driver.process(ZipInputService.this, lt, zpt));
             }
         } // Input
 

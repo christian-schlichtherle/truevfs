@@ -5,10 +5,10 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.entry.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.entry.FsMultiplexedOutputService;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.OutputService;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
@@ -33,7 +33,7 @@ import javax.annotation.concurrent.Immutable;
  * @see    <a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf">Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream</a>
  * @see    <a href="http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf">Open Document Format for Office Applications (OpenDocument) v1.1; Section 17.4: MIME Type Stream</a>
  * @see    <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part3.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 3: Packages; Section 3.3: MIME Type Stream</a>
- * @see    OdfOutputShop
+ * @see    OdfOutputService
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -45,15 +45,15 @@ public class OdfDriver extends JarDriver {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputShop<ZipDriverEntry> newOutputShop(
+    protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final OutputStream out,
-            final ZipInputShop source)
+            final ZipInputService source)
     throws IOException {
-        final ZipOutputShop shop = new ZipOutputShop(this, model, out, source);
+        final ZipOutputService service = new ZipOutputService(this, model, out, source);
         final IOPool<?> pool = getPool();
         return null != source && source.isAppendee()
-                ? new FsMultiplexedOutputShop<ZipDriverEntry>(shop, pool)
-                : new OdfOutputShop(shop, pool);
+                ? new FsMultiplexedOutputService<ZipDriverEntry>(service, pool)
+                : new OdfOutputService(service, pool);
     }
 }

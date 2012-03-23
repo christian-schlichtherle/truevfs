@@ -24,21 +24,21 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Decorates another input shop in order to disconnect any resources when this
- * input shop gets closed.
- * Once {@linkplain #close() closed}, all methods of all products of this shop,
+ * Decorates another input service in order to disconnect any resources when this
+ * input service gets closed.
+ * Once {@linkplain #close() closed}, all methods of all products of this service,
  * including all sockets, streams etc. but excluding {@link #getInputSocket}
  * and all {@link #close()} methods, will throw an
  * {@link InputClosedException} when called.
  *
  * @param  <E> the type of the entries.
- * @see    DisconnectingOutputShop
+ * @see    DisconnectingOutputService
  * @author Christian Schlichtherle
  */
 // TODO: Consider renaming this to ClutchInputArchive in TrueZIP 8.
 @NotThreadSafe
-public class DisconnectingInputShop<E extends Entry>
-extends DecoratingInputShop<E, InputShop<E>> {
+public class DisconnectingInputService<E extends Entry>
+extends DecoratingInputService<E, InputService<E>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
@@ -47,13 +47,13 @@ extends DecoratingInputShop<E, InputShop<E>> {
     private boolean closed;
 
     /**
-     * Constructs a disconnecting input shop.
+     * Constructs a disconnecting input service.
      *
-     * @param input the shop to decorate.
+     * @param input the service to decorate.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public DisconnectingInputShop(@WillCloseWhenClosed InputShop<E> input) {
+    public DisconnectingInputService(@WillCloseWhenClosed InputService<E> input) {
         super(input);
     }
 
@@ -96,10 +96,10 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     /**
-     * Closes this input shop.
+     * Closes this input service.
      * Subsequent calls to this method will just forward the call to the
-     * decorated input shop.
-     * Subsequent calls to any other method of this input shop will result in
+     * decorated input service.
+     * Subsequent calls to any other method of this input service will result in
      * an {@link InputClosedException}, even if the call to this method fails
      * with an {@link IOException}.
      * 
@@ -116,23 +116,23 @@ extends DecoratingInputShop<E, InputShop<E>> {
         NIO2() {
             @Override
             <E extends Entry> InputSocket<? extends E> newInputSocket(
-                    DisconnectingInputShop<E> shop,
+                    DisconnectingInputService<E> service,
                     InputSocket<? extends E> input) {
-                return shop.new Nio2Input(input);
+                return service.new Nio2Input(input);
             }
         },
 
         OIO() {
             @Override
             <E extends Entry> InputSocket<? extends E> newInputSocket(
-                    DisconnectingInputShop<E> shop,
+                    DisconnectingInputService<E> service,
                     InputSocket<? extends E> input) {
-                return shop.new Input(input);
+                return service.new Input(input);
             }
         };
 
         abstract <E extends Entry> InputSocket<? extends E> newInputSocket(
-                DisconnectingInputShop<E> shop,
+                DisconnectingInputService<E> service,
                 InputSocket <? extends E> input);
     } // SocketFactory
 

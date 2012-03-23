@@ -26,12 +26,12 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Decorates annother output shop to support a virtually unlimited number of
+ * Decorates annother output service to support a virtually unlimited number of
  * entries which may be written concurrently while actually at most one entry
- * is written concurrently to the decorated output shop.
+ * is written concurrently to the decorated output service.
  * If there is more than one entry to be written concurrently, the additional
  * entries are buffered to an I/O entry allocated from an I/O pool and copied
- * to the decorated output shop upon a call to their
+ * to the decorated output service upon a call to their
  * {@link OutputStream#close()} method.
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
@@ -40,8 +40,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class FsMultiplexedOutputShop<E extends FsArchiveEntry>
-extends DecoratingOutputShop<E, OutputShop<E>> {
+public class FsMultiplexedOutputService<E extends FsArchiveEntry>
+extends DecoratingOutputService<E, OutputService<E>> {
 
     private final IOPool<?> pool;
 
@@ -56,15 +56,15 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     private boolean busy;
 
     /**
-     * Constructs a new multiplexed output shop.
+     * Constructs a new multiplexed output service.
      * 
-     * @param output the decorated output shop.
+     * @param output the decorated output service.
      * @param pool the pool for buffering entry data.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public FsMultiplexedOutputShop(
-            final @WillCloseWhenClosed OutputShop<E> output,
+    public FsMultiplexedOutputService(
+            final @WillCloseWhenClosed OutputService<E> output,
             final IOPool<?> pool) {
         super(output);
         if (null == (this.pool = pool))
@@ -118,7 +118,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(FsMultiplexedOutputShop.super.getOutputSocket(entry));
+                super(FsMultiplexedOutputService.super.getOutputSocket(entry));
             }
 
             @Override
@@ -163,7 +163,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     @Override
     public void close() throws IOException {
         if (isBusy())
-            throw new IOException("Output shop is still busy!");
+            throw new IOException("Output service is still busy!");
         storeBuffers();
         assert buffers.isEmpty();
         delegate.close();
@@ -193,7 +193,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         builder.check();
     }
 
-    /** This entry output stream writes directly to this output shop. */
+    /** This entry output stream writes directly to this output service. */
     private class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
@@ -220,7 +220,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * This entry output stream writes the archive entry to an
      * {@link de.schlichtherle.truezip.socket.IOPool.Entry I/O pool entry}.
      * When the stream gets closed, the I/O pool entry is then copied to this
-     * output shop and finally deleted unless this output shop is still busy.
+     * output service and finally deleted unless this output service is still busy.
      */
     private class BufferedEntryOutputStream extends DecoratingOutputStream {
         final InputSocket<Entry> input;

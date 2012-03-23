@@ -22,21 +22,21 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Decorates another output shop in order to disconnect any resources when this
- * output shop gets closed.
- * Once {@linkplain #close() closed}, all methods of all products of this shop,
+ * Decorates another output service in order to disconnect any resources when this
+ * output service gets closed.
+ * Once {@linkplain #close() closed}, all methods of all products of this service,
  * including all sockets, streams etc. but excluding {@link #getOutputSocket}
  * and all {@link #close()} methods, will throw an
  * {@link OutputClosedException} when called.
  *
  * @param  <E> the type of the entries.
- * @see    DisconnectingInputShop
+ * @see    DisconnectingInputService
  * @author Christian Schlichtherle
  */
 // TODO: Consider renaming this to ClutchOutputArchive in TrueZIP 8.
 @NotThreadSafe
-public class DisconnectingOutputShop<E extends Entry>
-extends DecoratingOutputShop<E, OutputShop<E>> {
+public class DisconnectingOutputService<E extends Entry>
+extends DecoratingOutputService<E, OutputService<E>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
@@ -45,13 +45,13 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     private boolean closed;
 
     /**
-     * Constructs a disconnecting output shop.
+     * Constructs a disconnecting output service.
      * 
-     * @param output the shop to decorate.
+     * @param output the service to decorate.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public DisconnectingOutputShop(@WillCloseWhenClosed OutputShop<E> output) {
+    public DisconnectingOutputService(@WillCloseWhenClosed OutputService<E> output) {
         super(output);
     }
 
@@ -94,10 +94,10 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     /**
-     * Closes this output shop.
+     * Closes this output service.
      * Subsequent calls to this method will just forward the call to the
-     * decorated output shop.
-     * Subsequent calls to any other method of this output shop will result in
+     * decorated output service.
+     * Subsequent calls to any other method of this output service will result in
      * an {@link OutputClosedException}, even if the call to this method fails
      * with an {@link IOException}.
      * 
@@ -114,23 +114,23 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         NIO2() {
             @Override
             <E extends Entry> OutputSocket<? extends E> newOutputSocket(
-                    DisconnectingOutputShop<E> shop,
+                    DisconnectingOutputService<E> service,
                     OutputSocket<? extends E> output) {
-                return shop.new Nio2Output(output);
+                return service.new Nio2Output(output);
             }
         },
 
         OIO() {
             @Override
             <E extends Entry> OutputSocket<? extends E> newOutputSocket(
-                    DisconnectingOutputShop<E> shop,
+                    DisconnectingOutputService<E> service,
                     OutputSocket<? extends E> output) {
-                return shop.new Output(output);
+                return service.new Output(output);
             }
         };
 
         abstract <E extends Entry> OutputSocket<? extends E> newOutputSocket(
-                DisconnectingOutputShop<E> shop,
+                DisconnectingOutputService<E> service,
                 OutputSocket <? extends E> output);
     } // SocketFactory
 

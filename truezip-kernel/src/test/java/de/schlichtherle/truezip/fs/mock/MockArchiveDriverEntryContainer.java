@@ -4,10 +4,12 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
-import de.schlichtherle.truezip.entry.DisconnectingInputShop;
-import de.schlichtherle.truezip.entry.DisconnectingOutputShop;
-import de.schlichtherle.truezip.entry.InputShop;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.ThrowingInputService;
+import de.schlichtherle.truezip.entry.ThrowingOutputService;
+import de.schlichtherle.truezip.entry.DisconnectingInputService;
+import de.schlichtherle.truezip.entry.DisconnectingOutputService;
+import de.schlichtherle.truezip.entry.InputService;
+import de.schlichtherle.truezip.entry.OutputService;
 import static de.schlichtherle.truezip.entry.Entry.ALL_ACCESS_SET;
 import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
@@ -95,27 +97,27 @@ implements EntryContainer<MockArchiveDriverEntry> {
         return entries.get(name);
     }
 
-    public InputShop<MockArchiveDriverEntry> newInputShop() {
+    public InputService<MockArchiveDriverEntry> newInputService() {
         checkUndeclaredExceptions();
-        return new ThrowingInputShop<MockArchiveDriverEntry>(
-                new DisconnectingInputShop<MockArchiveDriverEntry>(
-                    new MockInputShop(entries, config)),
+        return new ThrowingInputService<MockArchiveDriverEntry>(
+                new DisconnectingInputService<MockArchiveDriverEntry>(
+                    new MockInputService(entries, config)),
                 config);
     }
 
-    public OutputShop<MockArchiveDriverEntry> newOutputShop() {
+    public OutputService<MockArchiveDriverEntry> newOutputService() {
         checkUndeclaredExceptions();
-        return new ThrowingOutputShop<MockArchiveDriverEntry>(
-                new DisconnectingOutputShop<MockArchiveDriverEntry>(
-                    new MockOutputShop(entries, config)),
+        return new ThrowingOutputService<MockArchiveDriverEntry>(
+                new DisconnectingOutputService<MockArchiveDriverEntry>(
+                    new MockOutputService(entries, config)),
                 config);
     }
 
-    private static final class MockInputShop
+    private static final class MockInputService
     extends MockArchiveDriverEntryContainer
-    implements InputShop<MockArchiveDriverEntry> {
+    implements InputService<MockArchiveDriverEntry> {
 
-        MockInputShop(  Map<String, MockArchiveDriverEntry> entries,
+        MockInputService(  Map<String, MockArchiveDriverEntry> entries,
                         TestConfig config) {
             super(entries, config);
         }
@@ -165,13 +167,13 @@ implements EntryContainer<MockArchiveDriverEntry> {
 
         @Override
         public void close() { }
-    } // MockInputShop
+    } // MockInputService
 
-    private static final class MockOutputShop
+    private static final class MockOutputService
     extends MockArchiveDriverEntryContainer
-    implements OutputShop<MockArchiveDriverEntry> {
+    implements OutputService<MockArchiveDriverEntry> {
 
-        MockOutputShop( Map<String, MockArchiveDriverEntry> entries,
+        MockOutputService( Map<String, MockArchiveDriverEntry> entries,
                         TestConfig config) {
             super(entries, config);
         }
@@ -240,5 +242,5 @@ implements EntryContainer<MockArchiveDriverEntry> {
 
         @Override
         public void close() { }
-    } // MockOutputShop
+    } // MockOutputService
 }

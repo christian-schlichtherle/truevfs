@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.entry.InputShop;
-import de.schlichtherle.truezip.entry.OutputShop;
-import de.schlichtherle.truezip.entry.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.entry.InputService;
+import de.schlichtherle.truezip.entry.OutputService;
+import de.schlichtherle.truezip.entry.FsMultiplexedOutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
@@ -132,11 +132,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         return KeyManagerLocator.SINGLETON;
     }
 
-    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputShop input) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputService input) {
         return zipCryptoParameters(input.getModel(), input.getRawCharset());
     }
 
-    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputShop output) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputService output) {
         return zipCryptoParameters(output.getModel(), output.getRawCharset());
     }
 
@@ -242,20 +242,20 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @since  TrueZIP 7.3
      */
     protected boolean check(
-            @WillNotClose ZipInputShop input,
+            @WillNotClose ZipInputService input,
             ZipDriverEntry entry) {
         return entry.isEncrypted();
     }
 
     final boolean process(
-            @WillNotClose ZipInputShop input,
+            @WillNotClose ZipInputService input,
             ZipDriverEntry local,
             ZipDriverEntry peer) {
         return process(local, peer);
     }
 
     final boolean process(
-            @WillNotClose ZipOutputShop output,
+            @WillNotClose ZipOutputService output,
             ZipDriverEntry local,
             ZipDriverEntry peer) {
         return process(peer, local);
@@ -452,10 +452,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * <p>
      * The implementation in the class {@link ZipDriver} acquires a read only
      * file from the given socket and forwards the call to
-     * {@link #newInputShop}.
+     * {@link #newInputService}.
      */
     @Override
-    public InputShop<ZipDriverEntry> newInputShop(
+    public InputService<ZipDriverEntry> newInputService(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
@@ -463,7 +463,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             throw new NullPointerException();
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
-            return newInputShop(model, rof);
+            return newInputService(model, rof);
         } catch (final IOException ex) {
             rof.close();
             throw ex;
@@ -471,12 +471,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @CreatesObligation
-    protected InputShop<ZipDriverEntry> newInputShop(
+    protected InputService<ZipDriverEntry> newInputService(
             FsModel model,
             @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
         assert null != model;
-        final ZipInputShop input = new ZipInputShop(this, model, rof);
+        final ZipInputService input = new ZipInputService(this, model, rof);
         try {
             input.recoverLostEntries();
         } catch (IOException ex) {
@@ -499,11 +499,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * </ol>
      * <p>
      * The resulting output socket is then wrapped in a private nested class
-     * for an upcast in {@link #newOutputShop}.
-     * Thus, when overriding this method, {@link #newOutputShop} should get
+     * for an upcast in {@link #newOutputService}.
+     * Thus, when overriding this method, {@link #newOutputService} should get
      * overridden, too.
      * Otherwise, a class cast exception will get thrown in
-     * {@link #newOutputShop}.
+     * {@link #newOutputService}.
      */
     @Override
     public OptionOutputSocket getOutputSocket(
@@ -527,46 +527,46 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * If this is the case and the given {@code source} is not {@code null},
      * then it's marked for appending to it.
      * Then, an output stream is acquired from the given {@code output} socket
-     * and the parameters are forwarded to {@link #newOutputShop(FsModel, OptionOutputSocket, ZipInputShop)}
-     * and the result gets wrapped in a new {@link FsMultiplexedOutputShop}
+     * and the parameters are forwarded to {@link #newOutputService(FsModel, OptionOutputSocket, ZipInputService)}
+     * and the result gets wrapped in a new {@link FsMultiplexedOutputService}
      * which uses the current {@link #getPool}.
      */
     @Override
-    public final OutputShop<ZipDriverEntry> newOutputShop(
+    public final OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final OutputSocket<?> output,
-            final InputShop<ZipDriverEntry> source)
+            final InputService<ZipDriverEntry> source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        return newOutputShop0(
+        return newOutputService0(
                 model,
                 (OptionOutputSocket) output,
-                (ZipInputShop) source);
+                (ZipInputService) source);
     }
 
     @CreatesObligation
-    private OutputShop<ZipDriverEntry> newOutputShop0(
+    private OutputService<ZipDriverEntry> newOutputService0(
             final FsModel model,
             final OptionOutputSocket output,
-            final @CheckForNull @WillNotClose ZipInputShop source)
+            final @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
         final BitField<FsOutputOption> options = output.getOptions();
         if (null != source)
             source.setAppendee(options.get(GROW));
-        return newOutputShop(model, output, source);
+        return newOutputService(model, output, source);
     }
 
     @CreatesObligation
-    protected OutputShop<ZipDriverEntry> newOutputShop(
+    protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final OptionOutputSocket output,
-            final @CheckForNull @WillNotClose ZipInputShop source)
+            final @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
         assert null != model;
         final OutputStream out = output.newOutputStream();
         try {
-            return newOutputShop(model, out, source);
+            return newOutputService(model, out, source);
         } catch (IOException ex) {
             out.close();
             throw ex;
@@ -575,13 +575,13 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputShop<ZipDriverEntry> newOutputShop(
+    protected OutputService<ZipDriverEntry> newOutputService(
             FsModel model,
             @WillCloseWhenClosed OutputStream out,
-            @CheckForNull @WillNotClose ZipInputShop source)
+            @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
-        return new FsMultiplexedOutputShop<ZipDriverEntry>(
-                new ZipOutputShop(this, model, out, source),
+        return new FsMultiplexedOutputService<ZipDriverEntry>(
+                new ZipOutputService(this, model, out, source),
                 getPool());
     }
 }

@@ -76,21 +76,21 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected TarInputShop newTarInputShop(
+    protected TarInputService newTarInputService(
             final FsModel model, final InputStream in)
     throws IOException {
-        return super.newTarInputShop(model,
+        return super.newTarInputService(model,
                 new BZip2CompressorInputStream(
                     new BufferedInputStream(in, getBufferSize())));
     }
 
     @Override
-    protected TarOutputShop newTarOutputShop(
+    protected TarOutputService newTarOutputService(
             final FsModel model,
             final OutputStream out,
-            final TarInputShop source)
+            final TarInputService source)
     throws IOException {
-        return super.newTarOutputShop(model,
+        return super.newTarOutputService(model,
                 new BZip2CompressorOutputStream(
                     new BufferedOutputStream(out, getBufferSize()),
                     getLevel()),

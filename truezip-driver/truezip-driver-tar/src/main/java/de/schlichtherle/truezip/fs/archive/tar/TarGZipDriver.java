@@ -79,19 +79,19 @@ public class TarGZipDriver extends TarDriver {
     }
 
     @Override
-    protected TarInputShop newTarInputShop(FsModel model, InputStream in)
+    protected TarInputService newTarInputService(FsModel model, InputStream in)
     throws IOException {
-        return super.newTarInputShop(model,
+        return super.newTarInputService(model,
                 new GZIPInputStream(in, getBufferSize()));
     }
 
     @Override
-    protected TarOutputShop newTarOutputShop(
+    protected TarOutputService newTarOutputService(
             final FsModel model,
             final OutputStream out,
-            final TarInputShop source)
+            final TarInputService source)
     throws IOException {
-        return super.newTarOutputShop(model,
+        return super.newTarOutputService(model,
                 new GZIPOutputStream(out, getBufferSize(), getLevel()),
                 source);
     }

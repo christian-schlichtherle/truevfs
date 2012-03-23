@@ -2,11 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.DecoratingInputShop;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.InputShop;
+import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -17,27 +15,27 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * @param   <E> The type of the entries served by the decorated input shop.
- * @see     ThrowingOutputShop
+ * @param   <E> The type of the entries served by the decorated input service.
+ * @see     ThrowingOutputService
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public class ThrowingInputShop<E extends Entry>
-extends DecoratingInputShop<E, InputShop<E>> {
+public class ThrowingInputService<E extends Entry>
+extends DecoratingInputService<E, InputService<E>> {
     private final TestConfig config;
     private volatile @CheckForNull ThrowControl control;
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ThrowingInputShop(   final @WillCloseWhenClosed InputShop<E> shop) {
-        this(shop, null);
+    public ThrowingInputService(   final @WillCloseWhenClosed InputService<E> service) {
+        this(service, null);
     }
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ThrowingInputShop(   final @WillCloseWhenClosed InputShop<E> shop,
+    public ThrowingInputService(   final @WillCloseWhenClosed InputService<E> service,
                                 final @CheckForNull TestConfig config) {
-        super(shop);
+        super(service);
         this.config = null != config ? config : TestConfig.get();
     }
 

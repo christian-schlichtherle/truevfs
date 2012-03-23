@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.InputShop;
-import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.InputService;
+import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.entry.Entry;
@@ -157,23 +157,23 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewInputShopMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newInputShop(null, getArchiveInputSocket());
+    public void testNewInputServiceMustNotTolerateNullModel() throws IOException {
+        getArchiveDriver().newInputService(null, getArchiveInputSocket());
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewInputShopMustNotTolerateNullInputSocket() throws IOException {
-        getArchiveDriver().newInputShop(model, null);
+    public void testNewInputServiceMustNotTolerateNullInputSocket() throws IOException {
+        getArchiveDriver().newInputService(model, null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewOutputShopMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newOutputShop(null, getArchiveOutputSocket(), null);
+    public void testNewOutputServiceMustNotTolerateNullModel() throws IOException {
+        getArchiveDriver().newOutputService(null, getArchiveOutputSocket(), null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewOutputShopMustNotTolerateNullInputSocket() throws IOException {
-        getArchiveDriver().newOutputShop(model, null, null);
+    public void testNewOutputServiceMustNotTolerateNullInputSocket() throws IOException {
+        getArchiveDriver().newOutputService(model, null, null);
     }
 
     @Test
@@ -183,8 +183,8 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void output() throws IOException {
-        final OutputShop<E> os = getArchiveDriver()
-                .newOutputShop(model, getArchiveOutputSocket(), null);
+        final OutputService<E> os = getArchiveDriver()
+                .newOutputService(model, getArchiveOutputSocket(), null);
         try {
             final Closeable[] streams = new Closeable[getNumEntries()];
             try {
@@ -211,7 +211,7 @@ extends FsArchiveDriverTestBase<D> {
             os.close();
         }
         // This is undefined in the contract, so the kernel decorates the
-        // driver product with a DisconnectingOutputShop to assert this.
+        // driver product with a DisconnectingOutputService to assert this.
         /*try {
             output(os, getNumEntries()).close();
             fail();
@@ -220,21 +220,21 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @CreatesObligation
-    private OutputStream output(final OutputShop<E> shop, final int i)
+    private OutputStream output(final OutputService<E> service, final int i)
     throws IOException {
         final String name = name(i);
         final E entry = newEntry(name);
-        final OutputSocket<? extends E> output = shop.getOutputSocket(entry);
+        final OutputSocket<? extends E> output = service.getOutputSocket(entry);
         assertSame(entry, output.getLocalTarget());
 
-        assertNull(shop.getEntry(name));
-        assertEquals(i, shop.getSize());
+        assertNull(service.getEntry(name));
+        assertEquals(i, service.getSize());
 
         boolean failure = true;
         final OutputStream out = output.newOutputStream();
         try {
-            assertSame(entry, shop.getEntry(name));
-            assertEquals(i + 1, shop.getSize());
+            assertSame(entry, service.getEntry(name));
+            assertEquals(i + 1, service.getSize());
             out.write(getData());
             failure = false;
         } finally {
@@ -250,8 +250,8 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void input() throws IOException {
-        final InputShop<E> is = getArchiveDriver()
-                .newInputShop(model, getArchiveInputSocket());
+        final InputService<E> is = getArchiveDriver()
+                .newInputService(model, getArchiveInputSocket());
         try {
             check(is);
             final Closeable[] streams = new Closeable[getNumEntries()];
@@ -281,7 +281,7 @@ extends FsArchiveDriverTestBase<D> {
             is.close();
         }
         // This is undefined in the contract, so the kernel decorates the
-        // driver product with a DisconnectingInputShop to assert this.
+        // driver product with a DisconnectingInputService to assert this.
         /*try {
             input(is, getNumEntries()).close();
             fail();
@@ -289,9 +289,9 @@ extends FsArchiveDriverTestBase<D> {
         }*/
     }
 
-    private InputStream input(final InputShop<E> shop, final int i)
+    private InputStream input(final InputService<E> service, final int i)
     throws IOException {
-        final InputSocket<? extends E> input = shop.getInputSocket(name(i));
+        final InputSocket<? extends E> input = service.getInputSocket(name(i));
 
         {
             final byte[] buf = new byte[getDataLength()];

@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.entry.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.entry.FsMultiplexedOutputService;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -23,7 +23,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class OdfOutputShop extends FsMultiplexedOutputShop<ZipDriverEntry> {
+public class OdfOutputService extends FsMultiplexedOutputService<ZipDriverEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";
@@ -32,14 +32,14 @@ public class OdfOutputShop extends FsMultiplexedOutputShop<ZipDriverEntry> {
     private boolean mimetype;
 
     /**
-     * Constructs a new ODF output shop.
+     * Constructs a new ODF output service.
      * 
-     * @param output the decorated output shop.
+     * @param output the decorated output service.
      * @param pool the pool for buffering entry data.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public OdfOutputShop(@WillCloseWhenClosed ZipOutputShop output, IOPool<?> pool) {
+    public OdfOutputService(@WillCloseWhenClosed ZipOutputService output, IOPool<?> pool) {
         super(output, pool);
     }
 
@@ -50,7 +50,7 @@ public class OdfOutputShop extends FsMultiplexedOutputShop<ZipDriverEntry> {
 
         class Output extends DecoratingOutputSocket<ZipDriverEntry> {
             Output() {
-                super(OdfOutputShop.super.getOutputSocket(entry));
+                super(OdfOutputService.super.getOutputSocket(entry));
             }
 
             @Override

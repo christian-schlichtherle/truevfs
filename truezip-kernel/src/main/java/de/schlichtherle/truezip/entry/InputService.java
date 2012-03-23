@@ -12,14 +12,14 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * A service for reading entries from a container.
+ * A service for reading entries from this container.
  *
  * @param  <E> the type of the entries.
- * @see    OutputShop
+ * @see    OutputService
  * @author Christian Schlichtherle
  */
 @CleanupObligation
-public interface InputShop<E extends Entry>
+public interface InputService<E extends Entry>
 extends Closeable, EntryContainer<E> {
 
     /**

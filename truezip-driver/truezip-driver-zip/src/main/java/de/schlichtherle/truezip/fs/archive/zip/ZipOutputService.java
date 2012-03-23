@@ -6,13 +6,13 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.entry.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
@@ -35,16 +35,16 @@ import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An output shop for writing ZIP files.
- * This output shop can only write one entry concurrently.
+ * An output service for writing ZIP files.
+ * This output service can only write one entry concurrently.
  * 
- * @see    ZipInputShop
+ * @see    ZipInputService
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class ZipOutputShop
+public class ZipOutputService
 extends RawZipOutputStream<ZipDriverEntry>
-implements OutputShop<ZipDriverEntry> {
+implements OutputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
     private final FsModel model;
@@ -54,10 +54,10 @@ implements OutputShop<ZipDriverEntry> {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ZipOutputShop(   final ZipDriver driver,
+    public ZipOutputService(   final ZipDriver driver,
                             final FsModel model,
                             final @WillCloseWhenClosed OutputStream out,
-                            final @CheckForNull @WillNotClose ZipInputShop source)
+                            final @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
         super(  out,
                 null != source && source.isAppendee() ? source : null,
@@ -169,7 +169,7 @@ implements OutputShop<ZipDriverEntry> {
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
                         final ZipDriverEntry zpt = (ZipDriverEntry) peer;
-                        process = driver.process(ZipOutputShop.this, entry, zpt);
+                        process = driver.process(ZipOutputService.this, entry, zpt);
                         if (!process) {
                             entry.setPlatform(zpt.getPlatform());
                             entry.setEncrypted(zpt.isEncrypted());
@@ -246,8 +246,8 @@ implements OutputShop<ZipDriverEntry> {
     }
 
     /**
-     * This entry output stream writes directly to this output shop.
-     * It can only be used if this output shop is not currently busy with
+     * This entry output stream writes directly to this output service.
+     * It can only be used if this output service is not currently busy with
      * writing another entry and the entry holds enough information to write
      * the entry header.
      * These preconditions are checked by
@@ -259,7 +259,7 @@ implements OutputShop<ZipDriverEntry> {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(ZipDriverEntry entry, boolean process)
         throws IOException {
-            super(ZipOutputShop.this);
+            super(ZipOutputService.this);
             putNextEntry(entry, process);
         }
 
@@ -273,7 +273,7 @@ implements OutputShop<ZipDriverEntry> {
      * This entry output stream writes the ZIP archive entry to an
      * {@link de.schlichtherle.truezip.socket.IOPool.Entry I/O pool entry}.
      * When the stream gets closed, the I/O pool entry is then copied to this
-     * output shop and finally deleted.
+     * output service and finally deleted.
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream extends CheckedOutputStream {
@@ -290,7 +290,7 @@ implements OutputShop<ZipDriverEntry> {
             super(buffer.getOutputSocket().newOutputStream(), new CRC32());
             assert STORED == entry.getMethod();
             this.buffer = buffer;
-            ZipOutputShop.this.bufferedEntry = entry;
+            ZipOutputService.this.bufferedEntry = entry;
             this.process = process;
         }
 
@@ -308,11 +308,11 @@ implements OutputShop<ZipDriverEntry> {
             final IOPool.Entry<?> buffer = this.buffer;
             assert null != buffer;
 
-            final ZipDriverEntry entry = ZipOutputShop.this.bufferedEntry;
+            final ZipDriverEntry entry = ZipOutputService.this.bufferedEntry;
             assert null != entry;
             assert STORED == entry.getMethod();
 
-            ZipOutputShop.this.bufferedEntry = null;
+            ZipOutputService.this.bufferedEntry = null;
             try {
                 final InputStream in = buffer.getInputSocket().newInputStream();
                 try {
@@ -325,7 +325,7 @@ implements OutputShop<ZipDriverEntry> {
                         entry.setTime(System.currentTimeMillis());*/
                     putNextEntry(entry, this.process);
                     try {
-                        Streams.cat(in, ZipOutputShop.this);
+                        Streams.cat(in, ZipOutputService.this);
                     } finally {
                         closeEntry();
                     }

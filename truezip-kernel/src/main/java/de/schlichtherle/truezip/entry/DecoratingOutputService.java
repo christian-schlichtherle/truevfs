@@ -12,19 +12,19 @@ import java.io.IOException;
 import javax.annotation.WillCloseWhenClosed;
 
 /**
- * An abstract decorator for an output shop.
+ * An abstract decorator for an output service.
  *
- * @param  <E> the type of the entries served to the decorated output shop.
- * @param  <O> the type of the decorated output shop.
- * @see    DecoratingInputShop
+ * @param  <E> the type of the entries served to the decorated output service.
+ * @param  <O> the type of the decorated output service.
+ * @see    DecoratingInputService
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingOutputShop<E extends Entry, O extends OutputShop<E>>
+public abstract class DecoratingOutputService<E extends Entry, O extends OutputService<E>>
 extends DecoratingEntryContainer<E, O>
-implements OutputShop<E> {
+implements OutputService<E> {
 
     @CreatesObligation
-    protected DecoratingOutputShop(final @WillCloseWhenClosed O delegate) {
+    protected DecoratingOutputService(final @WillCloseWhenClosed O delegate) {
         super(delegate);
     }
 

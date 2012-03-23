@@ -3,8 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Essential interfaces and classes for entries and containers in (possibly
- * federated virtual) file systems.
+ * Provides services for reading and writing entries in containers.
  * 
  * @author Christian Schlichtherle
  */

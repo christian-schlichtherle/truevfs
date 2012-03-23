@@ -12,19 +12,19 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * A service for writing entries to a container.
+ * A service for writing entries to this container.
  * <p>
  * All methods of this interface must reflect all entries, including those
  * which have just been partially written yet, i.e. which have not already
  * received a call to their {@code close()} method.
  *
  * @param   <E> the type of the entries.
- * @see     InputShop
+ * @see     InputService
  * @author  Christian Schlichtherle
  */
 // TODO: Consider renaming to OutputArchive
 @CleanupObligation
-public interface OutputShop<E extends Entry>
+public interface OutputService<E extends Entry>
 extends Closeable, EntryContainer<E> {
 
     /**
