@@ -26,7 +26,6 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import javax.swing.Icon;
 
 /**
  * A file system controller with a prospective directory in the platform file
@@ -68,18 +67,6 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public FsController<?> getParent() {
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
         return null;
     }
 

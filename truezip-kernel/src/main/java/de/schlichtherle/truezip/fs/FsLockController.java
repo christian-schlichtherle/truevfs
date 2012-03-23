@@ -39,7 +39,6 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Provides read/write locking for multi-threaded access by its clients.
@@ -176,32 +175,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
         }
     }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return readOrWriteLocked(new GetOpenIcon());
-    }
-
-    private final class GetOpenIcon implements IOOperation<Icon> {
-        @Override
-        public Icon call() throws IOException {
-            return delegate.getOpenIcon();
-        }
-    } // GetOpenIcon
-    
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return readOrWriteLocked(new GetClosedIcon());
-    }
-
-    private final class GetClosedIcon implements IOOperation<Icon> {
-        @Override
-        public Icon call() throws IOException {
-            return delegate.getClosedIcon();
-        }
-    } // GetClosedIcon
 
     @Override
     public boolean isReadOnly() throws IOException {

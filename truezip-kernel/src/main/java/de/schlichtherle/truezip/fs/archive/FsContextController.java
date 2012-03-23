@@ -22,7 +22,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Injects the original values of selected parameters of the operation in
@@ -45,32 +44,6 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
      */
     FsContextController(FsTargetArchiveController<?> controller) {
         super(controller);
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
-        try {
-            return delegate.getOpenIcon();
-        } finally {
-            delegate.setContext(context);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
-        try {
-            return delegate.getClosedIcon();
-        } finally {
-            delegate.setContext(context);
-        }
     }
 
     @Override

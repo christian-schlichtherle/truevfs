@@ -41,7 +41,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Manages I/O to the entry which represents the target archive file in its
@@ -152,20 +151,6 @@ extends FsFileSystemArchiveController<E> {
     @Override
     public FsController<?> getParent() {
         return parent;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        autoMount(); // detect false positives!
-        return driver.getOpenIcon(getModel());
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        autoMount(); // detect false positives!
-        return driver.getClosedIcon(getModel());
     }
 
     @Override
