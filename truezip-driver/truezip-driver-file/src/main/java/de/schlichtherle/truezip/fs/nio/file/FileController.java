@@ -42,7 +42,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class FileController extends FsModelController<FsModel>  {
+final class FileController extends FsAbstractController<FsModel>  {
 
     private final Path target;
 

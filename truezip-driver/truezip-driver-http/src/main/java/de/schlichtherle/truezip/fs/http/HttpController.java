@@ -30,7 +30,7 @@ import org.apache.http.HttpResponse;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public class HttpController extends FsModelController<FsModel>  {
+public class HttpController extends FsAbstractController<FsModel>  {
 
     private final HttpDriver driver;
 

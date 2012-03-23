@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 abstract class FsLockModelController
-extends FsModelController<FsLockModel>  {
+extends FsAbstractController<FsLockModel>  {
 
     /**
      * Constructs a new file system controller for the given

@@ -38,7 +38,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class FileController extends FsModelController<FsModel>  {
+final class FileController extends FsAbstractController<FsModel>  {
 
     private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
 

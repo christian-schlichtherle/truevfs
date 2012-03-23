@@ -17,7 +17,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsModelController<M extends FsModel>
+public abstract class FsAbstractController<M extends FsModel>
 extends FsController<M>  {
 
     private final M model;
@@ -27,7 +27,7 @@ extends FsController<M>  {
      * 
      * @param model the file system model.
      */
-    protected FsModelController(final M model) {
+    protected FsAbstractController(final M model) {
         if (null == (this.model = model))
             throw new NullPointerException();
     }
