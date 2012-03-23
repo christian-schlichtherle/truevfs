@@ -4,10 +4,13 @@
  */
 package de.schlichtherle.truezip.file;
 
-import static de.schlichtherle.truezip.fs.FsInputOptions.INPUT_PREFERENCES_MASK;
-import static de.schlichtherle.truezip.fs.FsOutputOption.*;
+import de.schlichtherle.truezip.fs.option.FsInputOption;
+import static de.schlichtherle.truezip.fs.option.FsInputOptions.INPUT_PREFERENCES_MASK;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.*;
-import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
+import de.schlichtherle.truezip.fs.option.FsInputOptions;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
+import static de.schlichtherle.truezip.fs.option.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.InheritableThreadLocalStack;

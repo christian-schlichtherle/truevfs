@@ -5,6 +5,8 @@
 package de.schlichtherle.truezip.fs.sample;
 
 import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.fs.option.FsInputOption;
+import de.schlichtherle.truezip.fs.option.FsSyncOptions;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.io.Streams;

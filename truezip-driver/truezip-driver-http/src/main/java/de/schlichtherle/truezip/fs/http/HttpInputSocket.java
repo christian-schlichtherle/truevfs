@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import de.schlichtherle.truezip.fs.FsInputOption;
+import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;

@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsSyncOption;
 import de.schlichtherle.truezip.fs.inst.InstrumentingManager;
+import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;

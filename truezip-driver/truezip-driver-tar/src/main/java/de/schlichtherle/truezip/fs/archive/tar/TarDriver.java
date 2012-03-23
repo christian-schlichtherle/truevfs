@@ -4,14 +4,16 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.*;
-import static de.schlichtherle.truezip.fs.FsOutputOption.COMPRESS;
+import static de.schlichtherle.truezip.fs.option.FsOutputOption.COMPRESS;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

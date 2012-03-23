@@ -4,7 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.fs.FsSyncOptions.RESET;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
+import static de.schlichtherle.truezip.fs.option.FsSyncOptions.RESET;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;

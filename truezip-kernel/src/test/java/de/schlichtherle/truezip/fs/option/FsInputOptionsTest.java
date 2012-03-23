@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.option;
 
-import static de.schlichtherle.truezip.fs.FsInputOption.CACHE;
-import static de.schlichtherle.truezip.fs.FsInputOptions.INPUT_PREFERENCES_MASK;
-import static de.schlichtherle.truezip.fs.FsInputOptions.NONE;
+import static de.schlichtherle.truezip.fs.option.FsInputOption.CACHE;
+import static de.schlichtherle.truezip.fs.option.FsInputOptions.INPUT_PREFERENCES_MASK;
+import static de.schlichtherle.truezip.fs.option.FsInputOptions.NONE;
 import de.schlichtherle.truezip.util.BitField;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
