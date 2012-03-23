@@ -4,15 +4,14 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.EntryName;
 import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.ENTRY_NAME;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
-import java.io.IOException;
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
+import de.schlichtherle.truezip.util.UriBuilder;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -132,8 +131,26 @@ import javax.annotation.concurrent.Immutable;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public final class FsEntryName extends EntryName {
-    private static final long serialVersionUID = 2212342253466752478L;
+public final class FsEntryName
+implements Serializable, Comparable<FsEntryName> {
+
+    private static final long serialVersionUID = 3453442253468244275L;
+
+    /**
+     * The separator string for file names in an entry name,
+     * which is {@value}.
+     *
+     * @see #SEPARATOR_CHAR
+     */
+    public static final String SEPARATOR = "/";
+
+    /**
+     * The separator character for file names in an entry name,
+     * which is {@value}.
+     *
+     * @see #SEPARATOR
+     */
+    public static final char SEPARATOR_CHAR = '/';
 
     private static final String ILLEGAL_PREFIX = ".." + SEPARATOR;
 
@@ -150,57 +167,30 @@ public final class FsEntryName extends EntryName {
         }
     }
 
-    /**
-     * Equivalent to {@link #create(String, FsUriModifier) create(uri, FsUriModifier.NULL)}.
-     * 
-     * @deprecated This method does not quote characters with a special meaning
-     *             in a URI - use the method variant with the URI parameter
-     *             instead.
-     */
-    @Deprecated
-    public static FsEntryName
-    create(String uri) {
-        return create(uri, NULL);
-    }
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    private URI uri; // not final for serialization only!
 
     /**
-     * Constructs a new file system entry name by constructing a new URI from
-     * the given string representation and parsing the result.
+     * Constructs a new file system entry name by parsing the given URI.
      * This static factory method calls
-     * {@link #FsEntryName(String, FsUriModifier) new FsEntryName(uri, modifier)}
+     * {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the URI string representation.
-     * @param  modifier the URI modifier.
+     * @param  uri the {@link #toUri() URI}.
+     * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for entry names.
+     *         syntax constraints for file system entry names.
      * @return A new file system entry name.
-     * @deprecated This method does not quote characters with a special meaning
-     *             in a URI - use the method variant with the URI parameter
-     *             instead.
      */
-    @Deprecated
-    public static FsEntryName
-    create(String uri, FsUriModifier modifier) {
-        try {
-            return uri.isEmpty()
-                    ? ROOT
-                    : new FsEntryName(uri, modifier);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-    }
-
-    /** Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}. */
-    @SuppressWarnings("deprecation")
     public static FsEntryName
     create(URI uri) {
         return create(uri, NULL);
     }
 
     /**
-     * Constructs a new file system entry name by parsing the given URI.
+     * Constructs a new file system entry name by parsing the given URI
+     * after applying the given URI modifier.
      * This static factory method calls
      * {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, modifier)}
      * and wraps any thrown {@link URISyntaxException} in an
@@ -208,8 +198,11 @@ public final class FsEntryName extends EntryName {
      *
      * @param  uri the {@link #toUri() URI}.
      * @param  modifier the URI modifier.
-     * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for entry names.
+     * @throws NullPointerException if {@code uri} or {@code modifier} are
+     *         {@code null}.
+     * @throws IllegalArgumentException if {@code uri} still does not conform
+     *         to the syntax constraints for file system entry names after its
+     *         modification.
      * @return A new file system entry name.
      */
     public static FsEntryName
@@ -224,62 +217,43 @@ public final class FsEntryName extends EntryName {
     }
 
     /**
-     * Equivalent to {@link #FsEntryName(String, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}.
-     * 
-     * @deprecated This constructor does not quote characters with a special
-     *             meaning in a URI - use the constructor variant with the URI
-     *             parameter instead.
-     */
-    @Deprecated
-    public FsEntryName(String uri) throws URISyntaxException {
-        this(uri, NULL);
-    }
-
-    /**
-     * Constructs a new file system entry name by calling
-     * {@link URI#URI(String) new URI(uri)} and parsing the resulting URI.
+     * Constructs a new file system entry name by parsing the given URI.
      *
-     * @param  uri the URI string representation.
-     * @param  modifier the URI modifier.
+     * @param  uri the {@link #toUri() URI}.
+     * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws URISyntaxException if {@code uri} does not conform to the
-     *         syntax constraints for entry names.
-     * @deprecated This constructor does not quote characters with a special
-     *             meaning in a URI - use the constructor variant with the URI
-     *             parameter instead.
-     */
-    @Deprecated
-    public FsEntryName(String uri, FsUriModifier modifier)
-    throws URISyntaxException {
-        this(new URI(uri), modifier);
-    }
-
-    /**
-     * Equivalent to {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}.
+     *         syntax constraints for file system entry names.
      */
     public FsEntryName(URI uri) throws URISyntaxException {
         this(uri, NULL);
     }
 
     /**
-     * Constructs a new file system entry name by parsing the given URI.
+     * Constructs a new file system entry name by parsing the given URI
+     * after applying the given URI modifier.
      *
      * @param  uri the {@link #toUri() URI}.
      * @param  modifier the URI modifier.
-     * @throws NullPointerException if {@code uri} is {@code null}.
-     * @throws URISyntaxException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
+     * @throws NullPointerException if {@code uri} or {@code modifier} are
+     *         {@code null}.
+     * @throws URISyntaxException if {@code uri} still does not conform to the
+     *         syntax constraints for file system entry names after its
+     *         modification.
      */
     public FsEntryName(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
-        super(uri = modifier.modify(uri, ENTRY_NAME));
-        parse(uri);
+        parse(modifier.modify(uri, ENTRY_NAME));
+    }
+
+    private void writeObject(ObjectOutputStream out)
+    throws IOException {
+        out.writeObject(uri.toString());
     }
 
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
         try {
-            parse(toUri()); // protect against manipulation
+            parse(new URI(in.readObject().toString())); // protect against manipulation
         } catch (URISyntaxException ex) {
             throw (InvalidObjectException) new InvalidObjectException(ex.toString())
                     .initCause(ex);
@@ -287,6 +261,15 @@ public final class FsEntryName extends EntryName {
     }
 
     private void parse(final URI uri) throws URISyntaxException {
+        if (uri.isAbsolute())
+            throw new QuotedUriSyntaxException(uri, "Scheme component defined.");
+        if (null != uri.getRawAuthority())
+            throw new QuotedUriSyntaxException(uri, "Authority component defined.");
+        if (null == uri.getRawPath())
+            throw new QuotedUriSyntaxException(uri, "Path component undefined.");
+        if (null != uri.getRawFragment())
+            throw new QuotedUriSyntaxException(uri, "Fragment component defined.");
+        this.uri = uri;
         final String p = uri.getRawPath();
         if (p.startsWith(SEPARATOR))
             throw new QuotedUriSyntaxException(uri,
@@ -316,16 +299,35 @@ public final class FsEntryName extends EntryName {
      */
     public FsEntryName( final FsEntryName parent,
                         final FsEntryName member) {
-        super(parent, member);
+        final URI pu = parent.uri;
+        final String pup = pu.getRawPath();
+        final URI mu = member.uri;
+        try {
+            uri = pup.isEmpty()
+                    ? mu
+                    : pup.endsWith(SEPARATOR)
+                        ? pu.resolve(mu)
+                        : mu.getPath().isEmpty()
+                            ? new UriBuilder(pu, true)
+                                .query(mu.getRawQuery())
+                                .getUri()
+                            : new UriBuilder(true)
+                                .path(pup + SEPARATOR_CHAR)
+                                .getUri()
+                                .resolve(mu);
+        } catch (URISyntaxException ex) {
+            throw new AssertionError(ex);
+        }
 
         assert invariants();
     }
 
     private boolean invariants() {
         assert null != toUri();
-        //assert !toUri().isAbsolute();
-        //assert null == toUri().getRawAuthority();
-        //assert null == toUri().getRawFragment();
+        assert !toUri().isAbsolute();
+        assert null == toUri().getRawAuthority();
+        assert null != toUri().getRawPath();
+        assert null == toUri().getRawFragment();
         assert toUri().normalize() == toUri();
         String p = toUri().getRawPath();
         assert !"..".equals(p);
@@ -353,5 +355,85 @@ public final class FsEntryName extends EntryName {
         if (null != query)
             return false;
         return true;
+    }
+
+    /**
+     * Returns the URI for this entry name.
+     *
+     * @return The URI for this entry name.
+     * @since  TrueZIP 7.1.1
+     */
+    public URI toUri() {
+        return uri;
+    }
+
+    /**
+     * Returns the path of this entry name.
+     * Equivalent to {@link #toUri() toUri()}{@code .getPath()}.
+     *
+     * @return The path of this entry name.
+     */
+    public String getPath() {
+        return uri.getPath();
+    }
+
+    /**
+     * Returns the query of this entry name.
+     * Equivalent to {@link #toUri() toUri()}{@code .getQuery()}.
+     *
+     * @return The query of this entry name.
+     */
+    public @CheckForNull String getQuery() {
+        return uri.getQuery();
+    }
+
+    /**
+     * Returns the fragment of this entry name.
+     * Equivalent to {@link #toUri() toUri()}{@code .getFragment()}.
+     *
+     * @return The fragment of this entry name.
+     */
+    public @CheckForNull String getFragment() {
+        return uri.getFragment();
+    }
+
+    /**
+     * Returns {@code true} iff the given object is a entry name
+     * and its URI {@link URI#equals(Object) equals} the URI of this entry name.
+     * 
+     * @param that the object to compare.
+     */
+    @Override
+    public boolean equals(@CheckForNull Object that) {
+        return this == that
+                || that instanceof FsEntryName
+                    && this.uri.equals(((FsEntryName) that).uri);
+    }
+
+    /**
+     * Implements a natural ordering which is consistent with
+     * {@link #equals(Object)}.
+     * 
+     * @param that the entry name to compare.
+     */
+    @Override
+    public int compareTo(FsEntryName that) {
+        return this.uri.compareTo(that.uri);
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals(Object)}.
+     */
+    @Override
+    public int hashCode() {
+        return uri.hashCode();
+    }
+
+    /**
+     * Equivalent to calling {@link URI#toString()} on {@link #toUri()}.
+     */
+    @Override
+    public String toString() {
+        return uri.toString();
     }
 }

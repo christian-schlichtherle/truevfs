@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.net.URI;
@@ -58,7 +58,6 @@ public enum FsUriModifier {
      * Post-fixes a URI when it gets
      * {@link FsUriModifier#CANONICALIZE canonicalized}.
      */
-    @Immutable
     public enum PostFix {
 
         /**
@@ -73,9 +72,8 @@ public enum FsUriModifier {
          *     This behavior is intended to fix URIs returned by
          *     {@link java.io.File#toURI()}.
          * <li>The URI path component gets truncated so that it does not end
-         *     with {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}
-         *     whereby a trailing separator after a Windows-like drive letter
-         *     is preserved.
+         *     with {@value FsEntryName#SEPARATOR} whereby a trailing separator
+         *     after a Windows-like drive letter is preserved.
          * <li>An empty authority component in the scheme specific part gets
          *     truncated.
          * </ol>
@@ -136,8 +134,7 @@ public enum FsUriModifier {
          * If the URI is absolute or has an authority or a fragment component
          * defined, nothing is modified.
          * Otherwise, the URI path component gets truncated so that it does not
-         * start or end with
-         * {@value de.schlichtherle.truezip.entry.EntryName#SEPARATOR}.
+         * start or end with {@value FsEntryName#SEPARATOR}.
          */
         ENTRY_NAME {
             @Override

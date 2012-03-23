@@ -6,10 +6,10 @@ package de.schlichtherle.truezip.nio.file;
 
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TVFS;
+import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.IOSocket;

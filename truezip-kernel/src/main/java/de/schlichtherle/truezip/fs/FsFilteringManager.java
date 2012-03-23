@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.util.FilteringIterator;
 import java.net.URI;
 import java.util.Iterator;

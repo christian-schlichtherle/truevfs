@@ -9,7 +9,7 @@ import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
+import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.InputSocket;

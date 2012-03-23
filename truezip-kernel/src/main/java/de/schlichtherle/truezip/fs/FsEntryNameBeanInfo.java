@@ -5,14 +5,14 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import javax.annotation.Nullable;
 import java.beans.*;
+import javax.annotation.Nullable;
 
 /**
  * Provides a persistence delegate to support
  * {@link XMLEncoder}/{@link XMLDecoder}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @DefaultAnnotation(Nullable.class)
 public class FsEntryNameBeanInfo extends SimpleBeanInfo {
@@ -35,7 +35,7 @@ public class FsEntryNameBeanInfo extends SimpleBeanInfo {
                     entryName.getClass(),
                     "new", // NOI18N
                     new Object[] {
-                        entryName.toString(),
+                        entryName.toUri(),
                     });
             }
         };
