@@ -4,14 +4,13 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.fs.addr.FsPath;
 import java.net.URI;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
