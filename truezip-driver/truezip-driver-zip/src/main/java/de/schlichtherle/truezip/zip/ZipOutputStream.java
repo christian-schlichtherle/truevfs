@@ -33,10 +33,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * third party tools would not treat the redundant ZIP64 extensions
  * correctly.
  * Note that it's impossible to inhibit ZIP64 extensions.
- * <p>
- * This class provides some limited support for multithreading: You can read
- * its properties from multiple threads, but obviously you cannot concurrently
- * write multiple entries at the same time by different threads.
  *
  * @see     ZipFile
  * @author  Christian Schlichtherle
