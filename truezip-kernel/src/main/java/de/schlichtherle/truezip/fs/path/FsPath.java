@@ -17,10 +17,10 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Addresses an entry in a file system.
+ * Addresses a file system entry.
  * The purpose of a file system path is to parse a {@link URI} and decompose it
- * into a {@link #getMountPoint() mount point} of a file system and its
- * relative {@link #getEntryName() entry name}.
+ * into a file system {@link #getMountPoint() mount point} and
+ * {@link #getEntryName() entry name}.
  * 
  * <a name="specification"/><h3>Specification</h3>
  * <p>

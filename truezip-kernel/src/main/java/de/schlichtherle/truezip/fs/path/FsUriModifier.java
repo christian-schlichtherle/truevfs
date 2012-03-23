@@ -13,10 +13,11 @@ import java.net.URISyntaxException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Modifies a URI when parsing an {@link FsPath}, an {@link FsMountPoint} or an
- * {@link FsEntryName}.
+ * Modifies a URI when parsing a file system {@linkplain FsPath path}, a
+ * {@linkplain FsMountPoint mount point} or an
+ * {@linkplain FsEntryName entry name}.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public enum FsUriModifier {
