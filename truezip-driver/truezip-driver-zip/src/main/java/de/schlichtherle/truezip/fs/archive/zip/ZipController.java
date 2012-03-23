@@ -12,8 +12,8 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * This file system controller decorates another file system controller in
- * order to manage the authentication key(s) required for accessing its target
- * encrypted ZIP archive file.
+ * order to manage the authentication key(s) required for accessing its
+ * WinZip AES encrypted ZIP file.
  * 
  * @author Christian Schlichtherle
  */
