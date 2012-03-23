@@ -352,10 +352,10 @@ system space.
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>jdepend-maven-plugin</artifactId>
                             </plugin>
-                            <plugin>
+                            <!--plugin>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>clirr-maven-plugin</artifactId>
-                            </plugin>
+                            </plugin-->
                             <!--plugin>
                                 <groupId>org.codehaus.mojo</groupId>
                                 <artifactId>cobertura-maven-plugin</artifactId>
