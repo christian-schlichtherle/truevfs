@@ -4,12 +4,12 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import static de.schlichtherle.truezip.fs.option.FsSyncOption.CLEAR_CACHE;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
