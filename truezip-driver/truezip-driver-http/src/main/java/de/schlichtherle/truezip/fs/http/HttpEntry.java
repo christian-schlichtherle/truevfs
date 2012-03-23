@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import de.schlichtherle.truezip.fs.path.FsEntryName;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOptions;
 import de.schlichtherle.truezip.fs.option.FsInputOption;

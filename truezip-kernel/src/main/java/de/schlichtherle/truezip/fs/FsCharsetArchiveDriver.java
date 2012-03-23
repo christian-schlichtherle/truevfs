@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;

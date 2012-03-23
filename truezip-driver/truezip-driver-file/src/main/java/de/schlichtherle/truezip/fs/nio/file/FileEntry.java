@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.fs.nio.file;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.path.FsEntryName;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR_CHAR;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOptions;
 import de.schlichtherle.truezip.socket.IOEntry;

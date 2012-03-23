@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.sample;
 
-import de.schlichtherle.truezip.fs.path.FsPath;
-import de.schlichtherle.truezip.fs.path.FsUriModifier;
+import de.schlichtherle.truezip.fs.addr.FsPath;
+import de.schlichtherle.truezip.fs.addr.FsUriModifier;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;

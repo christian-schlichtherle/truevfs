@@ -2,13 +2,13 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.path;
+package de.schlichtherle.truezip.fs.addr;
 
-import de.schlichtherle.truezip.fs.path.FsMountPoint;
-import de.schlichtherle.truezip.fs.path.FsEntryName;
-import de.schlichtherle.truezip.fs.path.FsPath;
-import static de.schlichtherle.truezip.fs.path.FsUriModifier.CANONICALIZE;
-import static de.schlichtherle.truezip.fs.path.FsUriModifier.NULL;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import de.schlichtherle.truezip.fs.addr.FsPath;
+import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
+import static de.schlichtherle.truezip.fs.addr.FsUriModifier.NULL;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

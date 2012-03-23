@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.path.FsEntryName;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.STORE;

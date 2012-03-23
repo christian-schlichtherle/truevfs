@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.fs.path.FsEntryName;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR_CHAR;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOEntry;
