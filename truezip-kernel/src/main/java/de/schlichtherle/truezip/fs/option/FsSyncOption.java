@@ -16,9 +16,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Defines the options for the synchronization of (federated) file systems.
- * via the methods {@link FsController#sync(BitField)} and its many
- * variants and incarnations in the TrueZIP Kernel and client API modules.
+ * Defines options for (federated) file systems synchronization.
  *
  * @see    FsController#sync(BitField)
  * @see    FsController#sync(BitField, ExceptionHandler) 
