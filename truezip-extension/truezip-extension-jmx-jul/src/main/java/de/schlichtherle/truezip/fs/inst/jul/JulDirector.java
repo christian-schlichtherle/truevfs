@@ -10,7 +10,7 @@ import de.schlichtherle.truezip.fs.inst.InstrumentingCompositeDriver;
 import de.schlichtherle.truezip.fs.inst.InstrumentingController;
 import de.schlichtherle.truezip.fs.inst.InstrumentingDirector;
 import de.schlichtherle.truezip.fs.inst.InstrumentingManager;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
@@ -30,7 +30,7 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
     private JulDirector() { }
 
     @Override
-    public <E extends IOPool.Buffer<E>> IOPool<E> instrument(IOPool<E> pool) {
+    public <E extends IOPool.IOBuffer<E>> IOPool<E> instrument(IOPool<E> pool) {
         return new JulIOPool<E>(pool, this);
     }
 

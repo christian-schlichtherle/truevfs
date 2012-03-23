@@ -11,7 +11,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.FsArchiveEntries;
 import de.schlichtherle.truezip.fs.FsArchiveEntry;
-import de.schlichtherle.truezip.socket.IOPool.Buffer;
+import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
 import de.schlichtherle.truezip.util.Pool.Releasable;
 import java.io.IOException;
 import java.util.Date;
@@ -33,7 +33,7 @@ implements FsArchiveEntry, Releasable<IOException> {
     private static final int SIZE = 1, MODTIME = 1 << 1;
 
     private byte init; // bit flags for init state
-    private @CheckForNull Buffer<?> temp;
+    private @CheckForNull IOBuffer<?> temp;
 
     public TarDriverEntry(final String name) {
         super(name, true);
@@ -67,11 +67,11 @@ implements FsArchiveEntry, Releasable<IOException> {
             this.init &= ~mask;
     }
 
-    @Nullable Buffer<?> getTemp() {
+    @Nullable IOBuffer<?> getTemp() {
         return temp;
     }
 
-    void setTemp(@CheckForNull Buffer<?> temp) {
+    void setTemp(@CheckForNull IOBuffer<?> temp) {
         this.temp = temp;
     }
 

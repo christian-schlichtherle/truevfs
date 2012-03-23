@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
+import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.entry.IOEntry;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;

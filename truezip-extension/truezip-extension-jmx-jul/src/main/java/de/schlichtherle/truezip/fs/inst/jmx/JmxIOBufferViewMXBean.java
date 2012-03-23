@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import de.schlichtherle.truezip.socket.IOPool.Buffer;
+import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
 import javax.annotation.Nullable;
 
 /**
- * The MXBean interface for an {@link Buffer I/O pool entry}.
+ * The MXBean interface for an {@link IOBuffer I/O pool entry}.
  *
  * @author  Christian Schlichtherle
  */

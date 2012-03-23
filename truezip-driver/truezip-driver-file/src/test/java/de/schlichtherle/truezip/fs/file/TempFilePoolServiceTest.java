@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.socket.spi.IOPoolService;
+import de.schlichtherle.truezip.entry.spi.IOPoolService;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;

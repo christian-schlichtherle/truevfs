@@ -8,13 +8,13 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.socket.IOPool.Buffer;
+import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.management.*;
 
 /**
- * The MXBean implementation for an {@link Buffer I/O pool entry}.
+ * The MXBean implementation for an {@link IOBuffer I/O pool entry}.
  *
  * @author  Christian Schlichtherle
  */
@@ -25,9 +25,9 @@ implements JmxIOBufferViewMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
-    private final Buffer<?> model;
+    private final IOBuffer<?> model;
 
-    static JmxIOBufferViewMXBean register(final Buffer<?> model) {
+    static JmxIOBufferViewMXBean register(final IOBuffer<?> model) {
         final ObjectName name = getObjectName(model);
         final JmxIOBufferViewMXBean view = new JmxIOBufferView(model);
         try {
@@ -44,7 +44,7 @@ implements JmxIOBufferViewMXBean {
         }
     }
 
-    static void unregister(final Buffer<?> model) {
+    static void unregister(final IOBuffer<?> model) {
         final ObjectName name = getObjectName(model);
         try {
             try {
@@ -58,10 +58,10 @@ implements JmxIOBufferViewMXBean {
         }
     }
 
-    private static ObjectName getObjectName(final Buffer<?> model) {
+    private static ObjectName getObjectName(final IOBuffer<?> model) {
         final String path = model.getName();
         try {
-            return new ObjectName(  Buffer.class.getName(),
+            return new ObjectName(  IOBuffer.class.getName(),
                                     "name",
                                     ObjectName.quote(path));
         } catch (MalformedObjectNameException ex) {
@@ -69,7 +69,7 @@ implements JmxIOBufferViewMXBean {
         }
     }
 
-    private JmxIOBufferView(Buffer<?> model) {
+    private JmxIOBufferView(IOBuffer<?> model) {
         super(JmxIOBufferViewMXBean.class, true);
         this.model = model;
     }

@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.entry.InputService;
 import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;

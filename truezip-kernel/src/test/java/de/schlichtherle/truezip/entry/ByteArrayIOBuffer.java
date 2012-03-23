@@ -2,13 +2,16 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
+import de.schlichtherle.truezip.entry.IOEntry;
 import static de.schlichtherle.truezip.entry.Entry.Access.READ;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import de.schlichtherle.truezip.io.SeekableByteBufferChannel;
 import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import java.io.*;
 import java.nio.ByteBuffer;

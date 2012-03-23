@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.spi.IOPoolService;
+import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.entry.spi.IOPoolService;
 import de.schlichtherle.truezip.util.JSE7;
 import javax.annotation.concurrent.Immutable;
 

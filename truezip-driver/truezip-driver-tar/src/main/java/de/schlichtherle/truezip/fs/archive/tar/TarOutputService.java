@@ -10,7 +10,7 @@ import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.socket.IOPool;
+import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.Maps;
@@ -190,14 +190,14 @@ implements OutputService<TarDriverEntry> {
      */
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final IOPool.Buffer<?> buffer;
+        final IOPool.IOBuffer<?> buffer;
         final TarDriverEntry entry;
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
-                final IOPool.Buffer<?> buffer,
+                final IOPool.IOBuffer<?> buffer,
                 final TarDriverEntry entry)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
@@ -217,7 +217,7 @@ implements OutputService<TarDriverEntry> {
         }
 
         void store() throws IOException {
-            final IOPool.Buffer<?> buffer = this.buffer;
+            final IOPool.IOBuffer<?> buffer = this.buffer;
             assert null != buffer;
 
             final TarDriverEntry entry = this.entry;

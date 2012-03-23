@@ -11,7 +11,7 @@ import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.socket.IOEntry;
+import de.schlichtherle.truezip.entry.IOEntry;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;

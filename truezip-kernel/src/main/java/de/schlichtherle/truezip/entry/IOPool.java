@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
 import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
@@ -18,11 +18,11 @@ import java.io.IOException;
  * However, this does not necessarily apply to the implementation of its
  * managed resources, i.e. the {@code IOEntry}s.
  *
- * @param  <E> the type of the entries for the I/O buffers.
+ * @param  <E> the type of the I/O entries in this pool.
  * @author Christian Schlichtherle
  */
 public interface IOPool<E extends IOEntry<E>>
-extends Pool<IOPool.Buffer<E>, IOException> {
+extends Pool<IOPool.IOBuffer<E>, IOException> {
 
     /**
      * A releasable I/O buffer.
@@ -30,7 +30,7 @@ extends Pool<IOPool.Buffer<E>, IOException> {
      * @param <E> the type of the I/O entries.
      */
     @SuppressWarnings("PublicInnerClass")
-    interface Buffer<E extends IOEntry<E>>
+    interface IOBuffer<E extends IOEntry<E>>
     extends IOEntry<E>, Pool.Releasable<IOException> {
     }
 }

@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.DecoratingEntry;
 import de.schlichtherle.truezip.entry.Entry;
@@ -11,6 +11,14 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.socket.DecoratingInputSocket;
+import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
+import de.schlichtherle.truezip.socket.DelegatingInputSocket;
+import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
+import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.socket.IOSocket;
+import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
@@ -49,7 +57,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 @CleanupObligation
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-public final class IOCache implements Flushable, Closeable {
+public final class FsCache implements Flushable, Closeable {
 
     private static final SocketFactory FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
@@ -76,7 +84,7 @@ public final class IOCache implements Flushable, Closeable {
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
     @CreatesObligation
-    private IOCache(final Strategy strategy, final IOPool<?> pool) {
+    private FsCache(final Strategy strategy, final IOPool<?> pool) {
         if (null == (this.strategy = strategy))
             throw new NullPointerException();
         if (null == (this.pool = pool))
@@ -96,7 +104,7 @@ public final class IOCache implements Flushable, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    public IOCache configure(final InputSocket<?> input) {
+    public FsCache configure(final InputSocket<?> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -116,7 +124,7 @@ public final class IOCache implements Flushable, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    public IOCache configure(final OutputSocket<?> output) {
+    public FsCache configure(final OutputSocket<?> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -224,7 +232,7 @@ public final class IOCache implements Flushable, Closeable {
          */
         READ_ONLY {
             @Override
-            IOCache.OutputBufferPool newOutputBufferPool(IOCache cache) {
+            FsCache.OutputBufferPool newOutputBufferPool(FsCache cache) {
                 throw new AssertionError(); // should throw an NPE before we can get here!
             }
         },
@@ -235,7 +243,7 @@ public final class IOCache implements Flushable, Closeable {
          */
         WRITE_THROUGH {
             @Override
-            IOCache.OutputBufferPool newOutputBufferPool(IOCache cache) {
+            FsCache.OutputBufferPool newOutputBufferPool(FsCache cache) {
                 return cache.new WriteThroughOutputBufferPool();
             }
         },
@@ -246,7 +254,7 @@ public final class IOCache implements Flushable, Closeable {
          */
         WRITE_BACK {
             @Override
-            IOCache.OutputBufferPool newOutputBufferPool(IOCache cache) {
+            FsCache.OutputBufferPool newOutputBufferPool(FsCache cache) {
                 return cache.new WriteBackOutputBufferPool();
             }
         };
@@ -258,15 +266,15 @@ public final class IOCache implements Flushable, Closeable {
          * @return A new cache.
          */
         @CreatesObligation
-        public IOCache newCache(IOPool<?> pool) {
-            return new IOCache(this, pool);
+        public FsCache newCache(IOPool<?> pool) {
+            return new FsCache(this, pool);
         }
 
-        IOCache.InputBufferPool newInputBufferPool(IOCache cache) {
+        FsCache.InputBufferPool newInputBufferPool(FsCache cache) {
             return cache.new InputBufferPool();
         }
 
-        abstract IOCache.OutputBufferPool newOutputBufferPool(IOCache cache);
+        abstract FsCache.OutputBufferPool newOutputBufferPool(FsCache cache);
     } // Strategy
 
     private final class Input extends DelegatingInputSocket<Entry> {
@@ -415,7 +423,7 @@ public final class IOCache implements Flushable, Closeable {
 
     /** A buffer for the contents of the cache. */
     private final class Buffer {
-        final IOPool.Buffer<?> data;
+        final IOPool.IOBuffer<?> data;
 
         int readers, writers; // max one writer!
 
@@ -566,5 +574,5 @@ public final class IOCache implements Flushable, Closeable {
                 return new Stream();
             }
         } // Output
-    } // Buffer
+    } // IOBuffer
 }
