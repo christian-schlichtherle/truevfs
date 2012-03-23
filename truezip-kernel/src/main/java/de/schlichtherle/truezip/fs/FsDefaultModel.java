@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.path.FsMountPoint;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 

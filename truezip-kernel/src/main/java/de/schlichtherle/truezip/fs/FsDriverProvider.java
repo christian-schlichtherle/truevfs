@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.path.FsScheme;
+import de.schlichtherle.truezip.fs.addr.FsScheme;
 import java.util.Map;
 
 /**

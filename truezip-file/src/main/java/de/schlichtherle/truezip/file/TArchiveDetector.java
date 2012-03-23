@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.file;
 import de.schlichtherle.truezip.fs.FsAbstractCompositeDriver;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
-import de.schlichtherle.truezip.fs.path.FsScheme;
+import de.schlichtherle.truezip.fs.addr.FsScheme;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;

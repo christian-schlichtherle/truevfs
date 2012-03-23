@@ -5,10 +5,10 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsFilteringManager;
-import de.schlichtherle.truezip.fs.path.FsMountPoint;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import static de.schlichtherle.truezip.fs.path.FsUriModifier.CANONICALIZE;
+import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
 import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import de.schlichtherle.truezip.fs.option.FsSyncOptions;
 import static de.schlichtherle.truezip.fs.option.FsSyncOptions.UMOUNT;

@@ -5,13 +5,13 @@
 package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.fs.path.FsEntryName;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.*;
-import de.schlichtherle.truezip.fs.path.FsMountPoint;
-import de.schlichtherle.truezip.fs.path.FsPath;
-import de.schlichtherle.truezip.fs.path.FsScheme;
-import static de.schlichtherle.truezip.fs.path.FsUriModifier.CANONICALIZE;
-import static de.schlichtherle.truezip.fs.path.FsUriModifier.NULL;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.*;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
+import de.schlichtherle.truezip.fs.addr.FsPath;
+import de.schlichtherle.truezip.fs.addr.FsScheme;
+import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
+import static de.schlichtherle.truezip.fs.addr.FsUriModifier.NULL;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;

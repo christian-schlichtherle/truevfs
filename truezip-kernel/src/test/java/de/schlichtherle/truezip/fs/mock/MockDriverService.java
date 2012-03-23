@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.mock;
 
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.path.FsScheme;
+import de.schlichtherle.truezip.fs.addr.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import java.util.Map;
 

@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.path.FsMountPoint;
-import de.schlichtherle.truezip.fs.path.FsEntryName;
-import de.schlichtherle.truezip.fs.path.FsPath;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import de.schlichtherle.truezip.fs.addr.FsPath;
 import java.net.URI;
 import org.junit.Test;
 

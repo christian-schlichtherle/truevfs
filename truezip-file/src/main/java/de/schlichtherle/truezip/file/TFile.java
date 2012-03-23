@@ -4,21 +4,21 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.path.FsScheme;
-import de.schlichtherle.truezip.fs.path.FsMountPoint;
-import de.schlichtherle.truezip.fs.path.FsPath;
+import de.schlichtherle.truezip.fs.addr.FsScheme;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
+import de.schlichtherle.truezip.fs.addr.FsPath;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Size;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.ROOT;
-import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.ROOT;
+import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.*;
-import static de.schlichtherle.truezip.fs.path.FsUriModifier.CANONICALIZE;
+import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.GROW;
-import de.schlichtherle.truezip.fs.path.FsEntryName;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;

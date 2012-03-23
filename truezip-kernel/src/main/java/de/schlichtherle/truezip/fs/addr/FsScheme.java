@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.path;
+package de.schlichtherle.truezip.fs.addr;
 
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.io.Serializable;

@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsArchiveDriver;
 import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.path.FsScheme;
+import de.schlichtherle.truezip.fs.addr.FsScheme;
 import de.schlichtherle.truezip.fs.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;
