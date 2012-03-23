@@ -24,13 +24,10 @@ extends KeyManagerController<ZipDriver> {
     /**
      * Constructs a new ZIP archive controller.
      *
-     * @param controller the non-{@code null} file system controller to
-     *        decorate.
+     * @param controller the file system controller to decorate.
      * @param driver the ZIP driver.
      */
-    ZipController(
-            final FsController<?> controller,
-            final ZipDriver driver) {
+    ZipController(FsController<?> controller, ZipDriver driver) {
         super(controller, driver);
     }
 
