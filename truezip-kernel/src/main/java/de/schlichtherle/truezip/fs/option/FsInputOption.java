@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Defines the options for input operations.
+ * Defines options for input operations.
  * Not all options may be supported or available for all operations and
  * certain combinations may even be illegal.
  * It's up to the particular operation and file system driver implementation
