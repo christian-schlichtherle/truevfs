@@ -13,12 +13,10 @@ import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Drop-in replacement for
- * {@link java.util.zip.ZipOutputStream java.util.zip.ZipOutputStream}.
- * <p>
+ * Writes a ZIP file.
  * This class starts writing ordinary ZIP32 File Format.
  * It automatically adds ZIP64 extensions if required,
  * i.e. if the file size exceeds 4GB or more than 65535 entries are written.
@@ -42,7 +40,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @see     ZipFile
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
+@NotThreadSafe
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
     /**
