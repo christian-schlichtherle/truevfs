@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.rof;
 
-import de.schlichtherle.truezip.socket.InputShop;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.concurrent.locks.Lock;
@@ -13,8 +12,7 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * A decorator which protects all access to a shared resource, e.g. an
- * {@link InputShop}, via a {@link Lock} object.
+ * A decorator which protects all access to a shared resource via a {@link Lock} object.
  *
  * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle

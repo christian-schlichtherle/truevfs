@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.socket.OutputShop;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,8 +14,7 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * A decorator which protects all access to a shared resource, e.g. an
- * {@link OutputShop}, via a {@link Lock} object.
+ * A decorator which protects all access to it via a {@link Lock}.
  *
  * @see     LockInputStream
  * @since   TrueZIP 7.5
