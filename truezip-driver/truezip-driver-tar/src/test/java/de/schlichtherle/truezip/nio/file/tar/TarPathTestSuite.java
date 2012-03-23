@@ -15,11 +15,8 @@ public abstract class TarPathTestSuite<D extends FsArchiveDriver<?>>
 extends TPathTestSuite<D> {
 
     /**
-     * Skipped because appending to TAR files is currently not supported.
-     * 
-     * @deprecated 
+     * Skipped because appending to TAR files is not supported.
      */
-    @Deprecated
     @Override
     public final void testGrowing() {
     }

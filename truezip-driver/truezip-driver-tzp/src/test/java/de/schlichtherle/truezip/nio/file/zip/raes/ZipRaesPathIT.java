@@ -108,10 +108,7 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
     /**
      * Skipped because appending to a RAES encrypted ZIP file is not possible
      * by design.
-     * 
-     * @deprecated 
      */
-    @Deprecated
     @Override
     public void testGrowing() {
     }

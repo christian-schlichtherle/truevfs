@@ -65,12 +65,6 @@ implements Iterable<FsController<?>> {
     public abstract Iterator<FsController<?>> iterator();
 
     /**
-     * @deprecated Use {@link FsSyncOptions#UMOUNT} instead.
-     */
-    @Deprecated
-    public static final BitField<FsSyncOption> UMOUNT = FsSyncOptions.UMOUNT;
-
-    /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems managed by this instance to their respective parent file system,
      * releases the associated resources (e.g. target archive files) for

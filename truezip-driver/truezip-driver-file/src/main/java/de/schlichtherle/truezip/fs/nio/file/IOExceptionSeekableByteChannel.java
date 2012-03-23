@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.io;
+package de.schlichtherle.truezip.fs.nio.file;
 
+import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,7 +21,7 @@ import javax.annotation.WillCloseWhenClosed;
  * @author  Christian Schlichtherle
  * @deprecated This class will be removed in TrueZIP 8.
  */
-public abstract class IOExceptionSeekableByteChannel
+abstract class IOExceptionSeekableByteChannel
 extends DecoratingSeekableByteChannel {
 
     /** The nullable last I/O exception. */
@@ -34,7 +35,7 @@ extends DecoratingSeekableByteChannel {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected IOExceptionSeekableByteChannel(
+    IOExceptionSeekableByteChannel(
             @Nullable @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);
     }

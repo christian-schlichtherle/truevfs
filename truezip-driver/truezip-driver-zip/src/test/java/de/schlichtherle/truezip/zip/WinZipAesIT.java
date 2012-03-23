@@ -105,10 +105,7 @@ public final class WinZipAesIT extends ZipTestSuite {
 
     /**
      * Skipped because this test is specified to a plain ZIP file.
-     * 
-     * @deprecated 
      */
-    @Deprecated
     @Override
     public void testBadGetCheckedInputStream() {
     }

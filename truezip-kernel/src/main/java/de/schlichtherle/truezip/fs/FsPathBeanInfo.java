@@ -35,7 +35,7 @@ public class FsPathBeanInfo extends SimpleBeanInfo {
                     path.getClass(),
                     "new", // NOI18N
                     new Object[] {
-                        path.toString(),
+                        path.toUri(),
                     });
             }
         };
