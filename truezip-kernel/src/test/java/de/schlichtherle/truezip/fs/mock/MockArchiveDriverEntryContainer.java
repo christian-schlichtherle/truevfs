@@ -4,6 +4,10 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
+import de.schlichtherle.truezip.entry.DisconnectingInputShop;
+import de.schlichtherle.truezip.entry.DisconnectingOutputShop;
+import de.schlichtherle.truezip.entry.InputShop;
+import de.schlichtherle.truezip.entry.OutputShop;
 import static de.schlichtherle.truezip.entry.Entry.ALL_ACCESS_SET;
 import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;

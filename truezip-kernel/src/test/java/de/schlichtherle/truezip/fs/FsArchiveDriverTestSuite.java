@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.InputShop;
+import de.schlichtherle.truezip.entry.OutputShop;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.entry.Entry;

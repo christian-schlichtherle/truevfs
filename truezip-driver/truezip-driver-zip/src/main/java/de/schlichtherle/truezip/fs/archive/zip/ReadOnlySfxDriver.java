@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
-import de.schlichtherle.truezip.socket.OutputShop;
+import de.schlichtherle.truezip.entry.OutputShop;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;

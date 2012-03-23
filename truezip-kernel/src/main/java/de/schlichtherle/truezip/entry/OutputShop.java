@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
+import de.schlichtherle.truezip.entry.OutputContainer;
 import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -23,7 +24,7 @@ import java.io.IOException;
  */
 // TODO: Consider renaming to OutputArchive
 @CleanupObligation
-public interface OutputShop<E extends Entry> extends Closeable, OutputService<E> {
+public interface OutputShop<E extends Entry> extends Closeable, OutputContainer<E> {
 
     @Override
     @DischargesObligation

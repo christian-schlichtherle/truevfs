@@ -10,8 +10,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Represents an entry in an entry container,
- * for example an archive file or a file system etc.
+ * Represents an entry in a container.
  * <p>
  * In general, if a property has an unknown value, its getter method must
  * return the value {@link #UNKNOWN} or {@code null} respectively.

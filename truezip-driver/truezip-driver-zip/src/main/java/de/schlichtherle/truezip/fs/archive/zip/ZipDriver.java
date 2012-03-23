@@ -4,6 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.entry.InputShop;
+import de.schlichtherle.truezip.entry.OutputShop;
+import de.schlichtherle.truezip.entry.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;

@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
+import de.schlichtherle.truezip.entry.InputShop;
+import de.schlichtherle.truezip.entry.OutputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;

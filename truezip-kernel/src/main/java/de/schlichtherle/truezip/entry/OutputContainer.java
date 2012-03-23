@@ -2,10 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import java.util.Iterator;
 
 /**
@@ -19,7 +18,7 @@ import java.util.Iterator;
  * @see     InputService
  * @author  Christian Schlichtherle
  */
-public interface OutputService<E extends Entry> extends EntryContainer<E> {
+public interface OutputContainer<E extends Entry> extends EntryContainer<E> {
 
     /**
      * {@inheritDoc}

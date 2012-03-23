@@ -4,8 +4,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.READ;
@@ -15,8 +13,10 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import de.schlichtherle.truezip.entry.*;
 import static de.schlichtherle.truezip.fs.FsArchiveFileSystem.newEmptyFileSystem;
 import static de.schlichtherle.truezip.fs.FsArchiveFileSystem.newPopulatedFileSystem;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.CACHE;
@@ -502,7 +502,7 @@ extends FsFileSystemArchiveController<E> {
         // The Disconnecting(In|Out)putShop should not get skipped however:
         // If these would throw an (In|Out)putClosedException, then this would
         // be an artifact of a bug.
-        final OutputService<E> os;
+        final OutputContainer<E> os;
         {
             final OutputArchive<E> oa = outputArchive;
             if (null == oa || oa.isClosed())
@@ -511,7 +511,7 @@ extends FsFileSystemArchiveController<E> {
             os = oa.getClutch();
         }
 
-        final InputService<E> is;
+        final InputContainer<E> is;
         {
             final InputArchive<E> ia = inputArchive;
             if (null != ia && ia.isClosed())
@@ -525,8 +525,8 @@ extends FsFileSystemArchiveController<E> {
 
     private static <E extends FsArchiveEntry, X extends IOException> void
     copy(   final FsArchiveFileSystem<E> fs,
-            final InputService<E> is,
-            final OutputService<E> os,
+            final InputContainer<E> is,
+            final OutputContainer<E> os,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
         for (final FsCovariantEntry<E> fse : fs) {
@@ -615,7 +615,7 @@ extends FsFileSystemArchiveController<E> {
      * @param <E> The type of the entries.
      */
     private static final class DummyInputService<E extends Entry>
-    implements InputService<E> {
+    implements InputContainer<E> {
         @Override
         public int getSize() {
             return 0;
