@@ -4,13 +4,14 @@
  */
 package de.schlichtherle.truezip.fs.sl;
 
-import de.schlichtherle.truezip.fs.FsDefaultManager;
-import de.schlichtherle.truezip.fs.FsFailSafeManager;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsManagerProvider;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
+import java.text.MessageFormat;
 import java.util.Iterator;
+import java.util.ResourceBundle;
+import java.util.ServiceConfigurationError;
 import static java.util.logging.Level.CONFIG;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
@@ -31,12 +32,8 @@ import javax.annotation.concurrent.Immutable;
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>
- * Otherwise, the expression
- * {@code new FsFailSafeManager(new FsDefaultManager())} is used to create the
- * file system manager in this container.
+ * Otherwise, a {@link ServiceConfigurationError} gets thrown.
  *
- * @see    FsFailSafeManager
- * @see    FsDefaultManager
  * @see    FsManagerService
  * @author Christian Schlichtherle
  */
@@ -52,12 +49,12 @@ public final class FsManagerLocator implements FsManagerProvider {
 
     @Override
     public FsManager get() {
-        return Boot.MANAGER;
+        return Boot.SERVICE.get();
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final FsManager MANAGER;
+        static final FsManagerService SERVICE;
         static {
             final Logger logger = Logger.getLogger(
                     FsManagerLocator.class.getName(),
@@ -79,15 +76,15 @@ public final class FsManagerLocator implements FsManagerProvider {
                         service = oldService;
                 }
             }
-            FsManager manager;
-            if (null != service) {
-                manager = service.get();
-                logger.log(CONFIG, "provided", manager);
-            } else {
-                manager = new FsFailSafeManager(new FsDefaultManager());
-                logger.log(CONFIG, "default", manager);
-            }
-            MANAGER = manager;
+            if (null == service)
+                throw new ServiceConfigurationError(
+                        MessageFormat.format(
+                            ResourceBundle
+                                .getBundle(FsManagerLocator.class.getName())
+                                .getString("null"),
+                            FsManagerLocator.class));
+            logger.log(CONFIG, "provided", service);
+            SERVICE = service;
         }
     } // Boot
 }

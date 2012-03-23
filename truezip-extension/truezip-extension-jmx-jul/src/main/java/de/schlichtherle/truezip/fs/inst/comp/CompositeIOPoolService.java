@@ -16,18 +16,20 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class CompositeIOPoolService extends IOPoolService {
 
-    private static final IOPoolService SERVICE;
-    static {
-        IOPoolService oio = new de.schlichtherle.truezip.fs.file.TempFilePoolService();
-        IOPoolService nio = new de.schlichtherle.truezip.fs.nio.file.TempFilePoolService();
-        SERVICE = oio.getPriority() > nio.getPriority() ? oio : nio;
+    private final IOPoolService service;
+    {
+        final IOPoolService
+                oio = new de.schlichtherle.truezip.fs.file.TempFilePoolService();
+        final IOPoolService
+                nio = new de.schlichtherle.truezip.fs.nio.file.TempFilePoolService();
+        service = oio.getPriority() > nio.getPriority() ? oio : nio;
     }
 
     @SuppressWarnings("unchecked")
-    private static final IOPool<?> pool =
+    private final IOPool<?> pool =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    (IOPool) SERVICE.get()));
+                    (IOPool) service.get()));
 
     @Override
     public IOPool<?> get() {
@@ -43,6 +45,6 @@ public final class CompositeIOPoolService extends IOPoolService {
      */
     @Override
     public int getPriority() {
-        return SERVICE.getPriority() * 3 / 2 + 1;
+        return service.getPriority() * 3 / 2 + 1;
     }
 }

@@ -10,33 +10,33 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Thrown to indicate an exceptional condition in an {@link FsArchiveFileSystem}.
+ * Indicates that a (federated) file system operation failed for some reason.
  * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FsArchiveFileSystemException extends IOException {
+public class FsFileSystemException extends IOException {
     private static final long serialVersionUID = 4652084652223428651L;
 
     /** The nullable entry path name. */
     private final @CheckForNull String path;
 
     /** @since TrueZIP 7.5 */
-    FsArchiveFileSystemException(FsEntryName name, String message) {
+    FsFileSystemException(FsEntryName name, String message) {
         this(name.toString(), message);
     }
 
-    FsArchiveFileSystemException(@CheckForNull String path, String message) {
+    FsFileSystemException(@CheckForNull String path, String message) {
         super(message);
         this.path = path;
     }
 
-    FsArchiveFileSystemException(@CheckForNull String path, Throwable cause) {
+    FsFileSystemException(@CheckForNull String path, Throwable cause) {
         super(cause);
         this.path = path;
     }
 
-    FsArchiveFileSystemException(@CheckForNull String path, String message, Throwable cause) {
+    FsFileSystemException(@CheckForNull String path, String message, Throwable cause) {
         super(message, cause);
         this.path = path;
     }

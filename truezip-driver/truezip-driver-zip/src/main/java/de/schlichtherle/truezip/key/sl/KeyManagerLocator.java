@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.key.sl;
 
-import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.key.AbstractKeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
@@ -23,8 +22,8 @@ import javax.annotation.concurrent.Immutable;
  * {@code "META-INF/services/de.schlichtherle.truezip.key.spi.KeyManagerService"}
  * on the class path by calling their public no-argument constructor.
  *
- * @see     KeyManagerService
- * @author  Christian Schlichtherle
+ * @see    KeyManagerService
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class KeyManagerLocator extends AbstractKeyManagerProvider {
@@ -55,7 +54,7 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
                     sorted = new TreeMap<Class<?>, KeyManager<?>>(
                         ClassComparator.INSTANCE);
             if (!i.hasNext())
-                logger.log(WARNING, "null", FsDriverService.class);
+                logger.log(WARNING, "null", KeyManagerService.class);
             while (i.hasNext()) {
                 KeyManagerService service = i.next();
                 logger.log(CONFIG, "located", service);

@@ -35,14 +35,14 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class FileDriverService extends FsDriverService {
 
-    private static final Map<FsScheme, FsDriver>
-            DRIVERS = newMap(new Object[][] {
+    private final Map<FsScheme, FsDriver>
+            drivers = newMap(new Object[][] {
                 { "file", new FileDriver() },
             });
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Map<FsScheme, FsDriver> get() {
-        return DRIVERS;
+        return drivers;
     }
 }

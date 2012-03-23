@@ -35,13 +35,13 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
+final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
 
     private static final Runtime RUNTIME = Runtime.getRuntime();
 
     private volatile @CheckForNull ShutdownHook shutdownHook;
 
-    public FsFailSafeManager(FsManager manager) {
+    FsFailSafeManager(FsManager manager) {
         super(manager);
     }
 

@@ -4,18 +4,18 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.option.FsOutputOptions;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.*;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.EXCLUSIVE;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import de.schlichtherle.truezip.fs.option.FsOutputOptions;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
@@ -206,7 +206,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *
      * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
      *         file system is read only.
-     * @throws FsArchiveFileSystemException If the listener vetoed the beforeTouch
+     * @throws FsFileSystemException If the listener vetoed the beforeTouch
      *         operation for any reason.
      */
     private void touch() throws IOException {
@@ -326,7 +326,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  type the type of the archive entry to create.
      * @param  template the nullable template for the archive entry to create.
      * @return A new archive entry.
-     * @throws FsArchiveFileSystemException if a {@link CharConversionException}
+     * @throws FsFileSystemException if a {@link CharConversionException}
      *         occurs as its cause.
      */
     private E newCheckedEntry(
@@ -334,14 +334,14 @@ implements Iterable<FsCovariantEntry<E>> {
             final Type type,
             final BitField<FsOutputOption> mknod,
             final @CheckForNull Entry template)
-    throws FsArchiveFileSystemException {
+    throws FsFileSystemException {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
 
         try {
             return factory.newEntry(name, type, template, mknod);
         } catch (CharConversionException ex) {
-            throw new FsArchiveFileSystemException(name, ex);
+            throw new FsFileSystemException(name, ex);
         }
     }
 
@@ -369,7 +369,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *         {@code null}.
      * @throws ArchiveReadOnlyExceptionn If this archive file system is read
      *         only.
-     * @throws FsArchiveFileSystemException If one of the following is true:
+     * @throws FsFileSystemException If one of the following is true:
      *         <ul>
      *         <li>The file system is read only.
      *         <li>{@code name} contains characters which are not
@@ -393,23 +393,23 @@ implements Iterable<FsCovariantEntry<E>> {
             final Entry.Type type,
             final BitField<FsOutputOption> options,
             @CheckForNull Entry template)
-    throws FsArchiveFileSystemException {
+    throws FsFileSystemException {
         if (null == type)
             throw new NullPointerException();
         if (FILE != type && DIRECTORY != type) // TODO: Add support for other types.
-            throw new FsArchiveFileSystemException(name,
+            throw new FsFileSystemException(name,
                     "only FILE and DIRECTORY entries are supported");
         final String path = name.getPath();
         final FsCovariantEntry<E> oldEntry = master.get(path);
         if (null != oldEntry) {
             if (!oldEntry.isType(FILE))
-                throw new FsArchiveFileSystemException(name,
+                throw new FsFileSystemException(name,
                         "only files can get replaced");
             if (FILE != type)
-                throw new FsArchiveFileSystemException(name,
+                throw new FsFileSystemException(name,
                         "entry exists as a different type");
             if (options.get(EXCLUSIVE))
-                throw new FsArchiveFileSystemException(name,
+                throw new FsFileSystemException(name,
                         "entry exists already");
         }
         while (template instanceof FsCovariantEntry<?>)
@@ -436,7 +436,7 @@ implements Iterable<FsCovariantEntry<E>> {
                     final Entry.Type type,
                     final BitField<FsOutputOption> options,
                     @CheckForNull final Entry template)
-        throws FsArchiveFileSystemException {
+        throws FsFileSystemException {
             // Consume FsOutputOption.CREATE_PARENTS.
             this.createParents = options.get(CREATE_PARENTS);
             this.options = options.clear(CREATE_PARENTS);
@@ -449,7 +449,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 final String entryName,
                 final Entry.Type entryType,
                 @CheckForNull final Entry template)
-        throws FsArchiveFileSystemException {
+        throws FsFileSystemException {
             splitter.split(entryName);
             final String parentPath = splitter.getParentPath(); // could equal ROOT_PATH
             final String memberName = splitter.getMemberName();
@@ -460,7 +460,7 @@ implements Iterable<FsCovariantEntry<E>> {
             final FsCovariantEntry<E> newEntry;
             if (null != parentEntry) {
                 if (!parentEntry.isType(DIRECTORY))
-                    throw new FsArchiveFileSystemException(entryName,
+                    throw new FsFileSystemException(entryName,
                             "parent entry must be a directory");
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<E>(null, parentEntry);
@@ -477,7 +477,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements[elements.length - level]
                         = new SegmentLink<E>(memberName, newEntry);
             } else {
-                throw new FsArchiveFileSystemException(entryName,
+                throw new FsFileSystemException(entryName,
                         "missing parent directory entry");
             }
             return elements;
@@ -558,7 +558,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  name the archive file system entry name.
      * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
      *         file system is read-only.
-     * @throws FsArchiveFileSystemException If the operation fails for some other
+     * @throws FsFileSystemException If the operation fails for some other
      *         reason.
      */
     void unlink(final FsEntryName name)
@@ -567,12 +567,12 @@ implements Iterable<FsCovariantEntry<E>> {
         final String path = name.getPath();
         final FsCovariantEntry<E> ce = master.get(path);
         if (null == ce)
-            throw new FsArchiveFileSystemException(name,
+            throw new FsFileSystemException(name,
                     "archive entry does not exist");
         if (ce.isType(DIRECTORY)) {
             final int size = ce.getMembers().size();
             if (0 != size)
-                throw new FsArchiveFileSystemException(name, String.format(
+                throw new FsFileSystemException(name, String.format(
                         "directory not empty - contains %d member(s)",
                         size));
         }
@@ -618,7 +618,7 @@ implements Iterable<FsCovariantEntry<E>> {
                     + " (negative access time)");
         final FsCovariantEntry<E> ce = master.get(name.getPath());
         if (null == ce)
-            throw new FsArchiveFileSystemException(name,
+            throw new FsFileSystemException(name,
                     "archive entry not found");
         // Order is important here!
         touch();
@@ -635,7 +635,7 @@ implements Iterable<FsCovariantEntry<E>> {
     throws IOException {
         final FsCovariantEntry<E> ce = master.get(name.getPath());
         if (null == ce)
-            throw new FsArchiveFileSystemException(name,
+            throw new FsFileSystemException(name,
                     "archive entry not found");
         // Order is important here!
         touch();
@@ -653,9 +653,9 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     void setReadOnly(FsEntryName name)
-    throws FsArchiveFileSystemException {
+    throws FsFileSystemException {
         if (!isReadOnly())
-            throw new FsArchiveFileSystemException(name,
+            throw new FsFileSystemException(name,
                 "cannot set read-only state");
     }
 
