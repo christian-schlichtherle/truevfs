@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.file.MockArchiveDriverTestBase;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
+import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.FsPath;
 import de.schlichtherle.truezip.io.Paths;
 import static java.io.File.separatorChar;
@@ -23,7 +23,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class TPathTest extends MockArchiveDriverTestBase {
 

@@ -48,24 +48,6 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     /** The default buffer length of the window to the file. */
     public static final int WINDOW_LEN = Streams.BUFFER_SIZE;
 
-    /**
-     * Returns the smaller parameter.
-     * 
-     * @deprecated Use {@link Math#min(long, long) instead.
-     */
-    protected static long min(long a, long b) {
-        return a < b ? a : b;
-    }
-
-    /**
-     * Returns the greater parameter.
-     * 
-     * @deprecated Use {@link Math#max(long, long) instead.
-     */
-    protected static long max(long a, long b) {
-        return a < b ? b : a;
-    }
-
     private long length;
 
     /**

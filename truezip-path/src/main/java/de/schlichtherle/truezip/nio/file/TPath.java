@@ -5,12 +5,10 @@
 package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
-import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TFile;
-import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.io.Paths;
