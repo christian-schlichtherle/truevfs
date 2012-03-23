@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.swing.Icon;
-import javax.swing.JTree;
 
 /**
  * An abstract class which provides read/write access to a file system.
@@ -117,32 +115,6 @@ public abstract class FsController<M extends FsModel> {
      * @return The nullable controller for the parent file system.
      */
     public abstract @Nullable FsController<?> getParent();
-
-    /**
-     * Returns a nullable icon representing the "open" state when displaying
-     * the (federated) file system represented by this controller in a GUI,
-     * e.g. a {@link JTree}.
-     * 
-     * @return The nullable icon.
-     * @throws IOException on any I/O failure.
-     * @deprecated GUI features will get removed from this class in TrueZIP 8.
-     */
-    @Deprecated
-    public abstract @Nullable Icon getOpenIcon()
-    throws IOException;
-
-    /**
-     * Returns a nullable icon representing the "closed" state when displaying
-     * the (federated) file system represented by this controller in a GUI,
-     * e.g. a {@link JTree}.
-     * 
-     * @return The nullable icon.
-     * @throws IOException on any I/O failure.
-     * @deprecated GUI features will get removed from this class in TrueZIP 8.
-     */
-    @Deprecated
-    public abstract @Nullable Icon getClosedIcon()
-    throws IOException;
 
     /**
      * Returns {@code true} if and only if the file system is read-only.

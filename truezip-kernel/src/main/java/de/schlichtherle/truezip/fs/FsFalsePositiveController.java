@@ -23,7 +23,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Implements a chain of responsibility in order to resolve
@@ -125,36 +124,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         final FsPath path = this.path;
         return null != path ? path : (this.path = getMountPoint().getPath());
     }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return call(new GetOpenIcon(), ROOT);
-    }
-
-    final static class GetOpenIcon implements IOOperation<Icon> {
-        @Override
-        public Icon call(   final FsController<?> controller,
-                            final FsEntryName name)
-        throws IOException {
-            return controller.getOpenIcon();
-        }
-    } // GetOpenIcon
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return call(new GetClosedIcon(), ROOT);
-    }
-
-    private static final class GetClosedIcon implements IOOperation<Icon> {
-        @Override
-        public Icon call(   final FsController<?> controller,
-                            final FsEntryName name)
-        throws IOException {
-            return controller.getClosedIcon();
-        }
-    } // GetClosedIcon
 
     @Override
     public boolean isReadOnly() throws IOException {

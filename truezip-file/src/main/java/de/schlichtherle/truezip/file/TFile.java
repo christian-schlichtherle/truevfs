@@ -33,7 +33,6 @@ import javax.annotation.Nullable;
 import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -1943,44 +1942,6 @@ public final class TFile extends File {
             }
         }
         return delegate.isDirectory();
-    }
-
-    /**
-     * If this file is a true archive file, its archive driver is asked to
-     * return an icon to be displayed for this file.
-     * Otherwise, null is returned.
-     * 
-     * @return An icon or {@code null}.
-     * @deprecated GUI features will be removed from this class in TrueZIP 8.
-     */
-    @Deprecated
-    public @CheckForNull Icon getOpenIcon() {
-        if (this == innerArchive) {
-            try {
-                return getController().getOpenIcon();
-            } catch (IOException ex) {
-            }
-        }
-        return null;
-    }
-
-    /**
-     * If this file is a true archive file, its archive driver is asked to
-     * return an icon to be displayed for this file.
-     * Otherwise, null is returned.
-     * 
-     * @return An icon or {@code null}.
-     * @deprecated GUI features will be removed from this class in TrueZIP 8.
-     */
-    @Deprecated
-    public @CheckForNull Icon getClosedIcon() {
-        if (this == innerArchive) {
-            try {
-                return getController().getClosedIcon();
-            } catch (IOException ex) {
-            }
-        }
-        return null;
     }
 
     @Override

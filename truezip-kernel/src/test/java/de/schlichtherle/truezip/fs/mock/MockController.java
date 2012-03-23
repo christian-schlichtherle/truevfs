@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * @author  Christian Schlichtherle
@@ -92,20 +91,6 @@ public class MockController extends FsController<FsModel> {
     public FsController<?> getParent() {
         checkUndeclaredExceptions(this);
         return parent;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        checkAllExceptions(this);
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        checkAllExceptions(this);
-        return null;
     }
 
     @Override

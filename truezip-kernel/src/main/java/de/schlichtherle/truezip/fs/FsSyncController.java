@@ -29,7 +29,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Performs a {@link FsController#sync(BitField) sync} operation on the
@@ -56,30 +55,6 @@ extends FsDecoratingController<M, FsController<? extends M>> {
      */
     public FsSyncController(FsController<? extends M> controller) {
         super(controller);
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        while (true) {
-            try {
-                return delegate.getOpenIcon();
-            } catch (FsNeedsSyncException ex) {
-                sync(ex);
-            }
-        }
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        while (true) {
-            try {
-                return delegate.getClosedIcon();
-            } catch (FsNeedsSyncException ex) {
-                sync(ex);
-            }
-        }
     }
 
     @Override

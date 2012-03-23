@@ -14,7 +14,6 @@ import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * An abstract decorator for a file system controller.
@@ -45,18 +44,6 @@ extends FsModelController<M> {
     @Override
     public FsController<?> getParent() {
         return delegate.getParent();
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return delegate.getOpenIcon();
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return delegate.getClosedIcon();
     }
 
     @Override
