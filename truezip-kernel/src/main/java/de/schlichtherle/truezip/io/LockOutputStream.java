@@ -25,7 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class LockOutputStream extends DecoratingOutputStream {
 
-    /** The object to synchronize on. */
+    /** The lock on which this object synchronizes. */
     protected final Lock lock;
 
     /**
