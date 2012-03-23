@@ -8,7 +8,6 @@ import static de.schlichtherle.truezip.entry.Entry.ALL_ACCESS_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.fs.FsArchiveEntry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.SequentialIOException;
@@ -40,7 +39,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class FsMultiplexedOutputService<E extends FsArchiveEntry>
+public class FsMultiplexedOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     private final IOPool<?> pool;
