@@ -7,7 +7,6 @@ package de.schlichtherle.truezip.fs.archive.tar;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.fs.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
@@ -43,8 +42,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * underlying {@code TarArchiveOutputStream} instead.
  * <p>
  * This output archive can only write one entry concurrently.
- * Archive drivers may wrap this class in a {@link FsMultiplexedOutputShop}
- * to overcome this limitation.
  *
  * @see    TarInputShop
  * @author Christian Schlichtherle
