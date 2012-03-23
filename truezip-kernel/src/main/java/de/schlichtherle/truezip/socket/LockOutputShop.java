@@ -31,7 +31,8 @@ import javax.annotation.concurrent.ThreadSafe;
 public class LockOutputShop<E extends Entry>
 extends DecoratingOutputShop<E, OutputShop<E>> {
 
-    private final Lock lock;
+    /** The lock on which this object synchronizes. */
+    protected final Lock lock;
 
     /**
      * Constructs a new concurrent output shop.

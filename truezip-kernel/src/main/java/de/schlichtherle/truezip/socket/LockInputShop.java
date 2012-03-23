@@ -33,7 +33,8 @@ import javax.annotation.concurrent.ThreadSafe;
 public class LockInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
 
-    private final Lock lock;
+    /** The lock on which this object synchronizes. */
+    protected final Lock lock;
 
     /**
      * Constructs a new concurrent input shop.
