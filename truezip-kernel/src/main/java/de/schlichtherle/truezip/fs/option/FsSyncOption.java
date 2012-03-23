@@ -4,18 +4,24 @@
  */
 package de.schlichtherle.truezip.fs.option;
 
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsResourceOpenException;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Defines the available options for the synchronization of federated file
- * systems via the methods {@link FsController#sync(BitField)} and its many
+ * Defines the options for the synchronization of (federated) file systems.
+ * via the methods {@link FsController#sync(BitField)} and its many
  * variants and incarnations in the TrueZIP Kernel and client API modules.
  *
- * @see    FsSyncOptions
+ * @see    FsController#sync(BitField)
+ * @see    FsController#sync(BitField, ExceptionHandler) 
  * @author Christian Schlichtherle
  */
 @Immutable

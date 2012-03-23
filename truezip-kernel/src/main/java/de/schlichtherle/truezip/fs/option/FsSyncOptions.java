@@ -9,12 +9,9 @@ import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Provides common options for use with {@link FsController#sync(BitField)} and
- * its many variants and incarnations in the TrueZIP Kernel and client API
- * modules.
+ * Provides common bit fields of synchronization options.
  * 
  * @see    FsSyncOption
- * @since  TrueZIP 7.1.1
  * @author Christian Schlichtherle
  */
 @Immutable
