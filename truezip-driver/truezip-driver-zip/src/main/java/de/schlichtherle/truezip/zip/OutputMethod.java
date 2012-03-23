@@ -30,7 +30,6 @@ interface OutputMethod {
      * respect to its side effects on {@code entry}!
      * 
      * @param  entry the ZIP entry to check and update.
-     * @param  zip the ZIP output stream to write the entry to.
      * @throws ZipException if checking the given entry failed for
      *         some reason.
      */
