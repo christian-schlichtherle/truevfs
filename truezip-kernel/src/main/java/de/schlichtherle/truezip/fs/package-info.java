@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides access to (possibly federated virtual) file systems.
+ * Provides access to (federated virtual) file systems.
  * This package is a nexus between client applications and file system drivers
  * and is really the heart of the module TrueZIP Kernel.
  * 
