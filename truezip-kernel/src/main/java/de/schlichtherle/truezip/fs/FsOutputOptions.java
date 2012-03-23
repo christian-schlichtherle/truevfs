@@ -28,22 +28,6 @@ public final class FsOutputOptions {
             NONE = BitField.noneOf(FsOutputOption.class);
 
     /**
-     * @deprecated
-     * @since TrueZIP 7.2
-     * @see #NONE
-     */
-    @Deprecated
-    public static final BitField<FsOutputOption> NO_OUTPUT_OPTIONS = NONE;
-
-    /**
-     * @deprecated
-     * @since TrueZIP 7.1.1
-     * @see #NONE
-     */
-    @Deprecated
-    public static final BitField<FsOutputOption> NO_OUTPUT_OPTION = NONE;
-
-    /**
      * The mask of output preferences, which is
      * <code>{@link BitField}.of({@link FsOutputOption#CACHE}, {@link FsOutputOption#CREATE_PARENTS}, {@link FsOutputOption#STORE}, {@link FsOutputOption#COMPRESS}, {@link FsOutputOption#GROW}, {@link FsOutputOption#ENCRYPT})</code>.
      * 
