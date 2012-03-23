@@ -2,23 +2,23 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.path;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import java.beans.*;
 import javax.annotation.Nullable;
+import java.beans.*;
 
 /**
  * Provides a persistence delegate to support
  * {@link XMLEncoder}/{@link XMLDecoder}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @DefaultAnnotation(Nullable.class)
-public class FsPathBeanInfo extends SimpleBeanInfo {
+public class FsSchemeBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
-    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.fs.FsPath.class , null ); // NOI18N
+    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.fs.path.FsScheme.class , null ); // NOI18N
 
     private static BeanDescriptor getBdescriptor(){
         return beanDescriptor;
@@ -29,17 +29,17 @@ public class FsPathBeanInfo extends SimpleBeanInfo {
         final PersistenceDelegate pd = new PersistenceDelegate() {
             @Override
             protected Expression instantiate(Object oldInstance, Encoder out) {
-                final FsPath path = (FsPath) oldInstance;
+                final FsScheme scheme = (FsScheme) oldInstance;
                 return new Expression(
-                    path,
-                    path.getClass(),
-                    "new", // NOI18N
-                    new Object[] {
-                        path.toUri(),
-                    });
+                        scheme,
+                        scheme.getClass(),
+                        "new", // NOI18N
+                        new Object[] {
+                            scheme.toString(),
+                        });
             }
         };
-        beanDescriptor.setValue("persistenceDelegate", pd); // NOI18N
+        beanDescriptor.setValue("persistenceDelegate", pd);
 
 }//GEN-LAST:BeanDescriptor
 
@@ -96,7 +96,7 @@ public class FsPathBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public BeanDescriptor getBeanDescriptor() {
-	return getBdescriptor();
+        return getBdescriptor();
     }
 
     /**
@@ -113,7 +113,7 @@ public class FsPathBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public PropertyDescriptor[] getPropertyDescriptors() {
-	return getPdescriptor();
+        return getPdescriptor();
     }
 
     /**
@@ -125,7 +125,7 @@ public class FsPathBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public EventSetDescriptor[] getEventSetDescriptors() {
-	return getEdescriptor();
+        return getEdescriptor();
     }
 
     /**
@@ -137,7 +137,7 @@ public class FsPathBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public MethodDescriptor[] getMethodDescriptors() {
-	return getMdescriptor();
+        return getMdescriptor();
     }
 
     /**
@@ -189,38 +189,38 @@ public class FsPathBeanInfo extends SimpleBeanInfo {
     @Override
     public java.awt.Image getIcon(int iconKind) {
         switch ( iconKind ) {
-        case ICON_COLOR_16x16:
+            case ICON_COLOR_16x16:
             if ( iconNameC16 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconColor16 == null )
                     iconColor16 = loadImage( iconNameC16 );
-                return iconColor16;
-            }
-        case ICON_COLOR_32x32:
+                    return iconColor16;
+                }
+            case ICON_COLOR_32x32:
             if ( iconNameC32 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconColor32 == null )
                     iconColor32 = loadImage( iconNameC32 );
-                return iconColor32;
-            }
-        case ICON_MONO_16x16:
+                    return iconColor32;
+                }
+            case ICON_MONO_16x16:
             if ( iconNameM16 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconMono16 == null )
                     iconMono16 = loadImage( iconNameM16 );
-                return iconMono16;
-            }
-        case ICON_MONO_32x32:
+                    return iconMono16;
+                }
+            case ICON_MONO_32x32:
             if ( iconNameM32 == null )
-                return null;
-            else {
+                    return null;
+                else {
                 if( iconMono32 == null )
                     iconMono32 = loadImage( iconNameM32 );
-                return iconMono32;
-            }
+                    return iconMono32;
+                }
 	default: return null;
         }
     }

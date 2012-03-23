@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.path.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.util.SuffixSet;
 import static org.hamcrest.CoreMatchers.notNullValue;

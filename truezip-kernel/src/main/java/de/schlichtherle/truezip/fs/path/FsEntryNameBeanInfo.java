@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.path;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import javax.annotation.Nullable;
 import java.beans.*;
+import javax.annotation.Nullable;
 
 /**
  * Provides a persistence delegate to support
@@ -15,10 +15,10 @@ import java.beans.*;
  * @author Christian Schlichtherle
  */
 @DefaultAnnotation(Nullable.class)
-public class FsSchemeBeanInfo extends SimpleBeanInfo {
+public class FsEntryNameBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
-    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.fs.FsScheme.class , null ); // NOI18N
+    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.schlichtherle.truezip.fs.path.FsEntryName.class , null ); // NOI18N
 
     private static BeanDescriptor getBdescriptor(){
         return beanDescriptor;
@@ -29,40 +29,49 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
         final PersistenceDelegate pd = new PersistenceDelegate() {
             @Override
             protected Expression instantiate(Object oldInstance, Encoder out) {
-                final FsScheme scheme = (FsScheme) oldInstance;
+                final FsEntryName entryName = (FsEntryName) oldInstance;
                 return new Expression(
-                        scheme,
-                        scheme.getClass(),
-                        "new", // NOI18N
-                        new Object[] {
-                            scheme.toString(),
-                        });
+                    entryName,
+                    entryName.getClass(),
+                    "new", // NOI18N
+                    new Object[] {
+                        entryName.toUri(),
+                    });
             }
         };
-        beanDescriptor.setValue("persistenceDelegate", pd);
+        beanDescriptor.setValue("persistenceDelegate", pd); // NOI18N
 
 }//GEN-LAST:BeanDescriptor
 
 
-    // Properties information will be obtained from introspection.//GEN-FIRST:Properties
-    private static PropertyDescriptor[] properties = null;
-    private static PropertyDescriptor[] getPdescriptor(){//GEN-HEADEREND:Properties
+    // Property identifiers//GEN-FIRST:Properties
+
+    // Property array 
+    /*lazy PropertyDescriptor*/
+    private static PropertyDescriptor[] getPdescriptor(){
+        PropertyDescriptor[] properties = new PropertyDescriptor[0];//GEN-HEADEREND:Properties
 
     // Here you can add code for customizing the properties array.
 
         return properties;     }//GEN-LAST:Properties
 
-    // Event set information will be obtained from introspection.//GEN-FIRST:Events
-    private static EventSetDescriptor[] eventSets = null;
-    private static EventSetDescriptor[] getEdescriptor(){//GEN-HEADEREND:Events
+    // EventSet identifiers//GEN-FIRST:Events
+
+    // EventSet array
+    /*lazy EventSetDescriptor*/
+    private static EventSetDescriptor[] getEdescriptor(){
+        EventSetDescriptor[] eventSets = new EventSetDescriptor[0];//GEN-HEADEREND:Events
 
     // Here you can add code for customizing the event sets array.
 
         return eventSets;     }//GEN-LAST:Events
 
-    // Method information will be obtained from introspection.//GEN-FIRST:Methods
-    private static MethodDescriptor[] methods = null;
-    private static MethodDescriptor[] getMdescriptor(){//GEN-HEADEREND:Methods
+    // Method identifiers//GEN-FIRST:Methods
+
+    // Method array 
+    /*lazy MethodDescriptor*/
+    private static MethodDescriptor[] getMdescriptor(){
+        MethodDescriptor[] methods = new MethodDescriptor[0];//GEN-HEADEREND:Methods
 
     // Here you can add code for customizing the methods array.
     
@@ -79,7 +88,6 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
 
     private static final int defaultPropertyIndex = -1;//GEN-BEGIN:Idx
     private static final int defaultEventIndex = -1;//GEN-END:Idx
-
     
 //GEN-FIRST:Superclass
 
@@ -96,7 +104,7 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public BeanDescriptor getBeanDescriptor() {
-        return getBdescriptor();
+	return getBdescriptor();
     }
 
     /**
@@ -113,7 +121,7 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public PropertyDescriptor[] getPropertyDescriptors() {
-        return getPdescriptor();
+	return getPdescriptor();
     }
 
     /**
@@ -125,7 +133,7 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public EventSetDescriptor[] getEventSetDescriptors() {
-        return getEdescriptor();
+	return getEdescriptor();
     }
 
     /**
@@ -137,7 +145,7 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      */
     @Override
     public MethodDescriptor[] getMethodDescriptors() {
-        return getMdescriptor();
+	return getMdescriptor();
     }
 
     /**
@@ -181,7 +189,7 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
      * so they can be rendered onto an existing background.
      *
      * @param  iconKind  The kind of icon requested.  This should be
-     *    one of the constant values ICON_COLOR_16x16, ICON_COLOR_32x32, 
+     *    one of the constant values ICON_COLOR_16x16, ICON_COLOR_32x32,
      *    ICON_MONO_16x16, or ICON_MONO_32x32.
      * @return  An image object representing the requested icon.  May
      *    return null if no suitable icon is available.
@@ -189,38 +197,38 @@ public class FsSchemeBeanInfo extends SimpleBeanInfo {
     @Override
     public java.awt.Image getIcon(int iconKind) {
         switch ( iconKind ) {
-            case ICON_COLOR_16x16:
+        case ICON_COLOR_16x16:
             if ( iconNameC16 == null )
-                    return null;
-                else {
+                return null;
+            else {
                 if( iconColor16 == null )
                     iconColor16 = loadImage( iconNameC16 );
-                    return iconColor16;
-                }
-            case ICON_COLOR_32x32:
+                return iconColor16;
+            }
+        case ICON_COLOR_32x32:
             if ( iconNameC32 == null )
-                    return null;
-                else {
+                return null;
+            else {
                 if( iconColor32 == null )
                     iconColor32 = loadImage( iconNameC32 );
-                    return iconColor32;
-                }
-            case ICON_MONO_16x16:
+                return iconColor32;
+            }
+        case ICON_MONO_16x16:
             if ( iconNameM16 == null )
-                    return null;
-                else {
+                return null;
+            else {
                 if( iconMono16 == null )
                     iconMono16 = loadImage( iconNameM16 );
-                    return iconMono16;
-                }
-            case ICON_MONO_32x32:
+                return iconMono16;
+            }
+        case ICON_MONO_32x32:
             if ( iconNameM32 == null )
-                    return null;
-                else {
+                return null;
+            else {
                 if( iconMono32 == null )
                     iconMono32 = loadImage( iconNameM32 );
-                    return iconMono32;
-                }
+                return iconMono32;
+            }
 	default: return null;
         }
     }

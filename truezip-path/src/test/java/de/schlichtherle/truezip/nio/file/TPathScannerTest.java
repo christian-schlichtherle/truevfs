@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.MockArchiveDriverTestBase;
 import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.fs.path.FsMountPoint;
+import de.schlichtherle.truezip.fs.path.FsPath;
 import static de.schlichtherle.truezip.nio.file.TPathScanner.parent;
 import static java.io.File.separatorChar;
 import java.net.URI;

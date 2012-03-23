@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.path;
 
-import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
-import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR_CHAR;
+import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR;
+import static de.schlichtherle.truezip.fs.path.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.net.URI;

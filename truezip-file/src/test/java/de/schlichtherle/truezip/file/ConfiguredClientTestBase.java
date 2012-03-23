@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.path.FsMountPoint;
+import de.schlichtherle.truezip.fs.path.FsScheme;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;

@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.path;
 
-import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
-import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
-import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.PATH;
+import static de.schlichtherle.truezip.fs.path.FsUriModifier.CANONICALIZE;
+import static de.schlichtherle.truezip.fs.path.FsUriModifier.NULL;
+import static de.schlichtherle.truezip.fs.path.FsUriModifier.PostFix.PATH;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.io.*;

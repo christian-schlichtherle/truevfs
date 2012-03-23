@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.nio.file;
 
 import de.schlichtherle.truezip.file.MockArchiveDriverTestBase;
-import de.schlichtherle.truezip.fs.FsMountPoint;
-import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
+import de.schlichtherle.truezip.fs.path.FsMountPoint;
+import static de.schlichtherle.truezip.fs.path.FsUriModifier.CANONICALIZE;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;

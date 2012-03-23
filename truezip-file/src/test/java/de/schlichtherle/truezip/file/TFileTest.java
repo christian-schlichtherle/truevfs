@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.file;
 
 import static de.schlichtherle.truezip.file.TArchiveDetector.NULL;
-import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
-import de.schlichtherle.truezip.fs.FsPath;
+import static de.schlichtherle.truezip.fs.path.FsEntryName.ROOT;
+import de.schlichtherle.truezip.fs.path.FsPath;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

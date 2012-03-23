@@ -2,9 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs;
+package de.schlichtherle.truezip.fs.path;
 
-import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
+import de.schlichtherle.truezip.fs.path.FsEntryName;
+import static de.schlichtherle.truezip.fs.path.FsUriModifier.CANONICALIZE;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

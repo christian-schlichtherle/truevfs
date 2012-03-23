@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.path.FsEntryName;
+import de.schlichtherle.truezip.fs.path.FsPath;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.annotation.CheckForNull;

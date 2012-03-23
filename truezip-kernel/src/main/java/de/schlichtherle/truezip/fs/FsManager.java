@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.path.FsMountPoint;
 import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import static de.schlichtherle.truezip.fs.option.FsSyncOption.*;
 import de.schlichtherle.truezip.util.BitField;

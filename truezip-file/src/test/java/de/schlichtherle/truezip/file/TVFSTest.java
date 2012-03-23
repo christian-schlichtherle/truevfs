@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.file;
 
 import static de.schlichtherle.truezip.file.TVFS.mountPoint;
-import de.schlichtherle.truezip.fs.FsMountPoint;
+import de.schlichtherle.truezip.fs.path.FsMountPoint;
 import java.net.URI;
 import java.net.URISyntaxException;
 import static org.hamcrest.CoreMatchers.is;

@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.fs.spi;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
-import de.schlichtherle.truezip.fs.FsScheme;
+import de.schlichtherle.truezip.fs.path.FsScheme;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.util.Maps;
 import de.schlichtherle.truezip.util.ServiceLocator;

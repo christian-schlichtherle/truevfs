@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.CREATE_PARENTS;
-import de.schlichtherle.truezip.fs.FsPath;
+import de.schlichtherle.truezip.fs.path.FsPath;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.socket.IOSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
