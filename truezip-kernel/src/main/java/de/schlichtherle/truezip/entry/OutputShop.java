@@ -4,15 +4,15 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.OutputContainer;
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Iterator;
 
 /**
- * A closable output service.
+ * A service for writing entries to a container.
  * <p>
  * All methods of this interface must reflect all entries, including those
  * which have just been partially written yet, i.e. which have not already
@@ -24,7 +24,27 @@ import java.io.IOException;
  */
 // TODO: Consider renaming to OutputArchive
 @CleanupObligation
-public interface OutputShop<E extends Entry> extends Closeable, OutputContainer<E> {
+public interface OutputShop<E extends Entry>
+extends Closeable, EntryContainer<E> {
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The iterator returned by this method must be unmodifiable.
+     */
+    @Override
+    Iterator<E> iterator();
+
+    /**
+     * Returns an output socket for writing to the given entry.
+     *
+     * @param  entry the entry, which will be the
+     *         {@link OutputSocket#getLocalTarget local target} of the returned
+     *         output socket.
+     * @return An output socket for writing to the given entry.
+     */
+    // TODO: This should return OutputSocket<E>.
+    OutputSocket<? extends E> getOutputSocket(E entry);
 
     @Override
     @DischargesObligation
