@@ -5,8 +5,6 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.concurrent.Immutable;
 

@@ -80,7 +80,7 @@ public abstract class FsControllerException extends IOException {
      * {@code true} (case is ignored), then instances of this class will have a
      * regular stack trace, otherwise their stack trace will be empty.
      */
-    protected static final boolean TRACEABLE = Boolean
+    static final boolean TRACEABLE = Boolean
             .getBoolean(FsControllerException.class.getName() + ".traceable");
 
     private static final StackTraceElement[]

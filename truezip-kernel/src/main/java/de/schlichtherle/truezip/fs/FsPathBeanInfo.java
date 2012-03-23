@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.fs;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
-import javax.annotation.Nullable;
 import java.beans.*;
+import javax.annotation.Nullable;
 
 /**
  * Provides a persistence delegate to support

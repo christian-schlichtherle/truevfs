@@ -41,7 +41,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsSyncController<M extends FsModel>
+final class FsSyncController<M extends FsModel>
 extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -53,7 +53,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
      *
      * @param controller the decorated file system controller.
      */
-    public FsSyncController(FsController<? extends M> controller) {
+    FsSyncController(FsController<? extends M> controller) {
         super(controller);
     }
 

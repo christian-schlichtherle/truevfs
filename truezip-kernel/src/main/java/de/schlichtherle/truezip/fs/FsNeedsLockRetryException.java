@@ -18,7 +18,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class FsNeedsLockRetryException extends FsControllerException {
+final class FsNeedsLockRetryException extends FsControllerException {
 
     private static final @Nullable FsNeedsLockRetryException
             SINGLETON = TRACEABLE ? null : new FsNeedsLockRetryException();

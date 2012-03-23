@@ -14,17 +14,17 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsDecoratingEntry<E extends Entry> extends FsEntry {
+abstract class FsDecoratingEntry<E extends Entry> extends FsEntry {
 
     /** The decorated entry. */
-    protected final E delegate;
+    final E delegate;
 
     /**
      * Constructs a new decorating entry.
      *
      * @param delegate the entry to decorate.
      */
-    protected FsDecoratingEntry(final E delegate) {
+    FsDecoratingEntry(final E delegate) {
         if (null == delegate)
             throw new NullPointerException();
         this.delegate = delegate;

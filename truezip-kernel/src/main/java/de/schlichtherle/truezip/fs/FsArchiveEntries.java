@@ -4,19 +4,17 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Size;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import java.util.Formatter;
 
 /**
- * Provides static utility methods for {@link FsArchiveEntry} objects.
+ * Static utility methods for {@link FsArchiveEntry} objects.
  * 
  * @author Christian Schlichtherle
  */
 public final class FsArchiveEntries {
 
-    /** You cannot instantiate this class. */
+    /* Can't touch this - hammer time! */
     private FsArchiveEntries() { }
 
     /**

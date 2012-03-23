@@ -10,20 +10,15 @@ import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.*;
 import de.schlichtherle.truezip.entry.EntryContainer;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
-import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR;
-import static de.schlichtherle.truezip.fs.FsEntryName.SEPARATOR_CHAR;
-import de.schlichtherle.truezip.fs.FsOutputOption;
+import static de.schlichtherle.truezip.fs.FsEntryName.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CREATE_PARENTS;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
-import de.schlichtherle.truezip.fs.FsOutputOptions;
 import de.schlichtherle.truezip.io.Paths.Normalizer;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
-import de.schlichtherle.truezip.util.Maps;
+import static de.schlichtherle.truezip.util.Maps.OVERHEAD_SIZE;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -43,22 +38,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class FsArchiveFileSystem<E extends FsArchiveEntry>
+class FsArchiveFileSystem<E extends FsArchiveEntry>
 implements Iterable<FsCovariantEntry<E>> {
-
-    /**
-     * The number of entries which can be additionally accomodated by
-     * the internal hash map without resizing it, which is {@value}.
-     * When a new file system is created, this constant is used in order to
-     * compute the initial capacity of the internal hash map.
-     * When an existing file system is mounted, this constant is added to the
-     * number of entries in order to compute the initial capacity of the
-     * internal hash map.
-     * 
-     * @see    Maps#initialCapacity(int)
-     * @since  TrueZIP 7.3
-     */
-    public static final int OVERHEAD_SIZE = (64 - 1) * 3 / 4; // consider 75% load factor
 
     private static final String ROOT_PATH = ROOT.getPath();
 

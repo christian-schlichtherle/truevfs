@@ -17,6 +17,7 @@ import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -317,14 +318,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link ZipDriver}
-     * returns {@code ZipOutputStream#OVERHEAD_SIZE}.
+     * returns {@code Maps#OVERHEAD_SIZE}.
      * 
      * @since  TrueZIP 7.3
-     * @return {@code ZipOutputStream#OVERHEAD_SIZE}
+     * @return {@code Maps#OVERHEAD_SIZE}
      */
     @Override
     public int getOverheadSize() {
-        return ZipOutputStream.OVERHEAD_SIZE;
+        return Maps.OVERHEAD_SIZE;
     }
 
     /**

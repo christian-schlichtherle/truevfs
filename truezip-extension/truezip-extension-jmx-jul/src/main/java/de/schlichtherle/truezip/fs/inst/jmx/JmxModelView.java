@@ -32,7 +32,7 @@ implements JmxModelViewMXBean {
     private static final BitField<FsSyncOption>
             SYNC_OPTIONS = BitField.of(CLEAR_CACHE);
     private static final FsCompositeDriver
-            DRIVER = new FsDefaultDriver(FsDriverLocator.SINGLETON);
+            DRIVER = new FsSimpleCompositeDriver(FsDriverLocator.SINGLETON);
 
     private final FsModel model;
 

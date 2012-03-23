@@ -14,12 +14,12 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FsDefaultModel extends FsModel {
+class FsDefaultModel extends FsModel {
 
     private final FsMountPoint mountPoint;
     private final @CheckForNull FsModel parent;
 
-    public FsDefaultModel(  final FsMountPoint mountPoint,
+    FsDefaultModel(  final FsMountPoint mountPoint,
                             final @CheckForNull FsModel parent) {
         if (!equals(mountPoint.getParent(),
                     (null == parent ? null : parent.getMountPoint())))

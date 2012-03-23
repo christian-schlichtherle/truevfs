@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
 import static de.schlichtherle.truezip.fs.FsUriModifier.NULL;
 import static de.schlichtherle.truezip.fs.FsUriModifier.PostFix.MOUNT_POINT;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;

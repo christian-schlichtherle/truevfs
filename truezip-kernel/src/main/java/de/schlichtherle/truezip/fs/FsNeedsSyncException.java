@@ -21,12 +21,12 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class FsNeedsSyncException extends FsControllerException {
+final class FsNeedsSyncException extends FsControllerException {
 
     private static final @Nullable FsNeedsSyncException
             SINGLETON = TRACEABLE ? null : new FsNeedsSyncException();
 
-    public static FsNeedsSyncException get( final FsModel model,
+    static FsNeedsSyncException get( final FsModel model,
                                             final FsEntryName name,
                                             final @CheckForNull Access access) {
         return TRACEABLE    ? new FsNeedsSyncException(model,
@@ -36,7 +36,7 @@ public final class FsNeedsSyncException extends FsControllerException {
                             : SINGLETON;
     }
 
-    public static FsNeedsSyncException get( final FsModel model,
+    static FsNeedsSyncException get( final FsModel model,
                                             final String name,
                                             final Throwable cause) {
         return TRACEABLE    ? new FsNeedsSyncException(model, name, cause)

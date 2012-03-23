@@ -13,7 +13,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Filters the list of federated file systems managed by the decorated file
  * system manager so that their mount point starts with the prefix provided
- * to the {@link #FsFilteringManager constructor}.
+ * to its {@link #FsFilteringManager constructor}.
  *
  * @author Christian Schlichtherle
  */

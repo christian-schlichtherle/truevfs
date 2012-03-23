@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.fs.FsArchiveFileSystem;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -41,19 +40,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
-
-    /**
-     * The number of entries which can be additionally accomodated by
-     * the internal hash map without resizing it, which is {@value}.
-     * When a new ZIP file is created, this constant is used in order to
-     * compute the initial capacity of the internal hash map.
-     * When an existing ZIP file is appended to, this constant is added to the
-     * number of entries in order to compute the initial capacity of the
-     * internal hash map.
-     * 
-     * @since  TrueZIP 7.3
-     */
-    public static final int OVERHEAD_SIZE = FsArchiveFileSystem.OVERHEAD_SIZE;
 
     /**
      * The default character set used for entry names and comments in ZIP files.
