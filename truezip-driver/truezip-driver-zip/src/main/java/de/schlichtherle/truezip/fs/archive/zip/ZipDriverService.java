@@ -51,8 +51,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class ZipDriverService extends FsDriverService {
 
-    private static final Map<FsScheme, FsDriver>
-            DRIVERS = newMap(new Object[][] {
+    private final Map<FsScheme, FsDriver>
+            drivers = newMap(new Object[][] {
                 { "zip", new ZipDriver(IOPoolLocator.SINGLETON) },
                 { "ear|jar|war", new JarDriver(IOPoolLocator.SINGLETON) },
                 { "odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb", new OdfDriver(IOPoolLocator.SINGLETON) },
@@ -61,6 +61,6 @@ public final class ZipDriverService extends FsDriverService {
 
     @Override
     public Map<FsScheme, FsDriver> get() {
-        return DRIVERS;
+        return drivers;
     }
 }

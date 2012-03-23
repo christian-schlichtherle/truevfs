@@ -32,10 +32,10 @@ import javax.annotation.concurrent.Immutable;
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>
- * Otherwise, a {@link ServiceConfigurationError} is thrown.
+ * Otherwise, a {@link ServiceConfigurationError} gets thrown.
  *
- * @see     IOPoolService
- * @author  Christian Schlichtherle
+ * @see    IOPoolService
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class IOPoolLocator implements IOPoolProvider {

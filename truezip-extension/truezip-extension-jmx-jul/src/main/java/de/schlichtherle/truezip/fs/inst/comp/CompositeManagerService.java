@@ -4,8 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.inst.comp;
 
-import de.schlichtherle.truezip.fs.FsDefaultManager;
-import de.schlichtherle.truezip.fs.FsFailSafeManager;
+import de.schlichtherle.truezip.fs.FsFailSafeManagerService;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.inst.jmx.JmxDirector;
 import de.schlichtherle.truezip.fs.inst.jul.JulDirector;
@@ -18,11 +17,10 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class CompositeManagerService extends FsManagerService {
 
-    private static final FsManager manager =
+    private final FsManager manager =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    new FsFailSafeManager(
-                        new FsDefaultManager())));
+                    new FsFailSafeManagerService().get()));
 
     @Override
     public FsManager get() {

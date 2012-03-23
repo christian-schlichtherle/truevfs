@@ -19,7 +19,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * A read-only virtual file system for archive entries.
  * <p>
- * All modifying methods throw a {@link FsReadOnlyArchiveFileSystemException}.
+ * All modifying methods throw a {@link FsReadOnlyFileSystemException}.
  *
  * @param  <E> The type of the archive entries.
  * @author Christian Schlichtherle
@@ -51,25 +51,25 @@ extends FsArchiveFileSystem<E> {
             Type type,
             BitField<FsOutputOption> options,
             Entry template)
-    throws FsArchiveFileSystemException {
-        throw new FsReadOnlyArchiveFileSystemException();
+    throws FsFileSystemException {
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override
     void unlink(FsEntryName path)
-    throws FsArchiveFileSystemException {
-        throw new FsReadOnlyArchiveFileSystemException();
+    throws FsFileSystemException {
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override
     boolean setTime(FsEntryName path, BitField<Access> types, long value)
-    throws FsArchiveFileSystemException {
-        throw new FsReadOnlyArchiveFileSystemException();
+    throws FsFileSystemException {
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override
     boolean setTime(FsEntryName path, Map<Access, Long> times)
-    throws FsArchiveFileSystemException {
-        throw new FsReadOnlyArchiveFileSystemException();
+    throws FsFileSystemException {
+        throw new FsReadOnlyFileSystemException();
     }
 }

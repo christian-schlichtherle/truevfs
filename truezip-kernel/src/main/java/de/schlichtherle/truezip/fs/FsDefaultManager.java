@@ -21,7 +21,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsDefaultManager extends FsManager {
+final class FsDefaultManager extends FsManager {
 
     /**
      * The map of all schedulers for composite file system controllers,
@@ -33,7 +33,7 @@ public final class FsDefaultManager extends FsManager {
 
     private final Type optionalScheduleType;
 
-    public FsDefaultManager() { this(WEAK); }
+    FsDefaultManager() { this(WEAK); }
 
     /** Provided for unit testing. */
     FsDefaultManager(final Type optionalScheduleType) {
