@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Addresses the mount point of a file system.
+ * Addresses a file system mount point.
  * 
  * <a name="specification"/><h3>Specification</h3>
  * <p>
