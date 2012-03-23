@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.fs.FsModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
@@ -70,7 +71,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public abstract class FsControllerException extends IOException {
+abstract class FsControllerException extends IOException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
