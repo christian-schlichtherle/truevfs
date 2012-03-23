@@ -71,51 +71,6 @@ public class EnhancedPanel extends JPanel  {
     }
 
     /**
-     * Overridden in order to prevent this component to deliver a
-     * {@link PanelEvent} multiple times from the same source.
-     *
-     * @deprecated See {@link PanelEvent}.
-     */
-    @Override
-    @Deprecated
-    protected AWTEvent coalesceEvents(
-            final AWTEvent existingEvent,
-            final AWTEvent newEvent) {
-        assert existingEvent.getSource() == newEvent.getSource();
-        
-        // Coalesce arbitrary sequences of ANCESTOR_WINDOW_* events into
-        // the last one.
-        if (existingEvent instanceof PanelEvent && newEvent instanceof PanelEvent) {
-            assert false : "This is dead code since the refactoring for TrueZIP 6.4!";
-            final int id = newEvent.getID();
-            assert id == existingEvent.getID();
-            switch (id) {
-                case PanelEvent.ANCESTOR_WINDOW_SHOWN:
-                case PanelEvent.ANCESTOR_WINDOW_HIDDEN:
-                    return newEvent;
-            }
-        }
-
-        return super.coalesceEvents(existingEvent, newEvent);
-    }
-
-    /**
-     * Overridden in order to process {@link PanelEvent}s.
-     *
-     * @deprecated See {@link PanelEvent}.
-     */
-    @Override
-    @Deprecated
-    protected void processEvent(final AWTEvent event) {
-        if (event instanceof PanelEvent) {
-            //assert false : "This is dead code since the refactoring for TrueZIP 6.4!";
-            processPanelEvent((PanelEvent) event);
-        } else {
-            super.processEvent(event);
-        }
-    }
-
-    /**
      * Calls {@link #fireAncestorWindowShown} or
      * {@link #fireAncestorWindowHidden}, depending on the ID of the given
      * {@code event}.
