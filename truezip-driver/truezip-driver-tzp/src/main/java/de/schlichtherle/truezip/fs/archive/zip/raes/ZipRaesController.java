@@ -30,13 +30,10 @@ extends KeyManagerController<ZipRaesDriver> {
     /**
      * Constructs a new ZIP.RAES archive controller.
      *
-     * @param controller the non-{@code null} file system controller to
-     *        decorate.
+     * @param controller the file system controller to decorate.
      * @param driver the ZIP.RAES driver.
      */
-    ZipRaesController(
-            final FsController<?> controller,
-            final ZipRaesDriver driver) {
+    ZipRaesController(FsController<?> controller, ZipRaesDriver driver) {
         super(controller, driver);
     }
 
