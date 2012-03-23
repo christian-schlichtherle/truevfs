@@ -224,7 +224,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
 
                 void copyProperties() {
                     final MockArchiveDriverEntry dst = getLocalTarget();
-                    final IOPool.Entry<?> src;
+                    final IOPool.Buffer<?> src;
                     try {
                         src = dst.getBuffer(getIOPool());
                     } catch (IOException ex) {

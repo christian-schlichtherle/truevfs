@@ -6,15 +6,15 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
+import de.schlichtherle.truezip.socket.IOPool.Buffer;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
-final class JmxIOPool<E extends Entry<E>>
+final class JmxIOPool<E extends Buffer<E>>
 extends InstrumentingIOPool<E, JmxDirector> {
 
     JmxIOPool(IOPool<E> model, JmxDirector director) {
@@ -22,15 +22,15 @@ extends InstrumentingIOPool<E, JmxDirector> {
     }
 
     @Override
-    public Entry<E> allocate() throws IOException {
-        return new Buffer(delegate.allocate());
+    public Buffer<E> allocate() throws IOException {
+        return new JmxBuffer(delegate.allocate());
     }
 
-    private final class Buffer
-    extends InstrumentingIOPool<E, JmxDirector>.Buffer {
+    private final class JmxBuffer
+    extends InstrumentingIOPool<E, JmxDirector>.InstrumentingBuffer {
 
         @SuppressWarnings("LeakingThisInConstructor")
-        Buffer(Entry<E> model) {
+        JmxBuffer(Buffer<E> model) {
             super(model);
             JmxIOBufferView.register(this);
         }

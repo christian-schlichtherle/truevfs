@@ -30,7 +30,7 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
     private JulDirector() { }
 
     @Override
-    public <E extends IOPool.Entry<E>> IOPool<E> instrument(IOPool<E> pool) {
+    public <E extends IOPool.Buffer<E>> IOPool<E> instrument(IOPool<E> pool) {
         return new JulIOPool<E>(pool, this);
     }
 

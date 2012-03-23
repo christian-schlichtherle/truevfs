@@ -11,7 +11,7 @@ import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.socket.IOPool;
-import de.schlichtherle.truezip.socket.IOPool.Entry;
+import de.schlichtherle.truezip.socket.IOPool.Buffer;
 import de.schlichtherle.truezip.entry.InputService;
 import de.schlichtherle.truezip.socket.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
@@ -88,7 +88,7 @@ implements InputService<TarDriverEntry> {
                     entry.release();
                 entry = new TarDriverEntry(name, tinEntry);
                 if (!tinEntry.isDirectory()) {
-                    final Entry<?> temp = pool.allocate();
+                    final Buffer<?> temp = pool.allocate();
                     entry.setTemp(temp);
                     try {
                         final OutputStream

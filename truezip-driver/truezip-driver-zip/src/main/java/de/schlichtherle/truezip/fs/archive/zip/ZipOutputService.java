@@ -48,7 +48,7 @@ implements OutputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
     private final FsModel model;
-    private @CheckForNull IOPool.Entry<?> postamble;
+    private @CheckForNull IOPool.Buffer<?> postamble;
     private @CheckForNull ZipDriverEntry bufferedEntry;
     private ZipCryptoParameters param;
 
@@ -217,7 +217,7 @@ implements OutputService<ZipDriverEntry> {
     @Override
     public void close() throws IOException {
         finish();
-        final IOPool.Entry<?> pa = this.postamble;
+        final IOPool.Buffer<?> pa = this.postamble;
         if (null != pa) {
             this.postamble = null;
             final InputSocket<?> is = pa.getInputSocket();
@@ -271,19 +271,19 @@ implements OutputService<ZipDriverEntry> {
 
     /**
      * This entry output stream writes the ZIP archive entry to an
-     * {@link de.schlichtherle.truezip.socket.IOPool.Entry I/O pool entry}.
+     * {@link de.schlichtherle.truezip.socket.IOPool.Buffer I/O pool entry}.
      * When the stream gets closed, the I/O pool entry is then copied to this
      * output service and finally deleted.
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream extends CheckedOutputStream {
-        final IOPool.Entry<?> buffer;
+        final IOPool.Buffer<?> buffer;
         final boolean process;
         boolean closed;
 
         @CreatesObligation
         BufferedEntryOutputStream(
-                final IOPool.Entry<?> buffer,
+                final IOPool.Buffer<?> buffer,
                 final ZipDriverEntry entry,
                 final boolean process)
         throws IOException {
@@ -305,7 +305,7 @@ implements OutputService<ZipDriverEntry> {
         }
 
         void store() throws IOException {
-            final IOPool.Entry<?> buffer = this.buffer;
+            final IOPool.Buffer<?> buffer = this.buffer;
             assert null != buffer;
 
             final ZipDriverEntry entry = ZipOutputService.this.bufferedEntry;

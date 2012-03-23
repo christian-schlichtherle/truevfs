@@ -36,14 +36,14 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     }
 
     @Override
-    public Entry<ByteArrayIOBuffer> allocate() {
-        Buffer entry = new Buffer(total.getAndIncrement());
+    public Buffer<ByteArrayIOBuffer> allocate() {
+        ByteBuffer entry = new ByteBuffer(total.getAndIncrement());
         active.getAndIncrement();
         return entry;
     }
 
     @Override
-    public void release(Entry<ByteArrayIOBuffer> entry) throws IOException {
+    public void release(Buffer<ByteArrayIOBuffer> entry) throws IOException {
         entry.release();
     }
 
@@ -59,12 +59,12 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     }
 
     @NotThreadSafe
-    private final class Buffer
+    private final class ByteBuffer
     extends ByteArrayIOBuffer
-    implements Entry<ByteArrayIOBuffer> {
+    implements de.schlichtherle.truezip.socket.IOPool.Buffer<ByteArrayIOBuffer> {
         private boolean released;
 
-        Buffer(int i) {
+        ByteBuffer(int i) {
             super(BUFFER_NAME + i, ByteArrayIOPool.this.initialCapacity);
         }
 

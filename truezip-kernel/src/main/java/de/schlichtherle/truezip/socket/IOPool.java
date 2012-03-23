@@ -22,16 +22,15 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  */
 public interface IOPool<E extends IOEntry<E>>
-extends Pool<IOPool.Entry<E>, IOException> {
+extends Pool<IOPool.Buffer<E>, IOException> {
 
     /**
      * A releasable I/O buffer.
-     * TODO for TrueZIP 8: This should be named "Buffer".
      * 
      * @param <E> the type of the I/O entries.
      */
     @SuppressWarnings("PublicInnerClass")
-    interface Entry<E extends IOEntry<E>>
+    interface Buffer<E extends IOEntry<E>>
     extends IOEntry<E>, Pool.Releasable<IOException> {
     }
 }

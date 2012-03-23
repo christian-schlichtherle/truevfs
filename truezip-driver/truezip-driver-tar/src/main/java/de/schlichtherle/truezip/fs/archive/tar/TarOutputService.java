@@ -190,14 +190,14 @@ implements OutputService<TarDriverEntry> {
      */
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final IOPool.Entry<?> buffer;
+        final IOPool.Buffer<?> buffer;
         final TarDriverEntry entry;
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
-                final IOPool.Entry<?> buffer,
+                final IOPool.Buffer<?> buffer,
                 final TarDriverEntry entry)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
@@ -217,7 +217,7 @@ implements OutputService<TarDriverEntry> {
         }
 
         void store() throws IOException {
-            final IOPool.Entry<?> buffer = this.buffer;
+            final IOPool.Buffer<?> buffer = this.buffer;
             assert null != buffer;
 
             final TarDriverEntry entry = this.entry;
