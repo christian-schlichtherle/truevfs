@@ -8,8 +8,6 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
-import de.schlichtherle.truezip.fs.archive.FsCovariantEntry;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.SafeKeyManager;
