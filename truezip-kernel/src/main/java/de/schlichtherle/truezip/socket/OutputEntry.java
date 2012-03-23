@@ -9,9 +9,9 @@ import de.schlichtherle.truezip.entry.Entry;
 /**
  * An entry which provides output sockets.
  *
- * @param   <E> the type of this output entry.
- * @see     InputEntry
- * @author  Christian Schlichtherle
+ * @param  <E> the type of this output entry.
+ * @see    InputEntry
+ * @author Christian Schlichtherle
  */
 public interface OutputEntry<E extends OutputEntry<E>> extends Entry {
 
