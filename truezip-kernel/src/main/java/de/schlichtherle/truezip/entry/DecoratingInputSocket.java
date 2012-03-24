@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.Entry;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**

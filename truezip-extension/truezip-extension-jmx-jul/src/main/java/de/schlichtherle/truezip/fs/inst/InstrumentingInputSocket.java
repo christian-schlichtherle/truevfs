@@ -10,6 +10,7 @@ import de.schlichtherle.truezip.entry.InputSocket;
 import javax.annotation.concurrent.Immutable;
 
 /**
+ * @param  <E> the type of the {@link #getLocalTarget() local target}.
  * @author Christian Schlichtherle
  */
 @Immutable

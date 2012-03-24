@@ -17,7 +17,8 @@ import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @param  <D> the type of the instrumenting director.
+ * @author Christian Schlichtherle
  */
 @Immutable
 public class InstrumentingController<D extends InstrumentingDirector<D>>
