@@ -112,9 +112,9 @@ implements OutputService<TarDriverEntry> {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
                 }
-                final Entry peer = getPeerTarget();
+                final Entry remote = getRemoteTarget();
                 long size;
-                if (null != peer && UNKNOWN != (size = peer.getSize(DATA))) {
+                if (null != remote && UNKNOWN != (size = remote.getSize(DATA))) {
                     entry.setSize(size);
                     return new EntryOutputStream(entry);
                 }
