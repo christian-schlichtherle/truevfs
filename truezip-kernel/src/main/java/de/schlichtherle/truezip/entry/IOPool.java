@@ -8,29 +8,18 @@ import de.schlichtherle.truezip.util.Pool;
 import java.io.IOException;
 
 /**
- * A pool for allocating I/O buffers, which are used as a volatile storage for
- * bulk data.
+ * A pool for allocating I/O buffers, which can get used as a volatile storage
+ * for bulk I/O.
  * Typical implementations may use temporary files for big data or byte arrays
  * for small data.
- * The I/O buffers are referred to by {@link IOEntry}s.
  * <p>
  * Implementations must be thread-safe.
- * However, this does not necessarily apply to the implementation of its
- * managed resources, i.e. the {@code IOEntry}s.
+ * However, this does not necessarily apply to its managed I/O buffers.
  *
- * @param  <E> the type of the I/O entries in this pool.
+ * @param  <B> the type parameter for the I/O buffers managed by this pool.
  * @author Christian Schlichtherle
  */
-public interface IOPool<E extends IOEntry<E>>
-extends Pool<IOPool.IOBuffer<E>, IOException> {
-
-    /**
-     * A releasable I/O buffer.
-     * 
-     * @param <E> the type of the I/O entries.
-     */
-    @SuppressWarnings("PublicInnerClass")
-    interface IOBuffer<E extends IOEntry<E>>
-    extends IOEntry<E>, Pool.Releasable<IOException> {
-    }
+@SuppressWarnings("MarkerInterface")
+public interface IOPool<B extends IOBuffer<B>>
+extends Pool<IOBuffer<B>, IOException> {
 }

@@ -2,25 +2,25 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.socket;
+package de.schlichtherle.truezip.entry;
 
 import de.schlichtherle.truezip.entry.Entry;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An abstract decorator for an output socket.
+ * An abstract decorator for an input socket.
  * 
- * @see    DecoratingInputSocket
+ * @see    DecoratingOutputSocket
  * @param  <E> the type of the {@link #getLocalTarget() local target}.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class DecoratingOutputSocket<E extends Entry>
-extends DelegatingOutputSocket<E> {
+public abstract class DecoratingInputSocket<E extends Entry>
+extends DelegatingInputSocket<E> {
 
-    private final OutputSocket<? extends E> delegate;
+    private final InputSocket<? extends E> delegate;
 
-    protected DecoratingOutputSocket(final OutputSocket<? extends E> delegate) {
+    protected DecoratingInputSocket(final InputSocket<? extends E> delegate) {
         if (null == (this.delegate = delegate))
             throw new NullPointerException();
     }
@@ -29,7 +29,7 @@ extends DelegatingOutputSocket<E> {
     // delegate field protected final for symmetry with other Decorating*
     // classes.
     @Override
-    protected OutputSocket<? extends E> getDelegate() {
+    protected InputSocket<? extends E> getDelegate() {
         return delegate;
     }
 

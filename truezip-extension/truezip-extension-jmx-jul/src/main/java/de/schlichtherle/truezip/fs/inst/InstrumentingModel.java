@@ -9,18 +9,18 @@ import de.schlichtherle.truezip.fs.FsModel;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class InstrumentingModel extends FsDecoratingModel<FsModel> {
 
-    protected final InstrumentingDirector director;
+    protected final InstrumentingDirector<?> director;
 
     @SuppressWarnings("LeakingThisInConstructor")
-    protected InstrumentingModel(FsModel model, InstrumentingDirector director) {
+    protected InstrumentingModel(   final FsModel model,
+                                    final InstrumentingDirector<?> director) {
         super(model);
-        if (null == director)
+        if (null == (this.director = director))
             throw new NullPointerException();
-        this.director = director;
     }
 }

@@ -8,7 +8,7 @@ import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.management.*;

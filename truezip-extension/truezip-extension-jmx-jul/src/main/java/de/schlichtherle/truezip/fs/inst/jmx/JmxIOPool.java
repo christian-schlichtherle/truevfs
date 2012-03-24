@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
+import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -14,23 +14,22 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JmxIOPool<E extends IOBuffer<E>>
-extends InstrumentingIOPool<E, JmxDirector> {
+final class JmxIOPool<B extends IOBuffer<B>>
+extends InstrumentingIOPool<B> {
 
-    JmxIOPool(IOPool<E> model, JmxDirector director) {
+    JmxIOPool(IOPool<B> model, JmxDirector director) {
         super(model, director);
     }
 
     @Override
-    public IOBuffer<E> allocate() throws IOException {
-        return new JmxBuffer(delegate.allocate());
+    public IOBuffer<B> allocate() throws IOException {
+        return new JmxBuffer(pool.allocate());
     }
 
-    private final class JmxBuffer
-    extends InstrumentingIOPool<E, JmxDirector>.InstrumentingBuffer {
+    private final class JmxBuffer extends InstrumentingBuffer {
 
         @SuppressWarnings("LeakingThisInConstructor")
-        JmxBuffer(IOBuffer<E> model) {
+        JmxBuffer(IOBuffer<B> model) {
             super(model);
             JmxIOBufferView.register(this);
         }
@@ -43,5 +42,5 @@ extends InstrumentingIOPool<E, JmxDirector> {
                 JmxIOBufferView.unregister(this);
             }
         }
-    } // IOBuffer
+    } // JmxBuffer
 }

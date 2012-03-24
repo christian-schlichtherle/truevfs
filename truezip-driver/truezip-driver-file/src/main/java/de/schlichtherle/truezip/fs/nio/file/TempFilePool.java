@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
+import de.schlichtherle.truezip.entry.IOBuffer;
 import de.schlichtherle.truezip.entry.IOPool;
 import java.io.IOException;
 import static java.nio.file.Files.createTempFile;
@@ -47,7 +48,7 @@ final class TempFilePool implements IOPool<FileEntry> {
     }
 
     @Override
-    public FileBuffer allocate() throws IOException {
+    public FileEntry allocate() throws IOException {
         return new FileBuffer(createTempFile(dir, name, null), this);
     }
 

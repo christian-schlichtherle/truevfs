@@ -11,14 +11,15 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.DelegatingInputSocket;
-import de.schlichtherle.truezip.socket.DelegatingOutputSocket;
+import de.schlichtherle.truezip.entry.DecoratingInputSocket;
+import de.schlichtherle.truezip.entry.DecoratingOutputSocket;
+import de.schlichtherle.truezip.entry.DelegatingInputSocket;
+import de.schlichtherle.truezip.entry.DelegatingOutputSocket;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.socket.IOSocket;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.IOSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.entry.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
@@ -423,7 +424,7 @@ public final class FsCache implements Flushable, Closeable {
 
     /** A buffer for the contents of the cache. */
     private final class Buffer {
-        final IOPool.IOBuffer<?> data;
+        final IOBuffer<?> data;
 
         int readers, writers; // max one writer!
 

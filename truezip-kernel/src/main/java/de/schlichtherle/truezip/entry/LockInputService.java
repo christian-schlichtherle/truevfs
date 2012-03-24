@@ -7,8 +7,6 @@ package de.schlichtherle.truezip.entry;
 import de.schlichtherle.truezip.io.LockInputStream;
 import de.schlichtherle.truezip.rof.LockReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;

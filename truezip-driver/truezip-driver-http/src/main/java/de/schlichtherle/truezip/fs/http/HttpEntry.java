@@ -4,20 +4,16 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
-import de.schlichtherle.truezip.fs.option.FsInputOptions;
-import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
-import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.entry.IOEntry;
-import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.*;
+import de.schlichtherle.truezip.fs.FsEntry;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import de.schlichtherle.truezip.fs.option.FsInputOption;
+import de.schlichtherle.truezip.fs.option.FsInputOptions;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
+import de.schlichtherle.truezip.fs.option.FsOutputOptions;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;

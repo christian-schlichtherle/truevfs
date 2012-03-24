@@ -10,8 +10,6 @@ import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.DecoratingInputSocket;
-import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;

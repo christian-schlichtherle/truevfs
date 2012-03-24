@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.IOPool;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -62,7 +61,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     @NotThreadSafe
     private final class ByteBuffer
     extends ByteArrayIOBuffer
-    implements de.schlichtherle.truezip.entry.IOPool.IOBuffer<ByteArrayIOBuffer> {
+    implements de.schlichtherle.truezip.entry.IOBuffer<ByteArrayIOBuffer> {
         private boolean released;
 
         ByteBuffer(int i) {

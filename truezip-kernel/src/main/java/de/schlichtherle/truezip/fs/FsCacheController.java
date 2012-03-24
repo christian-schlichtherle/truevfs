@@ -4,6 +4,12 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.DelegatingInputSocket;
+import de.schlichtherle.truezip.entry.DelegatingOutputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.entry.ClutchInputSocket;
+import de.schlichtherle.truezip.entry.ClutchOutputSocket;
+import de.schlichtherle.truezip.entry.OutputSocket;
 import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.entry.Entry;
@@ -20,7 +26,6 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_BACK;
-import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;

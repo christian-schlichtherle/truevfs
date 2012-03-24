@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import javax.annotation.Nullable;
 
 /**

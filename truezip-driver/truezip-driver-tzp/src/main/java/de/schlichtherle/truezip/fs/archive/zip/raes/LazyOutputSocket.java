@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.DecoratingOutputSocket;
+import de.schlichtherle.truezip.entry.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.fs.inst.InstrumentingInputSocket;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.concurrent.Immutable;

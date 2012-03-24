@@ -6,7 +6,6 @@ package de.schlichtherle.truezip.entry;
 
 import de.schlichtherle.truezip.entry.DecoratingEntryContainer;
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import javax.annotation.WillCloseWhenClosed;

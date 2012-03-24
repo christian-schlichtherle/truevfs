@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
+import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
 import de.schlichtherle.truezip.entry.IOPoolProvider;
 import de.schlichtherle.truezip.entry.IOEntry;
 import de.schlichtherle.truezip.entry.IOPool;
@@ -18,9 +20,9 @@ import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Size;
 import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import de.schlichtherle.truezip.util.Maps;
@@ -227,7 +229,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
 
                 void copyProperties() {
                     final MockArchiveDriverEntry dst = getLocalTarget();
-                    final IOPool.IOBuffer<?> src;
+                    final IOBuffer<?> src;
                     try {
                         src = dst.getBuffer(getIOPool());
                     } catch (IOException ex) {

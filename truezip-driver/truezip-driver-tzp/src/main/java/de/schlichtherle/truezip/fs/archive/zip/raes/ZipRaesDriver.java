@@ -24,7 +24,7 @@ import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.entry.IOPoolProvider;
 import de.schlichtherle.truezip.entry.InputService;
-import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
 import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.CharConversionException;

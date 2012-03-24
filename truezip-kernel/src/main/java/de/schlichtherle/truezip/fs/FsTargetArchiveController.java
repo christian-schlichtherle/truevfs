@@ -4,6 +4,11 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.entry.ClutchInputSocket;
+import de.schlichtherle.truezip.entry.ClutchOutputSocket;
+import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.entry.IOSocket;
 import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.READ;
@@ -29,7 +34,6 @@ import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

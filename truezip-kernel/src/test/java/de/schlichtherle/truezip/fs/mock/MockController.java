@@ -4,6 +4,10 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
+import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.entry.DelegatingInputSocket;
+import de.schlichtherle.truezip.entry.DelegatingOutputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
 import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
 import de.schlichtherle.truezip.entry.IOEntry;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
@@ -19,7 +23,6 @@ import de.schlichtherle.truezip.io.ThrowingOutputStream;
 import de.schlichtherle.truezip.io.ThrowingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ThrowingReadOnlyFile;
-import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import de.schlichtherle.truezip.util.BitField;
