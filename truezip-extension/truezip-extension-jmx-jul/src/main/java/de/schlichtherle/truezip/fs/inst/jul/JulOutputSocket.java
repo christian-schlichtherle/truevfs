@@ -24,6 +24,6 @@ extends InstrumentingOutputSocket<E> {
 
     @Override
     public final OutputStream newOutputStream() throws IOException {
-        return new JulOutputStream<E>(getBoundSocket());
+        return new JulOutputStream<E>(getBoundDelegate());
     }
 }

@@ -522,21 +522,21 @@ extends FsArchiveDriverTestBase<D> {
                 public ReadOnlyFile newReadOnlyFile()
                 throws IOException {
                     return new TestReadOnlyFile(
-                            getBoundSocket().newReadOnlyFile());
+                            getBoundDelegate().newReadOnlyFile());
                 }
 
                 @Override
                 public SeekableByteChannel newSeekableByteChannel()
                 throws IOException {
                     return new TestSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundDelegate().newSeekableByteChannel());
                 }
 
                 @Override
                 public InputStream newInputStream()
                 throws IOException {
                     return new TestInputStream(
-                            getBoundSocket().newInputStream());
+                            getBoundDelegate().newInputStream());
                 }
             } // Input
 
@@ -560,14 +560,14 @@ extends FsArchiveDriverTestBase<D> {
                 public SeekableByteChannel newSeekableByteChannel()
                 throws IOException {
                     return new TestSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundDelegate().newSeekableByteChannel());
                 }
 
                 @Override
                 public OutputStream newOutputStream()
                 throws IOException {
                     return new TestOutputStream(
-                            getBoundSocket().newOutputStream());
+                            getBoundDelegate().newOutputStream());
                 }
             } // Output
 

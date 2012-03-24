@@ -44,7 +44,7 @@ extends DelegatingInputSocket<E> {
     @Override
     public E getLocalTarget() throws IOException {
         try {
-            return getBoundSocket().getLocalTarget();
+            return getBoundDelegate().getLocalTarget();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -53,7 +53,7 @@ extends DelegatingInputSocket<E> {
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
         try {
-            return getBoundSocket().newReadOnlyFile();
+            return getBoundDelegate().newReadOnlyFile();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -63,7 +63,7 @@ extends DelegatingInputSocket<E> {
     public SeekableByteChannel newSeekableByteChannel()
     throws IOException {
         try {
-            return getBoundSocket().newSeekableByteChannel();
+            return getBoundDelegate().newSeekableByteChannel();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -72,7 +72,7 @@ extends DelegatingInputSocket<E> {
     @Override
     public InputStream newInputStream() throws IOException {
         try {
-            return getBoundSocket().newInputStream();
+            return getBoundDelegate().newInputStream();
         } catch (Throwable ex) {
             throw reset(ex);
         }

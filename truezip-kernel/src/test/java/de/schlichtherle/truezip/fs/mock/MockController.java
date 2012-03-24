@@ -190,7 +190,7 @@ public class MockController extends FsController<FsModel> {
             public ReadOnlyFile newReadOnlyFile()
             throws IOException {
                 return new ThrowingReadOnlyFile(
-                        getBoundSocket().newReadOnlyFile(),
+                        getBoundDelegate().newReadOnlyFile(),
                         config.getThrowControl());
             }
 
@@ -198,7 +198,7 @@ public class MockController extends FsController<FsModel> {
             public SeekableByteChannel newSeekableByteChannel()
             throws IOException {
                 return new ThrowingSeekableByteChannel(
-                        getBoundSocket().newSeekableByteChannel(),
+                        getBoundDelegate().newSeekableByteChannel(),
                         config.getThrowControl());
             }
 
@@ -206,7 +206,7 @@ public class MockController extends FsController<FsModel> {
             public InputStream newInputStream()
             throws IOException {
                 return new ThrowingInputStream(
-                        getBoundSocket().newInputStream(),
+                        getBoundDelegate().newInputStream(),
                         config.getThrowControl());
             }
         } // Input
@@ -240,7 +240,7 @@ public class MockController extends FsController<FsModel> {
             public SeekableByteChannel newSeekableByteChannel()
             throws IOException {
                 return new ThrowingSeekableByteChannel(
-                        getBoundSocket().newSeekableByteChannel(),
+                        getBoundDelegate().newSeekableByteChannel(),
                         config.getThrowControl());
             }
 
@@ -248,7 +248,7 @@ public class MockController extends FsController<FsModel> {
             public OutputStream newOutputStream()
             throws IOException {
                 return new ThrowingOutputStream(
-                        getBoundSocket().newOutputStream(),
+                        getBoundDelegate().newOutputStream(),
                         config.getThrowControl());
             }
         } // Output

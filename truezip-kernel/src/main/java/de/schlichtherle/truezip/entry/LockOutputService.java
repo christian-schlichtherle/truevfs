@@ -129,7 +129,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 final OutputStream out;
                 lock.lock();
                 try {
-                    out = getBoundSocket().newOutputStream();
+                    out = getBoundDelegate().newOutputStream();
                 } finally {
                     lock.unlock();
                 }

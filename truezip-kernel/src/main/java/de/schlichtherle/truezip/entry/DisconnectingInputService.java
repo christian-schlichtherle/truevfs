@@ -144,7 +144,7 @@ extends DecoratingInputService<E, InputService<E>> {
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new DisconnectingSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundDelegate().newSeekableByteChannel());
         }
     } // Nio2Input
 
@@ -154,7 +154,7 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
-        protected InputSocket<? extends E> getBoundSocket() throws IOException {
+        protected InputSocket<? extends E> getBoundDelegate() throws IOException {
             checkOpen();
             return getDelegate().bind(this);
         }
@@ -162,13 +162,13 @@ extends DecoratingInputService<E, InputService<E>> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             return new DisconnectingReadOnlyFile(
-                    getBoundSocket().newReadOnlyFile());
+                    getBoundDelegate().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
             return new DisconnectingInputStream(
-                    getBoundSocket().newInputStream());
+                    getBoundDelegate().newInputStream());
         }
     } // Input
 

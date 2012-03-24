@@ -128,8 +128,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
             @Override
             public OutputStream newOutputStream() throws IOException {
                 return isBusy()
-                        ? newBufferedEntryOutputStream(getBoundSocket())
-                        : new EntryOutputStream(getBoundSocket());
+                        ? newBufferedEntryOutputStream(getBoundDelegate())
+                        : new EntryOutputStream(getBoundDelegate());
             }
         } // Output
 

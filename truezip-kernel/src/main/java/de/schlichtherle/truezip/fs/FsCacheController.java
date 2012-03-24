@@ -399,7 +399,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     // bypassed because the delegate MUST get kept even upon an
                     // exception!
                     //super(Nio2Output.super.newSeekableByteChannel());
-                    super(getBoundSocket().newSeekableByteChannel());
+                    super(getBoundDelegate().newSeekableByteChannel());
                     register();
                 }
 
@@ -440,7 +440,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 // Note that the super class implementation MUST get
                 // bypassed because the delegate MUST get kept even upon an
                 // exception!
-                return getBoundSocket().getLocalTarget();
+                return getBoundDelegate().getLocalTarget();
             }
 
             @Override
@@ -457,7 +457,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     // bypassed because the delegate MUST get kept even upon an
                     // exception!
                     //super(Output.super.newOutputStream());
-                    super(getBoundSocket().newOutputStream());
+                    super(getBoundDelegate().newOutputStream());
                     register();
                 }
 

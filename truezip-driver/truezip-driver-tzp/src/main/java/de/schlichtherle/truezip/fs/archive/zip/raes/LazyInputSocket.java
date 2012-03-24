@@ -69,7 +69,7 @@ extends DecoratingInputSocket<E> {
             final ReadOnlyFile rof = delegate;
             return null != rof
                     ? rof
-                    : (delegate = getBoundSocket().newReadOnlyFile());
+                    : (delegate = getBoundDelegate().newReadOnlyFile());
         }
 
         @Override
@@ -117,7 +117,7 @@ extends DecoratingInputSocket<E> {
             final InputStream in = delegate;
             return null != in
                     ? in
-                    : (delegate = getBoundSocket().newInputStream());
+                    : (delegate = getBoundDelegate().newInputStream());
         }
 
         @Override

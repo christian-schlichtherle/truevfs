@@ -156,7 +156,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new FinalizeSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundDelegate().newSeekableByteChannel());
         }
     } // Nio2Input
 
@@ -171,13 +171,13 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             return new FinalizeReadOnlyFile(
-                    getBoundSocket().newReadOnlyFile());
+                    getBoundDelegate().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
             return new FinalizeInputStream(
-                    getBoundSocket().newInputStream());
+                    getBoundDelegate().newInputStream());
         }
     } // Input
 
@@ -192,7 +192,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new FinalizeSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundDelegate().newSeekableByteChannel());
         }
     } // Nio2Output
 
@@ -209,7 +209,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
         public OutputStream newOutputStream() throws IOException {
             return new FinalizeOutputStream(
-                    getBoundSocket().newOutputStream());
+                    getBoundDelegate().newOutputStream());
         }
     } // Output
 

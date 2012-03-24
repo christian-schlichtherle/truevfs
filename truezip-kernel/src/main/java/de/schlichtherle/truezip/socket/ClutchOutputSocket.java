@@ -43,7 +43,7 @@ extends DelegatingOutputSocket<E> {
     @Override
     public E getLocalTarget() throws IOException {
         try {
-            return getBoundSocket().getLocalTarget();
+            return getBoundDelegate().getLocalTarget();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -53,7 +53,7 @@ extends DelegatingOutputSocket<E> {
     public SeekableByteChannel newSeekableByteChannel()
     throws IOException {
         try {
-            return getBoundSocket().newSeekableByteChannel();
+            return getBoundDelegate().newSeekableByteChannel();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -62,7 +62,7 @@ extends DelegatingOutputSocket<E> {
     @Override
     public OutputStream newOutputStream() throws IOException {
         try {
-            return getBoundSocket().newOutputStream();
+            return getBoundDelegate().newOutputStream();
         } catch (Throwable ex) {
             throw reset(ex);
         }

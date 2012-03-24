@@ -142,7 +142,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new DisconnectingSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundDelegate().newSeekableByteChannel());
         }
     } // Nio2Output
 
@@ -152,7 +152,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
-        protected OutputSocket<? extends E> getBoundSocket() throws IOException {
+        protected OutputSocket<? extends E> getBoundDelegate() throws IOException {
             checkOpen();
             return getDelegate().bind(this);
         }
@@ -160,7 +160,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         public OutputStream newOutputStream() throws IOException {
             return new DisconnectingOutputStream(
-                    getBoundSocket().newOutputStream());
+                    getBoundDelegate().newOutputStream());
         }
     } // Output
 

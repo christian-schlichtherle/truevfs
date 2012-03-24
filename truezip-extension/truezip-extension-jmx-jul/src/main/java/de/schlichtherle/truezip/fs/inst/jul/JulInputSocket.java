@@ -25,11 +25,11 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public final ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new JulReadOnlyFile<E>(getBoundSocket());
+        return new JulReadOnlyFile<E>(getBoundDelegate());
     }
 
     @Override
     public final InputStream newInputStream() throws IOException {
-        return new JulInputStream<E>(getBoundSocket());
+        return new JulInputStream<E>(getBoundDelegate());
     }
 }

@@ -22,7 +22,7 @@ extends JulOutputSocket<E> {
 
     @Override
     public java.nio.channels.SeekableByteChannel newSeekableByteChannel() throws IOException {
-        final java.nio.channels.SeekableByteChannel sbc = getBoundSocket().newSeekableByteChannel();
+        final java.nio.channels.SeekableByteChannel sbc = getBoundDelegate().newSeekableByteChannel();
         try {
             return new JulOutputByteChannel<E>(sbc, this);
         } catch (IOException ex) {
