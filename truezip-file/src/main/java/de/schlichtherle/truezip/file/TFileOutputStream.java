@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.file;
 
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.APPEND;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;

@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.cio.Entry;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**

@@ -4,17 +4,17 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Access.READ;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
+import de.schlichtherle.truezip.cio.Entry;
+import static de.schlichtherle.truezip.cio.Entry.Access.READ;
+import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.fs.FsCache.Strategy;
-import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
-import de.schlichtherle.truezip.entry.ByteArrayIOPool;
-import de.schlichtherle.truezip.entry.IOSocket;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.cio.ByteArrayIOPool;
+import de.schlichtherle.truezip.cio.IOSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_BACK;
 import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_THROUGH;
 import java.io.IOException;

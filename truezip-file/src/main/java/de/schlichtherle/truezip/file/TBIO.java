@@ -4,15 +4,15 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.CREATE_PARENTS;
 import de.schlichtherle.truezip.fs.addr.FsPath;
 import de.schlichtherle.truezip.io.Paths;
-import de.schlichtherle.truezip.entry.IOSocket;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.IOSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
 import java.io.IOException;

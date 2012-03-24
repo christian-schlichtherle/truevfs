@@ -4,10 +4,10 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.entry.DecoratingOutputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.DecoratingOutputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;

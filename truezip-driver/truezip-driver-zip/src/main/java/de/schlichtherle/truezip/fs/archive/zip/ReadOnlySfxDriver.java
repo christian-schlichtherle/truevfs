@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.entry.IOPoolProvider;
-import de.schlichtherle.truezip.entry.OutputService;
+import de.schlichtherle.truezip.cio.IOPoolProvider;
+import de.schlichtherle.truezip.cio.OutputService;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;

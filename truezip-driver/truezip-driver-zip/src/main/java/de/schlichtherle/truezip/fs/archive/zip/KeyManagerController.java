@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.entry.Entry;
-import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
+import de.schlichtherle.truezip.cio.Entry;
+import static de.schlichtherle.truezip.cio.Entry.Type.SPECIAL;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.ROOT;

@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.entry.Entry.Access;
+import de.schlichtherle.truezip.cio.Entry.Access;
 import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;

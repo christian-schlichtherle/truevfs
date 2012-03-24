@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.inst;
 
-import de.schlichtherle.truezip.entry.DecoratingInputSocket;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.cio.DecoratingInputSocket;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.InputSocket;
 import javax.annotation.concurrent.Immutable;
 
 /**

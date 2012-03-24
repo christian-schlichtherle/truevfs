@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.inst;
 
-import de.schlichtherle.truezip.entry.*;
+import de.schlichtherle.truezip.cio.*;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 

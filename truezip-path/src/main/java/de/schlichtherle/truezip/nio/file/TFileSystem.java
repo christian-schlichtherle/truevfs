@@ -4,12 +4,12 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.Type.*;
-import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Access;
+import static de.schlichtherle.truezip.cio.Entry.Access.*;
+import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
+import static de.schlichtherle.truezip.cio.Entry.Type.*;
+import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
 import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsController;
@@ -24,8 +24,8 @@ import static de.schlichtherle.truezip.fs.option.FsSyncOptions.UMOUNT;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.FilteringIterator;
 import java.io.File;

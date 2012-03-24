@@ -5,9 +5,9 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Access;
+import de.schlichtherle.truezip.cio.Entry.Type;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
@@ -15,10 +15,10 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.entry.DecoratingInputSocket;
-import de.schlichtherle.truezip.entry.DecoratingOutputSocket;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.DecoratingInputSocket;
+import de.schlichtherle.truezip.cio.DecoratingOutputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

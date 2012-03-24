@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.entry.Entry.*;
+import static de.schlichtherle.truezip.cio.Entry.*;
 import java.util.Formatter;
 
 /**

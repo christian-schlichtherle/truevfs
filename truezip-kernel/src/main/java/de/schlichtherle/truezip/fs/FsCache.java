@@ -4,22 +4,22 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.DecoratingEntry;
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.cio.DecoratingEntry;
+import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.entry.DecoratingInputSocket;
-import de.schlichtherle.truezip.entry.DecoratingOutputSocket;
-import de.schlichtherle.truezip.entry.DelegatingInputSocket;
-import de.schlichtherle.truezip.entry.DelegatingOutputSocket;
-import de.schlichtherle.truezip.entry.IOBuffer;
-import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.IOSocket;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.DecoratingInputSocket;
+import de.schlichtherle.truezip.cio.DecoratingOutputSocket;
+import de.schlichtherle.truezip.cio.DelegatingInputSocket;
+import de.schlichtherle.truezip.cio.DelegatingOutputSocket;
+import de.schlichtherle.truezip.cio.IOBuffer;
+import de.schlichtherle.truezip.cio.IOPool;
+import de.schlichtherle.truezip.cio.IOSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.Pool;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;

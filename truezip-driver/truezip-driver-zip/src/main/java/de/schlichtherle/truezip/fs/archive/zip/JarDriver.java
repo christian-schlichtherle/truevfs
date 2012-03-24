@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.entry.IOPoolProvider;
+import de.schlichtherle.truezip.cio.IOPoolProvider;
 import de.schlichtherle.truezip.zip.DateTimeConverter;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import java.nio.charset.Charset;

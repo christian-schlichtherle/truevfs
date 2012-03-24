@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
 import java.io.CharConversionException;
 import java.util.*;
 import javax.annotation.Nullable;

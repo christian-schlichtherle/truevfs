@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.entry;
+package de.schlichtherle.truezip.cio;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,7 +61,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     @NotThreadSafe
     private final class ByteBuffer
     extends ByteArrayIOBuffer
-    implements de.schlichtherle.truezip.entry.IOBuffer<ByteArrayIOBuffer> {
+    implements de.schlichtherle.truezip.cio.IOBuffer<ByteArrayIOBuffer> {
         private boolean released;
 
         ByteBuffer(int i) {

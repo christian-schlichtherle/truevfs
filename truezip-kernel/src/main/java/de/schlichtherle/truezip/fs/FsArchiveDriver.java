@@ -4,17 +4,17 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.entry.InputService;
-import de.schlichtherle.truezip.entry.OutputService;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Type;
+import de.schlichtherle.truezip.cio.InputService;
+import de.schlichtherle.truezip.cio.OutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.IOPool;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
@@ -277,7 +277,7 @@ extends FsDriver {
     throws IOException;
 
     /**
-     * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.entry.Entry.Type, de.schlichtherle.truezip.entry.Entry, de.schlichtherle.truezip.util.BitField)
+     * Equivalent to {@link #newEntry(java.lang.String, de.schlichtherle.truezip.cio.Entry.Type, de.schlichtherle.truezip.cio.Entry, de.schlichtherle.truezip.util.BitField)
      * newEntry(name, type, template, FsOutputOptions.NONE)}.
      * 
      * @param  name an entry name.

@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
-import de.schlichtherle.truezip.entry.sl.IOPoolLocator;
+import de.schlichtherle.truezip.cio.sl.IOPoolLocator;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP

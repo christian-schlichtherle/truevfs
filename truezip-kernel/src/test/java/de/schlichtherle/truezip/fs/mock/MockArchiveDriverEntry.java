@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.IOBuffer;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.IOBuffer;
 import de.schlichtherle.truezip.fs.FsArchiveEntries;
 import de.schlichtherle.truezip.fs.FsArchiveEntry;
-import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.cio.IOPool;
 import java.io.IOException;
 import java.util.EnumMap;
 import javax.annotation.CheckForNull;
