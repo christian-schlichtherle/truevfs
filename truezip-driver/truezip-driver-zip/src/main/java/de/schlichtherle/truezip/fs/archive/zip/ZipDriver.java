@@ -253,15 +253,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     final boolean process(
             @WillNotClose ZipInputService input,
             ZipDriverEntry local,
-            ZipDriverEntry peer) {
-        return process(local, peer);
+            ZipDriverEntry remote) {
+        return process(local, remote);
     }
 
     final boolean process(
             @WillNotClose ZipOutputService output,
             ZipDriverEntry local,
-            ZipDriverEntry peer) {
-        return process(peer, local);
+            ZipDriverEntry remote) {
+        return process(remote, local);
     }
 
     /**
@@ -273,10 +273,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * agree on transferring raw (unprocessed) content.
      * Note that it is an error to compare the properties of the target entries
      * because this method may get called before the local output target gets
-     * mutated to compare equal with the peer input target!
+     * mutated to compare equal with the remote input target!
      * <p>
      * The implementation in the class {@link ZipDriver} returns
-     * {@code local.isEncrypted() || peer.isEncrypted()} in order to cover the
+     * {@code local.isEncrypted() || remote.isEncrypted()} in order to cover the
      * typical case that the cipher keys of both targets are not the same.
      * Note that there is no secure way to explicitly test for this.
      * 

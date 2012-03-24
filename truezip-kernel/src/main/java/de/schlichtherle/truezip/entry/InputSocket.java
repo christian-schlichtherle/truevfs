@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -20,8 +19,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <i>local target</i>.
  * <p>
  * Note that the entity relationship between input sockets and output sockets
- * is n:1, i.e. any input socket can have at most one peer output socket, but
- * it may be the peer of many other output sockets.
+ * is n:1, i.e. any input socket can have at most one remote output socket, but
+ * it may be the remote of many other output sockets.
  *
  * @param  <E> the type of the {@link #getLocalTarget() local target}
  *         for I/O operations.
@@ -34,59 +33,59 @@ public abstract class InputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
 
     @CheckForNull
-    private OutputSocket<?> peer;
+    private OutputSocket<?> remote;
 
     /**
      * {@inheritDoc}
      * <p>
-     * The peer target is {@code null} if and only if this socket is not
+     * The remote target is {@code null} if and only if this socket is not
      * {@link #connect}ed to another socket.
      * 
      * @throws IOException On any I/O failure.
      */
     // See https://java.net/jira/browse/TRUEZIP-203
     @Override
-    public final @Nullable Entry getPeerTarget() throws IOException {
-        return null == peer ? null : peer.getLocalTarget();
+    public final @Nullable Entry getRemoteTarget() throws IOException {
+        return null == remote ? null : remote.getLocalTarget();
     }
 
     /**
      * Binds this socket to given socket by inheriting its
-     * {@link #getPeerTarget() peer target}.
+     * {@link #getRemoteTarget() remote target}.
      * Note that this method does <em>not</em> change the state of the
-     * given socket and does <em>not</em> connect this socket to the peer
-     * socket, that is it does not set this socket as the peer of of the given
+     * given socket and does <em>not</em> connect this socket to the remote
+     * socket, that is it does not set this socket as the remote of of the given
      * socket.
      *
-     * @param  to the input socket with the peer target to inherit.
+     * @param  to the input socket with the remote target to inherit.
      * @return {@code this}
      * @throws IllegalArgumentException if {@code this} == {@code to}.
      */
     public final InputSocket<E> bind(final InputSocket<?> to) {
         if (this == to)
             throw new IllegalArgumentException();
-        this.peer = to.peer;
+        this.remote = to.remote;
         return this;
     }
 
     /**
-     * Connects this input socket to the given peer output socket.
-     * Note that this method changes the peer input socket of
-     * the given peer output socket to this instance.
+     * Connects this input socket to the given remote output socket.
+     * Note that this method changes the remote input socket of
+     * the given remote output socket to this instance.
      *
-     * @param  newPeer the nullable peer output socket to connect to.
+     * @param  newRemote the nullable remote output socket to connect to.
      * @return {@code this}
      */
-    final InputSocket<E> connect(@CheckForNull final OutputSocket<?> newPeer) {
-        final OutputSocket<?> oldPeer = peer;
-        if (oldPeer != newPeer) {
-            if (null != oldPeer) {
-                peer = null;
-                oldPeer.connect(null);
+    final InputSocket<E> connect(@CheckForNull final OutputSocket<?> newRemote) {
+        final OutputSocket<?> oldRemote = remote;
+        if (oldRemote != newRemote) {
+            if (null != oldRemote) {
+                remote = null;
+                oldRemote.connect(null);
             }
-            if (null != newPeer) {
-                peer = newPeer;
-                newPeer.connect(this);
+            if (null != newRemote) {
+                remote = newRemote;
+                newRemote.connect(this);
             }
         }
         return this;

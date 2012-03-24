@@ -195,7 +195,7 @@ extends FsLockModelController {
         public FsArchiveEntry getLocalTarget() throws IOException {
             if (null != localTarget)
                 return localTarget;
-            getPeerTarget(); // may sync() if in same target archive file!
+            getRemoteTarget(); // may sync() if in same target archive file!
             checkSync(name, READ);
             final FsCovariantEntry<E> fse = autoMount().getEntry(name);
             if (null == fse)
@@ -257,7 +257,7 @@ extends FsLockModelController {
             final E ae = mknod().getTarget().getEntry();
             if (options.get(APPEND)) {
                 // A proxy entry must get returned here in order to inhibit
-                // a peer target to recognize the type of this entry and
+                // a remote target to recognize the type of this entry and
                 // change the contents of the transferred data accordingly.
                 // This would not work when APPENDing.
                 return new ProxyEntry(ae);

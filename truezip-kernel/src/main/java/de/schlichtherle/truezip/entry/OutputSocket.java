@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.entry.Entry;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,8 +17,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <i>local target</i>.
  * <p>
  * Note that the entity relationship between output sockets and input sockets
- * is n:1, i.e. any output socket can have at most one peer input socket, but
- * it may be the peer of many other input sockets.
+ * is n:1, i.e. any output socket can have at most one remote input socket, but
+ * it may be the remote of many other input sockets.
  *
  * @param  <E> the type of the {@link #getLocalTarget() local target}
  *         for I/O operations.
@@ -32,59 +31,59 @@ public abstract class OutputSocket<E extends Entry>
 extends IOSocket<E, Entry> {
 
     @CheckForNull
-    private InputSocket<?> peer;
+    private InputSocket<?> remote;
 
     /**
      * {@inheritDoc}
      * <p>
-     * The peer target is {@code null} if and only if this socket is not
+     * The remote target is {@code null} if and only if this socket is not
      * {@link #connect}ed to another socket.
      * 
      * @throws IOException On any I/O failure.
      */
     // See https://java.net/jira/browse/TRUEZIP-203
     @Override
-    public final @Nullable Entry getPeerTarget() throws IOException {
-        return null == peer ? null : peer.getLocalTarget();
+    public final @Nullable Entry getRemoteTarget() throws IOException {
+        return null == remote ? null : remote.getLocalTarget();
     }
 
     /**
      * Binds this socket to given socket by inheriting its
-     * {@link #getPeerTarget() peer target}.
+     * {@link #getRemoteTarget() remote target}.
      * Note that this method does <em>not</em> change the state of the
-     * given socket and does <em>not</em> connect this socket to the peer
-     * socket, that is it does not set this socket as the peer of of the given
+     * given socket and does <em>not</em> connect this socket to the remote
+     * socket, that is it does not set this socket as the remote of of the given
      * socket.
      *
-     * @param  to the output socket with the peer target to inherit.
+     * @param  to the output socket with the remote target to inherit.
      * @return {@code this}
      * @throws IllegalArgumentException if {@code this} == {@code to}.
      */
     public final OutputSocket<E> bind(final OutputSocket<?> to) {
         if (this == to)
             throw new IllegalArgumentException();
-        this.peer = to.peer;
+        this.remote = to.remote;
         return this;
     }
 
     /**
-     * Connects this output socket to the given peer input socket.
-     * Note that this method changes the peer output socket of
-     * the given peer input socket to this instance.
+     * Connects this output socket to the given remote input socket.
+     * Note that this method changes the remote output socket of
+     * the given remote input socket to this instance.
      *
-     * @param  newPeer the nullable peer input socket to connect to.
+     * @param  newRemote the nullable remote input socket to connect to.
      * @return {@code this}
      */
-    final OutputSocket<E> connect(@CheckForNull final InputSocket<?> newPeer) {
-        final InputSocket<?> oldPeer = peer;
-        if (oldPeer != newPeer) {
-            if (null != oldPeer) {
-                peer = null;
-                oldPeer.connect(null);
+    final OutputSocket<E> connect(@CheckForNull final InputSocket<?> newRemote) {
+        final InputSocket<?> oldRemote = remote;
+        if (oldRemote != newRemote) {
+            if (null != oldRemote) {
+                remote = null;
+                oldRemote.connect(null);
             }
-            if (null != newPeer) {
-                peer = newPeer;
-                newPeer.connect(this);
+            if (null != newRemote) {
+                remote = newRemote;
+                newRemote.connect(this);
             }
         }
         return this;

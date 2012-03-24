@@ -50,7 +50,7 @@ public final class Copy {
      *
      * @param  src the URI string of the copy source.
      * @param  dst the URI string of the copy destination.
-     * @throws IOException if accessing the peers results in an I/O error.
+     * @throws IOException if accessing the targets results in an I/O error.
      * @throws IllegalArgumentException if {@code src} or {@code src} does not
      *         conform to the syntax constraints for {@link URI}s.
      */
