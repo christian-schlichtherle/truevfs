@@ -10,4 +10,4 @@
  * - so using it is entirely optional.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.schlichtherle.truezip.socket.sl;
+package de.schlichtherle.truezip.entry.sl;
