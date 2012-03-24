@@ -11,7 +11,7 @@ import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.option.FsInputOptions;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
-import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
+import de.schlichtherle.truezip.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.InheritableThreadLocalStack;
 import de.schlichtherle.truezip.util.Resource;

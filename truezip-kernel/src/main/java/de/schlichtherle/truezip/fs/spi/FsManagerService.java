@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.spi;
 
 import de.schlichtherle.truezip.fs.FsManagerProvider;
-import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
+import de.schlichtherle.truezip.sl.FsManagerLocator;
 
 /**
  * An abstract locatable service for a file system manager.
