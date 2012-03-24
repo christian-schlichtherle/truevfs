@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.file;
 
-import de.schlichtherle.truezip.entry.IOBuffer;
-import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.cio.IOBuffer;
+import de.schlichtherle.truezip.cio.IOPool;
 import java.io.File;
 import static java.io.File.createTempFile;
 import java.io.IOException;

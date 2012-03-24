@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.entry.MultiplexedOutputService;
-import de.schlichtherle.truezip.entry.DecoratingOutputSocket;
-import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
+import de.schlichtherle.truezip.cio.MultiplexedOutputService;
+import de.schlichtherle.truezip.cio.DecoratingOutputSocket;
+import de.schlichtherle.truezip.cio.IOPool;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;

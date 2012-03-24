@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.InputSocket;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;

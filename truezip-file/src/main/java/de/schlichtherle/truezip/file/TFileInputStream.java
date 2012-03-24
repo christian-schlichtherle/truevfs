@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;

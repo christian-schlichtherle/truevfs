@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.entry.IOPoolProvider;
+import de.schlichtherle.truezip.cio.IOPoolProvider;
 
 /**
  * @author Christian Schlichtherle

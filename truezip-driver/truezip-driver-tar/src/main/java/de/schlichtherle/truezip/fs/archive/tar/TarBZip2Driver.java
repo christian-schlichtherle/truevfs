@@ -4,15 +4,15 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.STORE;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.entry.IOPoolProvider;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.IOPoolProvider;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.*;
 import javax.annotation.CheckForNull;

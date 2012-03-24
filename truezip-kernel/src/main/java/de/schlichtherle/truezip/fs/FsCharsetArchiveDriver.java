@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
+import de.schlichtherle.truezip.cio.Entry.Type;
+import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;

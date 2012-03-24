@@ -4,10 +4,10 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.IOBuffer;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.IOBuffer;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
@@ -85,7 +85,6 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
      */
     @Override
     public void release() throws IOException {
-        throw new UnsupportedOperationException();
     }
 
     /** Returns the decorated file. */

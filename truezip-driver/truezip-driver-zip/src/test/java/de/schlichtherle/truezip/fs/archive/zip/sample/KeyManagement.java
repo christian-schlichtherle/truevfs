@@ -18,7 +18,7 @@ import de.schlichtherle.truezip.key.PromptingKeyProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
 import de.schlichtherle.truezip.key.UnknownKeyException;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.entry.sl.IOPoolLocator;
+import de.schlichtherle.truezip.cio.sl.IOPoolLocator;
 import de.schlichtherle.truezip.zip.WinZipAesParameters;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import de.schlichtherle.truezip.zip.ZipKeyException;

@@ -4,10 +4,10 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
+import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.FsArchiveEntries;
 import de.schlichtherle.truezip.fs.FsArchiveEntry;
 import de.schlichtherle.truezip.zip.DateTimeConverter;

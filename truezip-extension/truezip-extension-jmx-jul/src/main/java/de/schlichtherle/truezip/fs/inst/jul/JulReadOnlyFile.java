@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.fs.inst.jul;
 
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.IOBuffer;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.IOBuffer;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.cio.IOPool;
+import de.schlichtherle.truezip.cio.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;

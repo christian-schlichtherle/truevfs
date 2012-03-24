@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.fs.option.FsSyncOptions;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import java.io.File;
 import java.io.IOException;

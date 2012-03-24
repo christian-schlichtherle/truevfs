@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.zip;
 
-import de.schlichtherle.truezip.entry.Entry.Size;
-import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
-import de.schlichtherle.truezip.entry.IOEntry;
+import de.schlichtherle.truezip.cio.Entry.Size;
+import de.schlichtherle.truezip.cio.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.cio.IOEntry;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;

@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.test;
 
-import de.schlichtherle.truezip.entry.IOPoolProvider;
-import de.schlichtherle.truezip.entry.spi.ByteArrayIOPoolService;
+import de.schlichtherle.truezip.cio.IOPoolProvider;
+import de.schlichtherle.truezip.cio.spi.ByteArrayIOPoolService;
 import de.schlichtherle.truezip.util.InheritableThreadLocalStack;
 import de.schlichtherle.truezip.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;

@@ -4,14 +4,14 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
-import de.schlichtherle.truezip.entry.OutputSocket;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.IOPoolProvider;
-import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.InputService;
-import de.schlichtherle.truezip.entry.OutputService;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.cio.OutputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.IOPoolProvider;
+import de.schlichtherle.truezip.cio.IOPool;
+import de.schlichtherle.truezip.cio.InputService;
+import de.schlichtherle.truezip.cio.OutputService;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Type;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;

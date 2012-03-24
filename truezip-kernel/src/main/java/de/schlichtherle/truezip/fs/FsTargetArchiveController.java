@@ -4,21 +4,21 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.ClutchInputSocket;
-import de.schlichtherle.truezip.entry.ClutchOutputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
-import de.schlichtherle.truezip.entry.IOSocket;
-import static de.schlichtherle.truezip.entry.Entry.ALL_SIZE_SET;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import static de.schlichtherle.truezip.entry.Entry.Access.READ;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import de.schlichtherle.truezip.entry.Entry.Size;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
-import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.entry.*;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.ClutchInputSocket;
+import de.schlichtherle.truezip.cio.ClutchOutputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
+import de.schlichtherle.truezip.cio.IOSocket;
+import static de.schlichtherle.truezip.cio.Entry.ALL_SIZE_SET;
+import de.schlichtherle.truezip.cio.Entry.Access;
+import static de.schlichtherle.truezip.cio.Entry.Access.READ;
+import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
+import de.schlichtherle.truezip.cio.Entry.Size;
+import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
+import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.cio.Entry.Type.SPECIAL;
+import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
+import de.schlichtherle.truezip.cio.*;
 import static de.schlichtherle.truezip.fs.FsArchiveFileSystem.newEmptyFileSystem;
 import static de.schlichtherle.truezip.fs.FsArchiveFileSystem.newPopulatedFileSystem;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;

@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.MutableEntry;
+import de.schlichtherle.truezip.cio.MutableEntry;
 
 /**
  * Represents an entry in an archive file.

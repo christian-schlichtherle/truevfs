@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.*;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
-import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.entry.IOBuffer;
+import static de.schlichtherle.truezip.cio.Entry.Access.*;
+import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
+import static de.schlichtherle.truezip.cio.Entry.Size.STORAGE;
+import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
+import de.schlichtherle.truezip.cio.IOBuffer;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.management.*;

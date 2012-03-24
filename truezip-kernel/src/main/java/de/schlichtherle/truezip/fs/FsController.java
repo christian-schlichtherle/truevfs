@@ -5,15 +5,15 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Access;
+import de.schlichtherle.truezip.cio.Entry.Type;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import static de.schlichtherle.truezip.fs.option.FsSyncOptions.SYNC;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;

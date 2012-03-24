@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.inst.jul;
 
-import de.schlichtherle.truezip.entry.IOBuffer;
-import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.cio.IOBuffer;
+import de.schlichtherle.truezip.cio.IOPool;
 import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;

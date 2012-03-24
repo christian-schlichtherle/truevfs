@@ -4,17 +4,17 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.entry.DelegatingInputSocket;
-import de.schlichtherle.truezip.entry.DelegatingOutputSocket;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.ClutchInputSocket;
-import de.schlichtherle.truezip.entry.ClutchOutputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
-import de.schlichtherle.truezip.entry.IOPool;
+import de.schlichtherle.truezip.cio.DelegatingInputSocket;
+import de.schlichtherle.truezip.cio.DelegatingOutputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.ClutchInputSocket;
+import de.schlichtherle.truezip.cio.ClutchOutputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
+import de.schlichtherle.truezip.cio.IOPool;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Type;
+import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.EXCLUSIVE;

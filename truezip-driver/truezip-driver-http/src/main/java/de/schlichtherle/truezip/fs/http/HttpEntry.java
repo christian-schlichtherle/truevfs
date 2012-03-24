@@ -4,10 +4,10 @@
  */
 package de.schlichtherle.truezip.fs.http;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
-import de.schlichtherle.truezip.entry.*;
+import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
+import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;

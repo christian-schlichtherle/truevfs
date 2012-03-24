@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.entry;
+package de.schlichtherle.truezip.cio;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.READ;
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.cio.Entry.Access.READ;
+import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
 import de.schlichtherle.truezip.io.SeekableByteBufferChannel;
 import de.schlichtherle.truezip.rof.ByteArrayReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
@@ -192,7 +192,6 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
      */
     @Override
     public void release() throws IOException {
-        throw new UnsupportedOperationException();
     }
 
     @Immutable

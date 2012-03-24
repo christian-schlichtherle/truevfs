@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.inst.jul;
 
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.fs.inst.InstrumentingOutputSocket;
-import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.cio.OutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;

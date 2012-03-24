@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.addr.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
-import de.schlichtherle.truezip.entry.sl.IOPoolLocator;
+import de.schlichtherle.truezip.cio.sl.IOPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 

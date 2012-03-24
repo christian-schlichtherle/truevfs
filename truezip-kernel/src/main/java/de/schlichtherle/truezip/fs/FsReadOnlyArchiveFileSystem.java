@@ -5,10 +5,10 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Type;
-import de.schlichtherle.truezip.entry.EntryContainer;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Access;
+import de.schlichtherle.truezip.cio.Entry.Type;
+import de.schlichtherle.truezip.cio.EntryContainer;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Map;

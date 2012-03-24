@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;

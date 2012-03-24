@@ -4,14 +4,14 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
-import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
-import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
+import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
+import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
+import static de.schlichtherle.truezip.cio.Entry.Size.STORAGE;
+import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
+import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.FsArchiveEntries;
 import de.schlichtherle.truezip.fs.FsArchiveEntry;
-import de.schlichtherle.truezip.entry.IOBuffer;
+import de.schlichtherle.truezip.cio.IOBuffer;
 import de.schlichtherle.truezip.util.Releasable;
 import java.io.IOException;
 import java.util.Date;

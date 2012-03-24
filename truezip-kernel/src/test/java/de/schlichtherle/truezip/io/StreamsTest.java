@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.io;
 
-import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.cio.ByteArrayIOBuffer;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import static de.schlichtherle.truezip.util.Throwables.contains;

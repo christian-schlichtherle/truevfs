@@ -4,16 +4,16 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
-import de.schlichtherle.truezip.entry.OutputSocket;
-import de.schlichtherle.truezip.entry.DelegatingInputSocket;
-import de.schlichtherle.truezip.entry.DelegatingOutputSocket;
-import de.schlichtherle.truezip.entry.InputSocket;
-import de.schlichtherle.truezip.entry.ByteArrayIOBuffer;
-import de.schlichtherle.truezip.entry.IOEntry;
+import de.schlichtherle.truezip.cio.OutputSocket;
+import de.schlichtherle.truezip.cio.DelegatingInputSocket;
+import de.schlichtherle.truezip.cio.DelegatingOutputSocket;
+import de.schlichtherle.truezip.cio.InputSocket;
+import de.schlichtherle.truezip.cio.ByteArrayIOBuffer;
+import de.schlichtherle.truezip.cio.IOEntry;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.entry.Entry.Access;
-import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.cio.Entry.Access;
+import de.schlichtherle.truezip.cio.Entry.Type;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
