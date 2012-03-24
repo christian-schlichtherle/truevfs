@@ -138,6 +138,7 @@ implements Iterable<FsCovariantEntry<E>> {
         for (final E entry : archive) {
             final String path = cutTrailingSeparators(
                 normalizer.normalize(
+                    // Fix illegal Windoze file name separators.
                     entry.getName().replace('\\', SEPARATOR_CHAR)),
                 SEPARATOR_CHAR);
             master.add(path, entry);
