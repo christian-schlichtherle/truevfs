@@ -35,16 +35,16 @@ extends DecoratingOutputSocket<Entry> {
 
     @Override
     public Entry getLocalTarget() throws IOException {
-        return getBoundSocket().getLocalTarget();
+        return getBoundDelegate().getLocalTarget();
     }
 
     @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
+        return getBoundDelegate().newSeekableByteChannel();
     }
 
     @Override
     public OutputStream newOutputStream() throws IOException {
-        return getBoundSocket().newOutputStream();
+        return getBoundDelegate().newOutputStream();
     }
 }

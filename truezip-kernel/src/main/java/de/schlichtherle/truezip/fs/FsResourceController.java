@@ -228,7 +228,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new ResourceSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundDelegate().newSeekableByteChannel());
         }
     } // Nio2Input
 
@@ -243,13 +243,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             return new ResourceReadOnlyFile(
-                    getBoundSocket().newReadOnlyFile());
+                    getBoundDelegate().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
             return new ResourceInputStream(
-                    getBoundSocket().newInputStream());
+                    getBoundDelegate().newInputStream());
         }
     } // Input
 
@@ -264,7 +264,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new ResourceSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundDelegate().newSeekableByteChannel());
         }
     } // Nio2Output
 
@@ -280,7 +280,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @Override
         public OutputStream newOutputStream() throws IOException {
             return new ResourceOutputStream(
-                    getBoundSocket().newOutputStream());
+                    getBoundDelegate().newOutputStream());
         }
     } // Output
 

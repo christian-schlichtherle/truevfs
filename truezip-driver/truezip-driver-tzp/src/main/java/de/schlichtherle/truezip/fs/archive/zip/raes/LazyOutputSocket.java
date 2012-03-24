@@ -55,7 +55,7 @@ extends DecoratingOutputSocket<E> {
             final OutputStream out = delegate;
             return null != out
                     ? out
-                    : (delegate = getBoundSocket().newOutputStream());
+                    : (delegate = getBoundDelegate().newOutputStream());
         }
 
         @Override

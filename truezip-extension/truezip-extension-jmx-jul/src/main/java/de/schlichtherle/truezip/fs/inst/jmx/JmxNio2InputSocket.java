@@ -23,6 +23,6 @@ extends JmxInputSocket<E> {
 
     @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return new JmxSeekableByteChannel(getBoundSocket().newSeekableByteChannel(), stats);
+        return new JmxSeekableByteChannel(getBoundDelegate().newSeekableByteChannel(), stats);
     }
 }

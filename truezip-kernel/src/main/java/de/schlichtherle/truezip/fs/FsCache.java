@@ -453,7 +453,7 @@ public final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Channel() throws IOException {
-                        super(getBoundSocket().newSeekableByteChannel());
+                        super(getBoundDelegate().newSeekableByteChannel());
                     }
 
                     @Override
@@ -482,7 +482,7 @@ public final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     File() throws IOException {
-                        super(getBoundSocket().newReadOnlyFile());
+                        super(getBoundDelegate().newReadOnlyFile());
                     }
 
                     @Override
@@ -504,7 +504,7 @@ public final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Stream() throws IOException {
-                        super(getBoundSocket().newInputStream());
+                        super(getBoundDelegate().newInputStream());
                     }
 
                     @Override
@@ -529,7 +529,7 @@ public final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Channel() throws IOException {
-                        super(getBoundSocket().newSeekableByteChannel());
+                        super(getBoundDelegate().newSeekableByteChannel());
                     }
 
                     @Override
@@ -558,7 +558,7 @@ public final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Stream() throws IOException {
-                        super(getBoundSocket().newOutputStream());
+                        super(getBoundDelegate().newOutputStream());
                     }
 
                     @Override

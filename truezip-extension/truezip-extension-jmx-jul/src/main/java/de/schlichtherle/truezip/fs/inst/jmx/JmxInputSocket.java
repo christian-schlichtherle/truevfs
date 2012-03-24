@@ -28,11 +28,11 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public final ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new JmxReadOnlyFile(getBoundSocket().newReadOnlyFile(), stats);
+        return new JmxReadOnlyFile(getBoundDelegate().newReadOnlyFile(), stats);
     }
 
     @Override
     public final InputStream newInputStream() throws IOException {
-        return new JmxInputStream(getBoundSocket().newInputStream(), stats);
+        return new JmxInputStream(getBoundDelegate().newInputStream(), stats);
     }
 }

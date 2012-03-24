@@ -27,6 +27,6 @@ extends InstrumentingOutputSocket<E> {
 
     @Override
     public final OutputStream newOutputStream() throws IOException {
-        return new JmxOutputStream(getBoundSocket().newOutputStream(), stats);
+        return new JmxOutputStream(getBoundDelegate().newOutputStream(), stats);
     }
 }

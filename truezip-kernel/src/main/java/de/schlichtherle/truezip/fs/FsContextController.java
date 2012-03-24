@@ -239,7 +239,7 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
             try {
-                return getBoundSocket().getLocalTarget();
+                return getBoundDelegate().getLocalTarget();
             } finally {
                 delegate.setContext(context);
             }
@@ -252,7 +252,7 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
             try {
-                return getBoundSocket().newReadOnlyFile();
+                return getBoundDelegate().newReadOnlyFile();
             } finally {
                 delegate.setContext(context);
             }
@@ -265,7 +265,7 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
             try {
-                return getBoundSocket().newSeekableByteChannel();
+                return getBoundDelegate().newSeekableByteChannel();
             } finally {
                 delegate.setContext(context);
             }
@@ -278,7 +278,7 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(NULL);
             try {
-                return getBoundSocket().newInputStream();
+                return getBoundDelegate().newInputStream();
             } finally {
                 delegate.setContext(context);
             }
@@ -301,7 +301,7 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(operation);
             try {
-                return getBoundSocket().getLocalTarget();
+                return getBoundDelegate().getLocalTarget();
             } finally {
                 delegate.setContext(context);
             }
@@ -314,7 +314,7 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(operation);
             try {
-                return getBoundSocket().newSeekableByteChannel();
+                return getBoundDelegate().newSeekableByteChannel();
             } finally {
                 delegate.setContext(context);
             }
@@ -327,7 +327,7 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
             final FsOperationContext context = delegate.getContext();
             delegate.setContext(operation);
             try {
-                return getBoundSocket().newOutputStream();
+                return getBoundDelegate().newOutputStream();
             } finally {
                 delegate.setContext(context);
             }
