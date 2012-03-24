@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.cio.spi;
 
 import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.sl.IOPoolLocator;
+import de.schlichtherle.truezip.sl.IOPoolLocator;
 
 /**
  * An abstract locatable service for an I/O buffer pool.

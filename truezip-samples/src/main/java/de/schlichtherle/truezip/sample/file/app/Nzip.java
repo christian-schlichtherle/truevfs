@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.fs.archive.zip.CheckedJarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedReadOnlySfxDriver;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.sl.IOPoolLocator;
+import de.schlichtherle.truezip.sl.IOPoolLocator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;

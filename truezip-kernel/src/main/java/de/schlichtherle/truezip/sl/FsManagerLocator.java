@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.cio.sl;
+package de.schlichtherle.truezip.sl;
 
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.spi.IOPoolService;
+import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.FsManagerProvider;
+import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -17,55 +17,56 @@ import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Locates an I/O buffer pool service of a class with a name which is
- * resolved by querying a system property or searching the class path,
- * whatever yields a result first.
+ * Locates a file system manager service of a class with a name which is
+ * resolved by querying a system property or searching the class path
+ * or using a default implementation, whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "de.schlichtherle.truezip.cio.spi.IOPoolService"}
+ * with the class name {@code "de.schlichtherle.truezip.fs.spi.FsManagerService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/de.schlichtherle.truezip.cio.spi.IOPoolService"}.
+ * {@code "META-INF/services/de.schlichtherle.truezip.fs.spi.FsManagerService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, a {@link ServiceConfigurationError} gets thrown.
  *
- * @see    IOPoolService
+ * @see    FsManagerService
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class IOPoolLocator implements IOPoolProvider {
+public final class FsManagerLocator implements FsManagerProvider {
 
     /** The singleton instance of this class. */
-    public static final IOPoolLocator SINGLETON = new IOPoolLocator();
+    public static final FsManagerLocator SINGLETON = new FsManagerLocator();
 
     /** You cannot instantiate this class. */
-    private IOPoolLocator() {
+    private FsManagerLocator() {
     }
 
     @Override
-    public IOPool<?> get() {
+    public FsManager get() {
         return Boot.SERVICE.get();
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final IOPoolService SERVICE;
+        static final FsManagerService SERVICE;
         static {
             final Logger logger = Logger.getLogger(
-                    IOPoolLocator.class.getName(),
-                    IOPoolLocator.class.getName());
+                    FsManagerLocator.class.getName(),
+                    FsManagerLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
-                    IOPoolLocator.class.getClassLoader());
-            IOPoolService service = locator.getService(IOPoolService.class, null);
+                    FsManagerLocator.class.getClassLoader());
+            FsManagerService
+                    service = locator.getService(FsManagerService.class, null);
             if (null == service) {
-                IOPoolService oldService = null;
-                for (   final Iterator<IOPoolService>
-                            i = locator.getServices(IOPoolService.class);
+                FsManagerService oldService = null;
+                for (   final Iterator<FsManagerService>
+                            i = locator.getServices(FsManagerService.class);
                         i.hasNext();
                         oldService = service) {
                     service = i.next();
@@ -79,9 +80,9 @@ public final class IOPoolLocator implements IOPoolProvider {
                 throw new ServiceConfigurationError(
                         MessageFormat.format(
                             ResourceBundle
-                                .getBundle(IOPoolLocator.class.getName())
+                                .getBundle(FsManagerLocator.class.getName())
                                 .getString("null"),
-                            IOPoolService.class));
+                            FsManagerLocator.class));
             logger.log(CONFIG, "provided", service);
             SERVICE = service;
         }
