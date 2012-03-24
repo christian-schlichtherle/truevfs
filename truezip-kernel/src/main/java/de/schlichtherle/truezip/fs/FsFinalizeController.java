@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
@@ -13,10 +13,6 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.cio.DecoratingInputSocket;
-import de.schlichtherle.truezip.cio.DecoratingOutputSocket;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -40,8 +36,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class FsFinalizeController<M extends FsModel>
-extends FsDecoratingController<M, FsController<? extends M>> {
+final class FsFinalizeController
+extends FsDecoratingController<FsModel, FsController<?>> {
 
     private static final Logger logger = Logger.getLogger(
             FsFinalizeController.class.getName(),
@@ -58,7 +54,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
      *
      * @param controller the decorated file system controller.
      */
-    FsFinalizeController(FsController<? extends M> controller) {
+    FsFinalizeController(FsController<?> controller) {
         super(controller);
     }
 
@@ -99,7 +95,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsFinalizeController<?> controller,
+                    FsFinalizeController controller,
                     FsEntryName name,
                     BitField<FsInputOption> options) {
                 return controller.new Nio2Input(name, options);
@@ -107,7 +103,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsFinalizeController<?> controller,
+                    FsFinalizeController controller,
                     FsEntryName name,
                     BitField<FsOutputOption> options,
                     @CheckForNull Entry template) {
@@ -118,7 +114,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsFinalizeController<?> controller,
+                    FsFinalizeController controller,
                     FsEntryName name,
                     BitField<FsInputOption> options) {
                 return controller.new Input(name, options);
@@ -126,7 +122,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsFinalizeController<?> controller,
+                    FsFinalizeController controller,
                     FsEntryName name,
                     BitField<FsOutputOption> options,
                     @CheckForNull Entry template) {
@@ -135,12 +131,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsFinalizeController<?> controller,
+                FsFinalizeController controller,
                 FsEntryName name,
                 BitField<FsInputOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsFinalizeController<?> controller,
+                FsFinalizeController controller,
                 FsEntryName name,
                 BitField<FsOutputOption> options,
                 @CheckForNull Entry template);

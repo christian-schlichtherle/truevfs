@@ -28,8 +28,8 @@ final class FsDefaultManager extends FsManager {
      * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private final Map<FsMountPoint, Link<FsFalsePositiveController>> schedulers
-            = new WeakHashMap<FsMountPoint, Link<FsFalsePositiveController>>();
+    private final Map<FsMountPoint, Link<FsController<?>>> schedulers
+            = new WeakHashMap<FsMountPoint, Link<FsController<?>>>();
 
     private final Type optionalScheduleType;
 
@@ -58,22 +58,17 @@ final class FsDefaultManager extends FsManager {
             final FsModel model = new FsDefaultModel(mountPoint, null);
             return driver.newController(model, null);
         }
-        FsFalsePositiveController
-                controller = getTarget(schedulers.get(mountPoint));
+        FsController<?> controller = getTarget(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
                 parent = getController(mountPoint.getParent(), null, driver);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
-            // HC SUNT DRACONES!
-            model.setController(controller =
-                    new FsFalsePositiveController(
-                            new FsFinalizeController<FsModel>(
-                                driver.newController(model, parent))));
+            model.setController(controller = driver.newController(model, parent));
         }
         return controller;
     }
-
+    
     @Override
     public synchronized int getSize() {
         return schedulers.size();
@@ -87,7 +82,7 @@ final class FsDefaultManager extends FsManager {
     private synchronized Set<FsController<?>> getControllers() {
         final Set<FsController<?>> snapshot
                 = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
-        for (final Link<FsFalsePositiveController> link : schedulers.values()) {
+        for (final Link<FsController<?>> link : schedulers.values()) {
             final FsController<?> controller = getTarget(link);
             if (null != controller)
                 snapshot.add(controller);
@@ -104,14 +99,14 @@ final class FsDefaultManager extends FsManager {
      * the alternative observer pattern.
      */
     private final class ScheduledModel extends FsDefaultModel {
-        FsFalsePositiveController controller;
+        FsController<?> controller;
         boolean touched;
 
         ScheduledModel(FsMountPoint mountPoint, FsModel parent) {
             super(mountPoint, parent);
         }
 
-        void setController(final FsFalsePositiveController controller) {
+        void setController(final FsController<?> controller) {
             assert null != controller;
             assert !touched;
             this.controller = controller;
@@ -135,9 +130,10 @@ final class FsDefaultManager extends FsManager {
             schedule(touched);
         }
 
+        @SuppressWarnings("unchecked")
         void schedule(boolean mandatory) {
             synchronized (FsDefaultManager.this) {
-                schedulers.put(getMountPoint(),
+                schedulers.put(getMountPoint(), (Link<FsController<?>>)
                         (mandatory ? STRONG : optionalScheduleType)
                             .newLink(controller));
             }

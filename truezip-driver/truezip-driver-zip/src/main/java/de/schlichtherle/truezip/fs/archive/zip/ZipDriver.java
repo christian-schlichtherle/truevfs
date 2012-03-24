@@ -4,20 +4,16 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.InputService;
-import de.schlichtherle.truezip.cio.OutputService;
-import de.schlichtherle.truezip.cio.MultiplexedOutputService;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.cio.Entry;
 import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
 import de.schlichtherle.truezip.cio.Entry.Type;
 import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
-import de.schlichtherle.truezip.fs.*;
+import de.schlichtherle.truezip.cio.*;
+import de.schlichtherle.truezip.fs.FsArchiveDriver;
+import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
@@ -365,18 +361,18 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ZipDriver} returns the expression
-     * {@code new ZipController(superNewController(model, parent), this)}.
-     * This method should be overridden in order to call only
-     * {@link #superNewController} if and only if you are overriding
-     * {@link #zipCryptoParameters(de.schlichtherle.truezip.fs.FsModel, java.nio.charset.Charset)}, too,
-     * and do not want to use the key manager to resolve passwords,
-     * e.g. for WinZip AES encryption.
+     * The implementation in the class {@link ZipRaesDriver} decorates the
+     * given controller with a package private controller which keeps track of
+     * the encryption keys.
+     * This should get overridden in order to return just {@code controller} if
+     * and only if you are overriding
+     * {@link #zipCryptoParameters(FsModel, Charset)}, too, and do not want to
+     * use the locatable key manager to resolve passwords, e.g. for WinZip AES
+     * encryption.
      */
     @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
-        return new ZipController(superNewController(model, parent), this);
+    protected FsController<?> decorate(FsController<?> controller) {
+        return new ZipController(controller, this);
     }
 
     /**
