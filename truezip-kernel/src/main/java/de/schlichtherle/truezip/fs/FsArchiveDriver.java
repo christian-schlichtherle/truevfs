@@ -4,17 +4,12 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.cio.Entry.Type;
-import de.schlichtherle.truezip.cio.InputService;
-import de.schlichtherle.truezip.cio.OutputService;
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
@@ -149,7 +144,7 @@ extends FsDriver {
      *         point and parent file system controller.
      */
     @Override
-    public FsController<?>
+    public final FsController<?>
     newController(final FsModel model, final @Nonnull FsController<?> parent) {
         final boolean isLockModel = model instanceof FsLockModel;
         assert !isLockModel;
@@ -157,15 +152,22 @@ extends FsDriver {
                 ? (FsLockModel) model
                 : new FsLockModel(model);
         // HC SUNT DRACONES!
-        return  new FsSyncController<FsLockModel>(
-                    new FsLockController(
-                        new FsResetController(
-                            new FsCacheController(
-                                new FsResourceController(
-                                    new FsContextController(
-                                        new FsTargetArchiveController<E>(
-                                            lockModel, parent, this))),
-                                getIOPool()))));
+        return  new FsFalsePositiveController(
+                    new FsFinalizeController(
+                        decorate(
+                            new FsSyncController(
+                                new FsLockController(
+                                    new FsResetController(
+                                        new FsCacheController(
+                                            new FsResourceController(
+                                                new FsContextController(
+                                                    new FsTargetArchiveController<E>(
+                                                        lockModel, parent, this))),
+                                            getIOPool())))))));
+    }
+
+    protected FsController<?> decorate(FsController<?> controller) {
+        return controller;
     }
 
     /**

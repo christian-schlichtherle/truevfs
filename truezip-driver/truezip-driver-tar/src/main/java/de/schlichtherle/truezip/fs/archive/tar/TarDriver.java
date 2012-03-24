@@ -4,20 +4,13 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.InputService;
-import de.schlichtherle.truezip.cio.OutputService;
-import de.schlichtherle.truezip.cio.Entry;
 import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
 import de.schlichtherle.truezip.cio.Entry.Type;
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.cio.MultiplexedOutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;

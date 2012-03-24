@@ -90,16 +90,14 @@ public final class KeyManagement {
         }
         
         @Override
-        public FsController<?> newController(
-                FsModel model,
-                FsController<?> parent) {
+        protected FsController<?> decorate(FsController<?> controller) {
             // This is a minor improvement: The default implementation decorates
             // the default file system controller chain with a package private
             // file system controller which keeps track of the encryption keys.
             // Because we are not using the key manager, we don't need this
             // special purpose file system controller and can use the default
             // file system controller chain instead.
-            return superNewController(model, parent);
+            return controller;
         }
     } // CustomZipRaesDriver
     
