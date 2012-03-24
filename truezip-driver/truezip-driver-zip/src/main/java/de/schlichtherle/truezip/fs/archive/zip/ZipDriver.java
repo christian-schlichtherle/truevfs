@@ -292,7 +292,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    protected final IOPool<?> getPool() {
+    protected final IOPool<?> getIOPool() {
         return ioPool;
     }
 
@@ -532,7 +532,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * Then, an output stream is acquired from the given {@code output} socket
      * and the parameters are forwarded to {@link #newOutputService(FsModel, OptionOutputSocket, ZipInputService)}
      * and the result gets wrapped in a new {@link MultiplexedOutputService}
-     * which uses the current {@link #getPool}.
+     * which uses the current {@link #getIOPool}.
      */
     @Override
     public final OutputService<ZipDriverEntry> newOutputService(
@@ -585,6 +585,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     throws IOException {
         return new MultiplexedOutputService<ZipDriverEntry>(
                 new ZipOutputService(this, model, out, source),
-                getPool());
+                getIOPool());
     }
 }

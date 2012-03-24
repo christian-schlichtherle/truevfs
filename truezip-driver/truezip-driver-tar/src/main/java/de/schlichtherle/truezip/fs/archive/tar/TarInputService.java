@@ -78,7 +78,7 @@ implements InputService<TarDriverEntry> {
                         final @WillNotClose InputStream in)
     throws IOException {
         final TarArchiveInputStream tin = newValidatedTarInputStream(in);
-        final IOPool<?> pool = driver.getPool();
+        final IOPool<?> pool = driver.getIOPool();
         try {
             TarArchiveEntry tinEntry;
             while (null != (tinEntry = tin.getNextTarEntry())) {

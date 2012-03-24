@@ -82,7 +82,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    protected final IOPool<?> getPool() {
+    protected final IOPool<?> getIOPool() {
         return ioPool;
     }
 
@@ -198,7 +198,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
         try {
             return new MultiplexedOutputService<TarDriverEntry>(
                     newTarOutputService(model, os, (TarInputService) source),
-                    getPool());
+                    getIOPool());
         } catch (final IOException ex) {
             os.close();
             throw ex;

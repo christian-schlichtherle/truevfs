@@ -101,7 +101,7 @@ implements OutputService<ZipDriverEntry> {
     }
 
     private IOPool<?> getPool() {
-        return driver.getPool();
+        return driver.getIOPool();
     }
 
     @Override
