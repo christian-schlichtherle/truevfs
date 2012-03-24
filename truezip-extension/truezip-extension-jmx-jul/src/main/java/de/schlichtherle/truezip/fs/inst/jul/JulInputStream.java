@@ -5,9 +5,10 @@
 package de.schlichtherle.truezip.fs.inst.jul;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -37,7 +38,7 @@ extends DecoratingInputStream {
     throws IOException {
         super(socket.newInputStream());
         this.target = target;
-        Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
+        Level level = target instanceof IOBuffer ? Level.FINER : Level.FINEST;
         logger.log(level, "Stream reading " + target, new NeverThrowable());
     }
 
@@ -46,7 +47,7 @@ extends DecoratingInputStream {
         try {
             delegate.close();
         } finally {
-            Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
+            Level level = target instanceof IOBuffer ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }

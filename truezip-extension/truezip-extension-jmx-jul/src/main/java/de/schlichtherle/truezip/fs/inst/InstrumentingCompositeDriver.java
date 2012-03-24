@@ -15,20 +15,20 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class InstrumentingCompositeDriver implements FsCompositeDriver {
 
-    protected final FsCompositeDriver delegate;
-    protected final InstrumentingDirector director;
+    protected final FsCompositeDriver driver;
+    protected final InstrumentingDirector<?> director;
 
     public InstrumentingCompositeDriver(final FsCompositeDriver driver,
-                                        final InstrumentingDirector director) {
-        if (null == driver || null == director)
+                                        final InstrumentingDirector<?> director) {
+        if (null == (this.driver = driver))
             throw new NullPointerException();
-        this.director = director;
-        this.delegate = driver;
+        if (null == (this.director = director))
+            throw new NullPointerException();
     }
 
     @Override
     public FsController<?> newController(   final FsModel model,
                                             final FsController<?> parent) {
-        return director.instrument(delegate.newController(director.instrument(model, this), parent), this);
+        return director.instrument(driver.newController(director.instrument(model, this), parent), this);
     }
 }

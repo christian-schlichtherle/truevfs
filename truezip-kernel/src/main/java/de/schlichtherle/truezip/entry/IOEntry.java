@@ -4,13 +4,10 @@
  */
 package de.schlichtherle.truezip.entry;
 
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
-
 /**
  * An entry which provides I/O services.
  *
- * @param  <E> the type of this entry.
+ * @param  <E> the type of this I/O entry.
  * @author Christian Schlichtherle
  */
 public interface IOEntry<E extends IOEntry<E>> extends Entry {

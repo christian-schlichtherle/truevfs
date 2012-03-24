@@ -4,24 +4,26 @@
  */
 package de.schlichtherle.truezip.fs.inst;
 
+import de.schlichtherle.truezip.fs.FsCompositeDriver;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsDecoratingManager;
+import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
-import de.schlichtherle.truezip.fs.*;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingManager
-extends FsDecoratingManager<FsManager> {
+public class InstrumentingManager extends FsDecoratingManager<FsManager> {
 
-    protected final InstrumentingDirector director;
+    protected final InstrumentingDirector<?> director;
 
-    public InstrumentingManager(final FsManager manager, final InstrumentingDirector director) {
+    public InstrumentingManager(final FsManager manager,
+                                final InstrumentingDirector<?> director) {
         super(manager);
-        if (null == director)
+        if (null == (this.director = director))
             throw new NullPointerException();
-        this.director = director;
     }
 
     @Override

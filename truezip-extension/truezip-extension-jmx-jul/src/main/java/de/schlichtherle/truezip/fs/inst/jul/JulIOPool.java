@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.fs.inst.jul;
 
-import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
+import de.schlichtherle.truezip.fs.inst.InstrumentingIOPool;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
@@ -16,25 +16,24 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JulIOPool<E extends IOBuffer<E>>
-extends InstrumentingIOPool<E, JulDirector> {
+final class JulIOPool<B extends IOBuffer<B>>
+extends InstrumentingIOPool<B> {
 
     private static final Logger
             logger = Logger.getLogger(JulIOPool.class.getName());
 
-    JulIOPool(IOPool<E> model, JulDirector director) {
+    JulIOPool(IOPool<B> model, JulDirector director) {
         super(model, director);
     }
 
     @Override
-    public IOBuffer<E> allocate() throws IOException {
-        return new JulBuffer(delegate.allocate());
+    public IOBuffer<B> allocate() throws IOException {
+        return new JulBuffer(pool.allocate());
     }
 
-    private final class JulBuffer
-    extends InstrumentingIOPool<E, JulDirector>.InstrumentingBuffer {
+    private final class JulBuffer extends InstrumentingBuffer {
 
-        JulBuffer(IOBuffer<E> model) {
+        JulBuffer(IOBuffer<B> model) {
             super(model);
             logger.log(FINE, "Allocated " + delegate, new NeverThrowable());
         }
@@ -47,5 +46,5 @@ extends InstrumentingIOPool<E, JulDirector> {
                 logger.log(FINE, "Released " + delegate, new NeverThrowable());
             }
         }
-    } // IOBuffer
+    } // JulBuffer
 }

@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.fs.inst.jmx;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.OutputSocket;
 import de.schlichtherle.truezip.fs.inst.InstrumentingOutputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;

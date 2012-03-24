@@ -4,15 +4,11 @@
  */
 package de.schlichtherle.truezip.fs.inst.jmx;
 
-import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.*;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.inst.*;
-import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.entry.IOPool.IOBuffer;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;
@@ -108,8 +104,8 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <E extends IOPool.IOBuffer<E>> IOPool<E> instrument(IOPool<E> pool) {
-        return new JmxIOPool<E>(pool, this);
+    public <B extends IOBuffer<B>> IOPool<B> instrument(IOPool<B> pool) {
+        return new JmxIOPool<B>(pool, this);
     }
 
     @Override
@@ -118,63 +114,85 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public FsModel instrument(FsModel model, InstrumentingCompositeDriver context) {
+    public FsModel instrument(
+            FsModel model,
+            InstrumentingCompositeDriver context) {
         return new JmxModel(model, this);
     }
 
     @Override
-    public FsController<?> instrument(FsController<?> controller, InstrumentingManager context) {
+    public FsController<?> instrument(
+            FsController<?> controller,
+            InstrumentingManager context) {
         return new JmxApplicationController(controller, this);
     }
 
     @Override
-    public FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context) {
+    public FsController<?> instrument(
+            FsController<?> controller,
+            InstrumentingCompositeDriver context) {
         return new JmxKernelController(controller, this);
     }
 
     @Override
-    public <E extends IOBuffer<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.InstrumentingBuffer context) {
-        return new JmxInputSocket<E>(input, this, temp);
-    }
-
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-    @Override
-    public <E extends Entry> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<JmxDirector> context) {
-        return new JmxInputSocket<E>(input, this, ((JmxController) context).getIOStatistics());
+    public <B extends IOBuffer<B>> InputSocket<B> instrument(
+            InputSocket<B> input,
+            InstrumentingIOPool<B>.InstrumentingBuffer context) {
+        return new JmxInputSocket<B>(input, this, temp);
     }
 
     @Override
-    public <E extends IOBuffer<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.InstrumentingBuffer context) {
-        return new JmxOutputSocket<E>(output, this, temp);
+    public <E extends Entry> InputSocket<E> instrument(
+            InputSocket<E> input,
+            InstrumentingController<JmxDirector> context) {
+        return new JmxInputSocket<E>(input, this,
+                JmxController.class.cast(context).getIOStatistics());
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     @Override
-    public <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<JmxDirector> context) {
-        return new JmxOutputSocket<E>(output, this, ((JmxController) context).getIOStatistics());
+    public <B extends IOBuffer<B>> OutputSocket<B> instrument(
+            OutputSocket<B> output,
+            InstrumentingIOPool<B>.InstrumentingBuffer context) {
+        return new JmxOutputSocket<B>(output, this, temp);
+    }
+
+    @Override
+    public <E extends Entry> OutputSocket<E> instrument(
+            OutputSocket<E> output,
+            InstrumentingController<JmxDirector> context) {
+        return new JmxOutputSocket<E>(output, this,
+                JmxController.class.cast(context).getIOStatistics());
     }
 
     private static final class JmxNio2Director extends JmxDirector {
         @Override
-        public <E extends IOBuffer<E>> InputSocket<E> instrument(InputSocket<E> input, InstrumentingIOPool<E, JmxDirector>.InstrumentingBuffer context) {
-            return new JmxNio2InputSocket<E>(input, this, super.temp);
-        }
-
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-        @Override
-        public <E extends Entry> InputSocket<E> instrument(InputSocket<E> input, InstrumentingController<JmxDirector> context) {
-            return new JmxNio2InputSocket<E>(input, this, ((JmxController) context).getIOStatistics());
+        public <B extends IOBuffer<B>> InputSocket<B> instrument(
+                InputSocket<B> input,
+                InstrumentingIOPool<B>.InstrumentingBuffer context) {
+            return new JmxNio2InputSocket<B>(input, this, super.temp);
         }
 
         @Override
-        public <E extends IOBuffer<E>> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingIOPool<E, JmxDirector>.InstrumentingBuffer context) {
-            return new JmxNio2OutputSocket<E>(output, this, super.temp);
+        public <E extends Entry> InputSocket<E> instrument(
+                InputSocket<E> input,
+                InstrumentingController<JmxDirector> context) {
+            return new JmxNio2InputSocket<E>(input, this,
+                    JmxController.class.cast(context).getIOStatistics());
         }
 
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
         @Override
-        public <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output, InstrumentingController<JmxDirector> context) {
-            return new JmxNio2OutputSocket<E>(output, this, ((JmxController) context).getIOStatistics());
+        public <B extends IOBuffer<B>> OutputSocket<B> instrument(
+                OutputSocket<B> output,
+                InstrumentingIOPool<B>.InstrumentingBuffer context) {
+            return new JmxNio2OutputSocket<B>(output, this, super.temp);
+        }
+
+        @Override
+        public <E extends Entry> OutputSocket<E> instrument(
+                OutputSocket<E> output,
+                InstrumentingController<JmxDirector> context) {
+            return new JmxNio2OutputSocket<E>(output, this,
+                    JmxController.class.cast(context).getIOStatistics());
         }
     }
 }

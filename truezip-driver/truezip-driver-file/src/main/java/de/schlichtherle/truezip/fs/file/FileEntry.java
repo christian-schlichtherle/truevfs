@@ -6,16 +6,15 @@ package de.schlichtherle.truezip.fs.file;
 
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
+import de.schlichtherle.truezip.entry.IOBuffer;
+import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.entry.OutputSocket;
 import de.schlichtherle.truezip.fs.FsEntry;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.entry.IOEntry;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.Pool.Releasable;
 import java.io.File;
 import static java.io.File.separatorChar;
 import java.io.IOException;
@@ -33,9 +32,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-class FileEntry
-extends FsEntry
-implements IOEntry<FileEntry>, Releasable<IOException> {
+class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
 
     private static final File CURRENT_DIRECTORY = new File(".");
 
@@ -74,8 +71,12 @@ implements IOEntry<FileEntry>, Releasable<IOException> {
         return this.file.getName();
     }
 
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public void release() throws IOException {
+        throw new UnsupportedOperationException();
     }
 
     /** Returns the decorated file. */

@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
 import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.entry.IOPoolProvider;
 import de.schlichtherle.truezip.entry.InputService;
@@ -15,12 +17,11 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.entry.FsMultiplexedOutputService;
+import de.schlichtherle.truezip.entry.MultiplexedOutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.COMPRESS;
-import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
@@ -183,7 +184,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
      * The implementation in the class {@link TarDriver} acquires an output
      * stream from the given socket, forwards the call to
      * {@link #newTarOutputService} and wraps the result in a new
-     * {@link FsMultiplexedOutputService}.
+     * {@link MultiplexedOutputService}.
      */
     @Override
     public OutputService<TarDriverEntry> newOutputService(
@@ -195,7 +196,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             throw new NullPointerException();
         final OutputStream os = output.newOutputStream();
         try {
-            return new FsMultiplexedOutputService<TarDriverEntry>(
+            return new MultiplexedOutputService<TarDriverEntry>(
                     newTarOutputService(model, os, (TarInputService) source),
                     getPool());
         } catch (final IOException ex) {

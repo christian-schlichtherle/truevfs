@@ -4,11 +4,13 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.entry.OutputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
 import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.entry.IOPoolProvider;
 import de.schlichtherle.truezip.entry.InputService;
 import de.schlichtherle.truezip.entry.OutputService;
-import de.schlichtherle.truezip.entry.FsMultiplexedOutputService;
+import de.schlichtherle.truezip.entry.MultiplexedOutputService;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
@@ -22,7 +24,6 @@ import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
@@ -530,7 +531,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * then it's marked for appending to it.
      * Then, an output stream is acquired from the given {@code output} socket
      * and the parameters are forwarded to {@link #newOutputService(FsModel, OptionOutputSocket, ZipInputService)}
-     * and the result gets wrapped in a new {@link FsMultiplexedOutputService}
+     * and the result gets wrapped in a new {@link MultiplexedOutputService}
      * which uses the current {@link #getPool}.
      */
     @Override
@@ -582,7 +583,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             @WillCloseWhenClosed OutputStream out,
             @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
-        return new FsMultiplexedOutputService<ZipDriverEntry>(
+        return new MultiplexedOutputService<ZipDriverEntry>(
                 new ZipOutputService(this, model, out, source),
                 getPool());
     }

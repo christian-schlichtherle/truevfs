@@ -9,7 +9,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * An abstract decorator for an entry.
  *
- * @param  <E> the type of the decorated entries.
+ * @param  <E> the type of the decorated entry.
  * @author Christian Schlichtherle
  */
 @ThreadSafe

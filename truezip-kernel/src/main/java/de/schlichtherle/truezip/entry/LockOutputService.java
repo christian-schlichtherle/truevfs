@@ -5,8 +5,6 @@
 package de.schlichtherle.truezip.entry;
 
 import de.schlichtherle.truezip.io.LockOutputStream;
-import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

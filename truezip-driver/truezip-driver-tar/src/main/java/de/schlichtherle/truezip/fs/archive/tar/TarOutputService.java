@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.tar;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -12,7 +13,7 @@ import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.entry.IOPool;
 import de.schlichtherle.truezip.entry.OutputService;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.OutputSocket;
 import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -190,14 +191,14 @@ implements OutputService<TarDriverEntry> {
      */
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final IOPool.IOBuffer<?> buffer;
+        final IOBuffer<?> buffer;
         final TarDriverEntry entry;
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
-                final IOPool.IOBuffer<?> buffer,
+                final IOBuffer<?> buffer,
                 final TarDriverEntry entry)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
@@ -217,7 +218,7 @@ implements OutputService<TarDriverEntry> {
         }
 
         void store() throws IOException {
-            final IOPool.IOBuffer<?> buffer = this.buffer;
+            final IOBuffer<?> buffer = this.buffer;
             assert null != buffer;
 
             final TarDriverEntry entry = this.entry;

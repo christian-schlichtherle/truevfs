@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
-import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -25,7 +24,7 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Decorates annother output service to support a virtually unlimited number of
+ * Decorates another output service to support a virtually unlimited number of
  * entries which may be written concurrently while actually at most one entry
  * is written concurrently to the decorated output service.
  * If there is more than one entry to be written concurrently, the additional
@@ -39,7 +38,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class FsMultiplexedOutputService<E extends MutableEntry>
+public class MultiplexedOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     private final IOPool<?> pool;
@@ -62,7 +61,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public FsMultiplexedOutputService(
+    public MultiplexedOutputService(
             final @WillCloseWhenClosed OutputService<E> output,
             final IOPool<?> pool) {
         super(output);
@@ -117,7 +116,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(FsMultiplexedOutputService.super.getOutputSocket(entry));
+                super(MultiplexedOutputService.super.getOutputSocket(entry));
             }
 
             @Override
@@ -139,7 +138,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     private BufferedEntryOutputStream newBufferedEntryOutputStream(
             final OutputSocket<? extends E> output)
     throws IOException {
-        final IOPool.IOBuffer<?> buffer = pool.allocate();
+        final IOBuffer<?> buffer = pool.allocate();
         try {
             return new BufferedEntryOutputStream(buffer, output);
         } catch (final IOException ex) {
@@ -224,14 +223,14 @@ extends DecoratingOutputService<E, OutputService<E>> {
     private class BufferedEntryOutputStream extends DecoratingOutputStream {
         final InputSocket<Entry> input;
         final OutputSocket<? extends E> output;
-        final IOPool.IOBuffer<?> buffer;
+        final IOBuffer<?> buffer;
         final E local;
         boolean closed;
 
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        BufferedEntryOutputStream(  final IOPool.IOBuffer<?> buffer,
+        BufferedEntryOutputStream(  final IOBuffer<?> buffer,
                                     final OutputSocket<? extends E> output)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
@@ -290,7 +289,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             assert null != input;
             final OutputSocket<? extends E> output = this.output;
             assert null != output;
-            final IOPool.IOBuffer<?> buffer = this.buffer;
+            final IOBuffer<?> buffer = this.buffer;
             assert null != buffer;
             try {
                 if (!discard)

@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.OutputService;
 import de.schlichtherle.truezip.fs.FsModel;
@@ -12,8 +13,8 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.entry.IOPool;
-import de.schlichtherle.truezip.socket.InputSocket;
-import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.entry.InputSocket;
+import de.schlichtherle.truezip.entry.OutputSocket;
 import de.schlichtherle.truezip.util.JointIterator;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
@@ -48,7 +49,7 @@ implements OutputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
     private final FsModel model;
-    private @CheckForNull IOPool.IOBuffer<?> postamble;
+    private @CheckForNull IOBuffer<?> postamble;
     private @CheckForNull ZipDriverEntry bufferedEntry;
     private ZipCryptoParameters param;
 
@@ -217,7 +218,7 @@ implements OutputService<ZipDriverEntry> {
     @Override
     public void close() throws IOException {
         finish();
-        final IOPool.IOBuffer<?> pa = this.postamble;
+        final IOBuffer<?> pa = this.postamble;
         if (null != pa) {
             this.postamble = null;
             final InputSocket<?> is = pa.getInputSocket();
@@ -277,13 +278,13 @@ implements OutputService<ZipDriverEntry> {
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream extends CheckedOutputStream {
-        final IOPool.IOBuffer<?> buffer;
+        final IOBuffer<?> buffer;
         final boolean process;
         boolean closed;
 
         @CreatesObligation
         BufferedEntryOutputStream(
-                final IOPool.IOBuffer<?> buffer,
+                final IOBuffer<?> buffer,
                 final ZipDriverEntry entry,
                 final boolean process)
         throws IOException {
@@ -305,7 +306,7 @@ implements OutputService<ZipDriverEntry> {
         }
 
         void store() throws IOException {
-            final IOPool.IOBuffer<?> buffer = this.buffer;
+            final IOBuffer<?> buffer = this.buffer;
             assert null != buffer;
 
             final ZipDriverEntry entry = ZipOutputService.this.bufferedEntry;

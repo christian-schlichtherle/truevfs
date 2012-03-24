@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.fs.inst.jul;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.entry.IOBuffer;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.entry.IOPool;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -37,7 +38,7 @@ extends DecoratingSeekableByteChannel {
             throw new NullPointerException();
         this.socket = socket;
         E target = socket.getLocalTarget();
-        Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
+        Level level = target instanceof IOBuffer ? Level.FINER : Level.FINEST;
         logger.log(level, "Randomly reading " + target, new NeverThrowable());
     }
 
@@ -47,7 +48,7 @@ extends DecoratingSeekableByteChannel {
             delegate.close();
         } finally {
             E target = socket.getLocalTarget();
-            Level level = target instanceof IOPool.IOBuffer ? Level.FINER : Level.FINEST;
+            Level level = target instanceof IOBuffer ? Level.FINER : Level.FINEST;
             logger.log(level, "Closed " + target, new NeverThrowable());
         }
     }
