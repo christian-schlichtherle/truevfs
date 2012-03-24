@@ -51,15 +51,14 @@ extends FsDriver {
     }
 
     /**
-     * Returns the I/O buffer pool to use for allocating temporary I/O buffers.
+     * Returns the pool to use for allocating I/O buffers.
      * <p>
-     * Multiple invocations should return the same I/O buffer pool.
-     * However, callers should cache the return value for subsequent use in
-     * case it isn't always the same.
+     * Multiple invocations may return different I/O buffer pools, so callers
+     * may need to cache the result.
      *
-     * @return The I/O buffer pool to use for allocating temporary I/O buffers.
+     * @return The pool to use for allocating I/O buffers.
      */
-    protected abstract IOPool<?> getPool();
+    protected abstract IOPool<?> getIOPool();
 
     /**
      * Returns {@code true} if and only if the archive files produced by this
@@ -166,7 +165,7 @@ extends FsDriver {
                                     new FsContextController(
                                         new FsTargetArchiveController<E>(
                                             lockModel, parent, this))),
-                                getPool()))));
+                                getIOPool()))));
     }
 
     /**

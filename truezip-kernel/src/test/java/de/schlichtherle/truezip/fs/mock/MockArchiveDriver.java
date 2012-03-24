@@ -59,7 +59,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    protected IOPool<?> getPool() {
+    protected final IOPool<?> getIOPool() {
         return getIOPoolProvider().get();
     }
 

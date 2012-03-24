@@ -75,7 +75,7 @@ implements OutputService<TarDriverEntry> {
         super(out);
         this.delegate = out;
         super.setLongFileMode(LONGFILE_GNU);
-        this.pool = driver.getPool();
+        this.pool = driver.getIOPool();
     }
 
     @Override
