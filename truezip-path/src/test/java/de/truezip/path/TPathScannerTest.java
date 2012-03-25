@@ -2,13 +2,14 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.nio.file;
+package de.truezip.path;
 
 import de.truezip.file.MockArchiveDriverTestBase;
 import de.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.fs.addr.FsPath;
-import static de.schlichtherle.truezip.nio.file.TPathScanner.parent;
+import de.truezip.path.TPathScanner;
+import static de.truezip.path.TPathScanner.parent;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.net.URISyntaxException;

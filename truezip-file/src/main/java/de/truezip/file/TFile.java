@@ -1698,7 +1698,7 @@ public final class TFile extends File {
      * <li>Associated with the default file system provider:
      *     {@link java.nio.file.Paths#get(String, String[]) Paths.get(file.getPath())}.</li>
      * <li>Associated with a TrueZIP file system provider:
-     *     {@code new de.schlichtherle.truezip.nio.file.TPath(file)}.
+     *     {@code new de.truezip.path.TPath(file)}.
      *     This requires the TrueZIP Path module to be present on the compile
      *     time class path.</li>
      * </ul>

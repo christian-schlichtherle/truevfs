@@ -2,14 +2,14 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.nio.file.sample;
+package de.truezip.path.sample;
 
-import de.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.nio.file.TPath;
+import de.truezip.file.TVFS;
+import de.truezip.path.TPath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

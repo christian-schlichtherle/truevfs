@@ -4,7 +4,7 @@
 package ${package}.java;
 
 import de.truezip.file.TConfig;
-import de.schlichtherle.truezip.nio.file.TPath;
+import de.truezip.path.TPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;

@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.nio.file;
+package de.truezip.path;
 
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.fs.addr.FsPath;
@@ -17,7 +17,7 @@ import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.io.Paths;
-import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
+import static de.truezip.path.TPathScanner.*;
 import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.cio.OutputSocket;
 import de.truezip.file.TVFS;
