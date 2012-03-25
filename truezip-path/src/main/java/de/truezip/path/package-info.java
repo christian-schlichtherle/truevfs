@@ -5,7 +5,7 @@
 /**
  * Provides uniform, transparent, thread-safe, read/write access to archive
  * files as if they were just plain directories in a file system path by means
- * of the {@link de.schlichtherle.truezip.nio.file.TPath} class and its
+ * of the {@link de.truezip.path.TPath} class and its
  * dependent classes.
  * <p>
  * This is the primary API for JSE&nbsp;7 compliant TrueZIP applications:
@@ -42,7 +42,7 @@
  * This package provides a JSE&nbsp;7 compliant
  * {@link java.nio.file.spi.FileSystemProvider file system provider}
  * implementation in its class
- * {@link de.schlichtherle.truezip.nio.file.TFileSystemProvider}.
+ * {@link de.truezip.path.TFileSystemProvider}.
  * If the JAR of this package is present on the run time class path, an
  * application can transparently access archive files without a compile time
  * dependency on this API.
@@ -53,7 +53,7 @@
  *     one {@link java.nio.file.spi.FileSystemProvider#getScheme() file system
  *     provider scheme}.
  *     So the installed TrueZIP file system provider
- *     {@linkplain de.schlichtherle.truezip.nio.file.TFileSystemProvider#TFileSystemProvider() instance} limits
+ *     {@linkplain de.truezip.path.TFileSystemProvider#TFileSystemProvider() instance} limits
  *     the access to the platform file system, which is identified by the
  *     custom URI {@link java.net.URI#getScheme() scheme} "{@code tpath}".
  * <li>The TrueZIP file system provider instance competes with the
@@ -85,7 +85,7 @@
  * <p>
  * To overcome these <a href="#fspsl">constraints</a>, an application should
  * not rely on File System Provider Service Location and directly create
- * {@link de.schlichtherle.truezip.nio.file.TPath} instances instead by calling
+ * {@link de.truezip.path.TPath} instances instead by calling
  * one of the public class constructors.
  * Once created, it's safe to use {@code TPath} instances polymorphically as
  * {@link java.nio.file.Path} instances.
@@ -112,7 +112,7 @@
  * <thead>
  * <tr>
  *   <td>Feature</td>
- *   <td>{@link de.schlichtherle.truezip.nio.file.TFileSystemProvider}</td>
+ *   <td>{@link de.truezip.path.TFileSystemProvider}</td>
  *   <td>{@code ZipFileSystemProvider}</td>
  *   </tr>
  * </thead>
@@ -138,4 +138,4 @@
  * @author Christian Schlichtherle
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.schlichtherle.truezip.nio.file;
+package de.truezip.path;

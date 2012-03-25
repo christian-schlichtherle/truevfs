@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.scala
 
-import de.schlichtherle.truezip.nio.file.TPath
+import de.truezip.path.TPath
 import java.nio.file.Files._
 import java.nio.file.Path
 import java.util.TreeSet

@@ -5,7 +5,7 @@
 package de.truezip.driver.zip.it.path;
 
 import de.truezip.driver.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import de.truezip.path.TPathTestSuite;
 
 /**
  * @author  Christian Schlichtherle

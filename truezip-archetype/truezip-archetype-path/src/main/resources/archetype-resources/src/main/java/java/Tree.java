@@ -4,7 +4,7 @@
 package ${package}.java;
 
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.nio.file.TPath;
+import de.truezip.path.TPath;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;

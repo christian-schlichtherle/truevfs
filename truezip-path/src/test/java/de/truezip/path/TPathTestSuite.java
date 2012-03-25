@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.nio.file;
+package de.truezip.path;
 
 import de.truezip.file.ConfiguredClientTestBase;
 import de.truezip.file.TConfig;
@@ -18,6 +18,7 @@ import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.io.Streams;
+import de.truezip.path.TPath;
 import de.schlichtherle.truezip.util.ArrayHelper;
 import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;

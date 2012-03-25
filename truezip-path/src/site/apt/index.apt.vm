@@ -58,4 +58,4 @@ try (InputStream in = Files.newInputStream(path)) {
     {{{../truezip-samples/index.html}TrueZIP Samples}} module.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/de/schlichtherle/truezip/nio/file/package-summary.html}<<<de.schlichtherle.truezip.nio.file>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/nio/file/package-summary.html}<<<de.truezip.path>>>}}
