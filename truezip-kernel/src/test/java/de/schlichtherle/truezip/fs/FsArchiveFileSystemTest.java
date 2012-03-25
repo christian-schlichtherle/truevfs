@@ -17,7 +17,7 @@ import static de.schlichtherle.truezip.fs.addr.FsEntryName.ROOT;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
 import de.schlichtherle.truezip.fs.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.mock.MockArchiveDriverEntry;
-import de.schlichtherle.truezip.fs.mock.MockArchiveDriverEntryContainer;
+import de.schlichtherle.truezip.fs.mock.MockArchive;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.util.TooManyListenersException;
@@ -124,26 +124,25 @@ public class FsArchiveFileSystemTest {
         // Populate and check container.
         final TestConfig config = TestConfig.get();
         config.setNumEntries(paramss.length);
-        final MockArchiveDriverEntryContainer
-                container = MockArchiveDriverEntryContainer.create(config);
+        final MockArchive archive = MockArchive.create(config);
         final MockArchiveDriver driver = new MockArchiveDriver(config);
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
             final MockArchiveDriverEntry ae = driver.newEntry(aen, type, null);
             assertEquals(aen, ae.getName());
-            container   .newOutputService()
+            archive   .newOutputService()
                         .getOutputSocket(ae)
                         .newOutputStream()
                         .close();
-            assertSame(ae, container.getEntry(aen));
+            assertSame(ae, archive.getEntry(aen));
         }
-        assertEquals(paramss.length, container.size());
+        assertEquals(paramss.length, archive.size());
 
         // Populate file system.
         final FsArchiveFileSystem<MockArchiveDriverEntry>
                 fileSystem = FsArchiveFileSystem.newPopulatedFileSystem(
-                    driver, container, null, false);
+                    driver, archive, null, false);
 
         // Check file system.
         assert paramss.length <= fileSystem.getSize();

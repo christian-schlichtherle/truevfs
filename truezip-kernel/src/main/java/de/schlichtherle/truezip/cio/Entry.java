@@ -34,8 +34,9 @@ public interface Entry {
      * When parsed, an entry name is interpreted as follows:
      * <ol>
      * <li>An entry name is a sequence of <i>segments</i> which are
-     *     separated by one or more <i>separator characters</i>, which are
-     *     {@code '/'} and {@code '\\'}.
+     *     separated by one or more <i>separator characters</i>, which may be
+     *     {@code '/'} or {@code '\\'} or both, according to the rules of the
+     *     {@linkplain Container}.
      *     This implies that a segment cannot contain separator characters.
      * <li>An entry name may contain one or more dot ({@code "."}) or
      *     dot-dot ({@code ".."}) segments which represent the current or

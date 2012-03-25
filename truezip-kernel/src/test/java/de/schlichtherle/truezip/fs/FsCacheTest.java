@@ -4,19 +4,14 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.cio.Entry;
 import static de.schlichtherle.truezip.cio.Entry.Access.READ;
 import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.fs.FsCache.Strategy;
-import de.schlichtherle.truezip.cio.ByteArrayIOBuffer;
-import de.schlichtherle.truezip.cio.ByteArrayIOPool;
-import de.schlichtherle.truezip.cio.IOSocket;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
 import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_BACK;
 import static de.schlichtherle.truezip.fs.FsCache.Strategy.WRITE_THROUGH;
+import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,7 +52,7 @@ public final class FsCacheTest {
             back.setData(MOCK_ENTRY_DATA_READ.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
             assertThat(back.getCount(WRITE), is(0));
@@ -70,7 +65,7 @@ public final class FsCacheTest {
                 fail();
             } catch (IOException expected) {
             }
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
@@ -79,7 +74,7 @@ public final class FsCacheTest {
 
             cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
@@ -87,10 +82,10 @@ public final class FsCacheTest {
             assertThat(cache.getEntry(), nullValue());
 
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
             IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -102,7 +97,7 @@ public final class FsCacheTest {
             front.setData(MOCK_ENTRY_DATA_WRITE.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -119,7 +114,7 @@ public final class FsCacheTest {
                 fail();
             } catch (IOException expected) {
             }
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -129,7 +124,7 @@ public final class FsCacheTest {
 
             cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -143,7 +138,7 @@ public final class FsCacheTest {
                 cache.flush();
             }
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(back.getCount(READ), is(1));
@@ -156,7 +151,7 @@ public final class FsCacheTest {
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
@@ -167,7 +162,7 @@ public final class FsCacheTest {
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
@@ -177,7 +172,7 @@ public final class FsCacheTest {
 
             cache.clear();
             assertThat(cache.getEntry(), nullValue());
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
@@ -191,7 +186,7 @@ public final class FsCacheTest {
             } catch (IOException excepted) {
             }
             assertThat(cache.getEntry(), nullValue());
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
@@ -201,7 +196,7 @@ public final class FsCacheTest {
             cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
             assertThat(cache.getEntry(), nullValue());
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(0));
@@ -210,7 +205,7 @@ public final class FsCacheTest {
 
             IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -223,7 +218,7 @@ public final class FsCacheTest {
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -241,7 +236,7 @@ public final class FsCacheTest {
             } catch (IOException expected) {
             }
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -252,7 +247,7 @@ public final class FsCacheTest {
             cache   .configure(back.getInputSocket())
                     .configure(back.getOutputSocket());
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(back.getCount(READ), is(1));
@@ -266,7 +261,7 @@ public final class FsCacheTest {
                 cache.flush();
             }
             assertThat(cache.getEntry(), notNullValue());
-            assertThat(pool.getSize(), is(1));
+            assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(back.getCount(READ), is(1));
@@ -278,7 +273,7 @@ public final class FsCacheTest {
                     .configure(new BrokenOutputSocket(back))
                     .clear();
             assertThat(cache.getEntry(), nullValue());
-            assertThat(pool.getSize(), is(0));
+            assertThat(pool.size(), is(0));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(back.getCount(READ), is(1));

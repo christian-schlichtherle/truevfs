@@ -32,7 +32,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
     private static final Charset charset = Charset.forName("UTF-8");
     
     private final TestConfig config;
-    private final ConcurrentMap<FsMountPoint, MockArchiveDriverEntryContainer>
+    private final ConcurrentMap<FsMountPoint, MockArchive>
             containers;
 
     public MockArchiveDriver() {
@@ -44,7 +44,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
         if (null == config)
             config = TestConfig.get();
         this.config = config;
-        this.containers = new ConcurrentHashMap<FsMountPoint, MockArchiveDriverEntryContainer>(
+        this.containers = new ConcurrentHashMap<FsMountPoint, MockArchive>(
                 Maps.initialCapacity(config.getNumEntries()));
     }
 
@@ -64,7 +64,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         input.getLocalTarget(); // don't care for the result
-        final MockArchiveDriverEntryContainer
+        final MockArchive
                 c = containers.get(mp);
         if (null == c)
             throw new FileNotFoundException(mp.toString());
@@ -79,9 +79,9 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         output.getLocalTarget(); // don't care for the result
-        final MockArchiveDriverEntryContainer
-                n = MockArchiveDriverEntryContainer.create(config);
-        MockArchiveDriverEntryContainer o = containers.get(mp);
+        final MockArchive
+                n = MockArchive.create(config);
+        MockArchive o = containers.get(mp);
         if (null == o)
             o = containers.putIfAbsent(mp, n);
         return (null != o ? o : n).newOutputService();

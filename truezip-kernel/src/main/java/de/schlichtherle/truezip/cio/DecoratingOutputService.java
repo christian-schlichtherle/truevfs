@@ -16,8 +16,9 @@ import javax.annotation.WillCloseWhenClosed;
  * @see    DecoratingInputService
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingOutputService<E extends Entry, O extends OutputService<E>>
-extends DecoratingEntryContainer<E, O>
+public abstract class DecoratingOutputService<  E extends Entry,
+                                                O extends OutputService<E>>
+extends DecoratingContainer<E, O>
 implements OutputService<E> {
 
     @CreatesObligation

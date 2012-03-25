@@ -13,7 +13,7 @@ import javax.annotation.CheckForNull;
  * @param  <E> the type of the entries in this container.
  * @author Christian Schlichtherle
  */
-public interface EntryContainer<E extends Entry>
+public interface Container<E extends Entry>
 extends Iterable<E> {
 
     /**

@@ -24,7 +24,7 @@ import java.util.Iterator;
 // TODO: Consider renaming to OutputArchive
 @CleanupObligation
 public interface OutputService<E extends Entry>
-extends Closeable, EntryContainer<E> {
+extends Closeable, Container<E> {
 
     /**
      * {@inheritDoc}
