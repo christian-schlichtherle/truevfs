@@ -30,24 +30,24 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-public class MockArchiveDriverEntryContainer
-implements EntryContainer<MockArchiveDriverEntry> {
+public class MockArchive
+implements Container<MockArchiveDriverEntry> {
 
     final Map<String, MockArchiveDriverEntry> entries;
     private final TestConfig config;
     private @CheckForNull ThrowControl control;
 
-    public static MockArchiveDriverEntryContainer create(
+    public static MockArchive create(
             @CheckForNull TestConfig config) {
         if (null == config)
             config = TestConfig.get();
-        return new MockArchiveDriverEntryContainer(
+        return new MockArchive(
                 new LinkedHashMap<String, MockArchiveDriverEntry>(
                     Maps.initialCapacity(config.getNumEntries())),
                 config);
     }
 
-    private MockArchiveDriverEntryContainer(
+    private MockArchive(
             final Map<String, MockArchiveDriverEntry> entries,
             final TestConfig config) {
         this.entries = entries;
@@ -107,7 +107,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
     }
 
     private static final class MockInputService
-    extends MockArchiveDriverEntryContainer
+    extends MockArchive
     implements InputService<MockArchiveDriverEntry> {
 
         MockInputService(  Map<String, MockArchiveDriverEntry> entries,
@@ -163,7 +163,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
     } // MockInputService
 
     private static final class MockOutputService
-    extends MockArchiveDriverEntryContainer
+    extends MockArchive
     implements OutputService<MockArchiveDriverEntry> {
 
         MockOutputService( Map<String, MockArchiveDriverEntry> entries,

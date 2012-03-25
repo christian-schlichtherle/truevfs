@@ -54,7 +54,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
      * @return The number of I/O entries allocated but not yet released from
      *         this pool.
      */
-    public int getSize() {
+    public int size() {
         return active.get();
     }
 

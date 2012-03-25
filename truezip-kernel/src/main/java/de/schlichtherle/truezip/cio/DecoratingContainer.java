@@ -14,10 +14,10 @@ import javax.annotation.CheckForNull;
  * @param  <C> the type of the entry container.
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingEntryContainer<
+public abstract class DecoratingContainer<
         E extends Entry,
-        C extends EntryContainer<E>>
-implements EntryContainer<E> {
+        C extends Container<E>>
+implements Container<E> {
 
     /** The decorated entry container. */
     protected final C delegate;
@@ -27,7 +27,7 @@ implements EntryContainer<E> {
      *
      * @param  delegate the entry container to decorate.
      */
-    protected DecoratingEntryContainer(final C delegate) {
+    protected DecoratingContainer(final C delegate) {
         if (null == (this.delegate = delegate))
             throw new NullPointerException();
     }

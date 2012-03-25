@@ -19,7 +19,7 @@ import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
 import static de.schlichtherle.truezip.cio.Entry.Size.STORAGE;
 import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
 import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
-import de.schlichtherle.truezip.cio.EntryContainer;
+import de.schlichtherle.truezip.cio.Container;
 import de.schlichtherle.truezip.fs.mock.MockController;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.fs.option.FsInputOptions;
@@ -387,7 +387,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private <E extends FsArchiveEntry> void check(
-            final EntryContainer<E> container) {
+            final Container<E> container) {
         final int numEntries = getNumEntries();
         assertEquals(numEntries, container.size());
         final Iterator<E> it = container.iterator();

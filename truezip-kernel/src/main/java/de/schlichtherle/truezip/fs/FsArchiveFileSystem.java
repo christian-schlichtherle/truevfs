@@ -9,7 +9,7 @@ import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
 import static de.schlichtherle.truezip.cio.Entry.*;
-import de.schlichtherle.truezip.cio.EntryContainer;
+import de.schlichtherle.truezip.cio.Container;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.*;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
@@ -117,7 +117,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
     newPopulatedFileSystem( FsArchiveDriver<E> driver,
-                            @WillNotClose EntryContainer<E> archive,
+                            @WillNotClose Container<E> archive,
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
@@ -126,7 +126,7 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     FsArchiveFileSystem(final FsArchiveDriver<E> driver,
-                        final @WillNotClose EntryContainer<E> archive,
+                        final @WillNotClose Container<E> archive,
                         final @CheckForNull Entry rootTemplate) {
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
@@ -669,7 +669,7 @@ implements Iterable<FsCovariantEntry<E>> {
          * The map of covariant file system entries.
          * <p>
          * Note that the archive entries in the covariant file system entries
-         * in this map are shared with the {@link EntryContainer} object
+         * in this map are shared with the {@link Container} object
          * provided to the constructor of this class.
          */
         final Map<String, FsCovariantEntry<E>> map;

@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.cio.Entry.Access;
 import de.schlichtherle.truezip.cio.Entry.Type;
-import de.schlichtherle.truezip.cio.EntryContainer;
+import de.schlichtherle.truezip.cio.Container;
 import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Map;
@@ -28,7 +28,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class FsReadOnlyArchiveFileSystem<E extends FsArchiveEntry>
 extends FsArchiveFileSystem<E> {
 
-    FsReadOnlyArchiveFileSystem(final @WillNotClose EntryContainer<E> archive,
+    FsReadOnlyArchiveFileSystem(final @WillNotClose Container<E> archive,
                                 final FsArchiveDriver<E> driver,
                                 final @CheckForNull Entry rootTemplate) {
         super(driver, archive, rootTemplate);

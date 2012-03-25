@@ -19,7 +19,7 @@ import java.util.Iterator;
  */
 @CleanupObligation
 public interface InputService<E extends Entry>
-extends Closeable, EntryContainer<E> {
+extends Closeable, Container<E> {
 
     /**
      * {@inheritDoc}
