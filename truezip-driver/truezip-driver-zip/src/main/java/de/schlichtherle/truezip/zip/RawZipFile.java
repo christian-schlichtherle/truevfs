@@ -484,7 +484,7 @@ implements Iterable<E>, Closeable {
     /**
      * Recovers any lost entries which have been added to the ZIP file after
      * the (last) End Of Central Directory Record (EOCDR).
-     * This method should be called soon after the constructor.
+     * This method should be called immediately after the constructor.
      * It requires a fully initialized object, hence it's not part of the
      * constructor.
      * For example, to recover encrypted entries, it may require

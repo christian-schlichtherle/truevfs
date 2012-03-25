@@ -44,7 +44,7 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class ZipFile extends RawZipFile<ZipEntry> {
 
-    private @CheckForNull ZipCryptoParameters cryptoParameters;
+    private volatile @CheckForNull ZipCryptoParameters cryptoParameters;
 
     private final String name;
 
@@ -231,8 +231,13 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         this.name = rof.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that this method is <em>not</em> thread-safe!
+     */
     @Override
-    public synchronized void recoverLostEntries() throws IOException {
+    public void recoverLostEntries() throws IOException {
         super.recoverLostEntries();
     }
 
@@ -250,7 +255,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *
      * @see #iterator()
      */
-    public synchronized Enumeration<? extends ZipEntry> entries() {
+    public Enumeration<? extends ZipEntry> entries() {
         class CloneEnumeration implements Enumeration<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
@@ -273,7 +278,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * The iteration does not support element removal.
      */
     @Override
-    public synchronized Iterator<ZipEntry> iterator() {
+    public Iterator<ZipEntry> iterator() {
         class EntryIterator implements Iterator<ZipEntry> {
             final Iterator<ZipEntry> i = ZipFile.super.iterator();
 
@@ -303,7 +308,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @param name the name of the ZIP entry.
      */
     @Override
-    public synchronized ZipEntry getEntry(String name) {
+    public ZipEntry getEntry(String name) {
         final ZipEntry ze = super.getEntry(name);
         return ze != null ? ze.clone() : null;
     }
@@ -328,7 +333,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     @Override
-    public synchronized @Nullable ZipCryptoParameters getCryptoParameters() {
+    public @Nullable ZipCryptoParameters getCryptoParameters() {
         return cryptoParameters;
     }
 
@@ -339,7 +344,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      *        of entries.
      * @since TrueZIP 7.3
      */
-    public synchronized void setCryptoParameters(
+    public void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {
         this.cryptoParameters = cryptoParameters;
     }
@@ -348,7 +353,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     @SuppressWarnings("deprecation")
     protected synchronized InputStream getInputStream(
             String name, Boolean check, boolean process)
-    throws  IOException {
+    throws IOException {
         final InputStream in = super.getInputStream(name, check, process);
         return in == null ? null : new de.schlichtherle.truezip.io.SynchronizedInputStream(in, this);
     }
