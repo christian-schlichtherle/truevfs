@@ -235,14 +235,14 @@ public class ZipFile extends RawZipFile<ZipEntry> {
         this.name = rof.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note that this method is <em>not</em> thread-safe!
+     */
     @Override
     public void recoverLostEntries() throws IOException {
-        lock.lock();
-        try {
-            super.recoverLostEntries();
-        } finally {
-            lock.unlock();
-        }
+        super.recoverLostEntries();
     }
 
     /**
@@ -274,12 +274,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             }
         } // CloneEnumeration
 
-        lock.lock();
-        try {
-            return new CloneEnumeration();
-        } finally {
-            lock.unlock();
-        }
+        return new CloneEnumeration();
     }
 
     /**
@@ -307,12 +302,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             }
         } // EntryIterator
 
-        lock.lock();
-        try {
-            return new EntryIterator();
-        } finally {
-            lock.unlock();
-        }
+        return new EntryIterator();
     }
 
     /**
@@ -323,13 +313,7 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      */
     @Override
     public ZipEntry getEntry(String name) {
-        final ZipEntry ze;
-        lock.lock();
-        try {
-            ze = super.getEntry(name);
-        } finally {
-            lock.unlock();
-        }
+        final ZipEntry ze = super.getEntry(name);
         return ze != null ? ze.clone() : null;
     }
 
