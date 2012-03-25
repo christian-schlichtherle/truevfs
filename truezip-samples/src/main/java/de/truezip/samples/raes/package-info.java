@@ -6,4 +6,4 @@
  * Demonstrates the usage of the API of the module TrueZIP&nbsp;File*.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.schlichtherle.truezip.sample.file;
+package de.truezip.samples.raes;
