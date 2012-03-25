@@ -361,7 +361,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ZipRaesDriver} decorates the
+     * The implementation in the class {@link ZipDriver} decorates the
      * given controller with a package private controller which keeps track of
      * the encryption keys.
      * This should get overridden in order to return just {@code controller} if
@@ -373,19 +373,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     protected FsController<?> decorate(FsController<?> controller) {
         return new ZipController(controller, this);
-    }
-
-    /**
-     * Equivalent to calling
-     * {@link FsArchiveDriver#newController} on the {@link FsArchiveDriver}
-     * class.
-     * Call this method when overriding {@link #newController} and you need the
-     * default file system controller chain instead of the implementation in
-     * the class {@link ZipDriver}.
-     */
-    protected final FsController<?>
-    superNewController(FsModel model, FsController<?> parent) {
-        return super.newController(model, parent);
     }
 
     @Override

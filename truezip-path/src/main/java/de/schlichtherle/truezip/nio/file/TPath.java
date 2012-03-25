@@ -20,6 +20,7 @@ import de.schlichtherle.truezip.io.Paths;
 import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
 import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.cio.OutputSocket;
+import de.schlichtherle.truezip.file.TVFS;
 import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
@@ -596,7 +597,7 @@ public final class TPath implements Path {
      * @return A path object for the same path name, but does not detect any
      *         archive file name patterns in the last path name segment.
      * @see    TFileSystem#close()
-     * @see    TFileSystemProvider#umount()
+     * @see    TVFS#umount()
      * @since  TrueZIP 7.5
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive

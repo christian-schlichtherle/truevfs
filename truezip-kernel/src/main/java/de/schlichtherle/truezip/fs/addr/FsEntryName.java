@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.addr;
 
+import de.schlichtherle.truezip.fs.FsEntry;
 import static de.schlichtherle.truezip.fs.addr.FsUriModifier.NULL;
 import static de.schlichtherle.truezip.fs.addr.FsUriModifier.PostFix.ENTRY_NAME;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;

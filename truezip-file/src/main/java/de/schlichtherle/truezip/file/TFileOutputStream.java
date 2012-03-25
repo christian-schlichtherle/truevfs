@@ -45,9 +45,9 @@ import javax.annotation.concurrent.Immutable;
  * }</pre>
  * <p>
  * Applications cannot write to an entry in an archive file if an implicit
- * {@link TFile#umount() unmount} is required but cannot get performed because
- * another {@link TFileInputStream} or {@link TFileOutputStream} object hasn't
- * been closed or garbage collected yet.
+ * {@linkplain TVFS#umount() unmount} is required but cannot get performed
+ * because another {@link TFileInputStream} or {@link TFileOutputStream} object
+ * hasn't been closed or garbage collected yet.
  * A {@link FileNotFoundException} is thrown by the constructors of this class
  * in this case.
  * <p>

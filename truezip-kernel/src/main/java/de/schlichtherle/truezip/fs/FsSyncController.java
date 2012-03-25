@@ -34,7 +34,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * file system if and only if any decorated file system controller throws an
  * {@link FsNeedsSyncException}.
  * 
- * @param  <M> the type of the file system model.
  * @see    FsNeedsSyncException
  * @since  TrueZIP 7.3
  * @author Christian Schlichtherle

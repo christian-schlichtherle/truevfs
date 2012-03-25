@@ -5,9 +5,9 @@
 package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsFilteringManager;
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
+import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
 import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import de.schlichtherle.truezip.fs.option.FsSyncOptions;
@@ -20,13 +20,6 @@ import java.net.URISyntaxException;
  * Static utility methods for virtual file system operations with global scope.
  * If you are not sure which method you should use, try {@link #umount()} -
  * it does the right thing for most use cases.
- * <p>
- * For now, the primary purpose of this class is to consolidate the many
- * variants and incarnations of {@link TFile#umount} alias {@link TFile#sync}
- * alias ... into one class which can of easily referred to in the
- * documentation.
- * All other variants and incarnations now forward the call to this class and
- * are declared to be deprecated.
  * 
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle

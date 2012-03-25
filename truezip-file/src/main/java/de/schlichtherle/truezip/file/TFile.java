@@ -19,6 +19,7 @@ import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
@@ -940,8 +941,7 @@ public final class TFile extends File {
      * 
      * @return A file object for the same path name, but does not detect any
      *         archive file name patterns in the last path name segment.
-     * @see    #umount(TFile)
-     * @see    #umount()
+     * @see    TVFS#umount(TFile)
      * @since  TrueZIP 7.5
      */
     public TFile toNonArchiveFile() {
