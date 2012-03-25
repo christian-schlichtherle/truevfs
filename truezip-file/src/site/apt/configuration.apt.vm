@@ -81,7 +81,7 @@ Configuring TrueZIP File*
     by all file system driver modules on the run time class path.
 
     * The constructor
-    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String, de.schlichtherle.truezip.fs.FsDriver)}<<<TArchiveDetector(String suffixes, FsDriver driver)>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String, de.truezip.kernel.fs.FsDriver)}<<<TArchiveDetector(String suffixes, FsDriver driver)>>>}}
     lets you define a custom list of archive file suffixes for any archive
     driver.
     This enables you to define a custom {{{./usecases/aff.html}application file format}}.

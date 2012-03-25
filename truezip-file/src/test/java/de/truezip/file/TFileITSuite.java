@@ -4,19 +4,19 @@
  */
 package de.truezip.file;
 
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.GROW;
-import static de.schlichtherle.truezip.fs.option.FsSyncOption.*;
-import static de.schlichtherle.truezip.fs.option.FsSyncOptions.SYNC;
-import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.io.InputClosedException;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.OutputClosedException;
-import de.schlichtherle.truezip.util.ArrayHelper;
-import de.schlichtherle.truezip.util.BitField;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
-import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
-import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
+import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
+import static de.truezip.kernel.fs.option.FsSyncOption.*;
+import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
+import de.truezip.kernel.fs.*;
+import de.truezip.kernel.io.InputClosedException;
+import de.truezip.kernel.io.InputException;
+import de.truezip.kernel.io.OutputClosedException;
+import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.BitField;
+import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
+import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
+import de.truezip.kernel.util.ConcurrencyUtils.TaskJoiner;
+import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
 import static java.io.File.separatorChar;
 import java.io.*;
 import java.lang.ref.Reference;

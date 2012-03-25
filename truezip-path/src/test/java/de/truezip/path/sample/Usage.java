@@ -4,10 +4,10 @@
  */
 package de.truezip.path.sample;
 
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.io.SequentialIOException;
-import de.schlichtherle.truezip.io.Streams;
+import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.fs.FsSyncWarningException;
+import de.truezip.kernel.io.SequentialIOException;
+import de.truezip.kernel.io.Streams;
 import de.truezip.file.TVFS;
 import de.truezip.path.TPath;
 import java.io.IOException;

@@ -4,17 +4,17 @@
  */
 package de.truezip.driver.http;
 
-import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
-import de.schlichtherle.truezip.cio.*;
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
-import de.schlichtherle.truezip.fs.option.FsInputOptions;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.util.BitField;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsEntry;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.fs.option.FsInputOptions;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsOutputOptions;
+import de.truezip.kernel.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

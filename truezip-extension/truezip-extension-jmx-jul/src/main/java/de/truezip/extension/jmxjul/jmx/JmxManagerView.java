@@ -4,12 +4,12 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.option.FsSyncOption;
-import static de.schlichtherle.truezip.fs.option.FsSyncOption.CLEAR_CACHE;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsManager;
+import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.fs.option.FsSyncOption;
+import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
+import de.truezip.kernel.util.BitField;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;

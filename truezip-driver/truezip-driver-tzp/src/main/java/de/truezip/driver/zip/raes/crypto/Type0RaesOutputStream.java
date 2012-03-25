@@ -7,7 +7,7 @@ package de.truezip.driver.zip.raes.crypto;
 import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.*;
 import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
-import de.schlichtherle.truezip.io.LEDataOutputStream;
+import de.truezip.kernel.io.LEDataOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

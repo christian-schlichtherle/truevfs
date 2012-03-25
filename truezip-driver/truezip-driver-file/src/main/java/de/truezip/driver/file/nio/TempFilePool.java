@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.cio.IOPool;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.cio.IOPool;
 import java.io.IOException;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.deleteIfExists;

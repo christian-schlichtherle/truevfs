@@ -8,7 +8,7 @@ import de.truezip.driver.zip.raes.crypto.MockType0RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.driver.zip.io.ZipFile;
 import de.truezip.driver.zip.io.ZipOutputStream;
 import de.truezip.driver.zip.io.ZipTestSuite;

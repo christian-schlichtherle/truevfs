@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.file.oio;
 
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.rof.DefaultReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;

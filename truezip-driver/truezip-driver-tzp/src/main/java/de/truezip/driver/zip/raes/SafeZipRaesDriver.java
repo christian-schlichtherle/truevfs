@@ -5,7 +5,7 @@
 package de.truezip.driver.zip.raes;
 
 import de.truezip.kernel.key.KeyManagerProvider;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
+import de.truezip.kernel.cio.IOPoolProvider;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 

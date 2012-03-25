@@ -32,7 +32,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-// TODO: Consider implementing de.schlichtherle.truezip.fs.entry.Entry.
+// TODO: Consider implementing de.truezip.kernel.fs.entry.Entry.
 @NotThreadSafe
 public class ZipEntry implements Cloneable {
 

@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul;
 
-import de.schlichtherle.truezip.cio.*;
+import de.truezip.kernel.cio.*;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 

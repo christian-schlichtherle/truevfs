@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.util.Maps;
+import de.truezip.kernel.util.Maps;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import javax.annotation.concurrent.ThreadSafe;

@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
-import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
+import de.truezip.kernel.key.pbe.swing.HurlingWindowFeedback;
+import de.truezip.kernel.key.pbe.swing.InvalidKeyFeedback;
 import de.truezip.file.TApplication;
 
 /**

@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.util.Pool;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.util.Pool;
 import java.io.IOException;
 
 /**

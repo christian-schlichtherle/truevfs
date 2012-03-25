@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.util.ArrayHelper;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
-import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import de.schlichtherle.truezip.util.Maps;
+import de.truezip.kernel.rof.DefaultReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.util.ArrayHelper;
+import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
+import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
+import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
+import de.truezip.kernel.util.Maps;
 import de.truezip.driver.zip.io.CRC32Exception;
 import de.truezip.driver.zip.io.ZipEntry;
 import de.truezip.driver.zip.io.ZipEntryFactory;

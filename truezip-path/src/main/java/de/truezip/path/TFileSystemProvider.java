@@ -4,20 +4,20 @@
  */
 package de.truezip.path;
 
-import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
+import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
+import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
-import de.schlichtherle.truezip.fs.FsEntry;
-import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
-import de.schlichtherle.truezip.fs.addr.FsPath;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.EXCLUSIVE;
-import de.schlichtherle.truezip.cio.IOSocket;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.fs.FsEntry;
+import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
+import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
+import de.truezip.kernel.cio.IOSocket;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.util.BitField;
 import java.io.*;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;

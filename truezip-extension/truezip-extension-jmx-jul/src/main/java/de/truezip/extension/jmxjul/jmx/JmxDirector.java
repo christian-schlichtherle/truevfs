@@ -4,12 +4,12 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.cio.*;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsModel;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsManager;
+import de.truezip.kernel.fs.FsModel;
 import de.truezip.extension.jmxjul.*;
-import de.schlichtherle.truezip.util.JSE7;
+import de.truezip.kernel.util.JSE7;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;

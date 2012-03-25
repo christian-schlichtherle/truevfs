@@ -11,16 +11,16 @@ import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDriverProvider;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.truezip.driver.zip.raes.PromptingKeyManagerService;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsDriverProvider;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.driver.zip.raes.key.PromptingKeyManagerService;
 import de.truezip.driver.zip.raes.SafeZipRaesDriver;
 import de.truezip.kernel.key.PromptingKeyProvider;
 import de.truezip.kernel.key.PromptingKeyProvider.Controller;
 import de.truezip.kernel.key.UnknownKeyException;
 import de.truezip.kernel.sl.KeyManagerLocator;
-import de.schlichtherle.truezip.sl.IOPoolLocator;
+import de.truezip.kernel.sl.IOPoolLocator;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP

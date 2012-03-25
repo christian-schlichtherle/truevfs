@@ -6,8 +6,8 @@ package de.truezip.extension.jmxjul.comp;
 
 import de.truezip.extension.jmxjul.jmx.JmxDirector;
 import de.truezip.extension.jmxjul.jul.JulDirector;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.spi.IOPoolService;
+import de.truezip.kernel.cio.IOPool;
+import de.truezip.kernel.cio.spi.IOPoolService;
 import javax.annotation.concurrent.Immutable;
 
 /**

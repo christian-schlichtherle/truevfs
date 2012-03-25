@@ -4,16 +4,16 @@
  */
 package de.truezip.extension.jmxjul;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDecoratingController;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsDecoratingController;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**

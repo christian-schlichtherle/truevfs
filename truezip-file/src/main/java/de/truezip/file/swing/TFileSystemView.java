@@ -36,7 +36,7 @@ import javax.swing.filechooser.FileSystemView;
 // Other classes like BasicFileChooserUI also rely on the use of the
 // ShellFolder class, which they really shouldn't.
 // The use of the ShellFolder class is also the sole reason for the existence
-// of the file delegate property in de.schlichtherle.truezip.io.TFile.
+// of the file delegate property in de.truezip.kernel.io.TFile.
 // For many methods in this class, we need to pass in the delegate to the
 // superclass implementation in order for the JFileChooser to work as expected.
 //

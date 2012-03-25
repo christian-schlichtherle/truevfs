@@ -4,16 +4,16 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.fs.FsEntry;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.fs.FsEntry;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsOutputOptions;
+import de.truezip.kernel.util.BitField;
 import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;

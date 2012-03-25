@@ -4,11 +4,11 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.addr.FsScheme;
-import de.schlichtherle.truezip.fs.spi.FsDriverService;
+import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.fs.addr.FsScheme;
+import de.truezip.kernel.fs.spi.FsDriverService;
 import de.truezip.kernel.sl.KeyManagerLocator;
-import de.schlichtherle.truezip.sl.IOPoolLocator;
+import de.truezip.kernel.sl.IOPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 

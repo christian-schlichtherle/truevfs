@@ -4,15 +4,15 @@
  */
 package de.truezip.driver.tar;
 
-import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import static de.schlichtherle.truezip.cio.Entry.Size.STORAGE;
-import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
-import de.schlichtherle.truezip.fs.FsArchiveEntries;
-import de.schlichtherle.truezip.fs.FsArchiveEntry;
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.util.Releasable;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import static de.truezip.kernel.cio.Entry.Size.STORAGE;
+import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
+import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.fs.FsArchiveEntries;
+import de.truezip.kernel.fs.FsArchiveEntry;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.util.Releasable;
 import java.io.IOException;
 import java.util.Date;
 import javax.annotation.CheckForNull;

@@ -4,12 +4,12 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.FsArchiveDriverTestBase;
-import de.schlichtherle.truezip.fs.FsFailSafeManagerService;
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
-import de.schlichtherle.truezip.fs.addr.FsScheme;
-import de.schlichtherle.truezip.util.SuffixSet;
+import de.truezip.kernel.fs.FsArchiveDriver;
+import de.truezip.kernel.fs.FsArchiveDriverTestBase;
+import de.truezip.kernel.fs.FsFailSafeManagerService;
+import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.fs.addr.FsScheme;
+import de.truezip.kernel.util.SuffixSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;

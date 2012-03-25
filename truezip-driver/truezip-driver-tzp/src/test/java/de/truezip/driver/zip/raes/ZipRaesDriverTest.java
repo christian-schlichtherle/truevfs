@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsCharsetArchiveDriverTestSuite;
+import de.truezip.kernel.fs.FsCharsetArchiveDriverTestSuite;
 import de.truezip.driver.zip.ZipDriverEntry;
 
 /**

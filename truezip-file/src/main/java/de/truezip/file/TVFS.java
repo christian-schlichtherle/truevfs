@@ -4,15 +4,15 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsFilteringManager;
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
-import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
-import de.schlichtherle.truezip.fs.option.FsSyncOption;
-import de.schlichtherle.truezip.fs.option.FsSyncOptions;
-import static de.schlichtherle.truezip.fs.option.FsSyncOptions.UMOUNT;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.fs.FsFilteringManager;
+import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.fs.FsSyncWarningException;
+import de.truezip.kernel.fs.addr.FsMountPoint;
+import static de.truezip.kernel.fs.addr.FsUriModifier.CANONICALIZE;
+import de.truezip.kernel.fs.option.FsSyncOption;
+import de.truezip.kernel.fs.option.FsSyncOptions;
+import static de.truezip.kernel.fs.option.FsSyncOptions.UMOUNT;
+import de.truezip.kernel.util.BitField;
 import java.net.URI;
 import java.net.URISyntaxException;
 

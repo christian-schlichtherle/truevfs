@@ -38,7 +38,7 @@ About TrueZIP Driver ZIP
         To use this feature with a client API, set
         {{{./apidocs/de/schlichtherle/truezip/fs/FsOutputOption.html#GROW}<<<FsOutputOption.GROW>>>}},
         e.g. in
-        {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.schlichtherle.truezip.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
+        {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
 
         To use this feature with the ZIP API, call
         {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,de.truezip.driver.zip.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
@@ -61,16 +61,16 @@ About TrueZIP Driver ZIP
         To use this feature with a client API, set
         {{{./apidocs/de/schlichtherle/truezip/fs/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
         e.g. in
-        {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.schlichtherle.truezip.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
+        {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
         or
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which sets this option before calling its super-class implementation in
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#newEntry(java.lang.String,de.schlichtherle.truezip.fs.entry.Entry.Type,de.schlichtherle.truezip.fs.entry.Entry,de.schlichtherle.truezip.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
+        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#newEntry(java.lang.String,de.truezip.kernel.fs.entry.Entry.Type,de.truezip.kernel.fs.entry.Entry,de.truezip.kernel.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
         In either case, if you don't want to use the built-in
         {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
         for prompting the user for a password using a Swing GUI or the console,
         then you should override
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#zipCryptoParameters(de.schlichtherle.truezip.fs.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
+        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#zipCryptoParameters(de.truezip.kernel.fs.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
         in order to provide custom
         {{{./apidocs/de/schlichtherle/truezip/zip/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
         too.

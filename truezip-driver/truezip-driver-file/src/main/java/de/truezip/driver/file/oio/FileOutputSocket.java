@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.file.oio;
 
-import de.schlichtherle.truezip.cio.Entry;
-import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
-import de.schlichtherle.truezip.cio.IOSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.cio.Entry;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.UNKNOWN;
+import de.truezip.kernel.cio.IOSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import static de.truezip.kernel.fs.option.FsOutputOption.*;
+import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import static java.lang.Boolean.TRUE;

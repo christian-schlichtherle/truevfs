@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.file.oio;
 
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsModel;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.fs.FsModel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 

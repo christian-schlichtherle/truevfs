@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.spi.IOPoolService;
-import de.schlichtherle.truezip.util.JSE7;
+import de.truezip.kernel.cio.IOPool;
+import de.truezip.kernel.cio.spi.IOPoolService;
+import de.truezip.kernel.util.JSE7;
 import javax.annotation.concurrent.Immutable;
 
 /**

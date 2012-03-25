@@ -4,12 +4,12 @@
  */
 package de.truezip.driver.zip;
 
-import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
-import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
-import de.schlichtherle.truezip.fs.FsArchiveEntries;
-import de.schlichtherle.truezip.fs.FsArchiveEntry;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
+import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.fs.FsArchiveEntries;
+import de.truezip.kernel.fs.FsArchiveEntry;
 import de.truezip.driver.zip.io.DateTimeConverter;
 import de.truezip.driver.zip.io.ZipEntry;
 

@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jul;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.cio.OutputSocket;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.OutputSocket;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 

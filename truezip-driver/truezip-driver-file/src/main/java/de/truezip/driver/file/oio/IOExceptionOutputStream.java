@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.file.oio;
 
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
+import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

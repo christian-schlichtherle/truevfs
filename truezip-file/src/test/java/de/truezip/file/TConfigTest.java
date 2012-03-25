@@ -4,12 +4,12 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.mock.MockArchiveDriver;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
-import de.schlichtherle.truezip.fs.option.FsInputOptions;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.fs.mock.MockArchiveDriver;
+import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.fs.option.FsInputOptions;
+import static de.truezip.kernel.fs.option.FsOutputOption.*;
+import de.truezip.kernel.util.BitField;
 import java.util.NoSuchElementException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;

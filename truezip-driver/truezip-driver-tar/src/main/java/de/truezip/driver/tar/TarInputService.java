@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.tar;
 
-import de.schlichtherle.truezip.cio.*;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
-import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
-import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
+import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import static de.truezip.kernel.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;

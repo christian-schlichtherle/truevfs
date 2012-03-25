@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.FsSyncException;
+import de.truezip.kernel.fs.FsManager;
+import de.truezip.kernel.fs.FsSyncException;
 
 /**
  * The MXBean interface for a {@link FsManager file system manager}.

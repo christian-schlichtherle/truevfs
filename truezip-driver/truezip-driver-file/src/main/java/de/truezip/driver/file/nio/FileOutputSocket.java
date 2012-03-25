@@ -4,15 +4,15 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.schlichtherle.truezip.cio.Entry;
-import static de.schlichtherle.truezip.cio.Entry.Access.*;
-import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
-import de.schlichtherle.truezip.cio.IOSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
-import de.schlichtherle.truezip.util.BitField;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import de.truezip.kernel.cio.Entry;
+import static de.truezip.kernel.cio.Entry.Access.*;
+import static de.truezip.kernel.cio.Entry.UNKNOWN;
+import de.truezip.kernel.cio.IOSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import static de.truezip.kernel.fs.option.FsOutputOption.*;
+import de.truezip.kernel.util.BitField;
+import static de.truezip.kernel.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -4,12 +4,12 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsArchiveDriver;
-import static de.schlichtherle.truezip.fs.option.FsSyncOptions.SYNC;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
-import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
-import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
+import de.truezip.kernel.fs.FsArchiveDriver;
+import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
+import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
+import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
+import de.truezip.kernel.util.ConcurrencyUtils.TaskJoiner;
+import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;

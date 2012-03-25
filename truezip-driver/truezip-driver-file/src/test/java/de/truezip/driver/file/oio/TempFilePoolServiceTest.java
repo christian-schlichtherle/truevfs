@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.file.oio;
 
-import de.schlichtherle.truezip.cio.spi.IOPoolService;
+import de.truezip.kernel.cio.spi.IOPoolService;
 import de.truezip.driver.file.oio.TempFilePool;
 import de.truezip.driver.file.oio.TempFilePoolService;
 import static org.junit.Assert.assertSame;

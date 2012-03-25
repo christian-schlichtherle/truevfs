@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
+import de.truezip.kernel.fs.addr.FsMountPoint;
 import static de.truezip.file.TVFS.mountPoint;
 import java.net.URI;
 import java.net.URISyntaxException;

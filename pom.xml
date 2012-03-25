@@ -279,7 +279,7 @@ system space.
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
-                            <de.schlichtherle.truezip.fs.FsControllerException.traceable>true</de.schlichtherle.truezip.fs.FsControllerException.traceable>
+                            <de.truezip.kernel.fs.FsControllerException.traceable>true</de.truezip.kernel.fs.FsControllerException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
@@ -296,8 +296,8 @@ system space.
                                  in the classes under test, so it's generally
                                  discouraged. -->
                             <de.truezip.file.ConfiguredClientTestBase.isolateFsManager>false</de.truezip.file.ConfiguredClientTestBase.isolateFsManager>
-                            <de.schlichtherle.truezip.zip.forceZip64Ext>false</de.schlichtherle.truezip.zip.forceZip64Ext>
-                            <de.schlichtherle.truezip.fs.FsControllerException.traceable>true</de.schlichtherle.truezip.fs.FsControllerException.traceable>
+                            <de.truezip.driver.zip.io.forceZip64Ext>false</de.truezip.driver.zip.io.forceZip64Ext>
+                            <de.truezip.kernel.fs.FsControllerException.traceable>true</de.truezip.kernel.fs.FsControllerException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>

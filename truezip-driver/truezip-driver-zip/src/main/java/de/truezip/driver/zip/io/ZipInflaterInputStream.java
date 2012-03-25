@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.util.JSE7;
+import de.truezip.kernel.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;

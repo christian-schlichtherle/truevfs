@@ -5,17 +5,17 @@
 package de.truezip.path;
 
 import de.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import static de.schlichtherle.truezip.fs.addr.FsEntryName.*;
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
-import de.schlichtherle.truezip.fs.addr.FsPath;
-import de.schlichtherle.truezip.fs.addr.FsScheme;
-import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
-import static de.schlichtherle.truezip.fs.addr.FsUriModifier.NULL;
-import de.schlichtherle.truezip.io.Paths;
-import de.schlichtherle.truezip.io.Paths.Splitter;
-import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
-import de.schlichtherle.truezip.util.UriBuilder;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import static de.truezip.kernel.fs.addr.FsEntryName.*;
+import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.fs.addr.FsScheme;
+import static de.truezip.kernel.fs.addr.FsUriModifier.CANONICALIZE;
+import static de.truezip.kernel.fs.addr.FsUriModifier.NULL;
+import de.truezip.kernel.io.Paths;
+import de.truezip.kernel.io.Paths.Splitter;
+import de.truezip.kernel.util.QuotedUriSyntaxException;
+import de.truezip.kernel.util.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.Nullable;
