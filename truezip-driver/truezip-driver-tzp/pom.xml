@@ -79,7 +79,7 @@
                             <artifactId>maven-failsafe-plugin</artifactId>
                             <configuration>
                                 <excludes>
-                                    <exclude>**/*PathIT.class</exclude>
+                                    <exclude>**/path/*IT.class</exclude>
                                 </excludes>
                             </configuration>
                         </plugin>
