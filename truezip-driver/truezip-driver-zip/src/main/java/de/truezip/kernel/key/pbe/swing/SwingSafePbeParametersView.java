@@ -5,7 +5,7 @@
 package de.truezip.kernel.key.pbe.swing;
 
 import de.truezip.swing.awt.Windows;
-import de.truezip.driver.zip.crypto.param.KeyStrength;
+import de.truezip.kernel.key.param.KeyStrength;
 import de.truezip.kernel.key.KeyPromptingInterruptedException;
 import de.truezip.kernel.key.PromptingKeyProvider.Controller;
 import de.truezip.kernel.key.UnknownKeyException;

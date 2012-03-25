@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.key.pbe.console;
 
-import de.truezip.driver.zip.crypto.param.KeyStrength;
+import de.truezip.kernel.key.param.KeyStrength;
 import de.truezip.kernel.key.KeyPromptingDisabledException;
 import de.truezip.kernel.key.PromptingKeyProvider.Controller;
 import de.truezip.kernel.key.pbe.SafePbeParameters;

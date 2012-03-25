@@ -2,22 +2,24 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.zip.raes.crypto.param;
+package de.truezip.driver.zip.raes;
 
-import de.truezip.kernel.key.KeyManager;
-import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.KeyProvider;
-import de.truezip.kernel.key.UnknownKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesParametersProvider;
 import de.truezip.driver.zip.raes.crypto.Type0RaesParameters;
+import de.truezip.kernel.key.KeyManager;
+import de.truezip.kernel.key.KeyManagerProvider;
+import de.truezip.kernel.key.KeyProvider;
+import de.truezip.kernel.key.UnknownKeyException;
+import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.kernel.key.pbe.AesPbeParameters;
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An adapter which provides {@link RaesParameters} by using a
- * {@link KeyManager} for {@link AesCipherParameters}.
+ * {@link KeyManager} for {@link AesPbeParameters}.
  * <p>
  * The current implementation supports only {@link Type0RaesParameters}.
  *
@@ -28,7 +30,7 @@ public class KeyManagerRaesParameters
 implements RaesParametersProvider {
 
     /** The key manager for accessing RAES encrypted data. */
-    protected final KeyManager<AesCipherParameters> manager;
+    protected final KeyManager<AesPbeParameters> manager;
 
     /** The resource URI of the RAES file. */
     protected final URI raes;
@@ -43,7 +45,7 @@ implements RaesParametersProvider {
     public KeyManagerRaesParameters(
             final KeyManagerProvider provider,
             final URI raes) {
-        this(provider.get(AesCipherParameters.class), raes);
+        this(provider.get(AesPbeParameters.class), raes);
     }
 
     /**
@@ -53,19 +55,19 @@ implements RaesParametersProvider {
      * @param  raes the resource URI of the RAES file.
      */
     public KeyManagerRaesParameters(
-            final KeyManager<AesCipherParameters> manager,
+            final KeyManager<AesPbeParameters> manager,
             final URI raes) {
-        if (null == manager || null == raes)
+        if (null == (this.manager = manager))
             throw new NullPointerException();
-        this.manager = manager;
-        this.raes = raes;
+        if (null == (this.raes = raes))
+            throw new NullPointerException();
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * If {@code type} is assignable from {@link Type0RaesParameters}, then the
-     * {@link KeyManager} for {@link AesCipherParameters} will get used which
+     * {@link KeyManager} for {@link AesPbeParameters} will get used which
      * has been provided to the constructor.
      * <p>
      * Otherwise, {@code null} gets returned.
@@ -78,14 +80,14 @@ implements RaesParametersProvider {
     }
 
     /**
-     * Adapts a {@code KeyProvider} for {@link  AesCipherParameters} obtained
+     * Adapts a {@code KeyProvider} for {@link  AesPbeParameters} obtained
      * from the {@link #manager} to {@code Type0RaesParameters}.
      */
     private class Type0 implements Type0RaesParameters {
         @Override
         public char[] getWritePassword()
         throws RaesKeyException {
-            final KeyProvider<AesCipherParameters>
+            final KeyProvider<AesPbeParameters>
                     provider = manager.getKeyProvider(raes);
             try {
                 return provider.getWriteKey().getPassword();
@@ -97,7 +99,7 @@ implements RaesParametersProvider {
         @Override
         public char[] getReadPassword(final boolean invalid)
         throws RaesKeyException {
-            final KeyProvider<AesCipherParameters>
+            final KeyProvider<AesPbeParameters>
                     provider = manager.getKeyProvider(raes);
             try {
                 return provider.getReadKey(invalid).getPassword();
@@ -109,7 +111,7 @@ implements RaesParametersProvider {
         @Override
         public AesKeyStrength getKeyStrength()
         throws RaesKeyException {
-            final KeyProvider<AesCipherParameters>
+            final KeyProvider<AesPbeParameters>
                     provider = manager.getKeyProvider(raes);
             try {
                 return provider.getWriteKey().getKeyStrength();
@@ -121,9 +123,9 @@ implements RaesParametersProvider {
         @Override
         public void setKeyStrength(final AesKeyStrength keyStrength)
         throws RaesKeyException {
-            final KeyProvider<AesCipherParameters>
+            final KeyProvider<AesPbeParameters>
                     provider = manager.getKeyProvider(raes);
-            final AesCipherParameters param;
+            final AesPbeParameters param;
             try {
                 param = provider.getReadKey(false);
             } catch (UnknownKeyException ex) {

@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
-import static de.truezip.driver.zip.crypto.param.AesKeyStrength.BITS_128;
+import de.truezip.kernel.key.param.AesKeyStrength;
+import static de.truezip.kernel.key.param.AesKeyStrength.BITS_128;
 import static de.truezip.driver.zip.io.LittleEndian.readUShort;
 import static de.truezip.driver.zip.io.LittleEndian.writeShort;
 import javax.annotation.concurrent.NotThreadSafe;

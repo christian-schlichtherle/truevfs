@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.driver.zip.io.*;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.key.KeyManager;
 import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.KeyProvider;
 import de.truezip.kernel.key.UnknownKeyException;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.key.pbe.AesPbeParameters;
-import de.truezip.driver.zip.io.*;
 import java.net.URI;
 import java.nio.charset.Charset;
 import javax.annotation.concurrent.ThreadSafe;
@@ -54,11 +54,12 @@ implements ZipParametersProvider, ZipCryptoParameters {
             final ZipDriver driver,
             final FsModel model,
             final Charset charset) {
-        if (null == driver || null == model || null == charset)
+        if (null == (this.driver = driver))
             throw new NullPointerException();
-        this.driver = driver;
-        this.model = model;
-        this.charset = charset;
+        if (null == (this.model = model))
+            throw new NullPointerException();
+        if (null == (this.charset = charset))
+            throw new NullPointerException();
     }
 
     /**

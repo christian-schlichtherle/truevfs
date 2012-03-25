@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.cio.DecoratingOutputSocket;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

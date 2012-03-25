@@ -7,7 +7,7 @@ package de.truezip.samples.raes;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
-import de.truezip.driver.zip.raes.crypto.param.KeyManagerRaesParameters;
+import de.truezip.driver.zip.raes.KeyManagerRaesParameters;
 import de.truezip.file.*;
 import de.truezip.kernel.sl.KeyManagerLocator;
 import de.truezip.kernel.rof.DefaultReadOnlyFile;

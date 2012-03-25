@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.key.pbe.swing;
 
-import de.truezip.driver.zip.crypto.param.KeyStrength;
+import de.truezip.kernel.key.param.KeyStrength;
 import de.truezip.swing.EnhancedPanel;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;

@@ -6,4 +6,4 @@
  * Provides interfaces and implementations for general cryptography parameters.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.truezip.driver.zip.crypto.param;
+package de.truezip.kernel.key.param;

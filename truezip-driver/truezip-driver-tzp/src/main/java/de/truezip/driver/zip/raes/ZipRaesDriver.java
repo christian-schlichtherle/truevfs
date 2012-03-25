@@ -4,28 +4,23 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
-import de.truezip.driver.zip.raes.crypto.RaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
-import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
-import de.truezip.driver.zip.raes.crypto.param.KeyManagerRaesParameters;
-import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.FsModel;
 import de.truezip.driver.zip.JarDriver;
 import de.truezip.driver.zip.OptionOutputSocket;
 import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.driver.zip.ZipInputService;
+import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
+import de.truezip.driver.zip.raes.crypto.RaesParameters;
+import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.*;
 import de.truezip.kernel.key.KeyManagerProvider;
+import de.truezip.kernel.key.pbe.AesPbeParameters;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.cio.InputService;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputService;
 import de.truezip.kernel.util.BitField;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -104,7 +99,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     protected @CheckForNull RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
-                getKeyManagerProvider().get(AesCipherParameters.class),
+                getKeyManagerProvider().get(AesPbeParameters.class),
                 mountPointUri(model));
     }
 

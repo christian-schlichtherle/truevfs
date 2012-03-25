@@ -4,14 +4,14 @@
  */
 package de.truezip.kernel.key.pbe.console;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.key.pbe.AesPbeParameters;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A console based user interface to prompt for passwords.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class ConsoleAesPbeParametersView

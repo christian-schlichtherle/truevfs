@@ -4,12 +4,13 @@
  */
 package de.truezip.driver.zip;
 
+import static de.truezip.driver.zip.io.ZipEntry.*;
+import de.truezip.driver.zip.io.*;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.fs.FsArchiveDriver;
 import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
@@ -18,12 +19,10 @@ import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.*;
 import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.KeyProvider;
-import de.truezip.kernel.sl.KeyManagerLocator;
 import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.sl.KeyManagerLocator;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
-import static de.truezip.driver.zip.io.ZipEntry.*;
-import de.truezip.driver.zip.io.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;

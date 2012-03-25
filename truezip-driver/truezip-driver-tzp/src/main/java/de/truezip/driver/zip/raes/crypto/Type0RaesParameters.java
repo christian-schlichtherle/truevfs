@@ -4,9 +4,7 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
-import java.util.ResourceBundle;
-import javax.annotation.concurrent.ThreadSafe;
+import de.truezip.kernel.key.param.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.

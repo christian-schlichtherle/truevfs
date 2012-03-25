@@ -4,23 +4,23 @@
  */
 package de.truezip.driver.zip.raes.sample;
 
+import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.kernel.key.impl.PromptingKeyManagerService;
+import de.truezip.driver.zip.raes.SafeZipRaesDriver;
 import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.Type0RaesParameters;
-import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
-import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriverProvider;
 import de.truezip.kernel.fs.FsModel;
-import de.truezip.driver.zip.raes.key.PromptingKeyManagerService;
-import de.truezip.driver.zip.raes.SafeZipRaesDriver;
 import de.truezip.kernel.key.PromptingKeyProvider;
 import de.truezip.kernel.key.PromptingKeyProvider.Controller;
 import de.truezip.kernel.key.UnknownKeyException;
-import de.truezip.kernel.sl.KeyManagerLocator;
+import de.truezip.kernel.key.pbe.AesPbeParameters;
 import de.truezip.kernel.sl.IOPoolLocator;
+import de.truezip.kernel.sl.KeyManagerLocator;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP
@@ -170,7 +170,7 @@ public final class KeyManagement {
     }
     
     private static final class CustomView
-    implements PromptingKeyProvider.View<AesCipherParameters> {
+    implements PromptingKeyProvider.View<AesPbeParameters> {
         final char[] password;
         
         CustomView(char[] password) {
@@ -181,15 +181,15 @@ public final class KeyManagement {
          * You need to create a new key because the key manager may eventually
          * reset it when the archive file gets moved or deleted.
          */
-        private AesCipherParameters newKey() {
-            AesCipherParameters param = new AesCipherParameters();
+        private AesPbeParameters newKey() {
+            AesPbeParameters param = new AesPbeParameters();
             param.setPassword(password);
             param.setKeyStrength(AesKeyStrength.BITS_128);
             return param;
         }
         
         @Override
-        public void promptWriteKey(Controller<AesCipherParameters> controller)
+        public void promptWriteKey(Controller<AesPbeParameters> controller)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
@@ -200,7 +200,7 @@ public final class KeyManagement {
         }
         
         @Override
-        public void promptReadKey(  Controller<AesCipherParameters> controller,
+        public void promptReadKey(  Controller<AesPbeParameters> controller,
                                     boolean invalid)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to

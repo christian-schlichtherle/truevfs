@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.zip.sample;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriverProvider;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.driver.zip.JarDriver;
-import de.truezip.driver.zip.key.PromptingKeyManagerService;
+import de.truezip.kernel.key.impl.PromptingKeyManagerService;
 import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.PromptingKeyProvider;

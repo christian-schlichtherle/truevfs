@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.key.pbe;
 
-import de.truezip.driver.zip.crypto.param.KeyStrength;
+import de.truezip.kernel.key.param.KeyStrength;
 import de.truezip.kernel.key.SafeKey;
 import java.util.Arrays;
 import javax.annotation.CheckForNull;

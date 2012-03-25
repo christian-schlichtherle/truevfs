@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.driver.zip.io.WinZipAesParameters;
 import de.truezip.driver.zip.io.ZipEntry;

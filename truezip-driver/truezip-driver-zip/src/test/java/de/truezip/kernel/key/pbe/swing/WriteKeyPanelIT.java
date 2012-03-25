@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.key.pbe.swing;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.key.pbe.AesPbeParameters;
 import de.truezip.kernel.key.pbe.swing.KeyStrengthPanel;
 import de.truezip.kernel.key.pbe.swing.WriteKeyPanel;
