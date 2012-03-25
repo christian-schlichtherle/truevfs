@@ -4,16 +4,12 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.cio.IOEntry;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.cio.InputService;
-import de.schlichtherle.truezip.cio.InputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;

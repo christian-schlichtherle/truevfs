@@ -4,16 +4,12 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.cio.IOBuffer;
 import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
 import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.OutputBusyException;
 import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.OutputService;
-import de.schlichtherle.truezip.cio.OutputSocket;
 import de.schlichtherle.truezip.util.Maps;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

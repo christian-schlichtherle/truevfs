@@ -6,9 +6,9 @@ package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.cio.InputService;
+import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.zip.RawZipFile;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
