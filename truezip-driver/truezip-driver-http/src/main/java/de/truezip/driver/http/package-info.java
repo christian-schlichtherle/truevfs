@@ -6,4 +6,4 @@
  * Implements the {@code http(s)} scheme for read-only access to the web.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.schlichtherle.truezip.fs.http;
+package de.truezip.driver.http;

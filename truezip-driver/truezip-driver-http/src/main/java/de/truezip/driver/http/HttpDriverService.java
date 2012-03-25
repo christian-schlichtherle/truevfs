@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.http;
+package de.truezip.driver.http;
 
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.addr.FsScheme;
@@ -26,7 +26,7 @@ import javax.annotation.concurrent.Immutable;
 <tbody>
 <tr>
 <td>{@code http}, {@code https}</td>
-<td>{@link de.schlichtherle.truezip.fs.http.HttpDriver}</td>
+<td>{@link de.truezip.driver.http.HttpDriver}</td>
 </tr>
 </tbody>
 </table>

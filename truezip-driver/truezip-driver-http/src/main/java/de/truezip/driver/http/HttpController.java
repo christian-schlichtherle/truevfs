@@ -2,21 +2,24 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.fs.http;
+package de.truezip.driver.http;
 
-import de.schlichtherle.truezip.fs.addr.FsPath;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.fs.option.FsSyncOption;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
 import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.cio.Entry.Access;
 import de.schlichtherle.truezip.cio.Entry.Type;
 import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
-import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.cio.IOPool;
 import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.cio.OutputSocket;
+import de.schlichtherle.truezip.fs.FsAbstractController;
+import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsModel;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
+import de.schlichtherle.truezip.fs.addr.FsPath;
+import de.schlichtherle.truezip.fs.option.FsInputOption;
+import de.schlichtherle.truezip.fs.option.FsOutputOption;
+import de.schlichtherle.truezip.fs.option.FsSyncOption;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
