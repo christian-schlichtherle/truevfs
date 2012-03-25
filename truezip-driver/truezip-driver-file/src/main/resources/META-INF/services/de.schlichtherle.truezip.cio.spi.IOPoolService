@@ -1,2 +1,2 @@
-de.schlichtherle.truezip.fs.file.TempFilePoolService
-de.schlichtherle.truezip.fs.nio.file.TempFilePoolService
+de.truezip.driver.file.nio.TempFilePoolService
+de.truezip.driver.file.oio.TempFilePoolService

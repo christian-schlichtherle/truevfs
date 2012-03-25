@@ -19,9 +19,9 @@ public final class CompositeIOPoolService extends IOPoolService {
     private final IOPoolService service;
     {
         final IOPoolService
-                oio = new de.schlichtherle.truezip.fs.file.TempFilePoolService();
+                oio = new de.truezip.driver.file.oio.TempFilePoolService();
         final IOPoolService
-                nio = new de.schlichtherle.truezip.fs.nio.file.TempFilePoolService();
+                nio = new de.truezip.driver.file.nio.TempFilePoolService();
         service = oio.getPriority() > nio.getPriority() ? oio : nio;
     }
 

@@ -36,7 +36,7 @@
                             <artifactId>maven-surefire-plugin</artifactId>
                             <configuration>
                                 <excludes>
-                                    <exclude>**/nio/file/*Test.class</exclude>
+                                    <exclude>**/nio/*Test.class</exclude>
                                 </excludes>
                             </configuration>
                         </plugin>

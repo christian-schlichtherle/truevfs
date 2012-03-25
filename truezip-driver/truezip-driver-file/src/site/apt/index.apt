@@ -7,30 +7,30 @@
 About TrueZIP Driver FILE
 
     This module contains the file system driver service classes
-    {{{./apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.file.FileDriverService>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<de.truezip.driver.file.oio.FileDriverService>>>}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.nio.file.FileDriverService>>>}}.
+    {{{./apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriverService.html}<<<de.truezip.driver.file.nio.FileDriverService>>>}}.
 
     The class
-    {{{./apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.file.FileDriverService>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/fs/file/FileDriverService.html}<<<de.truezip.driver.file.oio.FileDriverService>>>}}
     provides the following map of file system drivers based on the
     java.io.File* API for JSE 6:
 
 *--*--*
 ||URI Schemes||File System Driver Class|
 *--+--+
-|<<<file>>>|{{{./apidocs/de/schlichtherle/truezip/fs/file/FileDriver.html}<<<de.schlichtherle.truezip.fs.file.FileDriver>>>}}|
+|<<<file>>>|{{{./apidocs/de/schlichtherle/truezip/fs/file/FileDriver.html}<<<de.truezip.driver.file.oio.FileDriver>>>}}|
 *--+--+
 
     The class
-    {{{./apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriverService.html}<<<de.schlichtherle.truezip.fs.nio.file.FileDriverService>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriverService.html}<<<de.truezip.driver.file.nio.FileDriverService>>>}}
     provides the following map of file system drivers based on the
     NIO.2 API for JSE 7 and later:
 
 *--*--*
 ||URI Schemes||File System Driver Class|
 *--+--+
-|<<<file>>>|{{{./apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriver.html}<<<de.schlichtherle.truezip.fs.nio.file.FileDriver>>>}}|
+|<<<file>>>|{{{./apidocs/de/schlichtherle/truezip/fs/nio/file/FileDriver.html}<<<de.truezip.driver.file.nio.FileDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
