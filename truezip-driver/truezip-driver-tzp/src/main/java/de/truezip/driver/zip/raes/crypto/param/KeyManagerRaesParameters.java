@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.zip.raes.crypto.param;
 
-import de.schlichtherle.truezip.key.KeyManager;
-import de.schlichtherle.truezip.key.KeyManagerProvider;
-import de.schlichtherle.truezip.key.KeyProvider;
-import de.schlichtherle.truezip.key.UnknownKeyException;
+import de.truezip.kernel.key.KeyManager;
+import de.truezip.kernel.key.KeyManagerProvider;
+import de.truezip.kernel.key.KeyProvider;
+import de.truezip.kernel.key.UnknownKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesParametersProvider;

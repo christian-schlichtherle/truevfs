@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
+import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.*;
 import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.io.LEDataOutputStream;

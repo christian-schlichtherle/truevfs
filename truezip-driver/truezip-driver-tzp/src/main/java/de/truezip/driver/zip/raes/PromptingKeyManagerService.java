@@ -5,10 +5,10 @@
 package de.truezip.driver.zip.raes;
 
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
-import de.schlichtherle.truezip.key.KeyManager;
-import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.key.PromptingKeyProvider.View;
-import de.schlichtherle.truezip.key.spi.KeyManagerService;
+import de.truezip.kernel.key.KeyManager;
+import de.truezip.kernel.key.PromptingKeyManager;
+import de.truezip.kernel.key.PromptingKeyProvider.View;
+import de.truezip.kernel.key.spi.KeyManagerService;
 import java.awt.GraphicsEnvironment;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;

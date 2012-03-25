@@ -6,9 +6,9 @@ package de.truezip.driver.zip.raes.it.path;
 
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
-import de.schlichtherle.truezip.key.MockView;
-import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
-import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
+import de.truezip.kernel.key.MockView;
+import static de.truezip.kernel.key.MockView.Action.CANCEL;
+import static de.truezip.kernel.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.nio.file.TPath;
 import de.schlichtherle.truezip.nio.file.TPathTestSuite;
 import java.io.IOException;

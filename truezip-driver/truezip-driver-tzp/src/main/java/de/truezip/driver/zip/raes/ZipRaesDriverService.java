@@ -7,7 +7,7 @@ package de.truezip.driver.zip.raes;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.addr.FsScheme;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
+import de.truezip.kernel.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.sl.IOPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;

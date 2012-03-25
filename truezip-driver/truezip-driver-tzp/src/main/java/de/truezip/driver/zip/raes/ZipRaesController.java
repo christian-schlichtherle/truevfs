@@ -7,7 +7,7 @@ package de.truezip.driver.zip.raes;
 import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.archive.zip.KeyManagerController;
+import de.truezip.driver.zip.KeyManagerController;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 

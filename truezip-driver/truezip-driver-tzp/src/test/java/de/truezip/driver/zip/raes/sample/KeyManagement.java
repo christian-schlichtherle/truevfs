@@ -16,10 +16,10 @@ import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.truezip.driver.zip.raes.PromptingKeyManagerService;
 import de.truezip.driver.zip.raes.SafeZipRaesDriver;
-import de.schlichtherle.truezip.key.PromptingKeyProvider;
-import de.schlichtherle.truezip.key.PromptingKeyProvider.Controller;
-import de.schlichtherle.truezip.key.UnknownKeyException;
-import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
+import de.truezip.kernel.key.PromptingKeyProvider;
+import de.truezip.kernel.key.PromptingKeyProvider.Controller;
+import de.truezip.kernel.key.UnknownKeyException;
+import de.truezip.kernel.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.sl.IOPoolLocator;
 
 /**

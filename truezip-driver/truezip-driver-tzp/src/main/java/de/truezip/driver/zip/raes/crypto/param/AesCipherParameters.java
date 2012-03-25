@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes.crypto.param;
 
-import de.schlichtherle.truezip.key.pbe.SafePbeParameters;
+import de.truezip.kernel.key.pbe.SafePbeParameters;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**

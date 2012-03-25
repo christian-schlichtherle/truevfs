@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.schlichtherle.truezip.crypto.CipherOutputStream;
-import de.schlichtherle.truezip.crypto.param.KeyStrength;
+import de.truezip.driver.zip.crypto.CipherOutputStream;
+import de.truezip.driver.zip.crypto.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

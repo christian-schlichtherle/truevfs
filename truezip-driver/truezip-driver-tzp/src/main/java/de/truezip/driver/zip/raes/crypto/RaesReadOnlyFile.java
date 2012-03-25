@@ -5,7 +5,7 @@
 package de.truezip.driver.zip.raes.crypto;
 
 import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
-import de.schlichtherle.truezip.crypto.CipherReadOnlyFile;
+import de.truezip.driver.zip.crypto.CipherReadOnlyFile;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;

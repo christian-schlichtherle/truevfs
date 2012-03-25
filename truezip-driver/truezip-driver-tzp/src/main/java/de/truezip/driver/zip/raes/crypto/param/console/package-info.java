@@ -4,7 +4,7 @@
  */
 /**
  * Provides the console I/O based implementation of the interface
- * {@link de.schlichtherle.truezip.key.PromptingKeyProvider.View}.
+ * {@link de.truezip.kernel.key.PromptingKeyProvider.View}.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.truezip.driver.zip.raes.crypto.param.console;

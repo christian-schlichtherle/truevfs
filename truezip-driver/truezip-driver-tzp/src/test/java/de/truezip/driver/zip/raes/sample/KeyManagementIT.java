@@ -6,7 +6,7 @@ package de.truezip.driver.zip.raes.sample;
 
 import de.schlichtherle.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.fs.archive.zip.sample.KeyManagementTestSuite;
+import de.truezip.driver.zip.sample.KeyManagementTestSuite;
 
 /**
  * @author Christian Schlichtherle

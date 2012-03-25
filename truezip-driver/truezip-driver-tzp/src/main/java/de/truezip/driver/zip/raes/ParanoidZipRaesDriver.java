@@ -5,10 +5,10 @@
 package de.truezip.driver.zip.raes;
 
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
-import de.schlichtherle.truezip.fs.archive.zip.ZipInputService;
-import de.schlichtherle.truezip.fs.archive.zip.ZipOutputService;
-import de.schlichtherle.truezip.key.KeyManagerProvider;
+import de.truezip.driver.zip.ZipDriverEntry;
+import de.truezip.driver.zip.ZipInputService;
+import de.truezip.driver.zip.ZipOutputService;
+import de.truezip.kernel.key.KeyManagerProvider;
 import de.schlichtherle.truezip.cio.IOPoolProvider;
 import de.schlichtherle.truezip.cio.OutputService;
 import java.io.IOException;

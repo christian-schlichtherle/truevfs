@@ -4,12 +4,12 @@
  */
 package de.schlichtherle.truezip.sample.file;
 
-import de.schlichtherle.truezip.crypto.raes.RaesOutputStream;
-import de.schlichtherle.truezip.crypto.raes.RaesParameters;
-import de.schlichtherle.truezip.crypto.raes.RaesReadOnlyFile;
-import de.schlichtherle.truezip.crypto.raes.param.KeyManagerRaesParameters;
+import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
+import de.truezip.driver.zip.raes.crypto.RaesParameters;
+import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.driver.zip.raes.crypto.param.KeyManagerRaesParameters;
 import de.schlichtherle.truezip.file.*;
-import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
+import de.truezip.kernel.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
