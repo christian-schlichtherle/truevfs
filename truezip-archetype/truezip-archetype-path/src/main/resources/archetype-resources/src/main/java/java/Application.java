@@ -5,7 +5,7 @@ package ${package}.java;
 
 import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
-import de.schlichtherle.truezip.file.TApplication;
+import de.truezip.file.TApplication;
 
 /**
  * An abstract class which configures the TrueZIP Path module.

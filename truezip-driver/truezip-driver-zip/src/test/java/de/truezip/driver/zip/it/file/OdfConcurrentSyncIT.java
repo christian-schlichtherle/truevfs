@@ -6,13 +6,13 @@ package de.truezip.driver.zip.it.file;
  */
 
 
-import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
+import de.truezip.file.ConcurrentSyncITSuite;
 import de.truezip.driver.zip.OdfDriver;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class OdfConcurrentSyncIT extends ConcurrentSyncTestSuite<OdfDriver> {
+public final class OdfConcurrentSyncIT extends ConcurrentSyncITSuite<OdfDriver> {
 
     @Override
     protected String getSuffixList() {

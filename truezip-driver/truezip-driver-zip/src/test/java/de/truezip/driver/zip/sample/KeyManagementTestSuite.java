@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.sample;
 
-import de.schlichtherle.truezip.file.*;
+import de.truezip.file.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.*;
 import java.util.Arrays;

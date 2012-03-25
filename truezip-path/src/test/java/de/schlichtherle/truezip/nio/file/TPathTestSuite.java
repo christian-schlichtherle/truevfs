@@ -4,10 +4,10 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.ConfiguredClientTestBase;
-import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFileTestSuite;
-import de.schlichtherle.truezip.file.TVFS;
+import de.truezip.file.ConfiguredClientTestBase;
+import de.truezip.file.TConfig;
+import de.truezip.file.TFileITSuite;
+import de.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsArchiveDriver;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.GROW;
 import de.schlichtherle.truezip.fs.FsResourceOpenException;
@@ -43,7 +43,7 @@ import org.junit.Test;
  * by using the API of the TrueZIP Path module.
  *
  * @param  <D> the type of the archive driver.
- * @see    TFileTestSuite Test suite for the TrueZIP File* API.
+ * @see    TFileITSuite Test suite for the TrueZIP File* API.
  * @author Christian Schlichtherle
  */
 public abstract class TPathTestSuite<D extends FsArchiveDriver<?>>

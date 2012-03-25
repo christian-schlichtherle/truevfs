@@ -34,10 +34,10 @@ Tutorial
 
     []
 
-* The package <<<de.schlichtherle.truezip.file>>>
+* The package <<<de.truezip.file>>>
 
     The entry point to the TrueZIP File* API is the package
-    {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.schlichtherle.truezip.file>>>}}.
+    {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.truezip.file>>>}}.
     It contains the classes
     {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
     {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},

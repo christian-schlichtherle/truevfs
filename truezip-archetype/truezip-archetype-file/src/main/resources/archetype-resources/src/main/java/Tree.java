@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
-import de.schlichtherle.truezip.file.TFile;
+import de.truezip.file.TFile;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import java.io.File;
 import java.util.Arrays;

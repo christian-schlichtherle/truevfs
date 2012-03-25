@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.tar.it.file;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.truezip.file.TFileITSuite;
 import de.schlichtherle.truezip.fs.FsArchiveDriver;
 
 /**
@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.fs.FsArchiveDriver;
  * @author Christian Schlichtherle
  */
 public abstract class TarFileITSuite<D extends FsArchiveDriver<?>>
-extends TFileTestSuite<D> {
+extends TFileITSuite<D> {
 
     /**
      * Skipped because appending to TAR files is not supported.

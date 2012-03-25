@@ -5,8 +5,8 @@
 package de.truezip.driver.zip.raes.it.file;
 
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.truezip.file.TFile;
+import de.truezip.file.TFileITSuite;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
 import de.truezip.kernel.key.MockView;
 import static de.truezip.kernel.key.MockView.Action.CANCEL;
@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class ZipRaesFileIT extends TFileTestSuite<TestZipRaesDriver> {
+public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
 
     private MockView<AesCipherParameters> view;
 

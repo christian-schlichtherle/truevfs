@@ -5,8 +5,8 @@
 package de.truezip.driver.zip.sample;
 
 import de.truezip.driver.zip.crypto.param.AesKeyStrength;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TConfig;
+import de.truezip.file.TArchiveDetector;
+import de.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsModel;

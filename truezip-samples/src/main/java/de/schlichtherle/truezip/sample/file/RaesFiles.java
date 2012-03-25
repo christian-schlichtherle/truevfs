@@ -8,7 +8,7 @@ import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
 import de.truezip.driver.zip.raes.crypto.param.KeyManagerRaesParameters;
-import de.schlichtherle.truezip.file.*;
+import de.truezip.file.*;
 import de.truezip.kernel.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;

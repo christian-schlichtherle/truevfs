@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.schlichtherle.truezip.file.TConfig;
+import de.truezip.file.TConfig;
 import de.schlichtherle.truezip.nio.file.TPath;
 import java.io.IOException;
 import java.nio.file.Files;

@@ -210,7 +210,7 @@ Using TrueZIP File*
 
     If these restrictions cannot be respected for some reason, an application
     may call <<<TVFS.umount()>>>,
-    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount(de.schlichtherle.truezip.file.TFile)}<<<TVFS.umount(TFile)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount(de.truezip.file.TFile)}<<<TVFS.umount(TFile)>>>}}
     or any of their many variants and incarnations (e.g.
     {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.fs.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
     in order to commit all changes and finally unmount the archive files.

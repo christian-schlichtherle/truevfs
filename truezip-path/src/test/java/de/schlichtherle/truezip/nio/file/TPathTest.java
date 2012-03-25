@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.MockArchiveDriverTestBase;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TConfig;
+import de.truezip.file.MockArchiveDriverTestBase;
+import de.truezip.file.TArchiveDetector;
+import de.truezip.file.TConfig;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.schlichtherle.truezip.fs.addr.FsPath;

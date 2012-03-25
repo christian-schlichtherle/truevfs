@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
-import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileWriter;
+import de.truezip.file.TFile;
+import de.truezip.file.TFileWriter;
 import java.io.IOException;
 import java.io.Writer;
 

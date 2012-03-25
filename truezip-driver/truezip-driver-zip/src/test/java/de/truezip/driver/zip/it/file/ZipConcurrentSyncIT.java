@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.it.file;
 
-import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
+import de.truezip.file.ConcurrentSyncITSuite;
 import de.truezip.driver.zip.ZipDriver;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class ZipConcurrentSyncIT extends ConcurrentSyncTestSuite<ZipDriver> {
+public final class ZipConcurrentSyncIT extends ConcurrentSyncITSuite<ZipDriver> {
 
     @Override
     protected String getSuffixList() {

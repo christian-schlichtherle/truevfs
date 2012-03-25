@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
-import de.schlichtherle.truezip.file.TApplication;
+import de.truezip.file.TApplication;
 import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 

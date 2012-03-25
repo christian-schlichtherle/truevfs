@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.it.file;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.truezip.file.TFileITSuite;
 import de.truezip.driver.zip.TestWinZipAesDriver;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
+public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
     @Override
     protected String getSuffixList() {
         return "zip";

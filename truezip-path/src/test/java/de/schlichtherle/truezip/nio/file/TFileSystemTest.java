@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.MockArchiveDriverTestBase;
+import de.truezip.file.MockArchiveDriverTestBase;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import java.io.IOException;
 import java.net.URI;

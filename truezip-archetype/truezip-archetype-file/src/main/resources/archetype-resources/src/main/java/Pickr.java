@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
-import de.schlichtherle.truezip.file.swing.TFileChooser;
+import de.truezip.file.swing.TFileChooser;
 import javax.swing.SwingUtilities;
 
 /**
