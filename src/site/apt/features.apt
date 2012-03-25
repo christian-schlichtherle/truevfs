@@ -21,9 +21,9 @@ Key Features
         provide convenient and transparent read/write access to archive files
         as if they were just plain directories.
         For example, by using the classes
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
-        {{{./apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
-        {{{./apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+        {{{./apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
+        {{{./apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
+        {{{./apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
         et al, you can instantly access ZIP files, TAR files and their
         relatives or your own
         {{{./usecases/aff.html}application file format}} or even your own
@@ -35,14 +35,14 @@ Key Features
         This enables you to read and write entries in nested archive files,
         e.g. you could write the manifest entry of a JAR file within a WAR file
         in the current directory simply by using
-        <<<new {{{./apidocs/de/schlichtherle/truezip/file/TFileWriter.html}TFileWriter}}("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")>>>
+        <<<new {{{./apidocs/de/truezip/file/TFileWriter.html}TFileWriter}}("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")>>>
 
     [Fast Bulk I/O]
         The client API module {{{./truezip-file/index.html}TrueZIP&#160;File*}}
         provides convenient and powerful methods for fast bulk I/O operations
         like file or directory tree copying, moving, deleting, traversing etc.
         For example, by using the multi-threaded method
-        {{{./apidocs/de/schlichtherle/truezip/file/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
+        {{{./apidocs/de/truezip/file/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
         you'll never need to use a naive read-stop-write-stop-loop again.
 
     [Modular Architecture]
@@ -53,7 +53,7 @@ Key Features
 
     [Pluggable File System Drivers]
         TrueZIP can support virtually any file system type via its pluggable 
-        {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system driver}}
+        {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}file system driver}}
         architecture in the driver tier.
         TrueZIP ships with file system drivers for the file system schemes
         FILE, HTTP(S), ZIP, TAR and their relatives like JAR, TGZ, TBZ2 etc.

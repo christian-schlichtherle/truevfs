@@ -7,12 +7,12 @@
 About TrueZIP Path
 
     This module provides the
-    {{{./apidocs/de/schlichtherle/truezip/nio/file/TPath.html}<<<TPath>>>}}
+    {{{./apidocs/de/truezip/path/TPath.html}<<<TPath>>>}}
     class
     for simple, uniform, transparent, thread-safe, read/write access to archive
     files as if they were virtual directories in a file system path.
     It also provides the
-    {{{./apidocs/de/schlichtherle/truezip/nio/file/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
+    {{{./apidocs/de/truezip/path/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
     class to implement a file system provider for the NIO.2 API (JSR 203) in
     JSE&#160;7.
 
@@ -32,7 +32,7 @@ About TrueZIP Path
 
     For example, an application could access an entry within an archive
     file which is located at a web site using a
-    {{{./apidocs/de/schlichtherle/truezip/nio/file/TPath.html}<<<TPath>>>}}
+    {{{./apidocs/de/truezip/path/TPath.html}<<<TPath>>>}}
     like this:
 
 +--+
@@ -54,8 +54,8 @@ try (InputStream in = Files.newInputStream(path)) {
     {{{../kick-start/index.html}Kick-Starting TrueZIP}} section.
     You might also want to
     {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
-    the source code of the
-    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+    the source code of the module
+    {{{../truezip-samples/index.html}TrueZIP Samples}}.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/de/schlichtherle/truezip/nio/file/package-summary.html}<<<de.truezip.path>>>}}
+    {{{./apidocs/de/truezip/path/package-summary.html}<<<de.truezip.path>>>}}

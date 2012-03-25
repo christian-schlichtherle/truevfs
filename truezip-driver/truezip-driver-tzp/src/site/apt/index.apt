@@ -7,13 +7,13 @@
 About TrueZIP Driver ZIP.RAES (TZP)
 
     This module contains the file system driver service class
-    {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ZipRaesDriverService.html}ZipRaesDriverService}}
+    {{{./apidocs/de/truezip/driver/zip/raes/ZipRaesDriverService.html}ZipRaesDriverService}}
     which provides the following map of file system drivers:
 
 *--*--*
 ||URI Schemes / Archive File Suffixes||File System Driver Class|
 *--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
@@ -21,7 +21,7 @@ About TrueZIP Driver ZIP.RAES (TZP)
     client API modules.
     The URI schemes will then get recognized as default archive file suffixes
     by the class
-    {{{../../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
 
 * Key Features
 
@@ -84,9 +84,9 @@ About TrueZIP Driver ZIP.RAES (TZP)
         ZIP.RAES files at the expense of authentication strength due to the
         frequent collisions of CRC-32 values.
         This strategy is configurable by selecting either the
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+        {{{./apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
         or the
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
 
     [Fast Access]
         RAES Type 0 uses CTR mode.

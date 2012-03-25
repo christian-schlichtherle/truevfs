@@ -72,16 +72,10 @@ Welcome!
 
     * If you are going to write a federated file system driver
       (i.e. archive driver), please consult the Javadoc for
-      {{{./apidocs/de/schlichtherle/truezip/fs/archive/FsArchiveDriver.html}<<<de.truezip.kernel.fs.archive.FsArchiveDriver>>>}}.
+      {{{./apidocs/de/truezip/kernel/fs/FsArchiveDriver.html}<<<de.truezip.kernel.fs.FsArchiveDriver>>>}}.
 
     * If you are going to write a non-federated file system driver,
       please consult the Javadoc for
-      {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<de.truezip.kernel.fs.FsDriver>>>}}.
+      {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}<<<de.truezip.kernel.fs.FsDriver>>>}}.
 
     []
-
-    For sample code, please
-    {{{./source-repository.html}check out}} or
-    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
-    the source code of this project and consult the file system driver
-    implementations which ship with TrueZIP, e.g. TrueZIP Driver FILE or TrueZIP Driver ZIP.

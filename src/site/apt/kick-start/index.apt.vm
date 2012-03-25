@@ -46,8 +46,8 @@ Getting Started
     If you are looking for more sample code and applications, then please
     {{{../source-repository.html}check out}} or
     {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
-    the source code of the
-    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+    the source code of the module
+    {{{../truezip-samples/index.html}TrueZIP Samples}}.
 
 * Tutorial (new)
 

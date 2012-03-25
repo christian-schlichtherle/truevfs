@@ -57,13 +57,13 @@ Concepts
     driver modules - no XML or property file editing is required.
 
     The application can simply accept this
-    {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}initial setup}}
+    {{{./apidocs/de/truezip/file/TArchiveDetector.html#ALL}initial setup}}
     of the
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector()}archive detection}}
+    {{{./apidocs/de/truezip/file/TConfig.html#getArchiveDetector()}archive detection}}
     in its 
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#get()}current configuration}}
+    {{{./apidocs/de/truezip/file/TConfig.html#get()}current configuration}}
     or it can
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}explicitly override}}
+    {{{./apidocs/de/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}explicitly override}}
     it.
     Check the {{{./faq.html#file}FAQ}} for the
     {{{./truezip-file/index.html}TrueZIP File*}}
@@ -76,17 +76,17 @@ Concepts
     the
     {{{./truezip-kernel/index.html}TrueZIP Kernel}}
     module provides service locator singletons for the
-    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsManagerLocator.html}file system manager}},
+    {{{./apidocs/de/truezip/kernel/sl/FsManagerLocator.html}file system manager}},
     the
-    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system drivers}}
+    {{{./apidocs/de/truezip/kernel/sl/FsDriverLocator.html}file system drivers}}
     and the
-    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}temporary I/O entry pool}}.
+    {{{./apidocs/de/truezip/kernel/sl/IOPoolLocator.html}temporary I/O entry pool}}.
 
     File system drivers may add additional service locators singletons.
     For example, the
     {{{./truezip-driver/truezip-driver-tzp/index.html}TrueZIP Driver ZIP.RAES (TZP)}}
     module adds another service locator singleton for the
-    {{{./apidocs/de/schlichtherle/truezip/key/sl/KeyManagerLocator.html}key manager}}
+    {{{./apidocs/de/truezip/kernel/sl/KeyManagerLocator.html}key manager}}
     which obtains passwords or key files required to encrypt and decrypt
     RAES encrypted ZIP files.
 
@@ -122,10 +122,10 @@ Concepts
     which is a key requirement for most TrueZIP Kernel classes.
 
     For example, the classes
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsPath.html}<<<FsPath>>>}},
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsMountPoint.html}<<<FsMountPoint>>>}}
+    {{{./apidocs/de/truezip/kernel/fs/addr/FsPath.html}<<<FsPath>>>}},
+    {{{./apidocs/de/truezip/kernel/fs/addr/FsMountPoint.html}<<<FsMountPoint>>>}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsEntryName.html}<<<FsEntryName>>>}}
+    {{{./apidocs/de/truezip/kernel/fs/addr/FsEntryName.html}<<<FsEntryName>>>}}
     are immutable so that their instances can get safely shared among many
     objects and threads.
 
@@ -135,9 +135,9 @@ Concepts
     implementation classes in order to ease exchanging implementation classes.
 
     For example, the abstract classes
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsModel.html}<<<FsModel>>>}}
+    {{{./apidocs/de/truezip/kernel/fs/FsModel.html}<<<FsModel>>>}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsController.html}<<<FsController>>>}}
+    {{{./apidocs/de/truezip/kernel/fs/FsController.html}<<<FsController>>>}}
     participate in a variant of the MVC design pattern which is known as the
     Front Controller design pattern.
     The numerous implementation classes participate in the different file
@@ -171,9 +171,9 @@ Concepts
     reduced as much as reasonable in order to ease implementation classes.
 
     For example, the abstract class
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}<<<FsDriver>>>}}
+    {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}<<<FsDriver>>>}}
     consists of only one abstract method
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html#newController(de.schlichtherle.fs.FsModel,de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    {{{./apidocs/de/truezip/kernel/fs/FsDriver.html#newController(de.schlichtherle.fs.FsModel,de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
     which needs to get implemented in any file system driver module.    
 
 ** Composition Over Inheritance

@@ -7,19 +7,19 @@
 About TrueZIP Driver ZIP
 
     This module contains the file system driver service class
-    {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriverService.html}ZipDriverService}}
+    {{{./apidocs/de/truezip/driver/zip/ZipDriverService.html}ZipDriverService}}
     which provides the following map of file system drivers:
 
 *--*--*
 ||URI Schemes / Archive File Suffixes||File System Driver Class|
 *--+--+
-|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}|
+|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{./apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
 *--+--+
-|<<<exe>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
+|<<<exe>>>|{{{./apidocs/de/truezip/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
 *--+--+
-|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/OdfDriver.html}<<<OdfDriver>>>}}|
+|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/de/truezip/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
 *--+--+
-|<<<zip>>>|{{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html}<<<ZipDriver>>>}}|
+|<<<zip>>>|{{{./apidocs/de/truezip/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
@@ -27,7 +27,7 @@ About TrueZIP Driver ZIP
     client API modules.
     The URI schemes will then get recognized as default archive file suffixes
     by the class
-    {{{../../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
 
 * Key Features
 
@@ -36,12 +36,12 @@ About TrueZIP Driver ZIP
         API with a file system driver or the ZIP classes directly.
 
         To use this feature with a client API, set
-        {{{./apidocs/de/schlichtherle/truezip/fs/FsOutputOption.html#GROW}<<<FsOutputOption.GROW>>>}},
+        {{{./apidocs/de/truezip/kernel/fs/option/FsOutputOption.html#GROW}<<<FsOutputOption.GROW>>>}},
         e.g. in
-        {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
+        {{{./apidocs/de/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,de.truezip.driver.zip.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,de.truezip.driver.zip.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
 
     [Recovery Of Lost ZIP Entries]
         When reading truncated ZIP files, lost entries can get recovered.
@@ -51,7 +51,7 @@ About TrueZIP Driver ZIP
         for reading ZIP files.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipFile.html#recoverLostEntries()}<<<ZipFile.recoverLostEntries()>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/io/ZipFile.html#recoverLostEntries()}<<<ZipFile.recoverLostEntries()>>>}}.
 
     [WinZip AES Specification]
         When reading or writing a ZIP file, ZIP entry data can get encrypted
@@ -59,29 +59,29 @@ About TrueZIP Driver ZIP
         {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES specification}}.
 
         To use this feature with a client API, set
-        {{{./apidocs/de/schlichtherle/truezip/fs/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
+        {{{./apidocs/de/truezip/kernel/fs/option/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
         e.g. in
-        {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
+        {{{./apidocs/de/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
         or
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which sets this option before calling its super-class implementation in
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#newEntry(java.lang.String,de.truezip.kernel.fs.entry.Entry.Type,de.truezip.kernel.fs.entry.Entry,de.truezip.kernel.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#newEntry(java.lang.String,de.truezip.kernel.fs.entry.Entry.Type,de.truezip.kernel.fs.entry.Entry,de.truezip.kernel.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
         In either case, if you don't want to use the built-in
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
+        {{{./apidocs/de/truezip/driver/zip/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
         for prompting the user for a password using a Swing GUI or the console,
         then you should override
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#zipCryptoParameters(de.truezip.kernel.fs.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
+        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#zipCryptoParameters(de.truezip.kernel.fs.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
         in order to provide custom
-        {{{./apidocs/de/schlichtherle/truezip/zip/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
+        {{{./apidocs/de/truezip/driver/zip/io/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
         too.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipEntry.html#setEncrypted(boolean)}<<<ZipEntry.setEncrypted(boolean)>>>}}
+        {{{./apidocs/de/truezip/driver/zip/io/ZipEntry.html#setEncrypted(boolean)}<<<ZipEntry.setEncrypted(boolean)>>>}}
         first.
         Then call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipFile.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{./apidocs/de/truezip/driver/zip/io/ZipFile.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
         or
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{./apidocs/de/truezip/driver/zip/io/ZipOutputStream.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
         respectively.
 
         Note that the WinZip AES encryption scheme does <not> encrypt and <not>
@@ -100,11 +100,11 @@ About TrueZIP Driver ZIP
         a client API,
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which overrides
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#getMethod()}<<<ZipDriver.getMethod()>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#getMethod()}<<<ZipDriver.getMethod()>>>}}.
 
         To use this feature for writing a BZIP2 compressed ZIP entry with
         the ZIP API, call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipEntry.html#setMethod(int)}<<<ZipEntry.setMethod(int)>>>}}
+        {{{./apidocs/de/truezip/driver/zip/io/ZipEntry.html#setMethod(int)}<<<ZipEntry.setMethod(int)>>>}}
 
     [Selectable Character Sets]
         The character set for reading and writing ZIP comments and ZIP entry
@@ -114,19 +114,19 @@ About TrueZIP Driver ZIP
         To use this feature with a client API,
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which overrides
-        {{{./apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html#getCharset()}<<<ZipDriver.getCharset()>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#getCharset()}<<<ZipDriver.getCharset()>>>}}.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,java.nio.charset.Charset)}<<<ZipOutputStream(OutputStream, Charset)>>>}}
+        {{{./apidocs/de/truezip/driver/zip/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,java.nio.charset.Charset)}<<<ZipOutputStream(OutputStream, Charset)>>>}}
         or
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipFile.html#ZipFile(java.io.File,java.nio.charset.Charset)}<<<ZipFile(File, Charset)>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/io/ZipFile.html#ZipFile(java.io.File,java.nio.charset.Charset)}<<<ZipFile(File, Charset)>>>}}.
 
     [External File Attributes]
         External file attributes can get used to set executable bits for third
         party tools, etc.
         This requires direct use of the ZIP classes.
         See
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipEntry.html#setExternalAttributes(long)}<<<ZipEntry.setExternalAttributes(long)>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/io/ZipEntry.html#setExternalAttributes(long)}<<<ZipEntry.setExternalAttributes(long)>>>}}.
 
     [ZIP64 Extensions]
         ZIP64 extensions are automatically and transparently activated when

@@ -19,7 +19,7 @@ TFile[] entries = new TFile("archive.zip").listFiles();
 
     Indexing the contents of any entry within an archive file works exactly the
     same way as it would work for plain files in the file system by using the
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}
     class
 
 +--+

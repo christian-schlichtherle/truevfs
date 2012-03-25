@@ -26,7 +26,7 @@ About TrueZIP File*
 
     For example, an application could access an entry within an archive
     file using a
-    {{{./apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{./apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
     like this:
 
 +--+
@@ -50,11 +50,11 @@ try {
     {{{../kick-start/index.html}Kick-Starting TrueZIP}} section.
     You might also want to
     {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
-    the source code of the
-    {{{../truezip-samples/index.html}TrueZIP Samples}} module.
+    the source code of the module
+    {{{../truezip-samples/index.html}TrueZIP Samples}}.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.truezip.file>>>}}
+    {{{./apidocs/de/truezip/file/package-summary.html}<<<de.truezip.file>>>}}
 
 * Swing GUI
 
@@ -62,4 +62,4 @@ try {
     and choosing entries in archive files.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/de/schlichtherle/truezip/file/swing/package-summary.html}<<<de.truezip.file.swing>>>}}
+    {{{./apidocs/de/truezip/file/swing/package-summary.html}<<<de.truezip.file.swing>>>}}

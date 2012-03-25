@@ -46,7 +46,7 @@ $title
     {{{../truezip-file/index.html}TrueZIP File*}},
     here's your relief:
     The
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
     class extends the <<<java.io.File>>> class in order to add the
     required functionality.
 

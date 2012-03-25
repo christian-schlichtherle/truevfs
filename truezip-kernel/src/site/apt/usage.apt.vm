@@ -19,13 +19,13 @@ TrueZIP Kernel Usage
     {{{../truezip-file/index.html}TrueZIP File*}},
     the API of this module is more complex to use, yet very extensible because
     it relies on Dependency Injection for the resolution of
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}}
+    {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}file system drivers}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/socket/IOPool.html}I/O entry pools}}.
+    {{{./apidocs/de/truezip/kernel/cio/IOPool.html}I/O entry pools}}.
     It also provides service locators for
-    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system driver providers}}
+    {{{./apidocs/de/truezip/kernel/sl/FsDriverLocator.html}file system driver providers}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}I/O entry pool providers}}
+    {{{./apidocs/de/truezip/kernel/sl/IOPoolLocator.html}I/O entry pool providers}}
     in order to enable applications to resolve these dependencies easily at
     runtime.
 
@@ -76,7 +76,7 @@ $ cat fileA fileB
     Here's how to copy the contents of the path name parameter <<<resource>>>
     to the standard output using the API of the module TrueZIP File*:
 
-%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/PathCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/truezip/file/sample/PathCat.java}
 
     Suppose that the modules TrueZIP Driver ZIP
     (Maven artifactId <<<truezip-driver-zip>>>) and TrueZIP Driver File
@@ -99,7 +99,7 @@ $ cat fileA fileB
     If an application needs to address URIs, too, then the following code
     could be used instead:
 
-%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/schlichtherle/truezip/file/sample/UriCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/truezip/file/sample/UriCat.java}
 
     Using the same configuration like before, the following URIs could now be
     addressed with the code above:
@@ -126,7 +126,7 @@ $ cat fileA fileB
     Now for comparison, let's implement the same functionality using the API
     of the module TrueZIP Kernel.
 
-%{snippet|id=cat|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/fs/sample/Cat.java}
+%{snippet|id=cat|file=${project.build.testSourceDirectory}/de/truezip/kernel/fs/sample/Cat.java}
 
     Using the same configuration like before, this code could access the same
     URIs than before.

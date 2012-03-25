@@ -56,6 +56,6 @@ TVFS.umount();
     total number of archive entries.
 
     For more information, please refer to the Javadoc for
-    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
+    {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
 
 #end ## cleaningUp
