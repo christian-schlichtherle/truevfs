@@ -4,18 +4,18 @@
  */
 package de.truezip.driver.tar;
 
-import static de.schlichtherle.truezip.cio.Entry.Access.WRITE;
-import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import de.schlichtherle.truezip.cio.Entry.Type;
-import de.schlichtherle.truezip.cio.*;
-import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.COMPRESS;
-import de.schlichtherle.truezip.util.BitField;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsCharsetArchiveDriver;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import static de.truezip.kernel.fs.option.FsOutputOption.COMPRESS;
+import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;

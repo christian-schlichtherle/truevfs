@@ -5,7 +5,7 @@
 package de.truezip.driver.zip;
 
 import de.truezip.driver.zip.crypto.param.AesKeyStrength;
-import de.schlichtherle.truezip.fs.FsModel;
+import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.key.KeyManager;
 import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.KeyProvider;

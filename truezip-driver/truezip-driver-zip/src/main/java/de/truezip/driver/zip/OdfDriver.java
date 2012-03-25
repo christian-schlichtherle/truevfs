@@ -4,11 +4,11 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.cio.MultiplexedOutputService;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.OutputService;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.cio.MultiplexedOutputService;
+import de.truezip.kernel.cio.IOPool;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.OutputService;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;

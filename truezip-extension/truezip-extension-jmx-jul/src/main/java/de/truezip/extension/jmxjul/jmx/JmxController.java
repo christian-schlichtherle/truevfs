@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.fs.FsController;
+import de.truezip.kernel.fs.FsController;
 import de.truezip.extension.jmxjul.InstrumentingController;
 
 /**

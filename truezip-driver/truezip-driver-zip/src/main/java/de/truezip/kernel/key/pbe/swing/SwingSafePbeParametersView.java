@@ -11,7 +11,7 @@ import de.truezip.kernel.key.PromptingKeyProvider.Controller;
 import de.truezip.kernel.key.UnknownKeyException;
 import de.truezip.kernel.key.pbe.SafePbeParameters;
 import de.truezip.kernel.key.pbe.SafePbeParametersView;
-import de.schlichtherle.truezip.util.ServiceLocator;
+import de.truezip.kernel.util.ServiceLocator;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.EOFException;

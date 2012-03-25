@@ -4,11 +4,11 @@
  */
 package de.truezip.driver.http;
 
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsModel;
+import de.truezip.kernel.cio.IOPool;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.fs.FsModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;

@@ -4,9 +4,9 @@
  */
 package de.truezip.extension.jmxjul;
 
-import de.schlichtherle.truezip.cio.DecoratingInputSocket;
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.cio.InputSocket;
+import de.truezip.kernel.cio.DecoratingInputSocket;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.InputSocket;
 import javax.annotation.concurrent.Immutable;
 
 /**

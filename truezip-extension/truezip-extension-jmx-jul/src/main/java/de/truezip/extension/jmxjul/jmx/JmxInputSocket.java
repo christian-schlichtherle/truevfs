@@ -4,10 +4,10 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.cio.Entry;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.extension.jmxjul.InstrumentingInputSocket;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.cio.InputSocket;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.cio.InputSocket;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.concurrent.Immutable;

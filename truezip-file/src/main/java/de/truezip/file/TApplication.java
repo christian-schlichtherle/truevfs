@@ -4,18 +4,18 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncWarningException;
-//import de.schlichtherle.truezip.fs.archive.tar.TarBZip2Driver;
-//import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
-//import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
-//import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
-//import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
-//import de.schlichtherle.truezip.fs.archive.zip.raes.ParanoidZipRaesDriver;
-//import de.schlichtherle.truezip.fs.archive.zip.raes.SafeZipRaesDriver;
-//import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
-//import de.schlichtherle.truezip.socket.spi.ByteArrayIOPoolService;
-//import de.schlichtherle.truezip.socket.sl.IOPoolLocator;
+import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.fs.FsSyncWarningException;
+//import de.truezip.kernel.cio.spi.ByteArrayIOPoolService;
+//import de.truezip.kernel.fs.archive.tar.TarBZip2Driver;
+//import de.truezip.kernel.fs.archive.tar.TarDriver;
+//import de.truezip.kernel.fs.archive.tar.TarGZipDriver;
+//import de.truezip.kernel.fs.archive.zip.JarDriver;
+//import de.truezip.kernel.fs.archive.zip.ZipDriver;
+//import de.truezip.kernel.fs.archive.zip.raes.ParanoidZipRaesDriver;
+//import de.truezip.kernel.fs.archive.zip.raes.SafeZipRaesDriver;
+//import de.truezip.kernel.key.sl.KeyManagerLocator;
+//import de.truezip.kernel.sl.IOPoolLocator;
 
 /**
  * A template class which aids in establishing the typical

@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.tar;
 
-import de.schlichtherle.truezip.fs.FsCharsetArchiveDriverTestSuite;
+import de.truezip.kernel.fs.FsCharsetArchiveDriverTestSuite;
 import de.truezip.driver.tar.TarDriverEntry;
 import de.truezip.driver.tar.TarGZipDriver;
 

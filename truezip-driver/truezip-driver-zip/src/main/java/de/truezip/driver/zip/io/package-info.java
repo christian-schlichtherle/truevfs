@@ -68,7 +68,7 @@
  *     </ol>
  * <li>{@link de.truezip.driver.zip.io.ZipFile} supports reading archive
  *     data from the random access read only interface
- *     {@link de.schlichtherle.truezip.rof.ReadOnlyFile}, which allows to read
+ *     {@link de.truezip.kernel.rof.ReadOnlyFile}, which allows to read
  *     archive data from composite data sources like e.g. RAES encrypted ZIP
  *     files directly without the need to decrypt them to a temporary file
  *     first.

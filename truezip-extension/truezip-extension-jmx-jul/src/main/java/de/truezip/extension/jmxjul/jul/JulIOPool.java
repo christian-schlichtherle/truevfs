@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jul;
 
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.cio.IOPool;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.cio.IOPool;
 import de.truezip.extension.jmxjul.InstrumentingIOPool;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;

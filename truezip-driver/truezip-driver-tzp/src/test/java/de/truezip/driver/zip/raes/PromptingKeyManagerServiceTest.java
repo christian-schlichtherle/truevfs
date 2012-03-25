@@ -4,6 +4,7 @@
  */
 package de.truezip.driver.zip.raes;
 
+import de.truezip.driver.zip.raes.key.PromptingKeyManagerService;
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
 import de.truezip.kernel.key.spi.KeyManagerService;
 import static org.junit.Assert.assertNotNull;

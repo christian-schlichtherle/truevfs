@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.fs.FsArchiveEntry;
+import de.truezip.kernel.fs.FsArchiveEntry;
 import de.truezip.driver.zip.io.ZipEntry;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;

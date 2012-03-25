@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.cio.IOPool;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.cio.IOPool;
 import de.truezip.extension.jmxjul.InstrumentingIOPool;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;

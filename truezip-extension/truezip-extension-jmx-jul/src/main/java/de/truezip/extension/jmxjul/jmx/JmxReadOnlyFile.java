@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.truezip.kernel.rof.DecoratingReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import javax.annotation.WillCloseWhenClosed;

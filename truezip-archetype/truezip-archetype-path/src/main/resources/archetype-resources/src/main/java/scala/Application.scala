@@ -4,8 +4,8 @@
 package ${package}.scala
 
 import de.truezip.file.TApplication
-import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback
-import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback
+import de.truezip.kernel.key.pbe.swing.HurlingWindowFeedback
+import de.truezip.kernel.key.pbe.swing.InvalidKeyFeedback
 
 /**
  * An abstract class which configures the TrueZIP Path module.

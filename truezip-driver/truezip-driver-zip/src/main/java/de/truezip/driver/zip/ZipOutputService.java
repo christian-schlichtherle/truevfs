@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip;
 
-import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import de.schlichtherle.truezip.cio.*;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.util.JointIterator;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.OutputBusyException;
+import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.util.JointIterator;
 import de.truezip.driver.zip.io.RawZipOutputStream;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import static de.truezip.driver.zip.io.ZipEntry.STORED;

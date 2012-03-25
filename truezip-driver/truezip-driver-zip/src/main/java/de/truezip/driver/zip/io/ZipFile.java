@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.io.LockInputStream;
-import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.util.Pool;
+import de.truezip.kernel.io.LockInputStream;
+import de.truezip.kernel.rof.DefaultReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.util.Pool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * archives.
  * <p>
  * Note that the entries returned by this class are instances of
- * {@code de.schlichtherle.truezip.io.zip.ZipEntry} instead of
+ * {@code de.truezip.kernel.io.zip.ZipEntry} instead of
  * {@code java.util.zip.ZipEntry}.
  *
  * @see    ZipOutputStream

@@ -4,19 +4,19 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.cio.Entry;
-import static de.schlichtherle.truezip.cio.Entry.Type.SPECIAL;
-import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import static de.schlichtherle.truezip.fs.addr.FsEntryName.ROOT;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.fs.option.FsSyncOption;
+import de.truezip.kernel.cio.Entry;
+import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
+import de.truezip.kernel.fs.*;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.key.KeyManager;
 import de.truezip.kernel.key.KeyProvider;
 import de.truezip.kernel.key.SafeKeyManager;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
+import de.truezip.kernel.util.BitField;
+import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
 import java.net.URI;
 import javax.annotation.CheckForNull;

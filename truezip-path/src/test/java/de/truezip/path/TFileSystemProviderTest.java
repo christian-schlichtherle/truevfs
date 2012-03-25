@@ -5,11 +5,11 @@
 package de.truezip.path;
 
 import de.truezip.file.MockArchiveDriverTestBase;
-import de.schlichtherle.truezip.fs.addr.FsMountPoint;
+import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.path.TFileSystem;
 import de.truezip.path.TFileSystemProvider;
 import de.truezip.path.TPath;
-import static de.schlichtherle.truezip.fs.addr.FsUriModifier.CANONICALIZE;
+import static de.truezip.kernel.fs.addr.FsUriModifier.CANONICALIZE;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;

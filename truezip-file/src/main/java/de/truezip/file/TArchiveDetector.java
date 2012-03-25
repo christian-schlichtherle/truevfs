@@ -4,14 +4,14 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsAbstractCompositeDriver;
-import de.schlichtherle.truezip.fs.FsDriver;
-import de.schlichtherle.truezip.fs.FsDriverProvider;
-import de.schlichtherle.truezip.fs.addr.FsScheme;
-import de.schlichtherle.truezip.sl.FsDriverLocator;
-import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import de.schlichtherle.truezip.util.SuffixSet;
+import de.truezip.kernel.fs.FsAbstractCompositeDriver;
+import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.fs.FsDriverProvider;
+import de.truezip.kernel.fs.addr.FsScheme;
+import de.truezip.kernel.sl.FsDriverLocator;
+import de.truezip.kernel.fs.spi.FsDriverService;
+import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.kernel.util.SuffixSet;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;

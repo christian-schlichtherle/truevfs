@@ -4,12 +4,12 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
-import de.schlichtherle.truezip.rof.IntervalReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
-import de.schlichtherle.truezip.util.Pool;
+import de.truezip.kernel.rof.BufferedReadOnlyFile;
+import de.truezip.kernel.rof.IntervalReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFileInputStream;
+import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.kernel.util.Pool;
 import static de.truezip.driver.zip.io.Constants.*;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static de.truezip.driver.zip.io.LittleEndian.*;

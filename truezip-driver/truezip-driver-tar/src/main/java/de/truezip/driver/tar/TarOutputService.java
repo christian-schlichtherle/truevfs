@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.tar;
 
-import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
-import de.schlichtherle.truezip.cio.*;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.util.Maps;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import static de.truezip.kernel.cio.Entry.UNKNOWN;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.OutputBusyException;
+import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.util.Maps;
+import static de.truezip.kernel.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;

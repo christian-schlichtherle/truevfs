@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.http;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;

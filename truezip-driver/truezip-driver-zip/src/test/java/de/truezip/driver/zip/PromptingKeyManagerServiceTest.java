@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.driver.zip.PromptingKeyManagerService;
+import de.truezip.driver.zip.key.PromptingKeyManagerService;
 import de.truezip.kernel.key.pbe.AesPbeParameters;
 import de.truezip.kernel.key.spi.KeyManagerService;
 import static org.junit.Assert.assertNotNull;

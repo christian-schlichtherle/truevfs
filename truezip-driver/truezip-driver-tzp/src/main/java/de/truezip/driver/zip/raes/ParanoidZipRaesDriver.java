@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.schlichtherle.truezip.fs.FsModel;
+import de.truezip.kernel.fs.FsModel;
 import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.ZipOutputService;
 import de.truezip.kernel.key.KeyManagerProvider;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.OutputService;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.OutputService;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;

@@ -7,8 +7,8 @@ package de.truezip.driver.zip;
 import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.MockView;
 import de.truezip.kernel.key.pbe.AesPbeParameters;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.truezip.driver.zip.PromptingKeyManagerService;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.driver.zip.key.PromptingKeyManagerService;
 import de.truezip.driver.zip.ZipDriver;
 
 /**

@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.util.JSE7;
+import de.truezip.kernel.util.JSE7;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;

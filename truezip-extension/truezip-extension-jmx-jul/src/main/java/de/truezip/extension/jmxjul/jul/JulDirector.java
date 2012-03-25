@@ -4,17 +4,17 @@
  */
 package de.truezip.extension.jmxjul.jul;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.fs.FsController;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.fs.FsController;
 import de.truezip.extension.jmxjul.InstrumentingCompositeDriver;
 import de.truezip.extension.jmxjul.InstrumentingController;
 import de.truezip.extension.jmxjul.InstrumentingDirector;
 import de.truezip.extension.jmxjul.InstrumentingManager;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.util.JSE7;
+import de.truezip.kernel.cio.IOPool;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.util.JSE7;
 import javax.annotation.concurrent.Immutable;
 
 /**

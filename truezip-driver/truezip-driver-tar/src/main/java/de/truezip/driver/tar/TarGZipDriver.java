@@ -4,16 +4,16 @@
  */
 package de.truezip.driver.tar;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.STORE;
-import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import static de.truezip.kernel.fs.option.FsOutputOption.STORE;
+import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

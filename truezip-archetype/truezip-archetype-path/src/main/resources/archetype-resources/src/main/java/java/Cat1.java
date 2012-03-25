@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.schlichtherle.truezip.io.Streams;
+import de.truezip.kernel.io.Streams;
 import de.truezip.path.TPath;
 import java.io.IOException;
 import java.io.InputStream;

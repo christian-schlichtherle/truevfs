@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.cio.IOPoolProvider;
+import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.driver.zip.io.DateTimeConverter;
 import de.truezip.driver.zip.io.ZipEntry;
 import java.nio.charset.Charset;

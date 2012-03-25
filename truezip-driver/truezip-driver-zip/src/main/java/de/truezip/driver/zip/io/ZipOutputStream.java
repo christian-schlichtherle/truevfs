@@ -25,7 +25,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * This implies that the class may produce ZIP archive files which cannot
  * be read by older ZIP implementations.
  * <p>
- * If the system property {@code de.schlichtherle.truezip.io.zip.zip64ext}
+ * If the system property {@code de.truezip.kernel.io.zip.zip64ext}
  * is set to {@code true} (case is ignored),
  * then ZIP64 extensions are always added when writing a ZIP archive file,
  * regardless of its size.

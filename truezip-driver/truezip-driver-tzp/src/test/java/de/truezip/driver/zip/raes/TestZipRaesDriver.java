@@ -4,10 +4,11 @@
  */
 package de.truezip.driver.zip.raes;
 
+import de.truezip.driver.zip.raes.key.PromptingKeyManagerService;
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
 import de.truezip.driver.zip.KeyProviderSyncStrategy;
 import de.truezip.kernel.key.MockView;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
+import de.truezip.kernel.cio.IOPoolProvider;
 
 /**
  * @author  Christian Schlichtherle

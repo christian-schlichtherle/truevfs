@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.io.Streams;
+import de.truezip.kernel.io.Streams;
 import java.nio.charset.Charset;
 
 /**

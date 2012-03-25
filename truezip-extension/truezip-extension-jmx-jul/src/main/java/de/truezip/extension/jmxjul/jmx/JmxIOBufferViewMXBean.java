@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.cio.IOBuffer;
+import de.truezip.kernel.cio.IOBuffer;
 import javax.annotation.Nullable;
 
 /**

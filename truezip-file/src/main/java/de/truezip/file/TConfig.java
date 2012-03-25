@@ -4,18 +4,18 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsManager;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
-import de.schlichtherle.truezip.fs.option.FsInputOptions;
-import static de.schlichtherle.truezip.fs.option.FsInputOptions.INPUT_PREFERENCES_MASK;
-import de.schlichtherle.truezip.fs.option.FsOutputOption;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.option.FsOutputOptions;
-import static de.schlichtherle.truezip.fs.option.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
-import de.schlichtherle.truezip.sl.FsManagerLocator;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.InheritableThreadLocalStack;
-import de.schlichtherle.truezip.util.Resource;
+import de.truezip.kernel.fs.FsManager;
+import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.fs.option.FsInputOptions;
+import static de.truezip.kernel.fs.option.FsInputOptions.INPUT_PREFERENCES_MASK;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import static de.truezip.kernel.fs.option.FsOutputOption.*;
+import de.truezip.kernel.fs.option.FsOutputOptions;
+import static de.truezip.kernel.fs.option.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
+import de.truezip.kernel.sl.FsManagerLocator;
+import de.truezip.kernel.util.BitField;
+import de.truezip.kernel.util.InheritableThreadLocalStack;
+import de.truezip.kernel.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;

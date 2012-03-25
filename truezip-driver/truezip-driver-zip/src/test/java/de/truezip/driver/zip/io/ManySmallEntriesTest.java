@@ -4,11 +4,11 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.cio.Entry.Size;
-import de.schlichtherle.truezip.cio.ByteArrayIOBuffer;
-import de.schlichtherle.truezip.cio.IOEntry;
-import de.schlichtherle.truezip.util.ArrayHelper;
-import de.schlichtherle.truezip.util.Maps;
+import de.truezip.kernel.cio.Entry.Size;
+import de.truezip.kernel.cio.ByteArrayIOBuffer;
+import de.truezip.kernel.cio.IOEntry;
+import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.Maps;
 import de.truezip.driver.zip.io.ZipEntry;
 import de.truezip.driver.zip.io.ZipFile;
 import de.truezip.driver.zip.io.ZipOutputStream;

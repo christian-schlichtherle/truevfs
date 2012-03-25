@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.io.DecoratingInputStream;
+import de.truezip.kernel.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;

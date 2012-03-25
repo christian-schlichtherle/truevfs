@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.schlichtherle.truezip.fs.addr.FsScheme;
+import de.truezip.kernel.fs.addr.FsScheme;
 import de.truezip.driver.file.nio.FileDriverService;
-import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import de.schlichtherle.truezip.util.SuffixSet;
+import de.truezip.kernel.fs.spi.FsDriverService;
+import de.truezip.kernel.util.SuffixSet;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;

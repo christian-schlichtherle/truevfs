@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.OutputService;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.OutputService;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;

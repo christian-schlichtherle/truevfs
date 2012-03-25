@@ -6,9 +6,9 @@ package de.truezip.driver.zip.raes.crypto;
 
 import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
 import de.truezip.driver.zip.crypto.CipherReadOnlyFile;
-import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.rof.DefaultReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.truezip.kernel.rof.DecoratingReadOnlyFile;
+import de.truezip.kernel.rof.DefaultReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
 import static de.truezip.driver.zip.raes.crypto.Constants.LEAD_IN_LENGTH;
 import static de.truezip.driver.zip.raes.crypto.Constants.SIGNATURE;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -21,7 +21,7 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * This class implements a {@link de.schlichtherle.truezip.rof.ReadOnlyFile}
+ * This class implements a {@link de.truezip.kernel.rof.ReadOnlyFile}
  * in order to provide transparent random read only access to the plain text
  * data which has been encrypted and stored in a file according to the
  * Random Access Encryption Specification (RAES).

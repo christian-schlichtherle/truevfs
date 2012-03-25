@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.schlichtherle.truezip.fs.FsModel;
+import de.truezip.kernel.fs.FsModel;
 import de.truezip.extension.jmxjul.InstrumentingModel;
 import javax.annotation.concurrent.Immutable;
 

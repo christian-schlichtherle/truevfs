@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFileInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import javax.annotation.WillCloseWhenClosed;

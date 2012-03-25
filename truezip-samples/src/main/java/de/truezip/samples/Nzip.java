@@ -5,16 +5,16 @@
 package de.truezip.samples;
 
 import de.truezip.file.*;
-import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.FsSyncException;
+import static de.truezip.kernel.fs.option.FsOutputOption.*;
+import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.driver.tar.TarBZip2Driver;
 import de.truezip.driver.tar.TarDriver;
 import de.truezip.driver.tar.TarGZipDriver;
 import de.truezip.driver.zip.CheckedJarDriver;
 import de.truezip.driver.zip.CheckedReadOnlySfxDriver;
 import de.truezip.driver.zip.CheckedZipDriver;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.sl.IOPoolLocator;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.sl.IOPoolLocator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;

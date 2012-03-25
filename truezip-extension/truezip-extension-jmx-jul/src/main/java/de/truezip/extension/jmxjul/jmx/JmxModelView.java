@@ -4,17 +4,17 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import static de.schlichtherle.truezip.cio.Entry.Access.*;
-import static de.schlichtherle.truezip.cio.Entry.Size.DATA;
-import static de.schlichtherle.truezip.cio.Entry.Size.STORAGE;
-import static de.schlichtherle.truezip.cio.Entry.UNKNOWN;
-import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.fs.addr.FsEntryName;
-import de.schlichtherle.truezip.fs.option.FsSyncOption;
-import static de.schlichtherle.truezip.fs.option.FsSyncOption.CLEAR_CACHE;
-import de.schlichtherle.truezip.sl.FsDriverLocator;
-import de.schlichtherle.truezip.sl.FsManagerLocator;
-import de.schlichtherle.truezip.util.BitField;
+import static de.truezip.kernel.cio.Entry.Access.*;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import static de.truezip.kernel.cio.Entry.Size.STORAGE;
+import static de.truezip.kernel.cio.Entry.UNKNOWN;
+import de.truezip.kernel.fs.*;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.fs.option.FsSyncOption;
+import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
+import de.truezip.kernel.sl.FsDriverLocator;
+import de.truezip.kernel.sl.FsManagerLocator;
+import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Date;

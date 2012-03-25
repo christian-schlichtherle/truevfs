@@ -5,9 +5,9 @@
 package de.truezip.driver.zip.io;
 
 import de.truezip.driver.zip.crypto.param.AesKeyStrength;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.LEDataOutputStream;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.LEDataOutputStream;
+import static de.truezip.kernel.util.Maps.initialCapacity;
 import static de.truezip.driver.zip.io.Constants.*;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static de.truezip.driver.zip.io.WinZipAesEntryExtraField.VV_AE_1;

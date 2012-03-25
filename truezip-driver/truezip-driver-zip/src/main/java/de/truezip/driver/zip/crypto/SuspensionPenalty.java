@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.crypto;
 
-import de.schlichtherle.truezip.util.Threads;
+import de.truezip.kernel.util.Threads;
 import javax.annotation.concurrent.Immutable;
 
 /**

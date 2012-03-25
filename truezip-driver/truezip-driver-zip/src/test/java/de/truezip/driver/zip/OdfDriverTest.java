@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.fs.FsCharsetArchiveDriverTestSuite;
+import de.truezip.kernel.fs.FsCharsetArchiveDriverTestSuite;
 import de.truezip.driver.zip.JarDriver;
 import de.truezip.driver.zip.OdfDriver;
 import de.truezip.driver.zip.ZipDriverEntry;

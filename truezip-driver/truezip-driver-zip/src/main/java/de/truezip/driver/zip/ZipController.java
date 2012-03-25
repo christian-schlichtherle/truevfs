@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.fs.FsController;
+import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.key.pbe.AesPbeParameters;
 import de.truezip.driver.zip.io.ZipKeyException;
 import java.io.IOException;

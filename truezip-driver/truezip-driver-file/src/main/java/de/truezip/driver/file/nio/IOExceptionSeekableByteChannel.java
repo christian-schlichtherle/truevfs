@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;

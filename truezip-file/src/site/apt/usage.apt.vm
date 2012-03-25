@@ -124,7 +124,7 @@ Using TrueZIP File*
     * <Manual synchronization> happens when the application calls
         {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}},
         which calls
-        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}},
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}},
         or any of their many variants and incarnations.
 
     * <Automatic synchronization> happens when the JVM terminates (in a JVM
@@ -212,7 +212,7 @@ Using TrueZIP File*
     may call <<<TVFS.umount()>>>,
     {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount(de.truezip.file.TFile)}<<<TVFS.umount(TFile)>>>}}
     or any of their many variants and incarnations (e.g.
-    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.fs.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.truezip.kernel.fs.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
     in order to commit all changes and finally unmount the archive files.
     A third party can then safely access them.
     Likewise, the    application must make sure not to access an archive file or
@@ -222,7 +222,7 @@ Using TrueZIP File*
 
     {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
     and
-    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
     and their many variants and incarnations are guaranteed to process <all>
     archive files which are mounted or have been updated by an application.
     However, processing some of these archive files may fail for any I/O
@@ -312,7 +312,7 @@ Using TrueZIP File*
     In essence: If at all, an application should never call
     {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
     or
-    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
+    {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
     in a loop which modifies an archive file.
 
     The situation gets more complicated with implicit remounting:
@@ -365,13 +365,13 @@ Using TrueZIP File*
     [[1]] When the JVM terminates, calling
         {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
         or
-        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
         is recommended in order to handle exceptions explicitly.
 
     [[2]] Otherwise, in order to achieve best performance,
         {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
         or
-        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.schlichtherle.truezip.util.BitField)}<<<TVFS.sync(BitField)>>>}}
+        {{{../apidocs/de/schlichtherle/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
         should not get called unless either third party access or explicit
         exception handling is required.
 

@@ -4,11 +4,11 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.cio.InputService;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.InputService;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.driver.zip.io.RawZipFile;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

@@ -4,15 +4,15 @@
  */
 package de.truezip.driver.http;
 
-import de.schlichtherle.truezip.cio.IOBuffer;
-import de.schlichtherle.truezip.fs.option.FsInputOption;
-import de.schlichtherle.truezip.io.InputException;
-import de.schlichtherle.truezip.io.Streams;
-import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.util.BitField;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.io.InputException;
+import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.rof.DecoratingReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.cio.IOPool;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;

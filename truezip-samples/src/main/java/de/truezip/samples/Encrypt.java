@@ -4,7 +4,7 @@
  */
 package de.truezip.samples;
 
-import de.schlichtherle.truezip.fs.FsSyncException;
+import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.samples.raes.RaesFiles;
 import java.io.IOException;
 import java.util.ResourceBundle;
