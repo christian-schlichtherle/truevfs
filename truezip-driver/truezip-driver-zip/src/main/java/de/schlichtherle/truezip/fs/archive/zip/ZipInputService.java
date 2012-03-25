@@ -91,11 +91,6 @@ implements InputService<ZipDriverEntry> {
     }
 
     @Override
-    public int getSize() {
-        return super.size();
-    }
-
-    @Override
     public InputSocket<ZipDriverEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();

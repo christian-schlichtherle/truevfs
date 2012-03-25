@@ -108,7 +108,7 @@ implements OutputService<ZipDriverEntry> {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return super.size() + (null != this.bufferedEntry ? 1 : 0);
     }
 

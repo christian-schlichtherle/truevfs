@@ -70,8 +70,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public int getSize() {
-        return delegate.getSize() + buffers.size();
+    public int size() {
+        return delegate.size() + buffers.size();
     }
 
     @Override

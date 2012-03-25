@@ -75,7 +75,7 @@ implements OutputService<TarDriverEntry> {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         return entries.size();
     }
 

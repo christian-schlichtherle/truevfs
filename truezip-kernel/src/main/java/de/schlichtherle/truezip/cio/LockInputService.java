@@ -86,10 +86,10 @@ extends DecoratingInputService<E, InputService<E>> {
 
     @Override
     @GuardedBy("lock")
-    public int getSize() {
+    public int size() {
         lock.lock();
         try {
-            return delegate.getSize();
+            return delegate.size();
         } finally {
             lock.unlock();
         }

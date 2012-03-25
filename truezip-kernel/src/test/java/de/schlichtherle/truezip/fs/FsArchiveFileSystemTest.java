@@ -138,7 +138,7 @@ public class FsArchiveFileSystemTest {
                         .close();
             assertSame(ae, container.getEntry(aen));
         }
-        assertEquals(paramss.length, container.getSize());
+        assertEquals(paramss.length, container.size());
 
         // Populate file system.
         final FsArchiveFileSystem<MockArchiveDriverEntry>

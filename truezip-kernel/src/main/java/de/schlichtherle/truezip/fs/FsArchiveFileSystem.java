@@ -131,9 +131,9 @@ implements Iterable<FsCovariantEntry<E>> {
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<E>(
-                initialCapacity(archive.getSize() + OVERHEAD_SIZE));
+                initialCapacity(archive.size() + OVERHEAD_SIZE));
         // Load entries from input archive.
-        final List<String> paths = new ArrayList<String>(archive.getSize());
+        final List<String> paths = new ArrayList<String>(archive.size());
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         for (final E entry : archive) {
             final String path = cutTrailingSeparators(

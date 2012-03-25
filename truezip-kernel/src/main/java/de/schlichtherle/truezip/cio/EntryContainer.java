@@ -21,8 +21,7 @@ extends Iterable<E> {
      * 
      * @return The number of entries in this container.
      */
-    // TODO: Rename this to size().
-    int getSize();
+    int size();
 
     /**
      * Returns a new iterator for all entries in this container.

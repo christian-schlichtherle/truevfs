@@ -232,13 +232,13 @@ extends FsArchiveDriverTestBase<D> {
         assertSame(entry, output.getLocalTarget());
 
         assertNull(service.getEntry(name));
-        assertEquals(i, service.getSize());
+        assertEquals(i, service.size());
 
         boolean failure = true;
         final OutputStream out = output.newOutputStream();
         try {
             assertSame(entry, service.getEntry(name));
-            assertEquals(i + 1, service.getSize());
+            assertEquals(i + 1, service.size());
             out.write(getData());
             failure = false;
         } finally {
@@ -389,7 +389,7 @@ extends FsArchiveDriverTestBase<D> {
     private <E extends FsArchiveEntry> void check(
             final EntryContainer<E> container) {
         final int numEntries = getNumEntries();
-        assertEquals(numEntries, container.getSize());
+        assertEquals(numEntries, container.size());
         final Iterator<E> it = container.iterator();
         for (int i = 0; i < numEntries; i++) {
             final E e = it.next();
@@ -418,7 +418,7 @@ extends FsArchiveDriverTestBase<D> {
             fail();
         } catch (UnsupportedOperationException expected) {
         }
-        assertEquals(numEntries, container.getSize());
+        assertEquals(numEntries, container.size());
     }
 
     private E newEntry(final String name) throws CharConversionException {

@@ -73,7 +73,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         checkUndeclaredExceptions();
         return entries.size();
     }
