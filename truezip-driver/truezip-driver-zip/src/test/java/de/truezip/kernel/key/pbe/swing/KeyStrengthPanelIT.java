@@ -7,7 +7,7 @@ package de.truezip.kernel.key.pbe.swing;
 import de.truezip.driver.zip.crypto.param.AesKeyStrength;
 import de.truezip.kernel.key.pbe.swing.KeyStrengthPanel;
 import static de.truezip.driver.zip.crypto.param.AesKeyStrength.*;
-import de.schlichtherle.truezip.swing.JemmyUtils;
+import de.truezip.swing.JemmyUtils;
 import org.junit.After;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;

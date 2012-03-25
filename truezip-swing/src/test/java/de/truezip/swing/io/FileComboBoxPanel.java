@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.io.swing;
+package de.truezip.swing.io;
 
 import java.io.File;
 import javax.annotation.CheckForNull;
@@ -90,7 +90,7 @@ public class FileComboBoxPanel extends JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private final de.schlichtherle.truezip.io.swing.FileComboBoxBrowser browser1 = new de.schlichtherle.truezip.io.swing.FileComboBoxBrowser();
-    private final de.schlichtherle.truezip.io.swing.FileComboBoxBrowser browser2 = new de.schlichtherle.truezip.io.swing.FileComboBoxBrowser();
+    private final de.truezip.swing.io.FileComboBoxBrowser browser1 = new de.truezip.swing.io.FileComboBoxBrowser();
+    private final de.truezip.swing.io.FileComboBoxBrowser browser2 = new de.truezip.swing.io.FileComboBoxBrowser();
     // End of variables declaration//GEN-END:variables
 }

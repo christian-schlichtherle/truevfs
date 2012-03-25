@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides Swing GUI classes which depend on the package {@code java.io}.
+ * Provides general Swing GUI classes.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.schlichtherle.truezip.io.swing;
+package de.truezip.swing;

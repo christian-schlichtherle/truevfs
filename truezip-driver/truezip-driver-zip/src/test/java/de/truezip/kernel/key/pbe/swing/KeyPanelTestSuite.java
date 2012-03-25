@@ -7,7 +7,7 @@ package de.truezip.kernel.key.pbe.swing;
 import de.truezip.kernel.key.pbe.SafePbeParameters;
 import de.truezip.kernel.key.pbe.swing.AuthenticationPanel;
 import de.truezip.kernel.key.pbe.swing.KeyPanel;
-import de.schlichtherle.truezip.swing.JemmyUtils;
+import de.truezip.swing.JemmyUtils;
 import java.awt.EventQueue;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;

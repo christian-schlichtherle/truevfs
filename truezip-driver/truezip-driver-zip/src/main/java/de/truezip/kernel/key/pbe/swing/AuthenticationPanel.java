@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.key.pbe.swing;
 
-import de.schlichtherle.truezip.io.swing.FileComboBoxBrowser;
+import de.truezip.swing.io.FileComboBoxBrowser;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
@@ -131,11 +131,11 @@ public class AuthenticationPanel extends JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         keyFilePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        keyFilePanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+        keyFilePanel.addPanelListener(new de.truezip.swing.PanelListener() {
+            public void ancestorWindowShown(de.truezip.swing.PanelEvent evt) {
                 keyFilePanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowHidden(de.truezip.swing.PanelEvent evt) {
             }
         });
         keyFilePanel.setLayout(new java.awt.GridBagLayout());
@@ -196,7 +196,7 @@ public class AuthenticationPanel extends JPanel {
         }
     }//GEN-LAST:event_keyFileChooserActionPerformed
 
-    private void keyFilePanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_keyFilePanelAncestorWindowShown
+    private void keyFilePanelAncestorWindowShown(de.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_keyFilePanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
         // set the focus to the passwd field in this panel when it shows.
         // However, this can't be done in the constructor since the panel is
@@ -249,7 +249,7 @@ public class AuthenticationPanel extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final javax.swing.JComboBox keyFile = new javax.swing.JComboBox();
     private final javax.swing.JButton keyFileChooser = new javax.swing.JButton();
-    private final de.schlichtherle.truezip.swing.EnhancedPanel keyFilePanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
+    private final de.truezip.swing.EnhancedPanel keyFilePanel = new de.truezip.swing.EnhancedPanel();
     private javax.swing.JTabbedPane tabs;
     // End of variables declaration//GEN-END:variables
 

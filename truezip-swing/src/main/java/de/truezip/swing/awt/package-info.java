@@ -6,4 +6,4 @@
  * Provides custom AWT GUI classes.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.schlichtherle.truezip.awt;
+package de.truezip.swing.awt;
