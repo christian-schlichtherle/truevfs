@@ -10,7 +10,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * The parameters of this interface are used with WinZip AES encrypted entries.
  *
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

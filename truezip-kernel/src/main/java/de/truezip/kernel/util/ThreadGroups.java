@@ -9,7 +9,6 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Static utility methods for {@link ThreadGroup}s.
  * 
- * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -26,8 +25,6 @@ public class ThreadGroups {
      * @return The thread group of the
      * {@link System#getSecurityManager() security manager} if installed or
      * else the thread group of the current thread.
-     * 
-     * @since TrueZIP 7.5
      */
     public static ThreadGroup getThreadGroup() {
         final SecurityManager sm = System.getSecurityManager();
@@ -63,7 +60,6 @@ public class ThreadGroups {
      *         manager if installed or else the thread group of the current
      *         thread and walking up the parent thread group hierarchy until
      *         the next parent does not exist or is inaccessible.
-     * @since  TrueZIP 7.5
      */
     public static ThreadGroup getServerThreadGroup() {
         ThreadGroup tg = getThreadGroup();
@@ -77,4 +73,3 @@ public class ThreadGroups {
         return tg;
     }
 }
-

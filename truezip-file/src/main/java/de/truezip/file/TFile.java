@@ -645,7 +645,6 @@ public final class TFile extends File {
      *         path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
      * @see    #toFsPath()
-     * @since  TrueZIP 7.3.2
      */
     public TFile(   final FsPath path,
                     final @CheckForNull TArchiveDetector detector) {
@@ -942,7 +941,6 @@ public final class TFile extends File {
      * @return A file object for the same path name, but does not detect any
      *         archive file name patterns in the last path name segment.
      * @see    TVFS#umount(TFile)
-     * @since  TrueZIP 7.5
      */
     public TFile toNonArchiveFile() {
         return isArchive()
@@ -1252,7 +1250,6 @@ public final class TFile extends File {
      * 
      * @return {@code true} if and only if this file is a
      *         {@linkplain #getTopLevelArchive() top level archive file}.
-     * @since  TrueZIP 7.5
      */
     public boolean isTopLevelArchive() {
         return getTopLevelArchive() == this;
@@ -2919,7 +2916,6 @@ public final class TFile extends File {
      *         archive files <em>within</em> the source and destination
      *         directory tree.
      * @throws IOException if any I/O error occurs.
-     * @since  TrueZIP 7.2
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
@@ -3031,7 +3027,6 @@ public final class TFile extends File {
      *         archive files <em>within</em> the source and destination
      *         directory tree.
      * @throws IOException if any I/O error occurs.
-     * @since  TrueZIP 7.2
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
@@ -3367,7 +3362,6 @@ public final class TFile extends File {
      * @return this
      * @throws IOException On any I/O error.
      * @see    FsOutputOption#GROW
-     * @since  TrueZIP 7.3
      */
     public TFile compact() throws IOException {
         if (isTopLevelArchive()) // see http://java.net/jira/browse/TRUEZIP-205

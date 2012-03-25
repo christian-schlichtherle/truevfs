@@ -31,7 +31,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Injects the original values of selected parameters of the operation in
  * progress into its decorated controller.
  * 
- * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

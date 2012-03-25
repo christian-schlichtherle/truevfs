@@ -361,7 +361,6 @@ implements Serializable, Comparable<FsEntryName> {
      * Returns the URI for this entry name.
      *
      * @return The URI for this entry name.
-     * @since  TrueZIP 7.1.1
      */
     public URI toUri() {
         return uri;

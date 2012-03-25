@@ -11,7 +11,6 @@ package de.truezip.driver.zip.io;
  * - its API may change at will without prior notification!
  * 
  * @param   <E> The type of the created ZIP entries.
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 public interface ZipFileParameters<E extends ZipEntry>

@@ -30,7 +30,6 @@ import javax.annotation.concurrent.Immutable;
 </tbody>
 </table>
  *
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @Immutable

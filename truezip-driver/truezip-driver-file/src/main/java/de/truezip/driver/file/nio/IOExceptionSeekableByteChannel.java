@@ -17,7 +17,6 @@ import javax.annotation.WillCloseWhenClosed;
  * A decorating seekable byte channel which saves the last {@link IOException}
  * in a {@link #exception protected field} for later use.
  *
- * @since   TrueZIP 7.3.2
  * @author  Christian Schlichtherle
  * @deprecated This class will be removed in TrueZIP 8.
  */

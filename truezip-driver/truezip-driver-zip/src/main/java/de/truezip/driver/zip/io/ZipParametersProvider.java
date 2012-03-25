@@ -11,7 +11,6 @@ import javax.annotation.CheckForNull;
  * The implementation of this interface enables to retrieve ZIP parameters on
  * demand rather than providing them upfront for any possible type.
  *
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 public interface ZipParametersProvider extends ZipParameters {

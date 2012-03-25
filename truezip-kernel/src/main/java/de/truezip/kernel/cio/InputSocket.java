@@ -122,7 +122,6 @@ extends IOSocket<E, Entry> {
      * @throws IOException On any I/O failure.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
-     * @since  TrueZIP 7.2
      */
     @CreatesObligation
     public SeekableByteChannel newSeekableByteChannel() throws IOException {

@@ -10,7 +10,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Default implementation of {@link ZipCharsetParameters}.
  * 
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

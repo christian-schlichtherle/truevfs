@@ -12,7 +12,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * Thrown to indicate that no suitable ZIP parameters have been provided
  * or something is wrong with these parameters.
  *
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

@@ -19,7 +19,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2</a>
  * scheme.
  * 
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe

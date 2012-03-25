@@ -9,7 +9,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * A marker interface for ZIP parameters.
  * 
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe

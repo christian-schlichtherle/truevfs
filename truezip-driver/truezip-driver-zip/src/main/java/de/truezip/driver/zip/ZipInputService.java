@@ -52,7 +52,6 @@ implements InputService<ZipDriverEntry> {
      * Returns the file system model provided to the constructor.
      * 
      * @return The file system model provided to the constructor.
-     * @since  TrueZIP 7.3
      */
     public FsModel getModel() {
         return model;

@@ -236,7 +236,6 @@ public class AppTest {
  * The most important feature of this code is that it's thread-safe, which
  * enables you to run your unit tests in parallel!
  * 
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -249,8 +248,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * The default value of the
      * {@link #getInputPreferences input preferences} property, which is
      * {@link FsInputOptions#NONE}.
-     * 
-     * @since TrueZIP 7.3
      */
     public static final BitField<FsInputOption>
             DEFAULT_INPUT_PREFERENCES = FsInputOptions.NONE;
@@ -262,8 +259,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * The default value of the
      * {@link #getOutputPreferences output preferences} property, which is
      * <code>{@link BitField}.of({@link FsOutputOption#CREATE_PARENTS})</code>.
-     * 
-     * @since TrueZIP 7.3
      */
     public static final BitField<FsOutputOption>
             DEFAULT_OUTPUT_PREFERENCES = BitField.of(CREATE_PARENTS);
@@ -347,7 +342,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * Returns the file system manager.
      * 
      * @return     The file system manager.
-     * @since      TrueZIP 7.5 (package private before)
      * @deprecated This public class property is solely intended to be used by
      *             the module TrueZIP&nbsp;Path and should never get used by
      *             client applications.
@@ -459,7 +453,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * Returns the input preferences.
      * 
      * @return The input preferences.
-     * @since  TrueZIP 7.3
      */
     public BitField<FsInputOption> getInputPreferences() {
         return this.inputPreferences;
@@ -474,7 +467,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
      *         {@link FsInputOptions#INPUT_PREFERENCES_MASK}.
-     * @since  TrueZIP 7.3
      */
     public void setInputPreferences(final BitField<FsInputOption> preferences) {
         final BitField<FsInputOption> illegal = preferences
@@ -488,7 +480,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * Returns the output preferences.
      * 
      * @return The output preferences.
-     * @since  TrueZIP 7.3
      */
     public BitField<FsOutputOption> getOutputPreferences() {
         return this.outputPreferences;
@@ -505,7 +496,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      *         {@link FsOutputOptions#OUTPUT_PREFERENCES_MASK} or if both
      *         {@link FsOutputOption#STORE} and
      *         {@link FsOutputOption#COMPRESS} have been set.
-     * @since  TrueZIP 7.3
      */
     public void setOutputPreferences(final BitField<FsOutputOption> preferences) {
         final BitField<FsOutputOption> illegal = preferences

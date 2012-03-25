@@ -19,7 +19,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.
  *
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

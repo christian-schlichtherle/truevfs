@@ -51,8 +51,6 @@ implements OutputService<TarDriverEntry> {
     /**
      * The number of entries which can be initially accomodated by
      * the internal hash map without resizing it, which is {@value}.
-     * 
-     * @since  TrueZIP 7.3
      */
     public static final int OVERHEAD_SIZE = Maps.OVERHEAD_SIZE;
 

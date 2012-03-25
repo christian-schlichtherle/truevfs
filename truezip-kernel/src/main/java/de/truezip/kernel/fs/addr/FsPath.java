@@ -344,7 +344,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * Returns the URI for this path.
      *
      * @return The URI for this path.
-     * @since  TrueZIP 7.1.1
      */
     public URI toUri() {
         return uri;
@@ -362,7 +361,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *
      * @return A URI which is recursively transformed from the URI of this
      *         path so that it's absolute and hierarchical.
-     * @since  TrueZIP 7.1.1
      */
     public URI toHierarchicalUri() {
         final URI hierarchical = this.hierarchical;

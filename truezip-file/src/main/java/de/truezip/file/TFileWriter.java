@@ -106,7 +106,6 @@ public final class TFileWriter extends OutputStreamWriter {
      *         given file.
      * @param  charset a character set for encoding characters to bytes.
      * @throws FileNotFoundException on any I/O failure.
-     * @since  TrueZIP 7.5
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")

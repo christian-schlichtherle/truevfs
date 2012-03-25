@@ -125,7 +125,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * 
      * @return The provider for key managers for accessing protected resources
      *         (encryption).
-     * @since  TrueZIP 7.3.
      */
     protected KeyManagerProvider getKeyManagerProvider() {
         return KeyManagerLocator.SINGLETON;
@@ -153,7 +152,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      *         and the file comment in the ZIP file.
      * @return The ZIP crypto parameters for the given file system model
      *         and character set or {@code null} if not available.
-     * @since  TrueZIP 7.3
      */
     protected @CheckForNull ZipCryptoParameters zipCryptoParameters(
             FsModel model,
@@ -208,7 +206,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      *         ZIP entry with an equal name.
      *         This holds true even if the central directory is used to access
      *         the ZIP entries in random order.
-     * @since  TrueZIP 7.3
      */
     @Override
     public boolean getRedundantContentSupport() {
@@ -224,7 +221,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      *         ZIP entry with an equal name.
      *         This holds true even if the central directory is used to access
      *         the ZIP entries in random order.
-     * @since  TrueZIP 7.3
      */
     @Override
     public boolean getRedundantMetaDataSupport() {
@@ -238,7 +234,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * then an {@link IOException} gets thrown.
      * 
      * @return {@code entry.isEncrypted()}.
-     * @since  TrueZIP 7.3
      */
     protected boolean check(
             @WillNotClose ZipInputService input,
@@ -281,7 +276,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @return Whether the content to get copied from the input target entry
      *         to the output target entry needs to get processed or can get
      *         sent in raw format.
-     * @since  TrueZIP 7.3
      */
     protected boolean process(ZipDriverEntry input, ZipDriverEntry output) {
         return input.isEncrypted() || output.isEncrypted();
@@ -324,7 +318,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * The implementation in the class {@link ZipDriver}
      * returns {@code Maps#OVERHEAD_SIZE}.
      * 
-     * @since  TrueZIP 7.3
      * @return {@code Maps#OVERHEAD_SIZE}
      */
     @Override

@@ -89,7 +89,6 @@ implements Iterable<E> {
      * @param  appendee the nullable raw ZIP file to append to.
      *         This may already be closed.
      * @param  param the parameters for writing the ZIP file.
-     * @since  TrueZIP 7.3
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -140,8 +139,6 @@ implements Iterable<E> {
     /**
      * Returns the character set which is used for
      * encoding entry names and the file comment.
-     * 
-     * @since TrueZIP 7.3
      */
     public Charset getRawCharset() {
         return charset;
@@ -287,7 +284,6 @@ implements Iterable<E> {
      * Returns the parameters for encryption or authentication of entries.
      * 
      * Returns The parameters for encryption or authentication of entries.
-     * @since  TrueZIP 7.3
      */
     protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
 

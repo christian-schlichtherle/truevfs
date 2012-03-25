@@ -32,7 +32,6 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Adapts a {@link Path} instance to a {@link FsEntry}.
  *
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @Immutable

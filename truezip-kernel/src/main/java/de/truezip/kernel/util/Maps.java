@@ -9,7 +9,6 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Static utility methods for maps.
  * 
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @Immutable
@@ -22,7 +21,6 @@ public final class Maps {
      * to compute the initial capacity or overhead for additional entries.
      * 
      * @see   #initialCapacity(int)
-     * @since TrueZIP 8
      */
     public static final int OVERHEAD_SIZE = (64 - 1) * 3 / 4; // consider 75% load factor
 

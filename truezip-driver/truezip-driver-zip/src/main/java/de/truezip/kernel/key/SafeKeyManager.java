@@ -21,11 +21,7 @@ implements KeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<URI, P>();
 
-    /**
-     * Constructs a new safe key manager.
-     *
-     * @since TrueZIP 7.2
-     */
+    /** Constructs a new safe key manager. */
     protected SafeKeyManager() {
     }
 
@@ -33,7 +29,6 @@ implements KeyManager<K> {
      * Returns a new key provider.
      * 
      * @return A new key provider.
-     * @since  TrueZIP 7.2
      */
     protected abstract P newKeyProvider();
 

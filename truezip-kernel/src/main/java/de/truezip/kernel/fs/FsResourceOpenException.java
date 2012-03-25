@@ -15,7 +15,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * successfully retry the operation as soon as these I/O resources have been
  * closed and no other exceptional conditions apply.
  * 
- * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

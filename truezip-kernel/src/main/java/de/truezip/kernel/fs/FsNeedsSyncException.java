@@ -16,7 +16,6 @@ import javax.annotation.concurrent.Immutable;
  * {@linkplain FsController#sync(BitField) synced} before the operation can
  * get retried.
  *
- * @since  TrueZIP 7.3
  * @see    FsSyncController
  * @author Christian Schlichtherle
  */

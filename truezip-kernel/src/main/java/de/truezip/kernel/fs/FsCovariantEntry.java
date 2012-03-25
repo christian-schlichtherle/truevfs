@@ -83,7 +83,6 @@ implements Cloneable {
      * 
      * @return {@code true} if and only if the name of this covariant entry
      *         identifies it as a root entry.
-     * @since  TrueZIP 7.5
      */
     public boolean isRoot() {
         return name.isEmpty();

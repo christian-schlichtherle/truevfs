@@ -64,7 +64,6 @@ extends FsDriver {
      * 
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
-     * @since  TrueZIP 7.3
      */
     public boolean getRedundantContentSupport() {
         return false;
@@ -81,7 +80,6 @@ extends FsDriver {
      * 
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
-     * @since  TrueZIP 7.3
      */
     public boolean getRedundantMetaDataSupport() {
         return false;
@@ -184,7 +182,6 @@ extends FsDriver {
      * @param  name the entry name.
      * @param  options the options to use.
      * @return An input socket for reading an artifact of this driver.
-     * @since  TrueZIP 7.1
      */
     public InputSocket<?> getInputSocket(   FsController<?> controller,
                                             FsEntryName name,
@@ -239,7 +236,6 @@ extends FsDriver {
      * @param  options the options to use.
      * @param  template the template to use.
      * @return An output socket for writing an artifact of this driver.
-     * @since  TrueZIP 7.1
      */
     public OutputSocket<?> getOutputSocket( FsController<?> controller,
                                             FsEntryName name,

@@ -65,7 +65,6 @@ import javax.annotation.concurrent.Immutable;
  * }</pre>
  * 
  * @see    FsDecoratingController
- * @since  TrueZIP 7.5 (renamed from {@code FsException} and changed super
  *         type from {@code IOException} to {@code RuntimeException})
  * @author Christian Schlichtherle
  */

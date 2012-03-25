@@ -176,7 +176,6 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not executable.
      * @throws IOException on any I/O failure.
-     * @since  TrueZIP 7.2.
      */
     // TODO: Consider using a Boolean return value in order to use null to
     // indicate that this property is not supported
@@ -213,7 +212,6 @@ public abstract class FsController<M extends FsModel> {
      * @throws IOException on any I/O failure.
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
-     * @since  TrueZIP 7.2
      */
     public boolean setTime(
             final FsEntryName name,

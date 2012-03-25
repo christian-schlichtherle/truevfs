@@ -12,7 +12,6 @@ import javax.annotation.concurrent.Immutable;
  * Indicates that all file system locks need to get released before the
  * operation can get retried.
  *
- * @since  TrueZIP 7.5
  * @see    FsSyncController
  * @author Christian Schlichtherle
  */

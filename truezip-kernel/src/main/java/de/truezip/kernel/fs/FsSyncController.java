@@ -35,7 +35,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * {@link FsNeedsSyncException}.
  * 
  * @see    FsNeedsSyncException
- * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @ThreadSafe

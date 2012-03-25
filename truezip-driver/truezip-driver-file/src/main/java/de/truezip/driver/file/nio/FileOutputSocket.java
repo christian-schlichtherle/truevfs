@@ -33,7 +33,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * An output socket for a file entry.
  *
- * @since  TrueZIP 7.2
  * @see    FileInputSocket
  * @author Christian Schlichtherle
  */

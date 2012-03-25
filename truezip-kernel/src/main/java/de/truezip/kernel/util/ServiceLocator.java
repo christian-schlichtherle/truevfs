@@ -207,7 +207,6 @@ public final class ServiceLocator {
      * @return an object of the desired type or {@code null} if and only if
      *         {@code object} is {@code null}.
      * @throws IllegalArgumentException if any promotion step fails.
-     * @since  TrueZIP 7.2
      */
     public static @CheckForNull <T> T promote(
             @CheckForNull Object object,

@@ -9,7 +9,6 @@ import java.util.zip.Deflater;
 /**
  * An interface for {@link ZipOutputStream} parameters.
  * 
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 public interface ZipOutputStreamParameters

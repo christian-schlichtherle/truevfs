@@ -15,7 +15,6 @@ import javax.annotation.concurrent.Immutable;
  * progress.
  *
  * @see     FsContextController
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @Immutable

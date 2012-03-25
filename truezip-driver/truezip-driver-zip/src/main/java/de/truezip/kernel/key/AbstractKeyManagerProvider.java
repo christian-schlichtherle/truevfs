@@ -32,7 +32,6 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      * {@link Map#equals(Object) equal} with the previously returned map.
      * 
      * @return an unmodifiable map of secret key classes to key managers.
-     * @since  TrueZIP 7.2
      */
     public abstract Map<Class<?>, KeyManager<?>> get();
 }

@@ -17,7 +17,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  *
  * @see    ClutchOutputSocket
  * @param  <E> the type of the {@link #getLocalTarget() local target}.
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

@@ -98,7 +98,6 @@ import javax.annotation.concurrent.Immutable;
  * bypass or corrupt the state which gets implicitly associated with any
  * archive file by the TrueZIP Kernel module!
  * 
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -598,7 +597,6 @@ public final class TPath implements Path {
      *         archive file name patterns in the last path name segment.
      * @see    TFileSystem#close()
      * @see    TVFS#umount()
-     * @since  TrueZIP 7.5
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     public TPath toNonArchivePath() {
