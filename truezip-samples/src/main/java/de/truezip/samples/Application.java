@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.sample.file.app;
+package de.truezip.samples;
 
 import de.truezip.file.TApplication;
 import de.truezip.kernel.key.pbe.swing.HurlingWindowFeedback;

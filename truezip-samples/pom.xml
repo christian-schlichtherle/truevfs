@@ -144,7 +144,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>de.schlichtherle.truezip.sample.file.app.Nzip</mainClass>
+                                    <mainClass>de.truezip.samples.Nzip</mainClass>
                                 </manifest>
                             </archive>
                             <descriptors>

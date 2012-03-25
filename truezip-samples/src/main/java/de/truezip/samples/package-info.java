@@ -10,4 +10,4 @@
  * unzip, encrypt, decrypt etc.).
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.schlichtherle.truezip.sample.file.app;
+package de.truezip.samples;
