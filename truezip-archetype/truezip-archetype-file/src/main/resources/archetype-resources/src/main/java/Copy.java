@@ -3,6 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
+import de.truezip.file.TConfig;
 import de.truezip.file.TFile;
 import java.io.IOException;
 
@@ -35,7 +36,7 @@ public class Copy extends Application<IOException> {
 
         // TFile  doesn't do path name completion, so we do it manually in
         // order to emulate the behavior of many copy command line utilities.
-        if (TFile.isLenient() && dst.isArchive() || dst.isDirectory())
+        if (TConfig.get().isLenient() && dst.isArchive() || dst.isDirectory())
             dst = new TFile(dst, src.getName());
 
         // If TFile.setLenient(false) is never called in your application,
