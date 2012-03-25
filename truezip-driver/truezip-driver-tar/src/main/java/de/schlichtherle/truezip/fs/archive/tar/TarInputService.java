@@ -183,7 +183,7 @@ implements InputService<TarDriverEntry> {
     }
 
     @Override
-    public final int getSize() {
+    public final int size() {
         return entries.size();
     }
 

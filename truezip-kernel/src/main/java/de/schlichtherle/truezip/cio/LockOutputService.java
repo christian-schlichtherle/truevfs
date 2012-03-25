@@ -84,10 +84,10 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     @GuardedBy("lock")
-    public int getSize() {
+    public int size() {
         lock.lock();
         try {
-            return delegate.getSize();
+            return delegate.size();
         } finally {
             lock.unlock();
         }

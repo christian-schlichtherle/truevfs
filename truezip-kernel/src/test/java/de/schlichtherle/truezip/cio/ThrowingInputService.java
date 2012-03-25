@@ -54,9 +54,9 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         checkUndeclaredExceptions();
-        return delegate.getSize();
+        return delegate.size();
     }
 
     @Override

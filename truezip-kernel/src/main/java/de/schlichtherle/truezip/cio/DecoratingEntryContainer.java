@@ -33,8 +33,8 @@ implements EntryContainer<E> {
     }
 
     @Override
-    public int getSize() {
-        return delegate.getSize();
+    public int size() {
+        return delegate.size();
     }
 
     @Override

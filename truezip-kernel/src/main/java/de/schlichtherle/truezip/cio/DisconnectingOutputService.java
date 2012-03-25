@@ -67,9 +67,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         assertOpen();
-        return delegate.getSize();
+        return delegate.size();
     }
 
     @Override

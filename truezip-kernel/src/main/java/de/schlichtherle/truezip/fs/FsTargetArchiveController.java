@@ -616,7 +616,7 @@ extends FsFileSystemArchiveController<E> {
     private static final class DummyInputService<E extends Entry>
     implements InputService<E> {
         @Override
-        public int getSize() {
+        public int size() {
             return 0;
         }
 
