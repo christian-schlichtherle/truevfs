@@ -6,7 +6,7 @@ package de.truezip.driver.zip.raes.crypto.param.console;
 
 import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
-import de.schlichtherle.truezip.key.pbe.console.ConsoleSafePbeParametersView;
+import de.truezip.kernel.key.pbe.console.ConsoleSafePbeParametersView;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**

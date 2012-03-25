@@ -5,8 +5,8 @@
 package de.truezip.driver.zip.raes;
 
 import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
-import de.schlichtherle.truezip.fs.archive.zip.KeyProviderSyncStrategy;
-import de.schlichtherle.truezip.key.MockView;
+import de.truezip.driver.zip.KeyProviderSyncStrategy;
+import de.truezip.kernel.key.MockView;
 import de.schlichtherle.truezip.cio.IOPoolProvider;
 
 /**

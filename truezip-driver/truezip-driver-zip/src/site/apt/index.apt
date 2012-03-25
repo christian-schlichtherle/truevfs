@@ -41,7 +41,7 @@ About TrueZIP Driver ZIP
         {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setOutputPreferences(de.schlichtherle.truezip.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,de.schlichtherle.truezip.zip.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
+        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,de.truezip.driver.zip.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
 
     [Recovery Of Lost ZIP Entries]
         When reading truncated ZIP files, lost entries can get recovered.
@@ -79,9 +79,9 @@ About TrueZIP Driver ZIP
         {{{./apidocs/de/schlichtherle/truezip/zip/ZipEntry.html#setEncrypted(boolean)}<<<ZipEntry.setEncrypted(boolean)>>>}}
         first.
         Then call
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipFile.html#setCryptoParameters(de.schlichtherle.truezip.zip.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{./apidocs/de/schlichtherle/truezip/zip/ZipFile.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
         or
-        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#setCryptoParameters(de.schlichtherle.truezip.zip.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{./apidocs/de/schlichtherle/truezip/zip/ZipOutputStream.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
         respectively.
 
         Note that the WinZip AES encryption scheme does <not> encrypt and <not>

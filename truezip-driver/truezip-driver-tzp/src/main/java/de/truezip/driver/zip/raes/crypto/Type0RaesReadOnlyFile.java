@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.schlichtherle.truezip.crypto.SICSeekableBlockCipher;
-import de.schlichtherle.truezip.crypto.SeekableBlockCipher;
-import de.schlichtherle.truezip.crypto.SuspensionPenalty;
+import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
+import de.truezip.driver.zip.crypto.SeekableBlockCipher;
+import de.truezip.driver.zip.crypto.SuspensionPenalty;
 import static de.truezip.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
 import static de.truezip.driver.zip.raes.crypto.Constants.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT;
 import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;

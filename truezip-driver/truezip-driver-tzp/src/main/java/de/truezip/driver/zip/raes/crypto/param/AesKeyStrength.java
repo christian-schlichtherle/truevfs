@@ -13,7 +13,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum AesKeyStrength implements de.schlichtherle.truezip.crypto.param.KeyStrength {
+public enum AesKeyStrength implements de.truezip.driver.zip.crypto.param.KeyStrength {
     /** Enum identifier for a 128 bit AES cipher key. */
     BITS_128,
 
