@@ -99,7 +99,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<? extends E> getOutputSocket(final E entry) {
+    public OutputSocket<E> getOutputSocket(final E entry) {
         class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(LockOutputService.super.getOutputSocket(entry));

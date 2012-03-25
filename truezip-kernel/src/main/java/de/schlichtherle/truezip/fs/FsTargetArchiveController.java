@@ -4,11 +4,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.ClutchInputSocket;
-import de.schlichtherle.truezip.cio.ClutchOutputSocket;
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.cio.IOSocket;
 import static de.schlichtherle.truezip.cio.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.cio.Entry.Access;
 import static de.schlichtherle.truezip.cio.Entry.Access.READ;
@@ -636,7 +631,7 @@ extends FsFileSystemArchiveController<E> {
         }
 
         @Override
-        public InputSocket<? extends E> getInputSocket(String name) {
+        public InputSocket<E> getInputSocket(String name) {
             throw new UnsupportedOperationException();
         }
 

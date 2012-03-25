@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.cio;
 
-import de.schlichtherle.truezip.cio.Entry;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.io.InputClosedException;
@@ -88,7 +87,7 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(String name) {
+    public InputSocket<E> getInputSocket(String name) {
         return SOCKET_FACTORY
                 .newInputSocket(this, delegate.getInputSocket(name));
     }
@@ -113,25 +112,25 @@ extends DecoratingInputService<E, InputService<E>> {
     private enum SocketFactory {
         NIO2() {
             @Override
-            <E extends Entry> InputSocket<? extends E> newInputSocket(
+            <E extends Entry> InputSocket<E> newInputSocket(
                     DisconnectingInputService<E> service,
-                    InputSocket<? extends E> input) {
+                    InputSocket<E> input) {
                 return service.new Nio2Input(input);
             }
         },
 
         OIO() {
             @Override
-            <E extends Entry> InputSocket<? extends E> newInputSocket(
+            <E extends Entry> InputSocket<E> newInputSocket(
                     DisconnectingInputService<E> service,
-                    InputSocket<? extends E> input) {
+                    InputSocket<E> input) {
                 return service.new Input(input);
             }
         };
 
-        abstract <E extends Entry> InputSocket<? extends E> newInputSocket(
+        abstract <E extends Entry> InputSocket<E> newInputSocket(
                 DisconnectingInputService<E> service,
-                InputSocket <? extends E> input);
+                InputSocket <E> input);
     } // SocketFactory
 
     private class Nio2Input extends Input {

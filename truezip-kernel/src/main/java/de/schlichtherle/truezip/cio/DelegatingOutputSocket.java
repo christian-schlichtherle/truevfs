@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.cio;
 
-import de.schlichtherle.truezip.cio.Entry;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;

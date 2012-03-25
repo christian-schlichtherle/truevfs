@@ -26,7 +26,7 @@ implements InputService<E> {
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(String name) {
+    public InputSocket<E> getInputSocket(String name) {
         return delegate.getInputSocket(name);
     }
 
