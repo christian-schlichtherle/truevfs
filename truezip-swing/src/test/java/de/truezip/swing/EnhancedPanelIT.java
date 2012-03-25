@@ -2,8 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.swing;
+package de.truezip.swing;
 
+import de.truezip.swing.EnhancedPanel;
+import de.truezip.swing.PanelEvent;
+import de.truezip.swing.PanelListener;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.util.EventListener;

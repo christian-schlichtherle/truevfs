@@ -5,9 +5,9 @@
 package de.truezip.kernel.key.pbe.swing;
 
 import de.truezip.kernel.key.pbe.SafePbeParameters;
-import de.schlichtherle.truezip.swing.EnhancedPanel;
-import de.schlichtherle.truezip.swing.PanelEvent;
-import de.schlichtherle.truezip.swing.PanelListener;
+import de.truezip.swing.EnhancedPanel;
+import de.truezip.swing.PanelEvent;
+import de.truezip.swing.PanelListener;
 import javax.annotation.CheckForNull;
 import java.net.URI;
 

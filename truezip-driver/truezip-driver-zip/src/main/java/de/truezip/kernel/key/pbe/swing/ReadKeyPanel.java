@@ -155,7 +155,7 @@ public class ReadKeyPanel extends KeyPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        passwdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
+        passwdPanel = new de.truezip.swing.EnhancedPanel();
         passwdLabel = new javax.swing.JLabel();
         passwdField = new javax.swing.JPasswordField();
         final javax.swing.JLabel prompt = new javax.swing.JLabel();
@@ -163,11 +163,11 @@ public class ReadKeyPanel extends KeyPanel {
         authenticationPanel = new de.truezip.kernel.key.pbe.swing.AuthenticationPanel();
         error = new javax.swing.JLabel();
 
-        passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+        passwdPanel.addPanelListener(new de.truezip.swing.PanelListener() {
+            public void ancestorWindowShown(de.truezip.swing.PanelEvent evt) {
                 passwdPanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowHidden(de.truezip.swing.PanelEvent evt) {
             }
         });
         passwdPanel.setLayout(new java.awt.GridBagLayout());
@@ -238,7 +238,7 @@ public class ReadKeyPanel extends KeyPanel {
         add(error, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
+    private void passwdPanelAncestorWindowShown(de.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
         // set the focus to the passwd field in this panel when it shows.
         // However, this can't be done in the constructor since the panel is
@@ -295,7 +295,7 @@ public class ReadKeyPanel extends KeyPanel {
     javax.swing.JLabel error;
     javax.swing.JPasswordField passwdField;
     javax.swing.JLabel passwdLabel;
-    de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
+    de.truezip.swing.EnhancedPanel passwdPanel;
     javax.swing.JTextPane resource;
     // End of variables declaration//GEN-END:variables
 }

@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.awt;
+package de.truezip.swing.awt;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;

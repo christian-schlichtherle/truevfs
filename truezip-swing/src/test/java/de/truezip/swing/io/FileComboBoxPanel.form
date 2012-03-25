@@ -2,7 +2,7 @@
 
 <Form version="1.4" maxVersion="1.4" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Component class="de.schlichtherle.truezip.io.swing.FileComboBoxBrowser" name="browser1">
+    <Component class="de.truezip.swing.io.FileComboBoxBrowser" name="browser1">
       <Properties>
         <Property name="comboBox" type="javax.swing.JComboBox" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="box1"/>
@@ -13,7 +13,7 @@
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="18"/>
       </AuxValues>
     </Component>
-    <Component class="de.schlichtherle.truezip.io.swing.FileComboBoxBrowser" name="browser2">
+    <Component class="de.truezip.swing.io.FileComboBoxBrowser" name="browser2">
       <Properties>
         <Property name="comboBox" type="javax.swing.JComboBox" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="box2"/>

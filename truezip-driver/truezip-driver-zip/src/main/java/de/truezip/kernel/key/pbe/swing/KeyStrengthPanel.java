@@ -5,7 +5,7 @@
 package de.truezip.kernel.key.pbe.swing;
 
 import de.truezip.driver.zip.crypto.param.KeyStrength;
-import de.schlichtherle.truezip.swing.EnhancedPanel;
+import de.truezip.swing.EnhancedPanel;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.ComboBoxModel;

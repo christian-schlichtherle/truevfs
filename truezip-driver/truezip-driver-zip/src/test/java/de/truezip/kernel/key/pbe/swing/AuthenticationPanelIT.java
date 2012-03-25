@@ -5,7 +5,7 @@
 package de.truezip.kernel.key.pbe.swing;
 
 import de.truezip.kernel.key.pbe.swing.AuthenticationPanel;
-import de.schlichtherle.truezip.swing.JemmyUtils;
+import de.truezip.swing.JemmyUtils;
 import java.io.File;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

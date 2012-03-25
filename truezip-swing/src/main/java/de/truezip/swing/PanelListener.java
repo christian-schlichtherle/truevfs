@@ -2,12 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.swing;
+package de.truezip.swing;
 
 import java.util.EventListener;
 
 /**
- * Used to notify listeners of an {@link de.schlichtherle.truezip.swing.EnhancedPanel}
+ * Used to notify listeners of an {@link de.truezip.swing.EnhancedPanel}
  * that its ancestor window is shown or hidden.
  *
  * @author Christian Schlichtherle
@@ -16,7 +16,7 @@ public interface PanelListener extends EventListener {
     
     /**
      * Invoked when the ancestor window of an
-     * {@link de.schlichtherle.truezip.swing.EnhancedPanel} is shown.
+     * {@link de.truezip.swing.EnhancedPanel} is shown.
      * 
      * @param evt A panel event.
      */
@@ -24,7 +24,7 @@ public interface PanelListener extends EventListener {
 
     /**
      * Invoked when the ancestor window of an
-     * {@link de.schlichtherle.truezip.swing.EnhancedPanel} is hidden.
+     * {@link de.truezip.swing.EnhancedPanel} is hidden.
      * 
      * @param evt A panel event.
      */

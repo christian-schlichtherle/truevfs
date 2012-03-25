@@ -2,9 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.io.swing;
+package de.truezip.swing.io;
 
-import de.schlichtherle.truezip.swing.AbstractComboBoxBrowser;
+import de.truezip.swing.AbstractComboBoxBrowser;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.text.Collator;

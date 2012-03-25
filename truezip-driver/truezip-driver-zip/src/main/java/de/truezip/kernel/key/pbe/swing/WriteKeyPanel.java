@@ -247,7 +247,7 @@ public class WriteKeyPanel extends KeyPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        passwdPanel = new de.schlichtherle.truezip.swing.EnhancedPanel();
+        passwdPanel = new de.truezip.swing.EnhancedPanel();
         newPasswd1Label = new javax.swing.JLabel();
         newPasswd1Field = new javax.swing.JPasswordField();
         newPasswd2Label = new javax.swing.JLabel();
@@ -257,11 +257,11 @@ public class WriteKeyPanel extends KeyPanel {
         authenticationPanel = new de.truezip.kernel.key.pbe.swing.AuthenticationPanel();
         error = new javax.swing.JLabel();
 
-        passwdPanel.addPanelListener(new de.schlichtherle.truezip.swing.PanelListener() {
-            public void ancestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {
+        passwdPanel.addPanelListener(new de.truezip.swing.PanelListener() {
+            public void ancestorWindowShown(de.truezip.swing.PanelEvent evt) {
                 passwdPanelAncestorWindowShown(evt);
             }
-            public void ancestorWindowHidden(de.schlichtherle.truezip.swing.PanelEvent evt) {
+            public void ancestorWindowHidden(de.truezip.swing.PanelEvent evt) {
             }
         });
         passwdPanel.setLayout(new java.awt.GridBagLayout());
@@ -342,7 +342,7 @@ public class WriteKeyPanel extends KeyPanel {
         add(error, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void passwdPanelAncestorWindowShown(de.schlichtherle.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
+    private void passwdPanelAncestorWindowShown(de.truezip.swing.PanelEvent evt) {//GEN-FIRST:event_passwdPanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
         // set the focus to the newPasswd1 field in this panel when it shows.
         // However, this can't be done in the constructor since the panel is
@@ -402,7 +402,7 @@ public class WriteKeyPanel extends KeyPanel {
     private javax.swing.JLabel newPasswd1Label;
     private javax.swing.JPasswordField newPasswd2Field;
     private javax.swing.JLabel newPasswd2Label;
-    private de.schlichtherle.truezip.swing.EnhancedPanel passwdPanel;
+    private de.truezip.swing.EnhancedPanel passwdPanel;
     private javax.swing.JTextPane resource;
     // End of variables declaration//GEN-END:variables
 }
