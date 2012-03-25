@@ -23,10 +23,10 @@ Application File Format
     {{{../truezip-file/index.html}TrueZIP File*}}
     module, here's your relief:
     The
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
     and
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    {{{../apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
     classes can read and write entries within an
     archive file as if they were plain files in regular directories in the file
     system.
@@ -50,7 +50,7 @@ TConfig.get().setArchiveDetector(
     use the suffix of your custom application file format.
 
     Please also note the usage of the class
-    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}
+    {{{../apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}
     for accessing the JAR file format.
     The JAR file format is typically the best choice for custom application
     file formats because it supports compression, fast access and UTF-8 encoded
@@ -70,7 +70,7 @@ try {
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}.
+    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}.
 
     This is how you could read the entry again:
 
@@ -84,7 +84,7 @@ try {
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
 
     And finally, to delete a virtual directory tree - in this case your custom
     application file - you could use this:

@@ -150,7 +150,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
     {{{./usecases/aff.html}application file formats}}
     which demonstrates this.
     As you can see in this article, you simply need to pass the
-    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html#SINGLETON}<<<IOPoolLocator.SINGLETON>>>}}
+    {{{./apidocs/de/truezip/kernel/sl/IOPoolLocator.html#SINGLETON}<<<IOPoolLocator.SINGLETON>>>}}
     to the archive driver constructors now in order to obtain their usual
     behaviour.
 

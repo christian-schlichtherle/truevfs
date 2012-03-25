@@ -7,7 +7,7 @@
 Nzip - a Comprehensive Command Line Utility
 
     The Nzip command line utility implemented by the class
-    {{{./apidocs/de/schlichtherle/truezip/sample/file/app/Nzip.html}<<<de.truezip.samples.Nzip>>>}}
+    {{{./apidocs/de/truezip/sample/Nzip.html}<<<de.truezip.samples.Nzip>>>}}
     showcases the power of the {{{../truezip-file/index.html}TrueZIP File*}} API.
 
     This is a comprehensive command line utility which allows you to work with
@@ -71,9 +71,9 @@ java %PROPS% -jar "%JAR%" %*
 *--+--+
 |<<<nzip.cmd llr truezip-${project.version}-jar-with-dependencies.jar>>>|Prints a recursive long listing of the contents of the root directory of the JAR file from which the tool is actually running.|
 *--+--+
-|<<<nzip.cmd cp truezip-${project.version}-jar-with-dependencies.jar/de/schlichtherle/truezip/sample/file/app/Nzip.class archive.zip>>>|Copies the file entry <<<de/schlichtherle/truezip/sample/file/app/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
+|<<<nzip.cmd cp truezip-${project.version}-jar-with-dependencies.jar/de/truezip/sample/Nzip.class archive.zip>>>|Copies the file entry <<<de/truezip/sample/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
 *--+--+
-|<<<nzip.cmd rm archive.zip/de/schlichtherle/truezip/sample/file/app/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/de/schlichtherle/truezip/sample/file/app>>>.|
+|<<<nzip.cmd rm archive.zip/de/truezip/sample/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/de/truezip/samples>>>.|
 *--+--+
 |<<<nzip.cmd rmr archive.zip/de>>>|Recursively removes the directory entry <<<de>>> from <<<archive.zip>>>.|
 *--+--+

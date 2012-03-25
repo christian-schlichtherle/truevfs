@@ -203,12 +203,12 @@ TConfig.get().setArchiveDetector(
                 <p>
                     Furthermore, this example presumes that you want no other
                     archive file suffixes to get detected, hence the use of
-                    <a href="apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
+                    <a href="apidocs/de/truezip/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
                     as the decorated archive detector.
                     The class <code>TArchiveDetector</code> has many different
                     constructors.
                     Check the
-                    <a href="apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html">Javadoc</a>
+                    <a href="apidocs/de/truezip/file/TArchiveDetector.html">Javadoc</a>
                     to make sure you get what you need.
                 </p>
             </answer>
@@ -331,7 +331,7 @@ long length = file.length();
                 <source>TVFS.umount();</source>
                 <p>
                     Please have a look at the method's
-                    <a href="apidocs/de/schlichtherle/truezip/file/TVFS.html#umount()">Javadoc</a>
+                    <a href="apidocs/de/truezip/file/TVFS.html#umount()">Javadoc</a>
                     for more options.
                 </p>
             </answer>
@@ -756,9 +756,9 @@ long size = Files.size(path);
                     normalized entry name.
                     Then, an application can read the contents of the file
                     entry by using e.g.
-                    <a href="apidocs/de/schlichtherle/truezip/file/TFileInputStream.html"><code>TFileInputStream</code></a>
+                    <a href="apidocs/de/truezip/file/TFileInputStream.html"><code>TFileInputStream</code></a>
                     and list the members of the directory entry by using
-                    <a href="apidocs/de/schlichtherle/truezip/file/TFile.html#listFiles()"><code>TFile.listFiles()</code></a>.
+                    <a href="apidocs/de/truezip/file/TFile.html#listFiles()"><code>TFile.listFiles()</code></a>.
                 </p>
                 <p>
                     Note that this feature solely exists to enable applications

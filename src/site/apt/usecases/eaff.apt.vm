@@ -28,10 +28,10 @@ Encrypted Application File Format
     {{{../truezip-file/index.html}TrueZIP File*}}
     module, here's your relief:
     The
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
     and
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    {{{../apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
     classes can read and write entries within an encrypted and authenticated
     archive file as if they were plain files in regular directories in the file
     system.
@@ -56,12 +56,12 @@ TConfig.get().setArchiveDetector(
     use the suffix of your custom application file format.
 
     Please also note the usage of the class
-    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+    {{{../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
     for accessing the ZIP.RAES file format.
     This is one of two available archive driver implementations for TrueZIP's
     custom encrypted ZIP.RAES file format (or TZP for short).
     The other one is the class
-    {{{../apidocs/de/schlichtherle/truezip/fs/archive/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
+    {{{../apidocs/de/truezip/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
     A TZP file is a ZIP file with UTF-8 encoded entry names (like the JAR file
     format) which is wrapped in a RAES file envelope.
     RAES is TrueZIP's custom Random Access Encryption Specification which
@@ -71,7 +71,7 @@ TConfig.get().setArchiveDetector(
     its encrypted payload, which makes reading a TZP file pretty fast.
 
     Note the injection of the
-    {{{../apidocs/de/schlichtherle/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
+    {{{../apidocs/de/truezip/kernel/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
     into the <<<SafeZipRaesDriver>>>.
     This object is responsible for resolving keys by prompting the user for
     passwords.
@@ -79,7 +79,7 @@ TConfig.get().setArchiveDetector(
     prompting, otherwise a Swing GUI.
     If you want to hard code a password instead, you would need to inject an
     instance of your own implementation of the interface
-    {{{../apidocs/de/schlichtherle/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}.
+    {{{../apidocs/de/truezip/kernel/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}.
     For more information, please refer to the article about
     {{{../truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
 
@@ -96,7 +96,7 @@ try {
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}.
+    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}.
 
     This is how you could read the entry again:
 
@@ -110,7 +110,7 @@ try {
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
 
     And finally, to delete a virtual directory tree - in this case your custom
     application file - you could use this:

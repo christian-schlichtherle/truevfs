@@ -18,20 +18,20 @@ Key Management
 
     At runtime, all WinZip AES encrypted ZIP entries are managed by an instance
     of a sub-class of the abstract archive driver implementation class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/ZipDriver.html}<<<ZipDriver>>>}}.
+    {{{../../apidocs/de/truezip/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}.
     For custom encrypted application file formats, this should be an instance
     of the class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}
+    {{{../../apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}
 
     Whenever this archive driver class reads or writes a WinZip AES encrypted
     ZIP entry, it uses an instance of the interface
-    {{{../../apidocs/de/schlichtherle/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
+    {{{../../apidocs/de/truezip/kernel/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
     in order to obtain an instance of the interface
-    {{{../../apidocs/de/schlichtherle/truezip/key/KeyManager.html}<<<KeyManager>>>}}
+    {{{../../apidocs/de/truezip/kernel/key/KeyManager.html}<<<KeyManager>>>}}
     for the interface
-    {{{../../apidocs/de/schlichtherle/truezip/key/pbe/AesPbeParameters.html}<<<AesPbeParameters>>>}}
+    {{{../../apidocs/de/truezip/kernel/key/pbe/AesPbeParameters.html}<<<AesPbeParameters>>>}}
     and finally obtain an instance of the interface
-    {{{../../apidocs/de/schlichtherle/truezip/key/KeyProvider.html}<<<KeyProvider>>>}}
+    {{{../../apidocs/de/truezip/kernel/key/KeyProvider.html}<<<KeyProvider>>>}}
     for the prospective archive file.
 
     Because dependency injection is used all over the place in order to resolve
@@ -40,27 +40,27 @@ Key Management
     architecture provides several ways to set passwords programmatically.
     In order to set a common password for all WinZip AES encrypted ZIP entries
     you need a custom
-    {{{../../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
+    {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
     which you can either inject into any
-    {{{../../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
     constructor or install as the default archive detector by calling
 
-%{snippet|id=install|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/fs/archive/zip/sample/KeyManagement.java}
+%{snippet|id=install|file=${project.build.testSourceDirectory}/de/truezip/driver/zip/sample/KeyManagement.java}
 
 * Setting Passwords For All WinZip AES Entries By Implementing A Custom Driver
 
     This option bypasses the key manager by subclassing
-    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/JarDriver.html}<<<JarDriver>>>}}
+    {{{../../apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}
     and overriding the relevant methods for dealing with WinZip AES parameters.
 
-%{snippet|id=newArchiveDetector1|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/fs/archive/zip/sample/KeyManagement.java}
+%{snippet|id=newArchiveDetector1|file=${project.build.testSourceDirectory}/de/truezip/driver/zip/sample/KeyManagement.java}
 
 * Setting Passwords For All WinZip AES Entries By Implementing A Custom View
 
     Another option is to customize the key manager by instantiating the class
-    {{{../../apidocs/de/schlichtherle/truezip/fs/archive/zip/PromptingKeyManagerService.html}<<<PromptingKeyManagerService>>>}}
+    {{{../../apidocs/de/truezip/driver/zip/PromptingKeyManagerService.html}<<<PromptingKeyManagerService>>>}}
     which applies the Model-View-Controller pattern to manage its key providers.
     Here I simply substitute the default view class with a custom
     implementation.
 
-%{snippet|id=newArchiveDetector2|file=${project.build.testSourceDirectory}/de/schlichtherle/truezip/fs/archive/zip/sample/KeyManagement.java}
+%{snippet|id=newArchiveDetector2|file=${project.build.testSourceDirectory}/de/truezip/driver/zip/sample/KeyManagement.java}

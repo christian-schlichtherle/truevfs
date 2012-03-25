@@ -26,17 +26,17 @@ Kick-Starting TrueZIP Applications With Eclipse
     and
     {{{../../truezip-path/index.html}TrueZIP Path}}
     use a
-    {{{../../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
+    {{{../../apidocs/de/truezip/kernel/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
     which scans the class path for
-    {{{../../apidocs/de/schlichtherle/truezip/fs/spi/FsDriverService.html}file system driver services}}.
+    {{{../../apidocs/de/truezip/kernel/fs/spi/FsDriverService.html}file system driver services}}.
     These file system driver services are contained in
     {{{../../truezip-driver/index.html}file system driver modules}}.
     By adding the JAR artifacts of the file system driver modules to the run
     time class path of your application, you trigger the module TrueZIP File*
     to add their file system drivers to the
-    {{{../../apidocs/de/schlichtherle/truezip/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
+    {{{../../apidocs/de/truezip/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
     of its
-    {{{../../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}archive detection}}.
+    {{{../../apidocs/de/truezip/file/TArchiveDetector.html#ALL}archive detection}}.
 
     Although it's straightforward, setting up the class path can be a daunting
     task for TrueZIP beginners, so a Maven archetype is provided as a template
@@ -131,7 +131,7 @@ Kick-Starting TrueZIP Applications With Eclipse
     This abstract base class runs the setup-work-sync life cycle of a typical
     TrueZIP application.
     It overrides the method
-    {{{../../apidocs/de/schlichtherle/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}}
+    {{{../../apidocs/de/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}}
     in order to customize the initial setup.
 
     [<<<src/main/java/com/company/project/Cat.java>>>]
@@ -162,7 +162,7 @@ Kick-Starting TrueZIP Applications With Eclipse
     This utility is only available with the archetype for the TrueZIP File*
     module.
     It llets you pick a file using a
-    {{{../../apidocs/de/schlichtherle/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
+    {{{../../apidocs/de/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
     and prints it's path.
     Of course, <<<TFileChooser>>> can browse archive files, too.
 

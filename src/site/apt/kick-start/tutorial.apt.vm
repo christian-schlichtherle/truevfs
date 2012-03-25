@@ -37,13 +37,13 @@ Tutorial
 * The package <<<de.truezip.file>>>
 
     The entry point to the TrueZIP File* API is the package
-    {{{../apidocs/de/schlichtherle/truezip/file/package-summary.html}<<<de.truezip.file>>>}}.
+    {{{../apidocs/de/truezip/file/package-summary.html}<<<de.truezip.file>>>}}.
     It contains the classes
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}<<<TFile>>>}},
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}},
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}},
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
+    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
+    {{{../apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}},
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}},
+    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
     etc, or just <<<TFile*>>> for short.
 
     Your starting point for almost all file system operations is an object of
@@ -51,7 +51,7 @@ Tutorial
     This class inherits from <<<java.io.File>>>, so you can use it with other
     APIs for its super class.
     The class
-    {{{../apidocs/de/schlichtherle/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
+    {{{../apidocs/de/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
     uses this feature by subclassing <<<javax.swing.JFileChooser>>> so that you
     can browse archive files with it, too.
     Note however that you can't use a plain old <<<java.io.FileInputStream>>>,
@@ -66,9 +66,9 @@ Tutorial
 
     Creating an archive file works exactly like creating any other directory,
     so you could simply call
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}
+    {{{../apidocs/de/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}
     or
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#mkdirs()}<<<TFile.mkdirs()>>>}}
+    {{{../apidocs/de/truezip/file/TFile.html#mkdirs()}<<<TFile.mkdirs()>>>}}
     in order to create an archive file or a member directory.
 
 +--+
@@ -85,7 +85,7 @@ dir.mkdirs(); // don't do this!
     archive file.
 
     The following example shows how to create an archive entry with the class
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
+    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
     without the need to create its containing archive file or the directory
     within this archive file first:
 
@@ -121,7 +121,7 @@ try {
 * Read
 
     Reading an archive entry is as easy as writing it - just use a class like
-    {{{../apidocs/de/schlichtherle/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}
     and point it to the archive entry:
     
 +--+
@@ -142,8 +142,8 @@ try {
     first place?
     Remember that the <<<TFile>>> class extends <<<File>>>, so you can simply
     use
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#list()}<<<TFile.list()>>>}},
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}
+    {{{../apidocs/de/truezip/file/TFile.html#list()}<<<TFile.list()>>>}},
+    {{{../apidocs/de/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}
     etc.
 
     The following example prints the members of the previously created archive
@@ -171,7 +171,7 @@ for (String member : archive.list())
     meta data, e.g. the last modification time.
     Just like with a real file system, you can easily update the last
     modification time of an archive entry by calling
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}.
+    {{{../apidocs/de/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}.
 
 +--+
 File entry = new TFile("archive.zip/dir/HälloWörld.txt");
@@ -190,7 +190,7 @@ entry.setLastModified(System.currentTimeMillis()); // sub-optimal!
     You may be guessing it already, so let it suffice to say that deleting an
     archive entry works in exactly the same way as with a regular file system
     entry - just call
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
+    {{{../apidocs/de/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
 
 +--+
 File entry = new TFile("archive.zip/dir/HälloWörld.txt");
@@ -200,7 +200,7 @@ boolean ok = entry.delete(); // sub-optimal!
     One shortcoming of this method is that it just returns a boolean value to
     indicate success or failure.
     To overcome this, another method has been added which is aptly named
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#rm()}<<<TFile.rm()>>>}}.
+    {{{../apidocs/de/truezip/file/TFile.html#rm()}<<<TFile.rm()>>>}}.
 
 +--+
 new TFile("archive.zip/dir/HälloWörld.txt").rm();
@@ -235,7 +235,7 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
     For more information about the available bulk I/O methods, please refer to
     the section
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html#bulkIOMethods}Bulk I/O methods}}
+    {{{../apidocs/de/truezip/file/TFile.html#bulkIOMethods}Bulk I/O methods}}
     of the <<<TFile>>> class Javadoc.
     For now, let's just clean up behind us:
 

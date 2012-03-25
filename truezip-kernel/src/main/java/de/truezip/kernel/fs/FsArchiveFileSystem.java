@@ -423,9 +423,8 @@ implements Iterable<FsCovariantEntry<E>> {
      * file system may be altered between the construction of an instance and
      * the call to the {@link #commit} method, which may render the operation
      * illegal and corrupt the file system.
-     * As long as only the ArchiveControllers in the package
-     * de.truezip.kernel.fs.archive are used, this should not
-     * happen, however.
+     * As long as only the ArchiveControllers in this package are used, this
+     * should not happen, however.
      */
     private final class PathLink implements FsArchiveFileSystemOperation<E> {
         final boolean createParents;

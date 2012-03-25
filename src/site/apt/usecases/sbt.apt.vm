@@ -30,7 +30,7 @@ new TFile("file").cp_rp(new TFile("archive.tar.gz/file"));
     The <<<TFile>>> class provides many alternative constructors and methods to
     ease the tasks of constructing complete path names and copy files or
     directories - please consult the
-    {{{../apidocs/de/schlichtherle/truezip/file/TFile.html}Javadoc}}
+    {{{../apidocs/de/truezip/file/TFile.html}Javadoc}}
     for more information.
     
     The type of the prospective archive file is detected by its
