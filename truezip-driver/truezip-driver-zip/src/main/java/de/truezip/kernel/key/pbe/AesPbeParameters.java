@@ -4,14 +4,14 @@
  */
 package de.truezip.kernel.key.pbe;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A JavaBean which holds password based encryption parameters for use with the
  * AES cipher.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class AesPbeParameters

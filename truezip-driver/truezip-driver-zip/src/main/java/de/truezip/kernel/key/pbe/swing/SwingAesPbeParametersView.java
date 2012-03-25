@@ -4,14 +4,14 @@
  */
 package de.truezip.kernel.key.pbe.swing;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.key.pbe.AesPbeParameters;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class SwingAesPbeParametersView

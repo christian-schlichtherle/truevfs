@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.driver.zip.raes.crypto.Type0RaesParameters;
 import java.util.Random;
 import java.util.logging.Level;

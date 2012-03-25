@@ -2,12 +2,14 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.zip.raes.key;
+package de.truezip.kernel.key.impl;
 
-import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
 import de.truezip.kernel.key.KeyManager;
 import de.truezip.kernel.key.PromptingKeyManager;
 import de.truezip.kernel.key.PromptingKeyProvider.View;
+import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.pbe.console.ConsoleAesPbeParametersView;
+import de.truezip.kernel.key.pbe.swing.SwingAesPbeParametersView;
 import de.truezip.kernel.key.spi.KeyManagerService;
 import java.awt.GraphicsEnvironment;
 import java.util.Map;
@@ -15,7 +17,7 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * A container for a prompting key manager implementation for
- * {@link AesCipherParameters}.
+ * {@link AesPbeParameters}.
  *
  * @author Christian Schlichtherle
  */
@@ -28,19 +30,17 @@ public final class PromptingKeyManagerService extends KeyManagerService {
      * Constructs a new prompting key manager service using the default view.
      * If this JVM is running {@link GraphicsEnvironment#isHeadless() headless},
      * then the view of the prompting key provider of the prompting key manager
-     * is an instance of
-     * {@link de.truezip.driver.zip.raes.crypto.param.console.AesCipherParametersView}.
-     * Otherwise, it's an instance of
-     * {@link de.truezip.driver.zip.raes.crypto.param.swing.AesCipherParametersView}.
+     * is an instance of {@link ConsoleAesPbeParametersView}.
+     * Otherwise, it's an instance of {@link SwingAesPbeParametersView}.
      */
     public PromptingKeyManagerService() {
         this.managers = newMap(new Object[][] {
             {
-                AesCipherParameters.class,
-                new PromptingKeyManager<AesCipherParameters>(
+                AesPbeParameters.class,
+                new PromptingKeyManager<AesPbeParameters>(
                     GraphicsEnvironment.isHeadless()
-                        ? new de.truezip.driver.zip.raes.crypto.param.console.AesCipherParametersView()
-                        : new de.truezip.driver.zip.raes.crypto.param.swing.AesCipherParametersView())
+                        ? new ConsoleAesPbeParametersView()
+                        : new SwingAesPbeParametersView())
             }
         });
     }
@@ -51,11 +51,11 @@ public final class PromptingKeyManagerService extends KeyManagerService {
      * @param view the view for the prompting key providers of the prompting
      *        key manager.
      */
-    public PromptingKeyManagerService(View<AesCipherParameters> view) {
+    public PromptingKeyManagerService(View<AesPbeParameters> view) {
         this.managers = newMap(new Object[][] {
             {
-                AesCipherParameters.class,
-                new PromptingKeyManager<AesCipherParameters>(view)
+                AesPbeParameters.class,
+                new PromptingKeyManager<AesPbeParameters>(view)
             }
         });
     }

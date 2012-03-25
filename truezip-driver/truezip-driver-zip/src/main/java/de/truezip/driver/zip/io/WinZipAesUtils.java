@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 
 /**
  * Static utility methods for WinZip AES encryption.

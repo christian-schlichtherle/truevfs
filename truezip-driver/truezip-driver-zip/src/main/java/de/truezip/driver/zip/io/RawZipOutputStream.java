@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.LEDataOutputStream;
 import static de.truezip.kernel.util.Maps.initialCapacity;

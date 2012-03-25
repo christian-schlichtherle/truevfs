@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.driver.zip.raes.crypto.RaesKeyException;
-import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
-import de.truezip.kernel.fs.FsController;
 import de.truezip.driver.zip.KeyManagerController;
+import de.truezip.driver.zip.raes.crypto.RaesKeyException;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.key.pbe.AesPbeParameters;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -34,7 +34,7 @@ extends KeyManagerController<ZipRaesDriver> {
 
     @Override
     protected Class<?> getKeyType() {
-        return AesCipherParameters.class;
+        return AesPbeParameters.class;
     }
 
     @Override

@@ -4,9 +4,9 @@
  */
 package de.truezip.kernel.key.pbe.swing;
 
-import de.truezip.driver.zip.crypto.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.key.pbe.swing.KeyStrengthPanel;
-import static de.truezip.driver.zip.crypto.param.AesKeyStrength.*;
+import static de.truezip.kernel.key.param.AesKeyStrength.*;
 import de.truezip.swing.JemmyUtils;
 import org.junit.After;
 import static org.junit.Assert.assertSame;

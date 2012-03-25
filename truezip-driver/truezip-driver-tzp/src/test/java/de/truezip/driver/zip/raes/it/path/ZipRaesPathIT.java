@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes.it.path;
 
-import de.truezip.driver.zip.raes.crypto.param.AesCipherParameters;
+import de.truezip.kernel.key.pbe.AesPbeParameters;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
 import de.truezip.kernel.key.MockView;
 import static de.truezip.kernel.key.MockView.Action.CANCEL;
@@ -21,7 +21,7 @@ import org.junit.Test;
  */
 public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
 
-    private MockView<AesCipherParameters> view;
+    private MockView<AesPbeParameters> view;
 
     @Override
     protected String getSuffixList() {

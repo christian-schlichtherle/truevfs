@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.truezip.driver.zip.raes.crypto.param.AesKeyStrength;
 import de.truezip.driver.zip.crypto.CipherReadOnlyFile;
+import de.truezip.kernel.key.param.AesKeyStrength;
+import static de.truezip.driver.zip.raes.crypto.Constants.LEAD_IN_LENGTH;
+import static de.truezip.driver.zip.raes.crypto.Constants.SIGNATURE;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.DefaultReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import static de.truezip.driver.zip.raes.crypto.Constants.LEAD_IN_LENGTH;
-import static de.truezip.driver.zip.raes.crypto.Constants.SIGNATURE;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.File;
 import java.io.FileNotFoundException;
