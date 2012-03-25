@@ -135,7 +135,7 @@
                             <artifactId>maven-failsafe-plugin</artifactId>
                             <configuration>
                                 <excludes>
-                                    <exclude>**/it/path/*PathIT.class</exclude>
+                                    <exclude>**/path/*IT.class</exclude>
                                     <!-- Still unreliable when run in parallel.
                                         Run manually when required. -->
                                     <exclude>**/swing/*IT.class</exclude>
