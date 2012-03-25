@@ -10,7 +10,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Indicates that a resource has been closed.
  *
- * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

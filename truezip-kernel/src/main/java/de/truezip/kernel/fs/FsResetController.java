@@ -15,7 +15,6 @@ import javax.annotation.concurrent.Immutable;
  * Resets the decorated file system controller once the virtual root directory
  * of the file system has been successfully unlinked.
  * 
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @Immutable

@@ -9,7 +9,6 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Static utility methods for {@link Throwable}s.
  * 
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @Immutable

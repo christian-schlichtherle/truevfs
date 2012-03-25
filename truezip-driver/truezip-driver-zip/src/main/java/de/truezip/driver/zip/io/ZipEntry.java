@@ -68,14 +68,11 @@ public class ZipEntry implements Cloneable {
      * Method for <em>BZIP2</em> compressed entries.
      * 
      * @see   #setMethod(int)
-     * @since TrueZIP 7.3
      */
     public static final int BZIP2 = 12;
 
     /**
      * Pseudo compression method for WinZip AES encrypted entries.
-     * 
-     * @since TrueZIP 7.3
      */
     static final int WINZIP_AES = 99;
 
@@ -251,7 +248,6 @@ public class ZipEntry implements Cloneable {
      * Note that only WinZip AES encryption is currently supported.
      * 
      * @return {@code true} if and only if this ZIP entry is encrypted.
-     * @since  TrueZIP 7.3
      */
     public final boolean isEncrypted() {
         return getGeneralPurposeBitFlag(GPBF_ENCRYPTED);
@@ -266,7 +262,6 @@ public class ZipEntry implements Cloneable {
      * currently supported.
      * 
      * @param encrypted whether or not this ZIP entry should get encrypted.
-     * @since TrueZIP 7.3
      */
     public final void setEncrypted(boolean encrypted) {
         setGeneralPurposeBitFlag(GPBF_ENCRYPTED, encrypted);
@@ -275,8 +270,6 @@ public class ZipEntry implements Cloneable {
     /**
      * Sets the encryption property to {@code false} and removes any other
      * encryption artifacts, e.g. a WinZip AES extra field.
-     * 
-     * @since TrueZIP 7.4
      * @see   <a href="http://java.net/jira/browse/TRUEZIP-176">#TRUEZIP-176</a>
      */
     public final void clearEncryption() {
@@ -480,7 +473,6 @@ public class ZipEntry implements Cloneable {
     /**
      * Returns the external file attributes.
      * 
-     * @since  TrueZIP 7.3
      * @return The external file attributes.
      */
     public final long getExternalAttributes() {
@@ -491,7 +483,6 @@ public class ZipEntry implements Cloneable {
      * Sets the external file attributes.
      * 
      * @param eattr the external file attributes.
-     * @since TrueZIP 7.3
      */
     public final void setExternalAttributes(final long eattr) {
         final boolean known = UNKNOWN != eattr;

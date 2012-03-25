@@ -11,7 +11,6 @@ import java.util.Map;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

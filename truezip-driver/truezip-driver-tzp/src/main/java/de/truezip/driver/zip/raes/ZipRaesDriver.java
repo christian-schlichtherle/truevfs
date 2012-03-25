@@ -85,7 +85,6 @@ public abstract class ZipRaesDriver extends JarDriver {
      * 
      * @return The provider for key managers for accessing protected resources
      *         (encryption).
-     * @since  TrueZIP 7.3.
      */
     @Override
     protected final KeyManagerProvider getKeyManagerProvider() {

@@ -14,7 +14,6 @@ import javax.annotation.concurrent.Immutable;
 /**
  * A file system driver for the FILE scheme.
  * 
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @Immutable

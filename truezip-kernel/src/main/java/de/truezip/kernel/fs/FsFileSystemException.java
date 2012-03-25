@@ -21,7 +21,6 @@ public class FsFileSystemException extends IOException {
     /** The nullable entry path name. */
     private final @CheckForNull String path;
 
-    /** @since TrueZIP 7.5 */
     FsFileSystemException(FsEntryName name, String message) {
         this(name.toString(), message);
     }

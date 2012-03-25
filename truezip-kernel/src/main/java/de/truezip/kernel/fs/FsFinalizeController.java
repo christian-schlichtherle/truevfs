@@ -31,7 +31,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Finalizes unclosed resources returned by its decorated controller.
  * 
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @ThreadSafe

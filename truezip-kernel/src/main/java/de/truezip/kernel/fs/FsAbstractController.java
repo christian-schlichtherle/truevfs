@@ -13,7 +13,6 @@ import javax.annotation.concurrent.Immutable;
  * this model for the convenience of sub-classes.
  *
  * @param  <M> the type of the file system model.
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @Immutable

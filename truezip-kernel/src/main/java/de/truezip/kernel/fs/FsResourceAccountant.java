@@ -36,7 +36,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * call {@link #stopAccountingFor(Closeable)}.
  *
  * @see    FsResourceController
- * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @ThreadSafe

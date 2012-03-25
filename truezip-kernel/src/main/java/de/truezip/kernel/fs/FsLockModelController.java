@@ -14,7 +14,6 @@ import javax.annotation.concurrent.Immutable;
  * protected methods to this model for the convenience of sub-classes.
  *
  * @see    FsLockModel
- * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @Immutable

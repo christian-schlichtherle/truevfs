@@ -89,7 +89,6 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
      * Returns the initial capacity of the next backing array to allocate when
      * starting output to this I/O buffer.
      * 
-     * @since  TrueZIP 7.5
      * @return The initial capacity of the next backing array to allocate when
      *         starting output to this I/O buffer.
      */

@@ -21,7 +21,6 @@ import java.net.URISyntaxException;
  * If you are not sure which method you should use, try {@link #umount()} -
  * it does the right thing for most use cases.
  * 
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 public final class TVFS {

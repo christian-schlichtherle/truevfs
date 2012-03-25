@@ -17,7 +17,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * A decorator which protects all access to it via a {@link Lock}.
  *
  * @see     LockOutputStream
- * @since   TrueZIP 7.5
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

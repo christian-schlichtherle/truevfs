@@ -12,7 +12,6 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Contains {@link TempFilePool#INSTANCE}.
  *
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @Immutable

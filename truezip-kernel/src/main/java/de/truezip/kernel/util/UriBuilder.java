@@ -501,7 +501,6 @@ public final class UriBuilder {
      * the first occurence of the query separator {@code '?'}.
      *
      * @param  pathQuery the combined URI path and query components.
-     * @since  TrueZIP 7.4.2
      */
     public void setPathQuery(final @CheckForNull String pathQuery) {
         final int i;
@@ -520,7 +519,6 @@ public final class UriBuilder {
      *
      * @param  pathQuery the combined URI path and query components.
      * @return {@code this}
-     * @since  TrueZIP 7.4.2
      */
     public UriBuilder pathQuery(@CheckForNull String pathQuery) {
         setPathQuery(pathQuery);

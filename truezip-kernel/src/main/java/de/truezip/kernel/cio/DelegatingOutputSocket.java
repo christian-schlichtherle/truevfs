@@ -14,7 +14,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  *
  * @see    DelegatingInputSocket
  * @param  <E> the type of the {@link #getLocalTarget() local target}.
- * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

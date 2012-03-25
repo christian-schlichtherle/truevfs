@@ -29,7 +29,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * so it could get published as a member of the package
  * {@code de.truezip.file} instead if required.
  * 
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

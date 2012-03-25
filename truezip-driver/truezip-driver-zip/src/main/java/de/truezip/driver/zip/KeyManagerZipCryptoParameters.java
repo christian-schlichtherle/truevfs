@@ -24,7 +24,6 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToByte
  * <p>
  * The current implementation supports only {@link WinZipAesParameters}.
  *
- * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @ThreadSafe

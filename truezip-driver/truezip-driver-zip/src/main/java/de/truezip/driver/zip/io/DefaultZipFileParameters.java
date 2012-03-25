@@ -10,7 +10,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * The default implementation of {@link ZipFileParameters}.
  *
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

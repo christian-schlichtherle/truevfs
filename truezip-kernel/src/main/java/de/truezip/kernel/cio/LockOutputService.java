@@ -23,7 +23,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @param  <E> the type of the entries.
  * @see    LockInputService
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @ThreadSafe

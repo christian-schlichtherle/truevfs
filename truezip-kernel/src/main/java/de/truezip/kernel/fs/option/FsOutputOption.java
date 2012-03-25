@@ -54,8 +54,6 @@ public enum FsOutputOption {
      * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
-     * 
-     * @since TrueZIP 7.1
      */
     STORE,
 
@@ -65,8 +63,6 @@ public enum FsOutputOption {
      * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
-     * 
-     * @since TrueZIP 7.1
      */
     COMPRESS,
 
@@ -85,8 +81,6 @@ public enum FsOutputOption {
      * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
-     * 
-     * @since TrueZIP 7.3
      */
     GROW,
 
@@ -97,8 +91,6 @@ public enum FsOutputOption {
      * Note that this option may get ignored by archive file system drivers.
      * Furthermore, if this happens, there may be no direct feedback available
      * to the caller.
-     * 
-     * @since TrueZIP 7.3
      */
     ENCRYPT,
 }

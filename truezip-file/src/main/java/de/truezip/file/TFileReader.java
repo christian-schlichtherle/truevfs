@@ -65,7 +65,6 @@ public final class TFileReader extends InputStreamReader {
      * @param  file a file to read.
      * @param  charset a character set for decoding bytes to characters.
      * @throws FileNotFoundException on any I/O failure.
-     * @since  TrueZIP 7.5
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")

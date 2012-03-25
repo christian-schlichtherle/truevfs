@@ -41,7 +41,6 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      * Returns a new prompting key provider.
      * 
      * @return A new prompting key provider.
-     * @since  TrueZIP 7.2
      */
     @Override
     protected PromptingKeyProvider<K> newKeyProvider() {

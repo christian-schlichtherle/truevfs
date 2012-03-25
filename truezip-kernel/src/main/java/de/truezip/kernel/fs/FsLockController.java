@@ -49,7 +49,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * 
  * @see    FsLockModel
  * @see    FsNeedsWriteLockException
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @Immutable

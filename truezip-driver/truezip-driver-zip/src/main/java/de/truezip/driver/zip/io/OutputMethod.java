@@ -17,7 +17,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * Implementations cannot be thread-safe.
  *
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe

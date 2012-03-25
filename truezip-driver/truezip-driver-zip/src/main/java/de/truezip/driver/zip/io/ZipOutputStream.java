@@ -162,7 +162,6 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
      * 
      * @param cryptoParameters the parameters for encryption or authentication
      *        of entries.
-     * @since TrueZIP 7.3
      */
     public void setCryptoParameters(
             final @CheckForNull ZipCryptoParameters cryptoParameters) {

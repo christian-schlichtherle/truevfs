@@ -19,7 +19,6 @@ import javax.annotation.Nullable;
  * parent's inheritable thread local stack is empty.
  * 
  * @param  <T> The type of the elements in the inheritable thread local stack.
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 public final class InheritableThreadLocalStack<T> {

@@ -17,11 +17,7 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class FsSyncOptions {
 
-    /**
-     * A bit field with no synchronization options set.
-     * 
-     * @since TrueZIP 7.5
-     */
+    /** A bit field with no synchronization options set. */
     public static final BitField<FsSyncOption>
             NONE = BitField.noneOf(FsSyncOption.class);
 
@@ -40,8 +36,6 @@ public final class FsSyncOptions {
      * Care should be taken not to use these options while any other thread
      * is still doing I/O to the archive files because otherwise the threads
      * may not be able to succeed and receive an exception.
-     * 
-     * @since TrueZIP 7.1.1
      */
     public static final BitField<FsSyncOption>
             UMOUNT = BitField.of(   FORCE_CLOSE_INPUT,
@@ -62,8 +56,6 @@ public final class FsSyncOptions {
      * However, a call with the {@link #UMOUNT} options is still required in
      * order to really clean up <em>all</em> resources, including the
      * selective entry cache.
-     * 
-     * @since TrueZIP 7.5
      */
     // Note that setting CLEAR_CACHE may cause endless loops when working with
     // nested archive files and there are copy operations where an input stream
@@ -85,8 +77,6 @@ public final class FsSyncOptions {
      * These options are only meaningful immediately before the federated file
      * system itself gets deleted and should not of used by client
      * applications.
-     * 
-     * @since TrueZIP 7.5
      */
     public static final BitField<FsSyncOption>
             RESET = BitField.of(ABORT_CHANGES);
@@ -96,7 +86,6 @@ public final class FsSyncOptions {
      * 
      * @param  options an array of synchronization options.
      * @return A bit field of synchronization options.
-     * @since  TrueZIP 7.5
      */
     public static BitField<FsSyncOption> of(FsSyncOption... options) {
         return 0 == options.length ? NONE : BitField.of(options[0], options);

@@ -9,7 +9,6 @@ import java.nio.charset.Charset;
 /**
  * Defines the default character set for accessing ZIP files.
  * 
- * @since   TrueZIP 7.3
  * @author  Christian Schlichtherle
  */
 public interface ZipCharsetParameters extends ZipParameters {

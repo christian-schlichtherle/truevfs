@@ -13,7 +13,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * WinZip AES Extra Field.
  *
- * @since   TrueZIP 7.3
  * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2 (WinZip Computing, S.L.)</a>
  * @see     <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers (WinZip Computing, S.L.)</a>
  * @see     RawZipOutputStream$WinZipAesOutputMethod

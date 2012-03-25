@@ -338,7 +338,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * Returns the URI for this mount point.
      *
      * @return The URI for this mount point.
-     * @since  TrueZIP 7.1.1
      */
     public URI toUri() {
         return uri;
@@ -356,7 +355,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @return A URI which is recursively transformed from the URI of this
      *         mount point so that it's absolute and hierarchical.
-     * @since  TrueZIP 7.1.1
      */
     public URI toHierarchicalUri() {
         final URI hierarchical = this.hierarchical;

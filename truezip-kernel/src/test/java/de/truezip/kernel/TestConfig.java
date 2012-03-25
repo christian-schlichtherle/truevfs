@@ -45,7 +45,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * As an implication, {@link #pop()} or {@link #close()} can be called at most
  * once in the child thread.
  * 
- * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
 @ThreadSafe

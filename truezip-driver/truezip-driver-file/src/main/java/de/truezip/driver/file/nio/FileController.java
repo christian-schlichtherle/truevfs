@@ -38,7 +38,6 @@ import javax.annotation.concurrent.Immutable;
  * A file system controller with a prospective directory in the platform file
  * system as its mount point.
  *
- * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
  */
 @Immutable
