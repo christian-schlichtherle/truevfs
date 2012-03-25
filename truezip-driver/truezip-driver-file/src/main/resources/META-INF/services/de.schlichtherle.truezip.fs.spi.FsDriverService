@@ -1,2 +1,2 @@
-de.schlichtherle.truezip.fs.file.FileDriverService
-de.schlichtherle.truezip.fs.nio.file.FileDriverService
+de.truezip.driver.file.nio.FileDriverService
+de.truezip.driver.file.oio.FileDriverService
