@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.nio.file;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
+import de.truezip.file.TArchiveDetector;
 import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.*;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
@@ -27,7 +27,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * Note that this class has no dependencies on other classes in this package,
  * so it could get published as a member of the package
- * {@code de.schlichtherle.truezip.file} instead if required.
+ * {@code de.truezip.file} instead if required.
  * 
  * @since  TrueZIP 7.2
  * @author Christian Schlichtherle

@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.it.file;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.truezip.file.TFileITSuite;
 import de.truezip.driver.zip.OdfDriver;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class OdfFileIT extends TFileTestSuite<OdfDriver> {
+public final class OdfFileIT extends TFileITSuite<OdfDriver> {
 
     @Override
     protected String getSuffixList() {

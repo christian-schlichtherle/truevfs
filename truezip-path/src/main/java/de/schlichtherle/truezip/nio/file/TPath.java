@@ -7,9 +7,9 @@ package de.schlichtherle.truezip.nio.file;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;
 import de.schlichtherle.truezip.fs.addr.FsPath;
 import de.schlichtherle.truezip.cio.Entry;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TConfig;
-import de.schlichtherle.truezip.file.TFile;
+import de.truezip.file.TArchiveDetector;
+import de.truezip.file.TConfig;
+import de.truezip.file.TFile;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.*;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.option.FsInputOption;
@@ -20,7 +20,7 @@ import de.schlichtherle.truezip.io.Paths;
 import static de.schlichtherle.truezip.nio.file.TPathScanner.*;
 import de.schlichtherle.truezip.cio.InputSocket;
 import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.file.TVFS;
+import de.truezip.file.TVFS;
 import de.schlichtherle.truezip.util.BitField;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import de.schlichtherle.truezip.util.QuotedUriSyntaxException;
@@ -264,14 +264,14 @@ public final class TPath implements Path {
 <dl>
     <dt>Absolute path name with plain {@code File}:</dt>
     <dd><code>Path path = new TPath(new File("/home/christian/archive.zip"));</code></dd>
-    <dt>Absolute path name with plain {@link de.schlichtherle.truezip.file.TFile}:</dt>
+    <dt>Absolute path name with plain {@link de.truezip.file.TFile}:</dt>
     <dd><code>Path path = new TPath(new TFile("/home/christian/archive.zip"));</code></dd>
 </dl>
 <p>On the Windows platform:</p>
 <dl>
     <dt>Absolute path name with plain {@code File}:</dt>
     <dd><code>Path path = new TPath(new File("c:\home\christian\archive.zip"));</code></dd>
-    <dt>Absolute path name with {@link de.schlichtherle.truezip.file.TFile}:</dt>
+    <dt>Absolute path name with {@link de.truezip.file.TFile}:</dt>
     <dd><code>Path path = new TPath(new TFile("c:\home\christian\archive.zip"));</code></dd>
 </dl>
      * 

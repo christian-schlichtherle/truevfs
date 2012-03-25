@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.it.file;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.truezip.file.TFileITSuite;
 import de.truezip.driver.zip.JarDriver;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class JarFileIT extends TFileTestSuite<JarDriver> {
+public final class JarFileIT extends TFileITSuite<JarDriver> {
 
     @Override
     protected String getSuffixList() {

@@ -136,7 +136,7 @@ src.cp_rp(dst); // copy "archive.zip" as a virtual directory!
     To get or set the default archive detector, call
     {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector}<<<TConfig.get().getArchiveDetector()>>>}}
     or
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(detector)>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(detector)>>>}}
     respectively - see {{{The class TConfig}below}}.
 
     Mind that a change of the default archive detector affects only
@@ -242,7 +242,7 @@ try (TConfig config = TConfig.push()) {
     {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#getArchiveDetector()}<<<TConfig.get().getArchiveDetector()>>>}}
     returns the archive detector of the current configuration.
     Similarly,
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(TArchiveDetector detector)>>>}}
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(TArchiveDetector detector)>>>}}
     updates the archive detector of the current configuration.
 
     Second, the call to

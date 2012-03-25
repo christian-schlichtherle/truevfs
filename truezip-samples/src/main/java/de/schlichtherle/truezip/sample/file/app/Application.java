@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.file.TApplication;
+import de.truezip.file.TApplication;
 import de.truezip.kernel.key.pbe.swing.HurlingWindowFeedback;
 import de.truezip.kernel.key.pbe.swing.InvalidKeyFeedback;
 import java.io.OutputStream;

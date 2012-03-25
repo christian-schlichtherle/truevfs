@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.sample.file.app;
 
-import de.schlichtherle.truezip.file.*;
+import de.truezip.file.*;
 import static de.schlichtherle.truezip.fs.option.FsOutputOption.*;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.truezip.driver.tar.TarBZip2Driver;
@@ -37,7 +37,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * However, this utility features some optional archive drivers which
  * provide additional safety or otherwise unavailable features.
  * Some of these drivers are not used in their default configuration -
- * see {@link de.schlichtherle.truezip.file.TArchiveDetector} for more
+ * see {@link de.truezip.file.TArchiveDetector} for more
  * information.
  * For example, the ZIP drivers used in this utility <em>always</em> check
  * the CRC-32 values provided in the ZIP file.

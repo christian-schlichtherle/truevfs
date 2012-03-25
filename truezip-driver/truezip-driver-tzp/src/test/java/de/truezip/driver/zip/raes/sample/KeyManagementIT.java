@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.raes.sample;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TConfig;
+import de.truezip.file.TArchiveDetector;
+import de.truezip.file.TConfig;
 import de.truezip.driver.zip.sample.KeyManagementTestSuite;
 
 /**

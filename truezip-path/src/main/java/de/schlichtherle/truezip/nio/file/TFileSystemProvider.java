@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.nio.file;
 
 import static de.schlichtherle.truezip.cio.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.cio.Entry.Type.FILE;
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TConfig;
+import de.truezip.file.TArchiveDetector;
+import de.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsEntry;
 import static de.schlichtherle.truezip.fs.addr.FsEntryName.SEPARATOR;
 import de.schlichtherle.truezip.fs.addr.FsMountPoint;

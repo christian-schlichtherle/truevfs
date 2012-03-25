@@ -50,7 +50,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
 *--*--*--*
 ||#||Search||Replace|
 *--+--+--+
-|1.|<<<de.schlichtherle.io>>>|<<<de.schlichtherle.truezip.file>>>|
+|1.|<<<de.schlichtherle.io>>>|<<<de.truezip.file>>>|
 *--+--+--+
 |2.|<<<de.schlichtherle.util.zip>>>|<<<de.schlichtherle.truezip.zip>>>|
 *--+--+--+

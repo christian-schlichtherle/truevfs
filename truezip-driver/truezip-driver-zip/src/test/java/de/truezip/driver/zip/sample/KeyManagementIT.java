@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.sample;
 
-import de.schlichtherle.truezip.file.TArchiveDetector;
-import de.schlichtherle.truezip.file.TConfig;
+import de.truezip.file.TArchiveDetector;
+import de.truezip.file.TConfig;
 import java.nio.charset.Charset;
 
 /**

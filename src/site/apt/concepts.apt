@@ -63,7 +63,7 @@ Concepts
     in its 
     {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#get()}current configuration}}
     or it can
-    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.schlichtherle.truezip.file.TArchiveDetector)}explicitly override}}
+    {{{./apidocs/de/schlichtherle/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}explicitly override}}
     it.
     Check the {{{./faq.html#file}FAQ}} for the
     {{{./truezip-file/index.html}TrueZIP File*}}

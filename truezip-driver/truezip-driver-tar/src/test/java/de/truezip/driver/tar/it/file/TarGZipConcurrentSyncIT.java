@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.tar.it.file;
 
-import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
+import de.truezip.file.ConcurrentSyncITSuite;
 import de.truezip.driver.tar.TarGZipDriver;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class TarGZipConcurrentSyncIT
-extends ConcurrentSyncTestSuite<TarGZipDriver> {
+extends ConcurrentSyncITSuite<TarGZipDriver> {
 
     @Override
     protected String getSuffixList() {

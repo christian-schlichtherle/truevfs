@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.nio.file.sample;
 
-import de.schlichtherle.truezip.file.TVFS;
+import de.truezip.file.TVFS;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncWarningException;
 import de.schlichtherle.truezip.io.SequentialIOException;
