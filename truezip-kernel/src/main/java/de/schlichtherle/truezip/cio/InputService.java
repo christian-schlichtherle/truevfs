@@ -13,7 +13,7 @@ import java.util.Iterator;
 /**
  * A service for reading entries from this container.
  *
- * @param  <E> the type of the entries.
+ * @param  <E> the type of the entries in this container.
  * @see    OutputService
  * @author Christian Schlichtherle
  */
@@ -35,8 +35,7 @@ extends Closeable, EntryContainer<E> {
      * @param  name an {@link Entry#getName() entry name}.
      * @return An input socket for reading from the entry with the given name.
      */
-    // TODO: This should return InputSocket<E>.
-    InputSocket<? extends E> getInputSocket(String name);
+    InputSocket<E> getInputSocket(String name);
 
     @Override
     @DischargesObligation

@@ -101,7 +101,7 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(final String name) {
+    public InputSocket<E> getInputSocket(final String name) {
         class Input extends DecoratingInputSocket<E> {
             Input() {
                 super(LockInputService.super.getInputSocket(name));

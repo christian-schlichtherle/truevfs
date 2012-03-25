@@ -4,8 +4,6 @@
  */
 package de.schlichtherle.truezip.cio;
 
-import de.schlichtherle.truezip.cio.DecoratingEntryContainer;
-import de.schlichtherle.truezip.cio.Entry;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import javax.annotation.WillCloseWhenClosed;
@@ -28,7 +26,7 @@ implements OutputService<E> {
     }
 
     @Override
-    public OutputSocket<? extends E> getOutputSocket(E entry) {
+    public OutputSocket<E> getOutputSocket(E entry) {
         return delegate.getOutputSocket(entry);
     }
 

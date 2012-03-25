@@ -110,7 +110,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<? extends E> getOutputSocket(final E entry) {
+    public OutputSocket<E> getOutputSocket(final E entry) {
         if (null == entry)
             throw new NullPointerException();
 

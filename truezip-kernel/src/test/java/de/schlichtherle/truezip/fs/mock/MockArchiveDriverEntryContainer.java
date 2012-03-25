@@ -4,23 +4,11 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
-import de.schlichtherle.truezip.cio.OutputSocket;
-import de.schlichtherle.truezip.cio.InputSocket;
-import de.schlichtherle.truezip.cio.IOPoolProvider;
-import de.schlichtherle.truezip.cio.IOEntry;
-import de.schlichtherle.truezip.cio.IOPool;
-import de.schlichtherle.truezip.cio.ThrowingInputService;
-import de.schlichtherle.truezip.cio.ThrowingOutputService;
-import de.schlichtherle.truezip.cio.DisconnectingInputService;
-import de.schlichtherle.truezip.cio.DisconnectingOutputService;
-import de.schlichtherle.truezip.cio.InputService;
-import de.schlichtherle.truezip.cio.OutputService;
 import static de.schlichtherle.truezip.cio.Entry.ALL_ACCESS_SET;
 import static de.schlichtherle.truezip.cio.Entry.ALL_SIZE_SET;
 import de.schlichtherle.truezip.cio.Entry.Access;
 import de.schlichtherle.truezip.cio.Entry.Size;
-import de.schlichtherle.truezip.cio.EntryContainer;
-import de.schlichtherle.truezip.cio.IOBuffer;
+import de.schlichtherle.truezip.cio.*;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.test.TestConfig;
@@ -128,7 +116,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
         }
 
         @Override
-        public InputSocket<? extends MockArchiveDriverEntry> getInputSocket(
+        public InputSocket<MockArchiveDriverEntry> getInputSocket(
                 final String name) {
             if (null == name)
                 throw new NullPointerException();
@@ -184,7 +172,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
         }
 
         @Override
-        public OutputSocket<? extends MockArchiveDriverEntry> getOutputSocket(
+        public OutputSocket<MockArchiveDriverEntry> getOutputSocket(
                 final MockArchiveDriverEntry entry) {
             if (null == entry)
                 throw new NullPointerException();

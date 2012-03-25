@@ -17,7 +17,7 @@ import java.util.Iterator;
  * which have just been partially written yet, i.e. which have not already
  * received a call to their {@code close()} method.
  *
- * @param   <E> the type of the entries.
+ * @param   <E> the type of the entries in this container.
  * @see     InputService
  * @author  Christian Schlichtherle
  */
@@ -42,8 +42,7 @@ extends Closeable, EntryContainer<E> {
      *         output socket.
      * @return An output socket for writing to the given entry.
      */
-    // TODO: This should return OutputSocket<E>.
-    OutputSocket<? extends E> getOutputSocket(E entry);
+    OutputSocket<E> getOutputSocket(E entry);
 
     @Override
     @DischargesObligation

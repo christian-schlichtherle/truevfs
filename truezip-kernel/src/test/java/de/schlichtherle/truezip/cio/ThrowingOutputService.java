@@ -14,25 +14,25 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * @param   <E> The type of the entries served by the decorated input service.
- * @see     ThrowingOutputService
+ * @param   <E> The type of the entries served to the decorated output service.
+ * @see     ThrowingInputService
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public class ThrowingInputService<E extends Entry>
-extends DecoratingInputService<E, InputService<E>> {
+public class ThrowingOutputService<E extends Entry>
+extends DecoratingOutputService<E, OutputService<E>> {
     private final TestConfig config;
     private volatile @CheckForNull ThrowControl control;
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ThrowingInputService(   final @WillCloseWhenClosed InputService<E> service) {
+    public ThrowingOutputService(  final @WillCloseWhenClosed OutputService<E> service) {
         this(service, null);
     }
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ThrowingInputService(   final @WillCloseWhenClosed InputService<E> service,
+    public ThrowingOutputService(  final @WillCloseWhenClosed OutputService<E> service,
                                 final @CheckForNull TestConfig config) {
         super(service);
         this.config = null != config ? config : TestConfig.get();
@@ -78,8 +78,8 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<? extends E> getInputSocket(String name) {
+    public OutputSocket<E> getOutputSocket(E entry) {
         checkUndeclaredExceptions();
-        return delegate.getInputSocket(name);
+        return delegate.getOutputSocket(entry);
     }
 }
