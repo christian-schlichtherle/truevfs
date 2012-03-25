@@ -110,7 +110,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *         the returned archive file system.
      * @param  readOnly If and only if {@code true}, any subsequent
      *         modifying operation on the file system will result in a
-     *         {@link FsReadOnlyArchiveFileSystemException}.
+     *         {@link FsReadOnlyFileSystemException}.
      * @return A new archive file system.
      * @throws NullPointerException If {@code factory} or {@code archive} are
      *         {@code null}.

@@ -216,8 +216,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     /**
      * This entry output stream writes the archive entry to an
-     * {@link de.schlichtherle.truezip.socket.IOPool.IOBuffer I/O pool entry}.
-     * When the stream gets closed, the I/O pool entry is then copied to this
+     * {@linkplain IOBuffer I/O buffer}.
+     * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
     private class BufferedEntryOutputStream extends DecoratingOutputStream {

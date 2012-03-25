@@ -31,7 +31,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Finalizes unclosed resources returned by its decorated controller.
  * 
- * @param  <M> the type of the file system model.
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */

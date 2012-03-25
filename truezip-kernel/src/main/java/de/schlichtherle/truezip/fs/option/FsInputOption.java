@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.option;
 
+import de.schlichtherle.truezip.fs.FsController;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 

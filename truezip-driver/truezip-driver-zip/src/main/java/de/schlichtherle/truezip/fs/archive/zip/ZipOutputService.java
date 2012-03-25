@@ -267,8 +267,8 @@ implements OutputService<ZipDriverEntry> {
 
     /**
      * This entry output stream writes the ZIP archive entry to an
-     * {@link de.schlichtherle.truezip.socket.IOPool.IOBuffer I/O pool entry}.
-     * When the stream gets closed, the I/O pool entry is then copied to this
+     * {@linkplain IOBuffer I/O buffer}.
+     * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted.
      */
     @CleanupObligation

@@ -73,7 +73,7 @@ public enum FsUriModifier {
          *     This behavior is intended to fix URIs returned by
          *     {@link java.io.File#toURI()}.
          * <li>The URI path component gets truncated so that it does not end
-         *     with {@value FsEntryName#SEPARATOR} whereby a trailing separator
+         *     with {@link FsEntryName#SEPARATOR} whereby a trailing separator
          *     after a Windows-like drive letter is preserved.
          * <li>An empty authority component in the scheme specific part gets
          *     truncated.
@@ -135,7 +135,7 @@ public enum FsUriModifier {
          * If the URI is absolute or has an authority or a fragment component
          * defined, nothing is modified.
          * Otherwise, the URI path component gets truncated so that it does not
-         * start or end with {@value FsEntryName#SEPARATOR}.
+         * start or end with {@link FsEntryName#SEPARATOR}.
          */
         ENTRY_NAME {
             @Override

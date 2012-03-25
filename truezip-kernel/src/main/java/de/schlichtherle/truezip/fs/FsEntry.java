@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.cio.Entry;
+import de.schlichtherle.truezip.fs.addr.FsEntryName;
 import de.schlichtherle.truezip.util.BitField;
 import java.util.Formatter;
 import java.util.Set;
