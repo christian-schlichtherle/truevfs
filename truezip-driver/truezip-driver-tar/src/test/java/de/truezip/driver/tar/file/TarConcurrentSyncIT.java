@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.tar.file;
 
-import de.truezip.file.ConcurrentSyncITSuite;
 import de.truezip.driver.tar.TarDriver;
+import de.truezip.file.ConcurrentSyncITSuite;
 
 /**
  * @author Christian Schlichtherle
