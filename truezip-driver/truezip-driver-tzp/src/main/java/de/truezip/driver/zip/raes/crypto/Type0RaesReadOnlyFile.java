@@ -8,7 +8,7 @@ import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
 import de.truezip.driver.zip.crypto.SeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
 import static de.truezip.driver.zip.raes.crypto.Constants.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT;
-import de.truezip.driver.zip.util.SuspensionPenalty;
+import de.truezip.kernel.util.SuspensionPenalty;
 import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.ArrayHelper;

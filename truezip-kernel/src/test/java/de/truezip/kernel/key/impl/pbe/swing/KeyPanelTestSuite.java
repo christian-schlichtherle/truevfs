@@ -5,8 +5,6 @@
 package de.truezip.kernel.key.impl.pbe.swing;
 
 import de.truezip.kernel.key.param.SafePbeParameters;
-import de.truezip.kernel.key.impl.pbe.swing.AuthenticationPanel;
-import de.truezip.kernel.key.impl.pbe.swing.KeyPanel;
 import de.truezip.swing.JemmyUtils;
 import java.awt.EventQueue;
 import java.io.File;

@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.key;
 
-import de.truezip.driver.zip.util.SuspensionPenalty;
+import de.truezip.kernel.util.SuspensionPenalty;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 

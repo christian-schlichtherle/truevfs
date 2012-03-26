@@ -4,6 +4,8 @@
  */
 package de.truezip.kernel.key;
 
+import de.truezip.kernel.key.KeyManager;
+import de.truezip.kernel.key.KeyProvider;
 import java.net.URI;
 import static org.junit.Assert.*;
 import org.junit.Before;

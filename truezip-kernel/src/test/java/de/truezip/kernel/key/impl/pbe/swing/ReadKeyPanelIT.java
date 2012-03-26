@@ -5,7 +5,6 @@
 package de.truezip.kernel.key.impl.pbe.swing;
 
 import de.truezip.kernel.key.param.AesPbeParameters;
-import de.truezip.kernel.key.impl.pbe.swing.ReadKeyPanel;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
