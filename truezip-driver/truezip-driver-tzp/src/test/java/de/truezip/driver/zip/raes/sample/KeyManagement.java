@@ -4,8 +4,6 @@
  */
 package de.truezip.driver.zip.raes.sample;
 
-import de.truezip.kernel.key.param.AesKeyStrength;
-import de.truezip.kernel.key.impl.PromptingKeyManagerService;
 import de.truezip.driver.zip.raes.SafeZipRaesDriver;
 import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
@@ -15,10 +13,13 @@ import de.truezip.file.TConfig;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriverProvider;
 import de.truezip.kernel.fs.FsModel;
-import de.truezip.kernel.key.PromptingKeyProvider;
-import de.truezip.kernel.key.PromptingKeyProvider.Controller;
 import de.truezip.kernel.key.UnknownKeyException;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
+import de.truezip.kernel.key.impl.PromptingKeyProvider;
+import de.truezip.kernel.key.impl.PromptingKeyProviderController;
+import de.truezip.kernel.key.impl.PromptingKeyProviderView;
+import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.sl.KeyManagerLocator;
 
@@ -95,7 +96,7 @@ public final class KeyManagement {
             // the default file system controller chain with a package private
             // file system controller which keeps track of the encryption keys.
             // Because we are not using the key manager, we don't need this
-            // special purpose file system controller and can use the default
+            // special purpose file system controller and can return the given
             // file system controller chain instead.
             return controller;
         }
@@ -170,7 +171,7 @@ public final class KeyManagement {
     }
     
     private static final class CustomView
-    implements PromptingKeyProvider.View<AesPbeParameters> {
+    implements PromptingKeyProviderView<AesPbeParameters> {
         final char[] password;
         
         CustomView(char[] password) {
@@ -189,7 +190,7 @@ public final class KeyManagement {
         }
         
         @Override
-        public void promptWriteKey(Controller<AesPbeParameters> controller)
+        public void promptWriteKey(PromptingKeyProviderController<AesPbeParameters> controller)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
@@ -200,7 +201,7 @@ public final class KeyManagement {
         }
         
         @Override
-        public void promptReadKey(  Controller<AesPbeParameters> controller,
+        public void promptReadKey(  PromptingKeyProviderController<AesPbeParameters> controller,
                                     boolean invalid)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to

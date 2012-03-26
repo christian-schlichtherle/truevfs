@@ -19,7 +19,7 @@ import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.*;
 import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import java.io.CharConversionException;

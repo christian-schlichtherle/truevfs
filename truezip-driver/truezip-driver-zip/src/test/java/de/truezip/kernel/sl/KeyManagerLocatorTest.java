@@ -5,7 +5,7 @@
 package de.truezip.kernel.sl;
 
 import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.kernel.sl.KeyManagerLocator;
 import static org.junit.Assert.*;
 import org.junit.Before;

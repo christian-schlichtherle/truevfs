@@ -15,8 +15,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * A clone of this key is returned on each call to {@link #getWriteKey}
  * and {@link #getReadKey}.
  *
- * @param   <K> The type of the keys.
- * @author  Christian Schlichtherle
+ * @param  <K> the type of the safe keys.
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class SafeKeyProvider<K extends SafeKey<K>>

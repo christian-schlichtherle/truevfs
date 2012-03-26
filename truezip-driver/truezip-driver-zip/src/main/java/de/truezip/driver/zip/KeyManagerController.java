@@ -9,12 +9,10 @@ import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.fs.*;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
-import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.key.KeyManager;
 import de.truezip.kernel.key.KeyProvider;
-import de.truezip.kernel.key.SafeKeyManager;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -62,8 +60,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         final KeyManager<?> manager = this.manager;
         return null != manager
                 ? manager
-                : (this.manager = driver.getKeyManagerProvider()
-                    .get(getKeyType()));
+                : (this.manager = driver.getKeyManagerProvider().get(getKeyType()));
     }
 
     @Override
@@ -113,7 +110,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             throw null != keyEx ? keyEx : ex;
         }
         if (name.isRoot())
-            getKeyManager().removeKeyProvider(
+            getKeyManager().delete(
                     driver.resourceUri(getModel(), name.toString()));
     }
 
@@ -132,20 +129,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         delegate.sync(options, handler);
-        final KeyManager<?> manager = getKeyManager();
-        final URI resource = driver.mountPointUri(getModel());
-        final KeyProvider<?> provider;
-        if (manager instanceof SafeKeyManager) {
-            // Don't create a key provider if there wasn't one mapped already.
-            provider = ((SafeKeyManager) manager).getMappedKeyProvider(resource);
-        } else {
-            // TODO: This might create a memory leak.
-            // It's unlikely that a third party implements the KeyManager
-            // interface and does NOT use extend the SafeKeyManager class,
-            // though.
-            provider = manager.getKeyProvider(resource);
-        }
-        if (null != provider)
-            driver.getKeyProviderSyncStrategy().sync(provider);
+        getKeyManager().unlock(driver.mountPointUri(getModel()));
     }
 }

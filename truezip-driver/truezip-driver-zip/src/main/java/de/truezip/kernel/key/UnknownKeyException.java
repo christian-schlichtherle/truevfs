@@ -4,8 +4,8 @@
  */
 package de.truezip.kernel.key;
 
-import javax.annotation.CheckForNull;
 import java.security.GeneralSecurityException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -19,10 +19,10 @@ import javax.annotation.concurrent.ThreadSafe;
 public class UnknownKeyException extends GeneralSecurityException {
     private static final long serialVersionUID = 6092786348232837265L;
 
-    UnknownKeyException() {
+    public UnknownKeyException() {
     }
 
-    protected UnknownKeyException(@CheckForNull String msg) {
+    UnknownKeyException(@CheckForNull String msg) {
         super(msg);
     }
 

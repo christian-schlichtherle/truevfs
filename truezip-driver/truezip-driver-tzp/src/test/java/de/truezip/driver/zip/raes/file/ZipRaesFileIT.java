@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip.raes.file;
 
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileITSuite;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
-import de.truezip.kernel.key.MockView;
-import static de.truezip.kernel.key.MockView.Action.CANCEL;
-import static de.truezip.kernel.key.MockView.Action.ENTER;
+import de.truezip.kernel.key.impl.MockView;
+import static de.truezip.kernel.key.impl.MockView.Action.CANCEL;
+import static de.truezip.kernel.key.impl.MockView.Action.ENTER;
 import java.io.IOException;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -29,8 +29,8 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
-        final TestZipRaesDriver
-                driver = new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
+        final TestZipRaesDriver driver = new TestZipRaesDriver(
+                getTestConfig().getIOPoolProvider());
         view = driver.getView();
         return driver;
     }
