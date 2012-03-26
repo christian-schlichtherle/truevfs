@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.driver.zip.KeyProviderSyncStrategy;
-import de.truezip.kernel.key.impl.PromptingKeyManagerService;
+import de.truezip.driver.zip.PromptingKeyProviderSyncStrategy;
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.key.MockView;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.impl.MockView;
+import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
+import de.truezip.kernel.key.param.AesPbeParameters;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class TestZipRaesDriver extends SafeZipRaesDriver {
 
@@ -41,7 +41,7 @@ public class TestZipRaesDriver extends SafeZipRaesDriver {
     }
 
     @Override
-    public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
-        return KeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
+    public PromptingKeyProviderSyncStrategy getKeyProviderSyncStrategy() {
+        return PromptingKeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
     }
 }
