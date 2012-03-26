@@ -65,6 +65,21 @@ public abstract class KeyManager<K> {
     @CheckForNull public abstract KeyProvider<K>
     delete(URI resource);
 
+    /**
+     * If and only if this key manager prompts users for keys, e.g. a password,
+     * <em>and</em> prompting for the key for the given protected resources had
+     * been cancelled by the user, then the key provider shall get reset to a
+     * state so that the user will get prompted again the next time a key is
+     * requested from the provider.
+     * Otherwise, this method shall have no effect.
+     * <p>
+     * This method is typically used once a file system has been synced in
+     * order to give the user a chance to enter the key the next time the file
+     * system will get accessed again.
+     * Otherwise the key provider would forever stay in its cancelled state.
+     * 
+     * @param resource 
+     */
     public abstract void unlock(URI resource);
 
     /**

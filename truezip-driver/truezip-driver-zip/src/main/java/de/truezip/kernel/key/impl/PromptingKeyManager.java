@@ -12,7 +12,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A key manager which prompts the user for a key if required.
  *
- * @param  <K> The type of the keys.
+ * @param  <K> The type of the safe keys.
  * @see    PromptingKeyProvider
  * @author Christian Schlichtherle
  */

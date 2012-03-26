@@ -7,6 +7,7 @@ package de.truezip.driver.zip.raes.file;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileITSuite;
+import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.impl.MockView;
 import static de.truezip.kernel.key.impl.MockView.Action.CANCEL;
 import static de.truezip.kernel.key.impl.MockView.Action.ENTER;

@@ -12,11 +12,9 @@ import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.key.KeyManager;
-import de.truezip.kernel.key.KeyProvider;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
-import java.net.URI;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
