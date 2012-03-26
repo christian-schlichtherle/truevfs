@@ -175,6 +175,8 @@ implements OutputService<ZipDriverEntry> {
                         }
                     }
                 }
+                if (0 == entry.getSize())
+                    entry.setMethod(STORED);
                 if (STORED == entry.getMethod()) {
                     if (0 == entry.getSize()) {
                         entry.setCompressedSize(0);
