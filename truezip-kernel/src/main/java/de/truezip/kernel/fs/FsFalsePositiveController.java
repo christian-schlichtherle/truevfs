@@ -7,15 +7,15 @@ package de.truezip.kernel.fs;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import de.truezip.kernel.fs.option.FsSyncOption;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
 import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -30,18 +30,16 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Implements a chain of responsibility in order to resolve
- * {@link FsFalsePositiveException}s thrown by the prospective file system
- * provided to its {@link #FsFalsePositiveController constructor}.
+ * Implements a chain of responsibility for resolving
+ * {@link FsFalsePositiveException}s which may get thrown by its decorated file
+ * system controller.
  * <p>
- * Whenever the controller for the prospective file system throws a
- * {@link FsFalsePositiveException}, the method call is delegated to the
- * controller for its parent file system in order to resolve the requested
- * operation.
- * If this method call fails with a second exception, then the
- * {@link IOException} which is associated as the cause of the first exception
- * gets rethrown unless the second exception is an
- * {@link FsControllerException}.
+ * Whenever the decorated controller for the prospective file system throws a
+ * {@link FsFalsePositiveException}, the file system operation is routed to the
+ * controller of the parent file system in order to continue the operation.
+ * If this fails with another exception, then the {@link IOException} which is
+ * associated as the cause of the initial exception gets rethrown unless the
+ * other exception is an {@link FsControllerException}.
  * In this case the {@link FsControllerException} gets rethrown as is in order
  * to enable the caller to resolve it.
  * <p>
