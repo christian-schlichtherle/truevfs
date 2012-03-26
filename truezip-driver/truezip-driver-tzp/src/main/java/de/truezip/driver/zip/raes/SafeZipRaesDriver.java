@@ -5,7 +5,6 @@
 package de.truezip.driver.zip.raes;
 
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.key.KeyManagerProvider;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -37,9 +36,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class SafeZipRaesDriver extends ZipRaesDriver {
 
-    public SafeZipRaesDriver(   IOPoolProvider ioPoolProvider,
-                                KeyManagerProvider keyManagerProvider) {
-        super(ioPoolProvider, keyManagerProvider);
+    public SafeZipRaesDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     private static final long AUTHENTICATION_TRIGGER = 512 * 1024;

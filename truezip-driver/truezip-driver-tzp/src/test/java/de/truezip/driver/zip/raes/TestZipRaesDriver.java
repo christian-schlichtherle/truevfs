@@ -6,6 +6,7 @@ package de.truezip.driver.zip.raes;
 
 import de.truezip.driver.zip.PromptingKeyProviderSyncStrategy;
 import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.impl.MockView;
 import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
 import de.truezip.kernel.key.param.AesPbeParameters;
@@ -15,6 +16,7 @@ import de.truezip.kernel.key.param.AesPbeParameters;
  */
 public class TestZipRaesDriver extends SafeZipRaesDriver {
 
+    private final KeyManagerProvider provider;
     private final MockView<AesPbeParameters> view;
 
     public TestZipRaesDriver(IOPoolProvider ioPoolProvider) {
@@ -24,8 +26,8 @@ public class TestZipRaesDriver extends SafeZipRaesDriver {
     private TestZipRaesDriver(
             final IOPoolProvider ioPoolProvider,
             final MockView<AesPbeParameters> view) {
-        super(ioPoolProvider, new PromptingKeyManagerService(view));
-        this.view = view;
+        super(ioPoolProvider);
+        this.provider = new PromptingKeyManagerService(this.view = view);
     }
 
     private static MockView<AesPbeParameters> newView() {
@@ -34,6 +36,11 @@ public class TestZipRaesDriver extends SafeZipRaesDriver {
         final MockView<AesPbeParameters> view = new MockView<AesPbeParameters>();
         view.setKey(key);
         return view;
+    }
+
+    @Override
+    protected KeyManagerProvider getKeyManagerProvider() {
+        return provider;
     }
 
     public MockView<AesPbeParameters> getView() {

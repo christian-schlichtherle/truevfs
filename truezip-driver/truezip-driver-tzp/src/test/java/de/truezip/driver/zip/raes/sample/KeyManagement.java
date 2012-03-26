@@ -13,15 +13,14 @@ import de.truezip.file.TConfig;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriverProvider;
 import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.UnknownKeyException;
-import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
-import de.truezip.kernel.key.impl.PromptingKeyProvider;
 import de.truezip.kernel.key.impl.PromptingKeyProviderController;
 import de.truezip.kernel.key.impl.PromptingKeyProviderView;
+import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
 import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.kernel.sl.IOPoolLocator;
-import de.truezip.kernel.sl.KeyManagerLocator;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP
@@ -75,7 +74,7 @@ public final class KeyManagement {
         final RaesParameters param;
         
         CustomZipRaesDriver(char[] password) {
-            super(IOPoolLocator.SINGLETON, KeyManagerLocator.SINGLETON);
+            super(IOPoolLocator.SINGLETON);
             param = new CustomRaesParameters(password);
         }
         
@@ -163,13 +162,24 @@ public final class KeyManagement {
             String suffixes,
             char[] password) {
         return new TArchiveDetector(delegate,
-                    suffixes,
-                    new SafeZipRaesDriver(
-                        IOPoolLocator.SINGLETON,
-                        new PromptingKeyManagerService(
-                            new CustomView(password))));
+                    suffixes, new CustomZipRaesDriver2(password));
     }
-    
+
+    private static final class CustomZipRaesDriver2 extends SafeZipRaesDriver {
+        final KeyManagerProvider provider;
+        
+        CustomZipRaesDriver2(char[] password) {
+            super(IOPoolLocator.SINGLETON);
+            this.provider = new PromptingKeyManagerService(
+                    new CustomView(password));
+        }
+
+        @Override
+        protected KeyManagerProvider getKeyManagerProvider() {
+            return provider;
+        }
+    } // CustomZipRaesDriver2
+
     private static final class CustomView
     implements PromptingKeyProviderView<AesPbeParameters> {
         final char[] password;

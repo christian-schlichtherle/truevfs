@@ -7,7 +7,6 @@ package de.truezip.driver.zip.raes;
 import de.truezip.kernel.fs.FsDriver;
 import de.truezip.kernel.fs.addr.FsScheme;
 import de.truezip.kernel.fs.spi.FsDriverService;
-import de.truezip.kernel.sl.KeyManagerLocator;
 import de.truezip.kernel.sl.IOPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
@@ -56,8 +55,7 @@ public final class ZipRaesDriverService extends FsDriverService {
                     // use encrypted byte arrays or wipe them with nulls after
                     // use.
                     // However, then you would have to write this yourself! ;-)
-                    /*new ParanoidZipRaesDriver(  new ByteArrayIOPoolProvider(2048),
-                                                KeyManagerLocator.SINGLETON),*/
+                    /*new ParanoidZipRaesDriver(new ByteArrayIOPoolProvider(2048)),*/
 
                     // If you're just a bit paranoid, then use this driver:
                     // It authenticates every input archive file using
@@ -65,8 +63,7 @@ public final class ZipRaesDriverService extends FsDriverService {
                     // RAES file format, which makes it comparably slow.
                     // The driver also uses unencrypted temporary files for
                     // archive entries whenever required.
-                    /*new ParanoidZipRaesDriver(  IOPoolLocator.SINGLETON,
-                                                KeyManagerLocator.SINGLETON),*/
+                    /*new ParanoidZipRaesDriver(IOPoolLocator.SINGLETON),*/
 
                     // For the rest of us, this driver is our choice:
                     // It authenticates input archive files up to 512 KB using
@@ -80,8 +77,7 @@ public final class ZipRaesDriverService extends FsDriverService {
                     // undetectable modification.
                     // The driver also uses unencrypted temporary files for
                     // archive entries whenever required.
-                    new SafeZipRaesDriver(      IOPoolLocator.SINGLETON,
-                                                KeyManagerLocator.SINGLETON),
+                    new SafeZipRaesDriver(IOPoolLocator.SINGLETON),
                 },
             });
 
