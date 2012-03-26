@@ -18,7 +18,6 @@ import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.*;
-import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
@@ -40,22 +39,14 @@ import javax.annotation.concurrent.Immutable;
 public abstract class ZipRaesDriver extends JarDriver {
 
     /**
-     * The key manager provider for accessing protected resources (cryptography).
-     */
-    private final KeyManagerProvider keyManagerProvider;
-
-    /**
      * Constructs a new RAES encrypted ZIP file driver.
      *
      * @param ioPoolProvider the provider for the I/O buffer pool.
      * @param keyManagerProvider the key manager provider for accessing
      *        protected resources (cryptography).
      */
-    public ZipRaesDriver(   final IOPoolProvider ioPoolProvider,
-                            final KeyManagerProvider keyManagerProvider) {
+    public ZipRaesDriver(final IOPoolProvider ioPoolProvider) {
         super(ioPoolProvider);
-        if (null == (this.keyManagerProvider = keyManagerProvider))
-            throw new NullPointerException();
     }
 
     /**
@@ -69,21 +60,6 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public final boolean getPreambled() {
         return true;
-    }
-
-    /**
-     * Returns the provider for key managers for accessing protected resources
-     * (encryption).
-     * <p>
-     * The implementation in {@link ZipRaesDriver} simply returns the value of
-     * the field {@link #keyManagerProvider}.
-     * 
-     * @return The provider for key managers for accessing protected resources
-     *         (encryption).
-     */
-    @Override
-    protected final KeyManagerProvider getKeyManagerProvider() {
-        return keyManagerProvider;
     }
 
     /**

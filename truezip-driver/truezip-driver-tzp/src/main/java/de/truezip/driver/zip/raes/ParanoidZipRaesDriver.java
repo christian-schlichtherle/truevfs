@@ -4,13 +4,12 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.kernel.fs.FsModel;
 import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.ZipOutputService;
-import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputService;
+import de.truezip.kernel.fs.FsModel;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
@@ -36,9 +35,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class ParanoidZipRaesDriver extends ZipRaesDriver {
 
-    public ParanoidZipRaesDriver(   IOPoolProvider ioPoolProvider,
-                                    KeyManagerProvider keyManagerProvider) {
-        super(ioPoolProvider, keyManagerProvider);
+    public ParanoidZipRaesDriver(IOPoolProvider ioPoolProvider) {
+        super(ioPoolProvider);
     }
 
     @Override
@@ -47,7 +45,10 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
     }
 
     /**
-     * This implementation returns a new {@link ZipOutputService}.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ParanoidZipRaesDriver} returns a
+     * new {@link ZipOutputService}.
      * This restricts the number of concurrent output entry streams to one in
      * order to inhibit writing unencrypted temporary files for buffering the
      * written entries.
