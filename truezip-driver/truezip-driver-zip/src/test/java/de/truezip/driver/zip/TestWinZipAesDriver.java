@@ -16,6 +16,7 @@ import de.truezip.kernel.key.param.AesPbeParameters;
 public final class TestWinZipAesDriver extends ZipDriver {
 
     private final KeyManagerProvider provider;
+    private final MockView<AesPbeParameters> view;
 
     public TestWinZipAesDriver(IOPoolProvider ioPoolProvider) {
         this(ioPoolProvider, newView());
@@ -25,7 +26,7 @@ public final class TestWinZipAesDriver extends ZipDriver {
             final IOPoolProvider ioPoolProvider,
             final MockView<AesPbeParameters> view) {
         super(ioPoolProvider);
-        this.provider = new PromptingKeyManagerService(view);
+        this.provider = new PromptingKeyManagerService(this.view = view);
     }
 
     private static MockView<AesPbeParameters> newView() {
@@ -39,6 +40,10 @@ public final class TestWinZipAesDriver extends ZipDriver {
     @Override
     protected KeyManagerProvider getKeyManagerProvider() {
         return provider;
+    }
+
+    public MockView<AesPbeParameters> getView() {
+        return view;
     }
 
     @Override
