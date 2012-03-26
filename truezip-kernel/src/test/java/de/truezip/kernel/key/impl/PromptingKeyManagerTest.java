@@ -5,6 +5,8 @@
 package de.truezip.kernel.key.impl;
 
 import de.truezip.kernel.key.KeyManagerTestSuite;
+import de.truezip.kernel.key.impl.PromptingKeyManager;
+import de.truezip.kernel.key.impl.PromptingKeyProvider;
 import de.truezip.kernel.key.impl.pbe.console.ConsoleAesPbeParametersView;
 import de.truezip.kernel.key.param.AesPbeParameters;
 import java.net.URI;

@@ -6,8 +6,6 @@ package de.truezip.kernel.key.impl.pbe.swing;
 
 import de.truezip.kernel.key.param.AesKeyStrength;
 import de.truezip.kernel.key.param.AesPbeParameters;
-import de.truezip.kernel.key.impl.pbe.swing.KeyStrengthPanel;
-import de.truezip.kernel.key.impl.pbe.swing.WriteKeyPanel;
 import javax.swing.JComponent;
 import static org.junit.Assert.*;
 import org.junit.Test;

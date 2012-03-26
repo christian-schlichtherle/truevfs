@@ -5,6 +5,8 @@
 package de.truezip.kernel.key.impl;
 
 import de.truezip.kernel.key.UnknownKeyException;
+import de.truezip.kernel.key.impl.PromptingKeyManager;
+import de.truezip.kernel.key.impl.PromptingKeyProvider;
 import static de.truezip.kernel.key.impl.MockView.Action.*;
 import java.net.URI;
 import static org.junit.Assert.*;

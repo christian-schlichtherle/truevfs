@@ -9,6 +9,8 @@ import de.truezip.kernel.key.SafeKey;
 import de.truezip.kernel.key.UnknownKeyException;
 import static de.truezip.kernel.key.impl.MockView.Action.ENTER;
 import de.truezip.kernel.key.impl.PromptingKeyProviderController;
+import de.truezip.kernel.key.impl.PromptingKeyProviderController;
+import de.truezip.kernel.key.impl.PromptingKeyProviderView;
 import de.truezip.kernel.key.impl.PromptingKeyProviderView;
 import java.net.URI;
 import java.util.Random;

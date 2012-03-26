@@ -5,8 +5,8 @@
 /**
  * Provides singletons to locate various service providers on the class path.
  * Note that this module has absolutely no dependency on this package!
- * It's up to the modules in the access tier to inject the service locators
- * into this module if they want to.
+ * It's up to the other modules to inject these service locators into this
+ * module if they want to.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.truezip.kernel.sl;
