@@ -4,12 +4,11 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.MockView;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.key.impl.PromptingKeyManagerService;
-import de.truezip.driver.zip.ZipDriver;
+import de.truezip.kernel.key.KeyManagerProvider;
+import de.truezip.kernel.key.impl.MockView;
+import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
+import de.truezip.kernel.key.param.AesPbeParameters;
 
 /**
  * @author Christian Schlichtherle
@@ -40,5 +39,10 @@ public final class TestWinZipAesDriver extends ZipDriver {
     @Override
     protected KeyManagerProvider getKeyManagerProvider() {
         return provider;
+    }
+
+    @Override
+    public PromptingKeyProviderSyncStrategy getKeyProviderSyncStrategy() {
+        return PromptingKeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
     }
 }

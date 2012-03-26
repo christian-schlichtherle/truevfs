@@ -11,12 +11,17 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * Implementations of this interface do not need to be thread-safe.
  *
- * @author  Christian Schlichtherle
+ * @param  <K> the type of this safe key.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public interface SafeKey<K> extends Cloneable {
+public interface SafeKey<K extends SafeKey<K>> extends Cloneable {
 
-    /** Returns a deep clone of this safe key. */
+    /**
+     * Returns a deep clone of this safe key.
+     * 
+     * @return A deep close of this safe key.
+     */
     K clone();
 
     /**

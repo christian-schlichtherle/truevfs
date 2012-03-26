@@ -11,7 +11,7 @@ import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.KeyProvider;
 import de.truezip.kernel.key.UnknownKeyException;
 import de.truezip.kernel.key.param.AesKeyStrength;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.param.AesPbeParameters;
 import java.net.URI;
 import java.nio.charset.Charset;
 import javax.annotation.concurrent.ThreadSafe;
@@ -132,7 +132,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
         public byte[] getWritePassword(final String name)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(name));
+                    provider = manager.make(resourceUri(name));
             try {
                 return password(provider.getWriteKey().getPassword(), name);
             } catch (UnknownKeyException ex) {
@@ -144,7 +144,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
         public byte[] getReadPassword(final String name, final boolean invalid)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(name));
+                    provider = manager.make(resourceUri(name));
             try {
                 return password(provider.getReadKey(invalid).getPassword(), name);
             } catch (UnknownKeyException ex) {
@@ -156,7 +156,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
         public AesKeyStrength getKeyStrength(final String name)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(name));
+                    provider = manager.make(resourceUri(name));
             try {
                 return provider.getWriteKey().getKeyStrength();
             } catch (UnknownKeyException ex) {
@@ -169,7 +169,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
                                     final AesKeyStrength keyStrength)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(resourceUri(name));
+                    provider = manager.make(resourceUri(name));
             final AesPbeParameters param;
             try {
                 param = provider.getReadKey(false);

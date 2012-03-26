@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.file;
 
-import de.truezip.file.TFileITSuite;
 import de.truezip.driver.zip.TestWinZipAesDriver;
+import de.truezip.file.TFileITSuite;
 
 /**
  * @author  Christian Schlichtherle
@@ -18,6 +18,8 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
+        final TestWinZipAesDriver driver = new TestWinZipAesDriver(
+                getTestConfig().getIOPoolProvider());
+        return driver;
     }
 }

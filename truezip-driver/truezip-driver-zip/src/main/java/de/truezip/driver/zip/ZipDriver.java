@@ -105,25 +105,21 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     /**
      * Returns the key provider sync strategy.
      * The implementation in the class {@link ZipDriver} returns 
-     * {@link KeyProviderSyncStrategy#RESET_CANCELLED_KEY}.
+     * {@link PromptingKeyProviderSyncStrategy#RESET_CANCELLED_KEY}.
      *
      * @return The key provider sync strategy.
      */
-    protected KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
-        return KeyProviderSyncStrategy.RESET_CANCELLED_KEY;
+    protected PromptingKeyProviderSyncStrategy getKeyProviderSyncStrategy() {
+        return PromptingKeyProviderSyncStrategy.RESET_CANCELLED_KEY;
     }
 
     /**
      * Returns the provider for key managers for accessing protected resources
      * (encryption).
-     * <p>
-     * The implementation in {@link ZipDriver} always returns
-     * {@link KeyManagerLocator#SINGLETON}.
-     * When overriding this method, subsequent calls must return the same
-     * object.
+     * When overriding this method, repeated calls must return the same object.
      * 
-     * @return The provider for key managers for accessing protected resources
-     *         (encryption).
+     * @return {@link KeyManagerLocator#SINGLETON}, as by the implementation
+     *         in the class {@link ZipDriver}.
      */
     protected KeyManagerProvider getKeyManagerProvider() {
         return KeyManagerLocator.SINGLETON;

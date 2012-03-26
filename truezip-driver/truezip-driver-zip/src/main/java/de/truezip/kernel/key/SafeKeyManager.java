@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.key;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,17 +12,18 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Uses a map to hold the safe key providers managed by this instance.
  *
- * @author  Christian Schlichtherle
+ * @param  <K> the type of the safe keys.
+ * @param  <P> the type of the safe key providers.
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class SafeKeyManager<K extends SafeKey<K>, P extends SafeKeyProvider<K>>
-implements KeyManager<K> {
+extends KeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<URI, P>();
 
     /** Constructs a new safe key manager. */
-    protected SafeKeyManager() {
-    }
+    protected SafeKeyManager() { }
 
     /**
      * Returns a new key provider.
@@ -33,35 +33,25 @@ implements KeyManager<K> {
     protected abstract P newKeyProvider();
 
     @Override
-    public synchronized P getKeyProvider(final URI resource) {
-        if (null == resource)
-            throw new NullPointerException();
-        P provider = providers.get(resource);
-        if (null == provider) {
-            provider = newKeyProvider();
-            providers.put(resource, provider);
-        }
-        return provider;
-    }
-
-    /**
-     * Returns the key provider which is mapped for the given {@code resource}
-     * or {@code null} if no key provider is mapped.
-     * <p>
-     * TODO: Make this part of the interface {@link KeyManager} in the next
-     * major version.
-     * 
-     * @param  resource the nullable URI of the protected resource.
-     * @return The key provider mapped for the protected resource.
-     */
-    public synchronized @Nullable P getMappedKeyProvider(URI resource) {
+    public synchronized P get(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
         return providers.get(resource);
     }
 
     @Override
-    public synchronized P moveKeyProvider(final URI oldResource, final URI newResource) {
+    public synchronized P make(final URI resource) {
+        if (null == resource)
+            throw new NullPointerException();
+        P provider = providers.get(resource);
+        if (null == provider)
+            providers.put(resource, provider = newKeyProvider());
+        return provider;
+    }
+
+    @Override
+    public synchronized P move(  final URI oldResource,
+                                            final URI newResource) {
         if (null == newResource)
             throw new NullPointerException();
         if (oldResource.equals(newResource))
@@ -80,18 +70,13 @@ implements KeyManager<K> {
      * for the secret key had been disabled or cancelled by the user.
      */
     @Override
-    public synchronized P removeKeyProvider(final URI resource) {
+    public synchronized P delete(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
         final P provider = providers.remove(resource);
         if (null != provider)
             provider.setKey(null);
         return provider;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
     }
 
     /**

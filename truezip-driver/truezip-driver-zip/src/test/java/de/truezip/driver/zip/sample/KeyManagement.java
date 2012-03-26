@@ -4,24 +4,24 @@
  */
 package de.truezip.driver.zip.sample;
 
-import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.driver.zip.JarDriver;
+import de.truezip.driver.zip.ZipDriverEntry;
+import de.truezip.driver.zip.io.WinZipAesParameters;
+import de.truezip.driver.zip.io.ZipCryptoParameters;
+import de.truezip.driver.zip.io.ZipKeyException;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriverProvider;
 import de.truezip.kernel.fs.FsModel;
-import de.truezip.driver.zip.JarDriver;
-import de.truezip.kernel.key.impl.PromptingKeyManagerService;
-import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.PromptingKeyProvider;
-import de.truezip.kernel.key.PromptingKeyProvider.Controller;
 import de.truezip.kernel.key.UnknownKeyException;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.impl.PromptingKeyProviderController;
+import de.truezip.kernel.key.impl.PromptingKeyProviderView;
+import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
+import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.kernel.sl.IOPoolLocator;
-import de.truezip.driver.zip.io.WinZipAesParameters;
-import de.truezip.driver.zip.io.ZipCryptoParameters;
-import de.truezip.driver.zip.io.ZipKeyException;
 import java.nio.charset.Charset;
 
 /**
@@ -101,7 +101,7 @@ public final class KeyManagement {
             // the default file system controller chain with a package private
             // file system controller which keeps track of the encryption keys.
             // Because we are not using the key manager, we don't need this
-            // special purpose file system controller and can use the default
+            // special purpose file system controller and can return the given
             // file system controller chain instead.
             return controller;
         }
@@ -190,7 +190,7 @@ public final class KeyManagement {
         return new TArchiveDetector(delegate,
                     suffixes, new CustomJarDriver2(password));
     }
-    
+
     private static final class CustomJarDriver2 extends JarDriver {
         final KeyManagerProvider provider;
         
@@ -199,21 +199,21 @@ public final class KeyManagement {
             this.provider = new PromptingKeyManagerService(
                     new CustomView(password));
         }
-        
+
         @Override
         protected KeyManagerProvider getKeyManagerProvider() {
             return provider;
         }
     } // CustomJarDriver2
-    
+
     private static final class CustomView
-    implements PromptingKeyProvider.View<AesPbeParameters> {
+    implements PromptingKeyProviderView<AesPbeParameters> {
         final char[] password;
-        
+
         CustomView(char[] password) {
             this.password = password.clone();
         }
-        
+
         /**
          * You need to create a new key because the key manager may eventually
          * reset it when the archive file gets moved or deleted.
@@ -226,7 +226,7 @@ public final class KeyManagement {
         }
         
         @Override
-        public void promptWriteKey(Controller<AesPbeParameters> controller)
+        public void promptWriteKey(PromptingKeyProviderController<AesPbeParameters> controller)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
@@ -237,7 +237,7 @@ public final class KeyManagement {
         }
         
         @Override
-        public void promptReadKey(  Controller<AesPbeParameters> controller,
+        public void promptReadKey(  PromptingKeyProviderController<AesPbeParameters> controller,
                                     boolean invalid)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to

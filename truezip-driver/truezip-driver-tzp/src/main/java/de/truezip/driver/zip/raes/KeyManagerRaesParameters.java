@@ -13,7 +13,7 @@ import de.truezip.kernel.key.KeyManagerProvider;
 import de.truezip.kernel.key.KeyProvider;
 import de.truezip.kernel.key.UnknownKeyException;
 import de.truezip.kernel.key.param.AesKeyStrength;
-import de.truezip.kernel.key.pbe.AesPbeParameters;
+import de.truezip.kernel.key.param.AesPbeParameters;
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -88,7 +88,7 @@ implements RaesParametersProvider {
         public char[] getWritePassword()
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(raes);
+                    provider = manager.make(raes);
             try {
                 return provider.getWriteKey().getPassword();
             } catch (UnknownKeyException ex) {
@@ -100,7 +100,7 @@ implements RaesParametersProvider {
         public char[] getReadPassword(final boolean invalid)
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(raes);
+                    provider = manager.make(raes);
             try {
                 return provider.getReadKey(invalid).getPassword();
             } catch (UnknownKeyException ex) {
@@ -112,7 +112,7 @@ implements RaesParametersProvider {
         public AesKeyStrength getKeyStrength()
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(raes);
+                    provider = manager.make(raes);
             try {
                 return provider.getWriteKey().getKeyStrength();
             } catch (UnknownKeyException ex) {
@@ -124,7 +124,7 @@ implements RaesParametersProvider {
         public void setKeyStrength(final AesKeyStrength keyStrength)
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.getKeyProvider(raes);
+                    provider = manager.make(raes);
             final AesPbeParameters param;
             try {
                 param = provider.getReadKey(false);
