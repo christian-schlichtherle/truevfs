@@ -6,12 +6,12 @@ package de.truezip.driver.zip.raes.sample;
 
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
-import de.truezip.driver.zip.sample.KeyManagementTestSuite;
+import de.truezip.driver.zip.sample.KeyManagementITSuite;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class KeyManagementIT extends KeyManagementTestSuite {
+public final class KeyManagementIT extends KeyManagementITSuite {
 
     @Override
     protected TArchiveDetector newArchiveDetector1(String suffix, String password) {

@@ -4,8 +4,8 @@
 package ${package};
 
 import de.truezip.file.TApplication;
-import de.truezip.kernel.key.pbe.swing.HurlingWindowFeedback;
-import de.truezip.kernel.key.pbe.swing.InvalidKeyFeedback;
+import de.truezip.key.pbe.swing.HurlingWindowFeedback;
+import de.truezip.key.pbe.swing.InvalidKeyFeedback;
 
 /**
  * An abstract class which configures the TrueZIP File* module.

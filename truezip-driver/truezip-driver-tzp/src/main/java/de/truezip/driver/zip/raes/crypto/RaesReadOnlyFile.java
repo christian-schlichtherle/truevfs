@@ -5,7 +5,7 @@
 package de.truezip.driver.zip.raes.crypto;
 
 import de.truezip.driver.zip.crypto.CipherReadOnlyFile;
-import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.key.param.AesKeyStrength;
 import static de.truezip.driver.zip.raes.crypto.Constants.LEAD_IN_LENGTH;
 import static de.truezip.driver.zip.raes.crypto.Constants.SIGNATURE;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;

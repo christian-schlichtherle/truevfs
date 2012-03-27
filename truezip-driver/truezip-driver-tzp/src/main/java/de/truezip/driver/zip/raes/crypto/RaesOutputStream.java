@@ -5,7 +5,7 @@
 package de.truezip.driver.zip.raes.crypto;
 
 import de.truezip.driver.zip.crypto.CipherOutputStream;
-import de.truezip.kernel.key.param.KeyStrength;
+import de.truezip.key.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

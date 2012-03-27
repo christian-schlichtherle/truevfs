@@ -82,14 +82,6 @@ Concepts
     and the
     {{{./apidocs/de/truezip/kernel/sl/IOPoolLocator.html}temporary I/O entry pool}}.
 
-    File system drivers may add additional service locators singletons.
-    For example, the
-    {{{./truezip-driver/truezip-driver-tzp/index.html}TrueZIP Driver ZIP.RAES (TZP)}}
-    module adds another service locator singleton for the
-    {{{./apidocs/de/truezip/kernel/sl/KeyManagerLocator.html}key manager}}
-    which obtains passwords or key files required to encrypt and decrypt
-    RAES encrypted ZIP files.
-
 ** Dependency Injection
 
     Although the service locator singletons are provided by the TrueZIP Kernel

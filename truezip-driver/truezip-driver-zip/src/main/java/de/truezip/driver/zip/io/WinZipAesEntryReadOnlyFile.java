@@ -6,8 +6,8 @@ package de.truezip.driver.zip.io;
 
 import de.truezip.driver.zip.crypto.CipherReadOnlyFile;
 import de.truezip.driver.zip.crypto.SeekableBlockCipher;
-import de.truezip.kernel.util.SuspensionPenalty;
-import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.key.util.SuspensionPenalty;
+import de.truezip.key.param.AesKeyStrength;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.ArrayHelper;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;

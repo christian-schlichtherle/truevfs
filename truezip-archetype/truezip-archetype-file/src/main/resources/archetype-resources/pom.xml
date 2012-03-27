@@ -52,7 +52,7 @@
         <!-- This optional dependency provides some nice swing classes. -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-swing</artifactId>
+            <artifactId>truezip-key</artifactId>
             <version>${truezip.version}</version>
         </dependency-->
 
