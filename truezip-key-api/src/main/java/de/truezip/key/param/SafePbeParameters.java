@@ -5,7 +5,6 @@
 package de.truezip.key.param;
 
 import de.truezip.key.SafeKey;
-import de.truezip.key.param.KeyStrength;
 import java.util.Arrays;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -16,6 +15,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <p>
  * Sub classes do not need to be thread-safe.
  *
+ * @param  <P> the type of these safe PBE parameters.
+ * @param  <S> the type of the key strength.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip;
 
+import de.schlichtherle.truezip.key.PromptingKeyProviderView;
 import de.truezip.key.KeyManager;
-import de.truezip.key.impl.PromptingKeyProviderView;
 import de.truezip.key.param.AesPbeParameters;
 import de.truezip.key.spi.KeyManagerService;
 import java.util.Map;

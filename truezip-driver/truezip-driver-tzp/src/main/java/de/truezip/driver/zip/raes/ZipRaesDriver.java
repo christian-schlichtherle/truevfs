@@ -18,9 +18,9 @@ import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.*;
-import de.truezip.key.param.AesPbeParameters;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
+import de.truezip.key.param.AesPbeParameters;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,8 +42,6 @@ public abstract class ZipRaesDriver extends JarDriver {
      * Constructs a new RAES encrypted ZIP file driver.
      *
      * @param ioPoolProvider the provider for the I/O buffer pool.
-     * @param keyManagerProvider the key manager provider for accessing
-     *        protected resources (cryptography).
      */
     public ZipRaesDriver(final IOPoolProvider ioPoolProvider) {
         super(ioPoolProvider);

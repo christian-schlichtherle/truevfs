@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.zip.raes.path;
 
+import de.schlichtherle.truezip.key.MockView;
+import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
+import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
-import de.truezip.key.impl.MockView;
-import static de.truezip.key.impl.MockView.Action.CANCEL;
-import static de.truezip.key.impl.MockView.Action.ENTER;
 import de.truezip.key.param.AesPbeParameters;
 import de.truezip.path.TPath;
 import de.truezip.path.TPathTestSuite;

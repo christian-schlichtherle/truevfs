@@ -24,12 +24,12 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
     protected abstract M newKeyManager();
 
     @Test
-    public void testMake() {
+    public void testMakeKeyProvider() {
         URI id = URI.create("a");
 
         try {
             manager.make(null);
-            fail("A NullPointerException is expected from the previous call!");
+            fail();
         } catch (NullPointerException expected) {
         }
 
@@ -41,7 +41,7 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
     }
 
     @Test
-    public void testMove() {
+    public void testMoveKeyProvider() {
         URI idA = URI.create("a");
         URI idB = URI.create("b");
 
@@ -80,7 +80,7 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
     }
 
     @Test
-    public void testDelete() {
+    public void testDeleteKeyProvider() {
         URI id = URI.create("a");
 
         assertNull(manager.delete(id));

@@ -4,6 +4,9 @@
  */
 package de.truezip.driver.zip.sample;
 
+import de.schlichtherle.truezip.key.PromptingKeyProviderController;
+import de.schlichtherle.truezip.key.PromptingKeyProviderView;
+import de.schlichtherle.truezip.key.spi.PromptingKeyManagerService;
 import de.truezip.driver.zip.JarDriver;
 import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.driver.zip.io.WinZipAesParameters;
@@ -17,9 +20,6 @@ import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.key.KeyManagerProvider;
 import de.truezip.key.UnknownKeyException;
-import de.truezip.key.impl.PromptingKeyProviderController;
-import de.truezip.key.impl.PromptingKeyProviderView;
-import de.truezip.key.impl.spi.PromptingKeyManagerService;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.param.AesPbeParameters;
 import java.nio.charset.Charset;

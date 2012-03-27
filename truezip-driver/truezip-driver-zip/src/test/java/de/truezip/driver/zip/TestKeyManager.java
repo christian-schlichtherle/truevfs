@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.zip;
 
+import de.schlichtherle.truezip.key.PromptingKeyManager;
+import de.schlichtherle.truezip.key.PromptingKeyProvider;
+import de.schlichtherle.truezip.key.PromptingKeyProviderView;
 import de.truezip.key.SafeKey;
-import de.truezip.key.impl.PromptingKeyManager;
-import de.truezip.key.impl.PromptingKeyProvider;
-import de.truezip.key.impl.PromptingKeyProviderView;
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
 
