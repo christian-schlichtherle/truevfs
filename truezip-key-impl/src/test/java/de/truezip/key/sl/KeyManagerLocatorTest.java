@@ -4,7 +4,6 @@
  */
 package de.truezip.key.sl;
 
-import de.truezip.key.param.AesPbeParameters;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
@@ -14,6 +13,6 @@ import org.junit.Test;
 public final class KeyManagerLocatorTest {
     @Test
     public void testGetManager() {
-        assertNotNull(KeyManagerLocator.SINGLETON.get(AesPbeParameters.class));
+        assertNotNull(KeyManagerLocator.SINGLETON.get(Object.class));
     }
 }
