@@ -89,7 +89,7 @@ implements KeyProvider<K> {
         try {
             retrieveReadKey(invalid);
         } finally {
-            enforceSuspensionPenalty();
+            SuspensionPenalty.enforce(invalidated.get());
         }
         return getNonNullKey();
     }
@@ -125,11 +125,6 @@ implements KeyProvider<K> {
         this.key = null == newKey ? null : newKey.clone();
         if (null != oldKey)
             oldKey.reset();
-    }
-
-    private void enforceSuspensionPenalty() {
-        // TODO: This makes this class untestable!
-        SuspensionPenalty.enforce(invalidated.get());
     }
 
     private static final class ThreadLocalLong extends ThreadLocal<Long> {
