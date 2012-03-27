@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.key.awt;
+package de.schlichtherle.truezip.key.swing;
 
+import de.schlichtherle.truezip.key.swing.Windows;
 import de.schlichtherle.truezip.key.swing.JemmyUtils;
 import java.awt.Window;
 import javax.swing.JDialog;

@@ -1,9 +1,9 @@
     -----------------------
-    About TrueZIP Key
+    About TrueZIP Key Implementation
     -----------------------
     Christian Schlichtherle
     -----------------------
 
 About TrueZIP Key
 
-    Secret key management.
+    Implements the secret key management API.
