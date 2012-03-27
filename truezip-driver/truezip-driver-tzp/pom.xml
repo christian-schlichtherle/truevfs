@@ -49,10 +49,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-key-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>truezip-key-impl</artifactId>
             <scope>test</scope>
         </dependency>
