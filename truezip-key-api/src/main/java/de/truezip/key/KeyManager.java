@@ -12,7 +12,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A container for key providers for reading and writing protected resources.
  * <p>
- * Implementations must be safe for multi-threading.
+ * Implementations must be thread-safe.
  *
  * @param   <K> The type of the secret keys.
  * @author  Christian Schlichtherle
