@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * A console based user interface to prompt for passwords.
+ * A console based user interface for prompting for passwords.
  * 
  * @author Christian Schlichtherle
  */

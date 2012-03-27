@@ -17,10 +17,10 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class ConsolePromptingKeyManagerService extends KeyManagerService {
+public final class ConsolePromptingAesPbeKeyManagerService extends KeyManagerService {
     private final Map<Class<?>, KeyManager<?>> managers;
 
-    public ConsolePromptingKeyManagerService() {
+    public ConsolePromptingAesPbeKeyManagerService() {
         this.managers = newMap(new Object[][] {{
             AesPbeParameters.class,
             new ConsolePromptingKeyManager<AesPbeParameters>(
