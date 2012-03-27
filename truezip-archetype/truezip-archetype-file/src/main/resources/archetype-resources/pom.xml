@@ -49,6 +49,8 @@
             <scope>runtime</scope>
         </dependency-->
 
+        <!-- Solely required to set the visual feedback for wrong password
+             prompts. -->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-key-impl</artifactId>
