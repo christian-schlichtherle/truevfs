@@ -61,7 +61,12 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-key</artifactId>
+            <artifactId>truezip-key-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-key-impl</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- A TrueZIP application typically has a dependency on one or more

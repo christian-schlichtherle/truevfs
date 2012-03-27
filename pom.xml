@@ -219,12 +219,25 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-key</artifactId>
+                <artifactId>truezip-key-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-key</artifactId>
+                <artifactId>truezip-key-api</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-key-impl</artifactId>
+                <version>${project.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-key-impl</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
