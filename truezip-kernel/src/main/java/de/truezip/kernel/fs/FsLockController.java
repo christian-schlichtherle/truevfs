@@ -4,10 +4,10 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
@@ -18,10 +18,6 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.cio.DecoratingInputSocket;
-import de.truezip.kernel.cio.DecoratingOutputSocket;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.kernel.util.JSE7;
