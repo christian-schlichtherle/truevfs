@@ -4,24 +4,20 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.cio.DecoratingEntry;
-import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.APPEND;
 import static de.truezip.kernel.fs.option.FsOutputOption.CREATE_PARENTS;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.cio.DelegatingInputSocket;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;

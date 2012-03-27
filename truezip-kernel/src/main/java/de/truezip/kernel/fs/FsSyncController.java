@@ -39,7 +39,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 final class FsSyncController
-extends FsDecoratingController<FsModel, FsController<?>> {
+extends FsSyncDecoratingController<FsModel, FsController<?>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2

@@ -4,16 +4,15 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
-import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -328,23 +327,6 @@ public abstract class FsController<M extends FsModel> {
     public abstract void
     unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException;
-
-    final void
-    sync(final FsNeedsSyncException trigger)
-    throws IOException {
-        final FsSyncWarningException fuse
-                = new FsSyncWarningException(getModel(), trigger);
-        final FsSyncExceptionBuilder ied = new FsSyncExceptionBuilder();
-        try {
-            ied.warn(fuse);     // charge fuse
-            sync(SYNC, ied);    // charge load
-            ied.check();        // pull trigger
-            throw new AssertionError("Expected an instance of the " + FsSyncException.class);
-        } catch (final FsSyncWarningException damage) {
-            if (damage != fuse) // check for dud
-                throw damage;
-        }
-    }
 
     /**
      * Commits all unsynchronized changes to the contents of this file system

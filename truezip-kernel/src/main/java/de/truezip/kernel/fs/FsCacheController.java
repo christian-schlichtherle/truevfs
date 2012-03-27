@@ -4,17 +4,11 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.cio.DelegatingInputSocket;
-import de.truezip.kernel.cio.DelegatingOutputSocket;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.ClutchInputSocket;
-import de.truezip.kernel.cio.ClutchOutputSocket;
-import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.cio.IOPool;
-import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.cio.*;
+import static de.truezip.kernel.fs.FsCache.Strategy.WRITE_BACK;
+import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
@@ -25,7 +19,6 @@ import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import static de.truezip.kernel.fs.FsCache.Strategy.WRITE_BACK;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.kernel.util.JSE7;
@@ -82,7 +75,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 final class FsCacheController
-extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
+extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsLockModel, ?>> {
 
     private static final Logger logger = Logger.getLogger(
             FsCacheController.class.getName(),
@@ -103,7 +96,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * @param controller the decorated file system controller.
      * @param pool the pool of I/O buffers to hold the cached entry contents.
      */
-    FsCacheController(  final FsController<? extends FsLockModel> controller,
+    FsCacheController(  final FsSyncDecoratingController<? extends FsLockModel, ?> controller,
                         final IOPool<?> pool) {
         super(controller);
         if (null == (this.pool = pool))

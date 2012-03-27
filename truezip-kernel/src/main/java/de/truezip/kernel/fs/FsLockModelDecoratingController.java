@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 abstract class FsLockModelDecoratingController<
         C extends FsController<? extends FsLockModel>>
-extends FsDecoratingController<FsLockModel, C>  {
+extends FsSyncDecoratingController<FsLockModel, C>  {
 
     static final int WAIT_TIMEOUT_MILLIS = 100;
 
