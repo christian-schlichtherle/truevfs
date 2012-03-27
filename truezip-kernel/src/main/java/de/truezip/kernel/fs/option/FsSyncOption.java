@@ -26,12 +26,12 @@ import javax.annotation.concurrent.Immutable;
 public enum FsSyncOption {
 
     /**
-     * Suppose there are any open input resources (input streams etc.) for any
-     * file system entries.
+     * Suppose there are any open I/O resources (streams, channels etc.) for
+     * any file system entries.
      * Then if this option is set, the respective file system controller waits
-     * until all <em>other</em> threads have closed their input resources
-     * before proceeding with the update of the federated file system.
-     * Input resources allocated by the <em>current</em> thread are always
+     * until all <em>other</em> threads have closed their I/O resources before
+     * proceeding with the update of the federated file system.
+     * I/O resources allocated by the <em>current</em> thread are always
      * ignored.
      * If the current thread gets interrupted while waiting, it will stop
      * waiting and proceed normally as if this option wasn't set.
@@ -42,18 +42,18 @@ public enum FsSyncOption {
      * then the respective file system controller will not return from the
      * update until the current thread gets interrupted!
      */
-    // TODO: Merge WAIT_CLOSE_INPUT and WAIT_CLOSE_OUTPUT into WAIT_CLOSE_IO.
-    WAIT_CLOSE_INPUT,
+    WAIT_CLOSE_IO,
 
     /**
-     * Suppose there are any open input resources (input streams etc.) for any
-     * file system entries.
+     * Suppose there are any open I/O resources (streams, channels etc.) for
+     * any file system entries.
      * Then if this option is set, the respective file system controller
      * proceeds to update the federated file system anyway and finally throws
      * an {@link FsSyncWarningException} with a
      * {@link FsResourceOpenException} as its cause to indicate that any
      * subsequent operations on these resources will fail with an
-     * {@link InputClosedException} because they have been forced to close.
+     * {@link InputClosedException} or {@link OutputClosedException}
+     * respectively because they have been forced to close.
      * <p>
      * If this option is not set however, the federated file system is
      * <em>not</em> updated, but instead
@@ -61,28 +61,7 @@ public enum FsSyncOption {
      * its cause is thrown to indicate
      * that the application must close all input resources first.
      */
-    // TODO: Merge FORCE_CLOSE_INPUT and FORCE_CLOSE_OUTPUT into FORCE_CLOSE_IO.
-    FORCE_CLOSE_INPUT,
-
-    /**
-     * Similar to {@link #WAIT_CLOSE_INPUT},
-     * but applies to file system entry output resources (output streams etc.)
-     * instead.
-     */
-    // TODO: Merge WAIT_CLOSE_INPUT and WAIT_CLOSE_OUTPUT into WAIT_CLOSE_IO.
-    WAIT_CLOSE_OUTPUT,
-
-    /**
-     * Similar to {@link #FORCE_CLOSE_INPUT},
-     * but applies to file system entry output resources (output streams etc.)
-     * and may respectively throw an {@link OutputClosedException}.
-     * <p>
-     * If this option is set, then
-     * {@link #FORCE_CLOSE_INPUT} must be set, too.
-     * Otherwise, an {@code IllegalArgumentException} is thrown.
-     */
-    // TODO: Merge FORCE_CLOSE_INPUT and FORCE_CLOSE_OUTPUT into FORCE_CLOSE_IO.
-    FORCE_CLOSE_OUTPUT,
+    FORCE_CLOSE_IO,
 
     /**
      * If this option is set, all pending changes are aborted.

@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.truezip.kernel.fs.FsManager;
 import de.truezip.extension.jmxjul.InstrumentingManager;
+import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 final class JmxManager extends InstrumentingManager {

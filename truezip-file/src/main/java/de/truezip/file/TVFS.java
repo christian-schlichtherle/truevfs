@@ -133,16 +133,13 @@ public final class TVFS {
      *
      * @param  options an array of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
@@ -157,16 +154,13 @@ public final class TVFS {
      *
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
@@ -184,16 +178,13 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options an array of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
@@ -210,16 +201,13 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
@@ -236,16 +224,13 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options an array of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
@@ -262,16 +247,13 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */

@@ -4,10 +4,11 @@
  */
 package de.truezip.file;
 
-import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
-import static de.truezip.kernel.fs.option.FsSyncOption.*;
-import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
 import de.truezip.kernel.fs.*;
+import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
+import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
+import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_IO;
+import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.OutputClosedException;
@@ -1304,8 +1305,7 @@ extends ConfiguredClientTestBase<D> {
                         try {
                             TVFS.sync(archive,
                                     BitField.of(CLEAR_CACHE)
-                                            .set(WAIT_CLOSE_INPUT, wait)
-                                            .set(WAIT_CLOSE_OUTPUT, wait));
+                                            .set(WAIT_CLOSE_IO, wait));
                         } catch (final FsSyncException ex) {
                             if (!(ex.getCause() instanceof FsResourceOpenException))
                                 throw ex;

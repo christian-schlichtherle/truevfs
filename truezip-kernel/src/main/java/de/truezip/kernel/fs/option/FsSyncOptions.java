@@ -28,7 +28,7 @@ public final class FsSyncOptions {
      * controller eligible for garbage collection unless any strong references
      * are held by the client application.
      * This is equivalent to
-     * {@code BitField.of(FsSyncOption.FORCE_CLOSE_INPUT, FsSyncOption.FORCE_CLOSE_OUTPUT, FsSyncOption.CLEAR_CACHE)}.
+     * {@code BitField.of(FsSyncOption.FORCE_CLOSE_IO, FsSyncOption.CLEAR_CACHE)}.
      * <p>
      * These options should be used if an application wants to
      * synchronize all mounted archive files and make sure to clean up
@@ -38,17 +38,14 @@ public final class FsSyncOptions {
      * may not be able to succeed and receive an exception.
      */
     public static final BitField<FsSyncOption>
-            UMOUNT = BitField.of(   FORCE_CLOSE_INPUT,
-                                    FORCE_CLOSE_OUTPUT,
-                                    CLEAR_CACHE);
+            UMOUNT = BitField.of(FORCE_CLOSE_IO, CLEAR_CACHE);
 
     /**
      * Waits for all other threads to close their I/O resources (i.e. streams,
      * channels etc) for any entries of the file system, flushes its selective
      * entry cache without clearing it and commits all changes to its parent
      * file system (if any).
-     * This is equivalent to
-     * {@code BitField.of(FsSyncOption.WAIT_CLOSE_INPUT, FsSyncOption.WAIT_CLOSE_OUTPUT)}.
+     * This is equivalent to {@code BitField.of(FsSyncOption.WAIT_CLOSE_IO)}.
      * <p>
      * These options should be used if a multithreaded application wants to
      * synchronize all mounted archive files without affecting any I/O to
@@ -63,8 +60,7 @@ public final class FsSyncOptions {
     // would require an automatic sync() of the same target archive file from
     // which the input stream is reading.
     public static final BitField<FsSyncOption>
-            SYNC = BitField.of( WAIT_CLOSE_INPUT,
-                                WAIT_CLOSE_OUTPUT);
+            SYNC = BitField.of(WAIT_CLOSE_IO);
 
     /**
      * Aborts all pending changes for the federated file system, clears the

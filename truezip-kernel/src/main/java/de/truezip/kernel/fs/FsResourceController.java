@@ -111,18 +111,15 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final FsResourceAccountant a = accountant;
         if (null == a)
             return;
-        final boolean force = options.get(FORCE_CLOSE_INPUT)
-                || options.get(FORCE_CLOSE_OUTPUT);
+        final boolean force = options.get(FORCE_CLOSE_IO);
         final int local = a.localResources();
         final IOException cause;
         if (0 != local && !force) {
             cause = new FsResourceOpenException(a.totalResources(), local);
             throw handler.fail(new FsSyncException(getModel(), cause));
         }
-        final boolean wait = options.get(WAIT_CLOSE_INPUT)
-                || options.get(WAIT_CLOSE_OUTPUT);
-        final int total = a.waitForeignResources(
-                wait ? 0 : WAIT_TIMEOUT_MILLIS);
+        final boolean wait = options.get(WAIT_CLOSE_IO);
+        final int total = a.waitForeignResources(wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 == total)
             return;
         cause = new FsResourceOpenException(total, local);
