@@ -4,12 +4,12 @@
  */
 package de.truezip.driver.zip.raes.file;
 
+import de.schlichtherle.truezip.key.MockView;
+import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
+import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileITSuite;
-import de.truezip.key.impl.MockView;
-import static de.truezip.key.impl.MockView.Action.CANCEL;
-import static de.truezip.key.impl.MockView.Action.ENTER;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
 import static org.junit.Assert.*;

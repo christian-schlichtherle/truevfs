@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip;
 
+import de.schlichtherle.truezip.key.MockView;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.key.KeyManagerProvider;
-import de.truezip.key.impl.MockView;
 import de.truezip.key.param.AesPbeParameters;
 
 /**

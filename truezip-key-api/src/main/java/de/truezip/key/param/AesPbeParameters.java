@@ -4,7 +4,6 @@
  */
 package de.truezip.key.param;
 
-import de.truezip.key.param.AesKeyStrength;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
