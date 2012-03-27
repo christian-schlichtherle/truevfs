@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * successfully retry the operation as soon as these I/O resources have been
  * closed and no other exceptional conditions apply.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class FsResourceOpenException extends IOException {
