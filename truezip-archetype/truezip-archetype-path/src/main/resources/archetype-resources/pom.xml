@@ -50,12 +50,11 @@
             <scope>runtime</scope>
         </dependency-->
 
-        <!-- This optional dependency provides some nice swing classes. -->
-        <!--dependency>
+        <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-key</artifactId>
+            <artifactId>truezip-key-impl</artifactId>
             <version>${truezip.version}</version>
-        </dependency-->
+        </dependency>
 
         <!-- A TrueZIP application typically has a dependency on one or more
              file system driver modules for accessing their respective file
