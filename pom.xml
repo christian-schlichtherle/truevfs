@@ -130,6 +130,9 @@ system space.
 
         <!-- clirr-maven-plugin -->
         <comparisonVersion>8.0</comparisonVersion>
+
+        <!-- maven-javadoc-plugin -->
+        <excludePackageNames>de.schlichtherle.truezip</excludePackageNames>
     </properties>
 
     <modules>
