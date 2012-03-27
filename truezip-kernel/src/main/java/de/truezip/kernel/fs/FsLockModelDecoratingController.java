@@ -13,8 +13,8 @@ import javax.annotation.concurrent.Immutable;
  * {@link FsLockModel} so that it can forward its additional method
  * calls to this model for the convenience of the sub-class.
  *
- * @param   <C> The type of the decorated file system controller.
- * @author  Christian Schlichtherle
+ * @param  <C> The type of the decorated file system controller.
+ * @author Christian Schlichtherle
  */
 @Immutable
 abstract class FsLockModelDecoratingController<
