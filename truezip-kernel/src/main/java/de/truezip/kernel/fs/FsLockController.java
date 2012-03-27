@@ -11,8 +11,7 @@ import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
-import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_INPUT;
-import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_OUTPUT;
+import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -61,7 +60,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 ).newThreadLocalUtil();
 
     private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
-            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT).not();
+            = BitField.of(WAIT_CLOSE_IO).not();
 
     private final ReadLock readLock;
     private final WriteLock writeLock;
@@ -78,12 +77,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    protected ReadLock readLock() {
+    ReadLock readLock() {
         return this.readLock;
     }
 
     @Override
-    protected WriteLock writeLock() {
+    WriteLock writeLock() {
         return this.writeLock;
     }
 

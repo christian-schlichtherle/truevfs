@@ -6,7 +6,7 @@ package de.truezip.kernel.fs;
 
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.option.FsSyncOption;
-import static de.truezip.kernel.fs.option.FsSyncOption.*;
+import static de.truezip.kernel.fs.option.FsSyncOption.ABORT_CHANGES;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -85,10 +85,8 @@ implements Iterable<FsController<?>> {
      * @param  options a bit field of synchronization options.
      * @throws FsSyncException if committing the changes fails for any reason.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} is cleared and
-     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@link FsSyncOption#ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
+     *         is set.
      */
     public final void
     sync(final BitField<FsSyncOption> options) throws FsSyncException {
@@ -117,19 +115,15 @@ implements Iterable<FsController<?>> {
      * @throws X at the discretion of the exception {@code handler}
      *         upon the occurence of any {@code IOException}.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} is cleared and
-     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@link FsSyncOption#ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
+     *         is set.
      */
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
-                || options.get(ABORT_CHANGES))
+        if (options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
-
         for (final FsController<?> controller : this) {
             try {
                 controller.sync(options, handler);

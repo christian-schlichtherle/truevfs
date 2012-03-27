@@ -9,16 +9,16 @@ import de.truezip.file.TConfig;
 import de.truezip.file.TFileITSuite;
 import de.truezip.file.TVFS;
 import de.truezip.kernel.fs.FsArchiveDriver;
-import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
 import de.truezip.kernel.fs.FsResourceOpenException;
 import de.truezip.kernel.fs.FsSyncException;
-import static de.truezip.kernel.fs.option.FsSyncOption.*;
-import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
 import de.truezip.kernel.fs.FsSyncWarningException;
+import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
+import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
+import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_IO;
+import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.io.Streams;
-import de.truezip.path.TPath;
 import de.truezip.kernel.util.ArrayHelper;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
@@ -1323,8 +1323,7 @@ extends ConfiguredClientTestBase<D> {
                         try {
                             TVFS.sync(archive.getFileSystem().getMountPoint(),
                                     BitField.of(CLEAR_CACHE)
-                                            .set(WAIT_CLOSE_INPUT, wait)
-                                            .set(WAIT_CLOSE_OUTPUT, wait));
+                                            .set(WAIT_CLOSE_IO, wait));
                         } catch (final FsSyncException ex) {
                             if (!(ex.getCause() instanceof FsResourceOpenException))
                                 throw ex;
