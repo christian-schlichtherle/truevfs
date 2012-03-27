@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.key.KeyManager;
-import de.truezip.kernel.key.impl.PromptingKeyProviderView;
-import de.truezip.kernel.key.param.AesPbeParameters;
-import de.truezip.kernel.key.spi.KeyManagerService;
+import de.truezip.key.KeyManager;
+import de.truezip.key.impl.PromptingKeyProviderView;
+import de.truezip.key.param.AesPbeParameters;
+import de.truezip.key.spi.KeyManagerService;
 import java.util.Map;
 
 /**

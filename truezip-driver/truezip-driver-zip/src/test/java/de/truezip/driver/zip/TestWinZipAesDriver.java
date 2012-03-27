@@ -5,9 +5,9 @@
 package de.truezip.driver.zip;
 
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.impl.MockView;
-import de.truezip.kernel.key.param.AesPbeParameters;
+import de.truezip.key.KeyManagerProvider;
+import de.truezip.key.impl.MockView;
+import de.truezip.key.param.AesPbeParameters;
 
 /**
  * @author Christian Schlichtherle

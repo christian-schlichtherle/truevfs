@@ -43,8 +43,7 @@ Encrypted Application File Format
 TConfig.get().setArchiveDetector(
     new TArchiveDetector(
         "fox|bax",
-        new SafeZipRaesDriver(  IOPoolLocator.SINGLETON,
-                                KeyManagerLocator.SINGLETON)));
+        new SafeZipRaesDriver(IOPoolLocator.SINGLETON)));
 +-------------------------------------------------+
 
     Once this has been called, any new <<<TFile>>> object will recognize the
@@ -70,17 +69,14 @@ TConfig.get().setArchiveDetector(
     By using CTR mode, RAES supports transparent <random> read access to
     its encrypted payload, which makes reading a TZP file pretty fast.
 
-    Note the injection of the
-    {{{../apidocs/de/truezip/kernel/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
-    into the <<<SafeZipRaesDriver>>>.
-    This object is responsible for resolving keys by prompting the user for
-    passwords.
-    It will check if the JVM is in headless mode and then use the console for
-    prompting, otherwise a Swing GUI.
-    If you want to hard code a password instead, you would need to inject an
-    instance of your own implementation of the interface
-    {{{../apidocs/de/truezip/kernel/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}.
-    For more information, please refer to the article about
+    Note that the <<<SafeZipRaesDriver>>> uses the
+    {{{../truezip-key/apidocs/de/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
+    to get a secret key manager.
+    The default implementation in the module 
+    {{{../truezip-key-impl/index.html}TrueZIP Key Implementation}}
+    will prompt the user for entering the secret keys, either on the console
+    (if the JVM is running headless) or with a Swing GUI.
+    You can change this by following the instructions on the page about
     {{{../truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
 
     Now you can easily create or overwrite an entry in your custom application

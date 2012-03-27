@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.key.param.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.

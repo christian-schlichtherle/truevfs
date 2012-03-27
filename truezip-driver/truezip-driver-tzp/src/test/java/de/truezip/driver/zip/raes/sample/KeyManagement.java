@@ -13,14 +13,14 @@ import de.truezip.file.TConfig;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriverProvider;
 import de.truezip.kernel.fs.FsModel;
-import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.UnknownKeyException;
-import de.truezip.kernel.key.impl.PromptingKeyProviderController;
-import de.truezip.kernel.key.impl.PromptingKeyProviderView;
-import de.truezip.kernel.key.impl.spi.PromptingKeyManagerService;
-import de.truezip.kernel.key.param.AesKeyStrength;
-import de.truezip.kernel.key.param.AesPbeParameters;
 import de.truezip.kernel.sl.IOPoolLocator;
+import de.truezip.key.KeyManagerProvider;
+import de.truezip.key.UnknownKeyException;
+import de.truezip.key.impl.PromptingKeyProviderController;
+import de.truezip.key.impl.PromptingKeyProviderView;
+import de.truezip.key.impl.spi.PromptingKeyManagerService;
+import de.truezip.key.param.AesKeyStrength;
+import de.truezip.key.param.AesPbeParameters;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP

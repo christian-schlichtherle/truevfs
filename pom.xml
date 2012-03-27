@@ -138,8 +138,8 @@ system space.
         <module>truezip-extension</module>
         <module>truezip-file</module>
         <module>truezip-kernel</module>
+        <module>truezip-key</module>
         <module>truezip-samples</module>
-        <module>truezip-swing</module>
     </modules>
 
     <profiles>
@@ -219,24 +219,24 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-path</artifactId>
+                <artifactId>truezip-key</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-path</artifactId>
+                <artifactId>truezip-key</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-swing</artifactId>
+                <artifactId>truezip-path</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-swing</artifactId>
+                <artifactId>truezip-path</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>

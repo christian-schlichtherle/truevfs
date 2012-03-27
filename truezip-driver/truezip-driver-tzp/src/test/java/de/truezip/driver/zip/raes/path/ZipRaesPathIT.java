@@ -5,10 +5,10 @@
 package de.truezip.driver.zip.raes.path;
 
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
-import de.truezip.kernel.key.impl.MockView;
-import static de.truezip.kernel.key.impl.MockView.Action.CANCEL;
-import static de.truezip.kernel.key.impl.MockView.Action.ENTER;
-import de.truezip.kernel.key.param.AesPbeParameters;
+import de.truezip.key.impl.MockView;
+import static de.truezip.key.impl.MockView.Action.CANCEL;
+import static de.truezip.key.impl.MockView.Action.ENTER;
+import de.truezip.key.param.AesPbeParameters;
 import de.truezip.path.TPath;
 import de.truezip.path.TPathTestSuite;
 import java.io.IOException;

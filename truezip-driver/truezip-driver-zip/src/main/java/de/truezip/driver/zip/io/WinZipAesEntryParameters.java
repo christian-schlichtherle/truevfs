@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.kernel.key.param.AesKeyStrength;
+import de.truezip.key.param.AesKeyStrength;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**

@@ -5,8 +5,8 @@
 package de.truezip.samples;
 
 import de.truezip.samples.Application;
-import de.truezip.kernel.key.pbe.swing.HurlingWindowFeedback;
-import de.truezip.kernel.key.pbe.swing.InvalidKeyFeedback;
+import de.truezip.key.pbe.swing.HurlingWindowFeedback;
+import de.truezip.key.pbe.swing.InvalidKeyFeedback;
 import java.io.ByteArrayOutputStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertEquals;

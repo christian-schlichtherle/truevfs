@@ -8,12 +8,12 @@ import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesParametersProvider;
 import de.truezip.driver.zip.raes.crypto.Type0RaesParameters;
-import de.truezip.kernel.key.KeyManager;
-import de.truezip.kernel.key.KeyManagerProvider;
-import de.truezip.kernel.key.KeyProvider;
-import de.truezip.kernel.key.UnknownKeyException;
-import de.truezip.kernel.key.param.AesKeyStrength;
-import de.truezip.kernel.key.param.AesPbeParameters;
+import de.truezip.key.KeyManager;
+import de.truezip.key.KeyManagerProvider;
+import de.truezip.key.KeyProvider;
+import de.truezip.key.UnknownKeyException;
+import de.truezip.key.param.AesKeyStrength;
+import de.truezip.key.param.AesPbeParameters;
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
 
