@@ -27,11 +27,6 @@
         service location in the client API modules.
     </description>
 
-    <properties>
-        <!-- clirr-maven-plugin -->
-        <comparisonVersion>7.4</comparisonVersion>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
