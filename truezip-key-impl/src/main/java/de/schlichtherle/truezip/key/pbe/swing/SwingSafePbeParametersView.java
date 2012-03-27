@@ -32,7 +32,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.JOptionPane;
 
 /**
- * A Swing based user interface to prompt for passwords or key files.
+ * A Swing based user interface for prompting for passwords or key files.
  *
  * @author Christian Schlichtherle
  */

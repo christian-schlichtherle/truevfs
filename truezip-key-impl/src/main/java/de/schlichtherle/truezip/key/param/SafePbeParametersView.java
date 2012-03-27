@@ -13,6 +13,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * <p>
  * Sub classes must be thread-safe and should have no side effects!
  * 
+ * @param  <P> the type of the safe PBE parameters.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
