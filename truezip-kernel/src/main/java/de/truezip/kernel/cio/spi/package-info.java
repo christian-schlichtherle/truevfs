@@ -3,8 +3,8 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides an abstract class for a locatable service provider for an
- * I/O buffer pool.
+ * Provides an abstract class for locatable service providers for I/O buffer
+ * pools.
  * <p>
  * Note that the TrueZIP Kernel module has no dependency on this package
  * - so using it is entirely optional.

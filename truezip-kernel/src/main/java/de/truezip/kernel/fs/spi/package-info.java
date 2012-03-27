@@ -3,8 +3,8 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides abstract classes for locatable service providers for a file system
- * manager and file system providers.
+ * Provides abstract classes for locatable service providers for file system
+ * managers and file system providers.
  * <p>
  * Note that the TrueZIP Kernel module has no dependency on this package
  * - so using it is entirely optional.

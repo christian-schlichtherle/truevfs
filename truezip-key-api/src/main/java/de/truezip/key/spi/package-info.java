@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides an abstract class for a locatable key manager service provider.
+ * Provides an abstract class for locatable service providers for key managers.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.truezip.key.spi;
