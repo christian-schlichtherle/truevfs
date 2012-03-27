@@ -3,9 +3,9 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
+import de.schlichtherle.truezip.key.pbe.swing.feedback.HurlingWindowFeedback;
+import de.schlichtherle.truezip.key.pbe.swing.feedback.InvalidKeyFeedback;
 import de.truezip.file.TApplication;
-import de.truezip.key.pbe.swing.HurlingWindowFeedback;
-import de.truezip.key.pbe.swing.InvalidKeyFeedback;
 
 /**
  * An abstract class which configures the TrueZIP File* module.

@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip.raes.sample;
 
+import de.truezip.driver.zip.sample.KeyManagementITSuite;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
-import de.truezip.driver.zip.sample.KeyManagementITSuite;
 
 /**
  * @author Christian Schlichtherle
@@ -14,16 +14,8 @@ import de.truezip.driver.zip.sample.KeyManagementITSuite;
 public final class KeyManagementIT extends KeyManagementITSuite {
 
     @Override
-    protected TArchiveDetector newArchiveDetector1(String suffix, String password) {
-        return KeyManagement.newArchiveDetector1(
-                TConfig.get().getArchiveDetector(),
-                suffix,
-                password.toCharArray());
-    }
-
-    @Override
-    protected TArchiveDetector newArchiveDetector2(String suffix, String password) {
-        return KeyManagement.newArchiveDetector2(
+    protected TArchiveDetector newArchiveDetector(String suffix, String password) {
+        return KeyManagement.newArchiveDetector(
                 TConfig.get().getArchiveDetector(),
                 suffix,
                 password.toCharArray());

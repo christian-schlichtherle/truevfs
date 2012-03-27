@@ -31,9 +31,8 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
     /** The singleton instance of this class. */
     public static final KeyManagerLocator SINGLETON = new KeyManagerLocator();
 
-    /** You cannot instantiate this class. */
-    private KeyManagerLocator() {
-    }
+    /* Can't touch this - hammer time! */
+    private KeyManagerLocator() { }
 
     @Override
     public Map<Class<?>, KeyManager<?>> get() {
