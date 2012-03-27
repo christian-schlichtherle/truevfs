@@ -14,7 +14,6 @@ import de.truezip.kernel.fs.FsSyncWarningException;
 //import de.truezip.kernel.fs.zip.ZipDriver;
 //import de.truezip.kernel.fs.zip.raes.ParanoidZipRaesDriver;
 //import de.truezip.kernel.fs.zip.raes.SafeZipRaesDriver;
-//import de.truezip.kernel.key.sl.KeyManagerLocator;
 //import de.truezip.kernel.sl.IOPoolLocator;
 
 /**
@@ -172,9 +171,7 @@ public abstract class TApplication<E extends Exception> {
      * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "bar",
-     *             new SafeZipRaesDriver(
-     *                 IOPoolLocator.SINGLETON,
-     *                 KeyManagerLocator.SINGLETON)));
+     *             new SafeZipRaesDriver(IOPoolLocator.SINGLETON)));
      * }</pre>
      * <p>
      * If you're a bit paranoid, then you could use the following driver
@@ -188,9 +185,7 @@ public abstract class TApplication<E extends Exception> {
      * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "bar",
-     *             new ParanoidZipRaesDriver(
-     *                 IOPoolLocator.SINGLETON,
-     *                 KeyManagerLocator.SINGLETON)));
+     *             new ParanoidZipRaesDriver(IOPoolLocator.SINGLETON)));
      * }</pre>
      * <p>
      * And finally, if you're quite paranoid, then this driver is for you:
@@ -206,9 +201,7 @@ public abstract class TApplication<E extends Exception> {
      * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
      *             "bar",
-     *             new ParanoidZipRaesDriver(
-     *                 new ByteArrayIOPoolService(2048),
-     *                 KeyManagerLocator.SINGLETON)));
+     *             new ParanoidZipRaesDriver(new ByteArrayIOPoolService(2048))));
      * }</pre>
      * <p>
      * Last but not least, the following class property controls whether
