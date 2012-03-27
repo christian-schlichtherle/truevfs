@@ -11,13 +11,13 @@
 
     <parent>
         <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-key</artifactId>
+        <artifactId>truezip</artifactId>
         <version>8-SNAPSHOT</version>
     </parent>
 
     <artifactId>truezip-key-impl</artifactId>
 
-    <name>TrueZIP Key Impl</name>
+    <name>TrueZIP Key Implementation</name>
     <description>Implements the secret key management API.</description>
 
     <dependencies>

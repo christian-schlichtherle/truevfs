@@ -138,7 +138,8 @@ system space.
         <module>truezip-extension</module>
         <module>truezip-file</module>
         <module>truezip-kernel</module>
-        <module>truezip-key</module>
+        <module>truezip-key-api</module>
+        <module>truezip-key-impl</module>
         <module>truezip-samples</module>
     </modules>
 
