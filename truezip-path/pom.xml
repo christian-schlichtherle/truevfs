@@ -26,11 +26,6 @@ It also provides the TFileSystemProvider class to implement a file
 system provider for the NIO.2 API (JSR 203) in JSE 7.
     </description>
 
-    <properties>
-        <!-- clirr-maven-plugin -->
-        <comparisonVersion>7.2</comparisonVersion>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
