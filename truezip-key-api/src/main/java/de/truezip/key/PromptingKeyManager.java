@@ -4,8 +4,6 @@
  */
 package de.truezip.key;
 
-import de.truezip.key.SafeKey;
-import de.truezip.key.SafeKeyManager;
 import java.net.URI;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -13,7 +11,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A key manager which prompts the user for a key if required.
  *
- * @param  <K> The type of the safe keys.
+ * @param  <K> the type of the safe keys.
  * @see    PromptingKeyProvider
  * @author Christian Schlichtherle
  */

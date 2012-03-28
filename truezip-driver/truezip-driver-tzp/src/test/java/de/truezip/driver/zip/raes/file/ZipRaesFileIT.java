@@ -4,13 +4,11 @@
  */
 package de.truezip.driver.zip.raes.file;
 
-import de.truezip.key.MockView;
-import static de.truezip.key.MockView.Action.CANCEL;
-import static de.truezip.key.MockView.Action.ENTER;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileITSuite;
-import de.truezip.key.param.AesPbeParameters;
+import static de.truezip.key.MockView.Action.CANCEL;
+import static de.truezip.key.MockView.Action.ENTER;
 import java.io.IOException;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -20,8 +18,6 @@ import org.junit.Test;
  */
 public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
 
-    private MockView<AesPbeParameters> view;
-
     @Override
     protected String getSuffixList() {
         return "tzp";
@@ -29,15 +25,12 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
-        final TestZipRaesDriver driver = new TestZipRaesDriver(
-                getTestConfig().getIOPoolProvider());
-        view = driver.getView();
-        return driver;
+        return new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
     }
 
     @Test
     public void testCancelling() throws IOException {
-        view.setAction(CANCEL);
+        getArchiveDriver().getView().setAction(CANCEL);
 
         final TFile archive = getArchive();
         assertFalse(archive.toNonArchiveFile().exists());
@@ -68,18 +61,18 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
         assertTrue(inner.mkdir());
 
         umount();
-        view.setAction(CANCEL);
+        getArchiveDriver().getView().setAction(CANCEL);
         assertTrue(archive.exists());
         assertFalse(archive.isDirectory());
         assertFalse(archive.isFile());
 
         umount();
-        view.setAction(ENTER);
+        getArchiveDriver().getView().setAction(ENTER);
         assertTrue(archive.exists());
         assertTrue(archive.isDirectory());
         assertFalse(archive.isFile());
 
-        view.setAction(CANCEL);
+        getArchiveDriver().getView().setAction(CANCEL);
         assertTrue(inner.exists());
         assertFalse(inner.isDirectory());
         assertFalse(inner.isFile());
@@ -92,7 +85,7 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
         }
             
         umount();
-        view.setAction(ENTER);
+        getArchiveDriver().getView().setAction(ENTER);
         archive.rm_r();
     }
 

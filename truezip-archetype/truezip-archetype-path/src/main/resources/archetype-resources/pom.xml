@@ -50,8 +50,12 @@
             <scope>runtime</scope>
         </dependency-->
 
-        <!-- Solely required to set the visual feedback for wrong password
-             prompts. -->
+        <!-- This should normally be only a runtime dependency in order to
+             prompt the user for passwords when accessing WinZip AES encrypted
+             ZIP entries or RAES encrypted ZIP files.
+             However, declaring it as a compile time dependency allows the
+             application to set the class for visual and audible feedback when
+             entering wrong passwords. -->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-key-impl</artifactId>

@@ -4,7 +4,6 @@
  */
 package de.truezip.key;
 
-import de.truezip.key.*;
 import java.io.Closeable;
 import java.net.URI;
 import javax.annotation.CheckForNull;
@@ -20,7 +19,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * on this instance and set the key by using the given
  * {@link PromptingKeyProviderController}.
  *
- * @param  <K> The type of the keys.
+ * @param  <K> the type of the safe keys.
  * @see    PromptingKeyManager
  * @author Christian Schlichtherle
  */

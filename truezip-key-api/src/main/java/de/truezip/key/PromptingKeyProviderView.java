@@ -4,10 +4,6 @@
  */
 package de.truezip.key;
 
-import de.truezip.key.KeyPromptingCancelledException;
-import de.truezip.key.SafeKey;
-import de.truezip.key.UnknownKeyException;
-
 /**
  * Used for the actual prompting of the user for a key (a password for
  * example) which is required to access a protected resource.
