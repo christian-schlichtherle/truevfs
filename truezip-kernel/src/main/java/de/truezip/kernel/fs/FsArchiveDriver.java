@@ -133,6 +133,18 @@ extends FsDriver {
         return manager.newController(this, model, parent);
     }
 
+    /**
+     * This hook can get overridden by archive drivers in order to decorate the
+     * given file system controller with some other file system controller(s).
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} simply returns
+     * the given controller.
+     * 
+     * @param  <M> the file system model used by the given controller.
+     * @param  controller the file system controller to decorate or return.
+     * @return The decorated file system controller or simply
+     *         {@code controller}.
+     */
     public <M extends FsModel> FsController<? extends M> decorate(
             FsController<M> controller) {
         return controller;
