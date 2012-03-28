@@ -7,6 +7,7 @@ package de.truezip.key;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -33,13 +34,6 @@ extends KeyManager<K> {
     protected abstract P newKeyProvider();
 
     @Override
-    public synchronized P get(final URI resource) {
-        if (null == resource)
-            throw new NullPointerException();
-        return providers.get(resource);
-    }
-
-    @Override
     public synchronized P make(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
@@ -50,7 +44,14 @@ extends KeyManager<K> {
     }
 
     @Override
-    public synchronized P move(  final URI oldResource,
+    public synchronized @CheckForNull P get(final URI resource) {
+        if (null == resource)
+            throw new NullPointerException();
+        return providers.get(resource);
+    }
+
+    @Override
+    public synchronized @CheckForNull P move(  final URI oldResource,
                                             final URI newResource) {
         if (null == newResource)
             throw new NullPointerException();
@@ -70,7 +71,7 @@ extends KeyManager<K> {
      * for the secret key had been disabled or cancelled by the user.
      */
     @Override
-    public synchronized P delete(final URI resource) {
+    public synchronized @CheckForNull P delete(final URI resource) {
         if (null == resource)
             throw new NullPointerException();
         final P provider = providers.remove(resource);

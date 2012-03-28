@@ -86,7 +86,7 @@ extends SafeKeyProvider<K> {
     }
 
     @Override
-    protected K getKey() {
+    protected @CheckForNull K getKey() {
         return getState().getKey(this);
     }
 
