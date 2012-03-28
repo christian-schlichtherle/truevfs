@@ -127,12 +127,10 @@ system space.
             <!-- Header text -->
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
+        <excludePackageNames>de.schlichtherle.truezip</excludePackageNames>
 
         <!-- clirr-maven-plugin -->
         <comparisonVersion>8.0</comparisonVersion>
-
-        <!-- maven-javadoc-plugin -->
-        <excludePackageNames>de.schlichtherle.truezip</excludePackageNames>
     </properties>
 
     <modules>
@@ -330,7 +328,6 @@ system space.
                             <link>http://commons.apache.org/compress/apidocs/</link>
                             <link>http://findbugs.sourceforge.net/api/</link>
                         </links>
-                        <show>private</show>
                     </configuration>
                 </plugin>
                 <plugin>
