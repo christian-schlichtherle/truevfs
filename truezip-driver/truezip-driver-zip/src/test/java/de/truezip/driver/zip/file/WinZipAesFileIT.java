@@ -5,17 +5,19 @@
 package de.truezip.driver.zip.file;
 
 import de.truezip.driver.zip.TestWinZipAesDriver;
+import de.truezip.file.TConfig;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileITSuite;
+import static de.truezip.kernel.fs.option.FsOutputOption.ENCRYPT;
+import de.truezip.key.MockView.Action;
 import static de.truezip.key.MockView.Action.CANCEL;
 import static de.truezip.key.MockView.Action.ENTER;
 import java.io.IOException;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
 
@@ -29,9 +31,20 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
         return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
     }
 
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+        final TConfig config = TConfig.get();
+        config.setOutputPreferences(config.getOutputPreferences().set(ENCRYPT));
+    }
+
+    private void setAction(Action action) {
+        getArchiveDriver().getView().setAction(action);
+    }
+
     @Test
     public void testCancelling() throws IOException {
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
 
         final TFile archive = getArchive();
         assertFalse(archive.toNonArchiveFile().exists());
@@ -58,23 +71,31 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
         assertTrue(inner.mkdir());
 
         umount();
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
         assertTrue(archive.exists());
         assertTrue(archive.isDirectory());
         assertFalse(archive.isFile());
 
         umount();
-        getArchiveDriver().getView().setAction(ENTER);
+        setAction(ENTER);
         assertTrue(archive.exists());
         assertTrue(archive.isDirectory());
         assertFalse(archive.isFile());
 
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
         assertTrue(inner.exists());
-        assertTrue(inner.isDirectory());
+        assertFalse(inner.isDirectory());
         assertFalse(inner.isFile());
 
         umount();
+        try {
+            archive.rm_r();
+            fail();
+        } catch (IOException expected) {
+        }
+            
+        umount();
+        setAction(ENTER);
         archive.rm_r();
     }
 }

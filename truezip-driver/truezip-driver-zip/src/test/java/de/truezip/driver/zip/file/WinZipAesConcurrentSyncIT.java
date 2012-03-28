@@ -4,11 +4,14 @@
  */
 package de.truezip.driver.zip.file;
 
-import de.truezip.file.ConcurrentSyncITSuite;
 import de.truezip.driver.zip.TestWinZipAesDriver;
+import de.truezip.file.ConcurrentSyncITSuite;
+import de.truezip.file.TConfig;
+import static de.truezip.kernel.fs.option.FsOutputOption.ENCRYPT;
+import java.io.IOException;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestWinZipAesDriver> {
 
@@ -20,5 +23,12 @@ public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestW
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
         return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
+    }
+
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+        final TConfig config = TConfig.get();
+        config.setOutputPreferences(config.getOutputPreferences().set(ENCRYPT));
     }
 }
