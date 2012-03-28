@@ -81,7 +81,7 @@ public abstract class KeyManagementITSuite {
     }
 
     @Test
-    private void testRoundTrip() throws IOException {
+    public void testRoundTrip() throws IOException {
         final TFile file = new TFile(archive, "entry");
         final OutputStream os = new TFileOutputStream(file);
         try {
