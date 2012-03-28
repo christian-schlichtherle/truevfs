@@ -2,10 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.key.param;
+package de.truezip.key.param;
 
-import de.schlichtherle.truezip.key.PromptingKeyProviderView;
-import de.truezip.key.param.SafePbeParameters;
+import de.truezip.key.PromptingKeyProviderView;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**

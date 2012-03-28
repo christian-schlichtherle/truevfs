@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.schlichtherle.truezip.key.MockView;
+import de.truezip.key.MockView;
 import de.truezip.driver.zip.TestKeyManagerService;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.key.KeyManagerProvider;

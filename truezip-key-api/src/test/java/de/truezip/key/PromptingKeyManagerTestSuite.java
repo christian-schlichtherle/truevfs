@@ -2,9 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.key;
+package de.truezip.key;
 
-import de.truezip.key.KeyManagerTestSuite;
 import java.net.URI;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -37,7 +36,7 @@ extends KeyManagerTestSuite<PromptingKeyManager<?>> {
     }
 
     @Test
-    public void testRemovePromptingKeyProvider() {
+    public void testDeletePromptingKeyProvider() {
         URI id = URI.create("a");
 
         PromptingKeyProvider<?> prov = manager.make(id);

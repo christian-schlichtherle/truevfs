@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip;
 
-import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.key.PromptingKeyProvider;
-import de.schlichtherle.truezip.key.PromptingKeyProviderView;
+import de.truezip.key.PromptingKeyManager;
+import de.truezip.key.PromptingKeyProvider;
+import de.truezip.key.PromptingKeyProviderView;
 import de.truezip.key.SafeKey;
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
