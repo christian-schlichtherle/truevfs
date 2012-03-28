@@ -118,40 +118,18 @@ extends FsDriver {
     }
 
     /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
+     * {@inheritDoc}
      * <p>
-     * When called, the following expression is a precondition:
-     * {@code model.getParent().equals(parent.getModel())}
-     * <p>
-     * Note that an archive file system is always federated and therefore
-     * its parent file system controller is never {@code null}.
-     * <p>
-     * Furthermore, an archive driver implementation is <em>not</em> expected
-     * to consider the scheme of the given mount point to determine the class
-     * of the returned file system controller.
-     * Consequently, it is an error to call this method with a mount point
-     * which has a scheme which is not supported by this archive driver.
-     * <p>
-     * Note again that unlike the other components created by this factory,
-     * the returned file system controller must be thread-safe!
-     *
-     * @param  model the file system model.
-     * @param  parent the parent file system controller.
-     * @param  manager the file system manager for the new controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
+     * The implementation in the class {@link FsArchiveDriver} simply forwards
+     * the call to the given file system manager after asserting that
+     * {@code model.getParent().equals(parent.getModel())} is {@code true}.
      */
     @Override
     public final FsController<?>
     newController(  FsManager manager,
                     FsModel model,
                     @Nonnull FsController<?> parent) {
-        assert null == model.getParent()
-                ? null == parent
-                : model.getParent().equals(parent.getModel());
-        if (null == parent)
-            throw new IllegalArgumentException();
+        assert model.getParent().equals(parent.getModel());
         return manager.newController(this, model, parent);
     }
 
