@@ -5,6 +5,7 @@
 package de.truezip.driver.zip.raes.path;
 
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
+import de.truezip.key.MockView.Action;
 import static de.truezip.key.MockView.Action.CANCEL;
 import static de.truezip.key.MockView.Action.ENTER;
 import de.truezip.path.TPath;
@@ -29,9 +30,13 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
         return new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
     }
 
+    private void setAction(Action action) {
+        getArchiveDriver().getView().setAction(action);
+    }
+
     @Test
     public void testCancelling() throws IOException {
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
 
         final TPath archive = getArchive();
         assertFalse(exists(archive.toNonArchivePath()));
@@ -70,18 +75,18 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
         createDirectory(inner);
 
         umount();
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
         assertTrue(exists(archive));
         assertFalse(isDirectory(archive));
         assertFalse(isRegularFile(archive));
 
         umount();
-        getArchiveDriver().getView().setAction(ENTER);
+        setAction(ENTER);
         assertTrue(exists(archive));
         assertTrue(isDirectory(archive));
         assertFalse(isRegularFile(archive));
 
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
         assertTrue(exists(inner));
         assertFalse(isDirectory(inner));
         assertFalse(isRegularFile(inner));
@@ -94,7 +99,7 @@ public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
         }
 
         umount();
-        getArchiveDriver().getView().setAction(ENTER);
+        setAction(ENTER);
         archive.toFile().rm_r();
     }
 
