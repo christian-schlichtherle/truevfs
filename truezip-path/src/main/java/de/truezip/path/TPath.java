@@ -4,27 +4,28 @@
  */
 package de.truezip.path;
 
-import de.truezip.kernel.fs.addr.FsMountPoint;
-import de.truezip.kernel.fs.addr.FsPath;
-import de.truezip.kernel.cio.Entry;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
 import de.truezip.file.TFile;
+import de.truezip.file.TVFS;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsEntry;
+import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.*;
-import de.truezip.kernel.fs.*;
+import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.fs.addr.FsPath;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.*;
-import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.io.Paths;
-import static de.truezip.path.TPathScanner.*;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.file.TVFS;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.QuotedUriSyntaxException;
 import de.truezip.kernel.util.UriBuilder;
+import static de.truezip.path.TPathScanner.*;
 import java.io.File;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;

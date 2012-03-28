@@ -4,19 +4,19 @@
  */
 package de.truezip.path;
 
-import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
-import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
+import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
+import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.cio.IOSocket;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.fs.FsEntry;
 import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.addr.FsPath;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
-import de.truezip.kernel.cio.IOSocket;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
 import java.net.URI;
