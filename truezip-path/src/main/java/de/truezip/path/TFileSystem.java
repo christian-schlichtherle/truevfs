@@ -4,28 +4,28 @@
  */
 package de.truezip.path;
 
+import de.truezip.file.TConfig;
+import de.truezip.file.TVFS;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.*;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
-import de.truezip.file.TConfig;
-import de.truezip.file.TVFS;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.FsSyncWarningException;
+import de.truezip.kernel.fs.addr.FsEntryName;
+import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
+import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import static de.truezip.kernel.fs.option.FsSyncOptions.UMOUNT;
-import de.truezip.kernel.fs.addr.FsEntryName;
-import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
-import de.truezip.kernel.fs.addr.FsMountPoint;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.FilteringIterator;
 import java.io.File;
