@@ -6,6 +6,7 @@ package de.truezip.extension.jmxjul;
 
 import de.truezip.kernel.fs.FsCompositeDriver;
 import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsModel;
 import javax.annotation.concurrent.Immutable;
 
@@ -27,8 +28,12 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
     }
 
     @Override
-    public FsController<?> newController(   final FsModel model,
+    public FsController<?> newController(   final FsManager manager,
+                                            final FsModel model,
                                             final FsController<?> parent) {
-        return director.instrument(driver.newController(director.instrument(model, this), parent), this);
+        assert null == model.getParent()
+                    ? null == parent
+                    : model.getParent().equals(parent.getModel());
+        return director.instrument(driver.newController(manager, director.instrument(model, this), parent), this);
     }
 }

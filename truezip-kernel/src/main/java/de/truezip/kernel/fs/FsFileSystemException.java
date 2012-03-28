@@ -21,21 +21,21 @@ public class FsFileSystemException extends IOException {
     /** The nullable entry path name. */
     private final @CheckForNull String path;
 
-    FsFileSystemException(FsEntryName name, String message) {
+    public FsFileSystemException(FsEntryName name, String message) {
         this(name.toString(), message);
     }
 
-    FsFileSystemException(@CheckForNull String path, String message) {
+    public FsFileSystemException(@CheckForNull String path, String message) {
         super(message);
         this.path = path;
     }
 
-    FsFileSystemException(@CheckForNull String path, Throwable cause) {
+    public FsFileSystemException(@CheckForNull String path, Throwable cause) {
         super(cause);
         this.path = path;
     }
 
-    FsFileSystemException(@CheckForNull String path, String message, Throwable cause) {
+    public FsFileSystemException(@CheckForNull String path, String message, Throwable cause) {
         super(message, cause);
         this.path = path;
     }

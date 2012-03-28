@@ -21,13 +21,14 @@ public abstract class FsDriver {
      * Returns a new thread-safe file system controller for the mount point of
      * the given file system model and parent file system controller.
      * <p>
-     * When called, you may safely assume the following precondition:
+     * When called, you may assert the following precondition:
      * <pre>{@code
      * assert null == model.getParent()
      *         ? null == parent
      *         : model.getParent().equals(parent.getModel())
      * }</pre>
      *
+     * @param  manager the file system manager for the new controller.
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
@@ -35,7 +36,9 @@ public abstract class FsDriver {
      * @see    FsCompositeDriver#newController
      */
     public abstract FsController<?>
-    newController(FsModel model, @Nullable FsController<?> parent);
+    newController(  FsManager manager,
+                    FsModel model,
+                    @Nullable FsController<?> parent);
 
     /**
      * Returns {@code true} iff this file system driver implements a federated

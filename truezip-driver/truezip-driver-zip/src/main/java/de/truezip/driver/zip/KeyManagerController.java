@@ -11,9 +11,9 @@ import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
-import de.truezip.key.KeyManager;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
+import de.truezip.key.KeyManager;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -22,12 +22,15 @@ import javax.annotation.concurrent.ThreadSafe;
  * This file system controller decorates another file system controller in
  * order to manage the keys required for accessing encrypted ZIP files.
  * 
+ * @param  <M> the type of the file system model.
  * @param  <D> the type of the ZIP driver.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class KeyManagerController<D extends ZipDriver>
-extends FsDecoratingController<FsModel, FsController<?>> {
+public abstract class KeyManagerController<
+        M extends FsModel,
+        D extends ZipDriver>
+extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final String ROOT_PATH = ROOT.getPath();
 
@@ -42,7 +45,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      * @param driver the ZIP driver.
      */
     protected KeyManagerController(
-            final FsController<?> controller,
+            final FsController<? extends M> controller,
             final D driver) {
         super(controller);
         if (null == driver)

@@ -8,6 +8,7 @@ import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
@@ -91,7 +92,9 @@ public class HttpDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    newController(FsModel model, @CheckForNull FsController<?> parent) {
+    newController(  final FsManager manager,
+                    final FsModel model,
+                    final @CheckForNull FsController<?> parent) {
         assert null == model.getParent()
                 ? null == parent
                 : model.getParent().equals(parent.getModel());

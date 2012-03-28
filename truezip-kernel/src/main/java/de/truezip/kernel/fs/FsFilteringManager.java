@@ -4,8 +4,8 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsMountPoint;
 import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.util.FilteringIterator;
 import java.net.URI;
 import java.util.Iterator;
@@ -40,7 +40,7 @@ extends FsDecoratingManager<FsManager> {
     }
 
     @Override
-    public int getSize() {
+    public int size() {
         int size = 0;
         for (FsController<?> controller : this)
             size++;

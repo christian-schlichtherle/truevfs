@@ -4,13 +4,13 @@
  */
 package de.truezip.kernel.fs.mock;
 
+import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.option.FsOutputOption;
-import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import java.io.CharConversionException;
@@ -53,7 +53,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    protected final IOPool<?> getIOPool() {
+    public final IOPool<?> getIOPool() {
         return getIOPoolProvider().get();
     }
 
@@ -94,9 +94,6 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
             Entry template,
             BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        return new MockArchiveDriverEntry(
-                toZipOrTarEntryName(name, type),
-                type,
-                template);
+        return new MockArchiveDriverEntry(normalize(name, type), type, template);
     }
 }

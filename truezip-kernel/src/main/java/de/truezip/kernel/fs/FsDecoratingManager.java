@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.fs;
 
+import de.truezip.kernel.fs.*;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
@@ -39,8 +40,17 @@ extends FsManager {
     }
 
     @Override
-    public int getSize() {
-        return delegate.getSize();
+    public <E extends FsArchiveEntry> FsController<?>
+    newController(  FsArchiveDriver<E> driver,
+                    FsModel model,
+                    FsController<?> parent) {
+        assert false;
+        return delegate.newController(driver, model, parent);
+    }
+
+    @Override
+    public int size() {
+        return delegate.size();
     }
 
     @Override

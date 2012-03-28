@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.fs.mock;
 
+import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.cio.DelegatingInputSocket;
 import de.truezip.kernel.cio.DelegatingOutputSocket;

@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.fs;
 
+import de.schlichtherle.truezip.kernel.fs.FsArchiveDriverTestSuite;
 import de.truezip.kernel.fs.FsArchiveEntry;
 import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
@@ -55,7 +56,7 @@ extends FsArchiveDriverTestSuite<E, D> {
         final String name = getUnencodableName();
         if (null == name)
             throw new CharConversionException("Ignore me!");
-        getArchiveDriver().assertEncodable(name);
+        getArchiveDriver().checkEncodable(name);
     }
 
     /**
@@ -70,7 +71,7 @@ extends FsArchiveDriverTestSuite<E, D> {
     @Test
     public void testAllUsAsciiCharactersMustBeEncodable()
     throws CharConversionException {
-        getArchiveDriver().assertEncodable(US_ASCII_CHARACTERS);
+        getArchiveDriver().checkEncodable(US_ASCII_CHARACTERS);
     }
 
     @Test
@@ -91,7 +92,7 @@ extends FsArchiveDriverTestSuite<E, D> {
                     start.countDown();
                     start.await();
                     for (int i = 0; i < 100000; i++)
-                        getArchiveDriver().assertEncodable(US_ASCII_CHARACTERS);
+                        getArchiveDriver().checkEncodable(US_ASCII_CHARACTERS);
                     return null;
                 }
             } // Check

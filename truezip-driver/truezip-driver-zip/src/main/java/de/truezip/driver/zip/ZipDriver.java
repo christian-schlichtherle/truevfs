@@ -266,7 +266,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    protected final IOPool<?> getIOPool() {
+    public final IOPool<?> getIOPool() {
         return ioPool;
     }
 
@@ -340,7 +340,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * <p>
      * The implementation in the class {@link ZipDriver} decorates the
      * given controller with a package private controller which keeps track of
-     * the encryption keys.
+     * the AES PBE parameters.
      * This should get overridden in order to return just {@code controller} if
      * and only if you are overriding
      * {@link #zipCryptoParameters(FsModel, Charset)}, too, and do not want to
@@ -348,8 +348,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * encryption.
      */
     @Override
-    protected FsController<?> decorate(FsController<?> controller) {
-        return new ZipController(controller, this);
+    public <M extends FsModel> FsController<? extends M> decorate(
+            FsController<M> controller) {
+        return new ZipController<M>(controller, this);
     }
 
     @Override
@@ -359,8 +360,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             final Entry template,
             final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        assertEncodable(name);
-        name = toZipOrTarEntryName(name, type);
+        checkEncodable(name);
+        name = normalize(name, type);
         final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {
             entry = newEntry(name, (ZipEntry) template);

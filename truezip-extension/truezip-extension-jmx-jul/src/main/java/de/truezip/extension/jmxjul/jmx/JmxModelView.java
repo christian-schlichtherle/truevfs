@@ -4,6 +4,7 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
+import de.truezip.kernel.fs.FsController;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Size.STORAGE;
@@ -34,7 +35,7 @@ implements JmxModelViewMXBean {
     private static final BitField<FsSyncOption>
             SYNC_OPTIONS = BitField.of(CLEAR_CACHE);
     private static final FsCompositeDriver
-            DRIVER = new FsSimpleCompositeDriver(FsDriverLocator.SINGLETON);
+            DRIVER = new FsDefaultCompositeDriver(FsDriverLocator.SINGLETON);
 
     private final FsModel model;
 

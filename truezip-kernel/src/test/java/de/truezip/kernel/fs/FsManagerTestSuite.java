@@ -23,7 +23,7 @@ import org.junit.Test;
 public abstract class FsManagerTestSuite {
 
     private final FsCompositeDriver driver
-            = new FsSimpleCompositeDriver(new MockDriverService("file|zip"));
+            = new FsDefaultCompositeDriver(new MockDriverService("file|zip"));
     private FsManager manager;
 
     @Before
@@ -71,7 +71,7 @@ public abstract class FsManagerTestSuite {
                 parent = controller;
             }
 
-            assertThat(manager.getSize(), is(params.length));
+            assertThat(manager.size(), is(params.length));
             parent = null;
             waitAllManagers();
         }
@@ -115,7 +115,7 @@ public abstract class FsManagerTestSuite {
             }
             assertThat(i.hasNext(), is(false));
 
-            assertThat(manager.getSize(), is(params.length));
+            assertThat(manager.size(), is(params.length));
             member = null;
             i = null;
             top = null;
@@ -126,6 +126,6 @@ public abstract class FsManagerTestSuite {
     private void waitAllManagers() {
         do {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
-        } while (0 < manager.getSize());
+        } while (0 < manager.size());
     }
 }

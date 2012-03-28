@@ -37,7 +37,7 @@ extends SafeKeyProvider<K> {
 
     private volatile boolean changeRequested;
 
-    private volatile @CheckForNull CacheableUnknownKeyException exception;
+    private volatile @CheckForNull PersistentUnknownKeyException exception;
 
     PromptingKeyProvider(PromptingKeyManager<K> manager) {
         this.view = manager.getView();
@@ -120,12 +120,12 @@ extends SafeKeyProvider<K> {
         this.changeRequested = changeRequested;
     }
 
-    private @CheckForNull CacheableUnknownKeyException getException() {
+    private @CheckForNull PersistentUnknownKeyException getException() {
         return exception;
     }
 
     private void setException(
-            final @CheckForNull CacheableUnknownKeyException exception) {
+            final @CheckForNull PersistentUnknownKeyException exception) {
         this.exception = exception;
     }
 
@@ -192,7 +192,7 @@ extends SafeKeyProvider<K> {
                         } finally {
                             controller.close();
                         }
-                    } catch (CacheableUnknownKeyException ex) {
+                    } catch (PersistentUnknownKeyException ex) {
                         setException(provider, ex);
                     }
                     state = provider.getState();
@@ -287,16 +287,16 @@ extends SafeKeyProvider<K> {
             return provider.getResource();
         }
 
-        final <K extends SafeKey<K>> CacheableUnknownKeyException
+        final <K extends SafeKey<K>> PersistentUnknownKeyException
         getException(PromptingKeyProvider<K> provider) {
-            CacheableUnknownKeyException ex = provider.getException();
+            PersistentUnknownKeyException ex = provider.getException();
             if (null == ex)
                 provider.setException(ex = new KeyPromptingCancelledException());
             return ex;
         }
         
         final <K extends SafeKey<K>> void
-        setException(PromptingKeyProvider<K> provider, CacheableUnknownKeyException ex) {
+        setException(PromptingKeyProvider<K> provider, PersistentUnknownKeyException ex) {
             provider.setException(ex);
             provider.setState(CANCELLED);
         }

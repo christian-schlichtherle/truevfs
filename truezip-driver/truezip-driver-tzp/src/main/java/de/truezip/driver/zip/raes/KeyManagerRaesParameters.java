@@ -91,7 +91,7 @@ implements RaesParametersProvider {
                     provider = manager.make(raes);
             try {
                 return provider.getWriteKey().getPassword();
-            } catch (UnknownKeyException ex) {
+            } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
         }
@@ -103,7 +103,7 @@ implements RaesParametersProvider {
                     provider = manager.make(raes);
             try {
                 return provider.getReadKey(invalid).getPassword();
-            } catch (UnknownKeyException ex) {
+            } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
         }
@@ -115,7 +115,7 @@ implements RaesParametersProvider {
                     provider = manager.make(raes);
             try {
                 return provider.getWriteKey().getKeyStrength();
-            } catch (UnknownKeyException ex) {
+            } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
         }
@@ -128,7 +128,7 @@ implements RaesParametersProvider {
             final AesPbeParameters param;
             try {
                 param = provider.getReadKey(false);
-            } catch (UnknownKeyException ex) {
+            } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
             param.setKeyStrength(keyStrength);

@@ -23,7 +23,7 @@ public final class FsEntryNotFoundException extends FileNotFoundException {
 
     private final FsPath path;
 
-    FsEntryNotFoundException(
+    public FsEntryNotFoundException(
             final FsModel model,
             final FsEntryName name,
             final @CheckForNull String msg) {
@@ -31,7 +31,7 @@ public final class FsEntryNotFoundException extends FileNotFoundException {
         this.path = model.getMountPoint().resolve(name);
     }
 
-    FsEntryNotFoundException(
+    public FsEntryNotFoundException(
             final FsModel model,
             final FsEntryName name,
             final @CheckForNull IOException cause) {

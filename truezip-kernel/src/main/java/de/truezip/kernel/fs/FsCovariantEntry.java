@@ -4,6 +4,9 @@
  */
 package de.truezip.kernel.fs;
 
+import de.truezip.kernel.fs.FsArchiveDriver;
+import de.truezip.kernel.fs.FsArchiveEntry;
+import de.truezip.kernel.fs.FsEntry;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import java.io.CharConversionException;
 import java.util.*;

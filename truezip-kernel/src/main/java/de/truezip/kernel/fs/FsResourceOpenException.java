@@ -23,7 +23,7 @@ public final class FsResourceOpenException extends IOException {
 
     final int total, local;
 
-    FsResourceOpenException(int total, int local) {
+    public FsResourceOpenException(int total, int local) {
         super("Total (thread local) number of open I/O resources: %d (%d)");
         this.total = total;
         this.local = local;
