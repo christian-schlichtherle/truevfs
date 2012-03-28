@@ -18,12 +18,11 @@ About TrueZIP Kernel
 
 * Disclaimer
 
-    The TrueZIP Kernel is still a field of research, i.e. there may be
-    backwards incompatible changes to its API in order to improve it.
-    Therefore, an application developer should never use the API of the module
-    TrueZIP&#160;Kernel directly, but instead use the API of the client
-    modules {{{../truezip-file/index.html}TrueZIP&#160;File*}} or
-    {{{../truezip-path/index.html}TrueZIP&#160;Path}}
-    (introduced in TrueZIP 7.2).
-    The API of these modules provide all of the functionality of the
+    The TrueZIP Kernel is a field of constant research, so backwards
+    incompatible changes to its API may appear anytime in order to improve it.
+    An application developer should never use the API of this module directly,
+    but instead use the API of the client facade modules
+    {{{../truezip-file/index.html}TrueZIP&#160;File*}} or
+    {{{../truezip-path/index.html}TrueZIP&#160;Path}}.
+    The API of these modules provides all of the functionality of the
     TrueZIP&#160;Kernel and more with ease and comfort.
