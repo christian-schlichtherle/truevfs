@@ -9,12 +9,12 @@ import de.truezip.kernel.fs.FsManagerTestSuite;
 import de.truezip.kernel.util.Link.Type;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-public class FsDefaultManagerTest extends FsManagerTestSuite {
+public class FsArchiveManagerTest extends FsManagerTestSuite {
 
     @Override
     protected FsManager newManager(Type type) {
-        return new FsDefaultManager(type);
+        return new FsArchiveManager(type);
     }
 }

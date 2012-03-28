@@ -30,7 +30,7 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class FsDecoratingController<
         M extends FsModel,
         C extends FsController<? extends M>>
-extends FsAbstractController<M> {
+extends FsController<M> {
 
     /** The decorated file system controller. */
     protected final C delegate;

@@ -145,7 +145,7 @@ extends FsDriver {
      * @return The decorated file system controller or simply
      *         {@code controller}.
      */
-    public <M extends FsModel> FsController<? extends M> decorate(
+    public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
         return controller;
     }

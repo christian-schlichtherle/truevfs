@@ -4,22 +4,18 @@
  */
 package de.schlichtherle.truezip.kernel.fs;
 
-import de.schlichtherle.truezip.kernel.fs.FsArchiveFileSystem;
-import de.schlichtherle.truezip.kernel.fs.FsArchiveFileSystemEvent;
-import de.schlichtherle.truezip.kernel.fs.FsArchiveFileSystemTouchListener;
-import de.truezip.kernel.fs.FsArchiveEntry;
-import de.truezip.kernel.fs.FsCovariantEntry;
+import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.fs.FsArchiveEntry;
+import de.truezip.kernel.fs.FsCovariantEntry;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
 import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
+import de.truezip.kernel.fs.mock.MockArchive;
 import de.truezip.kernel.fs.mock.MockArchiveDriver;
 import de.truezip.kernel.fs.mock.MockArchiveDriverEntry;
-import de.truezip.kernel.fs.mock.MockArchive;
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.fs.FsArchiveEntry;
 import de.truezip.kernel.util.UriBuilder;
 import java.util.TooManyListenersException;
 import static org.hamcrest.CoreMatchers.*;
@@ -31,7 +27,7 @@ import org.junit.Test;
 /**
  * @author  Christian Schlichtherle
  */
-public class FsArchiveFileSystemTest {
+public final class FsArchiveFileSystemTest {
 
     @Before
     public void setUp() {

@@ -4,9 +4,6 @@
  */
 package de.truezip.kernel.fs;
 
-import de.schlichtherle.truezip.kernel.fs.FsArchiveDriverTestSuite;
-import de.truezip.kernel.fs.FsArchiveEntry;
-import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
 import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
@@ -79,13 +76,13 @@ extends FsArchiveDriverTestSuite<E, D> {
     throws Throwable {
         final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
 
-        class CheckFactory implements TaskFactory {
+        final class CheckFactory implements TaskFactory {
             @Override
             public Callable<?> newTask(int threadNum) {
                 return new Check();
             }
 
-            class Check implements Callable<Void> {
+            final class Check implements Callable<Void> {
                 @Override
                 public Void call()
                 throws CharConversionException, InterruptedException {

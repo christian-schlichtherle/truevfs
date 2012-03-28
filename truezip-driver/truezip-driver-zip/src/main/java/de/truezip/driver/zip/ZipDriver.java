@@ -348,7 +348,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * encryption.
      */
     @Override
-    public <M extends FsModel> FsController<? extends M> decorate(
+    public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
         return new ZipController<M>(controller, this);
     }

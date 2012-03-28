@@ -11,7 +11,6 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.fs.FsAbstractController;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.FsSyncException;
@@ -33,7 +32,7 @@ import org.apache.http.HttpResponse;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public class HttpController extends FsAbstractController<FsModel>  {
+public class HttpController extends FsController<FsModel>  {
 
     private final HttpDriver driver;
 

@@ -4,15 +4,17 @@
  */
 package de.truezip.kernel.fs.sample;
 
-import de.truezip.kernel.fs.addr.FsUriModifier;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.fs.FsCompositeDriver;
+import de.truezip.kernel.fs.FsManager;
+import de.truezip.kernel.fs.FsSimpleCompositeDriver;
 import de.truezip.kernel.fs.addr.FsPath;
-import de.truezip.kernel.fs.*;
+import de.truezip.kernel.fs.addr.FsUriModifier;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsSyncOptions;
+import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.sl.FsManagerLocator;
-import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.util.BitField;
 import java.io.File;
 import java.io.IOException;
@@ -64,8 +66,8 @@ public final class Cat {
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.
-            FsCompositeDriver
-                    driver = new FsDefaultCompositeDriver(FsDriverLocator.SINGLETON);
+            FsCompositeDriver driver = new FsSimpleCompositeDriver(
+                    FsDriverLocator.SINGLETON);
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the
             // File class for transformation from a normal path name.

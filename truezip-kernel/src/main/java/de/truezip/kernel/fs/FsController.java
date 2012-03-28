@@ -9,11 +9,8 @@ import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.fs.FsEntry;
-import de.truezip.kernel.fs.FsModel;
-import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.FsSyncExceptionBuilder;
 import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
@@ -105,13 +102,37 @@ import javax.annotation.Nullable;
  */
 public abstract class FsController<M extends FsModel> {
 
+    private final M model;
+
+    /**
+     * Constructs a new file system controller for the given model.
+     * 
+     * @param model the file system model.
+     */
+    protected FsController(final M model) {
+        if (null == (this.model = model))
+            throw new NullPointerException();
+    }
+
     /**
      * Returns the file system model.
-     * Multiple invocations must return the same object.
      * 
      * @return The file system model.
      */
-    public abstract M getModel();
+    public final M getModel() {
+        return model;
+    }
+
+    /**
+     * Returns the mount point of this (federated virtual) file system as
+     * defined by the {@linkplain #getModel() model}.
+     * 
+     * @return The mount point of this (federated virtual) file system as
+     *         defined by the {@linkplain #getModel() model}.
+     */
+    public final FsMountPoint getMountPoint() {
+        return model.getMountPoint();
+    }
 
     /**
      * Returns the controller for the parent file system or {@code null} if

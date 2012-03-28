@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel.fs;
+package de.truezip.kernel.fs;
 
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.ThrowControl;
@@ -12,7 +12,6 @@ import static de.truezip.kernel.cio.Entry.Size.STORAGE;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.fs.*;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.mock.MockController;
@@ -57,8 +56,8 @@ extends FsArchiveDriverTestBase<D> {
 
     private static final FsEntryName
             name = FsEntryName.create(URI.create("archive"));
-    private static final FsModel model = newArchiveModel();
 
+    private FsModel model;
     private FsController<?> parent;
 
     @Override
@@ -68,6 +67,7 @@ extends FsArchiveDriverTestBase<D> {
         final TestConfig config = getTestConfig();
         config.setDataSize(getMaxArchiveLength());
         config.setIOPoolProvider(null); // reset
+        model = newArchiveModel();
         parent = newController(model.getParent());
     }
 
@@ -417,18 +417,23 @@ extends FsArchiveDriverTestBase<D> {
         return new TestController(model, pc);
     }
 
-    private static FsModel newArchiveModel() {
+    private FsModel newArchiveModel() {
         final FsModel parent = newNonArchiveModel();
-        return new FsDefaultModel(
+        return newModel(
                 FsMountPoint.create(URI.create(
                     "scheme:" + parent.getMountPoint() + name + "!/")),
                 parent);
     }
 
-    private static FsModel newNonArchiveModel() {
-        return new FsDefaultModel(
+    private FsModel newNonArchiveModel() {
+        return newModel(
                 FsMountPoint.create(URI.create("file:/")),
                 null);
+    }
+
+    protected FsModel newModel( FsMountPoint mountPoint,
+                                @CheckForNull FsModel parent) {
+        return new FsModel(mountPoint, parent);
     }
 
     private int getMaxArchiveLength() {

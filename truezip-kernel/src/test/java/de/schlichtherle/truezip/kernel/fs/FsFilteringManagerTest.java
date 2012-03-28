@@ -25,13 +25,13 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
     @Override
     protected FsManager newManager(Type type) {
         return new FsFilteringManager(
-                new FsDefaultManager(type),
+                new FsArchiveManager(type),
                 FsMountPoint.create(URI.create("file:/")));
     }
 
     @Test
     public void testFiltering() {
-        final FsCompositeDriver driver = new FsDefaultCompositeDriver(
+        final FsCompositeDriver driver = new FsSimpleCompositeDriver(
                 new MockDriverService("file|tar|tar.gz|zip"));
         for (final String[][] params : new String[][][] {
             // { { /* filter */ }, { /* test set */ }, { /* result set */ } },
@@ -46,7 +46,7 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
         }) {
             assert params[0].length == 1;
 
-            final FsManager manager = new FsDefaultManager(STRONG);
+            final FsManager manager = new FsArchiveManager(STRONG);
             for (final String param : params[1])
                 manager.getController(  FsMountPoint.create(URI.create(param)),
                                         driver);
