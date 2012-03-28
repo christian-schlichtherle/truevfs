@@ -21,16 +21,6 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class KeyManager<K> {
 
     /**
-     * Returns the mapped key provider for the given protected resource or
-     * {@code null} if no key provider is mapped yet.
-     *
-     * @param  resource the URI of the protected resource.
-     * @return The mapped key provider for the given protected resource or
-     *         {@code null} if no key provider is mapped yet.
-     */
-    @CheckForNull public abstract KeyProvider<K> get(URI resource);
-
-    /**
      * Returns the mapped key provider for the given protected resource.
      * If no key provider is mapped yet, then a new key provider gets created
      * and returned.
@@ -39,6 +29,16 @@ public abstract class KeyManager<K> {
      * @return The mapped key provider for the given protected resource.
      */
     public abstract KeyProvider<K> make(URI resource);
+
+    /**
+     * Returns the mapped key provider for the given protected resource or
+     * {@code null} if no key provider is mapped yet.
+     *
+     * @param  resource the URI of the protected resource.
+     * @return The mapped key provider for the given protected resource or
+     *         {@code null} if no key provider is mapped yet.
+     */
+    @CheckForNull public abstract KeyProvider<K> get(URI resource);
 
     /**
      * Moves the mapped key provider from the URI {@code oldResource} to
@@ -51,7 +51,7 @@ public abstract class KeyManager<K> {
      * @throws IllegalArgumentException if {@code oldResource} compares
      *         {@link URI#equals(Object) equal} to {@code newResource}.
      */
-    @Nullable public abstract KeyProvider<K>
+    @CheckForNull public abstract KeyProvider<K>
     move(URI oldResource, URI newResource);
 
     /**

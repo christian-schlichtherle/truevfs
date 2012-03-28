@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.key;
 import de.truezip.key.SafeKey;
 import de.truezip.key.SafeKeyManager;
 import java.net.URI;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -47,14 +48,6 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     }
 
     @Override
-    public final synchronized PromptingKeyProvider<K> get(final URI resource) {
-        final PromptingKeyProvider<K> provider = super.get(resource);
-        if (null != provider)
-            provider.setResource(resource);
-        return provider;
-    }
-
-    @Override
     public final synchronized PromptingKeyProvider<K> make(final URI resource) {
         final PromptingKeyProvider<K> provider = super.make(resource);
         provider.setResource(resource);
@@ -62,7 +55,15 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     }
 
     @Override
-    public final synchronized PromptingKeyProvider<K> move(URI oldResource, URI newResource) {
+    public final synchronized @CheckForNull PromptingKeyProvider<K> get(final URI resource) {
+        final PromptingKeyProvider<K> provider = super.get(resource);
+        if (null != provider)
+            provider.setResource(resource);
+        return provider;
+    }
+
+    @Override
+    public final synchronized @CheckForNull PromptingKeyProvider<K> move(URI oldResource, URI newResource) {
         final PromptingKeyProvider<K>
                 oldProvider = super.move(oldResource, newResource);
         if (null != oldProvider)
@@ -75,7 +76,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     }
 
     @Override
-    public final synchronized PromptingKeyProvider<K> delete(URI resource) {
+    public final synchronized @CheckForNull PromptingKeyProvider<K> delete(URI resource) {
         final PromptingKeyProvider<K> provider = super.delete(resource);
         if (null != provider)
             provider.setResource(null);
