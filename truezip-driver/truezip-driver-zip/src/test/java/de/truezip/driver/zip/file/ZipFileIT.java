@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.file;
 
-import de.truezip.file.TFileITSuite;
 import de.truezip.driver.zip.ZipDriver;
+import de.truezip.file.TFileITSuite;
 
 /**
  * @author  Christian Schlichtherle
