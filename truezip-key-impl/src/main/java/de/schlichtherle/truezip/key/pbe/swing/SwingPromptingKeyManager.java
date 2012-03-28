@@ -22,6 +22,6 @@ extends PromptingKeyManager<P> {
 
     @Override
     public int getPriority() {
-        return GraphicsEnvironment.isHeadless() ? 0 : -10;
+        return GraphicsEnvironment.isHeadless() ? -10 : 10;
     }
 }
