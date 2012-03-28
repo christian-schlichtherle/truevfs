@@ -5,6 +5,9 @@
 package de.truezip.driver.zip.path;
 
 import de.truezip.driver.zip.TestWinZipAesDriver;
+import de.truezip.file.TConfig;
+import static de.truezip.kernel.fs.option.FsOutputOption.ENCRYPT;
+import de.truezip.key.MockView;
 import static de.truezip.key.MockView.Action.CANCEL;
 import static de.truezip.key.MockView.Action.ENTER;
 import de.truezip.path.TPath;
@@ -15,7 +18,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class WinZipAesPathIT extends TPathTestSuite<TestWinZipAesDriver> {
     @Override
@@ -28,9 +31,20 @@ public final class WinZipAesPathIT extends TPathTestSuite<TestWinZipAesDriver> {
         return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
     }
 
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+        final TConfig config = TConfig.get();
+        config.setOutputPreferences(config.getOutputPreferences().set(ENCRYPT));
+    }
+
+    private void setAction(MockView.Action action) {
+        getArchiveDriver().getView().setAction(action);
+    }
+
     @Test
     public void testCancelling() throws IOException {
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
 
         final TPath archive = getArchive();
         assertFalse(exists(archive.toNonArchivePath()));
@@ -57,23 +71,31 @@ public final class WinZipAesPathIT extends TPathTestSuite<TestWinZipAesDriver> {
         createDirectory(inner);
 
         umount();
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
         assertTrue(exists(archive));
         assertTrue(isDirectory(archive));
         assertFalse(isRegularFile(archive));
 
         umount();
-        getArchiveDriver().getView().setAction(ENTER);
+        setAction(ENTER);
         assertTrue(exists(archive));
         assertTrue(isDirectory(archive));
         assertFalse(isRegularFile(archive));
 
-        getArchiveDriver().getView().setAction(CANCEL);
+        setAction(CANCEL);
         assertTrue(exists(inner));
-        assertTrue(isDirectory(inner));
+        assertFalse(isDirectory(inner));
         assertFalse(isRegularFile(inner));
 
         umount();
+        try {
+            archive.toFile().rm_r();
+            fail();
+        } catch (IOException expected) {
+        }
+
+        umount();
+        setAction(ENTER);
         archive.toFile().rm_r();
     }
 }
