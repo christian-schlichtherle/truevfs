@@ -19,9 +19,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FsSyncExceptionBuilder
+public final class FsSyncExceptionBuilder
 extends SequentialIOExceptionBuilder<IOException, FsSyncException> {
-    FsSyncExceptionBuilder() {
+    public FsSyncExceptionBuilder() {
         super(IOException.class, FsSyncException.class);
     }
 }

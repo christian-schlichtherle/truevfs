@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public class KeyPromptingCancelledException extends CacheableUnknownKeyException {
+public class KeyPromptingCancelledException extends PersistentUnknownKeyException {
     private static final long serialVersionUID = 7645927619378423566L;
     
     public KeyPromptingCancelledException() {

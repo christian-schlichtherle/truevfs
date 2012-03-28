@@ -6,6 +6,7 @@ package de.truezip.driver.file.nio;
 
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.util.JSE7;
 import javax.annotation.CheckForNull;
@@ -21,7 +22,9 @@ public final class FileDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    newController(FsModel model, @CheckForNull FsController<?> parent) {
+    newController(  final FsManager manager,
+                    final FsModel model,
+                    final @CheckForNull FsController<?> parent) {
         assert null == model.getParent()
                 ? null == parent
                 : model.getParent().equals(parent.getModel());
@@ -38,6 +41,6 @@ public final class FileDriver extends FsDriver {
      */
     @Override
     public int getPriority() {
-        return JSE7.AVAILABLE ? 100 : Integer.MIN_VALUE;
+        return JSE7.AVAILABLE ? 10 : -10;
     }
 }

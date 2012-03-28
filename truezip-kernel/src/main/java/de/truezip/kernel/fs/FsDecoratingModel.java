@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.fs;
 
+import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import javax.annotation.concurrent.ThreadSafe;
 

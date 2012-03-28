@@ -149,7 +149,7 @@ implements JmxManagerViewMXBean {
 
     @Override
     public JmxModelViewMXBean[] getFederatedFileSystems() {
-        int size = model.getSize();
+        int size = model.size();
         List<JmxModelViewMXBean> list = new ArrayList<JmxModelViewMXBean>(size);
         for (FsController<?> controller : model)
             list.add(JmxModelView.register(controller.getModel()));
@@ -158,7 +158,7 @@ implements JmxManagerViewMXBean {
 
     @Override
     public int getFileSystemsTotal() {
-        return model.getSize();
+        return model.size();
     }
 
     @Override

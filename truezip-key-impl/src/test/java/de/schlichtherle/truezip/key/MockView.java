@@ -4,12 +4,10 @@
  */
 package de.schlichtherle.truezip.key;
 
+import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.truezip.key.KeyPromptingCancelledException;
 import de.truezip.key.SafeKey;
 import de.truezip.key.UnknownKeyException;
-import de.schlichtherle.truezip.key.PromptingKeyProviderController;
-import de.schlichtherle.truezip.key.PromptingKeyProviderView;
-import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import java.net.URI;
 import java.util.Random;
 import javax.annotation.CheckForNull;
@@ -19,8 +17,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * A view implementation which uses its properties for providing a key whenever
  * the user is prompted.
  *
- * @param   <K> The type of the safe key.
- * @author  Christian Schlichtherle
+ * @param  <K> The type of the safe key.
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class MockView<K extends SafeKey<K>> implements PromptingKeyProviderView<K> {

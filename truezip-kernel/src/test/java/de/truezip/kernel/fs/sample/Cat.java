@@ -65,7 +65,7 @@ public final class Cat {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.
             FsCompositeDriver
-                    driver = new FsSimpleCompositeDriver(FsDriverLocator.SINGLETON);
+                    driver = new FsDefaultCompositeDriver(FsDriverLocator.SINGLETON);
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the
             // File class for transformation from a normal path name.

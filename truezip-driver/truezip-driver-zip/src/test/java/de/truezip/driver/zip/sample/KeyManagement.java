@@ -89,7 +89,8 @@ public final class KeyManagement {
         }
         
         @Override
-        protected FsController<?> decorate(FsController<?> controller) {
+        public <M extends FsModel> FsController<? extends M> decorate(
+                FsController<M> controller) {
             // This is a minor improvement: The default implementation decorates
             // the default file system controller chain with a package private
             // file system controller which uses the key manager to keep track

@@ -69,15 +69,14 @@ extends FsArchiveDriver<E> {
      * @param  type an entry type.
      * @return The fixed entry name.
      */
-    // TODO: Consider renaming this method to normalize().
-    protected static String toZipOrTarEntryName(String name, Type type) {
+    protected static String normalize(String name, Type type) {
         return DIRECTORY == type
                 ? name.endsWith(SEPARATOR) ? name : name + SEPARATOR_CHAR
                 : cutTrailingSeparators(name, SEPARATOR_CHAR);
     }
 
     /**
-     * Ensures that the given entry name can be encoded by this driver's
+     * Ensures that the given entry name can get encoded using this driver's
      * character set.
      * Should be called by sub classes in their implementation of the method
      * {@link FsArchiveDriver#newEntry}.
@@ -87,8 +86,7 @@ extends FsArchiveDriver<E> {
      * @throws CharConversionException If the path name contains characters
      *         which cannot get encoded.
      */
-    // TODO: Consider naming this checkEncodable because of throws declaration.
-    protected final void assertEncodable(String name)
+    protected final void checkEncodable(final String name)
     throws CharConversionException {
         if (!encoder.canEncode(name))
             throw new CharConversionException(name +

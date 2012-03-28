@@ -75,7 +75,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    protected final IOPool<?> getIOPool() {
+    public final IOPool<?> getIOPool() {
         return ioPool;
     }
 
@@ -111,8 +111,8 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             final Entry template,
             final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        assertEncodable(name);
-        name = toZipOrTarEntryName(name, type);
+        checkEncodable(name);
+        name = normalize(name, type);
         final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {
             entry = newEntry(name, (TarArchiveEntry) template);

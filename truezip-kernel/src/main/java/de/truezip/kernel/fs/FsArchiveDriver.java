@@ -53,7 +53,7 @@ extends FsDriver {
      *
      * @return The pool to use for allocating I/O buffers.
      */
-    protected abstract IOPool<?> getIOPool();
+    public abstract IOPool<?> getIOPool();
 
     /**
      * Returns {@code true} if and only if the archive files produced by this
@@ -137,34 +137,26 @@ extends FsDriver {
      * the returned file system controller must be thread-safe!
      *
      * @param  model the file system model.
-     * @param  parent the non-null parent file system controller.
+     * @param  parent the parent file system controller.
+     * @param  manager the file system manager for the new controller.
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
      */
     @Override
     public final FsController<?>
-    newController(final FsModel model, final @Nonnull FsController<?> parent) {
-        final boolean isLockModel = model instanceof FsLockModel;
-        assert !isLockModel;
-        final FsLockModel lockModel = isLockModel
-                ? (FsLockModel) model
-                : new FsLockModel(model);
-        // HC SUNT DRACONES!
-        return  new FsFalsePositiveController(
-                    new FsFinalizeController(
-                        decorate(
-                            new FsSyncController(
-                                new FsLockController(
-                                    new FsResetController(
-                                        new FsCacheController(
-                                            new FsResourceController(
-                                                new FsContextController(
-                                                    new FsTargetArchiveController<E>(
-                                                        lockModel, parent, this))),
-                                            getIOPool())))))));
+    newController(  FsManager manager,
+                    FsModel model,
+                    @Nonnull FsController<?> parent) {
+        assert null == model.getParent()
+                ? null == parent
+                : model.getParent().equals(parent.getModel());
+        if (null == parent)
+            throw new IllegalArgumentException();
+        return manager.newController(this, model, parent);
     }
 
-    protected FsController<?> decorate(FsController<?> controller) {
+    public <M extends FsModel> FsController<? extends M> decorate(
+            FsController<M> controller) {
         return controller;
     }
 
@@ -309,9 +301,8 @@ extends FsDriver {
      * @param  template if not {@code null}, then the new entry shall inherit
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
-     * @param  mknod when called from {@link FsArchiveController#mknod}, this
-     *         is its {@code options} parameter, otherwise it's typically an
-     *         empty set.
+     * @param  mknod when called from {@link FsController#mknod}, this is its
+     *         {@code options} parameter, otherwise it's typically an empty set.
      * @return A new entry for the given name.
      * @throws CharConversionException if {@code name} contains characters
      *         which are invalid.

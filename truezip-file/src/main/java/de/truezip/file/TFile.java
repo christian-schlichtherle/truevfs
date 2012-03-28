@@ -4,6 +4,7 @@
  */
 package de.truezip.file;
 
+import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.addr.FsScheme;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.addr.FsPath;

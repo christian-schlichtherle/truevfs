@@ -7,6 +7,7 @@ package de.truezip.driver.zip.raes;
 import de.truezip.driver.zip.KeyManagerController;
 import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsModel;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
@@ -19,8 +20,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ZipRaesController
-extends KeyManagerController<ZipRaesDriver> {
+final class ZipRaesController<M extends FsModel>
+extends KeyManagerController<M, ZipRaesDriver> {
 
     /**
      * Constructs a new ZIP.RAES archive controller.
@@ -28,7 +29,7 @@ extends KeyManagerController<ZipRaesDriver> {
      * @param controller the file system controller to decorate.
      * @param driver the ZIP.RAES driver.
      */
-    ZipRaesController(FsController<?> controller, ZipRaesDriver driver) {
+    ZipRaesController(FsController<? extends M> controller, ZipRaesDriver driver) {
         super(controller, driver);
     }
 
