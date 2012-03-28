@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.FsCovariantEntry;
 import static de.schlichtherle.truezip.kernel.fs.FsArchiveFileSystem.newEmptyFileSystem;
 import static de.schlichtherle.truezip.kernel.fs.FsArchiveFileSystem.newPopulatedFileSystem;
 import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;

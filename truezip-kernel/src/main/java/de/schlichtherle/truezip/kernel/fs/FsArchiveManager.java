@@ -22,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class FsDefaultManager extends FsManager {
+final class FsArchiveManager extends FsManager {
 
     /**
      * The map of all schedulers for composite file system controllers,
@@ -34,9 +34,9 @@ final class FsDefaultManager extends FsManager {
 
     private final Type optionalScheduleType;
 
-    FsDefaultManager() { this(WEAK); }
+    FsArchiveManager() { this(WEAK); }
 
-    FsDefaultManager(final Type optionalScheduleType) {
+    FsArchiveManager(final Type optionalScheduleType) {
         assert null != optionalScheduleType;
         this.optionalScheduleType = optionalScheduleType;
     }
@@ -55,7 +55,7 @@ final class FsDefaultManager extends FsManager {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
-            final FsModel model = new FsDefaultModel(mountPoint, null);
+            final FsModel model = new FsModel(mountPoint, null);
             return driver.newController(this, model, null);
         }
         FsController<?> controller = getTarget(schedulers.get(mountPoint));
@@ -123,7 +123,7 @@ final class FsDefaultManager extends FsManager {
      * property is simpler, faster and requires a smaller memory footprint than
      * the alternative observer pattern.
      */
-    private final class ScheduledModel extends FsDefaultModel {
+    private final class ScheduledModel extends FsModel {
         FsController<?> controller;
         boolean touched;
 
@@ -157,7 +157,7 @@ final class FsDefaultManager extends FsManager {
 
         @SuppressWarnings("unchecked")
         void schedule(boolean mandatory) {
-            synchronized (FsDefaultManager.this) {
+            synchronized (FsArchiveManager.this) {
                 schedulers.put(getMountPoint(), (Link<FsController<?>>)
                         (mandatory ? STRONG : optionalScheduleType)
                             .newLink(controller));

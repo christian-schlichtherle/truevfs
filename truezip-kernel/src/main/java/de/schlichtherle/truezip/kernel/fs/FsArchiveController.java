@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.FsCovariantEntry;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
@@ -13,6 +12,7 @@ import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsArchiveEntry;
+import de.truezip.kernel.fs.FsCovariantEntry;
 import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsEntryNotFoundException;
 import de.truezip.kernel.fs.addr.FsEntryName;

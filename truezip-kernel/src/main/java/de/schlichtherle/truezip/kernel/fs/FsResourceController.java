@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsResourceOpenException;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.FsSyncWarningException;

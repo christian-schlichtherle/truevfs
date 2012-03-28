@@ -15,7 +15,7 @@ import javax.annotation.concurrent.Immutable;
 public final class FsFailSafeManagerService extends FsManagerService {
 
     private final FsManager
-            manager = new FsFailSafeManager(new FsDefaultManager());
+            manager = new FsFailSafeManager(new FsArchiveManager());
 
     @Override
     public FsManager get() {
