@@ -4,13 +4,13 @@
  */
 package de.schlichtherle.truezip.kernel.fs;
 
+import static de.schlichtherle.truezip.kernel.fs.FsCache.Strategy.WRITE_BACK;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsResourceOpenException;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.FsSyncWarningException;
-import static de.schlichtherle.truezip.kernel.fs.FsCache.Strategy.WRITE_BACK;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
@@ -364,7 +364,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
                     super(Input.super.newInputStream());
-                    assert isTouched();
+                    assert getModel().isTouched();
                 }
 
                 @Override

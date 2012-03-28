@@ -43,7 +43,7 @@ final class FsLockModel extends FsDecoratingModel<FsModel> {
         return 0 != lock.getReadHoldCount();
     }
 
-    public WriteLock writeLock() {
+    WriteLock writeLock() {
         return lock.writeLock();
     }
 
