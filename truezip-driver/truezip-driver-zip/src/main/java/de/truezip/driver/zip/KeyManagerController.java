@@ -126,7 +126,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public <X extends IOException> void
+    public final <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
