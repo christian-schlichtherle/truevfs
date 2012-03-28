@@ -5,7 +5,7 @@
 package de.truezip.kernel.fs;
 
 import de.truezip.kernel.fs.addr.FsMountPoint;
-import javax.annotation.Nullable;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -17,7 +17,23 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsModel {
+public class FsModel {
+
+    private final FsMountPoint mountPoint;
+    private @CheckForNull final FsModel parent;
+
+    public FsModel( final FsMountPoint mountPoint,
+                    final @CheckForNull FsModel parent) {
+        if (!equals(mountPoint.getParent(),
+                    (null == parent ? null : parent.getMountPoint())))
+            throw new IllegalArgumentException("Parent/Member mismatch!");
+        this.mountPoint = mountPoint;
+        this.parent = parent;
+    }
+
+    private static boolean equals(@CheckForNull Object o1, @CheckForNull Object o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
+    }
 
     /**
      * Returns the mount point of the file system.
@@ -28,17 +44,20 @@ public abstract class FsModel {
      *
      * @return The mount point of the file system.
      */
-    public abstract FsMountPoint getMountPoint();
+    public final FsMountPoint getMountPoint() {
+        return mountPoint;
+    }
 
     /**
-     * Returns the model of the parent file system or {@code null} if and
-     * only if the file system is not federated, i.e. if it's not a member of
-     * a parent file system.
+     * Returns the parent file system model or {@code null} if and only if the
+     * file system is not federated, i.e. if it's not a member of a parent file
+     * system.
      *
      * @return The nullable parent file system model.
      */
-    @Nullable
-    public abstract FsModel getParent();
+    public final @CheckForNull FsModel getParent() {
+        return parent;
+    }
 
     /**
      * Returns {@code true} if and only if some state associated with the

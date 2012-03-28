@@ -4,18 +4,16 @@
  */
 package de.truezip.kernel.fs.mock;
 
-import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.cio.DelegatingInputSocket;
-import de.truezip.kernel.cio.DelegatingOutputSocket;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.ByteArrayIOBuffer;
-import de.truezip.kernel.cio.IOEntry;
-import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.TestConfig;
+import de.truezip.kernel.ThrowControl;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.fs.*;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.fs.FsEntry;
+import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsInputOption;
 import de.truezip.kernel.fs.option.FsOutputOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
@@ -24,8 +22,6 @@ import de.truezip.kernel.io.ThrowingOutputStream;
 import de.truezip.kernel.io.ThrowingSeekableByteChannel;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ThrowingReadOnlyFile;
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.FileNotFoundException;
@@ -41,12 +37,11 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class MockController extends FsController<FsModel> {
 
-    private final FsModel model;
     private final @Nullable FsController<?> parent;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final ConcurrentMap<FsEntryName, IOEntry<?>>
@@ -68,10 +63,10 @@ public class MockController extends FsController<FsModel> {
     public MockController(  final FsModel model,
                             final @CheckForNull FsController<?> parent,
                             final @CheckForNull TestConfig config) {
+        super(model);
         assert null == model.getParent()
                 ? null == parent
                 : model.getParent().equals(parent.getModel());
-        this.model = model;
         this.parent = parent;
         this.config = null != config ? config : TestConfig.get();
     }
@@ -89,12 +84,6 @@ public class MockController extends FsController<FsModel> {
     private void checkUndeclaredExceptions(final Object thiz) {
         getThrowControl().check(thiz, RuntimeException.class);
         getThrowControl().check(thiz, Error.class);
-    }
-
-    @Override
-    public FsModel getModel() {
-        checkUndeclaredExceptions(this);
-        return model;
     }
 
     @Override

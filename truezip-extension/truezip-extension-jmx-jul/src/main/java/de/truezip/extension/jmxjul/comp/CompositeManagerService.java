@@ -5,9 +5,9 @@
 package de.truezip.extension.jmxjul.comp;
 
 import de.schlichtherle.truezip.kernel.fs.FsFailSafeManagerService;
-import de.truezip.kernel.fs.FsManager;
 import de.truezip.extension.jmxjul.jmx.JmxDirector;
 import de.truezip.extension.jmxjul.jul.JulDirector;
+import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.spi.FsManagerService;
 import javax.annotation.concurrent.Immutable;
 

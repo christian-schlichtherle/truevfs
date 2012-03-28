@@ -4,13 +4,13 @@
  */
 package de.schlichtherle.truezip.kernel.fs;
 
+import de.schlichtherle.truezip.kernel.fs.FsCache.Strategy;
+import static de.schlichtherle.truezip.kernel.fs.FsCache.Strategy.WRITE_BACK;
+import static de.schlichtherle.truezip.kernel.fs.FsCache.Strategy.WRITE_THROUGH;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.*;
-import de.schlichtherle.truezip.kernel.fs.FsCache.Strategy;
-import static de.schlichtherle.truezip.kernel.fs.FsCache.Strategy.WRITE_BACK;
-import static de.schlichtherle.truezip.kernel.fs.FsCache.Strategy.WRITE_THROUGH;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;

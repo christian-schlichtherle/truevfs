@@ -15,7 +15,7 @@ import javax.annotation.concurrent.Immutable;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public final class FsDefaultCompositeDriver extends FsAbstractCompositeDriver {
+public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
 
     private final Map<FsScheme, FsDriver> drivers;
 
@@ -24,7 +24,7 @@ public final class FsDefaultCompositeDriver extends FsAbstractCompositeDriver {
      * file system driver provider for an appropriate file system driver for
      * the scheme of a given mount point.
      */
-    public FsDefaultCompositeDriver(final FsDriverProvider provider) {
+    public FsSimpleCompositeDriver(final FsDriverProvider provider) {
         this.drivers = provider.get(); // dedicated immutable map!
         assert null != drivers;
     }

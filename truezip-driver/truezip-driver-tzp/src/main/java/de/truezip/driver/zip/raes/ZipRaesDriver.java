@@ -121,7 +121,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * locatable key manager to resolve passwords for RAES encryption.
      */
     @Override
-    public <M extends FsModel> FsController<? extends M> decorate(
+    public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
         return new ZipRaesController<M>(controller, this);
     }

@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.*;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
@@ -44,7 +43,7 @@ extends FsManager {
     newController(  FsArchiveDriver<E> driver,
                     FsModel model,
                     FsController<?> parent) {
-        assert false;
+        assert false : "This method should never get called on this class!";
         return delegate.newController(driver, model, parent);
     }
 

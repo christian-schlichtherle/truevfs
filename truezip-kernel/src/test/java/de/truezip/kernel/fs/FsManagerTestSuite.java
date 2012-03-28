@@ -22,8 +22,8 @@ import org.junit.Test;
  */
 public abstract class FsManagerTestSuite {
 
-    private final FsCompositeDriver driver
-            = new FsDefaultCompositeDriver(new MockDriverService("file|zip"));
+    private final FsCompositeDriver driver = new FsSimpleCompositeDriver(
+            new MockDriverService("file|zip"));
     private FsManager manager;
 
     @Before

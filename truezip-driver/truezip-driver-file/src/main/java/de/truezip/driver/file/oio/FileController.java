@@ -11,7 +11,6 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.fs.FsAbstractController;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.FsSyncException;
@@ -41,7 +40,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class FileController extends FsAbstractController<FsModel>  {
+final class FileController extends FsController<FsModel>  {
 
     private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
 

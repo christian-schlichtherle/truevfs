@@ -9,7 +9,7 @@ import de.truezip.kernel.io.SequentialIOExceptionBuilderTestSuite;
 /**
  * @author Christian Schlichtherle
  */
-public class FsSyncExceptionBuilderTest
+public final class FsSyncExceptionBuilderTest
 extends SequentialIOExceptionBuilderTestSuite<FsSyncException> {
 
     public FsSyncExceptionBuilderTest() {

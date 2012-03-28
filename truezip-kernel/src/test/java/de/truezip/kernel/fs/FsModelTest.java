@@ -2,14 +2,13 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel.fs;
+package de.truezip.kernel.fs;
 
-import de.schlichtherle.truezip.kernel.fs.FsDefaultModel;
-import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.addr.FsPath;
 import java.net.URI;
+import javax.annotation.CheckForNull;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -17,13 +16,25 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public class FsDefaultModelTest {
+public class FsModelTest {
+
+    protected FsModel newModel( FsMountPoint mountPoint,
+                                @CheckForNull FsModel parent) {
+        return new FsModel(mountPoint, parent);
+    }
+
+    private FsModel newModel(final FsMountPoint mountPoint) {
+        return newModel(mountPoint,
+                        null == mountPoint.getParent()
+                            ? null
+                            : newModel(mountPoint.getParent()));
+    }
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithNull() {
         try {
-            new FsDefaultModel(null, null);
+            newModel(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -36,7 +47,7 @@ public class FsDefaultModelTest {
             { "foo:/bar/" },
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
-            final FsModel model = new FsDefaultModel(mountPoint, null);
+            final FsModel model = newModel(mountPoint, null);
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getMountPoint().getPath(), nullValue());
             assertThat(model.getParent(), nullValue());
@@ -53,9 +64,9 @@ public class FsDefaultModelTest {
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
             final FsMountPoint parentMountPoint = FsMountPoint.create(URI.create(params[1]));
-            final FsModel parent = new FsDefaultModel(parentMountPoint, null);
+            final FsModel parent = newModel(parentMountPoint, null);
             try {
-                new FsDefaultModel(mountPoint, parent);
+                newModel(mountPoint, parent);
                 fail(params[0]);
             } catch (RuntimeException expected) {
             }
@@ -73,7 +84,7 @@ public class FsDefaultModelTest {
             final FsEntryName parentEntryName = FsEntryName.create(URI.create(params[3]));
             final FsPath path = FsPath.create(URI.create(params[4]));
             FsModel parent = newModel(parentMountPoint);
-            FsModel model = new FsDefaultModel(mountPoint, parent);
+            FsModel model = newModel(mountPoint, parent);
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
@@ -81,12 +92,5 @@ public class FsDefaultModelTest {
             assertThat(model.getMountPoint().resolve(entryName), equalTo(path));
             assertThat(model.isTouched(), is(false));
         }
-    }
-
-    private static FsModel newModel(final FsMountPoint mountPoint) {
-        return new FsDefaultModel(  mountPoint,
-                                    null == mountPoint.getParent()
-                                        ? null
-                                        : newModel(mountPoint.getParent()));
     }
 }
