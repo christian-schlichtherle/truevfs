@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.PromptingKeyProviderController;
+import de.truezip.key.PromptingKeyProviderController;
 import de.schlichtherle.truezip.key.swing.Windows;
-import de.schlichtherle.truezip.key.param.SafePbeParametersView;
+import de.truezip.key.param.SafePbeParametersView;
 import de.truezip.kernel.util.ServiceLocator;
 import de.truezip.key.KeyPromptingInterruptedException;
 import de.truezip.key.UnknownKeyException;

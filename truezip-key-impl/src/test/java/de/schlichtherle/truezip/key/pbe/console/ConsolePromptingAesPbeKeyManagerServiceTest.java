@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.key.pbe.console;
 
-import de.schlichtherle.truezip.key.PromptingKeyManager;
-import de.schlichtherle.truezip.key.PromptingKeyManagerTestSuite;
+import de.truezip.key.PromptingKeyManager;
+import de.truezip.key.PromptingKeyManagerTestSuite;
 import de.truezip.key.param.AesPbeParameters;
 
 /**

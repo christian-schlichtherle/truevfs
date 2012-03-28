@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip.raes.file;
 
-import de.schlichtherle.truezip.key.MockView;
-import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
-import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
+import de.truezip.key.MockView;
+import static de.truezip.key.MockView.Action.CANCEL;
+import static de.truezip.key.MockView.Action.ENTER;
 import de.truezip.driver.zip.raes.TestZipRaesDriver;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileITSuite;

@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.key.pbe.console;
 
-import de.schlichtherle.truezip.key.PromptingKeyProviderController;
-import de.schlichtherle.truezip.key.param.SafePbeParametersView;
+import de.truezip.key.PromptingKeyProviderController;
+import de.truezip.key.param.SafePbeParametersView;
 import de.truezip.key.KeyPromptingDisabledException;
 import de.truezip.key.param.KeyStrength;
 import de.truezip.key.param.SafePbeParameters;

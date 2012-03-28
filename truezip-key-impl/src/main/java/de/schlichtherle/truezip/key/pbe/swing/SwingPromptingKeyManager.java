@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.schlichtherle.truezip.key.PromptingKeyManager;
+import de.truezip.key.PromptingKeyManager;
 import de.truezip.key.param.SafePbeParameters;
 import java.awt.GraphicsEnvironment;
 import javax.annotation.concurrent.ThreadSafe;
