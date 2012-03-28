@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.driver.zip.io.DateTimeConverter;
 import de.truezip.driver.zip.io.ZipEntry;
+import de.truezip.kernel.cio.IOPoolProvider;
 import java.nio.charset.Charset;
 import javax.annotation.concurrent.Immutable;
 

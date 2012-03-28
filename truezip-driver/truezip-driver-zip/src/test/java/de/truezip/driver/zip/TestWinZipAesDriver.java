@@ -4,9 +4,8 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.key.MockView;
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.key.KeyManagerProvider;
+import de.truezip.key.MockView;
 import de.truezip.key.param.AesPbeParameters;
 
 /**
@@ -14,34 +13,19 @@ import de.truezip.key.param.AesPbeParameters;
  */
 public final class TestWinZipAesDriver extends ZipDriver {
 
-    private final KeyManagerProvider provider;
-    private final MockView<AesPbeParameters> view;
+    private final TestKeyManagerService service;
 
-    public TestWinZipAesDriver(IOPoolProvider ioPoolProvider) {
-        this(ioPoolProvider, newView());
-    }
-
-    private TestWinZipAesDriver(
-            final IOPoolProvider ioPoolProvider,
-            final MockView<AesPbeParameters> view) {
+    public TestWinZipAesDriver(final IOPoolProvider ioPoolProvider) {
         super(ioPoolProvider);
-        this.provider = new TestKeyManagerService(this.view = view);
-    }
-
-    private static MockView<AesPbeParameters> newView() {
-        final AesPbeParameters key = new AesPbeParameters();
-        key.setPassword("secret".toCharArray());
-        final MockView<AesPbeParameters> view = new MockView<AesPbeParameters>();
-        view.setKey(key);
-        return view;
+        this.service = new TestKeyManagerService();
     }
 
     @Override
-    protected KeyManagerProvider getKeyManagerProvider() {
-        return provider;
+    protected TestKeyManagerService getKeyManagerProvider() {
+        return service;
     }
 
     public MockView<AesPbeParameters> getView() {
-        return view;
+        return service.getView();
     }
 }

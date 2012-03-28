@@ -18,7 +18,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class SafeKeyManager<K extends SafeKey<K>, P extends SafeKeyProvider<K>>
+public abstract class SafeKeyManager<   K extends SafeKey<K>,
+                                        P extends SafeKeyProvider<K>>
 extends KeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<URI, P>();

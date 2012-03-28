@@ -4,7 +4,6 @@
  */
 package de.truezip.key;
 
-import de.truezip.key.SafeKey;
 import java.net.URI;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -23,6 +22,8 @@ public interface PromptingKeyProviderController<K extends SafeKey<K>> {
      * Returns the unique resource identifier (resource ID) of the
      * protected resource for which this controller is used.
      *
+     * @return The unique resource identifier (resource ID) of the
+     *         protected resource for which this controller is used.
      * @throws IllegalStateException if getting this property is not legal
      *         in the current state.
      */
@@ -59,5 +60,4 @@ public interface PromptingKeyProviderController<K extends SafeKey<K>> {
      *         current state.
      */
     void setChangeRequested(boolean changeRequested);
-    
 }

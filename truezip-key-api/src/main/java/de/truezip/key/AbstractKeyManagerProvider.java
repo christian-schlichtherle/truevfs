@@ -21,7 +21,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
     public final <K> KeyManager<K> get(final Class<K> type) {
         final KeyManager<?> manager = get().get(type);
         if (null == manager)
-            throw new ServiceConfigurationError("No key manager available for " + type);
+            throw new ServiceConfigurationError("No key manager available for " + type + '.');
         return (KeyManager<K>) manager;
     }
 

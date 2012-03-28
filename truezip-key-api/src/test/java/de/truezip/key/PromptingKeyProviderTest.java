@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class PromptingKeyProviderTest {
 

@@ -11,7 +11,6 @@ import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.fs.addr.FsPath;
 import de.truezip.kernel.io.Paths;
-import de.truezip.path.TPath;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.nio.file.Path;

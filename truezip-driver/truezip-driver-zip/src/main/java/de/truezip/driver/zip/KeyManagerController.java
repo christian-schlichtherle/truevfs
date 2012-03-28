@@ -65,7 +65,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public FsEntry getEntry(final FsEntryName name)
+    public final FsEntry getEntry(final FsEntryName name)
     throws IOException {
         try {
             return delegate.getEntry(name);
@@ -95,7 +95,8 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public void unlink(final FsEntryName name, BitField<FsOutputOption> options)
+    public final void unlink(   final FsEntryName name,
+                                final BitField<FsOutputOption> options)
     throws IOException {
         try {
             delegate.unlink(name, options);
