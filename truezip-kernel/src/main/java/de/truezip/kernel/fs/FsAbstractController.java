@@ -9,8 +9,8 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
- * method so that it can forward calls to its additional protected methods to
- * this model for the convenience of sub-classes.
+ * method so that it can forward calls to its additional methods to this model
+ * for the convenience of sub-classes.
  *
  * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
