@@ -6,12 +6,12 @@ package de.truezip.driver.zip.io;
 
 import de.truezip.driver.zip.crypto.CipherReadOnlyFile;
 import de.truezip.driver.zip.crypto.SeekableBlockCipher;
-import de.truezip.key.util.SuspensionPenalty;
-import de.truezip.key.param.AesKeyStrength;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.ArrayHelper;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static de.truezip.driver.zip.io.WinZipAesEntryOutputStream.*;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.key.param.AesKeyStrength;
+import de.truezip.key.util.SuspensionPenalty;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
