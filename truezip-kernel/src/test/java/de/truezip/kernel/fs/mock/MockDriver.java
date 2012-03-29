@@ -21,9 +21,9 @@ public final class MockDriver extends FsDriver {
     newController(  FsManager manager,
                     FsModel model,
                     FsController<?> parent) {
-        assert null == model.getParent()
-                ? null == parent
-                : model.getParent().equals(parent.getModel());
+        assert null == parent
+                ? null == model.getParent()
+                : parent.getModel().equals(model.getParent());
         return new MockController(model, parent, null);
     }
 }

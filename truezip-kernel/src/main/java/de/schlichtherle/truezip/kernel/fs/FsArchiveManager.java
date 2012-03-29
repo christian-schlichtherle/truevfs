@@ -74,9 +74,8 @@ final class FsArchiveManager extends FsManager {
     newController(  final FsArchiveDriver<E> driver,
                     final FsModel model,
                     final FsController<?> parent) {
-        final boolean isLockModel = model instanceof FsLockModel;
-        assert !isLockModel;
-        final FsLockModel lockModel = isLockModel
+        assert !(model instanceof FsLockModel);
+        final FsLockModel lockModel = model instanceof FsLockModel
                 ? (FsLockModel) model
                 : new FsLockModel(model);
         // HC SUNT DRACONES!

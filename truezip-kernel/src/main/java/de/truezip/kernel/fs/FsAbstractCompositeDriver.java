@@ -25,9 +25,9 @@ implements FsCompositeDriver, FsDriverProvider {
     newController(  final FsManager manager,
                     final FsModel model,
                     final FsController<?> parent) {
-        assert null == model.getParent()
-                    ? null == parent
-                    : model.getParent().equals(parent.getModel());
+        assert null == parent
+                    ? null == model.getParent()
+                    : parent.getModel().equals(model.getParent());
         final FsScheme scheme = model.getMountPoint().getScheme();
         final FsDriver driver = get().get(scheme);
         if (null == driver)
