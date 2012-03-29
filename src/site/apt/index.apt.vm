@@ -10,6 +10,12 @@ Welcome!
     applications to perform CRUD (Create, Read, Update, Delete) operations on
     archive files as if they were virtual directories, even with nested archive
     files in multithreaded environments - see {{{./features.html}Key Features}}.
+    With TrueZIP, creating a TAR.GZ file from a ZIP file is as easy as calling:
+
++--+
+new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
++--+
+
     TrueZIP is Open Source Software and is covered by the
     {{{./license.html}Eclipse Public License, Version 1.0}}.
     The most recent release is <<TrueZIP&#160;${project.version}>> - see
