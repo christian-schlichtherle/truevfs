@@ -123,7 +123,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
-        return new ZipRaesController<M>(controller, this);
+        return new ZipRaesKeyController<M>(controller, this);
     }
 
     /**

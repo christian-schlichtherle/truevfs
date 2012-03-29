@@ -26,7 +26,7 @@ public abstract class KeyManagementITSuite {
 
     private static final String PREFIX = "tzp";
     private static final String SUFFIX = "eaff";
-    private static final String PASSWORD = "secret";
+    private static final String PASSWORD = "top secret";
 
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
@@ -44,11 +44,7 @@ public abstract class KeyManagementITSuite {
         data = DATA.clone();
         temp = createTempFile();
         assertTrue(temp.delete());
-        archive = new TFile(temp, newArchiveDetector(SUFFIX, PASSWORD));
     }
-
-    protected abstract TArchiveDetector
-    newArchiveDetector(String suffix, String password);
 
     @After
     public void tearDown() throws IOException {
@@ -81,7 +77,24 @@ public abstract class KeyManagementITSuite {
     }
 
     @Test
-    public void testRoundTrip() throws IOException {
+    public void testSetPasswords1() throws IOException {
+        archive = new TFile(temp, newArchiveDetector1(SUFFIX, PASSWORD));
+        roundTrip();
+    }
+
+    protected abstract TArchiveDetector
+    newArchiveDetector1(String suffix, String password);
+
+    @Test
+    public void testSetPasswords2() throws IOException {
+        archive = new TFile(temp, newArchiveDetector2(SUFFIX, PASSWORD));
+        roundTrip();
+    }
+
+    protected abstract TArchiveDetector
+    newArchiveDetector2(String suffix, String password);
+
+    private void roundTrip() throws IOException {
         final TFile file = new TFile(archive, "entry");
         final OutputStream os = new TFileOutputStream(file);
         try {

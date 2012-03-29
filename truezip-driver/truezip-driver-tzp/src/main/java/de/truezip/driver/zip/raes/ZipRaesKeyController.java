@@ -2,9 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.zip;
+package de.truezip.driver.zip.raes;
 
-import de.truezip.driver.zip.io.ZipKeyException;
+import de.truezip.driver.zip.KeyController;
+import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.key.param.AesPbeParameters;
@@ -13,22 +14,22 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * This file system controller decorates another file system controller in
- * order to manage its AES PBE parameters.
+ * order to manage the authentication key required for accessing its
+ * RAES encrypted ZIP file (ZIP.RAES).
  * 
- * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ZipController<M extends FsModel>
-extends KeyManagerController<M, ZipDriver> {
+final class ZipRaesKeyController<M extends FsModel>
+extends KeyController<M, ZipRaesDriver> {
 
     /**
-     * Constructs a new ZIP archive controller.
+     * Constructs a new ZIP.RAES archive controller.
      *
      * @param controller the file system controller to decorate.
-     * @param driver the ZIP driver.
+     * @param driver the ZIP.RAES driver.
      */
-    ZipController(FsController<? extends M> controller, ZipDriver driver) {
+    ZipRaesKeyController(FsController<? extends M> controller, ZipRaesDriver driver) {
         super(controller, driver);
     }
 
@@ -39,6 +40,6 @@ extends KeyManagerController<M, ZipDriver> {
 
     @Override
     protected Class<? extends IOException> getKeyExceptionType() {
-        return ZipKeyException.class;
+        return RaesKeyException.class;
     }
 }

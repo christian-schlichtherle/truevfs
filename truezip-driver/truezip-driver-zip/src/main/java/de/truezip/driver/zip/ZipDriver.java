@@ -110,7 +110,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @return {@link KeyManagerLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
      */
-    protected KeyManagerProvider getKeyManagerProvider() {
+    public KeyManagerProvider getKeyManagerProvider() {
         return KeyManagerLocator.SINGLETON;
     }
 
@@ -350,7 +350,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
-        return new ZipController<M>(controller, this);
+        return new ZipKeyController<M>(controller, this);
     }
 
     @Override

@@ -5,11 +5,11 @@
 package de.truezip.file;
 
 import de.truezip.kernel.fs.FsAbstractCompositeDriver;
+import de.truezip.kernel.fs.FsAbstractDriverProvider;
 import de.truezip.kernel.fs.FsDriver;
 import de.truezip.kernel.fs.FsDriverProvider;
 import de.truezip.kernel.fs.addr.FsScheme;
 import de.truezip.kernel.sl.FsDriverLocator;
-import de.truezip.kernel.fs.spi.FsDriverService;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.SuffixSet;
 import java.io.File;
@@ -210,7 +210,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * @see    SuffixSet Syntax contraints for suffix lists.
      */
     public TArchiveDetector(FsDriverProvider delegate, Object[][] config) {
-        this(delegate, FsDriverService.newMap(config));
+        this(delegate, FsAbstractDriverProvider.newMap(config));
     }
 
     /**
