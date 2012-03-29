@@ -4,11 +4,11 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
+import de.truezip.extension.jmxjul.*;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsModel;
-import de.truezip.extension.jmxjul.*;
 import de.truezip.kernel.util.JSE7;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;
@@ -104,45 +104,45 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <B extends IOBuffer<B>> IOPool<B> instrument(IOPool<B> pool) {
-        return new JmxIOPool<B>(pool, this);
-    }
-
-    @Override
     public FsManager instrument(FsManager manager) {
         return new JmxManager(manager, this);
     }
 
     @Override
-    public FsModel instrument(
+    public <B extends IOBuffer<B>> IOPool<B> instrument(IOPool<B> pool) {
+        return new JmxIOPool<B>(pool, this);
+    }
+
+    @Override
+    protected FsModel instrument(
             FsModel model,
             InstrumentingCompositeDriver context) {
         return new JmxModel(model, this);
     }
 
     @Override
-    public FsController<?> instrument(
+    protected FsController<?> instrument(
             FsController<?> controller,
             InstrumentingManager context) {
         return new JmxApplicationController(controller, this);
     }
 
     @Override
-    public FsController<?> instrument(
+    protected FsController<?> instrument(
             FsController<?> controller,
             InstrumentingCompositeDriver context) {
         return new JmxKernelController(controller, this);
     }
 
     @Override
-    public <B extends IOBuffer<B>> InputSocket<B> instrument(
+    protected <B extends IOBuffer<B>> InputSocket<B> instrument(
             InputSocket<B> input,
             InstrumentingIOPool<B>.InstrumentingBuffer context) {
         return new JmxInputSocket<B>(input, this, temp);
     }
 
     @Override
-    public <E extends Entry> InputSocket<E> instrument(
+    protected <E extends Entry> InputSocket<E> instrument(
             InputSocket<E> input,
             InstrumentingController<JmxDirector> context) {
         return new JmxInputSocket<E>(input, this,
@@ -150,14 +150,14 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <B extends IOBuffer<B>> OutputSocket<B> instrument(
+    protected <B extends IOBuffer<B>> OutputSocket<B> instrument(
             OutputSocket<B> output,
             InstrumentingIOPool<B>.InstrumentingBuffer context) {
         return new JmxOutputSocket<B>(output, this, temp);
     }
 
     @Override
-    public <E extends Entry> OutputSocket<E> instrument(
+    protected <E extends Entry> OutputSocket<E> instrument(
             OutputSocket<E> output,
             InstrumentingController<JmxDirector> context) {
         return new JmxOutputSocket<E>(output, this,
@@ -166,14 +166,14 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private static final class JmxNio2Director extends JmxDirector {
         @Override
-        public <B extends IOBuffer<B>> InputSocket<B> instrument(
+        protected <B extends IOBuffer<B>> InputSocket<B> instrument(
                 InputSocket<B> input,
                 InstrumentingIOPool<B>.InstrumentingBuffer context) {
             return new JmxNio2InputSocket<B>(input, this, super.temp);
         }
 
         @Override
-        public <E extends Entry> InputSocket<E> instrument(
+        protected <E extends Entry> InputSocket<E> instrument(
                 InputSocket<E> input,
                 InstrumentingController<JmxDirector> context) {
             return new JmxNio2InputSocket<E>(input, this,
@@ -181,14 +181,14 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
         }
 
         @Override
-        public <B extends IOBuffer<B>> OutputSocket<B> instrument(
+        protected <B extends IOBuffer<B>> OutputSocket<B> instrument(
                 OutputSocket<B> output,
                 InstrumentingIOPool<B>.InstrumentingBuffer context) {
             return new JmxNio2OutputSocket<B>(output, this, super.temp);
         }
 
         @Override
-        public <E extends Entry> OutputSocket<E> instrument(
+        protected <E extends Entry> OutputSocket<E> instrument(
                 OutputSocket<E> output,
                 InstrumentingController<JmxDirector> context) {
             return new JmxNio2OutputSocket<E>(output, this,
