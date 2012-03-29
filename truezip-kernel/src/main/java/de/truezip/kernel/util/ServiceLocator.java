@@ -82,8 +82,8 @@ public final class ServiceLocator {
      *         instances.
      * @throws ServiceConfigurationError if an exception occurs.
      */
-    public <S> Iterator<S> getServices(Class<S> service) {
-        ClassLoader l2 = Thread.currentThread().getContextClassLoader();
+    public <S> Iterator<S> getServices(final Class<S> service) {
+        final ClassLoader l2 = Thread.currentThread().getContextClassLoader();
         return l1 == l2
                 ? ServiceLoader.load(service, l1).iterator()
                 : new JointIterator<S>( ServiceLoader.load(service, l1).iterator(),
@@ -119,18 +119,20 @@ public final class ServiceLocator {
      *         the service fails for some reason.
      */
     public @Nullable <S> S
-    getService(Class<S> service, @CheckForNull Class<? extends S> def) {
-        String name = System.getProperty(   service.getName(),
-                                            null == def ? null : def.getName());
+    getService( final Class<S> service,
+                final @CheckForNull Class<? extends S> def) {
+        final String name = System.getProperty(
+                service.getName(),
+                null == def ? null : def.getName());
         if (null == name)
             return null;
         try {
             return def.cast(getClass(name).newInstance());
-        } catch (ClassCastException ex) {
+        } catch (final ClassCastException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
-        } catch (InstantiationException ex) {
+        } catch (final InstantiationException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
-        } catch (IllegalAccessException ex) {
+        } catch (final IllegalAccessException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
         }
     }
@@ -143,7 +145,7 @@ public final class ServiceLocator {
      * @throws ServiceConfigurationError if locating the class fails for some
      *         reason.
      */
-    public Class<?> getClass(String name) {
+    public Class<?> getClass(final String name) {
         try {
             try {
                 return l1.loadClass(name);
@@ -153,7 +155,7 @@ public final class ServiceLocator {
                     throw ex; // there's no point in trying this twice.
                 return l2.loadClass(name);
             }
-        } catch (ClassNotFoundException ex2) {
+        } catch (final ClassNotFoundException ex2) {
             throw new ServiceConfigurationError(ex2.toString(), ex2);
         }
     }
@@ -167,14 +169,14 @@ public final class ServiceLocator {
      * @throws ServiceConfigurationError if locating the resources fails for
      *         some reason.
      */
-    public Enumeration<URL> getResources(String name) {
+    public Enumeration<URL> getResources(final String name) {
         ClassLoader l2 = Thread.currentThread().getContextClassLoader();
         try {
             return l1 == l2
                     ? l1.getResources(name)
                     : new JointEnumeration<URL>(l1.getResources(name),
                                                 l2.getResources(name));
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
         }
     }
@@ -215,20 +217,20 @@ public final class ServiceLocator {
             if (object instanceof String && !type.equals(String.class))
                 object = new ServiceLocator(type.getClassLoader())
                         .getClass((String) object);
-        } catch (ServiceConfigurationError ex) {
+        } catch (final ServiceConfigurationError ex) {
             throw new IllegalArgumentException(ex);
         }
         try {
             if (object instanceof Class<?> && !type.equals(Class.class))
                 object = ((Class<?>) object).newInstance();
-        } catch (InstantiationException ex) {
+        } catch (final InstantiationException ex) {
             throw new IllegalArgumentException(ex);
-        } catch (IllegalAccessException ex) {
+        } catch (final IllegalAccessException ex) {
             throw new IllegalArgumentException(ex);
         }
         try {
             return type.cast(object);
-        } catch (ClassCastException ex) {
+        } catch (final ClassCastException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
