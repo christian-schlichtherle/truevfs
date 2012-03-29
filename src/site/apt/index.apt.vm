@@ -18,7 +18,7 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
     TrueZIP is Open Source Software and is covered by the
     {{{./license.html}Eclipse Public License, Version 1.0}}.
-    The most recent release is <<TrueZIP&#160;${project.version}>> - see
+    The most recent version is TrueZIP&#160;${project.version} - see
     {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
 
 * Supported File System Types
