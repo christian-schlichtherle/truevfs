@@ -190,12 +190,9 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             public void close() throws IOException {
                 if (closed)
                     return;
+                super.close();
                 closed = true;
-                try {
-                    super.close();
-                } finally {
-                    close(temp, null == exception);
-                }
+                close(temp, null == exception);
             }
         } // SeekableByteChannel
 
