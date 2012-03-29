@@ -4,16 +4,12 @@
  */
 package de.truezip.extension.jmxjul.jul;
 
-import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.cio.IOBuffer;
-import de.truezip.kernel.fs.FsController;
 import de.truezip.extension.jmxjul.InstrumentingCompositeDriver;
 import de.truezip.extension.jmxjul.InstrumentingController;
 import de.truezip.extension.jmxjul.InstrumentingDirector;
 import de.truezip.extension.jmxjul.InstrumentingManager;
-import de.truezip.kernel.cio.IOPool;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.util.JSE7;
 import javax.annotation.concurrent.Immutable;
 
@@ -36,12 +32,12 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
     }
 
     @Override
-    public FsController<?> instrument(FsController<?> controller, InstrumentingManager context) {
+    protected FsController<?> instrument(FsController<?> controller, InstrumentingManager context) {
         return controller;
     }
 
     @Override
-    public FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context) {
+    protected FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context) {
         return new InstrumentingController<JulDirector>(controller, this);
     }
 

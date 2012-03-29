@@ -28,6 +28,7 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public FsController<?> newController(   final FsManager manager,
                                             final FsModel model,
                                             final FsController<?> parent) {
