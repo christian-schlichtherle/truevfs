@@ -15,6 +15,7 @@ import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.key.KeyManager;
 import java.io.IOException;
+import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -27,7 +28,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class KeyManagerController<
+public abstract class KeyController<
         M extends FsModel,
         D extends ZipDriver>
 extends FsDecoratingController<M, FsController<? extends M>> {
@@ -44,7 +45,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
      *        decorate.
      * @param driver the ZIP driver.
      */
-    protected KeyManagerController(
+    protected KeyController(
             final FsController<? extends M> controller,
             final D driver) {
         super(controller);
@@ -111,9 +112,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             final IOException keyEx = findKeyException(ex);
             throw null != keyEx ? keyEx : ex;
         }
-        if (name.isRoot())
-            getKeyManager().delete(
-                    driver.resourceUri(getModel(), name.toString()));
+        if (name.isRoot()) {
+            try {
+                getKeyManager().delete(
+                        driver.resourceUri(getModel(), name.toString()));
+            } catch (final ServiceConfigurationError ignore) {
+                // The operation succeeded without a key manager.
+                // This can only mean that the target archive file doesn't
+                // require any keys, so we can and should ignore this exception.
+            }
+        }
     }
 
     private @CheckForNull IOException findKeyException(Throwable ex) {
@@ -131,6 +139,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         delegate.sync(options, handler);
-        getKeyManager().unlock(driver.mountPointUri(getModel()));
+        try {
+            getKeyManager().unlock(driver.mountPointUri(getModel()));
+        } catch (final ServiceConfigurationError ignore) {
+            // The operation succeeded without a key manager.
+            // This can only mean that the target archive file doesn't
+            // require any keys, so we can and should ignore this exception.
+        }
     }
 }

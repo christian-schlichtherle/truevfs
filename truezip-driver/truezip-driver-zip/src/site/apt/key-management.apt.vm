@@ -57,8 +57,8 @@ Key Management
 
 * Setting Passwords For All WinZip AES Entries By Implementing A Custom View
 
-    Another option is to customize the key manager by instantiating the class
-    {{{../../apidocs/de/truezip/driver/zip/PromptingKeyManagerService.html}<<<PromptingKeyManagerService>>>}}
+    Another option is to use a prompting key manager by instantiating the class
+    {{{../../apidocs/de/truezip/key/PromptingKeyManagerProvider.html}<<<PromptingKeyManagerProvider>>>}}
     which applies the Model-View-Controller pattern to manage its key providers.
     Here I simply substitute the default view class with a custom
     implementation.

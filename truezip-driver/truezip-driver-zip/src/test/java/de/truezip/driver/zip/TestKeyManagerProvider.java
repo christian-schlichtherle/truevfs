@@ -4,21 +4,21 @@
  */
 package de.truezip.driver.zip;
 
+import de.truezip.key.AbstractKeyManagerProvider;
 import de.truezip.key.KeyManager;
 import de.truezip.key.MockView;
 import de.truezip.key.param.AesPbeParameters;
-import de.truezip.key.spi.KeyManagerService;
 import java.util.Map;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class TestKeyManagerService extends KeyManagerService {
+public final class TestKeyManagerProvider extends AbstractKeyManagerProvider {
 
     private final MockView<AesPbeParameters> view;
     private final Map<Class<?>, KeyManager<?>> managers;
 
-    public TestKeyManagerService() {
+    public TestKeyManagerProvider() {
         this.managers = newMap(new Object[][]{{
             AesPbeParameters.class,
             new TestKeyManager<AesPbeParameters>(this.view = newView())

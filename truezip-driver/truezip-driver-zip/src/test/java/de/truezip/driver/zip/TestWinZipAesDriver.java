@@ -13,15 +13,15 @@ import de.truezip.key.param.AesPbeParameters;
  */
 public final class TestWinZipAesDriver extends ZipDriver {
 
-    private final TestKeyManagerService service;
+    private final TestKeyManagerProvider service;
 
     public TestWinZipAesDriver(final IOPoolProvider ioPoolProvider) {
         super(ioPoolProvider);
-        this.service = new TestKeyManagerService();
+        this.service = new TestKeyManagerProvider();
     }
 
     @Override
-    protected TestKeyManagerService getKeyManagerProvider() {
+    public TestKeyManagerProvider getKeyManagerProvider() {
         return service;
     }
 

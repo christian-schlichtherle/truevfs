@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.driver.zip.TestKeyManagerService;
+import de.truezip.driver.zip.TestKeyManagerProvider;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.key.MockView;
 import de.truezip.key.param.AesPbeParameters;
@@ -14,15 +14,15 @@ import de.truezip.key.param.AesPbeParameters;
  */
 public class TestZipRaesDriver extends SafeZipRaesDriver {
 
-    private final TestKeyManagerService service;
+    private final TestKeyManagerProvider service;
 
     public TestZipRaesDriver(final IOPoolProvider ioPoolProvider) {
         super(ioPoolProvider);
-        this.service = new TestKeyManagerService();
+        this.service = new TestKeyManagerProvider();
     }
 
     @Override
-    protected TestKeyManagerService getKeyManagerProvider() {
+    public TestKeyManagerProvider getKeyManagerProvider() {
         return service;
     }
 
