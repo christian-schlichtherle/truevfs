@@ -4,6 +4,7 @@
  */
 package de.truezip.driver.file.oio;
 
+import de.truezip.driver.file.io.IOExceptionOutputStream;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
@@ -135,12 +136,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        class OutputStream extends IOExceptionOutputStream {
+        final class Stream extends IOExceptionOutputStream {
             boolean closed;
 
             @CreatesObligation
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            OutputStream() throws FileNotFoundException {
+            Stream() throws FileNotFoundException {
                 super(new FileOutputStream(temp.getFile(), options.get(APPEND))); // Do NOT extend FileOutputStream: It implements finalize(), which may cause deadlocks!
             }
 
@@ -152,11 +153,11 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 closed = true;
                 close(temp, null == exception);
             }
-        } // OutputStream
+        } // Stream
 
         try {
             append(temp);
-            return new OutputStream();
+            return new Stream();
         } catch (IOException ex) {
             release(temp, ex);
             throw ex;

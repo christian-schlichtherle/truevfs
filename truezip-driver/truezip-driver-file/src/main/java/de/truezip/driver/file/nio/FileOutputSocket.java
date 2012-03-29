@@ -4,6 +4,8 @@
  */
 package de.truezip.driver.file.nio;
 
+import de.truezip.driver.file.io.IOExceptionOutputStream;
+import de.truezip.driver.file.io.IOExceptionSeekableByteChannel;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
@@ -178,10 +180,10 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         final FileEntry temp = begin();
 
-        class SeekableByteChannel extends IOExceptionSeekableByteChannel {
+        final class Channel extends IOExceptionSeekableByteChannel {
             boolean closed;
 
-            SeekableByteChannel() throws IOException {
+            Channel() throws IOException {
                 super(newByteChannel(temp.getPath(), optionSet()));
             }
 
@@ -189,18 +191,15 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             public void close() throws IOException {
                 if (closed)
                     return;
+                super.close();
                 closed = true;
-                try {
-                    super.close();
-                } finally {
-                    close(temp, null == exception);
-                }
+                close(temp, null == exception);
             }
-        } // SeekableByteChannel
+        } // Channel
 
         try {
             append(temp);
-            return new SeekableByteChannel();
+            return new Channel();
         } catch (IOException ex) {
             release(temp, ex);
             throw ex;
@@ -212,12 +211,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public OutputStream newOutputStream() throws IOException {
         final FileEntry temp = begin();
 
-        class OutputStream extends de.truezip.driver.file.oio.IOExceptionOutputStream {
+        final class Stream extends IOExceptionOutputStream {
             boolean closed;
 
             @CreatesObligation
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            OutputStream() throws IOException {
+            Stream() throws IOException {
                 super(Files.newOutputStream(temp.getPath(), optionArray()));
             }
 
@@ -229,11 +228,11 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 closed = true;
                 close(temp, null == exception);
             }
-        } // OutputStream
+        } // Stream
 
         try {
             append(temp);
-            return new OutputStream();
+            return new Stream();
         } catch (IOException ex) {
             release(temp, ex);
             throw ex;
