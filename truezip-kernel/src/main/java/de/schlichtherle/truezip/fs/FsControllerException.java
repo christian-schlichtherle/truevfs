@@ -70,21 +70,20 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public abstract class FsControllerException extends IOException {
+abstract class FsControllerException extends IOException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
      * trace or an empty stack trace.
      * If and only if the system property with the name
-     * {@code de.schlichtherle.fs.FsControllerException.traceable} is set to
-     * {@code true} (case is ignored), then instances of this class will have a
-     * regular stack trace, otherwise their stack trace will be empty.
+     * {@code de.schlichtherle.truezip.fs.FsControllerException.traceable}
+     * is set to {@code true} (whereby case is ignored), then instances of this
+     * class will have a regular stack trace, otherwise their stack trace will
+     * be empty.
+     * This should be set to {@code true} for debugging purposes only.
      */
-    protected static final boolean TRACEABLE = Boolean
+    static final boolean TRACEABLE = Boolean
             .getBoolean(FsControllerException.class.getName() + ".traceable");
-
-    private static final StackTraceElement[]
-            EMPTY_STACK = new StackTraceElement[0];
 
     FsControllerException() { }
 
@@ -108,11 +107,7 @@ public abstract class FsControllerException extends IOException {
      * @see <a href="http://blogs.oracle.com/jrose/entry/longjumps_considered_inexpensive">Longjumps Considered Inexpensive</a>
      */
     @Override
-    public FsControllerException fillInStackTrace() {
-        if (TRACEABLE)
-            super.fillInStackTrace();
-        else
-            super.setStackTrace(EMPTY_STACK);
-        return this;
+    public Throwable fillInStackTrace() {
+        return TRACEABLE ? super.fillInStackTrace() : this;
     }
 }
