@@ -18,8 +18,8 @@ import javax.annotation.concurrent.Immutable;
 public class SuspensionPenalty {
 
     /**
-     * The minimum delay between subsequent attempts to verify a key
-     * in milliseconds.
+     * The minimum delay between subsequent attempts to verify a key,
+     * which is {@value} milliseconds.
      */
     public static final int MIN_KEY_RETRY_DELAY = 3 * 1000;
 
@@ -29,7 +29,7 @@ public class SuspensionPenalty {
     /**
      * Call this method in a key verification loop in order to enforce a
      * suspension penalty for providing a wrong key of at least
-     * {@link #MIN_KEY_RETRY_DELAY} milliseconds.
+     * {@value #MIN_KEY_RETRY_DELAY} milliseconds.
      * Interrupting the current thread does not show any effect on this method.
      * 
      * @param  last the last try time.
