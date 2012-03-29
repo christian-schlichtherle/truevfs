@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.file.oio;
+package de.truezip.driver.file.io;
 
 import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -17,12 +17,10 @@ import javax.annotation.WillCloseWhenClosed;
  * in a {@linkplain #exception protected field} for later use.
  *
  * @author Christian Schlichtherle
- * @deprecated This class will be removed in TrueZIP 8.
  */
-public class IOExceptionOutputStream extends DecoratingOutputStream {
+public abstract class IOExceptionOutputStream extends DecoratingOutputStream {
 
     /** The nullable last I/O exception. */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     protected @CheckForNull IOException exception;
 
     /**
