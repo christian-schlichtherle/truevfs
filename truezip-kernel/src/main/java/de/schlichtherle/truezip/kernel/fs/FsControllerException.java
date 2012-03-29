@@ -66,7 +66,6 @@ import javax.annotation.concurrent.Immutable;
  * }</pre>
  * 
  * @see    FsDecoratingController
- *         type from {@code IOException} to {@code RuntimeException})
  * @author Christian Schlichtherle
  */
 @Immutable
