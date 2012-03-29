@@ -129,7 +129,7 @@ extends FsDriver {
     newController(  FsManager manager,
                     FsModel model,
                     @Nonnull FsController<?> parent) {
-        assert model.getParent().equals(parent.getModel());
+        assert parent.getModel().equals(model.getParent());
         return manager.newController(this, model, parent);
     }
 

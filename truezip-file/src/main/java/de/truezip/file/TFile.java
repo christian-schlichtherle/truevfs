@@ -3370,6 +3370,7 @@ public final class TFile extends File {
         return this;
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private static void compact(TFile grown) throws IOException {
         assert grown.isArchive();
         grown = grown.getNormalizedFile();

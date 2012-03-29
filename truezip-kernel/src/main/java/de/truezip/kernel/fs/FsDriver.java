@@ -12,6 +12,7 @@ import javax.annotation.concurrent.Immutable;
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  * 
+ * @see    FsCompositeDriver
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -23,9 +24,9 @@ public abstract class FsDriver {
      * <p>
      * When called, you may assert the following precondition:
      * <pre>{@code
-     * assert null == model.getParent()
-     *         ? null == parent
-     *         : model.getParent().equals(parent.getModel())
+     * assert null == parent
+     *         ? null == model.getParent()
+     *         : parent.getModel().equals(model.getParent())
      * }</pre>
      *
      * @param  manager the file system manager for the new controller.

@@ -12,6 +12,7 @@ import javax.annotation.Nullable;
  * order to lookup the appropriate file system driver which is then used to
  * create the requested thread-safe file system controller.
  *
+ * @see    FsDriver
  * @author Christian Schlichtherle
  */
 public interface FsCompositeDriver {
@@ -26,9 +27,9 @@ public interface FsCompositeDriver {
      * <p>
      * When called, you may assert the following precondition:
      * <pre>{@code
-     * assert null == model.getParent()
-     *         ? null == parent
-     *         : model.getParent().equals(parent.getModel())
+     * assert null == parent
+     *         ? null == model.getParent()
+     *         : parent.getModel().equals(model.getParent())
      * }</pre>
      * 
      * @param  manager the file system manager for the new controller.
