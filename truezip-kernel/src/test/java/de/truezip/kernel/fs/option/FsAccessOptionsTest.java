@@ -4,9 +4,8 @@
  */
 package de.truezip.kernel.fs.option;
 
-import static de.truezip.kernel.fs.option.FsInputOption.CACHE;
-import static de.truezip.kernel.fs.option.FsInputOptions.INPUT_PREFERENCES_MASK;
-import static de.truezip.kernel.fs.option.FsInputOptions.NONE;
+import static de.truezip.kernel.fs.option.FsAccessOption.*;
+import static de.truezip.kernel.fs.option.FsAccessOptions.*;
 import de.truezip.kernel.util.BitField;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -14,18 +13,19 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public class FsInputOptionsTest {
+public class FsAccessOptionsTest {
 
     @Test
     public void testOf() {
         for (final Object[] params : new Object[][] {
             // { $array, $bits }
-            { new FsInputOption[0], NONE },
-            { new FsInputOption[] { CACHE }, INPUT_PREFERENCES_MASK },
+            { new FsAccessOption[0], NONE },
+            { new FsAccessOption[] { CACHE }, INPUT_PREFERENCES_MASK },
+            { new FsAccessOption[] { CACHE, CREATE_PARENTS, STORE, COMPRESS, GROW, ENCRYPT }, OUTPUT_PREFERENCES_MASK },
         }) {
-            final FsInputOption[] array = (FsInputOption[]) params[0];
+            final FsAccessOption[] array = (FsAccessOption[]) params[0];
             final BitField<?> bits = (BitField<?>) params[1];
-            assertEquals(bits, FsInputOptions.of(array));
+            assertEquals(bits, FsAccessOptions.of(array));
         }
     }
 }

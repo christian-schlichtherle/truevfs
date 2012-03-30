@@ -10,8 +10,8 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.*;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.*;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -29,11 +29,11 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private final               FileEntry                entry;
-    private final               BitField<FsOutputOption> options;
+    private final               BitField<FsAccessOption> options;
     private final @CheckForNull Entry                    template;
 
     FileOutputSocket(   final               FileEntry                entry,
-                        final               BitField<FsOutputOption> options,
+                        final               BitField<FsAccessOption> options,
                         final @CheckForNull Entry                    template) {
         assert null != entry;
         assert null != options;

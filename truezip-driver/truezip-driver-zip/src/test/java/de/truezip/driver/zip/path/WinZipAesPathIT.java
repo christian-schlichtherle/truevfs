@@ -6,7 +6,7 @@ package de.truezip.driver.zip.path;
 
 import de.truezip.driver.zip.TestWinZipAesDriver;
 import de.truezip.file.TConfig;
-import static de.truezip.kernel.fs.option.FsOutputOption.ENCRYPT;
+import static de.truezip.kernel.fs.option.FsAccessOption.ENCRYPT;
 import de.truezip.key.MockView;
 import static de.truezip.key.MockView.Action.CANCEL;
 import static de.truezip.key.MockView.Action.ENTER;

@@ -15,9 +15,8 @@ import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.EXCLUSIVE;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -112,7 +111,7 @@ final class FileController extends FsController<FsModel>  {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            BitField<FsOutputOption> options)
+            BitField<FsAccessOption> options)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final Map<Access, Long> t = new EnumMap<Access, Long>(times);
@@ -127,7 +126,7 @@ final class FileController extends FsController<FsModel>  {
     public boolean setTime(
             final FsEntryName name,
             final BitField<Access> types,
-            final long value, BitField<FsOutputOption> options)
+            final long value, BitField<FsAccessOption> options)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final FileTime time = FileTime.fromMillis(value);
@@ -141,14 +140,14 @@ final class FileController extends FsController<FsModel>  {
     @Override
     public InputSocket<?> getInputSocket(
             FsEntryName name,
-            BitField<FsInputOption> options) {
+            BitField<FsAccessOption> options) {
         return new FileEntry(target, name).getInputSocket();
     }
 
     @Override
     public OutputSocket<?> getOutputSocket(
             FsEntryName name,
-            BitField<FsOutputOption> options,
+            BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return new FileEntry(target, name).getOutputSocket(options, template);
     }
@@ -156,7 +155,7 @@ final class FileController extends FsController<FsModel>  {
     @Override
     public void mknod(  final FsEntryName name,
                         final Type type,
-                        final BitField<FsOutputOption> options,
+                        final BitField<FsAccessOption> options,
                         final @CheckForNull Entry template)
     throws IOException {
         final Path file = target.resolve(name.getPath());
@@ -190,7 +189,7 @@ final class FileController extends FsController<FsModel>  {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
     throws IOException {
         Path file = target.resolve(name.getPath());
         delete(file);

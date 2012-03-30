@@ -12,9 +12,8 @@ import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.COMPRESS;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.COMPRESS;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
@@ -80,26 +79,26 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     }
 
     /**
-     * Clears {@link FsInputOption#CACHE} in {@code options} before
+     * Clears {@link FsAccessOption#CACHE} in {@code options} before
      * forwarding the call to {@code controller}.
      */
     @Override
     public InputSocket<?> getInputSocket(   FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<FsInputOption> options) {
+                                            BitField<FsAccessOption> options) {
         return controller.getInputSocket(
                 name,
-                options.clear(FsInputOption.CACHE));
+                options.clear(FsAccessOption.CACHE));
     }
 
     /**
-     * Sets {@link FsOutputOption#COMPRESS} in {@code options} before
+     * Sets {@link FsAccessOption#COMPRESS} in {@code options} before
      * forwarding the call to {@code controller}.
      */
     @Override
     public OutputSocket<?> getOutputSocket( FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<FsOutputOption> options,
+                                            BitField<FsAccessOption> options,
                                             @CheckForNull Entry template) {
         return controller.getOutputSocket(name, options.set(COMPRESS), template);
     }
@@ -109,7 +108,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             String name,
             final Type type,
             final Entry template,
-            final BitField<FsOutputOption> mknod)
+            final BitField<FsAccessOption> mknod)
     throws CharConversionException {
         checkEncodable(name);
         name = normalize(name, type);

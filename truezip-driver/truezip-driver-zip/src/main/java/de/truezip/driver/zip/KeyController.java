@@ -9,7 +9,7 @@ import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.fs.*;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -97,7 +97,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public final void unlink(   final FsEntryName name,
-                                final BitField<FsOutputOption> options)
+                                final BitField<FsAccessOption> options)
     throws IOException {
         try {
             delegate.unlink(name, options);

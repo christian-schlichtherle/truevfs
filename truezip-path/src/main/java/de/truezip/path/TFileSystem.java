@@ -21,9 +21,8 @@ import de.truezip.kernel.fs.FsSyncWarningException;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
 import de.truezip.kernel.fs.addr.FsMountPoint;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.EXCLUSIVE;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import static de.truezip.kernel.fs.option.FsSyncOptions.UMOUNT;
 import de.truezip.kernel.util.BitField;
@@ -244,14 +243,14 @@ public final class TFileSystem extends FileSystem {
         final FsEntryName name = path.getEntryName();
         final FsController<?> controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
-            final BitField<FsInputOption>
-                    o = path.mapInput(options).set(FsInputOption.CACHE);
+            final BitField<FsAccessOption>
+                    o = path.mapInput(options).set(FsAccessOption.CACHE);
             return controller
                     .getInputSocket(name, o)
                     .newSeekableByteChannel();
         } else {
-            final BitField<FsOutputOption>
-                    o = path.mapOutput(options).set(FsOutputOption.CACHE);
+            final BitField<FsAccessOption>
+                    o = path.mapOutput(options).set(FsAccessOption.CACHE);
             try {
                 return controller
                         .getOutputSocket(name, o, null)
@@ -382,13 +381,13 @@ public final class TFileSystem extends FileSystem {
     }
 
     InputSocket<?> getInputSocket(  TPath path,
-                                    BitField<FsInputOption> options) {
+                                    BitField<FsAccessOption> options) {
         return getController()
                 .getInputSocket(path.getEntryName(), options);
     }
 
     OutputSocket<?> getOutputSocket(TPath path,
-                                    BitField<FsOutputOption> options,
+                                    BitField<FsAccessOption> options,
                                     @CheckForNull Entry template) {
         return getController()
                 .getOutputSocket(path.getEntryName(), options, template);

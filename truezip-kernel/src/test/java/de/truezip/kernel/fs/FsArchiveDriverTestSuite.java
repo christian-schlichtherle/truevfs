@@ -15,10 +15,8 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.addr.FsMountPoint;
 import de.truezip.kernel.fs.mock.MockController;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsInputOptions;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import de.truezip.kernel.fs.option.FsOutputOptions;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import de.truezip.kernel.fs.option.FsAccessOptions;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -205,7 +203,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private OutputSocket<?> getArchiveOutputSocket() {
         return getArchiveDriver().getOutputSocket(parent, name,
-                FsOutputOptions.NONE, null);
+                FsAccessOptions.NONE, null);
     }
 
     private void input() throws IOException {
@@ -319,7 +317,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private InputSocket<?> getArchiveInputSocket() {
         return getArchiveDriver().getInputSocket(parent, name,
-                FsInputOptions.NONE);
+                FsAccessOptions.NONE);
     }
 
     private static void close(final Closeable[] resources) throws IOException {
@@ -472,7 +470,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public InputSocket<?> getInputSocket(
                 final FsEntryName name,
-                final BitField<FsInputOption> options) {
+                final BitField<FsAccessOption> options) {
             assert null != name;
             assert null != options;
 
@@ -509,7 +507,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public OutputSocket<?> getOutputSocket(
                 final FsEntryName name,
-                final BitField<FsOutputOption> options,
+                final BitField<FsAccessOption> options,
                 final Entry template) {
             assert null != name;
             assert null != options;

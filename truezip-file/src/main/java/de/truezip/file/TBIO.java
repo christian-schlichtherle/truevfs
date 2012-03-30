@@ -5,14 +5,13 @@
 package de.truezip.file;
 
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.CREATE_PARENTS;
-import de.truezip.kernel.fs.addr.FsPath;
-import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.CREATE_PARENTS;
+import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.util.BitField;
 import java.io.File;
 import java.io.IOException;
@@ -267,7 +266,7 @@ final class TBIO {
      */
     @SuppressWarnings("deprecation")
     static InputSocket<?>
-    getInputSocket(final File src, final BitField<FsInputOption> options) {
+    getInputSocket(final File src, final BitField<FsAccessOption> options) {
         if (src instanceof TFile) {
             final TFile tsrc = (TFile) src;
             final TFile archive = tsrc.getInnerArchive();
@@ -296,7 +295,7 @@ final class TBIO {
     @SuppressWarnings("deprecation")
     static OutputSocket<?>
     getOutputSocket(final File dst,
-                    final BitField<FsOutputOption> options,
+                    final BitField<FsAccessOption> options,
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
             final TFile tdst = (TFile) dst;

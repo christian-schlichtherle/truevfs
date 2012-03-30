@@ -11,9 +11,8 @@ import de.truezip.kernel.fs.FsDecoratingController;
 import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import de.truezip.kernel.fs.option.FsOutputOptions;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import de.truezip.kernel.fs.option.FsAccessOptions;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
@@ -37,7 +36,7 @@ final class FsContextController
 extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
 
     private static final FsOperationContext
-            NULL = new FsOperationContext(FsOutputOptions.NONE);
+            NULL = new FsOperationContext(FsAccessOptions.NONE);
 
     /**
      * Constructs a new file system context controller.
@@ -125,7 +124,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            final BitField<FsOutputOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -142,7 +141,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
             final FsEntryName name,
             final BitField<Access> types,
             final long value,
-            final BitField<FsOutputOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -156,13 +155,13 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
 
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<FsInputOption> options) {
+                                            BitField<FsAccessOption> options) {
         return new Input(delegate.getInputSocket(name, options));
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsOutputOption> options,
+                                            BitField<FsAccessOption> options,
                                             @CheckForNull Entry template) {
         return new Output(delegate.getOutputSocket(name, options, template),
                 options);
@@ -172,7 +171,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
     public void mknod(
             final FsEntryName name,
             final Type type,
-            final BitField<FsOutputOption> options,
+            final BitField<FsAccessOption> options,
             final @CheckForNull Entry template)
     throws IOException {
         final FsTargetArchiveController<?> delegate = this.delegate;
@@ -187,7 +186,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
 
     @Override
     public void unlink( final FsEntryName name,
-                        final BitField<FsOutputOption> options)
+                        final BitField<FsAccessOption> options)
     throws IOException {
         final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -221,7 +220,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
      * @return An operation context holding the given output options.
      */
     private static FsOperationContext makeContext(
-            final BitField<FsOutputOption> options) {
+            final BitField<FsAccessOption> options) {
         return new FsOperationContext(options);
     }
 
@@ -287,7 +286,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         final FsOperationContext operation;
 
         Output( OutputSocket<?> output,
-                BitField<FsOutputOption> options) {
+                BitField<FsAccessOption> options) {
             super(output);
             this.operation = makeContext(options);
         }

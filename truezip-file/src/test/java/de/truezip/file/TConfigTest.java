@@ -6,9 +6,9 @@ package de.truezip.file;
 
 import de.truezip.kernel.fs.FsDriver;
 import de.truezip.kernel.fs.mock.MockArchiveDriver;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsInputOptions;
-import static de.truezip.kernel.fs.option.FsOutputOption.*;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.*;
+import de.truezip.kernel.fs.option.FsAccessOptions;
 import de.truezip.kernel.util.BitField;
 import java.util.NoSuchElementException;
 import static org.hamcrest.CoreMatchers.is;
@@ -132,13 +132,13 @@ public final class TConfigTest {
             assertTrue(c.getInputPreferences().isEmpty());
             assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            c.setInputPreferences(BitField.of(FsInputOption.CACHE));
+            c.setInputPreferences(BitField.of(FsAccessOption.CACHE));
 
             assertTrue(c.isLenient());
-            assertThat(c.getInputPreferences(), is(BitField.of(FsInputOption.CACHE)));
+            assertThat(c.getInputPreferences(), is(BitField.of(FsAccessOption.CACHE)));
             assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            c.setInputPreferences(FsInputOptions.NONE);
+            c.setInputPreferences(FsAccessOptions.NONE);
 
             assertTrue(c.isLenient());
             assertTrue(c.getInputPreferences().isEmpty());

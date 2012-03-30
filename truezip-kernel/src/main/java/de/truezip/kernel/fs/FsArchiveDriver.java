@@ -7,9 +7,8 @@ package de.truezip.kernel.fs;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import de.truezip.kernel.fs.option.FsOutputOptions;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import de.truezip.kernel.fs.option.FsAccessOptions;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
@@ -167,7 +166,7 @@ extends FsDriver {
      */
     public InputSocket<?> getInputSocket(   FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<FsInputOption> options) {
+                                            BitField<FsAccessOption> options) {
         return controller.getInputSocket(name, options);
     }
 
@@ -221,7 +220,7 @@ extends FsDriver {
      */
     public OutputSocket<?> getOutputSocket( FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<FsOutputOption> options,
+                                            BitField<FsAccessOption> options,
                                             @CheckForNull Entry template) {
         return controller.getOutputSocket(name, options, template);
     }
@@ -257,7 +256,7 @@ extends FsDriver {
 
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.truezip.kernel.cio.Entry.Type, de.truezip.kernel.cio.Entry, de.truezip.kernel.util.BitField)
-     * newEntry(name, type, template, FsOutputOptions.NONE)}.
+     * newEntry(name, type, template, FsAccessOptions.NONE)}.
      * 
      * @param  name an entry name.
      * @param  type an entry type.
@@ -270,7 +269,7 @@ extends FsDriver {
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template)
     throws CharConversionException {
-        return newEntry(name, type, template, FsOutputOptions.NONE);
+        return newEntry(name, type, template, FsAccessOptions.NONE);
     }
 
     /**
@@ -301,6 +300,6 @@ extends FsDriver {
             String name,
             Type type,
             @CheckForNull Entry template,
-            BitField<FsOutputOption> mknod)
+            BitField<FsAccessOption> mknod)
     throws CharConversionException;
 }

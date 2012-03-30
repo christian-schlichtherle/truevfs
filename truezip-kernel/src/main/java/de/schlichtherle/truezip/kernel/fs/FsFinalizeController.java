@@ -9,8 +9,7 @@ import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDecoratingController;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -61,13 +60,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<FsInputOption> options) {
+                                            BitField<FsAccessOption> options) {
         return SOCKET_FACTORY.newInputSocket(this, name, options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsOutputOption> options,
+                                            BitField<FsAccessOption> options,
                                             @CheckForNull Entry template) {
         return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
     }
@@ -98,7 +97,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             InputSocket<?> newInputSocket(
                     FsFinalizeController controller,
                     FsEntryName name,
-                    BitField<FsInputOption> options) {
+                    BitField<FsAccessOption> options) {
                 return controller.new Nio2Input(name, options);
             }
 
@@ -106,7 +105,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             OutputSocket<?> newOutputSocket(
                     FsFinalizeController controller,
                     FsEntryName name,
-                    BitField<FsOutputOption> options,
+                    BitField<FsAccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Nio2Output(name, options, template);
             }
@@ -117,7 +116,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             InputSocket<?> newInputSocket(
                     FsFinalizeController controller,
                     FsEntryName name,
-                    BitField<FsInputOption> options) {
+                    BitField<FsAccessOption> options) {
                 return controller.new Input(name, options);
             }
 
@@ -125,7 +124,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             OutputSocket<?> newOutputSocket(
                     FsFinalizeController controller,
                     FsEntryName name,
-                    BitField<FsOutputOption> options,
+                    BitField<FsAccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Output(name, options, template);
             }
@@ -134,19 +133,19 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         abstract InputSocket<?> newInputSocket(
                 FsFinalizeController controller,
                 FsEntryName name,
-                BitField<FsInputOption> options);
+                BitField<FsAccessOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
                 FsFinalizeController controller,
                 FsEntryName name,
-                BitField<FsOutputOption> options,
+                BitField<FsAccessOption> options,
                 @CheckForNull Entry template);
     } // SocketFactory
 
     @Immutable
     private final class Nio2Input extends Input {
         Nio2Input(  final FsEntryName name,
-                    final BitField<FsInputOption> options) {
+                    final BitField<FsAccessOption> options) {
             super(name, options);
         }
 
@@ -160,7 +159,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Immutable
     private class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
-                final BitField<FsInputOption> options) {
+                final BitField<FsAccessOption> options) {
             super(FsFinalizeController.this.delegate
                     .getInputSocket(name, options));
         }
@@ -181,7 +180,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Immutable
     private final class Nio2Output extends Output {
         Nio2Output( final FsEntryName name,
-                    final BitField<FsOutputOption> options,
+                    final BitField<FsAccessOption> options,
                     final @CheckForNull Entry template) {
             super(name, options, template);
         }
@@ -196,7 +195,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Immutable
     private class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
-                final BitField<FsOutputOption> options,
+                final BitField<FsAccessOption> options,
                 final @CheckForNull Entry template) {
             super(FsFinalizeController.this.delegate
                     .getOutputSocket(name, options, template));
