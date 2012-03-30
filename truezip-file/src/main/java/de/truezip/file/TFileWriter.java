@@ -46,24 +46,6 @@ public final class TFileWriter extends OutputStreamWriter {
      * Constructs a new {@code TFile} writer.
      * This writer uses the default character set for encoding characters
      * to bytes.
-     * <p>
-     * TODO: Remove this redundant constructor in TrueZIP 8.
-     * 
-     * @param  file a file to write.
-     * @throws FileNotFoundException on any I/O failure.
-     */
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings({
-        "DM_DEFAULT_ENCODING", "OBL_UNSATISFIED_OBLIGATION"
-    })
-    public TFileWriter(TFile file) throws FileNotFoundException {
-        super(new TFileOutputStream(file));
-    }
-
-    /**
-     * Constructs a new {@code TFile} writer.
-     * This writer uses the default character set for encoding characters
-     * to bytes.
      * 
      * @param  file a file to write.
      * @param  append iff {@code true}, then this writer appends the data to the
@@ -75,26 +57,6 @@ public final class TFileWriter extends OutputStreamWriter {
         "DM_DEFAULT_ENCODING", "OBL_UNSATISFIED_OBLIGATION"
     })
     public TFileWriter(File file, boolean append) throws FileNotFoundException {
-        super(new TFileOutputStream(file, append));
-    }
-
-    /**
-     * Constructs a new {@code TFile} writer.
-     * This writer uses the default character set for encoding characters
-     * to bytes.
-     * <p>
-     * TODO: Remove this redundant constructor in TrueZIP 8.
-     * 
-     * @param  file a file to write.
-     * @param  append iff {@code true}, then this writer appends the data to the
-     *         given file.
-     * @throws FileNotFoundException on any I/O failure.
-     */
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings({
-        "DM_DEFAULT_ENCODING", "OBL_UNSATISFIED_OBLIGATION"
-    })
-    public TFileWriter(TFile file, boolean append) throws FileNotFoundException {
         super(new TFileOutputStream(file, append));
     }
 
@@ -126,24 +88,6 @@ public final class TFileWriter extends OutputStreamWriter {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileWriter(File file, boolean append, CharsetEncoder encoder)
-    throws FileNotFoundException {
-        super(new TFileOutputStream(file, append), encoder);
-    }
-
-    /**
-     * Constructs a new {@code TFile} writer.
-     * <p>
-     * TODO: Remove this redundant constructor in TrueZIP 8.
-     * 
-     * @param  file a file to write.
-     * @param  append iff {@code true}, then this writer appends the data to the
-     *         given file.
-     * @param  encoder an encoder for encoding characters to bytes.
-     * @throws FileNotFoundException on any I/O failure.
-     */
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public TFileWriter(TFile file, boolean append, CharsetEncoder encoder)
     throws FileNotFoundException {
         super(new TFileOutputStream(file, append), encoder);
     }
