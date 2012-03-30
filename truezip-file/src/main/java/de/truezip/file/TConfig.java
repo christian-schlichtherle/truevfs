@@ -251,7 +251,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
             DEFAULT_INPUT_PREFERENCES = FsAccessOptions.NONE;
 
     private static final BitField<FsAccessOption>
-            INPUT_PREFERENCES_COMPLEMENT_MASK = INPUT_PREFERENCES_MASK.not();
+            NOT_INPUT_PREFERENCES_MASK = INPUT_PREFERENCES_MASK.not();
 
     /**
      * The default value of the
@@ -262,7 +262,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
             DEFAULT_OUTPUT_PREFERENCES = BitField.of(CREATE_PARENTS);
 
     private static final BitField<FsAccessOption>
-            OUTPUT_PREFERENCES_COMPLEMENT_MASK = OUTPUT_PREFERENCES_MASK.not();
+            NOT_OUTPUT_PREFERENCES_MASK = OUTPUT_PREFERENCES_MASK.not();
 
     private static final InheritableThreadLocalStack<TConfig>
             configs = new InheritableThreadLocalStack<TConfig>();
@@ -467,10 +467,10 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      *         {@link FsAccessOptions#INPUT_PREFERENCES_MASK}.
      */
     public void setInputPreferences(final BitField<FsAccessOption> preferences) {
-        final BitField<FsAccessOption> illegal = preferences
-                .and(INPUT_PREFERENCES_COMPLEMENT_MASK);
+        final BitField<FsAccessOption>
+                illegal = preferences.and(NOT_INPUT_PREFERENCES_MASK);
         if (!illegal.isEmpty())
-            throw new IllegalArgumentException(preferences + " (illegal input preferences)");
+            throw new IllegalArgumentException(illegal + " (illegal input preference(s))");
         this.inputPreferences = preferences;
     }
 
@@ -496,10 +496,10 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      *         {@link FsAccessOption#COMPRESS} have been set.
      */
     public void setOutputPreferences(final BitField<FsAccessOption> preferences) {
-        final BitField<FsAccessOption> illegal = preferences
-                .and(OUTPUT_PREFERENCES_COMPLEMENT_MASK);
+        final BitField<FsAccessOption>
+                illegal = preferences.and(NOT_OUTPUT_PREFERENCES_MASK);
         if (!illegal.isEmpty())
-            throw new IllegalArgumentException(preferences + " (illegal output preferences)");
+            throw new IllegalArgumentException(illegal + " (illegal output preference(s))");
         if (preferences.get(STORE) && preferences.get(COMPRESS))
             throw new IllegalArgumentException(preferences + " (either STORE or COMPRESS may be set, but not both)");
         this.outputPreferences = preferences;
