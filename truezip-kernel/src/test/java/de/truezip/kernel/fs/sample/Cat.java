@@ -10,7 +10,7 @@ import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsSimpleCompositeDriver;
 import de.truezip.kernel.fs.addr.FsPath;
 import de.truezip.kernel.fs.addr.FsUriModifier;
-import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsSyncOptions;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.sl.FsDriverLocator;
@@ -82,7 +82,7 @@ public final class Cat {
             InputSocket<?> socket = manager
                     .getController(     path.getMountPoint(), driver)
                     .getInputSocket(    path.getEntryName(),
-                                        BitField.noneOf(FsInputOption.class));
+                                        BitField.noneOf(FsAccessOption.class));
             // Copy the data.
             // For this small example, we could skip the call to in.close() or
             // use Streams.copy(in, out), but this would not be correct if this

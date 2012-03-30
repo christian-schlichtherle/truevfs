@@ -13,7 +13,7 @@ import de.truezip.kernel.fs.FsArchiveDriver;
 import de.truezip.kernel.fs.FsArchiveEntry;
 import de.truezip.kernel.fs.FsFileSystemException;
 import de.truezip.kernel.fs.FsReadOnlyFileSystemException;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import java.util.Map;
 import javax.annotation.CheckForNull;
@@ -53,7 +53,7 @@ extends FsArchiveFileSystem<E> {
     FsArchiveFileSystemOperation<E> mknod(
             FsEntryName name,
             Type type,
-            BitField<FsOutputOption> options,
+            BitField<FsAccessOption> options,
             Entry template)
     throws FsFileSystemException {
         throw new FsReadOnlyFileSystemException();

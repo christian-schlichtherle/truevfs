@@ -5,13 +5,11 @@
 package de.truezip.file;
 
 import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsInputOptions;
-import static de.truezip.kernel.fs.option.FsInputOptions.INPUT_PREFERENCES_MASK;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.*;
-import de.truezip.kernel.fs.option.FsOutputOptions;
-import static de.truezip.kernel.fs.option.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.*;
+import de.truezip.kernel.fs.option.FsAccessOptions;
+import static de.truezip.kernel.fs.option.FsAccessOptions.INPUT_PREFERENCES_MASK;
+import static de.truezip.kernel.fs.option.FsAccessOptions.OUTPUT_PREFERENCES_MASK;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.InheritableThreadLocalStack;
@@ -72,10 +70,10 @@ class MyApplication extends TApplication<IOException> {
         // Configure custom application file format.
         config.setArchiveDetector(new TArchiveDetector("aff",
                 new JarDriver(IOPoolLocator.SINGLETON)));
-        // Set FsOutputOption.GROW for appending-to rather than reassembling
+        // Set FsAccessOption.GROW for appending-to rather than reassembling
         // existing archive files.
         config.setOutputPreferences(
-                config.getOutputPreferences.set(FsOutputOption.GROW));
+                config.getOutputPreferences.set(FsAccessOption.GROW));
     }
 
     ...
@@ -148,7 +146,7 @@ try (TConfig config = TConfig.push()) {
  * the resulting archive file.
  * <p>
  * Therefore, you can change this strategy by setting the
- * {@link FsOutputOption#GROW} output option preference when writing archive
+ * {@link FsAccessOption#GROW} output option preference when writing archive
  * entry contents or updating their meta data.
  * When set, this output option allows archive files to grow by appending new
  * or updated archive entries to their end and inhibiting archive update
@@ -163,10 +161,10 @@ TFile file = new TFile("archive.zip/entry");
 // stack.
 TConfig config = TConfig.push();
 try {
-    // Set FsOutputOption.GROW for appending-to rather than reassembling
+    // Set FsAccessOption.GROW for appending-to rather than reassembling
     // existing archive files.
     config.setOutputPreferences(
-            config.getOutputPreferences.set(FsOutputOption.GROW));
+            config.getOutputPreferences.set(FsAccessOption.GROW));
 
     // Now use the current configuration and append the entry to the archive
     // file even if it's already present.
@@ -247,23 +245,23 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     /**
      * The default value of the
      * {@link #getInputPreferences input preferences} property, which is
-     * {@link FsInputOptions#NONE}.
+     * {@link FsAccessOptions#NONE}.
      */
-    public static final BitField<FsInputOption>
-            DEFAULT_INPUT_PREFERENCES = FsInputOptions.NONE;
+    public static final BitField<FsAccessOption>
+            DEFAULT_INPUT_PREFERENCES = FsAccessOptions.NONE;
 
-    private static final BitField<FsInputOption>
+    private static final BitField<FsAccessOption>
             INPUT_PREFERENCES_COMPLEMENT_MASK = INPUT_PREFERENCES_MASK.not();
 
     /**
      * The default value of the
      * {@link #getOutputPreferences output preferences} property, which is
-     * <code>{@link BitField}.of({@link FsOutputOption#CREATE_PARENTS})</code>.
+     * <code>{@link BitField}.of({@link FsAccessOption#CREATE_PARENTS})</code>.
      */
-    public static final BitField<FsOutputOption>
+    public static final BitField<FsAccessOption>
             DEFAULT_OUTPUT_PREFERENCES = BitField.of(CREATE_PARENTS);
 
-    private static final BitField<FsOutputOption>
+    private static final BitField<FsAccessOption>
             OUTPUT_PREFERENCES_COMPLEMENT_MASK = OUTPUT_PREFERENCES_MASK.not();
 
     private static final InheritableThreadLocalStack<TConfig>
@@ -279,8 +277,8 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     // local configuration which has been obtained by a call to TConfig.push().
     private FsManager manager;
     private TArchiveDetector detector;
-    private BitField<FsInputOption> inputPreferences;
-    private BitField<FsOutputOption> outputPreferences;
+    private BitField<FsAccessOption> inputPreferences;
+    private BitField<FsAccessOption> outputPreferences;
 
     /**
      * Returns the current configuration.
@@ -454,7 +452,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * 
      * @return The input preferences.
      */
-    public BitField<FsInputOption> getInputPreferences() {
+    public BitField<FsAccessOption> getInputPreferences() {
         return this.inputPreferences;
     }
 
@@ -466,10 +464,10 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @param  preferences the input preferences.
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
-     *         {@link FsInputOptions#INPUT_PREFERENCES_MASK}.
+     *         {@link FsAccessOptions#INPUT_PREFERENCES_MASK}.
      */
-    public void setInputPreferences(final BitField<FsInputOption> preferences) {
-        final BitField<FsInputOption> illegal = preferences
+    public void setInputPreferences(final BitField<FsAccessOption> preferences) {
+        final BitField<FsAccessOption> illegal = preferences
                 .and(INPUT_PREFERENCES_COMPLEMENT_MASK);
         if (!illegal.isEmpty())
             throw new IllegalArgumentException(preferences + " (illegal input preferences)");
@@ -481,7 +479,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * 
      * @return The output preferences.
      */
-    public BitField<FsOutputOption> getOutputPreferences() {
+    public BitField<FsAccessOption> getOutputPreferences() {
         return this.outputPreferences;
     }
 
@@ -493,12 +491,12 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @param  preferences the output preferences.
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
-     *         {@link FsOutputOptions#OUTPUT_PREFERENCES_MASK} or if both
-     *         {@link FsOutputOption#STORE} and
-     *         {@link FsOutputOption#COMPRESS} have been set.
+     *         {@link FsAccessOptions#OUTPUT_PREFERENCES_MASK} or if both
+     *         {@link FsAccessOption#STORE} and
+     *         {@link FsAccessOption#COMPRESS} have been set.
      */
-    public void setOutputPreferences(final BitField<FsOutputOption> preferences) {
-        final BitField<FsOutputOption> illegal = preferences
+    public void setOutputPreferences(final BitField<FsAccessOption> preferences) {
+        final BitField<FsAccessOption> illegal = preferences
                 .and(OUTPUT_PREFERENCES_COMPLEMENT_MASK);
         if (!illegal.isEmpty())
             throw new IllegalArgumentException(preferences + " (illegal output preferences)");

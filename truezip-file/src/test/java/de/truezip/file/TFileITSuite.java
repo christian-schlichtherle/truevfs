@@ -6,7 +6,7 @@ package de.truezip.file;
 
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.*;
-import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
+import static de.truezip.kernel.fs.option.FsAccessOption.GROW;
 import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_IO;
 import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;

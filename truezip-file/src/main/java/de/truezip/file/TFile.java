@@ -17,10 +17,10 @@ import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
 import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.fs.*;
 import static de.truezip.kernel.fs.addr.FsUriModifier.CANONICALIZE;
-import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
-import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
+import static de.truezip.kernel.fs.option.FsAccessOption.EXCLUSIVE;
+import static de.truezip.kernel.fs.option.FsAccessOption.GROW;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.io.Paths.Splitter;
 import de.truezip.kernel.io.Streams;
@@ -3327,7 +3327,7 @@ public final class TFile extends File {
      * then this operation does nothing and returns immediately.
      * <p>
      * This operation is intended to compact archive files which have been
-     * frequently updated with {@link FsOutputOption#GROW} or similar means.
+     * frequently updated with {@link FsAccessOption#GROW} or similar means.
      * If this output option preference is set and an archive file is updated
      * frequently, then over time a lot of redundant artifacts such as archive
      * entry contents and meta data, including central directories may be
@@ -3362,7 +3362,7 @@ public final class TFile extends File {
      * 
      * @return this
      * @throws IOException On any I/O error.
-     * @see    FsOutputOption#GROW
+     * @see    FsAccessOption#GROW
      */
     public TFile compact() throws IOException {
         if (isTopLevelArchive()) // see http://java.net/jira/browse/TRUEZIP-205
@@ -3380,7 +3380,7 @@ public final class TFile extends File {
         final String suffix = getSuffix(grown);
         final TConfig config = TConfig.push();
         try {
-            // Switch off FsOutputOption.GROW.
+            // Switch off FsAccessOption.GROW.
             config.setOutputPreferences(
                     config.getOutputPreferences().clear(GROW));
 

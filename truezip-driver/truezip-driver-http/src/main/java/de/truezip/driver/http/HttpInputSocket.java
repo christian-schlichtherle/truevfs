@@ -5,13 +5,12 @@
 package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.IOBuffer;
-import de.truezip.kernel.fs.option.FsInputOption;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.cio.IOPool;
-import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -31,7 +30,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
     private final HttpEntry entry;
 
     HttpInputSocket(final HttpEntry                entry, 
-                    final BitField<FsInputOption> options) {
+                    final BitField<FsAccessOption> options) {
         assert null != entry;
         assert null != options;
         this.entry = entry;

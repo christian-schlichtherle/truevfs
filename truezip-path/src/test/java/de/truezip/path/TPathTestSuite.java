@@ -12,7 +12,7 @@ import de.truezip.kernel.fs.FsArchiveDriver;
 import de.truezip.kernel.fs.FsResourceOpenException;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.FsSyncWarningException;
-import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
+import static de.truezip.kernel.fs.option.FsAccessOption.GROW;
 import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_IO;
 import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
@@ -470,10 +470,10 @@ extends ConfiguredClientTestBase<D> {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
-        createFile(file1); // uses FsOutputOption.CACHE!
+        createFile(file1); // uses FsAccessOption.CACHE!
         umount();
         final InputStream in1 = newInputStream(file1);
-        createFile(file2); // uses FsOutputOption.CACHE!
+        createFile(file2); // uses FsAccessOption.CACHE!
         try {
             copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
 

@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import static de.truezip.kernel.fs.option.FsOutputOption.APPEND;
+import static de.truezip.kernel.fs.option.FsAccessOption.APPEND;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.cio.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

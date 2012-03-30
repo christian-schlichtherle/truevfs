@@ -10,8 +10,7 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -85,7 +84,7 @@ extends FsController<M> {
     public boolean setTime(
             FsEntryName name,
             Map<Access, Long> times,
-            BitField<FsOutputOption> options)
+            BitField<FsAccessOption> options)
     throws IOException {
         return delegate.setTime(name, times, options);
     }
@@ -95,7 +94,7 @@ extends FsController<M> {
             FsEntryName name,
             BitField<Access> types,
             long value,
-            BitField<FsOutputOption> options)
+            BitField<FsAccessOption> options)
     throws IOException {
         return delegate.setTime(name, types, value, options);
     }
@@ -103,14 +102,14 @@ extends FsController<M> {
     @Override
     public InputSocket<?>
     getInputSocket( FsEntryName name,
-                    BitField<FsInputOption> options) {
+                    BitField<FsAccessOption> options) {
         return delegate.getInputSocket(name, options);
     }
 
     @Override
     public OutputSocket<?>
     getOutputSocket(    FsEntryName name,
-                        BitField<FsOutputOption> options,
+                        BitField<FsAccessOption> options,
                         Entry template) {
         return delegate.getOutputSocket(name, options, template);
     }
@@ -119,14 +118,14 @@ extends FsController<M> {
     public void
     mknod(  FsEntryName name,
             Type type,
-            BitField<FsOutputOption> options,
+            BitField<FsAccessOption> options,
             Entry template)
     throws IOException {
         delegate.mknod(name, type, options, template);
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
     throws IOException {
         delegate.unlink(name, options);
     }

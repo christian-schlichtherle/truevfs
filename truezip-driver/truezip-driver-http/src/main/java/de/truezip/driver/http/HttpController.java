@@ -16,8 +16,7 @@ import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.addr.FsPath;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -99,7 +98,7 @@ public class HttpController extends FsController<FsModel>  {
             FsEntryName name,
             BitField<Access> types,
             long value,
-            BitField<FsOutputOption> options)
+            BitField<FsAccessOption> options)
     throws IOException {
         throw new ReadOnlyFileSystemTypeException();
     }
@@ -107,14 +106,14 @@ public class HttpController extends FsController<FsModel>  {
     @Override
     public InputSocket<?> getInputSocket(
             FsEntryName name,
-            BitField<FsInputOption> options) {
+            BitField<FsAccessOption> options) {
         return newEntry(name).newInputSocket(options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket(
             FsEntryName name,
-            BitField<FsOutputOption> options,
+            BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return newEntry(name).newOutputSocket(options, template);
     }
@@ -122,14 +121,14 @@ public class HttpController extends FsController<FsModel>  {
     @Override
     public void mknod(  final FsEntryName name,
                         final Type type,
-                        final BitField<FsOutputOption> options,
+                        final BitField<FsAccessOption> options,
                         final @CheckForNull Entry template)
     throws IOException {
         throw new ReadOnlyFileSystemTypeException();
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsOutputOption> options)
+    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
     throws IOException {
         throw new ReadOnlyFileSystemTypeException();
     }

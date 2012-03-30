@@ -11,8 +11,7 @@ import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.addr.FsMountPoint;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -240,7 +239,7 @@ public abstract class FsController<M extends FsModel> {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            final BitField<FsOutputOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         boolean ok = true;
         for (Map.Entry<Access, Long> time : times.entrySet())
@@ -272,7 +271,7 @@ public abstract class FsController<M extends FsModel> {
             FsEntryName name,
             BitField<Access> types,
             long value,
-            BitField<FsOutputOption> options)
+            BitField<FsAccessOption> options)
     throws IOException;
 
     /**
@@ -285,7 +284,7 @@ public abstract class FsController<M extends FsModel> {
      */
     public abstract InputSocket<?>
     getInputSocket( FsEntryName name,
-                    BitField<FsInputOption> options);
+                    BitField<FsAccessOption> options);
 
     /**
      * Returns an output socket for writing the contents of the entry addressed
@@ -302,7 +301,7 @@ public abstract class FsController<M extends FsModel> {
      */
     public abstract OutputSocket<?>
     getOutputSocket(FsEntryName name,
-                    BitField<FsOutputOption> options,
+                    BitField<FsAccessOption> options,
                     @CheckForNull Entry template);
 
     /**
@@ -312,7 +311,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the file system entry name.
      * @param  type the file system entry type.
      * @param  options the file system output options.
-     *         If {@link FsOutputOption#CREATE_PARENTS} is set, any missing
+     *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
      *         parent directories will be created and linked into the file
      *         system with its last modification time set to the system's
      *         current time.
@@ -326,7 +325,7 @@ public abstract class FsController<M extends FsModel> {
      *         <li>{@code name} contains characters which are not
      *             supported by the file system.
      *         <li>The entry already exists and either the option
-     *             {@link FsOutputOption#EXCLUSIVE} is set or the entry is a
+     *             {@link FsAccessOption#EXCLUSIVE} is set or the entry is a
      *             directory.
      *         <li>The entry exists as a different type.
      *         <li>A parent entry exists but is not a directory.
@@ -337,7 +336,7 @@ public abstract class FsController<M extends FsModel> {
     public abstract void
     mknod(  FsEntryName name,
             Type type,
-            BitField<FsOutputOption> options,
+            BitField<FsAccessOption> options,
             @CheckForNull Entry template)
     throws IOException;
 
@@ -350,7 +349,7 @@ public abstract class FsController<M extends FsModel> {
      * @throws IOException on any I/O failure.
      */
     public abstract void
-    unlink(FsEntryName name, BitField<FsOutputOption> options)
+    unlink(FsEntryName name, BitField<FsAccessOption> options)
     throws IOException;
 
     /**

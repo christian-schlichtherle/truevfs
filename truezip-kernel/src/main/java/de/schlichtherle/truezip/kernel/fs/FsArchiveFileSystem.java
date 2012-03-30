@@ -16,10 +16,10 @@ import de.truezip.kernel.fs.FsArchiveEntry;
 import de.truezip.kernel.fs.FsFileSystemException;
 import de.truezip.kernel.fs.addr.FsEntryName;
 import static de.truezip.kernel.fs.addr.FsEntryName.*;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.CREATE_PARENTS;
-import static de.truezip.kernel.fs.option.FsOutputOption.EXCLUSIVE;
-import de.truezip.kernel.fs.option.FsOutputOptions;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.CREATE_PARENTS;
+import static de.truezip.kernel.fs.option.FsAccessOption.EXCLUSIVE;
+import de.truezip.kernel.fs.option.FsAccessOptions;
 import de.truezip.kernel.io.Paths.Normalizer;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import static de.truezip.kernel.io.Paths.isRoot;
@@ -78,7 +78,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.factory = driver;
-        final E root = newEntry(ROOT_PATH, DIRECTORY, FsOutputOptions.NONE, null);
+        final E root = newEntry(ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -153,7 +153,7 @@ implements Iterable<FsCovariantEntry<E>> {
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
         master.add(ROOT_PATH, newEntry(
-                ROOT_PATH, DIRECTORY, FsOutputOptions.NONE, rootTemplate));
+                ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, rootTemplate));
         this.master = master;
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this must be done
@@ -187,7 +187,7 @@ implements Iterable<FsCovariantEntry<E>> {
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
             parent = master.add(parentPath, newEntry(
-                    parentPath, DIRECTORY, FsOutputOptions.NONE, null));
+                    parentPath, DIRECTORY, FsAccessOptions.NONE, null));
         parent.add(memberName);
         fix(parentPath);
     }
@@ -309,7 +309,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private E newEntry(
             final String name,
             final Type type,
-            final BitField<FsOutputOption> mknod,
+            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
@@ -337,7 +337,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private E newCheckedEntry(
             final String name,
             final Type type,
-            final BitField<FsOutputOption> mknod,
+            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template)
     throws FsFileSystemException {
         assert null != type;
@@ -381,7 +381,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *             supported by the file system.
      *         <li>TODO: type is not {@code FILE} or {@code DIRECTORY}.
      *         <li>The entry already exists and either the option
-     *             {@link FsOutputOption#EXCLUSIVE} is set or the entry is a
+     *             {@link FsAccessOption#EXCLUSIVE} is set or the entry is a
      *             directory.
      *         <li>The entry exists as a different type.
      *         <li>A parent entry exists but is not a directory.
@@ -396,7 +396,7 @@ implements Iterable<FsCovariantEntry<E>> {
     FsArchiveFileSystemOperation<E> mknod(
             final FsEntryName name,
             final Entry.Type type,
-            final BitField<FsOutputOption> options,
+            final BitField<FsAccessOption> options,
             @CheckForNull Entry template)
     throws FsFileSystemException {
         if (null == type)
@@ -432,16 +432,16 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     private final class PathLink implements FsArchiveFileSystemOperation<E> {
         final boolean createParents;
-        final BitField<FsOutputOption> options;
+        final BitField<FsAccessOption> options;
         final SegmentLink<E>[] links;
         long time = UNKNOWN;
 
         PathLink(   final String path,
                     final Entry.Type type,
-                    final BitField<FsOutputOption> options,
+                    final BitField<FsAccessOption> options,
                     @CheckForNull final Entry template)
         throws FsFileSystemException {
-            // Consume FsOutputOption.CREATE_PARENTS.
+            // Consume FsAccessOption.CREATE_PARENTS.
             this.createParents = options.get(CREATE_PARENTS);
             this.options = options.clear(CREATE_PARENTS);
             links = newSegmentLinks(1, path, type, template);

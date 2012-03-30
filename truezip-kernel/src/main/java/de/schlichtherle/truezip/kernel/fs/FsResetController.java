@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.kernel.fs;
 
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsSyncOptions.RESET;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
@@ -33,7 +33,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public void unlink( final FsEntryName name,
-                        final BitField<FsOutputOption> options)
+                        final BitField<FsAccessOption> options)
     throws IOException {
         boolean checkRoot = true;
         try {

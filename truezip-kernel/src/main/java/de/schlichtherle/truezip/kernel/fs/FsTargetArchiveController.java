@@ -18,11 +18,10 @@ import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.*;
 import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
-import static de.truezip.kernel.fs.option.FsOutputOption.CACHE;
-import static de.truezip.kernel.fs.option.FsOutputOption.GROW;
-import static de.truezip.kernel.fs.option.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
+import de.truezip.kernel.fs.option.FsAccessOption;
+import static de.truezip.kernel.fs.option.FsAccessOption.CACHE;
+import static de.truezip.kernel.fs.option.FsAccessOption.GROW;
+import static de.truezip.kernel.fs.option.FsAccessOptions.OUTPUT_PREFERENCES_MASK;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import static de.truezip.kernel.fs.option.FsSyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
@@ -57,8 +56,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class FsTargetArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
-    private static final BitField<FsInputOption>
-            MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
+    private static final BitField<FsAccessOption>
+            MOUNT_INPUT_OPTIONS = BitField.of(FsAccessOption.CACHE);
 
     private final FsArchiveDriver<E> driver;
     
@@ -242,7 +241,7 @@ extends FsFileSystemArchiveController<E> {
         OutputArchive<E> oa = getCheckedOutputArchive();
         if (null != oa)
             return oa;
-        final BitField<FsOutputOption> options = getContext()
+        final BitField<FsAccessOption> options = getContext()
                 .getOutputOptions()
                 .and(OUTPUT_PREFERENCES_MASK)
                 .set(CACHE);

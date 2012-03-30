@@ -12,8 +12,7 @@ import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsSimpleCompositeDriver;
 import de.truezip.kernel.fs.addr.FsPath;
 import de.truezip.kernel.fs.addr.FsUriModifier;
-import de.truezip.kernel.fs.option.FsInputOption;
-import de.truezip.kernel.fs.option.FsOutputOption;
+import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsSyncOptions;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.sl.FsManagerLocator;
@@ -79,7 +78,7 @@ public final class Copy {
             InputSocket<?> srcSocket = manager
                     .getController(     srcPath.getMountPoint(), driver)
                     .getInputSocket(    srcPath.getEntryName(),
-                                        BitField.noneOf(FsInputOption.class));
+                                        BitField.noneOf(FsAccessOption.class));
             // Resolve the destination socket. Again, we need an absolute URI.
             URI dstUri = URI.create(dst);
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
@@ -87,8 +86,8 @@ public final class Copy {
             OutputSocket<?> dstSocket = manager
                     .getController(     dstPath.getMountPoint(), driver)
                     .getOutputSocket(   dstPath.getEntryName(),
-                                        BitField.of(FsOutputOption.CREATE_PARENTS,
-                                                    FsOutputOption.EXCLUSIVE),
+                                        BitField.of(FsAccessOption.CREATE_PARENTS,
+                                                    FsAccessOption.EXCLUSIVE),
                                         srcSocket.getLocalTarget());
             IOSocket.copy(srcSocket, dstSocket); // copy the data
         } finally {

@@ -9,26 +9,25 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Defines options for output operations.
+ * Defines common access options for I/O operations.
  * Not all options may be supported or available for all operations and
  * certain combinations may even be illegal.
  * It's up to the particular operation and file system driver implementation
  * to define which options are supported and available.
- * If an option is not supported, it must get silently ignored.
+ * If an option is not supported, it should get silently ignored.
  * If an option is not available or illegal, an {@link IOException} must get
  * thrown.
  *
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum FsOutputOption {
+public enum FsAccessOption {
 
     /**
-     * Whether or not the entry data read by an input socket shall get
-     * cached for subsequent access.
-     * As a desired side effect, caching allows a file system controller to
-     * {@link FsController#sync} the entry data to the backing storage
-     * (e.g. a parent file system) while some client is still busy on reading
+     * Whether or not the entry data shall get cached for subsequent access.
+     * As a desired side effect, caching allows a federated file system (i.e.
+     * prospective archive file) to {@link FsController#sync} its contents to
+     * its parent file system while some client is still busy on reading
      * or writing the cached entry data.
      */
     CACHE,
@@ -39,32 +38,14 @@ public enum FsOutputOption {
      */
     CREATE_PARENTS,
 
+    /** Whether or not an entry must be exclusively created. */
+    EXCLUSIVE,
+
     /**
      * Whether or not the new entry contents shall get appended to the existing
      * entry contents rather than replacing them entirely.
      */
     APPEND,
-
-    /** Whether or not an entry must be exclusively created. */
-    EXCLUSIVE,
-
-    /**
-     * Expresses a preference to store an entry uncompressed within its archive.
-     * <p>
-     * Note that this option may get ignored by archive file system drivers.
-     * Furthermore, if this happens, there may be no direct feedback available
-     * to the caller.
-     */
-    STORE,
-
-    /**
-     * Expresses a preference to compress an entry within its archive.
-     * <p>
-     * Note that this option may get ignored by archive file system drivers.
-     * Furthermore, if this happens, there may be no direct feedback available
-     * to the caller.
-     */
-    COMPRESS,
 
     /**
      * Expresses a preference to allow an archive file to grow by appending any
@@ -83,6 +64,24 @@ public enum FsOutputOption {
      * to the caller.
      */
     GROW,
+
+    /**
+     * Expresses a preference to store an entry uncompressed within its archive.
+     * <p>
+     * Note that this option may get ignored by archive file system drivers.
+     * Furthermore, if this happens, there may be no direct feedback available
+     * to the caller.
+     */
+    STORE,
+
+    /**
+     * Expresses a preference to compress an entry within its archive.
+     * <p>
+     * Note that this option may get ignored by archive file system drivers.
+     * Furthermore, if this happens, there may be no direct feedback available
+     * to the caller.
+     */
+    COMPRESS,
 
     /**
      * Expresses a preference to encrypt archive entries when writing them to
