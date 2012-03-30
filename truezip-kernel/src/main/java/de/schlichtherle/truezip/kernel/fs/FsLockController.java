@@ -59,8 +59,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             : ThreadLocalUtilFactory.OLD
                 ).newThreadLocalUtil();
 
-    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
-            = BitField.of(WAIT_CLOSE_IO).not();
+    private static final BitField<FsSyncOption>
+            NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not();
 
     private final ReadLock readLock;
     private final WriteLock writeLock;
