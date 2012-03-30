@@ -64,7 +64,7 @@ final class FsCache implements Flushable, Closeable {
 
     /**
      * Constructs a new cache which applies the given caching strategy,
-     * uses the given pool to allocate and release temporary I/O entries.
+     * uses the given pool to allocate and release temporary I/O buffers.
      * <p>
      * Note that you need to call {@link #configure(InputSocket)} before
      * you can do any input.
