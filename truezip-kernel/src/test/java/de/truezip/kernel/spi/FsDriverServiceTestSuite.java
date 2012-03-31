@@ -17,7 +17,7 @@ import org.junit.Test;
 public abstract class FsDriverServiceTestSuite extends FsDriverProviderTestSuite {
 
     @Test
-    public void testLocatability() {
+    public void testIsLocatable() {
         for (final String suffix : new SuffixSet(getSuffixes()))
             assertNotNull(FsDriverLocator.SINGLETON.get().get(FsScheme.create(suffix)));
     }
