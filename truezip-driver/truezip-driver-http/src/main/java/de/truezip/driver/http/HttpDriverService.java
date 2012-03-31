@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.http;
 
-import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.fs.spi.FsDriverService;
+import de.truezip.kernel.spi.FsDriverService;
 import de.truezip.kernel.sl.IOPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;

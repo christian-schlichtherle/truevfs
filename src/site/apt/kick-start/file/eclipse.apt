@@ -28,7 +28,7 @@ Kick-Starting TrueZIP Applications With Eclipse
     use a
     {{{../../apidocs/de/truezip/kernel/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
     which scans the class path for
-    {{{../../apidocs/de/truezip/kernel/fs/spi/FsDriverService.html}file system driver services}}.
+    {{{../../apidocs/de/truezip/kernel/spi/FsDriverService.html}file system driver services}}.
     These file system driver services are contained in
     {{{../../truezip-driver/index.html}file system driver modules}}.
     By adding the JAR artifacts of the file system driver modules to the run

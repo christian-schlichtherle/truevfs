@@ -5,7 +5,7 @@
 package de.truezip.driver.zip;
 
 import de.truezip.driver.zip.io.*;
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsModel;
 import de.truezip.key.KeyManager;
 import de.truezip.key.KeyManagerProvider;
 import de.truezip.key.KeyProvider;

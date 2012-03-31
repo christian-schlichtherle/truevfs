@@ -4,7 +4,7 @@
 package ${package};
 
 import de.truezip.file.TFile;
-import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.FsSyncException;
 import java.io.File;
 import java.util.Arrays;
 

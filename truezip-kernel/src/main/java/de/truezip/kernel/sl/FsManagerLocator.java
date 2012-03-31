@@ -4,9 +4,9 @@
  */
 package de.truezip.kernel.sl;
 
-import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.fs.FsManagerProvider;
-import de.truezip.kernel.fs.spi.FsManagerService;
+import de.truezip.kernel.FsManager;
+import de.truezip.kernel.FsManagerProvider;
+import de.truezip.kernel.spi.FsManagerService;
 import de.truezip.kernel.util.ServiceLocator;
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -22,13 +22,13 @@ import javax.annotation.concurrent.Immutable;
  * or using a default implementation, whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "de.truezip.kernel.fs.spi.FsManagerService"}
+ * with the class name {@code "de.truezip.kernel.spi.FsManagerService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/de.truezip.kernel.fs.spi.FsManagerService"}.
+ * {@code "META-INF/services/de.truezip.kernel.spi.FsManagerService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>

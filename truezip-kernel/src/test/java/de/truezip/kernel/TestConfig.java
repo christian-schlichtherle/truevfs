@@ -5,7 +5,7 @@
 package de.truezip.kernel;
 
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.cio.spi.ByteArrayIOPoolService;
+import de.truezip.kernel.spi.ByteArrayIOPoolService;
 import de.truezip.kernel.util.InheritableThreadLocalStack;
 import de.truezip.kernel.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;

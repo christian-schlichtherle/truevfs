@@ -4,10 +4,10 @@
  */
 package de.truezip.kernel.option;
 
-import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.fs.FsResourceOpenException;
-import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.FsSyncWarningException;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsResourceOpenException;
+import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.util.BitField;

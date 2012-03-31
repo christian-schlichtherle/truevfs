@@ -53,7 +53,7 @@ Configuring TrueZIP File*
     {{{./apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
     is to scan path names for archive file suffixes and map it to the
     respective
-    {{{./apidocs/de/truezip/kernel/fs/FsArchiveDriver.html}<<<FsArchiveDriver>>>}}
+    {{{./apidocs/de/truezip/kernel/FsArchiveDriver.html}<<<FsArchiveDriver>>>}}
     class.
     For example, it could detect the file suffix <<<jar>>> in the path name
     <<<directory/lib.jar>>> and map it to the class
@@ -81,7 +81,7 @@ Configuring TrueZIP File*
     by all file system driver modules on the run time class path.
 
     * The constructor
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String, de.truezip.kernel.fs.FsDriver)}<<<TArchiveDetector(String suffixes, FsDriver driver)>>>}}
+    {{{./apidocs/de/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String, de.truezip.kernel.FsDriver)}<<<TArchiveDetector(String suffixes, FsDriver driver)>>>}}
     lets you define a custom list of archive file suffixes for any archive
     driver.
     This enables you to define a custom {{{./usecases/aff.html}application file format}}.

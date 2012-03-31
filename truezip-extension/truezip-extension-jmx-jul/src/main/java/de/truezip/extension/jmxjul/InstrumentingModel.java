@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul;
 
-import de.truezip.kernel.fs.FsDecoratingModel;
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsDecoratingModel;
+import de.truezip.kernel.FsModel;
 import javax.annotation.concurrent.Immutable;
 
 /**

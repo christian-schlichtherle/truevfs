@@ -6,7 +6,7 @@ package de.truezip.driver.zip;
 
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.OutputBusyException;
 import de.truezip.kernel.io.Streams;

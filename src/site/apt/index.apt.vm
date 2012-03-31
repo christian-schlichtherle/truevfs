@@ -78,10 +78,10 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
     * If you are going to write a federated file system driver
       (i.e. archive driver), please consult the Javadoc for
-      {{{./apidocs/de/truezip/kernel/fs/FsArchiveDriver.html}<<<de.truezip.kernel.fs.FsArchiveDriver>>>}}.
+      {{{./apidocs/de/truezip/kernel/FsArchiveDriver.html}<<<de.truezip.kernel.FsArchiveDriver>>>}}.
 
     * If you are going to write a non-federated file system driver,
       please consult the Javadoc for
-      {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}<<<de.truezip.kernel.fs.FsDriver>>>}}.
+      {{{./apidocs/de/truezip/kernel/FsDriver.html}<<<de.truezip.kernel.FsDriver>>>}}.
 
     []

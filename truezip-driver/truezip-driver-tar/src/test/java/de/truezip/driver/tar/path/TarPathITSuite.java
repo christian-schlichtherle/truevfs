@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.tar.path;
 
-import de.truezip.kernel.fs.FsArchiveDriver;
+import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.path.TPathTestSuite;
 
 /**

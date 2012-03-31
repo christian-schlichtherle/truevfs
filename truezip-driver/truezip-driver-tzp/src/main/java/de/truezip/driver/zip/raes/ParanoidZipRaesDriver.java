@@ -9,7 +9,7 @@ import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.ZipOutputService;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputService;
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsModel;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;

@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.MultiplexedOutputService;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.IOPoolProvider;

@@ -7,7 +7,7 @@ package de.truezip.driver.zip;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.driver.zip.io.RawZipFile;
 import de.truezip.driver.zip.io.ZipCryptoParameters;

@@ -8,7 +8,7 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.fs.FsEntry;
+import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;

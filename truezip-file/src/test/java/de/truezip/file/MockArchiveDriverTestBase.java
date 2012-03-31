@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.mock.MockArchiveDriver;
+import de.truezip.kernel.mock.MockArchiveDriver;
 
 /**
  * @author  Christian Schlichtherle

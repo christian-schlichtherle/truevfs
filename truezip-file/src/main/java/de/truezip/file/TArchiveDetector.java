@@ -4,10 +4,10 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsAbstractCompositeDriver;
-import de.truezip.kernel.fs.FsAbstractDriverProvider;
-import de.truezip.kernel.fs.FsDriver;
-import de.truezip.kernel.fs.FsDriverProvider;
+import de.truezip.kernel.FsAbstractCompositeDriver;
+import de.truezip.kernel.FsAbstractDriverProvider;
+import de.truezip.kernel.FsDriver;
+import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.sl.FsDriverLocator;
 import static de.truezip.kernel.util.Maps.initialCapacity;

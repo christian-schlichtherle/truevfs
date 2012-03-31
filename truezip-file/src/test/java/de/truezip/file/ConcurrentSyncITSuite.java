@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsArchiveDriver;
+import de.truezip.kernel.FsArchiveDriver;
 import static de.truezip.kernel.option.SyncOptions.SYNC;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;

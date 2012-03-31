@@ -4,8 +4,8 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsDriver;
-import de.truezip.kernel.fs.mock.MockArchiveDriver;
+import de.truezip.kernel.FsDriver;
+import de.truezip.kernel.mock.MockArchiveDriver;
 import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.util.BitField;
 import java.util.NoSuchElementException;

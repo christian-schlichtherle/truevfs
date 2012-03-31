@@ -53,7 +53,7 @@ Key Features
 
     [Pluggable File System Drivers]
         TrueZIP can support virtually any file system type via its pluggable 
-        {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}file system driver}}
+        {{{./apidocs/de/truezip/kernel/FsDriver.html}file system driver}}
         architecture in the driver tier.
         TrueZIP ships with file system drivers for the file system schemes
         FILE, HTTP(S), ZIP, TAR and their relatives like JAR, TGZ, TBZ2 etc.

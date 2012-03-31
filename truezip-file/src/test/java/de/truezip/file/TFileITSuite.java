@@ -4,8 +4,8 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.fs.*;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.*;
 import static de.truezip.kernel.option.AccessOption.GROW;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;

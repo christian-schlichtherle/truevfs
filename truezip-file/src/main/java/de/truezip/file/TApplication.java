@@ -4,16 +4,16 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.FsSyncWarningException;
-//import de.truezip.kernel.cio.spi.ByteArrayIOPoolService;
-//import de.truezip.kernel.fs.tar.TarBZip2Driver;
-//import de.truezip.kernel.fs.tar.TarDriver;
-//import de.truezip.kernel.fs.tar.TarGZipDriver;
-//import de.truezip.kernel.fs.zip.JarDriver;
-//import de.truezip.kernel.fs.zip.ZipDriver;
-//import de.truezip.kernel.fs.zip.raes.ParanoidZipRaesDriver;
-//import de.truezip.kernel.fs.zip.raes.SafeZipRaesDriver;
+import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.FsSyncWarningException;
+//import de.truezip.kernel.spi.ByteArrayIOPoolService;
+//import de.truezip.kernel.tar.TarBZip2Driver;
+//import de.truezip.kernel.tar.TarDriver;
+//import de.truezip.kernel.tar.TarGZipDriver;
+//import de.truezip.kernel.zip.JarDriver;
+//import de.truezip.kernel.zip.ZipDriver;
+//import de.truezip.kernel.zip.raes.ParanoidZipRaesDriver;
+//import de.truezip.kernel.zip.raes.SafeZipRaesDriver;
 //import de.truezip.kernel.sl.IOPoolLocator;
 
 /**

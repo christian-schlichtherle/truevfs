@@ -4,15 +4,13 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.truezip.kernel.cio.spi.IOPoolService;
-import de.truezip.driver.file.nio.TempFilePool;
-import de.truezip.driver.file.nio.TempFilePoolService;
+import de.truezip.kernel.spi.IOPoolService;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class TempFilePoolServiceTest {
 

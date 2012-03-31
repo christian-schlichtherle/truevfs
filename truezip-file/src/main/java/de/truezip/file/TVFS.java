@@ -4,9 +4,9 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsFilteringManager;
-import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.FsSyncWarningException;
+import de.truezip.kernel.FsFilteringManager;
+import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.addr.FsMountPoint;
 import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
 import de.truezip.kernel.option.SyncOption;

@@ -65,12 +65,12 @@ About TrueZIP Driver ZIP
         or
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which sets this option before calling its super-class implementation in
-        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#newEntry(java.lang.String,de.truezip.kernel.fs.entry.Entry.Type,de.truezip.kernel.fs.entry.Entry,de.truezip.kernel.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
+        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#newEntry(java.lang.String,de.truezip.kernel.entry.Entry.Type,de.truezip.kernel.entry.Entry,de.truezip.kernel.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
         In either case, if you don't want to use the built-in
         {{{./apidocs/de/truezip/driver/zip/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
         for prompting the user for a password using a Swing GUI or the console,
         then you should override
-        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#zipCryptoParameters(de.truezip.kernel.fs.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
+        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#zipCryptoParameters(de.truezip.kernel.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
         in order to provide custom
         {{{./apidocs/de/truezip/driver/zip/io/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
         too.

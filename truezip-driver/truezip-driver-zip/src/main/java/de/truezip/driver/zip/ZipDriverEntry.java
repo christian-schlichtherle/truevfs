@@ -8,8 +8,8 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
-import de.truezip.kernel.fs.FsArchiveEntries;
-import de.truezip.kernel.fs.FsArchiveEntry;
+import de.truezip.kernel.FsArchiveEntries;
+import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.driver.zip.io.DateTimeConverter;
 import de.truezip.driver.zip.io.ZipEntry;
 

@@ -4,10 +4,10 @@
  */
 package de.truezip.kernel.sl;
 
-import de.truezip.kernel.fs.FsDriver;
-import de.truezip.kernel.fs.FsDriverProvider;
+import de.truezip.kernel.FsDriver;
+import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.fs.spi.FsDriverService;
+import de.truezip.kernel.spi.FsDriverService;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.ServiceLocator;
 import java.util.*;
@@ -20,7 +20,7 @@ import javax.annotation.concurrent.Immutable;
  * Locates all file system drivers on the class path.
  * The map of file system drivers is populated by instantiating all classes
  * which are named in the resource files with the name
- * {@code "META-INF/services/de.truezip.kernel.fs.spi.FsDriverService"}
+ * {@code "META-INF/services/de.truezip.kernel.spi.FsDriverService"}
  * on the class path by calling their public no-argument constructor.
  * 
  * @see    FsDriverService

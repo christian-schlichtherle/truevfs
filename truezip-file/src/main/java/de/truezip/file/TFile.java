@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.FsController;
 import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.addr.FsPath;
@@ -15,7 +15,7 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import static de.truezip.kernel.addr.FsEntryName.ROOT;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
-import de.truezip.kernel.fs.*;
+import de.truezip.kernel.*;
 import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
 import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
 import static de.truezip.kernel.option.AccessOption.GROW;

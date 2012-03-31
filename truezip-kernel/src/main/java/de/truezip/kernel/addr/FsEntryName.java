@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.addr;
 
-import de.truezip.kernel.fs.FsEntry;
+import de.truezip.kernel.FsEntry;
 import static de.truezip.kernel.addr.FsUriModifier.NULL;
 import static de.truezip.kernel.addr.FsUriModifier.PostFix.ENTRY_NAME;
 import de.truezip.kernel.util.QuotedUriSyntaxException;

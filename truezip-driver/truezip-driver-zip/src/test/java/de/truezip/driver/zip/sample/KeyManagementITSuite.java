@@ -5,7 +5,7 @@
 package de.truezip.driver.zip.sample;
 
 import de.truezip.file.*;
-import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.FsSyncException;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;

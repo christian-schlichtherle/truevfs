@@ -12,7 +12,7 @@ import de.truezip.driver.zip.CheckedReadOnlySfxDriver;
 import de.truezip.driver.zip.CheckedZipDriver;
 import de.truezip.file.*;
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.FsSyncException;
 import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.sl.IOPoolLocator;
 import java.io.IOException;

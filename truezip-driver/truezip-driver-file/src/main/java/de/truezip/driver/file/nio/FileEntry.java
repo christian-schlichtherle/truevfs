@@ -8,7 +8,7 @@ import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.fs.FsEntry;
+import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.option.AccessOption;
