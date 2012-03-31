@@ -365,28 +365,33 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * Now let's assume that {@code a} exists as a plain directory in the
      * platform file system, while all other segments of this path don't, and
      * that the module TrueZIP Driver ZIP is present on the run-time class path
-     * in order to detect {@code outer.zip} and {@code inner.zip} as ZIP files
-     * according to the initial setup.
+     * in order to enable the detection of {@code outer.zip} and
+     * {@code inner.zip} as prospective ZIP files.
      * <p>
-     * Now, if this property is set to {@code false}, then an application
+     * Now, if this property is set to {@code false}, then a client application
      * needs to call {@code new TFile("a/outer.zip/b/inner.zip").mkdirs()}
-     * before it can actually create the innermost {@code c} entry as a file
+     * before it can actually create the innermost entry {@code c} as a file
      * or directory.
-     * <p>
-     * More formally, before an application can access an entry in a federated
+     * More formally, before an application can access an entry in an archive
      * file system, all its parent directories need to exist, including archive
      * files.
+     * <p>
      * This emulates the behaviour of the platform file system.
      * <p>
      * If this property is set to {@code true} however, then any missing
      * parent directories (including archive files) up to the outermost archive
      * file {@code outer.zip} get automatically created when using operations
-     * to create the innermost element of the path {@code c}.
-     * <p>
+     * to create the innermost entry {@code c}.
      * This enables applications to succeed with doing this:
      * {@code new TFile("a/outer.zip/b/inner.zip/c").createNewFile()},
      * or that:
      * {@code new TFileOutputStream("a/outer.zip/b/inner.zip/c")}.
+     * <p>
+     * A most desirable side effect of <i>being lenient</i> is that it will
+     * safe space in the target archive file.
+     * This is because the directory entry {@code b} in this exaple does not
+     * need to get output because there is no meta data associated with it.
+     * This is called a <em>ghost directory</em>.
      * <p>
      * Note that in either case the parent directory of the outermost archive
      * file {@code a} must exist - TrueZIP does not automatically create
