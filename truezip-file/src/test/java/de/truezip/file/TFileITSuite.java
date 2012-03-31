@@ -6,10 +6,10 @@ package de.truezip.file;
 
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.*;
-import static de.truezip.kernel.fs.option.FsAccessOption.GROW;
-import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
-import static de.truezip.kernel.fs.option.FsSyncOption.WAIT_CLOSE_IO;
-import static de.truezip.kernel.fs.option.FsSyncOptions.SYNC;
+import static de.truezip.kernel.option.FsAccessOption.GROW;
+import static de.truezip.kernel.option.FsSyncOption.CLEAR_CACHE;
+import static de.truezip.kernel.option.FsSyncOption.WAIT_CLOSE_IO;
+import static de.truezip.kernel.option.FsSyncOptions.SYNC;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.OutputClosedException;

@@ -6,7 +6,7 @@ package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.fs.option.FsAccessOption;
+import de.truezip.kernel.option.FsAccessOption;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;

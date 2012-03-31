@@ -5,7 +5,7 @@
 package de.truezip.driver.zip;
 
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.fs.option.FsAccessOption;
+import de.truezip.kernel.option.FsAccessOption;
 import de.truezip.kernel.cio.DecoratingOutputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
