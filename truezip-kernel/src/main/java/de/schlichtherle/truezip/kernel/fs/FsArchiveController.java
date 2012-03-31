@@ -15,7 +15,7 @@ import de.truezip.kernel.fs.FsArchiveEntry;
 import de.truezip.kernel.fs.FsCovariantEntry;
 import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsEntryNotFoundException;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsAccessOption.APPEND;
 import static de.truezip.kernel.fs.option.FsAccessOption.CREATE_PARENTS;

@@ -14,7 +14,7 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsAccessOption.*;
 import de.truezip.kernel.rof.ReadOnlyFile;

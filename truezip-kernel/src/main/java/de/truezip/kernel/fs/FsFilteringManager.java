@@ -4,8 +4,8 @@
  */
 package de.truezip.kernel.fs;
 
-import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
-import de.truezip.kernel.fs.addr.FsMountPoint;
+import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.util.FilteringIterator;
 import java.net.URI;
 import java.util.Iterator;

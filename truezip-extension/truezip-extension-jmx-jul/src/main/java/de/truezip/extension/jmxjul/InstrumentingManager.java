@@ -8,7 +8,7 @@ import de.truezip.kernel.fs.FsCompositeDriver;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsDecoratingManager;
 import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsMountPoint;
 import javax.annotation.concurrent.Immutable;
 
 /**

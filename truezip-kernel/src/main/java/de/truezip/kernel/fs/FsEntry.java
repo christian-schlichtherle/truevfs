@@ -5,7 +5,7 @@
 package de.truezip.kernel.fs;
 
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.util.BitField;
 import java.util.Formatter;
 import java.util.Set;

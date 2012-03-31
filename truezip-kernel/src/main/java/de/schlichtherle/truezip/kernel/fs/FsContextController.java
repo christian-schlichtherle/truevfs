@@ -10,7 +10,7 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsDecoratingController;
 import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsAccessOptions;
 import de.truezip.kernel.fs.option.FsSyncOption;

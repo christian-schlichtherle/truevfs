@@ -17,7 +17,7 @@ import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.*;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsAccessOption.CACHE;
 import static de.truezip.kernel.fs.option.FsAccessOption.GROW;

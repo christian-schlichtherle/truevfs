@@ -6,8 +6,8 @@ package de.truezip.kernel.fs;
 
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
-import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR;
-import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
+import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
+import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;

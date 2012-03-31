@@ -5,7 +5,7 @@
 package de.truezip.file;
 
 import static de.truezip.file.TVFS.mountPoint;
-import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsMountPoint;
 import java.net.URI;
 import java.net.URISyntaxException;
 import static org.hamcrest.CoreMatchers.is;

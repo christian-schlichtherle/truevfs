@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel.fs;
 
 import de.schlichtherle.truezip.kernel.fs.FsControllerException;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.util.BitField;

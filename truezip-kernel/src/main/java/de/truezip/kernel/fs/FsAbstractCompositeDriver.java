@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsScheme;
+import de.truezip.kernel.addr.FsScheme;
 import java.util.ServiceConfigurationError;
 import javax.annotation.concurrent.Immutable;
 

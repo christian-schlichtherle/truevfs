@@ -4,8 +4,8 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.addr.FsPath;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.annotation.CheckForNull;

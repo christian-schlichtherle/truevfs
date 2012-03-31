@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.fs.addr.FsScheme;
+import de.truezip.kernel.addr.FsScheme;
 import de.truezip.driver.tar.TarDriverService;
 import de.truezip.kernel.fs.spi.FsDriverService;
 import de.truezip.kernel.util.SuffixSet;

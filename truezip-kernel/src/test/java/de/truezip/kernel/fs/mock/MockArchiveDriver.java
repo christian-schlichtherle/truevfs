@@ -9,7 +9,7 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import de.truezip.kernel.fs.FsModel;
-import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;

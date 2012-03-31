@@ -13,7 +13,7 @@ import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import de.truezip.kernel.io.ThrowingInputStream;

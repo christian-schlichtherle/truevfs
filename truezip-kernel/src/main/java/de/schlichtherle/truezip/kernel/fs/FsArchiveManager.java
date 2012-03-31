@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel.fs;
 
 import de.truezip.kernel.fs.*;
-import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Link;
 import de.truezip.kernel.util.Link.Type;

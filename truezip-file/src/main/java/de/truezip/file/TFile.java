@@ -5,21 +5,21 @@
 package de.truezip.file;
 
 import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.fs.addr.FsScheme;
-import de.truezip.kernel.fs.addr.FsMountPoint;
-import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.addr.FsScheme;
+import de.truezip.kernel.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
-import static de.truezip.kernel.fs.addr.FsEntryName.ROOT;
-import static de.truezip.kernel.fs.addr.FsEntryName.SEPARATOR_CHAR;
+import static de.truezip.kernel.addr.FsEntryName.ROOT;
+import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.fs.*;
-import static de.truezip.kernel.fs.addr.FsUriModifier.CANONICALIZE;
+import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
 import static de.truezip.kernel.fs.option.FsAccessOption.EXCLUSIVE;
 import static de.truezip.kernel.fs.option.FsAccessOption.GROW;
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.io.Paths.Splitter;
