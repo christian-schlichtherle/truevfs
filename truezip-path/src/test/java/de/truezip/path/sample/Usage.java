@@ -4,8 +4,8 @@
  */
 package de.truezip.path.sample;
 
-import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.FsSyncWarningException;
+import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.io.SequentialIOException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.file.TVFS;

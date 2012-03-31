@@ -19,7 +19,7 @@ TrueZIP Kernel Usage
     {{{../truezip-file/index.html}TrueZIP File*}},
     the API of this module is more complex to use, yet very extensible because
     it relies on Dependency Injection for the resolution of
-    {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}file system drivers}}
+    {{{./apidocs/de/truezip/kernel/FsDriver.html}file system drivers}}
     and
     {{{./apidocs/de/truezip/kernel/cio/IOPool.html}I/O entry pools}}.
     It also provides service locators for
@@ -126,7 +126,7 @@ $ cat fileA fileB
     Now for comparison, let's implement the same functionality using the API
     of the module TrueZIP Kernel.
 
-%{snippet|id=cat|file=${project.build.testSourceDirectory}/de/truezip/kernel/fs/sample/Cat.java}
+%{snippet|id=cat|file=${project.build.testSourceDirectory}/de/truezip/kernel/sample/Cat.java}
 
     Using the same configuration like before, this code could access the same
     URIs than before.

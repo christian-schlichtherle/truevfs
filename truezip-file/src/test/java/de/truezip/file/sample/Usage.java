@@ -7,8 +7,8 @@ package de.truezip.file.sample;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileInputStream;
 import de.truezip.file.TVFS;
-import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.fs.FsSyncWarningException;
+import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.FsSyncWarningException;
 import java.io.IOException;
 import java.io.InputStream;
 

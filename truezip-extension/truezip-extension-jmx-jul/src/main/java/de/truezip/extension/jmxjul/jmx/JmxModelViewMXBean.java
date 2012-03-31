@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.truezip.kernel.fs.FsModel;
-import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.FsModel;
+import de.truezip.kernel.FsSyncException;
 import javax.annotation.Nullable;
 
 /**

@@ -6,7 +6,7 @@ package de.truezip.driver.zip;
 
 import de.truezip.kernel.addr.FsScheme;
 import de.truezip.driver.zip.ZipDriverService;
-import de.truezip.kernel.fs.spi.FsDriverService;
+import de.truezip.kernel.spi.FsDriverService;
 import de.truezip.kernel.util.SuffixSet;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;

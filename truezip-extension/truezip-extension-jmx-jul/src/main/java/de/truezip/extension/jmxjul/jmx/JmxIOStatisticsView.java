@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.truezip.kernel.fs.FsManager;
+import de.truezip.kernel.FsManager;
 import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.util.Date;

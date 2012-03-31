@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputService;
 import java.io.FileNotFoundException;

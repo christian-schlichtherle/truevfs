@@ -6,7 +6,7 @@ package de.truezip.driver.zip;
 
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
-import de.truezip.kernel.fs.*;
+import de.truezip.kernel.*;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.ROOT;
 import de.truezip.kernel.option.AccessOption;

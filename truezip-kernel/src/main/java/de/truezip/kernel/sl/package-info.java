@@ -4,8 +4,8 @@
  */
 /**
  * Provides singletons to locate various service providers on the class path.
- * Note that this module has absolutely no dependency on this package!
- * It's up to the other modules to inject these service locators into this
+ * Note that this module has no dependency on this package.
+ * It's up to the client modules to inject these service locators into this
  * module if they want to.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)

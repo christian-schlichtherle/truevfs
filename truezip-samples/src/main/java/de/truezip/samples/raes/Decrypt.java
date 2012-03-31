@@ -4,7 +4,7 @@
  */
 package de.truezip.samples.raes;
 
-import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.FsSyncException;
 import de.truezip.samples.file.Application;
 import de.truezip.samples.file.IllegalUsageException;
 import java.io.IOException;

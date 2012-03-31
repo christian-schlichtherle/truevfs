@@ -5,7 +5,7 @@
 package de.truezip.driver.tar.file;
 
 import de.truezip.file.TFileITSuite;
-import de.truezip.kernel.fs.FsArchiveDriver;
+import de.truezip.kernel.FsArchiveDriver;
 
 /**
  * @param  <D> The type of the archive driver.

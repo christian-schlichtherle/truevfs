@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsManager;
+import de.truezip.kernel.FsManager;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.option.AccessOptions;

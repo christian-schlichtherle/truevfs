@@ -4,10 +4,10 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsArchiveDriver;
-import de.truezip.kernel.fs.FsDriver;
+import de.truezip.kernel.FsArchiveDriver;
+import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.fs.mock.MockArchiveDriver;
+import de.truezip.kernel.mock.MockArchiveDriver;
 import de.truezip.kernel.util.SuffixSet;
 import java.io.File;
 import java.util.Locale;

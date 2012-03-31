@@ -6,9 +6,9 @@ package de.truezip.extension.jmxjul.jmx;
 
 import de.truezip.extension.jmxjul.*;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsManager;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.util.JSE7;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;

@@ -86,11 +86,11 @@ Using TrueZIP File*
     any open entry streams or not.
     If the entry streams are <not> forced to close, the archive file cannot
     get unmounted and an
-    {{{../apidocs/de/truezip/kernel/fs/FsSyncException.html}<<<FsSyncException>>>}}
+    {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}
     is thrown.
     If the entry streams are forced to close however, the archive file is
     unmounted and an
-    {{{../apidocs/de/truezip/kernel/fs/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
+    {{{../apidocs/de/truezip/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
     is thrown to indicate that any subsequent I/O operations on these entry
     streams other than <<<(In|Out)putStream.close()>>> will fail with an
     {{{../apidocs/de/truezip/kernel/io/InputClosedException.html}<<<InputClosedException>>>}}
@@ -142,7 +142,7 @@ Using TrueZIP File*
     or
     <<<TVFS.sync(BitField<FsSyncOption>)>>>
     may throw an
-    {{{../apidocs/de/truezip/kernel/fs/FsSyncException.html}<<<FsSyncException>>>}}.
+    {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}.
     An application may catch these exceptions and act on them individually
     (see {{{Exception_Handling}below}}).
 
@@ -212,7 +212,7 @@ Using TrueZIP File*
     may call <<<TVFS.umount()>>>,
     {{{../apidocs/de/truezip/file/TVFS.html#umount(de.truezip.file.TFile)}<<<TVFS.umount(TFile)>>>}}
     or any of their many variants and incarnations (e.g.
-    {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.fs.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
+    {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
     in order to commit all changes and finally unmount the archive files.
     A third party can then safely access them.
     Likewise, the    application must make sure not to access an archive file or
@@ -261,13 +261,13 @@ Using TrueZIP File*
     selectively catch the following sequential I/O exception chain sub-classes:
 
     [[1]] The class
-        {{{../apidocs/de/truezip/kernel/fs/FsSyncException.html}<<<FsSyncException>>>}}
+        {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}
         is the root of the synchronization exception chain types.
         An exception of this type is thrown if an archive file could not get
         updated and some or all of its data got lost.
 
     [[2]] The class
-        {{{../apidocs/de/truezip/kernel/fs/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
+        {{{../apidocs/de/truezip/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
         is the root of the synchronization warning exception chain types.
         An exception of this type is thrown if an archive file has been updated,
         but some warning conditions apply.
@@ -276,9 +276,9 @@ Using TrueZIP File*
     []
 
     Now, because
-    {{{../apidocs/de/truezip/kernel/fs/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}s
+    {{{../apidocs/de/truezip/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}s
     have a lower priority than
-    {{{../apidocs/de/truezip/kernel/fs/FsSyncException.html}<<<FsSyncException>>>}}s,
+    {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}s,
     they are always pushed back to the end before the exception chain is thrown,
     so that an application could use the following snippet to detect if only
     some warnings or at least one severe error condition has occured:

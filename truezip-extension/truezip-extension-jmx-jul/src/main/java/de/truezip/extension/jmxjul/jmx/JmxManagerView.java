@@ -4,9 +4,9 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsManager;
+import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import de.truezip.kernel.util.BitField;

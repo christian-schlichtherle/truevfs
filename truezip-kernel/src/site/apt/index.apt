@@ -10,7 +10,7 @@ About TrueZIP Kernel
     manages their state and commits unsynchronized changes if required or
     requested.
     The TrueZIP Kernel uses
-    {{{./apidocs/de/truezip/kernel/fs/FsDriver.html}file system drivers}} to access
+    {{{./apidocs/de/truezip/kernel/FsDriver.html}file system drivers}} to access
     these resources.
     It provides federating, multithreading, multiplexing, caching and
     accounting so that archive file system drivers do not need to take care of

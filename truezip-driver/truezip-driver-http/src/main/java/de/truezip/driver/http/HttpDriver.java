@@ -6,10 +6,10 @@ package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.fs.FsController;
-import de.truezip.kernel.fs.FsDriver;
-import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.fs.FsModel;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsDriver;
+import de.truezip.kernel.FsManager;
+import de.truezip.kernel.FsModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;

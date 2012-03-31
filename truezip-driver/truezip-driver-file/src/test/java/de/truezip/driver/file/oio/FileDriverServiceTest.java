@@ -5,8 +5,7 @@
 package de.truezip.driver.file.oio;
 
 import de.truezip.kernel.addr.FsScheme;
-import de.truezip.driver.file.oio.FileDriverService;
-import de.truezip.kernel.fs.spi.FsDriverService;
+import de.truezip.kernel.spi.FsDriverService;
 import de.truezip.kernel.util.SuffixSet;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -15,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class FileDriverServiceTest {
 

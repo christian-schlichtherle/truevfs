@@ -9,7 +9,7 @@ import de.truezip.extension.jmxjul.InstrumentingController;
 import de.truezip.extension.jmxjul.InstrumentingDirector;
 import de.truezip.extension.jmxjul.InstrumentingManager;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.FsController;
 import de.truezip.kernel.util.JSE7;
 import javax.annotation.concurrent.Immutable;
 

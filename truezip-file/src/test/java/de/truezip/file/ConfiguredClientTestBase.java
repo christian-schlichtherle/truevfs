@@ -4,9 +4,9 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.fs.FsArchiveDriver;
-import de.truezip.kernel.fs.FsArchiveDriverTestBase;
-import de.schlichtherle.truezip.kernel.fs.FsFailSafeManagerService;
+import de.truezip.kernel.FsArchiveDriver;
+import de.truezip.kernel.FsArchiveDriverTestBase;
+import de.schlichtherle.truezip.kernel.FsFailSafeManagerService;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.util.SuffixSet;

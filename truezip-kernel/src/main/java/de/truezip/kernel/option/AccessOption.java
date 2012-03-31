@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.option;
 
-import de.truezip.kernel.fs.FsController;
+import de.truezip.kernel.FsController;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 

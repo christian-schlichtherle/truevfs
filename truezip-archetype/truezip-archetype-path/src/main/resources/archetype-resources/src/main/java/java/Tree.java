@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.truezip.kernel.fs.FsSyncException;
+import de.truezip.kernel.FsSyncException;
 import de.truezip.path.TPath;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
