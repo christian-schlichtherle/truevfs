@@ -13,7 +13,7 @@ import de.truezip.driver.zip.CheckedZipDriver;
 import de.truezip.file.*;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.fs.FsSyncException;
-import static de.truezip.kernel.fs.option.FsAccessOption.*;
+import static de.truezip.kernel.option.FsAccessOption.*;
 import de.truezip.kernel.sl.IOPoolLocator;
 import java.io.IOException;
 import java.io.InputStream;

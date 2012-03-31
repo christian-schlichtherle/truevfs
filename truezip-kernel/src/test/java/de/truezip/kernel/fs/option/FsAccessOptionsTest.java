@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.fs.option;
+package de.truezip.kernel.option;
 
-import static de.truezip.kernel.fs.option.FsAccessOption.*;
-import static de.truezip.kernel.fs.option.FsAccessOptions.ACCESS_PREFERENCES_MASK;
-import static de.truezip.kernel.fs.option.FsAccessOptions.NONE;
+import static de.truezip.kernel.option.FsAccessOption.*;
+import static de.truezip.kernel.option.FsAccessOptions.ACCESS_PREFERENCES_MASK;
+import static de.truezip.kernel.option.FsAccessOptions.NONE;
 import de.truezip.kernel.util.BitField;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;

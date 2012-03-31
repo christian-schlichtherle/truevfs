@@ -2,9 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.fs.option;
+package de.truezip.kernel.option;
 
-import static de.truezip.kernel.fs.option.FsAccessOption.*;
+import static de.truezip.kernel.option.FsAccessOption.*;
 import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 

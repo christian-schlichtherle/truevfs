@@ -5,10 +5,10 @@
 package de.truezip.file;
 
 import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.fs.option.FsAccessOption;
-import static de.truezip.kernel.fs.option.FsAccessOption.*;
-import de.truezip.kernel.fs.option.FsAccessOptions;
-import static de.truezip.kernel.fs.option.FsAccessOptions.ACCESS_PREFERENCES_MASK;
+import de.truezip.kernel.option.FsAccessOption;
+import static de.truezip.kernel.option.FsAccessOption.*;
+import de.truezip.kernel.option.FsAccessOptions;
+import static de.truezip.kernel.option.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.InheritableThreadLocalStack;

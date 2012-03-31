@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel.fs;
 
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.fs.option.FsAccessOption;
+import de.truezip.kernel.option.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 

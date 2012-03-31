@@ -36,7 +36,7 @@ About TrueZIP Driver ZIP
         API with a file system driver or the ZIP classes directly.
 
         To use this feature with a client API, set
-        {{{./apidocs/de/truezip/kernel/fs/option/FsOutputOption.html#GROW}<<<FsOutputOption.GROW>>>}},
+        {{{./apidocs/de/truezip/kernel/option/FsOutputOption.html#GROW}<<<FsOutputOption.GROW>>>}},
         e.g. in
         {{{./apidocs/de/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
 
@@ -59,7 +59,7 @@ About TrueZIP Driver ZIP
         {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES specification}}.
 
         To use this feature with a client API, set
-        {{{./apidocs/de/truezip/kernel/fs/option/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
+        {{{./apidocs/de/truezip/kernel/option/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
         e.g. in
         {{{./apidocs/de/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
         or

@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.fs.option;
+package de.truezip.kernel.option;
 
-import static de.truezip.kernel.fs.option.FsSyncOption.*;
-import static de.truezip.kernel.fs.option.FsSyncOptions.*;
+import static de.truezip.kernel.option.FsSyncOption.*;
+import static de.truezip.kernel.option.FsSyncOptions.*;
 import de.truezip.kernel.util.BitField;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
