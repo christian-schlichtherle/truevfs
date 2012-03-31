@@ -6,7 +6,7 @@ package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.option.FsAccessOption;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
@@ -30,7 +30,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
     private final HttpEntry entry;
 
     HttpInputSocket(final HttpEntry                entry, 
-                    final BitField<FsAccessOption> options) {
+                    final BitField<AccessOption> options) {
         assert null != entry;
         assert null != options;
         this.entry = entry;

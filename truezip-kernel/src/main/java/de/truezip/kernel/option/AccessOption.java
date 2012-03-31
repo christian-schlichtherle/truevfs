@@ -21,7 +21,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum FsAccessOption {
+public enum AccessOption {
 
     /**
      * Whether or not the entry data shall get cached for subsequent access.

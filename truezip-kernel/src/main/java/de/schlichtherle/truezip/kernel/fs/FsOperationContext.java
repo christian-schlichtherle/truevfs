@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel.fs;
 
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.option.FsAccessOption;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
@@ -20,9 +20,9 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 final class FsOperationContext {
 
-    private final BitField<FsAccessOption> outputOptions;
+    private final BitField<AccessOption> outputOptions;
 
-    FsOperationContext(final BitField<FsAccessOption> outputOptions) {
+    FsOperationContext(final BitField<AccessOption> outputOptions) {
         assert null != outputOptions;
         this.outputOptions = outputOptions;
     }
@@ -38,7 +38,7 @@ final class FsOperationContext {
      * @see    FsContextController#getOutputSocket(FsEntryName, BitField, Entry)
      * @see    FsContextController#mknod(FsEntryName, Entry.Type, BitField, Entry)
      */
-    BitField<FsAccessOption> getOutputOptions() {
+    BitField<AccessOption> getOutputOptions() {
         return outputOptions;
     }
 
@@ -47,7 +47,7 @@ final class FsOperationContext {
      *
      * @param option The output option to test.
      */
-    boolean get(final FsAccessOption option) {
+    boolean get(final AccessOption option) {
         return outputOptions.get(option);
     }
 

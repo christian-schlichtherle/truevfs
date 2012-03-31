@@ -7,7 +7,7 @@ package de.truezip.driver.zip.file;
 import de.truezip.driver.zip.TestWinZipAesDriver;
 import de.truezip.file.ConcurrentSyncITSuite;
 import de.truezip.file.TConfig;
-import static de.truezip.kernel.option.FsAccessOption.ENCRYPT;
+import static de.truezip.kernel.option.AccessOption.ENCRYPT;
 import java.io.IOException;
 
 /**

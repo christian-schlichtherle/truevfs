@@ -4,15 +4,15 @@
  */
 package de.truezip.kernel.fs;
 
+import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.option.FsAccessOption;
-import de.truezip.kernel.option.FsSyncOption;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -239,7 +239,7 @@ public abstract class FsController<M extends FsModel> {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            final BitField<FsAccessOption> options)
+            final BitField<AccessOption> options)
     throws IOException {
         boolean ok = true;
         for (Map.Entry<Access, Long> time : times.entrySet())
@@ -271,7 +271,7 @@ public abstract class FsController<M extends FsModel> {
             FsEntryName name,
             BitField<Access> types,
             long value,
-            BitField<FsAccessOption> options)
+            BitField<AccessOption> options)
     throws IOException;
 
     /**
@@ -284,7 +284,7 @@ public abstract class FsController<M extends FsModel> {
      */
     public abstract InputSocket<?>
     getInputSocket( FsEntryName name,
-                    BitField<FsAccessOption> options);
+                    BitField<AccessOption> options);
 
     /**
      * Returns an output socket for writing the contents of the entry addressed
@@ -301,7 +301,7 @@ public abstract class FsController<M extends FsModel> {
      */
     public abstract OutputSocket<?>
     getOutputSocket(FsEntryName name,
-                    BitField<FsAccessOption> options,
+                    BitField<AccessOption> options,
                     @CheckForNull Entry template);
 
     /**
@@ -311,7 +311,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the file system entry name.
      * @param  type the file system entry type.
      * @param  options the file system output options.
-     *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
+     *         If {@link AccessOption#CREATE_PARENTS} is set, any missing
      *         parent directories will be created and linked into the file
      *         system with its last modification time set to the system's
      *         current time.
@@ -325,7 +325,7 @@ public abstract class FsController<M extends FsModel> {
      *         <li>{@code name} contains characters which are not
      *             supported by the file system.
      *         <li>The entry already exists and either the option
-     *             {@link FsAccessOption#EXCLUSIVE} is set or the entry is a
+     *             {@link AccessOption#EXCLUSIVE} is set or the entry is a
      *             directory.
      *         <li>The entry exists as a different type.
      *         <li>A parent entry exists but is not a directory.
@@ -336,7 +336,7 @@ public abstract class FsController<M extends FsModel> {
     public abstract void
     mknod(  FsEntryName name,
             Type type,
-            BitField<FsAccessOption> options,
+            BitField<AccessOption> options,
             @CheckForNull Entry template)
     throws IOException;
 
@@ -349,7 +349,7 @@ public abstract class FsController<M extends FsModel> {
      * @throws IOException on any I/O failure.
      */
     public abstract void
-    unlink(FsEntryName name, BitField<FsAccessOption> options)
+    unlink(FsEntryName name, BitField<AccessOption> options)
     throws IOException;
 
     /**
@@ -375,7 +375,7 @@ public abstract class FsController<M extends FsModel> {
      * @throws IOException on any other (not necessarily I/O related) failure.
      */
     public final void
-    sync(final BitField<FsSyncOption> options)
+    sync(final BitField<SyncOption> options)
     throws IOException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
@@ -405,7 +405,7 @@ public abstract class FsController<M extends FsModel> {
      * @throws IOException on any other (not necessarily I/O related) failure.
      */
     public abstract <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
+    sync(   BitField<SyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException;
 

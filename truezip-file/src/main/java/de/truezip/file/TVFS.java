@@ -9,9 +9,9 @@ import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.FsSyncWarningException;
 import de.truezip.kernel.addr.FsMountPoint;
 import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
-import de.truezip.kernel.option.FsSyncOption;
-import de.truezip.kernel.option.FsSyncOptions;
-import static de.truezip.kernel.option.FsSyncOptions.UMOUNT;
+import de.truezip.kernel.option.SyncOption;
+import de.truezip.kernel.option.SyncOptions;
+import static de.truezip.kernel.option.SyncOptions.UMOUNT;
 import de.truezip.kernel.util.BitField;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,7 +43,7 @@ public final class TVFS {
      * order to leak no memory.
      * <p>
      * Calling this method is equivalent to
-     * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
+     * {@link #sync(BitField) sync(SyncOptions.UMOUNT)}.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
@@ -65,7 +65,7 @@ public final class TVFS {
      * cached data.
      * <p>
      * Calling this method is equivalent to
-     * {@link #sync(TFile, BitField) sync(tree, FsSyncOptions.UMOUNT)}.
+     * {@link #sync(TFile, BitField) sync(tree, SyncOptions.UMOUNT)}.
      *
      * @param  tree a file or directory in the (virtual) file system space.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
@@ -88,7 +88,7 @@ public final class TVFS {
      * cached data.
      * <p>
      * Calling this method is equivalent to
-     * {@link #sync(FsMountPoint, BitField) sync(tree, FsSyncOptions.UMOUNT)}.
+     * {@link #sync(FsMountPoint, BitField) sync(tree, SyncOptions.UMOUNT)}.
      *
      * @param  tree a file or directory in the (virtual) file system space.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
@@ -133,19 +133,19 @@ public final class TVFS {
      *
      * @param  options an array of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         options is illegal, e.g. if {@code SyncOption.ABORT_CHANGES}
      *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
+     *         {@code SyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public static void sync(FsSyncOption... options)
+    public static void sync(SyncOption... options)
     throws FsSyncException {
-        sync(FsSyncOptions.of(options));
+        sync(SyncOptions.of(options));
     }
 
     /**
@@ -154,18 +154,18 @@ public final class TVFS {
      *
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         options is illegal, e.g. if {@code SyncOption.ABORT_CHANGES}
      *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
+     *         {@code SyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
     @SuppressWarnings("deprecation")
-    public static void sync(BitField<FsSyncOption> options)
+    public static void sync(BitField<SyncOption> options)
     throws FsSyncException {
         TConfig.get().getFsManager().sync(options);
     }
@@ -178,19 +178,19 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options an array of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         options is illegal, e.g. if {@code SyncOption.ABORT_CHANGES}
      *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
+     *         {@code SyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public static void sync(TFile tree, FsSyncOption... options)
+    public static void sync(TFile tree, SyncOption... options)
     throws FsSyncException {
-        sync(tree, FsSyncOptions.of(options));
+        sync(tree, SyncOptions.of(options));
     }
 
     /**
@@ -201,17 +201,17 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         options is illegal, e.g. if {@code SyncOption.ABORT_CHANGES}
      *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
+     *         {@code SyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public static void sync(TFile tree, BitField<FsSyncOption> options)
+    public static void sync(TFile tree, BitField<SyncOption> options)
     throws FsSyncException {
         sync(mountPoint(tree), options);
     }
@@ -224,19 +224,19 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options an array of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         options is illegal, e.g. if {@code SyncOption.ABORT_CHANGES}
      *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
+     *         {@code SyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public static void sync(FsMountPoint tree, FsSyncOption... options)
+    public static void sync(FsMountPoint tree, SyncOption... options)
     throws FsSyncException {
-        sync(tree, FsSyncOptions.of(options));
+        sync(tree, SyncOptions.of(options));
     }
 
     /**
@@ -247,18 +247,18 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@code FsSyncOption.ABORT_CHANGES}
+     *         options is illegal, e.g. if {@code SyncOption.ABORT_CHANGES}
      *         is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_IO} is set and an unclosed
+     *         {@code SyncOption.FORCE_CLOSE_IO} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
     @SuppressWarnings("deprecation")
-    public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
+    public static void sync(FsMountPoint tree, BitField<SyncOption> options)
     throws FsSyncException {
         new FsFilteringManager(TConfig.get().getFsManager(), tree)
                 .sync(options);

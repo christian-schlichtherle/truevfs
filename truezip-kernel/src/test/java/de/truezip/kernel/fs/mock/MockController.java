@@ -14,8 +14,8 @@ import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.FsAccessOption;
-import de.truezip.kernel.option.FsSyncOption;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.io.ThrowingInputStream;
 import de.truezip.kernel.io.ThrowingOutputStream;
 import de.truezip.kernel.io.ThrowingSeekableByteChannel;
@@ -136,7 +136,7 @@ public class MockController extends FsController<FsModel> {
     public boolean setTime(
             FsEntryName name,
             Map<Access, Long> times,
-            BitField<FsAccessOption> options)
+            BitField<AccessOption> options)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -150,7 +150,7 @@ public class MockController extends FsController<FsModel> {
             FsEntryName name,
             BitField<Access> types,
             long value,
-            BitField<FsAccessOption> options)
+            BitField<AccessOption> options)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -162,7 +162,7 @@ public class MockController extends FsController<FsModel> {
     @Override
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
-            final BitField<FsAccessOption> options) {
+            final BitField<AccessOption> options) {
         checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
@@ -209,7 +209,7 @@ public class MockController extends FsController<FsModel> {
     @Override
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
-            final BitField<FsAccessOption> options,
+            final BitField<AccessOption> options,
             final Entry template) {
         checkUndeclaredExceptions(this);
         assert null != name;
@@ -251,7 +251,7 @@ public class MockController extends FsController<FsModel> {
     @Override
     public void mknod(  FsEntryName name,
                         Type type,
-                        BitField<FsAccessOption> options,
+                        BitField<AccessOption> options,
                         Entry template)
     throws IOException {
         checkAllExceptions(this);
@@ -262,7 +262,7 @@ public class MockController extends FsController<FsModel> {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
+    public void unlink(FsEntryName name, BitField<AccessOption> options)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -272,7 +272,7 @@ public class MockController extends FsController<FsModel> {
 
     @Override
     public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
+    sync(   BitField<SyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         checkAllExceptions(this);

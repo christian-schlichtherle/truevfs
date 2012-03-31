@@ -4,22 +4,22 @@
  */
 package de.truezip.kernel.option;
 
-import static de.truezip.kernel.option.FsSyncOption.*;
+import static de.truezip.kernel.option.SyncOption.*;
 import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * Provides common bit fields of synchronization options.
  * 
- * @see    FsSyncOption
+ * @see    SyncOption
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsSyncOptions {
+public final class SyncOptions {
 
     /** A bit field with no synchronization options set. */
-    public static final BitField<FsSyncOption>
-            NONE = BitField.noneOf(FsSyncOption.class);
+    public static final BitField<SyncOption>
+            NONE = BitField.noneOf(SyncOption.class);
 
     /**
      * Forcibly closes all I/O resources (i.e. streams, channels etc) for any
@@ -28,7 +28,7 @@ public final class FsSyncOptions {
      * controller eligible for garbage collection unless any strong references
      * are held by the client application.
      * This is equivalent to
-     * {@code BitField.of(FsSyncOption.FORCE_CLOSE_IO, FsSyncOption.CLEAR_CACHE)}.
+     * {@code BitField.of(SyncOption.FORCE_CLOSE_IO, SyncOption.CLEAR_CACHE)}.
      * <p>
      * These options should be used if an application wants to
      * synchronize all mounted archive files and make sure to clean up
@@ -37,7 +37,7 @@ public final class FsSyncOptions {
      * is still doing I/O to the archive files because otherwise the threads
      * may not be able to succeed and receive an exception.
      */
-    public static final BitField<FsSyncOption>
+    public static final BitField<SyncOption>
             UMOUNT = BitField.of(FORCE_CLOSE_IO, CLEAR_CACHE);
 
     /**
@@ -45,7 +45,7 @@ public final class FsSyncOptions {
      * channels etc) for any entries of the file system, flushes its selective
      * entry cache without clearing it and commits all changes to its parent
      * file system (if any).
-     * This is equivalent to {@code BitField.of(FsSyncOption.WAIT_CLOSE_IO)}.
+     * This is equivalent to {@code BitField.of(SyncOption.WAIT_CLOSE_IO)}.
      * <p>
      * These options should be used if a multithreaded application wants to
      * synchronize all mounted archive files without affecting any I/O to
@@ -59,7 +59,7 @@ public final class FsSyncOptions {
     // has been successfully acquired and then acquiring the output stream
     // would require an automatic sync() of the same target archive file from
     // which the input stream is reading.
-    public static final BitField<FsSyncOption>
+    public static final BitField<SyncOption>
             SYNC = BitField.of(WAIT_CLOSE_IO);
 
     /**
@@ -68,13 +68,13 @@ public final class FsSyncOptions {
      * eligible for garbage collection unless any strong references are held by
      * the client application.
      * This is equivalent to
-     * {@code BitField.of(FsSyncOption.ABORT_CHANGES)}.
+     * {@code BitField.of(SyncOption.ABORT_CHANGES)}.
      * <p>
      * These options are only meaningful immediately before the federated file
      * system itself gets deleted and should not of used by client
      * applications.
      */
-    public static final BitField<FsSyncOption>
+    public static final BitField<SyncOption>
             RESET = BitField.of(ABORT_CHANGES);
 
     /**
@@ -83,10 +83,10 @@ public final class FsSyncOptions {
      * @param  options an array of synchronization options.
      * @return A bit field of synchronization options.
      */
-    public static BitField<FsSyncOption> of(FsSyncOption... options) {
+    public static BitField<SyncOption> of(SyncOption... options) {
         return 0 == options.length ? NONE : BitField.of(options[0], options);
     }
 
     /* Can't touch this - hammer time! */
-    private FsSyncOptions() { }
+    private SyncOptions() { }
 }

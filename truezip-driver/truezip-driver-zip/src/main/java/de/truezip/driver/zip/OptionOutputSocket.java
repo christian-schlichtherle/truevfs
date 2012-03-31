@@ -5,7 +5,7 @@
 package de.truezip.driver.zip;
 
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.option.FsAccessOption;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.cio.DecoratingOutputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
@@ -20,16 +20,16 @@ import java.nio.channels.SeekableByteChannel;
  */
 public final class OptionOutputSocket
 extends DecoratingOutputSocket<Entry> {
-    final BitField<FsAccessOption> options;
+    final BitField<AccessOption> options;
 
     public OptionOutputSocket(
             final OutputSocket<?> output,
-            final BitField<FsAccessOption> options) {
+            final BitField<AccessOption> options) {
         super(output);
         this.options = options;
     }
 
-    public BitField<FsAccessOption> getOptions() {
+    public BitField<AccessOption> getOptions() {
         return options;
     }
 

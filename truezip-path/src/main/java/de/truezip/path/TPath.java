@@ -17,8 +17,8 @@ import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.*;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.addr.FsPath;
-import de.truezip.kernel.option.FsAccessOption;
-import static de.truezip.kernel.option.FsAccessOption.*;
+import de.truezip.kernel.option.AccessOption;
+import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Maps.initialCapacity;
@@ -967,11 +967,11 @@ public final class TPath implements Path {
         return getFileSystem().getEntry(this);
     }
 
-    InputSocket<?> getInputSocket(BitField<FsAccessOption> options) {
+    InputSocket<?> getInputSocket(BitField<AccessOption> options) {
         return getFileSystem().getInputSocket(this, options);
     }
 
-    OutputSocket<?> getOutputSocket(BitField<FsAccessOption> options,
+    OutputSocket<?> getOutputSocket(BitField<AccessOption> options,
                                     @CheckForNull Entry template) {
         return getFileSystem().getOutputSocket(this, options, template);
     }
@@ -994,29 +994,29 @@ public final class TPath implements Path {
         return getFileSystem().readAttributes(this, type, options);
     }
 
-    BitField<FsAccessOption> mapInput(final OpenOption... options) {
+    BitField<AccessOption> mapInput(final OpenOption... options) {
         final HashSet<OpenOption> set = new HashSet<OpenOption>(
                 initialCapacity(options.length));
         Collections.addAll(set, options);
         return mapInput(set);
     }
 
-    BitField<FsAccessOption> mapInput(final Set<? extends OpenOption> options) {
+    BitField<AccessOption> mapInput(final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
             return getAccessPreferences();
         throw new IllegalArgumentException(options.toString());
     }
 
-    BitField<FsAccessOption> mapOutput(final OpenOption... options) {
+    BitField<AccessOption> mapOutput(final OpenOption... options) {
         final HashSet<OpenOption> set = new HashSet<OpenOption>(
                 initialCapacity(options.length));
         Collections.addAll(set, options);
         return mapOutput(set);
     }
 
-    BitField<FsAccessOption> mapOutput(final Set<? extends OpenOption> options) {
-        final EnumSet<FsAccessOption> set = EnumSet.noneOf(FsAccessOption.class);
+    BitField<AccessOption> mapOutput(final Set<? extends OpenOption> options) {
+        final EnumSet<AccessOption> set = EnumSet.noneOf(AccessOption.class);
         for (final OpenOption option : options) {
             if (!(option instanceof StandardOpenOption))
                 throw new UnsupportedOperationException(option.toString());
@@ -1037,12 +1037,12 @@ public final class TPath implements Path {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        final BitField<FsAccessOption> prefs = getAccessPreferences();
+        final BitField<AccessOption> prefs = getAccessPreferences();
         return set.isEmpty() ? prefs : prefs.or(BitField.copyOf(set));
     }
 
-    BitField<FsAccessOption> getAccessPreferences() {
-        final BitField<FsAccessOption>
+    BitField<AccessOption> getAccessPreferences() {
+        final BitField<AccessOption>
                 prefs = TConfig.get().getAccessPreferences();
         return null != getMountPoint().getParent()
                 ? prefs

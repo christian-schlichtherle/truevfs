@@ -12,8 +12,8 @@ import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsSimpleCompositeDriver;
 import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.addr.FsUriModifier;
-import de.truezip.kernel.option.FsAccessOption;
-import de.truezip.kernel.option.FsSyncOptions;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.SyncOptions;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
@@ -78,7 +78,7 @@ public final class Copy {
             InputSocket<?> srcSocket = manager
                     .getController(     srcPath.getMountPoint(), driver)
                     .getInputSocket(    srcPath.getEntryName(),
-                                        BitField.noneOf(FsAccessOption.class));
+                                        BitField.noneOf(AccessOption.class));
             // Resolve the destination socket. Again, we need an absolute URI.
             URI dstUri = URI.create(dst);
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
@@ -86,15 +86,15 @@ public final class Copy {
             OutputSocket<?> dstSocket = manager
                     .getController(     dstPath.getMountPoint(), driver)
                     .getOutputSocket(   dstPath.getEntryName(),
-                                        BitField.of(FsAccessOption.CREATE_PARENTS,
-                                                    FsAccessOption.EXCLUSIVE),
+                                        BitField.of(AccessOption.CREATE_PARENTS,
+                                                    AccessOption.EXCLUSIVE),
                                         srcSocket.getLocalTarget());
             IOSocket.copy(srcSocket, dstSocket); // copy the data
         } finally {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(FsSyncOptions.UMOUNT);
+            manager.sync(SyncOptions.UMOUNT);
         }
     }
 // END SNIPPET: copy

@@ -10,7 +10,7 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsCharsetArchiveDriver;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.option.FsAccessOption;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import java.io.CharConversionException;
@@ -92,7 +92,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
             String name,
             Type type,
             Entry template,
-            BitField<FsAccessOption> mknod)
+            BitField<AccessOption> mknod)
     throws CharConversionException {
         return new MockArchiveDriverEntry(normalize(name, type), type, template);
     }

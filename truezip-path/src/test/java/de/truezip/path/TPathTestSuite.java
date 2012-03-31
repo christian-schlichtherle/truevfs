@@ -12,10 +12,10 @@ import de.truezip.kernel.fs.FsArchiveDriver;
 import de.truezip.kernel.fs.FsResourceOpenException;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.FsSyncWarningException;
-import static de.truezip.kernel.option.FsAccessOption.GROW;
-import static de.truezip.kernel.option.FsSyncOption.CLEAR_CACHE;
-import static de.truezip.kernel.option.FsSyncOption.WAIT_CLOSE_IO;
-import static de.truezip.kernel.option.FsSyncOptions.SYNC;
+import static de.truezip.kernel.option.AccessOption.GROW;
+import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
+import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
+import static de.truezip.kernel.option.SyncOptions.SYNC;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.io.Streams;
@@ -470,10 +470,10 @@ extends ConfiguredClientTestBase<D> {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
-        createFile(file1); // uses FsAccessOption.CACHE!
+        createFile(file1); // uses AccessOption.CACHE!
         umount();
         final InputStream in1 = newInputStream(file1);
-        createFile(file2); // uses FsAccessOption.CACHE!
+        createFile(file2); // uses AccessOption.CACHE!
         try {
             copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
 

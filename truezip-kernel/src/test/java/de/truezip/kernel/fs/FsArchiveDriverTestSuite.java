@@ -15,8 +15,8 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.fs.mock.MockController;
-import de.truezip.kernel.option.FsAccessOption;
-import de.truezip.kernel.option.FsAccessOptions;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -203,7 +203,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private OutputSocket<?> getArchiveOutputSocket() {
         return getArchiveDriver().getOutputSocket(parent, name,
-                FsAccessOptions.NONE, null);
+                AccessOptions.NONE, null);
     }
 
     private void input() throws IOException {
@@ -317,7 +317,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private InputSocket<?> getArchiveInputSocket() {
         return getArchiveDriver().getInputSocket(parent, name,
-                FsAccessOptions.NONE);
+                AccessOptions.NONE);
     }
 
     private static void close(final Closeable[] resources) throws IOException {
@@ -470,7 +470,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public InputSocket<?> getInputSocket(
                 final FsEntryName name,
-                final BitField<FsAccessOption> options) {
+                final BitField<AccessOption> options) {
             assert null != name;
             assert null != options;
 
@@ -507,7 +507,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public OutputSocket<?> getOutputSocket(
                 final FsEntryName name,
-                final BitField<FsAccessOption> options,
+                final BitField<AccessOption> options,
                 final Entry template) {
             assert null != name;
             assert null != options;

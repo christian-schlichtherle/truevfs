@@ -21,10 +21,10 @@ import de.truezip.kernel.fs.FsSyncWarningException;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
 import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.option.FsAccessOption;
-import static de.truezip.kernel.option.FsAccessOption.EXCLUSIVE;
-import de.truezip.kernel.option.FsSyncOption;
-import static de.truezip.kernel.option.FsSyncOptions.UMOUNT;
+import de.truezip.kernel.option.AccessOption;
+import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
+import de.truezip.kernel.option.SyncOption;
+import static de.truezip.kernel.option.SyncOptions.UMOUNT;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.FilteringIterator;
 import java.io.File;
@@ -108,7 +108,7 @@ public final class TFileSystem extends FileSystem {
      * data.
      * <p>
      * Calling this method is equivalent to
-     * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
+     * {@link #sync(BitField) sync(SyncOptions.UMOUNT)}.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
@@ -132,21 +132,21 @@ public final class TFileSystem extends FileSystem {
      * @param  options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
+     *         {@code SyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *         {@code SyncOption.FORCE_CLOSE_OUTPUT} is set or if
+     *         {@code SyncOption.ABORT_CHANGES} is set.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
      *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *         {@code SyncOption.FORCE_CLOSE_INPUT} or
+     *         {@code SyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      *         This implies some loss of data!
      */
     @SuppressWarnings("deprecation")
-    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
+    public void sync(BitField<SyncOption> options) throws FsSyncException {
         TVFS.sync(getMountPoint(), options);
     }
 
@@ -243,14 +243,14 @@ public final class TFileSystem extends FileSystem {
         final FsEntryName name = path.getEntryName();
         final FsController<?> controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
-            final BitField<FsAccessOption>
-                    o = path.mapInput(options).set(FsAccessOption.CACHE);
+            final BitField<AccessOption>
+                    o = path.mapInput(options).set(AccessOption.CACHE);
             return controller
                     .getInputSocket(name, o)
                     .newSeekableByteChannel();
         } else {
-            final BitField<FsAccessOption>
-                    o = path.mapOutput(options).set(FsAccessOption.CACHE);
+            final BitField<AccessOption>
+                    o = path.mapOutput(options).set(AccessOption.CACHE);
             try {
                 return controller
                         .getOutputSocket(name, o, null)
@@ -381,13 +381,13 @@ public final class TFileSystem extends FileSystem {
     }
 
     InputSocket<?> getInputSocket(  TPath path,
-                                    BitField<FsAccessOption> options) {
+                                    BitField<AccessOption> options) {
         return getController()
                 .getInputSocket(path.getEntryName(), options);
     }
 
     OutputSocket<?> getOutputSocket(TPath path,
-                                    BitField<FsAccessOption> options,
+                                    BitField<AccessOption> options,
                                     @CheckForNull Entry template) {
         return getController()
                 .getOutputSocket(path.getEntryName(), options, template);

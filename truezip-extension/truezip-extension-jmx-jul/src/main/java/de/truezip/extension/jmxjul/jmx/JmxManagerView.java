@@ -7,8 +7,8 @@ package de.truezip.extension.jmxjul.jmx;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsSyncException;
-import de.truezip.kernel.option.FsSyncOption;
-import static de.truezip.kernel.option.FsSyncOption.CLEAR_CACHE;
+import de.truezip.kernel.option.SyncOption;
+import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import de.truezip.kernel.util.BitField;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ implements JmxManagerViewMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
-    private static final BitField<FsSyncOption>
+    private static final BitField<SyncOption>
             SYNC_OPTIONS = BitField.of(CLEAR_CACHE);
 
     private final FsManager model;

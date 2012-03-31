@@ -23,7 +23,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum FsSyncOption {
+public enum SyncOption {
 
     /**
      * Suppose there are any open I/O resources (streams, channels etc.) for
