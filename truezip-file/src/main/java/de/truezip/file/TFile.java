@@ -1933,7 +1933,7 @@ public final class TFile extends File {
                         getInnerFsEntryName(),
                         BitField.of(Access.WRITE),
                         time,
-                        TConfig.get().getOutputPreferences());
+                        TConfig.get().getAccessPreferences());
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -2205,7 +2205,7 @@ public final class TFile extends File {
             controller.mknod(
                     entryName,
                     FILE,
-                    TConfig.get().getOutputPreferences().set(EXCLUSIVE),
+                    TConfig.get().getAccessPreferences().set(EXCLUSIVE),
                     null);
             return true;
         }
@@ -2251,7 +2251,7 @@ public final class TFile extends File {
                 innerArchive.getController().mknod(
                         getInnerFsEntryName(),
                         DIRECTORY,
-                        TConfig.get().getOutputPreferences(),
+                        TConfig.get().getAccessPreferences(),
                         null);
                 return true;
             } catch (IOException ex) {
@@ -2284,7 +2284,7 @@ public final class TFile extends File {
                 controller.mknod(
                         innerEntryName,
                         DIRECTORY,
-                        TConfig.get().getOutputPreferences(),
+                        TConfig.get().getAccessPreferences(),
                         null);
             } catch (IOException ex) {
                 final FsEntry entry = controller.getEntry(innerEntryName);
@@ -2348,7 +2348,7 @@ public final class TFile extends File {
             if (null != file.innerArchive) {
                 file.innerArchive.getController().unlink(
                         file.getInnerFsEntryName(),
-                        TConfig.get().getOutputPreferences());
+                        TConfig.get().getAccessPreferences());
                 return;
             }
             node = file.delegate;
@@ -3381,8 +3381,8 @@ public final class TFile extends File {
         final TConfig config = TConfig.push();
         try {
             // Switch off FsAccessOption.GROW.
-            config.setOutputPreferences(
-                    config.getOutputPreferences().clear(GROW));
+            config.setAccessPreferences(
+                    config.getAccessPreferences().clear(GROW));
 
             // Create temp file.
             final TFile compact = new TFile(createTempFile("tzp", suffix, dir));

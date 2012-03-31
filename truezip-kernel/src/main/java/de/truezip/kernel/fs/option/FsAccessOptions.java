@@ -17,22 +17,15 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class FsAccessOptions {
 
-    /** A bit field with no output options set. */
+    /** A bit field with no access options set. */
     public static final BitField<FsAccessOption>
             NONE = BitField.noneOf(FsAccessOption.class);
 
     /**
-     * The mask of input preferences, which is
-     * <code>{@link BitField}.of({@link FsAccessOption#CACHE})</code>.
-     */
-    public static final BitField<FsAccessOption> INPUT_PREFERENCES_MASK
-            = BitField.of(CACHE);
-
-    /**
-     * The mask of output preferences, which is
+     * The mask of access preferences, which is
      * <code>{@link BitField}.of({@link FsAccessOption#CACHE}, {@link FsAccessOption#CREATE_PARENTS}, {@link FsAccessOption#STORE}, {@link FsAccessOption#COMPRESS}, {@link FsAccessOption#GROW}, {@link FsAccessOption#ENCRYPT})</code>.
      */
-    public static final BitField<FsAccessOption> OUTPUT_PREFERENCES_MASK
+    public static final BitField<FsAccessOption> ACCESS_PREFERENCES_MASK
             = BitField.of(CACHE, CREATE_PARENTS, STORE, COMPRESS, GROW, ENCRYPT);
 
     /**

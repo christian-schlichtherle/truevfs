@@ -362,7 +362,7 @@ public final class TFileSystem extends FileSystem {
             controller.mknod(
                     name,
                     DIRECTORY,
-                    path.getOutputPreferences(),
+                    path.getAccessPreferences(),
                     null);
         } catch (IOException ex) {
             if (null != controller.getEntry(name))
@@ -373,7 +373,7 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        getController().unlink(path.getEntryName(), path.getOutputPreferences());
+        getController().unlink(path.getEntryName(), path.getAccessPreferences());
     }
 
     FsEntry getEntry(TPath path) throws IOException {
@@ -474,7 +474,7 @@ public final class TFileSystem extends FileSystem {
             controller.setTime(
                     path.getEntryName(),
                     times,
-                    path.getOutputPreferences());
+                    path.getAccessPreferences());
         }
     } // FsEntryAttributeView
 

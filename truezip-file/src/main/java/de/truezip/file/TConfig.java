@@ -8,8 +8,7 @@ import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsAccessOption.*;
 import de.truezip.kernel.fs.option.FsAccessOptions;
-import static de.truezip.kernel.fs.option.FsAccessOptions.INPUT_PREFERENCES_MASK;
-import static de.truezip.kernel.fs.option.FsAccessOptions.OUTPUT_PREFERENCES_MASK;
+import static de.truezip.kernel.fs.option.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.InheritableThreadLocalStack;
@@ -72,8 +71,8 @@ class MyApplication extends TApplication<IOException> {
                 new JarDriver(IOPoolLocator.SINGLETON)));
         // Set FsAccessOption.GROW for appending-to rather than reassembling
         // existing archive files.
-        config.setOutputPreferences(
-                config.getOutputPreferences.set(FsAccessOption.GROW));
+        config.setAccessPreferences(
+                config.getAccessPreferences.set(FsAccessOption.GROW));
     }
 
     ...
@@ -163,8 +162,8 @@ TConfig config = TConfig.push();
 try {
     // Set FsAccessOption.GROW for appending-to rather than reassembling
     // existing archive files.
-    config.setOutputPreferences(
-            config.getOutputPreferences.set(FsAccessOption.GROW));
+    config.setAccessPreferences(
+            config.getAccessPreferences.set(FsAccessOption.GROW));
 
     // Now use the current configuration and append the entry to the archive
     // file even if it's already present.
@@ -244,25 +243,14 @@ implements Closeable { // this could be AutoCloseable in JSE 7
 
     /**
      * The default value of the
-     * {@link #getInputPreferences input preferences} property, which is
-     * {@link FsAccessOptions#NONE}.
-     */
-    public static final BitField<FsAccessOption>
-            DEFAULT_INPUT_PREFERENCES = FsAccessOptions.NONE;
-
-    private static final BitField<FsAccessOption>
-            NOT_INPUT_PREFERENCES_MASK = INPUT_PREFERENCES_MASK.not();
-
-    /**
-     * The default value of the
-     * {@link #getOutputPreferences output preferences} property, which is
+     * {@link #getAccessPreferences output preferences} property, which is
      * <code>{@link BitField}.of({@link FsAccessOption#CREATE_PARENTS})</code>.
      */
     public static final BitField<FsAccessOption>
-            DEFAULT_OUTPUT_PREFERENCES = BitField.of(CREATE_PARENTS);
+            DEFAULT_ACCESS_PREFERENCES = BitField.of(CREATE_PARENTS);
 
     private static final BitField<FsAccessOption>
-            NOT_OUTPUT_PREFERENCES_MASK = OUTPUT_PREFERENCES_MASK.not();
+            NOT_ACCESS_PREFERENCES_MASK = ACCESS_PREFERENCES_MASK.not();
 
     private static final InheritableThreadLocalStack<TConfig>
             configs = new InheritableThreadLocalStack<TConfig>();
@@ -277,8 +265,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     // local configuration which has been obtained by a call to TConfig.push().
     private FsManager manager;
     private TArchiveDetector detector;
-    private BitField<FsAccessOption> inputPreferences;
-    private BitField<FsAccessOption> outputPreferences;
+    private BitField<FsAccessOption> accessPreferences;
 
     /**
      * Returns the current configuration.
@@ -324,16 +311,14 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     private TConfig() {
         this.manager = FsManagerLocator.SINGLETON.get();
         this.detector = TArchiveDetector.ALL;
-        this.inputPreferences = DEFAULT_INPUT_PREFERENCES;
-        this.outputPreferences = DEFAULT_OUTPUT_PREFERENCES;
+        this.accessPreferences = DEFAULT_ACCESS_PREFERENCES;
     }
 
     /** Copy constructor for inheritable thread local configurations. */
     private TConfig(final TConfig template) {
         this.manager = template.getFsManager();
         this.detector = template.getArchiveDetector();
-        this.inputPreferences = template.getInputPreferences();
-        this.outputPreferences = template.getOutputPreferences();
+        this.accessPreferences = template.getAccessPreferences();
     }
 
     /**
@@ -367,7 +352,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @see    #setLenient(boolean)
      */
     public boolean isLenient() {
-        return this.outputPreferences.get(CREATE_PARENTS);
+        return this.accessPreferences.get(CREATE_PARENTS);
     }
 
     /**
@@ -411,7 +396,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @see   #isLenient()
      */
     public void setLenient(final boolean lenient) {
-        this.outputPreferences = this.outputPreferences
+        this.accessPreferences = this.accessPreferences
                 .set(CREATE_PARENTS, lenient);
     }
 
@@ -448,61 +433,34 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     }
 
     /**
-     * Returns the input preferences.
+     * Returns the access preferences.
      * 
-     * @return The input preferences.
+     * @return The access preferences.
      */
-    public BitField<FsAccessOption> getInputPreferences() {
-        return this.inputPreferences;
+    public BitField<FsAccessOption> getAccessPreferences() {
+        return this.accessPreferences;
     }
 
     /**
-     * Sets the input preferences.
-     * These preferences are usually not cached, so changing them should take
-     * effect immediately.
+     * Sets the access preferences.
+     * Changing this property will show imediate effect upon the next effective
+     * access to the (virtual federated) file system.
      * 
-     * @param  preferences the input preferences.
+     * @param  preferences the access preferences.
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
-     *         {@link FsAccessOptions#INPUT_PREFERENCES_MASK}.
-     */
-    public void setInputPreferences(final BitField<FsAccessOption> preferences) {
-        final BitField<FsAccessOption>
-                illegal = preferences.and(NOT_INPUT_PREFERENCES_MASK);
-        if (!illegal.isEmpty())
-            throw new IllegalArgumentException(illegal + " (illegal input preference(s))");
-        this.inputPreferences = preferences;
-    }
-
-    /**
-     * Returns the output preferences.
-     * 
-     * @return The output preferences.
-     */
-    public BitField<FsAccessOption> getOutputPreferences() {
-        return this.outputPreferences;
-    }
-
-    /**
-     * Sets the output preferences.
-     * These preferences are usually not cached, so changing them should take
-     * effect immediately.
-     * 
-     * @param  preferences the output preferences.
-     * @throws IllegalArgumentException if an option is present in
-     *         {@code preferences} which is not present in
-     *         {@link FsAccessOptions#OUTPUT_PREFERENCES_MASK} or if both
+     *         {@link FsAccessOptions#ACCESS_PREFERENCES_MASK} or if both
      *         {@link FsAccessOption#STORE} and
      *         {@link FsAccessOption#COMPRESS} have been set.
      */
-    public void setOutputPreferences(final BitField<FsAccessOption> preferences) {
+    public void setAccessPreferences(final BitField<FsAccessOption> preferences) {
         final BitField<FsAccessOption>
-                illegal = preferences.and(NOT_OUTPUT_PREFERENCES_MASK);
+                illegal = preferences.and(NOT_ACCESS_PREFERENCES_MASK);
         if (!illegal.isEmpty())
             throw new IllegalArgumentException(illegal + " (illegal output preference(s))");
         if (preferences.get(STORE) && preferences.get(COMPRESS))
             throw new IllegalArgumentException(preferences + " (either STORE or COMPRESS may be set, but not both)");
-        this.outputPreferences = preferences;
+        this.accessPreferences = preferences;
     }
 
     @Override

@@ -1004,12 +1004,8 @@ public final class TPath implements Path {
     BitField<FsAccessOption> mapInput(final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return getInputPreferences();
+            return getAccessPreferences();
         throw new IllegalArgumentException(options.toString());
-    }
-
-    BitField<FsAccessOption> getInputPreferences() {
-        return TConfig.get().getInputPreferences();
     }
 
     BitField<FsAccessOption> mapOutput(final OpenOption... options) {
@@ -1041,14 +1037,13 @@ public final class TPath implements Path {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        final BitField<FsAccessOption> prefs = getOutputPreferences();
+        final BitField<FsAccessOption> prefs = getAccessPreferences();
         return set.isEmpty() ? prefs : prefs.or(BitField.copyOf(set));
     }
 
-    BitField<FsAccessOption> getOutputPreferences() {
-        final BitField<FsAccessOption> prefs = TConfig
-                .get()
-                .getOutputPreferences();
+    BitField<FsAccessOption> getAccessPreferences() {
+        final BitField<FsAccessOption>
+                prefs = TConfig.get().getAccessPreferences();
         return null != getMountPoint().getParent()
                 ? prefs
                 : prefs.clear(CREATE_PARENTS);

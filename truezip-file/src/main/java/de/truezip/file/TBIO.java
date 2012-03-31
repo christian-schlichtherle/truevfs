@@ -212,10 +212,9 @@ final class TBIO {
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
         final TConfig config = TConfig.get();
-        final InputSocket<?> input = getInputSocket(src,
-                config.getInputPreferences());
-        final OutputSocket<?> output = getOutputSocket(dst,
-                config.getOutputPreferences(),
+        BitField<FsAccessOption> preferences = config.getAccessPreferences();
+        final InputSocket<?> input = getInputSocket(src, preferences);
+        final OutputSocket<?> output = getOutputSocket(dst, preferences,
                 preserve ? input.getLocalTarget() : null);
         IOSocket.copy(input, output);
     }

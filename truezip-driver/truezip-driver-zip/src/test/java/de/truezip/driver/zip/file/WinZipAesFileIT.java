@@ -35,7 +35,7 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
     public void setUp() throws IOException {
         super.setUp();
         final TConfig config = TConfig.get();
-        config.setOutputPreferences(config.getOutputPreferences().set(ENCRYPT));
+        config.setAccessPreferences(config.getAccessPreferences().set(ENCRYPT));
     }
 
     private void setAction(Action action) {

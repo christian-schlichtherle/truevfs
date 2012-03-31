@@ -383,7 +383,7 @@ public class Nzip extends Application {
 
         final TConfig config = TConfig.push();
         try {
-            config.setOutputPreferences(config.getOutputPreferences()
+            config.setAccessPreferences(config.getAccessPreferences()
                     .set(STORE, store)
                     .set(COMPRESS, compress)
                     .set(GROW, grow)

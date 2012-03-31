@@ -6,9 +6,7 @@ package de.truezip.file;
 
 import de.truezip.kernel.fs.FsDriver;
 import de.truezip.kernel.fs.mock.MockArchiveDriver;
-import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsAccessOption.*;
-import de.truezip.kernel.fs.option.FsAccessOptions;
 import de.truezip.kernel.util.BitField;
 import java.util.NoSuchElementException;
 import static org.hamcrest.CoreMatchers.is;
@@ -35,8 +33,7 @@ public final class TConfigTest {
         final boolean lenient = c.isLenient();
         assertThat(lenient, is(true));
         assertThat(c.isLenient(), is(lenient));
-        assertTrue(c.getInputPreferences().isEmpty());
-        assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+        assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
     }
 
     @Test
@@ -117,100 +114,76 @@ public final class TConfigTest {
         final TConfig c = TConfig.push();
         try {
             assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
 
             c.setLenient(false);
 
             assertFalse(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertTrue(c.getOutputPreferences().isEmpty());
+            assertTrue(c.getAccessPreferences().isEmpty());
 
             c.setLenient(true);
 
             assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            c.setInputPreferences(BitField.of(FsAccessOption.CACHE));
-
-            assertTrue(c.isLenient());
-            assertThat(c.getInputPreferences(), is(BitField.of(FsAccessOption.CACHE)));
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
-
-            c.setInputPreferences(FsAccessOptions.NONE);
-
-            assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
-
-            c.setOutputPreferences(BitField.of(CACHE));
+            c.setAccessPreferences(BitField.of(CACHE));
 
             assertFalse(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CACHE)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CACHE)));
 
-            c.setOutputPreferences(BitField.of(CREATE_PARENTS));
+            c.setAccessPreferences(BitField.of(CREATE_PARENTS));
 
             assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
 
             try {
-                c.setOutputPreferences(BitField.of(APPEND));
+                c.setAccessPreferences(BitField.of(APPEND));
                 fail();
             } catch (IllegalArgumentException expected) {
             }
 
             assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
 
             try {
-                c.setOutputPreferences(BitField.of(EXCLUSIVE));
+                c.setAccessPreferences(BitField.of(EXCLUSIVE));
                 fail();
             } catch (IllegalArgumentException expected) {
             }
 
             assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
 
-            c.setOutputPreferences(BitField.of(STORE));
-
-            assertFalse(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(STORE)));
-
-            c.setOutputPreferences(BitField.of(COMPRESS));
+            c.setAccessPreferences(BitField.of(STORE));
 
             assertFalse(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(COMPRESS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(STORE)));
 
-            c.setOutputPreferences(BitField.of(GROW));
+            c.setAccessPreferences(BitField.of(COMPRESS));
 
             assertFalse(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(GROW)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(COMPRESS)));
 
-            c.setOutputPreferences(BitField.of(CACHE, CREATE_PARENTS, COMPRESS));
+            c.setAccessPreferences(BitField.of(GROW));
+
+            assertFalse(c.isLenient());
+            assertThat(c.getAccessPreferences(), is(BitField.of(GROW)));
+
+            c.setAccessPreferences(BitField.of(CACHE, CREATE_PARENTS, COMPRESS));
 
             assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CACHE, CREATE_PARENTS, COMPRESS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CACHE, CREATE_PARENTS, COMPRESS)));
 
-            c.setOutputPreferences(BitField.of(CREATE_PARENTS));
+            c.setAccessPreferences(BitField.of(CREATE_PARENTS));
 
             try {
-                c.setOutputPreferences(BitField.of(STORE, COMPRESS));
+                c.setAccessPreferences(BitField.of(STORE, COMPRESS));
                 fail();
             } catch (IllegalArgumentException expected) {
             }
 
             assertTrue(c.isLenient());
-            assertTrue(c.getInputPreferences().isEmpty());
-            assertThat(c.getOutputPreferences(), is(BitField.of(CREATE_PARENTS)));
+            assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
         } finally {
             c.close();
         }
