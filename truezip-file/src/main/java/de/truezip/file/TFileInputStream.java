@@ -4,8 +4,8 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
@@ -99,7 +99,7 @@ public final class TFileInputStream extends DecoratingInputStream {
     private static InputStream newInputStream(final File src)
     throws FileNotFoundException {
         final InputSocket<?> input = TBIO.getInputSocket(src,
-                TConfig.get().getInputPreferences());
+                TConfig.get().getAccessPreferences());
         try {
             return input.newInputStream();
         } catch (FileNotFoundException ex) {

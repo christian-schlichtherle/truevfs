@@ -21,7 +21,7 @@ import de.truezip.kernel.fs.addr.FsEntryName;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsAccessOption.CACHE;
 import static de.truezip.kernel.fs.option.FsAccessOption.GROW;
-import static de.truezip.kernel.fs.option.FsAccessOptions.OUTPUT_PREFERENCES_MASK;
+import static de.truezip.kernel.fs.option.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import static de.truezip.kernel.fs.option.FsSyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.fs.option.FsSyncOption.CLEAR_CACHE;
@@ -243,7 +243,7 @@ extends FsFileSystemArchiveController<E> {
             return oa;
         final BitField<FsAccessOption> options = getContext()
                 .getOutputOptions()
-                .and(OUTPUT_PREFERENCES_MASK)
+                .and(ACCESS_PREFERENCES_MASK)
                 .set(CACHE);
         final OutputSocket<?> os = driver.getOutputSocket(
                 parent, name, options, null);

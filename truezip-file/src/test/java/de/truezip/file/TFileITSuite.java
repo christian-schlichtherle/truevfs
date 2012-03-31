@@ -1458,7 +1458,7 @@ extends ConfiguredClientTestBase<D> {
 
         TConfig config = TConfig.push();
         try {
-            config.setOutputPreferences(config.getOutputPreferences().set(GROW));
+            config.setAccessPreferences(config.getAccessPreferences().set(GROW));
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1488,7 +1488,7 @@ extends ConfiguredClientTestBase<D> {
 
         config = TConfig.push();
         try {
-            config.setOutputPreferences(config.getOutputPreferences().set(GROW));
+            config.setAccessPreferences(config.getAccessPreferences().set(GROW));
 
             archive.rm();
             umount();
