@@ -8,4 +8,4 @@
  * @author Christian Schlichtherle
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package de.truezip.kernel.fs.addr;
+package de.truezip.kernel.addr;

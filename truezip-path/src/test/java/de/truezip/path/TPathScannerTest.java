@@ -6,8 +6,8 @@ package de.truezip.path;
 
 import de.truezip.file.MockArchiveDriverTestBase;
 import de.truezip.file.TConfig;
-import de.truezip.kernel.fs.addr.FsMountPoint;
-import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsPath;
 import de.truezip.path.TPathScanner;
 import static de.truezip.path.TPathScanner.parent;
 import static java.io.File.separatorChar;

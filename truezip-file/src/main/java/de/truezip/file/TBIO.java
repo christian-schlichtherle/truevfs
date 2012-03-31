@@ -8,7 +8,7 @@ import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.fs.option.FsAccessOption;
 import static de.truezip.kernel.fs.option.FsAccessOption.CREATE_PARENTS;
 import de.truezip.kernel.io.Paths;

@@ -6,7 +6,7 @@ package de.truezip.kernel.fs.sample;
 
 import de.truezip.kernel.fs.FsDriver;
 import de.truezip.kernel.fs.FsDriverProvider;
-import de.truezip.kernel.fs.addr.FsScheme;
+import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.util.SuffixSet;
 import java.io.PrintStream;

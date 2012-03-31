@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.fs.option.FsSyncOption;
 import static de.truezip.kernel.fs.option.FsSyncOption.ABORT_CHANGES;
 import de.truezip.kernel.util.BitField;

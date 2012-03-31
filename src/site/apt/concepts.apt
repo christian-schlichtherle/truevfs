@@ -114,10 +114,10 @@ Concepts
     which is a key requirement for most TrueZIP Kernel classes.
 
     For example, the classes
-    {{{./apidocs/de/truezip/kernel/fs/addr/FsPath.html}<<<FsPath>>>}},
-    {{{./apidocs/de/truezip/kernel/fs/addr/FsMountPoint.html}<<<FsMountPoint>>>}}
+    {{{./apidocs/de/truezip/kernel/addr/FsPath.html}<<<FsPath>>>}},
+    {{{./apidocs/de/truezip/kernel/addr/FsMountPoint.html}<<<FsMountPoint>>>}}
     and
-    {{{./apidocs/de/truezip/kernel/fs/addr/FsEntryName.html}<<<FsEntryName>>>}}
+    {{{./apidocs/de/truezip/kernel/addr/FsEntryName.html}<<<FsEntryName>>>}}
     are immutable so that their instances can get safely shared among many
     objects and threads.
 

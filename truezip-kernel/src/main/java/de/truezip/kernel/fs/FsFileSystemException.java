@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsEntryName;
+import de.truezip.kernel.addr.FsEntryName;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;

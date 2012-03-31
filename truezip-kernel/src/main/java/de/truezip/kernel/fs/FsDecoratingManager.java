@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsMountPoint;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
 

@@ -4,9 +4,9 @@
  */
 package de.truezip.kernel.fs;
 
-import de.truezip.kernel.fs.addr.FsEntryName;
-import de.truezip.kernel.fs.addr.FsMountPoint;
-import de.truezip.kernel.fs.addr.FsPath;
+import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsPath;
 import java.net.URI;
 import javax.annotation.CheckForNull;
 import static org.hamcrest.CoreMatchers.*;

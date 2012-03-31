@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.fs.addr;
+package de.truezip.kernel.addr;
 
-import de.truezip.kernel.fs.addr.FsEntryName;
-import static de.truezip.kernel.fs.addr.FsUriModifier.CANONICALIZE;
+import de.truezip.kernel.addr.FsEntryName;
+import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
