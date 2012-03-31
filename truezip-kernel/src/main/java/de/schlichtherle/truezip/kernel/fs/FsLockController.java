@@ -9,9 +9,9 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.*;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.FsAccessOption;
-import de.truezip.kernel.option.FsSyncOption;
-import static de.truezip.kernel.option.FsSyncOption.WAIT_CLOSE_IO;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.SyncOption;
+import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -59,7 +59,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             : ThreadLocalUtilFactory.OLD
                 ).newThreadLocalUtil();
 
-    private static final BitField<FsSyncOption>
+    private static final BitField<SyncOption>
             NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not();
 
     private final ReadLock readLock;
@@ -251,7 +251,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            final BitField<FsAccessOption> options)
+            final BitField<AccessOption> options)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
@@ -268,7 +268,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             final FsEntryName name,
             final BitField<Access> types,
             final long value,
-            final BitField<FsAccessOption> options)
+            final BitField<AccessOption> options)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
@@ -282,13 +282,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<FsAccessOption> options) {
+                                            BitField<AccessOption> options) {
         return SOCKET_FACTORY.newInputSocket(this, name, options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsAccessOption> options,
+                                            BitField<AccessOption> options,
                                             @CheckForNull Entry template) {
         return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
     }
@@ -298,7 +298,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     public void
     mknod(  final FsEntryName name,
             final Type type,
-            final BitField<FsAccessOption> options,
+            final BitField<AccessOption> options,
             final Entry template)
     throws IOException {
         final class Mknod implements IOOperation<Void> {
@@ -315,7 +315,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Override
     public void unlink(
             final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<AccessOption> options)
     throws IOException {
         final class Unlink implements IOOperation<Void> {
             @Override
@@ -330,11 +330,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
+    sync(   final BitField<SyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         // MUST not initialize within IOOperation => would always be true!
-        final BitField<FsSyncOption> sync = threadUtil.get().locking
+        final BitField<SyncOption> sync = threadUtil.get().locking
                 ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
                 : options;
 
@@ -388,7 +388,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             InputSocket<?> newInputSocket(
                     FsLockController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options) {
+                    BitField<AccessOption> options) {
                 return controller.new Nio2Input(name, options);
             }
 
@@ -396,7 +396,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             OutputSocket<?> newOutputSocket(
                     FsLockController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options,
+                    BitField<AccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Nio2Output(name, options, template);
             }
@@ -407,7 +407,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             InputSocket<?> newInputSocket(
                     FsLockController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options) {
+                    BitField<AccessOption> options) {
                 return controller.new Input(name, options);
             }
 
@@ -415,7 +415,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             OutputSocket<?> newOutputSocket(
                     FsLockController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options,
+                    BitField<AccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Output(name, options, template);
             }
@@ -424,19 +424,19 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         abstract InputSocket<?> newInputSocket(
                 FsLockController controller,
                 FsEntryName name,
-                BitField<FsAccessOption> options);
+                BitField<AccessOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
                 FsLockController controller,
                 FsEntryName name,
-                BitField<FsAccessOption> options,
+                BitField<AccessOption> options,
                 @CheckForNull Entry template);
     } // SocketFactory
 
     @Immutable
     private final class Nio2Input extends Input {
         Nio2Input(  final FsEntryName name,
-                    final BitField<FsAccessOption> options) {
+                    final BitField<AccessOption> options) {
             super(name, options);
         }
 
@@ -457,7 +457,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Immutable
     private class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
-                final BitField<FsAccessOption> options) {
+                final BitField<AccessOption> options) {
             super(FsLockController.this.delegate
                     .getInputSocket(name, options));
         }
@@ -504,7 +504,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Immutable
     private final class Nio2Output extends Output {
         Nio2Output( final FsEntryName name,
-                    final BitField<FsAccessOption> options,
+                    final BitField<AccessOption> options,
                     final @CheckForNull Entry template) {
             super(name, options, template);
         }
@@ -526,7 +526,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Immutable
     private class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
-                final BitField<FsAccessOption> options,
+                final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
             super(FsLockController.this.delegate
                     .getOutputSocket(name, options, template));

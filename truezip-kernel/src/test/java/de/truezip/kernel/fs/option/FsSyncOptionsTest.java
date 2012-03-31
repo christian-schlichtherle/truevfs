@@ -4,8 +4,8 @@
  */
 package de.truezip.kernel.option;
 
-import static de.truezip.kernel.option.FsSyncOption.*;
-import static de.truezip.kernel.option.FsSyncOptions.*;
+import static de.truezip.kernel.option.SyncOption.*;
+import static de.truezip.kernel.option.SyncOptions.*;
 import de.truezip.kernel.util.BitField;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -19,14 +19,14 @@ public class FsSyncOptionsTest {
     public void testOf() {
         for (final Object[] params : new Object[][] {
             // { $array, $bits }
-            { new FsSyncOption[0], NONE },
-            { new FsSyncOption[] { ABORT_CHANGES }, RESET },
-            { new FsSyncOption[] { WAIT_CLOSE_IO }, SYNC },
-            { new FsSyncOption[] { FORCE_CLOSE_IO, CLEAR_CACHE }, UMOUNT },
+            { new SyncOption[0], NONE },
+            { new SyncOption[] { ABORT_CHANGES }, RESET },
+            { new SyncOption[] { WAIT_CLOSE_IO }, SYNC },
+            { new SyncOption[] { FORCE_CLOSE_IO, CLEAR_CACHE }, UMOUNT },
         }) {
-            final FsSyncOption[] array = (FsSyncOption[]) params[0];
+            final SyncOption[] array = (SyncOption[]) params[0];
             final BitField<?> bits = (BitField<?>) params[1];
-            assertEquals(bits, FsSyncOptions.of(array));
+            assertEquals(bits, SyncOptions.of(array));
         }
     }
 }

@@ -10,10 +10,10 @@ import de.truezip.kernel.fs.FsResourceOpenException;
 import de.truezip.kernel.fs.FsSyncException;
 import de.truezip.kernel.fs.FsSyncWarningException;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.FsAccessOption;
-import de.truezip.kernel.option.FsSyncOption;
-import static de.truezip.kernel.option.FsSyncOption.FORCE_CLOSE_IO;
-import static de.truezip.kernel.option.FsSyncOption.WAIT_CLOSE_IO;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.SyncOption;
+import static de.truezip.kernel.option.SyncOption.FORCE_CLOSE_IO;
+import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -65,20 +65,20 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<FsAccessOption> options) {
+                                            BitField<AccessOption> options) {
         return SOCKET_FACTORY.newInputSocket(this, name, options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsAccessOption> options,
+                                            BitField<AccessOption> options,
                                             @CheckForNull Entry template) {
         return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
     }
 
     @Override
     public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
+    sync(   final BitField<SyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         assert isWriteLockedByCurrentThread();
@@ -104,7 +104,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    waitIdle(   final BitField<FsSyncOption> options,
+    waitIdle(   final BitField<SyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // HC SUNT DRACONES!
@@ -169,7 +169,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             InputSocket<?> newInputSocket(
                     FsResourceController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options) {
+                    BitField<AccessOption> options) {
                 return controller.new Nio2Input(name, options);
             }
 
@@ -177,7 +177,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             OutputSocket<?> newOutputSocket(
                     FsResourceController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options,
+                    BitField<AccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Nio2Output(name, options, template);
             }
@@ -188,7 +188,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             InputSocket<?> newInputSocket(
                     FsResourceController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options) {
+                    BitField<AccessOption> options) {
                 return controller.new Input(name, options);
             }
 
@@ -196,7 +196,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             OutputSocket<?> newOutputSocket(
                     FsResourceController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options,
+                    BitField<AccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Output(name, options, template);
             }
@@ -205,19 +205,19 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         abstract InputSocket<?> newInputSocket(
                 FsResourceController controller,
                 FsEntryName name,
-                BitField<FsAccessOption> options);
+                BitField<AccessOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
                 FsResourceController controller,
                 FsEntryName name,
-                BitField<FsAccessOption> options,
+                BitField<AccessOption> options,
                 @CheckForNull Entry template);
     } // SocketFactory
 
     @Immutable
     private final class Nio2Input extends Input {
         Nio2Input(  final FsEntryName name,
-                    final BitField<FsAccessOption> options) {
+                    final BitField<AccessOption> options) {
             super(name, options);
         }
 
@@ -231,7 +231,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Immutable
     private class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
-                final BitField<FsAccessOption> options) {
+                final BitField<AccessOption> options) {
             super(FsResourceController.this.delegate
                     .getInputSocket(name, options));
         }
@@ -252,7 +252,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Immutable
     private final class Nio2Output extends Output {
         Nio2Output( final FsEntryName name,
-                    final BitField<FsAccessOption> options,
+                    final BitField<AccessOption> options,
                     final @CheckForNull Entry template) {
             super(name, options, template);
         }
@@ -267,7 +267,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Immutable
     private class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
-                final BitField<FsAccessOption> options,
+                final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
             super(FsResourceController.this.delegate
                     .getOutputSocket(name, options, template));

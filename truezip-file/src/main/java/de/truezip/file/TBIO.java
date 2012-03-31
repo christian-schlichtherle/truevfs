@@ -9,8 +9,8 @@ import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.addr.FsPath;
-import de.truezip.kernel.option.FsAccessOption;
-import static de.truezip.kernel.option.FsAccessOption.CREATE_PARENTS;
+import de.truezip.kernel.option.AccessOption;
+import static de.truezip.kernel.option.AccessOption.CREATE_PARENTS;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.util.BitField;
 import java.io.File;
@@ -212,7 +212,7 @@ final class TBIO {
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
         final TConfig config = TConfig.get();
-        BitField<FsAccessOption> preferences = config.getAccessPreferences();
+        BitField<AccessOption> preferences = config.getAccessPreferences();
         final InputSocket<?> input = getInputSocket(src, preferences);
         final OutputSocket<?> output = getOutputSocket(dst, preferences,
                 preserve ? input.getLocalTarget() : null);
@@ -265,7 +265,7 @@ final class TBIO {
      */
     @SuppressWarnings("deprecation")
     static InputSocket<?>
-    getInputSocket(final File src, final BitField<FsAccessOption> options) {
+    getInputSocket(final File src, final BitField<AccessOption> options) {
         if (src instanceof TFile) {
             final TFile tsrc = (TFile) src;
             final TFile archive = tsrc.getInnerArchive();
@@ -294,7 +294,7 @@ final class TBIO {
     @SuppressWarnings("deprecation")
     static OutputSocket<?>
     getOutputSocket(final File dst,
-                    final BitField<FsAccessOption> options,
+                    final BitField<AccessOption> options,
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
             final TFile tdst = (TFile) dst;

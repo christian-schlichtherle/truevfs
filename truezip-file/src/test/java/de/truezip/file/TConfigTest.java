@@ -6,7 +6,7 @@ package de.truezip.file;
 
 import de.truezip.kernel.fs.FsDriver;
 import de.truezip.kernel.fs.mock.MockArchiveDriver;
-import static de.truezip.kernel.option.FsAccessOption.*;
+import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.util.BitField;
 import java.util.NoSuchElementException;
 import static org.hamcrest.CoreMatchers.is;

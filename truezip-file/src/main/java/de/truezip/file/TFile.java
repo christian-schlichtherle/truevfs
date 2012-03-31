@@ -17,10 +17,10 @@ import static de.truezip.kernel.addr.FsEntryName.ROOT;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.fs.*;
 import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
-import static de.truezip.kernel.option.FsAccessOption.EXCLUSIVE;
-import static de.truezip.kernel.option.FsAccessOption.GROW;
+import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
+import static de.truezip.kernel.option.AccessOption.GROW;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.FsAccessOption;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.io.Paths.Splitter;
 import de.truezip.kernel.io.Streams;
@@ -3327,7 +3327,7 @@ public final class TFile extends File {
      * then this operation does nothing and returns immediately.
      * <p>
      * This operation is intended to compact archive files which have been
-     * frequently updated with {@link FsAccessOption#GROW} or similar means.
+     * frequently updated with {@link AccessOption#GROW} or similar means.
      * If this output option preference is set and an archive file is updated
      * frequently, then over time a lot of redundant artifacts such as archive
      * entry contents and meta data, including central directories may be
@@ -3362,7 +3362,7 @@ public final class TFile extends File {
      * 
      * @return this
      * @throws IOException On any I/O error.
-     * @see    FsAccessOption#GROW
+     * @see    AccessOption#GROW
      */
     public TFile compact() throws IOException {
         if (isTopLevelArchive()) // see http://java.net/jira/browse/TRUEZIP-205
@@ -3380,7 +3380,7 @@ public final class TFile extends File {
         final String suffix = getSuffix(grown);
         final TConfig config = TConfig.push();
         try {
-            // Switch off FsAccessOption.GROW.
+            // Switch off AccessOption.GROW.
             config.setAccessPreferences(
                     config.getAccessPreferences().clear(GROW));
 

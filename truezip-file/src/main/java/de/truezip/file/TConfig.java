@@ -5,10 +5,10 @@
 package de.truezip.file;
 
 import de.truezip.kernel.fs.FsManager;
-import de.truezip.kernel.option.FsAccessOption;
-import static de.truezip.kernel.option.FsAccessOption.*;
-import de.truezip.kernel.option.FsAccessOptions;
-import static de.truezip.kernel.option.FsAccessOptions.ACCESS_PREFERENCES_MASK;
+import de.truezip.kernel.option.AccessOption;
+import static de.truezip.kernel.option.AccessOption.*;
+import de.truezip.kernel.option.AccessOptions;
+import static de.truezip.kernel.option.AccessOptions.ACCESS_PREFERENCES_MASK;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.InheritableThreadLocalStack;
@@ -69,10 +69,10 @@ class MyApplication extends TApplication<IOException> {
         // Configure custom application file format.
         config.setArchiveDetector(new TArchiveDetector("aff",
                 new JarDriver(IOPoolLocator.SINGLETON)));
-        // Set FsAccessOption.GROW for appending-to rather than reassembling
+        // Set AccessOption.GROW for appending-to rather than reassembling
         // existing archive files.
         config.setAccessPreferences(
-                config.getAccessPreferences.set(FsAccessOption.GROW));
+                config.getAccessPreferences.set(AccessOption.GROW));
     }
 
     ...
@@ -145,7 +145,7 @@ try (TConfig config = TConfig.push()) {
  * the resulting archive file.
  * <p>
  * Therefore, you can change this strategy by setting the
- * {@link FsAccessOption#GROW} output option preference when writing archive
+ * {@link AccessOption#GROW} output option preference when writing archive
  * entry contents or updating their meta data.
  * When set, this output option allows archive files to grow by appending new
  * or updated archive entries to their end and inhibiting archive update
@@ -160,10 +160,10 @@ TFile file = new TFile("archive.zip/entry");
 // stack.
 TConfig config = TConfig.push();
 try {
-    // Set FsAccessOption.GROW for appending-to rather than reassembling
+    // Set AccessOption.GROW for appending-to rather than reassembling
     // existing archive files.
     config.setAccessPreferences(
-            config.getAccessPreferences.set(FsAccessOption.GROW));
+            config.getAccessPreferences.set(AccessOption.GROW));
 
     // Now use the current configuration and append the entry to the archive
     // file even if it's already present.
@@ -244,12 +244,12 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     /**
      * The default value of the
      * {@link #getAccessPreferences output preferences} property, which is
-     * <code>{@link BitField}.of({@link FsAccessOption#CREATE_PARENTS})</code>.
+     * <code>{@link BitField}.of({@link AccessOption#CREATE_PARENTS})</code>.
      */
-    public static final BitField<FsAccessOption>
+    public static final BitField<AccessOption>
             DEFAULT_ACCESS_PREFERENCES = BitField.of(CREATE_PARENTS);
 
-    private static final BitField<FsAccessOption>
+    private static final BitField<AccessOption>
             NOT_ACCESS_PREFERENCES_MASK = ACCESS_PREFERENCES_MASK.not();
 
     private static final InheritableThreadLocalStack<TConfig>
@@ -265,7 +265,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     // local configuration which has been obtained by a call to TConfig.push().
     private FsManager manager;
     private TArchiveDetector detector;
-    private BitField<FsAccessOption> accessPreferences;
+    private BitField<AccessOption> accessPreferences;
 
     /**
      * Returns the current configuration.
@@ -442,7 +442,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * 
      * @return The access preferences.
      */
-    public BitField<FsAccessOption> getAccessPreferences() {
+    public BitField<AccessOption> getAccessPreferences() {
         return this.accessPreferences;
     }
 
@@ -454,12 +454,12 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * @param  preferences the access preferences.
      * @throws IllegalArgumentException if an option is present in
      *         {@code preferences} which is not present in
-     *         {@link FsAccessOptions#ACCESS_PREFERENCES_MASK} or if both
-     *         {@link FsAccessOption#STORE} and
-     *         {@link FsAccessOption#COMPRESS} have been set.
+     *         {@link AccessOptions#ACCESS_PREFERENCES_MASK} or if both
+     *         {@link AccessOption#STORE} and
+     *         {@link AccessOption#COMPRESS} have been set.
      */
-    public void setAccessPreferences(final BitField<FsAccessOption> preferences) {
-        final BitField<FsAccessOption>
+    public void setAccessPreferences(final BitField<AccessOption> preferences) {
+        final BitField<AccessOption>
                 illegal = preferences.and(NOT_ACCESS_PREFERENCES_MASK);
         if (!illegal.isEmpty())
             throw new IllegalArgumentException(illegal + " (illegal output preference(s))");

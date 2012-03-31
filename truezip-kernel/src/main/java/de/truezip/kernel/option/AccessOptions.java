@@ -4,28 +4,28 @@
  */
 package de.truezip.kernel.option;
 
-import static de.truezip.kernel.option.FsAccessOption.*;
+import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * Provides common bit fields of access options for I/O operations.
  * 
- * @see    FsAccessOption
+ * @see    AccessOption
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsAccessOptions {
+public final class AccessOptions {
 
     /** A bit field with no access options set. */
-    public static final BitField<FsAccessOption>
-            NONE = BitField.noneOf(FsAccessOption.class);
+    public static final BitField<AccessOption>
+            NONE = BitField.noneOf(AccessOption.class);
 
     /**
      * The mask of access preferences, which is
-     * <code>{@link BitField}.of({@link FsAccessOption#CACHE}, {@link FsAccessOption#CREATE_PARENTS}, {@link FsAccessOption#STORE}, {@link FsAccessOption#COMPRESS}, {@link FsAccessOption#GROW}, {@link FsAccessOption#ENCRYPT})</code>.
+     * <code>{@link BitField}.of({@link AccessOption#CACHE}, {@link AccessOption#CREATE_PARENTS}, {@link AccessOption#STORE}, {@link AccessOption#COMPRESS}, {@link AccessOption#GROW}, {@link AccessOption#ENCRYPT})</code>.
      */
-    public static final BitField<FsAccessOption> ACCESS_PREFERENCES_MASK
+    public static final BitField<AccessOption> ACCESS_PREFERENCES_MASK
             = BitField.of(CACHE, CREATE_PARENTS, STORE, COMPRESS, GROW, ENCRYPT);
 
     /**
@@ -34,10 +34,10 @@ public final class FsAccessOptions {
      * @param  options an array of output options.
      * @return A bit field of output options.
      */
-    public static BitField<FsAccessOption> of(FsAccessOption... options) {
+    public static BitField<AccessOption> of(AccessOption... options) {
         return 0 == options.length ? NONE : BitField.of(options[0], options);
     }
 
     /* Can't touch this - hammer time! */
-    private FsAccessOptions() { }
+    private AccessOptions() { }
 }

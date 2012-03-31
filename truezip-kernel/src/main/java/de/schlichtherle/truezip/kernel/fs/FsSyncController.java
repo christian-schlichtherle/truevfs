@@ -11,7 +11,7 @@ import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsEntry;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.FsAccessOption;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -128,7 +128,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            final BitField<FsAccessOption> options)
+            final BitField<AccessOption> options)
     throws IOException {
         while (true) {
             try {
@@ -144,7 +144,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             final FsEntryName name,
             final BitField<Access> types,
             final long value,
-            final BitField<FsAccessOption> options)
+            final BitField<AccessOption> options)
     throws IOException {
         while (true) {
             try {
@@ -157,14 +157,14 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<FsAccessOption> options) {
+                                            BitField<AccessOption> options) {
         return SOCKET_FACTORY.newInputSocket(this, name, options);
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<FsAccessOption> options,
+                                            BitField<AccessOption> options,
                                             @CheckForNull Entry template) {
         return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
     }
@@ -173,7 +173,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public void mknod(
             final FsEntryName name,
             final Type type,
-            final BitField<FsAccessOption> options,
+            final BitField<AccessOption> options,
             final @CheckForNull Entry template)
     throws IOException {
         while (true) {
@@ -189,7 +189,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     @Override
     public void unlink(
             final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<AccessOption> options)
     throws IOException {
         while (true) {
             try {
@@ -219,7 +219,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             InputSocket<?> newInputSocket(
                     FsSyncController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options) {
+                    BitField<AccessOption> options) {
                 return controller.new Nio2Input(name, options);
             }
 
@@ -227,7 +227,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             OutputSocket<?> newOutputSocket(
                     FsSyncController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options,
+                    BitField<AccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Nio2Output(name, options, template);
             }
@@ -238,7 +238,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             InputSocket<?> newInputSocket(
                     FsSyncController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options) {
+                    BitField<AccessOption> options) {
                 return controller.new Input(name, options);
             }
 
@@ -246,7 +246,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             OutputSocket<?> newOutputSocket(
                     FsSyncController controller,
                     FsEntryName name,
-                    BitField<FsAccessOption> options,
+                    BitField<AccessOption> options,
                     @CheckForNull Entry template) {
                 return controller.new Output(name, options, template);
             }
@@ -255,19 +255,19 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         abstract InputSocket<?> newInputSocket(
                 FsSyncController controller,
                 FsEntryName name,
-                BitField<FsAccessOption> options);
+                BitField<AccessOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
                 FsSyncController controller,
                 FsEntryName name,
-                BitField<FsAccessOption> options,
+                BitField<AccessOption> options,
                 @CheckForNull Entry template);
     } // SocketFactory
 
     @Immutable
     private final class Nio2Input extends Input {
         Nio2Input(  final FsEntryName name,
-                    final BitField<FsAccessOption> options) {
+                    final BitField<AccessOption> options) {
             super(name, options);
         }
 
@@ -287,7 +287,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     @Immutable
     private class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
-                final BitField<FsAccessOption> options) {
+                final BitField<AccessOption> options) {
             super(FsSyncController.this.delegate
                     .getInputSocket(name, options));
         }
@@ -331,7 +331,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     @Immutable
     private final class Nio2Output extends Output {
         Nio2Output( final FsEntryName name,
-                    final BitField<FsAccessOption> options,
+                    final BitField<AccessOption> options,
                     final @CheckForNull Entry template) {
             super(name, options, template);
         }
@@ -352,7 +352,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     @Immutable
     private class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
-                final BitField<FsAccessOption> options,
+                final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
             super(FsSyncController.this.delegate
                     .getOutputSocket(name, options, template));

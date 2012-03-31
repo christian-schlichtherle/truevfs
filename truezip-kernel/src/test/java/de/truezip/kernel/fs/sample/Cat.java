@@ -10,8 +10,8 @@ import de.truezip.kernel.fs.FsManager;
 import de.truezip.kernel.fs.FsSimpleCompositeDriver;
 import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.addr.FsUriModifier;
-import de.truezip.kernel.option.FsAccessOption;
-import de.truezip.kernel.option.FsSyncOptions;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.SyncOptions;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.sl.FsManagerLocator;
@@ -82,7 +82,7 @@ public final class Cat {
             InputSocket<?> socket = manager
                     .getController(     path.getMountPoint(), driver)
                     .getInputSocket(    path.getEntryName(),
-                                        BitField.noneOf(FsAccessOption.class));
+                                        BitField.noneOf(AccessOption.class));
             // Copy the data.
             // For this small example, we could skip the call to in.close() or
             // use Streams.copy(in, out), but this would not be correct if this
@@ -97,7 +97,7 @@ public final class Cat {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(FsSyncOptions.UMOUNT);
+            manager.sync(SyncOptions.UMOUNT);
         }
     }
 // END SNIPPET: cat

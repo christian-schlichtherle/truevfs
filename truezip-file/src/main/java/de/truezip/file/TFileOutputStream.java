@@ -5,7 +5,7 @@
 package de.truezip.file;
 
 import de.truezip.kernel.cio.OutputSocket;
-import static de.truezip.kernel.option.FsAccessOption.APPEND;
+import static de.truezip.kernel.option.AccessOption.APPEND;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;

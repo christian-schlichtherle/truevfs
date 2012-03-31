@@ -16,8 +16,8 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.fs.FsController;
 import de.truezip.kernel.fs.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.FsAccessOption;
-import static de.truezip.kernel.option.FsAccessOption.*;
+import de.truezip.kernel.option.AccessOption;
+import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
@@ -145,7 +145,7 @@ public abstract class ZipRaesDriver extends JarDriver {
             final String path,
             final Type type,
             final Entry template,
-            final BitField<FsAccessOption> mknod)
+            final BitField<AccessOption> mknod)
     throws CharConversionException {
         final ZipDriverEntry entry
                 = super.newEntry(path, type, template, mknod.set(COMPRESS));
@@ -193,19 +193,19 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Sets {@link FsAccessOption#STORE} in {@code options} before
+     * Sets {@link AccessOption#STORE} in {@code options} before
      * forwarding the call to {@code controller}.
      */
     @Override
     public final OptionOutputSocket getOutputSocket(
             final FsController<?> controller,
             final FsEntryName name,
-            BitField<FsAccessOption> options,
+            BitField<AccessOption> options,
             final @CheckForNull Entry template) {
         options = options.clear(GROW);
-        // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
+        // Leave AccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
-        BitField<FsAccessOption> options2 = options.set(STORE);
+        BitField<AccessOption> options2 = options.set(STORE);
         return new OptionOutputSocket(
                 controller.getOutputSocket(name, options2, template),
                 options); // use modified options!
