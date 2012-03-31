@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsCharsetArchiveDriver;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
 import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;

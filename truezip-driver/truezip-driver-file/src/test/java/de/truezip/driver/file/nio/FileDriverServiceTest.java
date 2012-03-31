@@ -4,41 +4,20 @@
  */
 package de.truezip.driver.file.nio;
 
-import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.spi.FsDriverService;
-import de.truezip.kernel.util.SuffixSet;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
+import de.truezip.kernel.FsDriverProvider;
+import de.truezip.kernel.spi.FsDriverServiceTestSuite;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class FileDriverServiceTest {
-
-    public static final String DRIVER_LIST = "file";
-
-    private FsDriverService instance;
-
-    @Before
-    public void setUp() {
-        instance = new FileDriverService();
+public final class FileDriverServiceTest extends FsDriverServiceTestSuite {
+    @Override
+    protected String getSuffixes() {
+        return "file";
     }
 
-    @Test
-    public void testGet() {
-        for (String scheme : new SuffixSet(DRIVER_LIST))
-            assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
-    }
-
-    @Test
-    public void testImmutability() {
-        try {
-            instance.get().remove(FsScheme.create("file"));
-            fail("put");
-        } catch (UnsupportedOperationException ex) {
-        }
+    @Override
+    protected FsDriverProvider newDriverProvider() {
+        return new FileDriverService();
     }
 }

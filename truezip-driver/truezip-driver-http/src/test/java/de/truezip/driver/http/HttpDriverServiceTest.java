@@ -4,41 +4,20 @@
  */
 package de.truezip.driver.http;
 
-import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.spi.FsDriverService;
-import de.truezip.kernel.util.SuffixSet;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
+import de.truezip.kernel.FsDriverProvider;
+import de.truezip.kernel.spi.FsDriverServiceTestSuite;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-public final class HttpDriverServiceTest {
-
-    public static final String DRIVER_LIST = "http|https";
-
-    private FsDriverService instance;
-
-    @Before
-    public void setUp() {
-        instance = new HttpDriverService();
+public final class HttpDriverServiceTest extends FsDriverServiceTestSuite {
+    @Override
+    protected String getSuffixes() {
+        return "http|https";
     }
 
-    @Test
-    public void testGet() {
-        for (String scheme : new SuffixSet(DRIVER_LIST))
-            assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
-    }
-
-    @Test
-    public void testImmutability() {
-        try {
-            instance.get().remove(FsScheme.create("file"));
-            fail("put");
-        } catch (UnsupportedOperationException ex) {
-        }
+    @Override
+    protected FsDriverProvider newDriverProvider() {
+        return new HttpDriverService();
     }
 }

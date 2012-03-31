@@ -4,37 +4,21 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.addr.FsScheme;
-import de.truezip.driver.tar.TarDriverService;
-import de.truezip.kernel.spi.FsDriverService;
-import de.truezip.kernel.util.SuffixSet;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import org.junit.Before;
-import org.junit.Test;
+import de.truezip.kernel.FsDriverProvider;
+import de.truezip.kernel.spi.FsDriverServiceTestSuite;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-public class TarDriverServiceTest {
+public class TarDriverServiceTest extends FsDriverServiceTestSuite {
 
-    public static final String DRIVER_LIST = "tar|tar.bz2|tar.gz|tbz|tb2|tgz";
-
-    private FsDriverService instance;
-
-    @Before
-    public void setUp() {
-        instance = new TarDriverService();
+    @Override
+    protected String getSuffixes() {
+        return "tar|tar.bz2|tar.gz|tbz|tb2|tgz";
     }
 
-    @Test
-    public void testGet() {
-        for (String scheme : new SuffixSet(DRIVER_LIST))
-            assertThat(instance.get().get(FsScheme.create(scheme)), notNullValue());
-    }
-
-    @Test(expected = UnsupportedOperationException.class)
-    public void testImmutability() {
-        instance.get().remove(FsScheme.create("tar"));
+    @Override
+    protected FsDriverProvider newDriverProvider() {
+        return new TarDriverService();
     }
 }
