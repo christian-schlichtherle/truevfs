@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.file.oio;
+package de.truezip.driver.file;
 
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.addr.FsScheme;
@@ -25,7 +25,7 @@ import javax.annotation.concurrent.Immutable;
 <tbody>
 <tr>
 <td>{@code file}</td>
-<td>{@link de.truezip.driver.file.oio.FileDriver}</td>
+<td>{@link de.truezip.driver.file.FileDriver}</td>
 </tr>
 </tbody>
 </table>

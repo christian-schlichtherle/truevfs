@@ -1,2 +1,1 @@
-de.truezip.driver.file.nio.TempFilePoolService
-de.truezip.driver.file.oio.TempFilePoolService
+de.truezip.driver.file.TempFilePoolService

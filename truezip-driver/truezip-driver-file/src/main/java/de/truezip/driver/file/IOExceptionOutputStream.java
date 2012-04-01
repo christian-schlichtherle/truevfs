@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.file.io;
+package de.truezip.driver.file;
 
 import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -18,10 +18,10 @@ import javax.annotation.WillCloseWhenClosed;
  *
  * @author Christian Schlichtherle
  */
-public abstract class IOExceptionOutputStream extends DecoratingOutputStream {
+abstract class IOExceptionOutputStream extends DecoratingOutputStream {
 
     /** The nullable last I/O exception. */
-    protected @CheckForNull IOException exception;
+    @CheckForNull IOException exception;
 
     /**
      * Constructs a new I/O exception output stream.
@@ -30,7 +30,7 @@ public abstract class IOExceptionOutputStream extends DecoratingOutputStream {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected IOExceptionOutputStream(
+    IOExceptionOutputStream(
             @Nullable @WillCloseWhenClosed OutputStream delegate) {
         super(delegate);
     }

@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.file.nio;
+package de.truezip.driver.file;
 
-import de.truezip.driver.file.io.IOExceptionOutputStream;
-import de.truezip.driver.file.io.IOExceptionSeekableByteChannel;
+import de.truezip.driver.file.IOExceptionOutputStream;
+import de.truezip.driver.file.IOExceptionSeekableByteChannel;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
