@@ -4,20 +4,22 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.truezip.kernel.cio.Entry;
 import de.truezip.extension.jmxjul.InstrumentingInputSocket;
-import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle
  */
 @Immutable
-class JmxInputSocket<E extends Entry>
+final class JmxInputSocket<E extends Entry>
 extends InstrumentingInputSocket<E> {
+
     final JmxIOStatistics stats;
 
     JmxInputSocket(InputSocket<? extends E> model, JmxDirector director, JmxIOStatistics stats) {
@@ -27,12 +29,17 @@ extends InstrumentingInputSocket<E> {
     }
 
     @Override
-    public final ReadOnlyFile newReadOnlyFile() throws IOException {
+    public ReadOnlyFile newReadOnlyFile() throws IOException {
         return new JmxReadOnlyFile(getBoundDelegate().newReadOnlyFile(), stats);
     }
 
     @Override
-    public final InputStream newInputStream() throws IOException {
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return new JmxSeekableByteChannel(getBoundDelegate().newSeekableByteChannel(), stats);
+    }
+
+    @Override
+    public InputStream newInputStream() throws IOException {
         return new JmxInputStream(getBoundDelegate().newInputStream(), stats);
     }
 }

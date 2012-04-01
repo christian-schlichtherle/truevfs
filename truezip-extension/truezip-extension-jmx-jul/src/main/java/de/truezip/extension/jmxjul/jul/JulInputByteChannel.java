@@ -6,50 +6,48 @@ package de.truezip.extension.jmxjul.jul;
 
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
-import de.truezip.kernel.cio.IOPool;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
-final class JulInputByteChannel<E extends Entry>
-extends DecoratingSeekableByteChannel {
+final class JulInputByteChannel extends DecoratingSeekableByteChannel {
     private static final Logger
             logger = Logger.getLogger(JulInputByteChannel.class.getName());
 
-    private final JulNio2InputSocket<E> socket;
+    private final InputSocket<?> socket;
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    JulInputByteChannel(
-            final @WillCloseWhenClosed SeekableByteChannel model,
-            final JulNio2InputSocket<E> socket)
-    throws IOException {
-        super(model);
-        if (null == model)
-            throw new NullPointerException();
+    JulInputByteChannel(final InputSocket<?> socket) throws IOException {
+        super(socket.newSeekableByteChannel());
         this.socket = socket;
-        E target = socket.getLocalTarget();
-        Level level = target instanceof IOBuffer ? Level.FINER : Level.FINEST;
-        logger.log(level, "Randomly reading " + target, new NeverThrowable());
+        log("Random reading ");
     }
 
     @Override
     public void close() throws IOException {
+        log("Closing ");
+        delegate.close();
+    }
+
+    private void log(String message) {
+        Entry target;
         try {
-            delegate.close();
-        } finally {
-            E target = socket.getLocalTarget();
-            Level level = target instanceof IOBuffer ? Level.FINER : Level.FINEST;
-            logger.log(level, "Closed " + target, new NeverThrowable());
+            target = socket.getLocalTarget();
+        } catch (final IOException ignore) {
+            target = null;
         }
+        final Level level = target instanceof IOBuffer
+                ? Level.FINER
+                : Level.FINEST;
+        logger.log(level, message + target, new NeverThrowable());
     }
 }

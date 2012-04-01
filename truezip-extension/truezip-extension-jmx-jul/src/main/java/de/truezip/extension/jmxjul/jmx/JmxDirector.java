@@ -5,11 +5,10 @@
 package de.truezip.extension.jmxjul.jmx;
 
 import de.truezip.extension.jmxjul.*;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.util.JSE7;
+import de.truezip.kernel.cio.*;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;
@@ -25,12 +24,10 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     private static final String TEMP_IO_STATISTICS = "TempIOStatistics";
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
-    public static final JmxDirector SINGLETON = JSE7.AVAILABLE
-            ? new JmxNio2Director()
-            : new JmxDirector();
+    public static final JmxDirector SINGLETON = new JmxDirector();
 
-    private JmxDirector() {
-    }
+    /** Can't touch this - hammer time! */
+    private JmxDirector() { }
 
     private volatile JmxIOStatistics application;
 
@@ -162,37 +159,5 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
             InstrumentingController<JmxDirector> context) {
         return new JmxOutputSocket<E>(output, this,
                 JmxController.class.cast(context).getIOStatistics());
-    }
-
-    private static final class JmxNio2Director extends JmxDirector {
-        @Override
-        protected <B extends IOBuffer<B>> InputSocket<B> instrument(
-                InputSocket<B> input,
-                InstrumentingIOPool<B>.InstrumentingBuffer context) {
-            return new JmxNio2InputSocket<B>(input, this, super.temp);
-        }
-
-        @Override
-        protected <E extends Entry> InputSocket<E> instrument(
-                InputSocket<E> input,
-                InstrumentingController<JmxDirector> context) {
-            return new JmxNio2InputSocket<E>(input, this,
-                    JmxController.class.cast(context).getIOStatistics());
-        }
-
-        @Override
-        protected <B extends IOBuffer<B>> OutputSocket<B> instrument(
-                OutputSocket<B> output,
-                InstrumentingIOPool<B>.InstrumentingBuffer context) {
-            return new JmxNio2OutputSocket<B>(output, this, super.temp);
-        }
-
-        @Override
-        protected <E extends Entry> OutputSocket<E> instrument(
-                OutputSocket<E> output,
-                InstrumentingController<JmxDirector> context) {
-            return new JmxNio2OutputSocket<E>(output, this,
-                    JmxController.class.cast(context).getIOStatistics());
-        }
     }
 }

@@ -4,21 +4,20 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.cio.Entry.Access;
-import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.cio.Entry.Access;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -42,10 +41,6 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 final class FsSyncController
 extends FsSyncDecoratingController<FsModel, FsController<?>> {
-
-    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
-            ? SocketFactory.NIO2
-            : SocketFactory.OIO;
 
     /**
      * Constructs a new file system sync controller.
@@ -158,7 +153,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<AccessOption> options) {
-        return SOCKET_FACTORY.newInputSocket(this, name, options);
+        return new Input(name, options);
     }
 
     @Override
@@ -166,7 +161,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<AccessOption> options,
                                             @CheckForNull Entry template) {
-        return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
+        return new Output(name, options, template);
     }
 
     @Override
@@ -213,79 +208,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     }
 
     @Immutable
-    private enum SocketFactory {
-        NIO2() {
-            @Override
-            InputSocket<?> newInputSocket(
-                    FsSyncController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options) {
-                return controller.new Nio2Input(name, options);
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    FsSyncController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options,
-                    @CheckForNull Entry template) {
-                return controller.new Nio2Output(name, options, template);
-            }
-        },
-
-        OIO() {
-            @Override
-            InputSocket<?> newInputSocket(
-                    FsSyncController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options) {
-                return controller.new Input(name, options);
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    FsSyncController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options,
-                    @CheckForNull Entry template) {
-                return controller.new Output(name, options, template);
-            }
-        };
-
-        abstract InputSocket<?> newInputSocket(
-                FsSyncController controller,
-                FsEntryName name,
-                BitField<AccessOption> options);
-        
-        abstract OutputSocket<?> newOutputSocket(
-                FsSyncController controller,
-                FsEntryName name,
-                BitField<AccessOption> options,
-                @CheckForNull Entry template);
-    } // SocketFactory
-
-    @Immutable
-    private final class Nio2Input extends Input {
-        Nio2Input(  final FsEntryName name,
-                    final BitField<AccessOption> options) {
-            super(name, options);
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            while (true) {
-                try {
-                    return new SyncSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-    } // Nio2Input
-
-    @Immutable
-    private class Input extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
             super(FsSyncController.this.delegate
@@ -316,6 +239,18 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            while (true) {
+                try {
+                    return new SyncSeekableByteChannel(
+                            getBoundDelegate().newSeekableByteChannel());
+                } catch (FsNeedsSyncException ex) {
+                    sync(ex);
+                }
+            }
+        }
+
+        @Override
         public InputStream newInputStream() throws IOException {
             while (true) {
                 try {
@@ -329,28 +264,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     } // Input
 
     @Immutable
-    private final class Nio2Output extends Output {
-        Nio2Output( final FsEntryName name,
-                    final BitField<AccessOption> options,
-                    final @CheckForNull Entry template) {
-            super(name, options, template);
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            while (true) {
-                try {
-                    return new SyncSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-    } // Nio2Output
-
-    @Immutable
-    private class Output extends DecoratingOutputSocket<Entry> {
+    private final class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
                 final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
@@ -363,6 +277,18 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             while (true) {
                 try {
                     return getBoundDelegate().getLocalTarget();
+                } catch (FsNeedsSyncException ex) {
+                    sync(ex);
+                }
+            }
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            while (true) {
+                try {
+                    return new SyncSeekableByteChannel(
+                            getBoundDelegate().newSeekableByteChannel());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }

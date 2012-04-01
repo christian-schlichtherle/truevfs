@@ -4,24 +4,23 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.DecoratingInputStream;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.FORCE_CLOSE_IO;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
-import de.truezip.kernel.io.DecoratingInputStream;
-import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import de.truezip.kernel.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,10 +40,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 final class FsResourceController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
-
-    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
-            ? SocketFactory.NIO2
-            : SocketFactory.OIO;
 
     private @CheckForNull FsResourceAccountant accountant;
 
@@ -66,14 +61,14 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<AccessOption> options) {
-        return SOCKET_FACTORY.newInputSocket(this, name, options);
+        return new Input(name, options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<AccessOption> options,
                                             @CheckForNull Entry template) {
-        return SOCKET_FACTORY.newOutputSocket(this, name, options, template);
+        return new Output(name, options, template);
     }
 
     @Override
@@ -163,73 +158,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Immutable
-    private enum SocketFactory {
-        NIO2() {
-            @Override
-            InputSocket<?> newInputSocket(
-                    FsResourceController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options) {
-                return controller.new Nio2Input(name, options);
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    FsResourceController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options,
-                    @CheckForNull Entry template) {
-                return controller.new Nio2Output(name, options, template);
-            }
-        },
-
-        OIO() {
-            @Override
-            InputSocket<?> newInputSocket(
-                    FsResourceController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options) {
-                return controller.new Input(name, options);
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    FsResourceController controller,
-                    FsEntryName name,
-                    BitField<AccessOption> options,
-                    @CheckForNull Entry template) {
-                return controller.new Output(name, options, template);
-            }
-        };
-
-        abstract InputSocket<?> newInputSocket(
-                FsResourceController controller,
-                FsEntryName name,
-                BitField<AccessOption> options);
-        
-        abstract OutputSocket<?> newOutputSocket(
-                FsResourceController controller,
-                FsEntryName name,
-                BitField<AccessOption> options,
-                @CheckForNull Entry template);
-    } // SocketFactory
-
-    @Immutable
-    private final class Nio2Input extends Input {
-        Nio2Input(  final FsEntryName name,
-                    final BitField<AccessOption> options) {
-            super(name, options);
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return new ResourceSeekableByteChannel(
-                    getBoundDelegate().newSeekableByteChannel());
-        }
-    } // Nio2Input
-
-    @Immutable
-    private class Input extends DecoratingInputSocket<Entry> {
+    private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
             super(FsResourceController.this.delegate
@@ -243,6 +172,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            return new ResourceSeekableByteChannel(
+                    getBoundDelegate().newSeekableByteChannel());
+        }
+
+        @Override
         public InputStream newInputStream() throws IOException {
             return new ResourceInputStream(
                     getBoundDelegate().newInputStream());
@@ -250,27 +185,18 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     } // Input
 
     @Immutable
-    private final class Nio2Output extends Output {
-        Nio2Output( final FsEntryName name,
-                    final BitField<AccessOption> options,
-                    final @CheckForNull Entry template) {
-            super(name, options, template);
+    private final class Output extends DecoratingOutputSocket<Entry> {
+        Output( final FsEntryName name,
+                final BitField<AccessOption> options,
+                final @CheckForNull Entry template) {
+            super(FsResourceController.this.delegate
+                    .getOutputSocket(name, options, template));
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new ResourceSeekableByteChannel(
                     getBoundDelegate().newSeekableByteChannel());
-        }
-    } // Nio2Output
-
-    @Immutable
-    private class Output extends DecoratingOutputSocket<Entry> {
-        Output( final FsEntryName name,
-                final BitField<AccessOption> options,
-                final @CheckForNull Entry template) {
-            super(FsResourceController.this.delegate
-                    .getOutputSocket(name, options, template));
         }
 
         @Override
