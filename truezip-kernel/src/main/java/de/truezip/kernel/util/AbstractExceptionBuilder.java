@@ -12,40 +12,40 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Subclasses must implement {@link #update(Exception, Exception)} and may
  * override {@link #post(Exception)}.
  *
- * @param  <C> the type of the cause exceptions.
- * @param  <X> the type of the assembled exceptions.
+ * @param  <I> the type of the input exceptions.
+ * @param  <O> the type of the assembled (output) exceptions.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class AbstractExceptionBuilder< C extends Exception,
-                                                X extends Exception>
-implements ExceptionBuilder<C, X> {
+public abstract class AbstractExceptionBuilder< I extends Exception,
+                                                O extends Exception>
+implements ExceptionBuilder<I, O> {
 
-    private @CheckForNull X assembly;
+    private @CheckForNull O assembly;
 
     /**
      * This method is called to update the given {@code previous} result of
-     * the assembly with the given {@code cause}.
+     * the assembly with the given {@code exception}.
      * 
-     * @param  cause A(nother) cause exception to add to the assembly.
-     * @param  previous The previous result of the assembly or {@code null} if
+     * @param  input the input exception to handle.
+     * @param  previous the previous result of the assembly or {@code null} if
      *         this is the first call since the creation of this instance or the
      *         last assembly has been checked out.
-     * @return The assembled exception. {@code null} is not permitted.
+     * @return The assembled (output) exception..
      */
-    protected abstract X update(C cause, @CheckForNull X previous);
+    protected abstract O update(I input, @CheckForNull O previous);
 
     /**
-     * This method is called to post-process the given result of the assembly
-     * after it has been checked out.
+     * This method is called to post-process the given result of the assembled
+     * (output) exception after it has been checked out.
      * <p>
      * The implementation in the class {@link AbstractExceptionBuilder} simply
-     * returns the parameter.
+     * returns the given parameter.
      *
-     * @param  assembly The checked out result of the exception assembly.
-     * @return The post-processed checked out result of the exception assembly.
+     * @param  assembly the assembled (output) exception.
+     * @return The result of the optional post-processing.
      */
-    protected X post(X assembly) {
+    protected O post(O assembly) {
         return assembly;
     }
 
@@ -56,10 +56,10 @@ implements ExceptionBuilder<C, X> {
      * @see #post(Exception)
      */
     @Override
-    public final X fail(C cause) {
-        if (null == cause)
+    public final O fail(I input) {
+        if (null == input)
             throw new NullPointerException();
-        final X assembly = update(cause, this.assembly);
+        final O assembly = update(input, this.assembly);
         this.assembly = null;
         return post(assembly);
     }
@@ -73,22 +73,20 @@ implements ExceptionBuilder<C, X> {
      * @see #update(Exception, Exception)
      */
     @Override
-    public final void warn(C cause) {
-        if (null == cause)
+    public final void warn(I input) {
+        if (null == input)
             throw new NullPointerException();
-        this.assembly = update(cause, this.assembly);
+        this.assembly = update(input, this.assembly);
     }
 
     /**
      * {@inheritDoc}
      *
-     * @throws X the assembled exception if the implementation wants
-     *         the caller to abort its task.
      * @see    #post(Exception)
      */
     @Override
-    public final void check() throws X {
-        final X assembly = this.assembly;
+    public final void check() throws O {
+        final O assembly = this.assembly;
         if (null != assembly) {
             this.assembly = null;
             throw post(assembly);

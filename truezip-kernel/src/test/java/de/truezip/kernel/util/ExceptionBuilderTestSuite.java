@@ -10,27 +10,27 @@ import org.junit.Test;
 
 /**
  * @param  <B> the type of the exception builder.
- * @param  <C> the type of the cause exceptions.
- * @param  <X> the type of the assembled exceptions.
+ * @param  <I> the type of the input exceptions.
+ * @param  <O> the type of the assembled (output) exceptions.
  * @author Christian Schlichtherle
  */
 public abstract class ExceptionBuilderTestSuite<
-        B extends ExceptionBuilder<C, X>,
-        C extends Exception,
-        X extends Exception> {
+        B extends ExceptionBuilder<I, O>,
+        I extends Exception,
+        O extends Exception> {
 
-    protected final Class<X> clazz;
+    protected final Class<O> clazz;
 
     protected B builder;
 
-    protected ExceptionBuilderTestSuite(final Class<X> clazz) {
+    protected ExceptionBuilderTestSuite(final Class<O> clazz) {
         if (null == (this.clazz = clazz))
             throw new NullPointerException();        
     }
 
     protected abstract B newBuilder();
 
-    protected abstract C newCause();
+    protected abstract I newCause();
 
     @Before
     public void setUp() {
@@ -39,12 +39,12 @@ public abstract class ExceptionBuilderTestSuite<
     }
 
     @Test
-    public void testCheck() throws X {
+    public void testCheck() throws O {
         builder.check();
     }
 
     @Test
-    public void testFailThenCheck() throws X {
+    public void testFailThenCheck() throws O {
         try {
             builder.fail(null);
             fail();
@@ -57,7 +57,7 @@ public abstract class ExceptionBuilderTestSuite<
     }
 
     @Test
-    public void testWarnThenCheck() throws X {
+    public void testWarnThenCheck() throws O {
         try {
             builder.warn(null);
             fail();

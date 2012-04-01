@@ -5,12 +5,12 @@
 package de.truezip.driver.zip.path;
 
 import de.truezip.driver.zip.OdfDriver;
-import de.truezip.path.TPathTestSuite;
+import de.truezip.path.TPathITSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class OdfPathIT extends TPathTestSuite<OdfDriver> {
+public final class OdfPathIT extends TPathITSuite<OdfDriver> {
 
     @Override
     protected String getSuffixList() {
