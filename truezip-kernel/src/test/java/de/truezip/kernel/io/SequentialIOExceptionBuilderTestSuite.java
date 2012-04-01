@@ -28,7 +28,7 @@ extends ExceptionBuilderTestSuite<
     }
 
     @Override
-    protected final IOException newCause() {
+    protected final IOException newInput() {
         return new IOException("test");
     }
 
@@ -66,13 +66,13 @@ extends ExceptionBuilderTestSuite<
 
     @Test
     public void testFailIdempotence() {
-        final X ex = builder.fail(newCause());
+        final X ex = builder.fail(newInput());
         assertSame(ex, builder.fail(ex));
     }
 
     @Test
     public void testWarnIdempotence() {
-        builder.warn(newCause());
+        builder.warn(newInput());
         try {
             builder.check();
             fail();

@@ -15,7 +15,7 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public abstract class ExceptionBuilderTestSuite<
-        B extends ExceptionBuilder<I, O>,
+        B extends ExceptionBuilder<? super I, ? extends O>,
         I extends Exception,
         O extends Exception> {
 
@@ -30,7 +30,7 @@ public abstract class ExceptionBuilderTestSuite<
 
     protected abstract B newBuilder();
 
-    protected abstract I newCause();
+    protected abstract I newInput();
 
     @Before
     public void setUp() {
@@ -52,7 +52,7 @@ public abstract class ExceptionBuilderTestSuite<
             builder.check();
         }
 
-        assertNotNull(builder.fail(newCause()));
+        assertNotNull(builder.fail(newInput()));
         builder.check();
     }
 
@@ -66,7 +66,7 @@ public abstract class ExceptionBuilderTestSuite<
         }
 
         try {
-            builder.warn(newCause());
+            builder.warn(newInput());
             builder.check();
             fail();
         } catch (final Exception expected) {
