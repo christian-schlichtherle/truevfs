@@ -8,18 +8,18 @@ import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
 import de.truezip.file.TFile;
 import de.truezip.file.TVFS;
-import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.*;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.addr.FsPath;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.*;
-import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.QuotedUriSyntaxException;
@@ -602,14 +602,11 @@ public final class TPath implements Path {
     public TPath toNonArchivePath() {
         if (!isArchive())
             return this;
-        final TConfig config = TConfig.push();
-        try {
+        try (final TConfig config = TConfig.push()) {
             config.setArchiveDetector(TArchiveDetector.NULL);
             final TPath fileName = getFileName();
             assert null != fileName : "an archive file must not have an empty path name!";
             return resolveSibling(fileName);
-        } finally {
-            config.close();
         }
     }
 
@@ -995,7 +992,7 @@ public final class TPath implements Path {
     }
 
     BitField<AccessOption> mapInput(final OpenOption... options) {
-        final HashSet<OpenOption> set = new HashSet<OpenOption>(
+        final HashSet<OpenOption> set = new HashSet<>(
                 initialCapacity(options.length));
         Collections.addAll(set, options);
         return mapInput(set);
@@ -1009,7 +1006,7 @@ public final class TPath implements Path {
     }
 
     BitField<AccessOption> mapOutput(final OpenOption... options) {
-        final HashSet<OpenOption> set = new HashSet<OpenOption>(
+        final HashSet<OpenOption> set = new HashSet<>(
                 initialCapacity(options.length));
         Collections.addAll(set, options);
         return mapOutput(set);

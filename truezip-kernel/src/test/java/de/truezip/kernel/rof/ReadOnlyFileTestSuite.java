@@ -54,11 +54,8 @@ public abstract class ReadOnlyFileTestSuite {
     public void setUp() throws IOException {
         temp = File.createTempFile(TEMP_FILE_PREFIX, null);
         try {
-            final OutputStream out = new FileOutputStream(temp);
-            try {
+            try (final OutputStream out = new FileOutputStream(temp)) {
                 out.write(DATA);
-            } finally {
-                out.close();
             }
             assert DATA.length == temp.length();
             rrof = new DefaultReadOnlyFile(temp);

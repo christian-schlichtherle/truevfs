@@ -188,7 +188,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             throw new NullPointerException();
         final OutputStream os = output.newOutputStream();
         try {
-            return new MultiplexedOutputService<TarDriverEntry>(
+            return new MultiplexedOutputService<>(
                     newTarOutputService(model, os, (TarInputService) source),
                     getIOPool());
         } catch (final IOException ex) {

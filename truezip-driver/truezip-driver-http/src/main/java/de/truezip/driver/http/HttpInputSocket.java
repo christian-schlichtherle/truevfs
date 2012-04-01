@@ -6,9 +6,9 @@ package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
@@ -48,11 +48,8 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
         try {
             temp = entry.getPool().allocate();
             try {
-                final OutputStream out = temp.getOutputSocket().newOutputStream();
-                try {
+                try (final OutputStream out = temp.getOutputSocket().newOutputStream()) {
                     Streams.cat(in, out);
-                } finally {
-                    out.close();
                 }
             } catch (IOException ex) {
                 temp.release();

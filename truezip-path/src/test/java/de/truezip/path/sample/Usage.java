@@ -4,16 +4,15 @@
  */
 package de.truezip.path.sample;
 
+import de.truezip.file.TVFS;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.io.SequentialIOException;
 import de.truezip.kernel.io.Streams;
-import de.truezip.file.TVFS;
 import de.truezip.path.TPath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * A collection of code snippets to demonstrate the usage of the API in the
@@ -34,12 +33,8 @@ abstract class Usage {
 
     void cat1(String name) throws IOException {
 // START SNIPPET: cat1
-        Path path = new TPath(name);
-        InputStream in = Files.newInputStream(path);
-        try {
+        try (InputStream in = Files.newInputStream(new TPath(name))) {
             Streams.cat(in, System.out);
-        } finally {
-            in.close(); // ALWAYS close the stream!
         }
 // END SNIPPET: cat1
     }
@@ -47,12 +42,8 @@ abstract class Usage {
     void cat2(String name) {
 // START SNIPPET: cat2
         try {
-            Path path = new TPath(name);
-            InputStream in = Files.newInputStream(path);
-            try {
+            try (InputStream in = Files.newInputStream(new TPath(name))) {
                 Streams.cat(in, System.out);
-            } finally {
-                in.close(); // ALWAYS close the stream!
             }
         } catch (IOException ouch) {
             ouch.printStackTrace();

@@ -83,15 +83,8 @@ public final class Cat {
                     .getController(     path.getMountPoint(), driver)
                     .getInputSocket(    path.getEntryName(),
                                         BitField.noneOf(AccessOption.class));
-            // Copy the data.
-            // For this small example, we could skip the call to in.close() or
-            // use Streams.copy(in, out), but this would not be correct if this
-            // were not just the end of the application.
-            InputStream in = socket.newInputStream();
-            try {
+            try (final InputStream in = socket.newInputStream()) {
                 Streams.cat(in, System.out); // copy the data
-            } finally {
-                in.close(); // ALWAYS close the stream!
             }
         } finally {
             // Commit all unsynchronized changes to the contents of federated

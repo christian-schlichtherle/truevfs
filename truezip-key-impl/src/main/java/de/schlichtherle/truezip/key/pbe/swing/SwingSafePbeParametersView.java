@@ -4,18 +4,18 @@
  */
 package de.schlichtherle.truezip.key.pbe.swing;
 
-import de.truezip.key.PromptingKeyProviderController;
-import de.schlichtherle.truezip.key.swing.Windows;
-import de.truezip.key.param.SafePbeParametersView;
-import de.truezip.kernel.util.ServiceLocator;
-import de.truezip.key.KeyPromptingInterruptedException;
-import de.truezip.key.UnknownKeyException;
-import de.truezip.key.param.KeyStrength;
-import de.truezip.key.param.SafePbeParameters;
 import de.schlichtherle.truezip.key.pbe.swing.feedback.BasicInvalidKeyFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.feedback.BasicUnknownKeyFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.feedback.InvalidKeyFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.feedback.UnknownKeyFeedback;
+import de.schlichtherle.truezip.key.swing.Windows;
+import de.truezip.kernel.util.ServiceLocator;
+import de.truezip.key.KeyPromptingInterruptedException;
+import de.truezip.key.PromptingKeyProviderController;
+import de.truezip.key.UnknownKeyException;
+import de.truezip.key.param.KeyStrength;
+import de.truezip.key.param.SafePbeParameters;
+import de.truezip.key.param.SafePbeParametersView;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.EOFException;
@@ -56,8 +56,7 @@ extends SafePbeParametersView<P> {
     // output.
     public static final int KEY_FILE_LEN = 512;
 
-    private static final Map<URI, ReadKeyPanel>
-            readKeyPanels = new WeakHashMap<URI, ReadKeyPanel>();
+    private static final Map<URI, ReadKeyPanel> readKeyPanels = new WeakHashMap<>();
 
     private static final ServiceLocator serviceLocator
             = new ServiceLocator(SwingSafePbeParametersView.class.getClassLoader());
@@ -81,11 +80,8 @@ extends SafePbeParametersView<P> {
      */
     static byte[] readKeyFile(File file) throws IOException {
         final byte[] buf = new byte[KEY_FILE_LEN];
-        final RandomAccessFile raf = new RandomAccessFile(file, "r");
-        try {
+        try (final RandomAccessFile raf = new RandomAccessFile(file, "r")) {
             raf.readFully(buf);
-        } finally {
-            raf.close();
         }
         return buf;
     }
@@ -144,7 +140,7 @@ extends SafePbeParametersView<P> {
         if (null == param)
             param = newPbeParameters();
 
-        final KeyStrengthPanel<S> keyStrengthPanel = new KeyStrengthPanel<S>(
+        final KeyStrengthPanel<S> keyStrengthPanel = new KeyStrengthPanel<>(
                 param.getKeyStrengthValues());
         keyStrengthPanel.setKeyStrength(param.getKeyStrength());
         final WriteKeyPanel keyPanel = new WriteKeyPanel();

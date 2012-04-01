@@ -163,12 +163,9 @@ extends SafeKeyProvider<K> {
             throws UnknownKeyException {
                 State state;
                 try {
-                    PromptingKeyProvider<K>.BaseController controller
-                            = provider.new WriteController(this);
-                    try {
+                    try (final PromptingKeyProvider<K>.BaseController
+                            controller = provider.new WriteController(this)) {
                         provider.getView().promptWriteKey(controller);
-                    } finally {
-                        controller.close();
                     }
                 } finally {
                     if (this == (state = provider.getState()))
@@ -184,12 +181,9 @@ extends SafeKeyProvider<K> {
                 State state;
                 do {
                     try {
-                        PromptingKeyProvider<K>.BaseController controller
-                                = provider.new ReadController(this);
-                        try {
+                        try (final PromptingKeyProvider<K>.BaseController
+                                controller = provider.new ReadController(this)) {
                             provider.getView().promptReadKey(controller, invalid);
-                        } finally {
-                            controller.close();
                         }
                     } catch (PersistentUnknownKeyException ex) {
                         setException(provider, ex);

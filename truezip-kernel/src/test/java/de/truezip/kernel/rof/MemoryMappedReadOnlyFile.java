@@ -147,11 +147,10 @@ public final class MemoryMappedReadOnlyFile extends AbstractReadOnlyFile {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_GC")
     @Override
     public void close() throws IOException {
-        final FileChannel channel = this.channel;
-        if (null == channel)
-            return;
-
-        channel.close();
+        try (FileChannel channel = this.channel) {
+            if (null == channel)
+                return;
+        }
         this.channel = null;
         this.window = null;
 

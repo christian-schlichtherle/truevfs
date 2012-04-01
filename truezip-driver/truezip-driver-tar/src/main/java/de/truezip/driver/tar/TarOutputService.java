@@ -55,9 +55,8 @@ implements OutputService<TarDriverEntry> {
     public static final int OVERHEAD_SIZE = Maps.OVERHEAD_SIZE;
 
     /** Maps entry names to tar entries [String -> TarDriverEntry]. */
-    private final Map<String, TarDriverEntry> entries
-            = new LinkedHashMap<String, TarDriverEntry>(
-                    initialCapacity(OVERHEAD_SIZE));
+    private final Map<String, TarDriverEntry>
+            entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
     private final OutputStream delegate;
     private final IOPool<?> pool;

@@ -49,9 +49,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 @CleanupObligation
-public final class TestConfig
-extends Resource<RuntimeException>
-implements Closeable { // this could be AutoCloseable in JSE 7
+public final class TestConfig extends Resource<RuntimeException> {
 
     public static final int DEFAULT_NUM_ENTRIES = 10;
     public static final int DEFAULT_DATA_LENGTH = 1024;
@@ -158,6 +156,12 @@ implements Closeable { // this could be AutoCloseable in JSE 7
     public void setIOPoolProvider(
             final @CheckForNull IOPoolProvider ioPoolProvider) {
         this.ioPoolProvider = ioPoolProvider;
+    }
+
+    // This one is just for you, NetBeans.
+    @Override
+    public void close() {
+        super.close();
     }
 
     @Override

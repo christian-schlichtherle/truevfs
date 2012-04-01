@@ -4,6 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
+import static de.truezip.driver.zip.io.Constants.FORCE_ZIP64_EXT;
 import de.truezip.kernel.rof.DefaultReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.ArrayHelper;
@@ -11,12 +12,6 @@ import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
 import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
 import de.truezip.kernel.util.Maps;
-import de.truezip.driver.zip.io.CRC32Exception;
-import de.truezip.driver.zip.io.ZipEntry;
-import de.truezip.driver.zip.io.ZipEntryFactory;
-import de.truezip.driver.zip.io.ZipFile;
-import de.truezip.driver.zip.io.ZipOutputStream;
-import static de.truezip.driver.zip.io.Constants.FORCE_ZIP64_EXT;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -151,13 +146,8 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
     @Test
     public final void testConstructors() throws Exception {
-        {
-            OutputStream os = new FileOutputStream(file);
-            try {
-                os.write(data);
-            } finally {
-                os.close();
-            }
+        try (final OutputStream os = new FileOutputStream(file)) {
+            os.write(data);
         }
 
         final ReadOnlyFile rof = new DefaultReadOnlyFile(file);
@@ -303,9 +293,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         // Create empty ZIP file.
         newZipOutputStream(new FileOutputStream(file)).close();
 
-        // Assert that the empty ZIP file has no preamble.
-        final ZipFile zipIn = newZipFile(file);
-        try {
+        try (final ZipFile zipIn = newZipFile(file)) {
             assertEquals(0, zipIn.getPreambleLength());
             final InputStream in = zipIn.getPreambleInputStream();
             try {
@@ -313,45 +301,34 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
             } finally {
                 in.close();
             }
-        } finally {
-            zipIn.close();
         }
     }
 
     @Test
     public final void testGetInputStream() throws IOException {
-        final ZipOutputStream zipOut
-                = newZipOutputStream(new FileOutputStream(file));
-        try {
+        try (final ZipOutputStream zipOut = newZipOutputStream(new FileOutputStream(file))) {
             zipOut.putNextEntry(newEntry("foo"));
-        } finally {
-            zipOut.close();
         }
 
-        final ZipFile zipIn = newZipFile(file);
-        try {
+        try (final ZipFile zipIn = newZipFile(file)) {
             zipIn.getInputStream("foo").close();
             assertNull(zipIn.getInputStream("bar"));
-        } finally {
-            zipIn.close();
         }
     }
 
     @Test
     public final void testWriteAndReadSingleBytes() throws IOException {
-        final ZipOutputStream zipOut
-                = newZipOutputStream(new FileOutputStream(file));
-        zipOut.putNextEntry(newEntry("file"));
-        for (int i = 0; i < data.length; i++)
-            zipOut.write(data[i]);
-        zipOut.close();
+        try (final ZipOutputStream zipOut = newZipOutputStream(new FileOutputStream(file))) {
+            zipOut.putNextEntry(newEntry("file"));
+            for (int i = 0; i < data.length; i++)
+                zipOut.write(data[i]);
+        }
 
-        final ZipFile zipIn = newZipFile(file);
-        InputStream in = zipIn.getInputStream("file");
-        for (int i = 0, c; (c = in.read()) != -1; i++)
-            assertEquals(data[i] & 0xFF, c);
-        in.close();
-        zipIn.close();
+        try (   final ZipFile zipIn = newZipFile(file);
+                final InputStream in = zipIn.getInputStream("file")) {
+            for (int i = 0, c; (c = in.read()) != -1; i++)
+                assertEquals(data[i] & 0xFF, c);
+        }
     }
 
     @Test
@@ -430,33 +407,24 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      */
     private void createTestZipFile(final int nEntries) throws IOException {
         final HashSet<String>
-                set = new HashSet<String>(Maps.initialCapacity(nEntries));
+                set = new HashSet<>(Maps.initialCapacity(nEntries));
 
-        {
-            ZipOutputStream zout
-                    = newZipOutputStream(new FileOutputStream(file));
-            try {
-                for (int i = 0; i < nEntries; i++) {
-                    String name = i + ".txt";
-                    zout.putNextEntry(newEntry(name));
-                    zout.write(data);
-                    assertTrue(set.add(name));
-                }
-            } finally {
-                zout.close();
+        try (final ZipOutputStream zout = newZipOutputStream(new FileOutputStream(file))) {
+            for (int i = 0; i < nEntries; i++) {
+                String name = i + ".txt";
+                zout.putNextEntry(newEntry(name));
+                zout.write(data);
+                assertTrue(set.add(name));
             }
         }
 
-        ZipFile zin = newZipFile(file);
-        try {
+        try (final ZipFile zin = newZipFile(file)) {
             // Check that zipIn correctly enumerates all entries.
             for (ZipEntry entry : zin) {
                 assertEquals(data.length, entry.getSize());
                 assertTrue(set.remove(entry.getName()));
             }
             assertTrue(set.isEmpty());
-        } finally {
-            zin.close();
         }
     }
 
@@ -464,29 +432,25 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     public final void testGoodGetCheckedInputStream() throws IOException {
         // Create test ZIP file.
         final String name = "entry";
-        final ZipOutputStream zipOut
-                = newZipOutputStream(new FileOutputStream(file));
-        zipOut.putNextEntry(newEntry(name));
-        zipOut.write(data);
-        zipOut.close();
-
-        final ZipFile zipIn = newZipFile(file);
-
-        // Open checked input stream and join immediately.
-        InputStream in = zipIn.getCheckedInputStream(name);
-        in.close();
-
-        // Open checked input stream and read fully, using multiple methods.
-        in = zipIn.getCheckedInputStream(name);
-        final int n = data.length / 4;
-        in.skip(n);
-        in.read(new byte[n]);
-        in.read(new byte[n], 0, n);
-        while (in.read() != -1) { // read until EOF
+        try (final ZipOutputStream zipOut = newZipOutputStream(new FileOutputStream(file))) {
+            zipOut.putNextEntry(newEntry(name));
+            zipOut.write(data);
         }
-        in.close();
 
-        zipIn.close();
+        try (final ZipFile zipIn = newZipFile(file)) {
+            InputStream in = zipIn.getCheckedInputStream(name);
+            in.close();
+
+            // Open checked input stream and read fully, using multiple methods.
+            in = zipIn.getCheckedInputStream(name);
+            final int n = data.length / 4;
+            in.skip(n);
+            in.read(new byte[n]);
+            in.read(new byte[n], 0, n);
+            while (in.read() != -1) { // read until EOF
+            }
+            in.close();
+        }
     }
 
     /**
@@ -507,13 +471,10 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         for (int i = 0; i < 4; i++) {
             // Create test ZIP file.
             final String name = "entry";
-            final ZipOutputStream zipOut = newZipOutputStream(
-                    new FileOutputStream(file));
-            try {
+            try (final ZipOutputStream zipOut = newZipOutputStream(
+                   new FileOutputStream(file))) {
                 zipOut.putNextEntry(newEntry(name));
                 zipOut.write(data);
-            } finally {
-                zipOut.close();
             }
 
             final boolean tweakDD = (i & 1) != 0;
@@ -522,54 +483,51 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
             // Modify ZIP file to contain an incorrect CRC32 value in the
             // Central File Header.
             final byte[] crc = new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
-            final RandomAccessFile raf = new RandomAccessFile(file, "rw");
-            if (tweakDD) {
-                raf.seek(raf.length() - 57 - 28); // CRC-32 position in Data Descriptor
-                raf.write(crc);
-            }
-            if (tweakCFH) {
-                raf.seek(raf.length() - 57); // CRC-32 position in Central File Header
-                raf.write(crc);
-            }
-            raf.close();
-
-            final ZipFile zipIn = new ZipFile(file); // NOT newZipFile(...) !
-
-            try {
-                InputStream in = zipIn.getCheckedInputStream(name);
-                if (tweakDD ^ tweakCFH)
-                    fail("Expected CRC32Exception!");
-
-                // Open checked input stream and join immediately.
-                in.close();
-
-                if (tweakDD & tweakCFH)
-                    fail("Expected CRC32Exception!");
-            } catch (CRC32Exception ex) {
-                assertTrue(tweakDD | tweakCFH);
-            }
-
-            try {
-                InputStream in = zipIn.getCheckedInputStream(name);
-                if (tweakDD ^ tweakCFH)
-                    fail("Expected CRC32Exception!");
-
-                // Open checked input stream and read fully, using multiple methods.
-                final int n = data.length / 4;
-                in.skip(n);
-                in.read(new byte[n]);
-                in.read(new byte[n], 0, n);
-                while (in.read() != -1) { // read until EOF
+            try (final RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+                if (tweakDD) {
+                    raf.seek(raf.length() - 57 - 28); // CRC-32 position in Data Descriptor
+                    raf.write(crc);
                 }
-                in.close();
-
-                if (tweakDD & tweakCFH)
-                    fail("Expected CRC32Exception!");
-            } catch (CRC32Exception ex) {
-                assertTrue(tweakDD | tweakCFH);
+                if (tweakCFH) {
+                    raf.seek(raf.length() - 57); // CRC-32 position in Central File Header
+                    raf.write(crc);
+                }
             }
 
-            zipIn.close();
+            try (final ZipFile zipIn = new ZipFile(file)) {
+                try {
+                    InputStream in = zipIn.getCheckedInputStream(name);
+                    if (tweakDD ^ tweakCFH)
+                        fail("Expected CRC32Exception!");
+
+                    // Open checked input stream and join immediately.
+                    in.close();
+                    if (tweakDD & tweakCFH)
+                        fail("Expected CRC32Exception!");
+                } catch (CRC32Exception ex) {
+                    assertTrue(tweakDD | tweakCFH);
+                }
+
+                try {
+                    try (final InputStream in = zipIn.getCheckedInputStream(name)) {
+                        if (tweakDD ^ tweakCFH)
+                            fail("Expected CRC32Exception!");
+
+                        // Open checked input stream and read fully, using multiple methods.
+                        final int n = data.length / 4;
+                        in.skip(n);
+                        in.read(new byte[n]);
+                        in.read(new byte[n], 0, n);
+                        while (in.read() != -1) { // read until EOF
+                        }
+                    }
+
+                    if (tweakDD & tweakCFH)
+                        fail("Expected CRC32Exception!");
+                } catch (CRC32Exception ex) {
+                    assertTrue(tweakDD | tweakCFH);
+                }
+            }
         }
     }
 

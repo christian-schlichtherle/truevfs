@@ -4,17 +4,17 @@
  */
 package de.truezip.driver.zip;
 
-import static de.truezip.kernel.cio.Entry.Size.DATA;
-import de.truezip.kernel.cio.*;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.OutputBusyException;
-import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.util.JointIterator;
 import de.truezip.driver.zip.io.RawZipOutputStream;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import static de.truezip.driver.zip.io.ZipEntry.UNKNOWN;
+import de.truezip.kernel.FsModel;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.OutputBusyException;
+import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -67,12 +67,8 @@ implements OutputService<ZipDriverEntry> {
                 // Retain comment and preamble of input ZIP archive.
                 super.setComment(source.getComment());
                 if (0 < source.getPreambleLength()) {
-                    final InputStream in = source.getPreambleInputStream();
-                    try {
-                        Streams.cat(in,
-                                source.offsetsConsiderPreamble() ? this : out);
-                    } finally {
-                        in.close();
+                    try (final InputStream in = source.getPreambleInputStream()) {
+                        Streams.cat(in, source.offsetsConsiderPreamble() ? this : out);
                     }
                 }
             }
@@ -116,7 +112,7 @@ implements OutputService<ZipDriverEntry> {
         final ZipDriverEntry tempEntry = this.bufferedEntry;
         if (null == tempEntry)
             return super.iterator();
-        return new JointIterator<ZipDriverEntry>(
+        return new JointIterator<>(
                 super.iterator(),
                 Collections.singletonList(tempEntry).iterator());
     }
@@ -219,8 +215,7 @@ implements OutputService<ZipDriverEntry> {
             this.postamble = null;
             final InputSocket<?> is = pa.getInputSocket();
             try {
-                final InputStream in = is.newInputStream();
-                try {
+                try (final InputStream in = is.newInputStream()) {
                     // If the output ZIP file differs in length from the
                     // input ZIP file then pad the output to the next four
                     // byte boundary before appending the postamble.
@@ -232,8 +227,6 @@ implements OutputService<ZipDriverEntry> {
                         write(new byte[4 - (int) (ol % 4)]);
 
                     Streams.cat(in, this);
-                } finally {
-                    in.close();
                 }
             } finally {
                 pa.release();
@@ -311,8 +304,7 @@ implements OutputService<ZipDriverEntry> {
 
             ZipOutputService.this.bufferedEntry = null;
             try {
-                final InputStream in = buffer.getInputSocket().newInputStream();
-                try {
+                try (final InputStream in = buffer.getInputSocket().newInputStream()) {
                     final long length = buffer.getSize(DATA);
                     entry.setCrc(getChecksum().getValue());
                     entry.setCompressedSize(length);
@@ -326,8 +318,6 @@ implements OutputService<ZipDriverEntry> {
                     } finally {
                         closeEntry();
                     }
-                } finally {
-                    in.close();
                 }
             } finally {
                 buffer.release();

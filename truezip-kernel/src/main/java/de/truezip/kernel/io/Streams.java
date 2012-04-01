@@ -227,13 +227,7 @@ public class Streams {
                 try {
                     final byte[] buf = buffer.buf;
                     out.write(buf, 0, write);
-                } catch (final IOException ex) {
-                    cancel(result);
-                    throw ex;
-                } catch (final RuntimeException ex) {
-                    cancel(result);
-                    throw ex;
-                } catch (final Error ex) {
+                } catch (final IOException | RuntimeException | Error ex) {
                     cancel(result);
                     throw ex;
                 }
@@ -308,7 +302,7 @@ public class Streams {
          * because it uses locks, which I would like to abandon.
          */
         static final Queue<Reference<Buffer[]>> queue
-                = new ConcurrentLinkedQueue<Reference<Buffer[]>>();
+                = new ConcurrentLinkedQueue<>();
 
         static Buffer[] allocate() {
             {
@@ -327,8 +321,8 @@ public class Streams {
         }
 
         static void release(Buffer[] buffers) {
-            //queue.push(new SoftReference<Buffer[]>(buffers));
-            queue.add(new SoftReference<Buffer[]>(buffers));
+            //queue.push(new SoftReference<>(buffers));
+            queue.add(new SoftReference<>(buffers));
         }
 
         /** The byte buffer used for reading and writing. */

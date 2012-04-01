@@ -87,12 +87,8 @@ implements InputService<TarDriverEntry> {
                     final IOBuffer<?> temp = pool.allocate();
                     entry.setTemp(temp);
                     try {
-                        final OutputStream
-                                out = temp.getOutputSocket().newOutputStream();
-                        try {
+                        try (final OutputStream out = temp.getOutputSocket().newOutputStream()) {
                             Streams.cat(tin, out);
-                        } finally {
-                            out.close();
                         }
                     } catch (IOException ex) {
                         temp.release();

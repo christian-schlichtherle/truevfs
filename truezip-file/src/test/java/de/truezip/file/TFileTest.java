@@ -484,16 +484,17 @@ public final class TFileTest extends MockArchiveDriverTestBase {
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                final ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(original);
-                oos.close();
+                try (final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                    oos.writeObject(original);
+                }
 
                 logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final ObjectInputStream ois = new ObjectInputStream(bis);
-                final TFile clone = (TFile) ois.readObject();
-                ois.close();
+                final TFile clone;
+                try (final ObjectInputStream ois = new ObjectInputStream(bis)) {
+                    clone = (TFile) ois.readObject();
+                }
 
                 assertThat(clone, not(sameInstance(original)));
                 assertThat(clone, equalTo(original.getAbsoluteFile()));
@@ -501,17 +502,18 @@ public final class TFileTest extends MockArchiveDriverTestBase {
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                final XMLEncoder enc = new XMLEncoder(bos);
-                enc.setExceptionListener(listener);
-                enc.writeObject(original);
-                enc.close();
+                try (final XMLEncoder enc = new XMLEncoder(bos)) {
+                    enc.setExceptionListener(listener);
+                    enc.writeObject(original);
+                }
 
                 logger.log(Level.FINEST, bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final XMLDecoder dec = new XMLDecoder(bis);
-                final TFile clone = (TFile) dec.readObject();
-                dec.close();
+                final TFile clone;
+                try (final XMLDecoder dec = new XMLDecoder(bis)) {
+                    clone = (TFile) dec.readObject();
+                }
 
                 assertThat(clone, not(sameInstance(original)));
                 assertThat(clone, equalTo(original.getAbsoluteFile()));

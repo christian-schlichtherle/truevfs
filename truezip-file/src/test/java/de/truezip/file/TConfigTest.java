@@ -50,40 +50,34 @@ public final class TConfigTest {
 
     @Test
     public void close() {
-        final TConfig c1 = TConfig.push();
-        try {
-            final TConfig c2 = TConfig.push();
+        try (final TConfig c1 = TConfig.push()) {
             try {
-                c1.close();
-                fail();
-            } catch (IllegalStateException notTopElement) {
-                assertSame(c2, TConfig.get());
+                try (final TConfig c2 = TConfig.push()) {
+                    try {
+                        c1.close();
+                        fail();
+                    } catch (IllegalStateException notTopElement) {
+                        assertSame(c2, TConfig.get());
+                    } finally {
+                        c2.close();
+                    }
+                }
+                assertSame(c1, TConfig.get());
             } finally {
-                c2.close();
+                c1.close();
             }
-            c2.close(); // should get ignored
-            assertSame(c1, TConfig.get());
-        } finally {
-            c1.close();
         }
-        c1.close(); // should get ignored
     }
 
     @Test
     public void inheritance() throws InterruptedException {
         assertInheritance();
-        final TConfig c1 = TConfig.push();
-        try {
+        try (final TConfig c1 = TConfig.push()) {
             assertInheritance();
-            final TConfig c2 = TConfig.push();
-            try {
+            try (final TConfig c2 = TConfig.push()) {
                 assertInheritance();
-            } finally {
-                c2.close();
             }
             assertInheritance();
-        } finally {
-            c1.close();
         }
     }
 
@@ -111,8 +105,7 @@ public final class TConfigTest {
 
     @Test
     public void preferences() {
-        final TConfig c = TConfig.push();
-        try {
+        try (final TConfig c = TConfig.push()) {
             assertTrue(c.isLenient());
             assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
 
@@ -184,8 +177,6 @@ public final class TConfigTest {
 
             assertTrue(c.isLenient());
             assertThat(c.getAccessPreferences(), is(BitField.of(CREATE_PARENTS)));
-        } finally {
-            c.close();
         }
     }
 
@@ -193,9 +184,7 @@ public final class TConfigTest {
     public void standardUseCase() {
         TFile f1 = new TFile("file.mok");
         assertFalse(f1.isArchive());
-        // Push a new current configuration on the thread local stack.
-        TConfig c = TConfig.push();
-        try {
+        try (final TConfig c = TConfig.push()) {
             // Change the inheritable thread local configuration.
             c.setArchiveDetector(
                     new TArchiveDetector("mok", new MockArchiveDriver()));
@@ -203,9 +192,6 @@ public final class TConfigTest {
             TFile f2 = new TFile("file.mok");
             assertTrue(f2.isArchive());
             // Do some I/O here.
-        } finally {
-            // Pop the configuration off the inheritable thread local stack.
-            c.close();
         }
     }
 
@@ -217,24 +203,18 @@ public final class TConfigTest {
         final TArchiveDetector ad1 = c1.getArchiveDetector();
         assertThat(c1.getArchiveDetector(), sameInstance(ad1));
         final TArchiveDetector ad2 = new TArchiveDetector("mok", d);
-        final TConfig c2 = TConfig.push();
-        try {
+        try (final TConfig c2 = TConfig.push()) {
             c2.setArchiveDetector(ad2);
             assertThat(TConfig.get(), sameInstance(c2));
             assertThat(c2.getArchiveDetector(), sameInstance(ad2));
             final TArchiveDetector ad3 = new TArchiveDetector("mok", d);
-            final TConfig c3 = TConfig.push();
-            try {
+            try (final TConfig c3 = TConfig.push()) {
                 c3.setArchiveDetector(ad3);
                 assertThat(TConfig.get(), sameInstance(c3));
                 assertThat(c3.getArchiveDetector(), sameInstance(ad3));
-            } finally {
-                c3.close();
             }
             assertThat(TConfig.get(), sameInstance(c2));
             assertThat(c2.getArchiveDetector(), sameInstance(ad2));
-        } finally {
-            c2.close();
         }
         assertThat(TConfig.get(), sameInstance(c1));
         assertThat(c1.getArchiveDetector(), sameInstance(ad1));

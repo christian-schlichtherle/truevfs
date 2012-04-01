@@ -92,9 +92,9 @@ public final class TFileWriter extends OutputStreamWriter {
         super(new TFileOutputStream(file, append), encoder);
     }
 
-    @Override
+    /*@Override
     @DischargesObligation
     public void close() throws IOException {
         super.close();
-    }
+    }*/
 }

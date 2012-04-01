@@ -4,15 +4,15 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.FsController;
-import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.STORE;
-import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.option.AccessOption;
+import static de.truezip.kernel.option.AccessOption.STORE;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
 import javax.annotation.CheckForNull;

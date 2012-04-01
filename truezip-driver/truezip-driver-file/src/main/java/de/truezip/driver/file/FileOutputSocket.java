@@ -4,8 +4,6 @@
  */
 package de.truezip.driver.file;
 
-import de.truezip.driver.file.IOExceptionOutputStream;
-import de.truezip.driver.file.IOExceptionSeekableByteChannel;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
@@ -106,7 +104,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     private Set<OpenOption> optionSet() {
-        final Set<OpenOption> set = new HashSet<OpenOption>(INITIAL_CAPACITY);
+        final Set<OpenOption> set = new HashSet<>(INITIAL_CAPACITY);
         Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
         if (options.get(APPEND)) {
             set.add(StandardOpenOption.APPEND);

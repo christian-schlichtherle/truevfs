@@ -4,6 +4,10 @@
  */
 package de.truezip.driver.file;
 
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsModel;
+import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.*;
@@ -11,10 +15,6 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
 import de.truezip.kernel.option.SyncOption;
@@ -114,7 +114,7 @@ final class FileController extends FsController<FsModel>  {
             BitField<AccessOption> options)
     throws IOException {
         final Path file = target.resolve(name.getPath());
-        final Map<Access, Long> t = new EnumMap<Access, Long>(times);
+        final Map<Access, Long> t = new EnumMap<>(times);
         getBasicFileAttributeView(file).setTimes(
                 toFileTime(t.remove(WRITE)),
                 toFileTime(t.remove(READ)),

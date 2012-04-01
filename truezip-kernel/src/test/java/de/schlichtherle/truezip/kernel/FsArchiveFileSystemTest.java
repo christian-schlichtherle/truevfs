@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsArchiveEntry;
+import de.truezip.kernel.FsCovariantEntry;
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.ROOT;
@@ -11,8 +13,6 @@ import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsCovariantEntry;
 import de.truezip.kernel.mock.MockArchive;
 import de.truezip.kernel.mock.MockArchiveDriver;
 import de.truezip.kernel.mock.MockArchiveDriverEntry;

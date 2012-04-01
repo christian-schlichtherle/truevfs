@@ -678,7 +678,7 @@ implements Iterable<E> {
     @Override
     public void close() throws IOException {
         finish();
-        this.delegate.close();
+        delegate.close();
     }
 
     /** Adjusts the number of written bytes in the offset for appending mode. */

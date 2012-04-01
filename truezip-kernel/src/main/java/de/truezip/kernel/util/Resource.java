@@ -33,7 +33,7 @@ public abstract class Resource<X extends Exception> implements AutoCloseable {
      */
     @Override
     @DischargesObligation
-    public final void close() throws X {
+    public void close() throws X {
         if (!closed) {
             onClose();
             closed = true;

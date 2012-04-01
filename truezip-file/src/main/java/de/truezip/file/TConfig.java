@@ -237,9 +237,7 @@ public class AppTest {
  */
 @ThreadSafe
 @CleanupObligation
-public final class TConfig
-extends Resource<RuntimeException>
-implements Closeable { // this could be AutoCloseable in JSE 7
+public final class TConfig extends Resource<RuntimeException> {
 
     /**
      * The default value of the
@@ -466,6 +464,12 @@ implements Closeable { // this could be AutoCloseable in JSE 7
         if (preferences.get(STORE) && preferences.get(COMPRESS))
             throw new IllegalArgumentException(preferences + " (either STORE or COMPRESS may be set, but not both)");
         this.accessPreferences = preferences;
+    }
+
+    // This one is just for you, NetBeans.
+    @Override
+    public void close() {
+        super.close();
     }
 
     @Override
