@@ -5,6 +5,7 @@
 package de.truezip.kernel.io;
 
 import de.truezip.kernel.util.AbstractExceptionBuilder;
+import java.lang.reflect.InvocationTargetException;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -43,7 +44,7 @@ extends AbstractExceptionBuilder<C, X> {
 
     public static <C extends Exception, X extends SequentialIOException> SequentialIOExceptionBuilder<C, X>
     create(Class<C> cause, Class<X> assembly) {
-        return new SequentialIOExceptionBuilder<C, X>(cause, assembly);
+        return new SequentialIOExceptionBuilder<>(cause, assembly);
     }
 
     public SequentialIOExceptionBuilder(final Class<C> c, final Class<X> x) {
@@ -79,7 +80,7 @@ extends AbstractExceptionBuilder<C, X> {
                     : clazz .getConstructor(String.class)
                             .newInstance(cause.toString())
                             .initCause(cause));
-        } catch (final Exception ex) {
+        } catch (final NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new AssertionError(cause.toString(), ex);
         }
         try {
