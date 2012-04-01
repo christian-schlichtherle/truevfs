@@ -5,8 +5,8 @@
 package de.truezip.driver.zip.io;
 
 import de.truezip.driver.zip.crypto.CipherOutputStream;
-import de.truezip.key.param.KeyStrength;
 import de.truezip.kernel.io.LEDataOutputStream;
+import de.truezip.key.param.KeyStrength;
 import java.io.IOException;
 import java.security.SecureRandom;
 import javax.annotation.concurrent.NotThreadSafe;

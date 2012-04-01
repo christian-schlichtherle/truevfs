@@ -4,10 +4,6 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.key.param.AesKeyStrength;
-import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.LEDataOutputStream;
-import static de.truezip.kernel.util.Maps.initialCapacity;
 import static de.truezip.driver.zip.io.Constants.*;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static de.truezip.driver.zip.io.WinZipAesEntryExtraField.VV_AE_1;
@@ -15,6 +11,10 @@ import static de.truezip.driver.zip.io.WinZipAesEntryExtraField.VV_AE_2;
 import static de.truezip.driver.zip.io.WinZipAesUtils.overhead;
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.LEDataOutputStream;
+import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
