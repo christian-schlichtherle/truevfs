@@ -5,6 +5,8 @@
 package de.truezip.kernel.util;
 
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -13,13 +15,15 @@ import javax.annotation.concurrent.NotThreadSafe;
  * {@linkplain Exception#addSuppressed(Throwable) suppressing} and optionally
  * prioritizing them with the help of a {@link Comparator}.
  * 
+ * @param  <X> the type of the input and assembled (output) exceptions.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class PriorityExceptionBuilder
-extends AbstractExceptionBuilder<Exception, Exception> {
+public final class PriorityExceptionBuilder<X extends Exception>
+extends AbstractExceptionBuilder<X, X> {
 
-    private final Comparator<Exception> comparator;
+    private final Comparator<? super X> comparator;
+    private LinkedList<X> suppressed;
 
     /**
      * Constructs a new priority exception builder.
@@ -45,23 +49,34 @@ extends AbstractExceptionBuilder<Exception, Exception> {
      * @param comparator the comparator used for prioritizing the exceptions in
      *        the assembly.
      */
-    public PriorityExceptionBuilder(final Comparator<Exception> comparator) {
+    public PriorityExceptionBuilder(final Comparator<? super X> comparator) {
         if (null == (this.comparator = comparator))
             throw new NullPointerException();
+        suppressed = new LinkedList<>();
     }
 
     @Override
-    protected Exception update( final Exception input,
-                                final @CheckForNull Exception previous) {
+    protected X update(final X input, final @CheckForNull X previous) {
         if (null == previous)
             return input;
         if (comparator.compare(previous, input) >= 0) {
-            previous.addSuppressed(input);
+            suppressed.addLast(input);
             return previous;
         } else {
-            input.addSuppressed(previous);
+            suppressed.addFirst(previous);
             return input;
         }
+    }
+
+    @Override
+    protected X post(final X assembly) {
+        final Iterator<X> i = suppressed.iterator();
+        while (i.hasNext()) {
+            assembly.addSuppressed(i.next());
+            i.remove();
+        }
+        assert suppressed.isEmpty();
+        return assembly;
     }
 
     private static final class NullComparator implements Comparator<Exception> {
