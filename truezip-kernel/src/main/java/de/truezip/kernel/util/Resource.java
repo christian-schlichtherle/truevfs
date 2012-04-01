@@ -18,8 +18,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  */
 @CleanupObligation
-public abstract class Resource<X extends Exception>
-/*implements AutoCloseable*/ {
+public abstract class Resource<X extends Exception> implements AutoCloseable {
     private boolean closed;
 
     /**
@@ -32,6 +31,7 @@ public abstract class Resource<X extends Exception>
      * 
      * @throws X At the discretion of the method {@link #onClose()}.
      */
+    @Override
     @DischargesObligation
     public final void close() throws X {
         if (!closed) {
