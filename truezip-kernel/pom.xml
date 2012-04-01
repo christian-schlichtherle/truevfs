@@ -60,25 +60,5 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>no-jse7-tests</id>
-            <activation>
-                <jdk>1.6</jdk>
-            </activation>
-            <build>
-                <pluginManagement>
-                    <plugins>
-                        <plugin>
-                            <artifactId>maven-surefire-plugin</artifactId>
-                            <configuration>
-                                <excludes>
-                                    <exclude>**/MockArchiveDriverTest.class</exclude>
-                                </excludes>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </pluginManagement>
-            </build>
-       </profile>
     </profiles>
 </project>
