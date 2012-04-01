@@ -20,7 +20,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * assume a particular position of the file pointer of the decorated read only
  * file.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
