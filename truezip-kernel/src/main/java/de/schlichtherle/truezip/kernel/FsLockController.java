@@ -19,7 +19,6 @@ import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import de.truezip.kernel.util.JSE7;
 import de.truezip.kernel.util.Threads;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -50,10 +49,13 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class FsLockController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
-    private static final ThreadLocal<ThreadUtil> threadUtil = (JSE7.AVAILABLE
-            ? ThreadLocalUtilFactory.NEW
-            : ThreadLocalUtilFactory.OLD
-                ).newThreadLocalUtil();
+    private static final ThreadLocal<ThreadUtil>
+            threadUtil = new ThreadLocal<ThreadUtil>() {
+                @Override
+                public ThreadUtil initialValue() {
+                    return new ThreadUtil(ThreadLocalRandom.current());
+                }
+            };
 
     private static final BitField<SyncOption>
             NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not();
@@ -557,33 +559,4 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             Threads.pause(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
         }
     } // ThreadUtil
-
-    @Immutable
-    private enum ThreadLocalUtilFactory {
-        NEW {
-            @Override
-            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
-                return new ThreadLocal<ThreadUtil>() {
-                    @Override
-                    public ThreadUtil initialValue() {
-                        return new ThreadUtil(ThreadLocalRandom.current());
-                    }
-                };
-            }
-        },
-
-        OLD {
-            @Override
-            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
-                return new ThreadLocal<ThreadUtil>() {
-                    @Override
-                    public ThreadUtil initialValue() {
-                        return new ThreadUtil(new Random());
-                    }
-                };
-            }
-        };
-
-        abstract ThreadLocal<ThreadUtil> newThreadLocalUtil();
-    } // ThreadLocalToolFactory
 }

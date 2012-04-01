@@ -2,13 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.file.nio;
+package de.truezip.driver.file;
 
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.util.JSE7;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
@@ -27,16 +26,5 @@ public final class FileDriver extends FsDriver {
                     final @CheckForNull FsController<?> parent) {
         assert null == parent;
         return new FileController(model);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @return {@code 100} or {@link Integer#MIN_VALUE}, depending on the
-     *         availability of the NIO.2 API.
-     */
-    @Override
-    public int getPriority() {
-        return JSE7.AVAILABLE ? 10 : -10;
     }
 }

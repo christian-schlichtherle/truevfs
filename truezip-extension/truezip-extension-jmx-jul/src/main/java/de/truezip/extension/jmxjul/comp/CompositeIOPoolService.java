@@ -4,6 +4,7 @@
  */
 package de.truezip.extension.jmxjul.comp;
 
+import de.truezip.driver.file.TempFilePoolService;
 import de.truezip.extension.jmxjul.jmx.JmxDirector;
 import de.truezip.extension.jmxjul.jul.JulDirector;
 import de.truezip.kernel.cio.IOPool;
@@ -16,14 +17,7 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class CompositeIOPoolService extends IOPoolService {
 
-    private final IOPoolService service;
-    {
-        final IOPoolService
-                oio = new de.truezip.driver.file.oio.TempFilePoolService();
-        final IOPoolService
-                nio = new de.truezip.driver.file.nio.TempFilePoolService();
-        service = oio.getPriority() > nio.getPriority() ? oio : nio;
-    }
+    private final IOPoolService service = new TempFilePoolService();
 
     @SuppressWarnings("unchecked")
     private final IOPool<?> pool =

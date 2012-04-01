@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.file.io;
+package de.truezip.driver.file;
 
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -19,11 +19,11 @@ import javax.annotation.WillCloseWhenClosed;
  *
  * @author  Christian Schlichtherle
  */
-public abstract class IOExceptionSeekableByteChannel
+abstract class IOExceptionSeekableByteChannel
 extends DecoratingSeekableByteChannel {
 
     /** The nullable last I/O exception. */
-    protected @CheckForNull IOException exception;
+    @CheckForNull IOException exception;
 
     /**
      * Constructs a new I/O exception seekable byte channel.
@@ -32,7 +32,7 @@ extends DecoratingSeekableByteChannel {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected IOExceptionSeekableByteChannel(
+    IOExceptionSeekableByteChannel(
             @Nullable @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);
     }

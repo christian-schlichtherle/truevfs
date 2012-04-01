@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.driver.file.oio;
+package de.truezip.driver.file;
 
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
-import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Access.*;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.InputSocket;
@@ -15,21 +15,24 @@ import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.addr.FsEntryName;
-import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import java.io.File;
-import static java.io.File.separatorChar;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
+import static java.nio.file.Files.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributeView;
+import java.nio.file.attribute.FileTime;
+import java.util.EnumMap;
 import java.util.Map;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -41,33 +44,20 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 final class FileController extends FsController<FsModel>  {
 
-    private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
-
-    private final File target;
+    private final Path target;
 
     FileController(final FsModel model) {
         super(model);
         if (null != model.getParent())
             throw new IllegalArgumentException();
-        URI uri = model.getMountPoint().toUri();
-        if ('\\' == separatorChar && null != uri.getRawAuthority()) {
-            try {
-                // Postfix: Move Windows UNC host from authority to path
-                // component because the File class can't deal with this.
-                // Note that the authority parameter must not be null and that
-                // you cannot use the UriBuilder class - using either of these
-                // would result in the authority property of the new URI object
-                // being equal to the original value again.
-                // Note that the use of the buggy URI constructor is authorized
-                // for this case!
-                uri = new URI(  uri.getScheme(), "",
-                                TWO_SEPARATORS + uri.getAuthority() + uri.getPath(),
-                                uri.getQuery(), uri.getFragment());
-            } catch (URISyntaxException ex) {
-                throw new AssertionError(ex);
-            }
-        }
-        this.target = new File(uri);
+        this.target = Paths.get(model.getMountPoint().toUri());
+    }
+
+    private BasicFileAttributeView getBasicFileAttributeView(Path file) {
+        BasicFileAttributeView view = getFileAttributeView(
+                file, BasicFileAttributeView.class);
+        assert null != view;
+        return view;
     }
 
     @Override
@@ -83,62 +73,68 @@ final class FileController extends FsController<FsModel>  {
     @Override
     public FileEntry getEntry(FsEntryName name) throws IOException {
         FileEntry entry = new FileEntry(target, name);
-        return entry.getFile().exists() ? entry : null;
+        return exists(entry.getPath()) ? entry : null;
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        File file = new File(target, name.getPath());
-        return file.canRead();
+        Path file = target.resolve(name.getPath());
+        return Files.isReadable(file);
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
-        File file = new File(target, name.getPath());
-        return file.canWrite();
+        Path file = target.resolve(name.getPath());
+        return Files.isWritable(file);
     }
 
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
-        File file = new File(target, name.getPath());
-        return file.canExecute();
+        Path file = target.resolve(name.getPath());
+        return Files.isExecutable(file);
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        final File file = new File(target, name.getPath());
-        if (!file.setReadOnly())
-            if (file.exists())
-                throw new IOException(file + " (access denied)"); // just guessing here
+        Path file = target.resolve(name.getPath());
+        // Confirmed: There is no equivalent NIO.2 method, e.g. something like
+        //   setAttribute(file, "readOnly", Boolean.TRUE, null);
+        // is not available!
+        if (!file.toFile().setReadOnly())
+            if (exists(file))
+                throw new AccessDeniedException(file.toString()); // just guessing here
             else
                 throw new FileNotFoundException(file.toString());
     }
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            Map<Access, Long> times,
+            final FsEntryName name,
+            final Map<Access, Long> times,
             BitField<AccessOption> options)
     throws IOException {
-        final File file = new File(target, name.getPath());
-        boolean ok = true;
-        for (Map.Entry<Access, Long> time : times.entrySet())
-            ok &= WRITE == time.getKey() && file.setLastModified(time.getValue());
-        return ok;
+        final Path file = target.resolve(name.getPath());
+        final Map<Access, Long> t = new EnumMap<Access, Long>(times);
+        getBasicFileAttributeView(file).setTimes(
+                toFileTime(t.remove(WRITE)),
+                toFileTime(t.remove(READ)),
+                toFileTime(t.remove(CREATE)));
+        return t.isEmpty();
     }
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            BitField<Access> types,
-            long value,
-            BitField<AccessOption> options)
+            final FsEntryName name,
+            final BitField<Access> types,
+            final long value, BitField<AccessOption> options)
     throws IOException {
-        final File file = new File(target, name.getPath());
-        boolean ok = true;
-        for (final Access type : types)
-            ok &= WRITE == type && file.setLastModified(value);
-        return ok;
+        final Path file = target.resolve(name.getPath());
+        final FileTime time = FileTime.fromMillis(value);
+        getBasicFileAttributeView(file).setTimes(
+                types.get(WRITE)  ? time : null,
+                types.get(READ)   ? time : null,
+                types.get(CREATE) ? time : null);
+        return types.clear(WRITE).clear(READ).clear(CREATE).isEmpty();
     }
 
     @Override
@@ -162,39 +158,41 @@ final class FileController extends FsController<FsModel>  {
                         final BitField<AccessOption> options,
                         final @CheckForNull Entry template)
     throws IOException {
-        final File file = new File(target, name.getPath());
+        final Path file = target.resolve(name.getPath());
         switch (type) {
             case FILE:
-                if (options.get(EXCLUSIVE)) {
-                    if (!file.createNewFile())
-                        throw new IOException(file + " (file exists already)");
-                } else {
-                    new FileOutputStream(file).close();
-                }
+                if (options.get(EXCLUSIVE))
+                    createFile(file);
+                else
+                    newOutputStream(file).close();
                 break;
             case DIRECTORY:
-                if (!file.mkdir())
-                    if (file.exists())
-                        throw new IOException(file + " (directory exists already)");
-                    else
-                        throw new IOException(file.toString());
+                createDirectory(file);
                 break;
             default:
                 throw new IOException(file + " (entry type not supported: " + type + ")");
         }
         if (null != template) {
-            final long time = template.getTime(WRITE);
-            if (UNKNOWN != time && !file.setLastModified(time))
-                throw new IOException(file + " (cannot set last modification time)");
+            getBasicFileAttributeView(file)
+                    .setTimes(  toFileTime(template.getTime(WRITE)),
+                                toFileTime(template.getTime(READ)),
+                                toFileTime(template.getTime(CREATE)));
         }
+    }
+
+    private static @Nullable FileTime toFileTime(Long time) {
+        return null == time ? null : toFileTime((long) time);
+    }
+
+    private static @Nullable FileTime toFileTime(long time) {
+        return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 
     @Override
     public void unlink(FsEntryName name, BitField<AccessOption> options)
     throws IOException {
-        final File file = new File(target, name.getPath());
-        if (!file.delete())
-            throw new IOException(file + " (cannot delete)");
+        Path file = target.resolve(name.getPath());
+        delete(file);
     }
 
     @Override
