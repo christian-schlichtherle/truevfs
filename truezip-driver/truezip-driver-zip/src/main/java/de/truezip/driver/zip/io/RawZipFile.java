@@ -4,12 +4,6 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.kernel.rof.BufferedReadOnlyFile;
-import de.truezip.kernel.rof.IntervalReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFileInputStream;
-import static de.truezip.kernel.util.Maps.initialCapacity;
-import de.truezip.kernel.util.Pool;
 import static de.truezip.driver.zip.io.Constants.*;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static de.truezip.driver.zip.io.LittleEndian.*;
@@ -17,6 +11,12 @@ import static de.truezip.driver.zip.io.WinZipAesEntryExtraField.VV_AE_2;
 import static de.truezip.driver.zip.io.WinZipAesUtils.overhead;
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
+import de.truezip.kernel.rof.BufferedReadOnlyFile;
+import de.truezip.kernel.rof.IntervalReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.rof.ReadOnlyFileInputStream;
+import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.kernel.util.Pool;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -362,7 +362,7 @@ implements Iterable<E>, Closeable {
      */
     private void mountCentralDirectory(final ReadOnlyFile rof, int numEntries)
     throws IOException {
-        final Map<String, E> entries = new LinkedHashMap<String, E>(
+        final Map<String, E> entries = new LinkedHashMap<>(
                 Math.max(initialCapacity(numEntries), 16));
         final byte[] cfh = new byte[CFH_MIN_LEN];
         for (; ; numEntries--) {
@@ -621,9 +621,7 @@ implements Iterable<E>, Closeable {
                                 + method
                                 + " is not supported)");
                 }
-                final CheckedInputStream
-                        cin = new CheckedInputStream(in, new CRC32());
-                try {
+                try (final CheckedInputStream cin = new CheckedInputStream(in, new CRC32())) {
                     entry.setRawSize(cin.skip(Long.MAX_VALUE));
                     if (null != field && field.getVendorVersion() == VV_AE_2)
                         entry.setRawCrc(0);
@@ -643,8 +641,6 @@ implements Iterable<E>, Closeable {
                         default:
                             throw new AssertionError();
                     }
-                } finally {
-                    cin.close();
                 }
                 if (null != field)
                     fp += overhead(field.getKeyStrength());

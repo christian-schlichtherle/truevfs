@@ -12,13 +12,13 @@ import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
+import de.truezip.kernel.io.InputClosedException;
+import de.truezip.kernel.io.OutputClosedException;
+import de.truezip.kernel.io.Streams;
 import static de.truezip.kernel.option.AccessOption.GROW;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
 import static de.truezip.kernel.option.SyncOptions.SYNC;
-import de.truezip.kernel.io.InputClosedException;
-import de.truezip.kernel.io.OutputClosedException;
-import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.ArrayHelper;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
@@ -153,14 +153,9 @@ extends ConfiguredClientTestBase<D> {
         assertTrue(getLastModifiedTime(file).toMillis() > 0);
 
         // Read back portion
-        {
-            InputStream in = newInputStream(file);
-            try {
-                byte[] buf = new byte[getDataLength()];
-                assertTrue(ArrayHelper.equals(getData(), 0, buf, 0, in.read(buf)));
-            } finally {
-                in.close();
-            }
+        try (final InputStream in = newInputStream(file)) {
+            byte[] buf = new byte[getDataLength()];
+            assertTrue(ArrayHelper.equals(getData(), 0, buf, 0, in.read(buf)));
         }
         assertRm(file);
 
@@ -258,8 +253,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertCreateNewEnhancedFile() throws IOException {
         final TPath file1 = archive.resolve("test.txt");
         final TPath file2 = file1.resolve("test.txt");
-        TConfig config = TConfig.push();
-        try {
+        try (final TConfig config = TConfig.push()) {
             config.setLenient(false);
             try {
                 createFile(file1);
@@ -267,8 +261,6 @@ extends ConfiguredClientTestBase<D> {
             } catch (IOException expected) {
             }
             assertCreateNewFile(archive, file1, file2);
-        } finally {
-            config.close();
         }
         assertCreateNewFile(archive, file1, file2);
     }
@@ -382,8 +374,7 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public final void testStrictFileOutputStream() throws IOException {
         TPath file = archive.resolve("test.txt");
-        TConfig config = TConfig.push();
-        try {
+        try (final TConfig config = TConfig.push()) {
             config.setLenient(false);
             try {
                 assertFileOutputStream(file);
@@ -393,8 +384,6 @@ extends ConfiguredClientTestBase<D> {
             createDirectory(archive);
             assertFileOutputStream(file);
             delete(archive);
-        } finally {
-            config.close();
         }
     }
     
@@ -423,8 +412,7 @@ extends ConfiguredClientTestBase<D> {
 
     private void assertFileOutputStream(final TPath file) throws IOException {
         final byte[] message = "Hello World!\r\n".getBytes();
-        final OutputStream out = newOutputStream(file);
-        try {
+        try (final OutputStream out = newOutputStream(file)) {
             assertTrue(exists(file));
             assertFalse(isDirectory(file));
             assertTrue(isRegularFile(file));
@@ -433,8 +421,6 @@ extends ConfiguredClientTestBase<D> {
             assertEquals(0, size(file));
             out.flush();
             assertEquals(0, size(file));
-        } finally {
-            out.close();
         }
         assertTrue(exists(file));
         assertFalse(isDirectory(file));
@@ -539,23 +525,17 @@ extends ConfiguredClientTestBase<D> {
         // This is used later to check whether the update operation knows
         // how to deal with updating an archive for which there is still
         // an open output stream.
-        OutputStream out = newOutputStream(file1);
-        try {
+        try (final OutputStream out = newOutputStream(file1)) {
             Streams.cat(new ByteArrayInputStream(getData()), out);
-        } finally {
-            out.close();
         }
 
-        out = newOutputStream(file2);
-        try {
+        try (final OutputStream out = newOutputStream(file2)) {
             Streams.cat(new ByteArrayInputStream(getData()), out);
-        } finally {
-            out.close();
         }
 
         umount(); // ensure two entries in the archive
 
-        out = newOutputStream(file1);
+        OutputStream out = newOutputStream(file1);
         Streams.cat(new ByteArrayInputStream(getData()), out);
 
         // out is still open!
@@ -674,8 +654,7 @@ extends ConfiguredClientTestBase<D> {
         delete(dir2);
         delete(dir1);
 
-        final TConfig config = TConfig.push();
-        try {
+        try (final TConfig config = TConfig.push()) {
             config.setLenient(false);
 
             try {
@@ -710,8 +689,6 @@ extends ConfiguredClientTestBase<D> {
             createDirectory(dir4);
             createDirectory(dir5);
             createDirectory(dir6);
-        } finally {
-            config.close();
         }
 
         delete(dir6);
@@ -778,14 +755,11 @@ extends ConfiguredClientTestBase<D> {
 
     private static Path[] listFiles(final Path dir) throws IOException {
         try {
-            final DirectoryStream<Path> stream = newDirectoryStream(dir);
-            try {
-                final List<Path> list = new LinkedList<Path>();
+            try (final DirectoryStream<Path> stream = newDirectoryStream(dir)) {
+                final List<Path> list = new LinkedList<>();
                 for (Path path : stream)
                     list.add(path);
                 return list.toArray(new Path[list.size()]);
-            } finally {
-                stream.close();
             }
         } catch (NotDirectoryException ex) {
             return null;
@@ -813,11 +787,8 @@ extends ConfiguredClientTestBase<D> {
     }
 
     private void assertInput(final TPath file) throws IOException {
-        final InputStream in = new ByteArrayInputStream(getData());
-        try {
+        try (final InputStream in = new ByteArrayInputStream(getData())) {
             copy(in, file);
-        } finally {
-            in.close();
         }
         assertEquals(getDataLength(), size(file));
     }
@@ -1001,8 +972,7 @@ extends ConfiguredClientTestBase<D> {
     throws IOException {
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
-        final OutputStream out1 = newOutputStream(entry1);
-        try {
+        try (final OutputStream out1 = newOutputStream(entry1)) {
             try {
                 delete(entry1);
                 fail();
@@ -1014,11 +984,8 @@ extends ConfiguredClientTestBase<D> {
                 fail();
             } catch (IOException expected) {
             }
-        } finally {
-            out1.close();
         }
-        final OutputStream out2 = newOutputStream(entry2);
-        try {
+        try (final OutputStream out2 = newOutputStream(entry2)) {
             try {
                 delete(entry2);
                 fail();
@@ -1030,13 +997,9 @@ extends ConfiguredClientTestBase<D> {
                 fail();
             } catch (IOException expected) {
             }
-        } finally {
-            out2.close();
         }
-        final InputStream in1 = newInputStream(entry1); // performs auto sync!
-        try {
-            final InputStream in2 = newInputStream(entry2);
-            try {
+        try (final InputStream in1 = newInputStream(entry1)) {
+            try (final InputStream in2 = newInputStream(entry2)) {
                 delete(entry2);
                 final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
                 try {
@@ -1050,8 +1013,6 @@ extends ConfiguredClientTestBase<D> {
                     fail();
                 } catch (IOException expected) {
                 }
-            } finally {
-                in2.close();
             }
             try {
                 delete(entry1);
@@ -1070,8 +1031,6 @@ extends ConfiguredClientTestBase<D> {
                 fail();
             } catch (IOException expected) {
             }
-        } finally {
-            in1.close();
         }
         archive.toFile().rm_r();
         assertFalse(exists(archive.toNonArchivePath()));
@@ -1079,12 +1038,9 @@ extends ConfiguredClientTestBase<D> {
     
     @Test
     public final void testRenameValidArchive() throws IOException {
-        PrintStream out = new PrintStream(
-                newOutputStream(archive.resolve("entry")));
-        try {
+        try (final PrintStream out = new PrintStream(
+                     newOutputStream(archive.resolve("entry")))) {
             out.println("Hello World!");
-        } finally {
-            out.close(); // ALWAYS close streams!
         }
         assertRenameArchiveToTemp(archive);
     }
@@ -1278,9 +1234,7 @@ extends ConfiguredClientTestBase<D> {
         final byte[] buf = new byte[getDataLength()];
         for (final Path _entry : entries) {
             final TPath entry = (TPath) _entry;
-            // Read full entry and check the contents.
-            final InputStream in = newInputStream(entry);
-            try {
+            try (final InputStream in = newInputStream(entry)) {
                 int off = 0;
                 int read;
                 while (true) {
@@ -1294,8 +1248,6 @@ extends ConfiguredClientTestBase<D> {
                 assertEquals(-1, read);
                 assertEquals(off, getDataLength());
                 assertTrue(0 >= in.read(new byte[0]));
-            } finally {
-                in.close();
             }
         }
     }

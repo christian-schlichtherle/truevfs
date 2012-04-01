@@ -6,7 +6,6 @@ package de.truezip.path;
 
 import de.truezip.file.MockArchiveDriverTestBase;
 import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.path.TFileSystem;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;

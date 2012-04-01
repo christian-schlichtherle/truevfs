@@ -84,8 +84,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
     private final IOPool<?> pool;
 
-    private final Map<FsEntryName, EntryCache>
-            caches = new HashMap<FsEntryName, EntryCache>();
+    private final Map<FsEntryName, EntryCache> caches = new HashMap<>();
 
     /**
      * Constructs a new file system cache controller.

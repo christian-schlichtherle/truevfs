@@ -121,16 +121,17 @@ public class BitFieldTest {
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                final ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(original);
-                oos.close();
+                try (final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                    oos.writeObject(original);
+                }
 
                 logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final ObjectInputStream ois = new ObjectInputStream(bis);
-                final Object clone = ois.readObject();
-                ois.close();
+                final Object clone;
+                try (final ObjectInputStream ois = new ObjectInputStream(bis)) {
+                    clone = ois.readObject();
+                }
 
                 assertThat(clone, not(sameInstance((Object) original)));
                 assertThat(clone, equalTo((Object) original));
@@ -138,17 +139,18 @@ public class BitFieldTest {
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                final XMLEncoder enc = new XMLEncoder(bos);
-                enc.setExceptionListener(listener);
-                enc.writeObject(original);
-                enc.close();
+                try (final XMLEncoder enc = new XMLEncoder(bos)) {
+                    enc.setExceptionListener(listener);
+                    enc.writeObject(original);
+                }
 
                 logger.log(Level.FINEST, bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final XMLDecoder dec = new XMLDecoder(bis);
-                final Object clone = dec.readObject();
-                dec.close();
+                final Object clone;
+                try (final XMLDecoder dec = new XMLDecoder(bis)) {
+                    clone = dec.readObject();
+                }
 
                 assertThat(clone, not(sameInstance((Object) original)));
                 assertThat(clone, equalTo((Object) original));

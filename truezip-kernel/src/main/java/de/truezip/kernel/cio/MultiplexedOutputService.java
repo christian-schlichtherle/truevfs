@@ -47,8 +47,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * The map of temporary archive entries which have not yet been written
      * to the output archive.
      */
-    private final Map<String, BufferedEntryOutputStream> buffers
-            = new LinkedHashMap<String, BufferedEntryOutputStream>();
+    private final Map<String, BufferedEntryOutputStream>
+            buffers = new LinkedHashMap<>();
 
     /** @see #isBusy */
     private boolean busy;
@@ -76,7 +76,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     public Iterator<E> iterator() {
-        return new JointIterator<E>(
+        return new JointIterator<>(
                 delegate.iterator(),
                 new BufferedEntriesIterator());
     }

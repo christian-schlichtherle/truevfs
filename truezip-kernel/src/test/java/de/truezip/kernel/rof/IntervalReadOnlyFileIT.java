@@ -28,13 +28,10 @@ public final class IntervalReadOnlyFileIT extends ReadOnlyFileTestSuite {
     public void setUp() throws IOException {
         temp2 = File.createTempFile(TEMP_FILE_PREFIX, null);
         try {
-            final OutputStream out = new FileOutputStream(temp2);
-            try {
+            try (final OutputStream out = new FileOutputStream(temp2)) {
                 out.write(DATA);
                 out.write(DATA);
                 out.write(DATA);
-            } finally {
-                out.close();
             }
             assert 3 * DATA.length == temp2.length();
         } catch (final IOException ex) {

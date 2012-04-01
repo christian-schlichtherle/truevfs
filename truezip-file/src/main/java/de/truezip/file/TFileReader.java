@@ -69,9 +69,9 @@ public final class TFileReader extends InputStreamReader {
 	super(new TFileInputStream(file), decoder);
     }
 
-    @Override
+    /*@Override
     @DischargesObligation
     public void close() throws IOException {
         super.close();
-    }
+    }*/
 }

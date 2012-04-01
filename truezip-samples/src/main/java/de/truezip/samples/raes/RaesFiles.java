@@ -25,13 +25,12 @@ import java.io.OutputStream;
  * Note that this class is not intended to access RAES encrypted ZIP files -
  * use the {@link TFile} class for this task instead.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class RaesFiles {
 
-    /** You cannot instantiate this class. */
-    private RaesFiles() {
-    }
+    /** Can't touch this - hammer time! */
+    private RaesFiles() { }
 
     /**
      * Encrypts the given plain file to the given RAES file.
@@ -58,8 +57,8 @@ public class RaesFiles {
             final String raesFilePath,
             final TArchiveDetector detector)
     throws IOException {
-        final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
-        final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
+        final TFile plainFile = new TFile(plainFilePath, detector).toNonArchiveFile();
+        final TFile raesFile = new TFile(raesFilePath, detector).toNonArchiveFile();
         final RaesParameters params = new KeyManagerRaesParameters(
                 KeyManagerLocator.SINGLETON,
                 raesFile/*.getCanonicalFile()*/.toURI());
@@ -110,13 +109,12 @@ public class RaesFiles {
             final boolean authenticate,
             final TArchiveDetector detector)
     throws IOException {
-        final TFile raesFile = newNonArchiveFile(raesFilePath, detector);
-        final TFile plainFile = newNonArchiveFile(plainFilePath, detector);
+        final TFile raesFile = new TFile(raesFilePath, detector).toNonArchiveFile();
+        final TFile plainFile = new TFile(plainFilePath, detector).toNonArchiveFile();
         final RaesParameters params = new KeyManagerRaesParameters(
                 KeyManagerLocator.SINGLETON,
                 raesFile/*.getCanonicalFile()*/.toURI());
-        final ReadOnlyFile rof = new DefaultReadOnlyFile(raesFile);
-        try {
+        try (final ReadOnlyFile rof = new DefaultReadOnlyFile(raesFile)) {
             final RaesReadOnlyFile rrof
                     = RaesReadOnlyFile.getInstance(rof, params);
             if (authenticate)
@@ -130,21 +128,6 @@ public class RaesFiles {
                     in.close();
             }
             TFile.cp(in, out);
-        } finally {
-            rof.close();
         }
-    }
-
-    /**
-     * Creates a file object which uses the provided TArchiveDetector,
-     * but does not recognize its own pathname as an archive file.
-     * Please note that this method just creates a file object,
-     * and does not actually operate on the file system.
-     */
-    private static TFile newNonArchiveFile(
-            String path,
-            TArchiveDetector detector) {
-        TFile file = new TFile(path, detector);
-        return new TFile(file.getParentFile(), file.getName(), TArchiveDetector.NULL);
     }
 }

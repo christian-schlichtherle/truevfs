@@ -210,7 +210,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
      */
     @Override
     public void close() throws IOException {
-        if (this.exclusive)
-            this.delegate.close();
+        if (exclusive)
+            delegate.close();
     }
 }

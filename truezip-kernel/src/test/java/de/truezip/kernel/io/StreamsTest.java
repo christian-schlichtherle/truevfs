@@ -4,9 +4,9 @@
  */
 package de.truezip.kernel.io;
 
-import de.truezip.kernel.cio.ByteArrayIOBuffer;
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.ThrowControl;
+import de.truezip.kernel.cio.ByteArrayIOBuffer;
 import static de.truezip.kernel.util.Throwables.contains;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,13 +93,7 @@ public class StreamsTest {
                 try {
                     Streams.cat(tis, out);
                     fail();
-                } catch (final IOException got) {
-                    if (!contains(got, expected))
-                        throw got;
-                } catch (final RuntimeException got) {
-                    if (!contains(got, expected))
-                        throw got;
-                } catch (final Error got) {
+                } catch (final IOException | RuntimeException | Error got) {
                     if (!contains(got, expected))
                         throw got;
                 }
@@ -128,13 +122,7 @@ public class StreamsTest {
                 try {
                     Streams.cat(in, tos);
                     fail();
-                } catch (final IOException got) {
-                    if (!contains(got, expected))
-                        throw got;
-                } catch (final RuntimeException got) {
-                    if (!contains(got, expected))
-                        throw got;
-                } catch (final Error got) {
+                } catch (final IOException | RuntimeException | Error got) {
                     if (!contains(got, expected))
                         throw got;
                 }
@@ -175,7 +163,7 @@ public class StreamsTest {
         final int numThreads = Runtime.getRuntime().availableProcessors() * 10;
         final int numTasks = 10 * numThreads;
 
-        final List<Future<Void>> results = new ArrayList<Future<Void>>(numTasks);
+        final List<Future<Void>> results = new ArrayList<>(numTasks);
         final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try {
             for (int i = 0; i < numTasks; i++)
@@ -193,17 +181,16 @@ public class StreamsTest {
         final ByteArrayIOBuffer buffer = new ByteArrayIOBuffer("test", data);
 
         void run() throws IOException {
-            final TestInputStream in = newTestInputStream(buffer);
-            final TestOutputStream out = newTestOutputStream(buffer);
-            Thread.currentThread().interrupt();
-            cat(in, out);
-            assertTrue("The interrupt status should not have changed!",
-                    Thread.interrupted()); // test and clear status!
-            assertTrue(out.flushed);
-            assertFalse(out.closed);
-            assertFalse(in.closed);
-            in.close();
-            out.close();
+            try (   final TestInputStream in = newTestInputStream(buffer);
+                    final TestOutputStream out = newTestOutputStream(buffer)) {
+                Thread.currentThread().interrupt();
+                cat(in, out);
+                assertTrue("The interrupt status should not have changed!",
+                        Thread.interrupted());
+                assertTrue(out.flushed);
+                assertFalse(out.closed);
+                assertFalse(in.closed);
+            }
             assertNotSame(data, buffer.getData());
             assertArrayEquals(data, buffer.getData());
         }

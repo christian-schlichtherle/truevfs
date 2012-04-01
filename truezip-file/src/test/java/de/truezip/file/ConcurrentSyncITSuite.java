@@ -115,11 +115,8 @@ extends ConfiguredClientTestBase<D> {
     }
 
     private void create(final TFile file) throws IOException {
-        final OutputStream out = new TFileOutputStream(file);
-        try {
+        try (final OutputStream out = new TFileOutputStream(file)) {
             out.write(getData());
-        } finally {
-            out.close();
         }
         assertEquals(getDataLength(), file.length());
     }

@@ -48,9 +48,9 @@ public class FsEntryNameTest {
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                final ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.writeObject(original);
-                oos.close();
+                try (final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+                    oos.writeObject(original);
+                }
 
                 logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
 
@@ -65,10 +65,10 @@ public class FsEntryNameTest {
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                final XMLEncoder enc = new XMLEncoder(bos);
-                enc.setExceptionListener(listener);
-                enc.writeObject(original);
-                enc.close();
+                try (final XMLEncoder enc = new XMLEncoder(bos)) {
+                    enc.setExceptionListener(listener);
+                    enc.writeObject(original);
+                }
 
                 logger.log(Level.FINEST, bos.toString("UTF-8"));
 

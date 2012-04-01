@@ -28,12 +28,8 @@ abstract class Usage {
     }
 
     void cat1(String path) throws IOException {
-// START SNIPPET: cat1
-        InputStream in = new TFileInputStream(path);
-        try {
+        try (InputStream in = new TFileInputStream(path)) {
             TFile.cat(in, System.out);
-        } finally {
-            in.close(); // ALWAYS close the stream!
         }
 // END SNIPPET: cat1
     }
@@ -41,11 +37,8 @@ abstract class Usage {
     void cat2(String path) {
 // START SNIPPET: cat2
         try {
-            InputStream in = new TFileInputStream(path);
-            try {
+            try (InputStream in = new TFileInputStream(path)) {
                 TFile.cat(in, System.out);
-            } finally {
-                in.close(); // ALWAYS close the stream!
             }
         } catch (IOException ouch) {
             ouch.printStackTrace();

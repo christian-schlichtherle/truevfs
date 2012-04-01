@@ -32,8 +32,7 @@ public final class RaesRofIT extends ReadOnlyFileTestSuite {
     @Override
     protected ReadOnlyFile newReadOnlyFile(final File plainFile)
     throws IOException {
-        final InputStream in = new FileInputStream(plainFile);
-        try {
+        try (final InputStream in = new FileInputStream(plainFile)) {
             cipherFile = File.createTempFile(TEMP_FILE_PREFIX, null);
             try {
                 final RaesOutputStream out = RaesOutputStream.getInstance(
@@ -52,8 +51,6 @@ public final class RaesRofIT extends ReadOnlyFileTestSuite {
                 throw ex;
             }
             return RaesReadOnlyFile.getInstance(cipherFile, newRaesParameters());
-        } finally {
-            in.close();
         }
     }
 

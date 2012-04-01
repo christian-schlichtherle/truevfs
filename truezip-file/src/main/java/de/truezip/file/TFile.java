@@ -5,25 +5,25 @@
 package de.truezip.file;
 
 import de.truezip.kernel.FsController;
-import de.truezip.kernel.addr.FsScheme;
+import de.truezip.kernel.FsEntry;
+import de.truezip.kernel.addr.FsEntryName;
+import static de.truezip.kernel.addr.FsEntryName.ROOT;
+import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.addr.FsPath;
+import de.truezip.kernel.addr.FsScheme;
+import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
-import static de.truezip.kernel.addr.FsEntryName.ROOT;
-import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
-import de.truezip.kernel.*;
-import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
-import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
-import static de.truezip.kernel.option.AccessOption.GROW;
-import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.io.Paths.Splitter;
 import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.option.AccessOption;
+import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
+import static de.truezip.kernel.option.AccessOption.GROW;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.UriBuilder;
 import java.io.*;
@@ -362,7 +362,7 @@ public final class TFile extends File {
     /** The file system roots. */
     private static final Set<File>
             ROOTS = Collections.unmodifiableSet(
-                new TreeSet<File>(Arrays.asList(listRoots())));
+                new TreeSet<>(Arrays.asList(listRoots())));
 
     private static final File CURRENT_DIRECTORY = new File(".");
 
@@ -2004,8 +2004,7 @@ public final class TFile extends File {
                 return null;
             if (null == filter)
                 return members.toArray(new String[members.size()]);
-            final Collection<String> accepted
-                    = new ArrayList<String>(members.size());
+            final Collection<String> accepted = new ArrayList<>(members.size());
             for (final String member : members)
                 if (filter.accept(this, member))
                     accepted.add(member);
@@ -2103,8 +2102,7 @@ public final class TFile extends File {
         if (null == members)
             return null;
         if (null != filter) {
-            final Collection<TFile>
-                    accepted = new ArrayList<TFile>(members.size());
+            final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members)
                 if (filter.accept(this, member))
                     accepted.add(new TFile(this, member, detector));
@@ -2168,8 +2166,7 @@ public final class TFile extends File {
         if (null == members)
             return null;
         if (null != filter) {
-            final Collection<TFile>
-                    accepted = new ArrayList<TFile>(members.size());
+            final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members) {
                 final TFile file = new TFile(this, member, detector);
                 if (filter.accept(file))
@@ -3378,8 +3375,7 @@ public final class TFile extends File {
 
         final File dir = getParent(grown);
         final String suffix = getSuffix(grown);
-        final TConfig config = TConfig.push();
-        try {
+        try (final TConfig config = TConfig.push()) {
             // Switch off AccessOption.GROW.
             config.setAccessPreferences(
                     config.getAccessPreferences().clear(GROW));
@@ -3405,8 +3401,6 @@ public final class TFile extends File {
                 compact.rm();
                 throw ex;
             }
-        } finally {
-            config.close();
         }
     }
 

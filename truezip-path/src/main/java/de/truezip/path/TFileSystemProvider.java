@@ -6,15 +6,15 @@ package de.truezip.path;
 
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
+import de.truezip.kernel.FsEntry;
+import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
+import de.truezip.kernel.addr.FsMountPoint;
+import de.truezip.kernel.addr.FsPath;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsEntry;
-import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
-import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
 import de.truezip.kernel.util.BitField;
@@ -53,13 +53,12 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private static final URI DEFAULT_ROOT_MOUNT_POINT_URI
             = URI.create(DEFAULT_ROOT_MOUNT_POINT);
     private static final Map<String, TFileSystemProvider>
-            providers = new WeakHashMap<String, TFileSystemProvider>();
+            providers = new WeakHashMap<>();
 
     private final String scheme;
     private final FsPath root;
 
-    private Map<FsMountPoint, TFileSystem>
-            fileSystems = new WeakHashMap<FsMountPoint, TFileSystem>();
+    private Map<FsMountPoint, TFileSystem> fileSystems = new WeakHashMap<>();
 
     /**
      * Obtains a file system provider for the given {@link TPath} URI.
@@ -166,14 +165,11 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
-        TConfig config = push(configuration);
-        try {
+        try (final TConfig config = push(configuration)) {
             TPath p = new TPath(path);
             if (null == p.getMountPoint().getParent())
                 throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
             return p.getFileSystem();
-        } finally {
-            config.close();
         }
     }
 
@@ -201,11 +197,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(URI uri, Map<String, ?> configuration) {
-        TConfig config = push(configuration);
-        try {
+        try (final TConfig config = push(configuration)) {
             return getFileSystem(uri);
-        } finally {
-            config.close();
         }
     }
 
@@ -441,6 +434,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     /** Keys for environment maps. */
+    @SuppressWarnings("PublicInnerClass")
     public interface Parameter {
         /** The key for the {@code archiveDetector} parameter. */
         String ARCHIVE_DETECTOR = "archiveDetector";

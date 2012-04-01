@@ -11,8 +11,8 @@ import de.truezip.driver.zip.CheckedJarDriver;
 import de.truezip.driver.zip.CheckedReadOnlySfxDriver;
 import de.truezip.driver.zip.CheckedZipDriver;
 import de.truezip.file.*;
-import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.cio.IOPoolProvider;
 import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.sl.IOPoolLocator;
 import java.io.IOException;
@@ -147,42 +147,54 @@ public class Nzip extends Application {
         try {
             // Install custom archive detector.
             TConfig.get().setArchiveDetector(newArchiveDetector());
-
-            if ("ls".equals(cmd)) {
+            switch (cmd) {
+            case "ls":
                 ls(args, false, false);
-            } else if ("ll".equals(cmd)) {
+                break;
+            case "ll":
                 ls(args, true, false);
-            } else if ("llr".equals(cmd)) {
+                break;
+            case "llr":
                 ls(args, true, true);
-            } else if ("cat".equals(cmd)) {
+                break;
+            case "cat":
                 cat(args);
-            } else if ("compact".equals(cmd)) {
+                break;
+            case "compact":
                 compact(args);
-            } else if ("cp".equals(cmd)) {
+                break;
+            case "cp":
                 cpOrMv(args, false);
-            } else if ("mv".equals(cmd)) {
+                break;
+            case "mv":
                 cpOrMv(args, true);
-            } else if ("touch".equals(cmd)) {
+                break;
+            case "touch":
                 touch(args);
-            } else if ("mkdir".equals(cmd)) {
+                break;
+            case "mkdir":
                 mkdir(args, false);
-            } else if ("mkdirs".equals(cmd)) {
+                break;
+            case "mkdirs":
                 mkdir(args, true);
-            } else if ("rm".equals(cmd)) {
+                break;
+            case "rm":
                 rm(args, false);
-            } else if ("rmr".equals(cmd)) {
+                break;
+            case "rmr":
                 rm(args, true);
-            } else if ("isarchive".equals(cmd)) {
+                break;
+            case "isarchive":
                 return isArchive(args) ? 0 : 1;
-            } else if ("isdirectory".equals(cmd)) {
+            case "isdirectory":
                 return isDirectory(args) ? 0 : 1;
-            } else if ("isfile".equals(cmd)) {
+            case "isfile":
                 return isFile(args) ? 0 : 1;
-            } else if ("exists".equals(cmd)) {
+            case "exists":
                 return exists(args) ? 0 : 1;
-            } else if ("length".equals(cmd)) {
+            case "length":
                 return length(args) ? 0 : 1;
-            } else {
+            default:
                 throw new IllegalUsageException();
             }
         } finally {
@@ -290,11 +302,8 @@ public class Nzip extends Application {
             throw new IllegalUsageException();
 
         for (int i = 0; i < args.length; i++) {
-            final InputStream in = new TFileInputStream(args[i]);
-            try {
+            try (final InputStream in = new TFileInputStream(args[i])) {
                 TFile.cat(in, out);
-            } finally {
-                in.close();
             }
         }
     }
@@ -334,25 +343,35 @@ public class Nzip extends Application {
             if (mv) // mv
                 throw new IllegalUsageException();
             final String opt = args[srcI].toLowerCase(Locale.ENGLISH);
-            if ("-unzip".equals(opt)) {
+            switch (opt) {
+            case "-unzip":
                 unzip = true;
-            } else if ("-cp437out".equals(opt)) {
+                break;
+            case "-cp437out":
                 cp437out = true;
-            } else if ("-utf8out".equals(opt)) {
+                break;
+            case "-utf8out":
                 utf8out = true;
-            } else if ("-cp437in".equals(opt)) {
+                break;
+            case "-cp437in":
                 cp437in = true;
-            } else if ("-utf8in".equals(opt)) {
+                break;
+            case "-utf8in":
                 utf8in = true;
-            } else if ("-store".equals(opt)) {
+                break;
+            case "-store":
                 store = true;
-            } else if ("-compress".equals(opt)) {
+                break;
+            case "-compress":
                 compress = true;
-            } else if ("-grow".equals(opt)) {
+                break;
+            case "-grow":
                 grow = true;
-            } else if ("-encrypt".equals(opt)) {
+                break;
+            case "-encrypt":
                 encrypt = true;
-            } else {
+                break;
+            default:
                 throw new IllegalUsageException();
             }
         }
@@ -380,9 +399,7 @@ public class Nzip extends Application {
         if (dstI - srcI < 1 || (dstI - srcI > 1
                 && !dst.isArchive() && !dst.isDirectory()))
             throw new IllegalUsageException();
-
-        final TConfig config = TConfig.push();
-        try {
+        try (final TConfig config = TConfig.push()) {
             config.setAccessPreferences(config.getAccessPreferences()
                     .set(STORE, store)
                     .set(COMPRESS, compress)
@@ -406,8 +423,6 @@ public class Nzip extends Application {
                     TFile.cp_rp(src, tmp, srcDetector, dstDetector);
                 }
             }
-        } finally {
-            config.close();
         }
     }
 

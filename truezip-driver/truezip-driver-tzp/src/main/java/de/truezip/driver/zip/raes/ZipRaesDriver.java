@@ -123,7 +123,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
-        return new ZipRaesKeyController<M>(controller, this);
+        return new ZipRaesKeyController<>(controller, this);
     }
 
     /**
@@ -220,8 +220,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final OutputStream out = new LazyOutputSocket<Entry>(output)
-                .newOutputStream();
+        final OutputStream out = new LazyOutputSocket<>(output).newOutputStream();
         try {
             final RaesOutputStream ros = RaesOutputStream.getInstance(
                     out, raesParameters(model));

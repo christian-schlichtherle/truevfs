@@ -6,6 +6,8 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.FsArchiveFileSystem.newEmptyFileSystem;
 import static de.schlichtherle.truezip.kernel.FsArchiveFileSystem.newPopulatedFileSystem;
+import de.truezip.kernel.*;
+import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
@@ -16,8 +18,9 @@ import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.io.InputClosedException;
+import de.truezip.kernel.io.InputException;
+import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.CACHE;
 import static de.truezip.kernel.option.AccessOption.GROW;
@@ -25,9 +28,6 @@ import static de.truezip.kernel.option.AccessOptions.ACCESS_PREFERENCES_MASK;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
-import de.truezip.kernel.io.InputClosedException;
-import de.truezip.kernel.io.InputException;
-import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -203,7 +203,7 @@ extends FsFileSystemArchiveController<E> {
                 final boolean ro = !parent.isWritable(name);
                 final InputSocket<?> is = driver.getInputSocket(
                         parent, name, MOUNT_INPUT_OPTIONS);
-                final InputArchive<E> ia = new InputArchive<E>(
+                final InputArchive<E> ia = new InputArchive<>(
                         driver.newInputService(getModel(), is));
                 fs = newPopulatedFileSystem(driver, ia.getArchive(), pe, ro);
                 setInputArchive(ia);
@@ -249,7 +249,7 @@ extends FsFileSystemArchiveController<E> {
                 parent, name, options, null);
         final InputArchive<E> ia = getCheckedInputArchive();
         try {
-            oa = new OutputArchive<E>(driver.newOutputService(
+            oa = new OutputArchive<>(driver.newOutputService(
                     getModel(), os, null == ia ? null : ia.getArchive()));
         } catch (final FsControllerException ex) {
             assert ex instanceof FsNeedsLockRetryException;
@@ -648,7 +648,7 @@ extends FsFileSystemArchiveController<E> {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         InputArchive(final @WillCloseWhenClosed InputService<E> input) {
-            super(new DisconnectingInputService<E>(input));
+            super(new DisconnectingInputService<>(input));
             this.archive = input;
         }
 
@@ -675,7 +675,7 @@ extends FsFileSystemArchiveController<E> {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         OutputArchive(final @WillCloseWhenClosed OutputService<E> output) {
-            super(new DisconnectingOutputService<E>(output));
+            super(new DisconnectingOutputService<>(output));
         }
 
         boolean isClosed() {

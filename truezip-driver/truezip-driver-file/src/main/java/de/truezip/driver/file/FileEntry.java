@@ -163,14 +163,11 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
     @Override
     public final @Nullable Set<String> getMembers() {
         try {
-            final DirectoryStream<Path> stream = newDirectoryStream(path);
-            try {
+            try (final DirectoryStream<Path> stream = newDirectoryStream(path)) {
                 final Set<String> result = new LinkedHashSet<String>();
                 for (final Path member : stream)
                     result.add(member.getFileName().toString());
                 return result;
-            } finally {
-                stream.close();
             }
         } catch (IOException ignore) {
             // This isn't a directory or may be inaccessible. In either case...

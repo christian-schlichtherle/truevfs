@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.zip.raes.zip;
 
+import de.truezip.driver.zip.io.ZipFile;
+import de.truezip.driver.zip.io.ZipOutputStream;
+import de.truezip.driver.zip.io.ZipTestSuite;
 import de.truezip.driver.zip.raes.crypto.MockType0RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.driver.zip.io.ZipFile;
-import de.truezip.driver.zip.io.ZipOutputStream;
-import de.truezip.driver.zip.io.ZipTestSuite;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -66,12 +66,9 @@ public final class RaesZipIT extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof);
-        } catch (RuntimeException ex) {
+        } catch (final RuntimeException | IOException ex) {
             rof.close();
             throw ex;
-        } catch (IOException exc) {
-            rof.close();
-            throw exc;
         }
     }
 
@@ -88,10 +85,7 @@ public final class RaesZipIT extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof, cs);
-        } catch (RuntimeException ex) {
-            rof.close();
-            throw ex;
-        } catch (IOException ex) {
+        } catch (final RuntimeException | IOException ex) {
             rof.close();
             throw ex;
         }
@@ -106,10 +100,7 @@ public final class RaesZipIT extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof);
-        } catch (RuntimeException ex) {
-            rof.close();
-            throw ex;
-        } catch (IOException ex) {
+        } catch (final RuntimeException | IOException ex) {
             rof.close();
             throw ex;
         }
@@ -129,12 +120,9 @@ public final class RaesZipIT extends ZipTestSuite {
             if (rof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rof.authenticate();
             return new ZipFile(rof, charset);
-        } catch (RuntimeException ex) {
+        } catch (final RuntimeException | IOException ex) {
             rof.close();
             throw ex;
-        } catch (IOException exc) {
-            rof.close();
-            throw exc;
         }
     }
 
@@ -147,12 +135,9 @@ public final class RaesZipIT extends ZipTestSuite {
             if (rrof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rrof.authenticate();
             return new ZipFile(rrof);
-        } catch (RuntimeException ex) {
+        } catch (final RuntimeException | IOException ex) {
             rrof.close();
             throw ex;
-        } catch (IOException exc) {
-            rrof.close();
-            throw exc;
         }
     }
 
@@ -169,10 +154,7 @@ public final class RaesZipIT extends ZipTestSuite {
             if (rrof.length() < AUTHENTICATION_TRIGGER) // heuristic
                 rrof.authenticate();
             return new ZipFile(rrof, cs);
-        } catch (RuntimeException ex) {
-            rrof.close();
-            throw ex;
-        } catch (IOException ex) {
+        } catch (final RuntimeException | IOException ex) {
             rrof.close();
             throw ex;
         }
