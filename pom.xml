@@ -83,15 +83,11 @@ system space.
         <!-- While using an older Maven version may work, this hasn't been
              tested and is probably not producing exactly the same results. -->
         <maven.enforcer.requireMavenVersion>3.0.4</maven.enforcer.requireMavenVersion>
-        <!-- Most modules require JSE 7 at compile time.
-             At run time however, most modules require only JSE 6.
-             So while you can't compile TrueZIP with JSE 6, you can still run
-             the integration tests with it. -->
-        <maven.enforcer.requireJavaVersion>1.6</maven.enforcer.requireJavaVersion>
+        <maven.enforcer.requireJavaVersion>1.7</maven.enforcer.requireJavaVersion>
 
         <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
-        <maven.compiler.source>1.6</maven.compiler.source>
-        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
 
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
 
@@ -141,20 +137,9 @@ system space.
         <module>truezip-kernel</module>
         <module>truezip-key-api</module>
         <module>truezip-key-impl</module>
+        <module>truezip-path</module>
         <module>truezip-samples</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>jse7-modules</id>
-            <activation>
-                <jdk>[1.7,)</jdk>
-            </activation>
-            <modules>
-                <module>truezip-path</module>
-            </modules>
-        </profile>
-    </profiles>
 
     <dependencyManagement>
         <dependencies>

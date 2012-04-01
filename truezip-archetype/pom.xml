@@ -20,19 +20,8 @@
 
     <modules>
         <module>truezip-archetype-file</module>
+        <module>truezip-archetype-path</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>jse7-modules</id>
-            <activation>
-                <jdk>[1.7,)</jdk>
-            </activation>
-            <modules>
-                <module>truezip-archetype-path</module>
-            </modules>
-        </profile>
-    </profiles>
 
     <build>
         <extensions>
