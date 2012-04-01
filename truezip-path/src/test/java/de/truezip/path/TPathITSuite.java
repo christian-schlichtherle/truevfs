@@ -47,11 +47,11 @@ import org.junit.Test;
  * @see    TFileITSuite Test suite for the TrueZIP File* API.
  * @author Christian Schlichtherle
  */
-public abstract class TPathTestSuite<D extends FsArchiveDriver<?>>
+public abstract class TPathITSuite<D extends FsArchiveDriver<?>>
 extends ConfiguredClientTestBase<D> {
 
     private static final Logger
-            logger = Logger.getLogger(TPathTestSuite.class.getName());
+            logger = Logger.getLogger(TPathITSuite.class.getName());
 
     /**
      * The prefix for temporary files, which is {@value}.

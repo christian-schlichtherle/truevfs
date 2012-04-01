@@ -8,59 +8,53 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An exception builder is an exception handler which assembles an exception
- * of the parameter type {@code T} from one or more exceptions of the parameter
- * type {@code C}.
+ * of the parameter type {@code O} from one or more exceptions of the parameter
+ * type {@code I}.
  * This may be used in scenarios where a cooperative algorithm needs to
- * continue its task even if one or more exceptional conditions occur.
+ * continue its task even if one or more input exceptions occur.
  * This interface would then allow to collect all cause exceptions during
  * the processing by calling {@link #warn(Exception)} and later check out the
  * assembled exception by calling {@link #fail(Exception)} or
  * {@link #check()}.
- * <p>
- * TODO: Consider allowing {@link Throwable} as type parameters.
  *
- * @param  <C> the type of the cause exceptions.
- * @param  <X> the type of the assembled exceptions.
+ * @param  <I> the type of the input exceptions.
+ * @param  <O> the type of the assembled (output) exceptions.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public interface ExceptionBuilder<C extends Exception, X extends Exception>
-extends ExceptionHandler<C, X> {
+public interface ExceptionBuilder<I extends Exception, O extends Exception>
+extends ExceptionHandler<I, O> {
 
     /**
-     * Adds the {@code cause} exception to the assembly and
-     * checks out and returns
-     * the result
-     * in order to enable the assembly of another exception.
+     * Adds {@code input} to the assembly and checks out and returns the
+     * result in order to enable the assembly of another exception.
      * <p>
      * {@inheritDoc}
      *
-     * @return The assembled exception to throw.
+     * @return The assembled (output) exception to throw.
      */
     @Override
-    X fail(C cause);
+    O fail(I input);
 
     /**
-     * Adds the {@code cause} exception to the assembly and
-     * either returns or checks out and throws
-     * the result
-     * in order to enable the assembly of another exception.
+     * Adds {@code input} to the assembly and either returns or checks out
+     * and throws the result in order to enable the assembly of another output
+     * exception.
      * <p>
      * {@inheritDoc}
      *
-     * @throws X the assembled exception if the implementation wants
-     *         the caller to abort its task.
+     * @throws O the assembled (output) exception if the client application
+     *         wants the cooperative algorithm to abort its task.
      */
     @Override
-    void warn(C cause) throws X;
+    void warn(I input) throws O;
 
     /**
-     * Either returns or checks out and throws
-     * the result of the assembly
-     * in order to enable the assembly of another exception.
+     * Either returns or checks out and throws the result of the assembly in
+     * order to enable the assembly of another output exception.
      *
-     * @throws X the assembled exception if the implementation wants
-     *         the caller to abort its task.
+     * @throws O the assembled (output) exception if the client application
+     *         wants the cooperative algorithm to abort its task.
      */
-    void check() throws X;
+    void check() throws O;
 }

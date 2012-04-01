@@ -11,7 +11,7 @@ import de.truezip.key.MockView;
 import static de.truezip.key.MockView.Action.CANCEL;
 import static de.truezip.key.MockView.Action.ENTER;
 import de.truezip.path.TPath;
-import de.truezip.path.TPathTestSuite;
+import de.truezip.path.TPathITSuite;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class WinZipAesPathIT extends TPathTestSuite<TestWinZipAesDriver> {
+public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
     @Override
     protected String getSuffixList() {
         return "zip";

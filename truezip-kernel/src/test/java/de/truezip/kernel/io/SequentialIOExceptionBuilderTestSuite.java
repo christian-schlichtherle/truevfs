@@ -57,8 +57,7 @@ extends ExceptionBuilderTestSuite<
         assertTrue(clazz.isInstance(ex1));
         final SequentialIOException ex2 = mapper.map(ex1);
         assertTrue(clazz.isInstance(ex2));
-        final Set<IOException> causes = new HashSet<IOException>(
-                Arrays.asList(warning, failure));
+        final Set<IOException> causes = new HashSet<>(Arrays.asList(warning, failure));
         assertTrue(causes.remove(ex2.getCause()));
         assertTrue(causes.remove(ex2.getPredecessor().getCause()));
         assertTrue(causes.isEmpty());

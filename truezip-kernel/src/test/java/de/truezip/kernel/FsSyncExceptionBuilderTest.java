@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.FsSyncExceptionBuilder;
 import de.truezip.kernel.io.SequentialIOExceptionBuilderTestSuite;
 
 /**

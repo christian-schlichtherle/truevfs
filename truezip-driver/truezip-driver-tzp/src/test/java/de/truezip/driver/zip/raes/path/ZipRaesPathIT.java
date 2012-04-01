@@ -9,7 +9,7 @@ import de.truezip.key.MockView.Action;
 import static de.truezip.key.MockView.Action.CANCEL;
 import static de.truezip.key.MockView.Action.ENTER;
 import de.truezip.path.TPath;
-import de.truezip.path.TPathTestSuite;
+import de.truezip.path.TPathITSuite;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
+public final class ZipRaesPathIT extends TPathITSuite<TestZipRaesDriver> {
 
     @Override
     protected String getSuffixList() {

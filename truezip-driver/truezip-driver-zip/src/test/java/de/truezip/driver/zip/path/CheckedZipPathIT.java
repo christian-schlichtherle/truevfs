@@ -5,12 +5,12 @@
 package de.truezip.driver.zip.path;
 
 import de.truezip.driver.zip.CheckedZipDriver;
-import de.truezip.path.TPathTestSuite;
+import de.truezip.path.TPathITSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class CheckedZipPathIT extends TPathTestSuite<CheckedZipDriver> {
+public final class CheckedZipPathIT extends TPathITSuite<CheckedZipDriver> {
 
     @Override
     protected String getSuffixList() {
