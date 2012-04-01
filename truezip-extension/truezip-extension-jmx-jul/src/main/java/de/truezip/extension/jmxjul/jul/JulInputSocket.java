@@ -4,19 +4,19 @@
  */
 package de.truezip.extension.jmxjul.jul;
 
-import de.truezip.kernel.cio.Entry;
 import de.truezip.extension.jmxjul.InstrumentingInputSocket;
-import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
-class JulInputSocket<E extends Entry>
+final class JulInputSocket<E extends Entry>
 extends InstrumentingInputSocket<E> {
 
     JulInputSocket(InputSocket<? extends E> model, JulDirector director) {
@@ -24,12 +24,17 @@ extends InstrumentingInputSocket<E> {
     }
 
     @Override
-    public final ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new JulReadOnlyFile<E>(getBoundDelegate());
+    public ReadOnlyFile newReadOnlyFile() throws IOException {
+        return new JulReadOnlyFile(getBoundDelegate());
     }
 
     @Override
-    public final InputStream newInputStream() throws IOException {
-        return new JulInputStream<E>(getBoundDelegate());
+    public java.nio.channels.SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return new JulInputByteChannel(getBoundDelegate());
+    }
+
+    @Override
+    public InputStream newInputStream() throws IOException {
+        return new JulInputStream(getBoundDelegate());
     }
 }

@@ -5,25 +5,24 @@
 package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.FsCache.Strategy.WRITE_BACK;
-import de.truezip.kernel.cio.Entry.Type;
-import static de.truezip.kernel.cio.Entry.Type.FILE;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.cio.Entry.Type;
+import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.DecoratingInputStream;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
-import de.truezip.kernel.io.DecoratingInputStream;
-import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import de.truezip.kernel.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,10 +81,6 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
     private static final Logger logger = Logger.getLogger(
             FsCacheController.class.getName(),
             FsCacheController.class.getName());
-
-    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
-            ? SocketFactory.NIO2
-            : SocketFactory.OIO;
 
     private final IOPool<?> pool;
 
@@ -265,34 +260,6 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
         }
     }
 
-    @Immutable
-    private enum SocketFactory {
-        NIO2() {
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    EntryCache cache,
-                    BitField<AccessOption> options,
-                    @CheckForNull Entry template) {
-                return cache.new Nio2Output(options, template);
-            }
-        },
-        
-        OIO() {
-            @Override
-            OutputSocket<?> newOutputSocket(
-                    EntryCache cache,
-                    BitField<AccessOption> options,
-                    @CheckForNull Entry template) {
-                return cache.new Output(options, template);
-            }
-        };
-
-        abstract OutputSocket<?> newOutputSocket(
-                EntryCache cache,
-                BitField<AccessOption> options,
-                @CheckForNull Entry template);
-    } // SocketFactory
-
     /** A cache for the contents of an individual archive entry. */
     @Immutable
     private final class EntryCache {
@@ -310,7 +277,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
         OutputSocket<?> getOutputSocket(BitField<AccessOption> options,
                                         @CheckForNull Entry template) {
-            return SOCKET_FACTORY.newOutputSocket(this, options, template);
+            return new Output(options, template);
         }
 
         void flush() throws IOException {
@@ -379,44 +346,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
          * automatic decoupling on exceptions!
          */
         @Immutable
-        final class Nio2Output extends Output {
-            Nio2Output( BitField<AccessOption> options,
-                        @CheckForNull Entry template) {
-                super(options, template);
-            }
-
-            @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                preOutput();
-                return new Channel();
-            }
-
-            final class Channel extends DecoratingSeekableByteChannel {
-                @CreatesObligation
-                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-                Channel() throws IOException {
-                    // Note that the super class implementation MUST get
-                    // bypassed because the delegate MUST get kept even upon an
-                    // exception!
-                    //super(Nio2Output.super.newSeekableByteChannel());
-                    super(getBoundDelegate().newSeekableByteChannel());
-                    register();
-                }
-
-                @Override
-                public void close() throws IOException {
-                    delegate.close();
-                    postOutput();
-                }
-            } // Channel
-        } // Nio2Output
-
-        /**
-         * This class requires LAZY INITIALIZATION of its delegate, but NO
-         * automatic decoupling on exceptions!
-         */
-        @Immutable
-        class Output extends ClutchOutputSocket<Entry> {
+        final class Output extends ClutchOutputSocket<Entry> {
             final BitField<AccessOption> options;
             final @CheckForNull Entry template;
 
@@ -442,9 +372,33 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 // exception!
                 return getBoundDelegate().getLocalTarget();
             }
+            @Override
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                preOutput();
+                return new Channel();
+            }
+
+            final class Channel extends DecoratingSeekableByteChannel {
+                @CreatesObligation
+                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+                Channel() throws IOException {
+                    // Note that the super class implementation MUST get
+                    // bypassed because the delegate MUST get kept even upon an
+                    // exception!
+                    //super(Nio2Output.super.newSeekableByteChannel());
+                    super(getBoundDelegate().newSeekableByteChannel());
+                    register();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    delegate.close();
+                    postOutput();
+                }
+            } // Channel
 
             @Override
-            public final OutputStream newOutputStream() throws IOException {
+            public OutputStream newOutputStream() throws IOException {
                 preOutput();
                 return new Stream();
             }

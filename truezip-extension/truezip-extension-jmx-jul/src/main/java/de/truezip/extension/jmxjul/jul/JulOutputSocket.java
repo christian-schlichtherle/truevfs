@@ -4,8 +4,8 @@
  */
 package de.truezip.extension.jmxjul.jul;
 
-import de.truezip.kernel.cio.Entry;
 import de.truezip.extension.jmxjul.InstrumentingOutputSocket;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.OutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +15,7 @@ import javax.annotation.concurrent.Immutable;
  * @author  Christian Schlichtherle
  */
 @Immutable
-class JulOutputSocket<E extends Entry>
+final class JulOutputSocket<E extends Entry>
 extends InstrumentingOutputSocket<E> {
 
     JulOutputSocket(OutputSocket<? extends E> model, JulDirector director) {
@@ -23,7 +23,7 @@ extends InstrumentingOutputSocket<E> {
     }
 
     @Override
-    public final OutputStream newOutputStream() throws IOException {
-        return new JulOutputStream<E>(getBoundDelegate());
+    public OutputStream newOutputStream() throws IOException {
+        return new JulOutputStream(getBoundDelegate());
     }
 }

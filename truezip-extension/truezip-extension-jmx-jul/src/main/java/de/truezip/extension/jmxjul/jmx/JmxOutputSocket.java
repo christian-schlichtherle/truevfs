@@ -4,19 +4,21 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
+import de.truezip.extension.jmxjul.InstrumentingOutputSocket;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.extension.jmxjul.InstrumentingOutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle
  */
 @Immutable
-class JmxOutputSocket<E extends Entry>
+final class JmxOutputSocket<E extends Entry>
 extends InstrumentingOutputSocket<E> {
+
     final JmxIOStatistics stats;
 
     JmxOutputSocket(OutputSocket<? extends E> model, JmxDirector director, JmxIOStatistics stats) {
@@ -26,7 +28,12 @@ extends InstrumentingOutputSocket<E> {
     }
 
     @Override
-    public final OutputStream newOutputStream() throws IOException {
+    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        return new JmxSeekableByteChannel(getBoundDelegate().newSeekableByteChannel(), stats);
+    }
+
+    @Override
+    public OutputStream newOutputStream() throws IOException {
         return new JmxOutputStream(getBoundDelegate().newOutputStream(), stats);
     }
 }

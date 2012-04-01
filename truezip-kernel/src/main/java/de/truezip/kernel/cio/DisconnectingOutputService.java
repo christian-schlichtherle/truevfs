@@ -7,7 +7,6 @@ package de.truezip.kernel.cio;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.io.OutputClosedException;
-import de.truezip.kernel.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,7 +14,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -34,10 +32,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public class DisconnectingOutputService<E extends Entry>
 extends DecoratingOutputService<E, OutputService<E>> {
-
-    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
-            ? SocketFactory.NIO2
-            : SocketFactory.OIO;
 
     private boolean closed;
 
@@ -86,8 +80,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     public final OutputSocket<E> getOutputSocket(E entry) {
-        return SOCKET_FACTORY
-                .newOutputSocket(this, delegate.getOutputSocket(entry));
+        return new Output(delegate.getOutputSocket(entry));
     }
 
     /**
@@ -106,44 +99,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         delegate.close();
     }
 
-    @Immutable
-    private enum SocketFactory {
-        NIO2() {
-            @Override
-            <E extends Entry> OutputSocket<E> newOutputSocket(
-                    DisconnectingOutputService<E> service,
-                    OutputSocket<E> output) {
-                return service.new Nio2Output(output);
-            }
-        },
-
-        OIO() {
-            @Override
-            <E extends Entry> OutputSocket<E> newOutputSocket(
-                    DisconnectingOutputService<E> service,
-                    OutputSocket<E> output) {
-                return service.new Output(output);
-            }
-        };
-
-        abstract <E extends Entry> OutputSocket<E> newOutputSocket(
-                DisconnectingOutputService<E> service,
-                OutputSocket <E> output);
-    } // SocketFactory
-
-    private class Nio2Output extends Output {
-        Nio2Output(OutputSocket<? extends E> output) {
-            super(output);
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return new DisconnectingSeekableByteChannel(
-                    getBoundDelegate().newSeekableByteChannel());
-        }
-    } // Nio2Output
-
-    private class Output extends DecoratingOutputSocket<E> {
+    private final class Output extends DecoratingOutputSocket<E> {
         Output(OutputSocket<? extends E> output) {
             super(output);
         }
@@ -152,6 +108,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
         protected OutputSocket<? extends E> getBoundDelegate() throws IOException {
             checkOpen();
             return getDelegate().bind(this);
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            return new DisconnectingSeekableByteChannel(
+                    getBoundDelegate().newSeekableByteChannel());
         }
 
         @Override

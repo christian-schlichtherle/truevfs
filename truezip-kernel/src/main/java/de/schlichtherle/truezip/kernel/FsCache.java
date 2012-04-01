@@ -10,7 +10,6 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.JSE7;
 import de.truezip.kernel.util.Pool;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -49,10 +48,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 @CleanupObligation
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
 final class FsCache implements Flushable, Closeable {
-
-    private static final SocketFactory FACTORY = JSE7.AVAILABLE
-            ? SocketFactory.NIO2
-            : SocketFactory.OIO;
 
     private final Strategy strategy;
     private final IOPool<?> pool;
@@ -382,36 +377,6 @@ final class FsCache implements Flushable, Closeable {
         }
     } // OutputBufferPool
 
-    @Immutable
-    private enum SocketFactory {
-        NIO2() {
-            @Override
-            InputSocket<?> newInputSocket(Buffer buffer) {
-                return buffer.new Nio2Input();
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(Buffer buffer) {
-                return buffer.new Nio2Output();
-            }
-        },
-        
-        OIO() {
-            @Override
-            InputSocket<?> newInputSocket(Buffer buffer) {
-                return buffer.new Input();
-            }
-
-            @Override
-            OutputSocket<?> newOutputSocket(Buffer buffer) {
-                return buffer.new Output();
-            }
-        };
-
-        abstract InputSocket<?> newInputSocket(Buffer buffer);
-        abstract OutputSocket<?> newOutputSocket(Buffer buffer);
-    } // SocketFactory
-
     /** A buffer for the contents of the cache. */
     private final class Buffer {
         final IOBuffer<?> data;
@@ -423,11 +388,11 @@ final class FsCache implements Flushable, Closeable {
         }
 
         InputSocket<?> getInputSocket() {
-            return FACTORY.newInputSocket(this);
+            return new Input();
         }
 
         OutputSocket<?> getOutputSocket() {
-            return FACTORY.newOutputSocket(this);
+            return new Output();
         }
 
         void release() throws IOException {
@@ -437,38 +402,13 @@ final class FsCache implements Flushable, Closeable {
         }
 
         @Immutable
-        final class Nio2Input extends Input {
-            @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                class Channel extends DecoratingSeekableByteChannel {
-                    boolean closed;
-
-                    Channel() throws IOException {
-                        super(getBoundDelegate().newSeekableByteChannel());
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        if (closed)
-                            return;
-                        delegate.close();
-                        getInputBufferPool().release(Buffer.this);
-                        closed = true;
-                    }
-                } // Channel
-
-                return new Channel();
-            }
-        } // Nio2Input
-
-        @Immutable
-        class Input extends DecoratingInputSocket<Entry> {
+        final class Input extends DecoratingInputSocket<Entry> {
             Input() {
                 super(Buffer.this.data.getInputSocket());
             }
 
             @Override
-            public final ReadOnlyFile newReadOnlyFile() throws IOException {
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
                 class File extends DecoratingReadOnlyFile {
                     boolean closed;
 
@@ -490,7 +430,29 @@ final class FsCache implements Flushable, Closeable {
             }
 
             @Override
-            public final InputStream newInputStream() throws IOException {
+            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+                class Channel extends DecoratingSeekableByteChannel {
+                    boolean closed;
+
+                    Channel() throws IOException {
+                        super(getBoundDelegate().newSeekableByteChannel());
+                    }
+
+                    @Override
+                    public void close() throws IOException {
+                        if (closed)
+                            return;
+                        delegate.close();
+                        getInputBufferPool().release(Buffer.this);
+                        closed = true;
+                    }
+                } // Channel
+
+                return new Channel();
+            }
+
+            @Override
+            public InputStream newInputStream() throws IOException {
                 class Stream extends DecoratingInputStream {
                     boolean closed;
 
@@ -513,7 +475,11 @@ final class FsCache implements Flushable, Closeable {
         } // Input
 
         @Immutable
-        final class Nio2Output extends Output {
+        final class Output extends DecoratingOutputSocket<Entry> {
+            Output() {
+                super(Buffer.this.data.getOutputSocket());
+            }
+
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 class Channel extends DecoratingSeekableByteChannel {
@@ -535,16 +501,9 @@ final class FsCache implements Flushable, Closeable {
 
                 return new Channel();
             }
-        } // Nio2Output
-
-        @Immutable
-        class Output extends DecoratingOutputSocket<Entry> {
-            Output() {
-                super(Buffer.this.data.getOutputSocket());
-            }
 
             @Override
-            public final OutputStream newOutputStream() throws IOException {
+            public OutputStream newOutputStream() throws IOException {
                 class Stream extends DecoratingOutputStream {
                     boolean closed;
 

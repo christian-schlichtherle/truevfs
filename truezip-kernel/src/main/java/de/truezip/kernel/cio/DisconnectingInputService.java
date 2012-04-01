@@ -9,7 +9,6 @@ import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +16,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -36,10 +34,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public class DisconnectingInputService<E extends Entry>
 extends DecoratingInputService<E, InputService<E>> {
-
-    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
-            ? SocketFactory.NIO2
-            : SocketFactory.OIO;
 
     private boolean closed;
 
@@ -88,8 +82,7 @@ extends DecoratingInputService<E, InputService<E>> {
 
     @Override
     public InputSocket<E> getInputSocket(String name) {
-        return SOCKET_FACTORY
-                .newInputSocket(this, delegate.getInputSocket(name));
+        return new Input(delegate.getInputSocket(name));
     }
 
     /**
@@ -108,44 +101,7 @@ extends DecoratingInputService<E, InputService<E>> {
         delegate.close();
     }
 
-    @Immutable
-    private enum SocketFactory {
-        NIO2() {
-            @Override
-            <E extends Entry> InputSocket<E> newInputSocket(
-                    DisconnectingInputService<E> service,
-                    InputSocket<E> input) {
-                return service.new Nio2Input(input);
-            }
-        },
-
-        OIO() {
-            @Override
-            <E extends Entry> InputSocket<E> newInputSocket(
-                    DisconnectingInputService<E> service,
-                    InputSocket<E> input) {
-                return service.new Input(input);
-            }
-        };
-
-        abstract <E extends Entry> InputSocket<E> newInputSocket(
-                DisconnectingInputService<E> service,
-                InputSocket <E> input);
-    } // SocketFactory
-
-    private class Nio2Input extends Input {
-        Nio2Input(InputSocket<? extends E> input) {
-            super(input);
-        }
-
-        @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return new DisconnectingSeekableByteChannel(
-                    getBoundDelegate().newSeekableByteChannel());
-        }
-    } // Nio2Input
-
-    private class Input extends DecoratingInputSocket<E> {
+    private final class Input extends DecoratingInputSocket<E> {
         Input(InputSocket<? extends E> input) {
             super(input);
         }
@@ -160,6 +116,12 @@ extends DecoratingInputService<E, InputService<E>> {
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             return new DisconnectingReadOnlyFile(
                     getBoundDelegate().newReadOnlyFile());
+        }
+
+        @Override
+        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            return new DisconnectingSeekableByteChannel(
+                    getBoundDelegate().newSeekableByteChannel());
         }
 
         @Override
