@@ -87,7 +87,7 @@ implements InputService<TarDriverEntry> {
                     final IOBuffer<?> temp = pool.allocate();
                     entry.setTemp(temp);
                     try {
-                        try (final OutputStream out = temp.getOutputSocket().newOutputStream()) {
+                        try (final OutputStream out = temp.getOutputSocket().newStream()) {
                             Streams.cat(tin, out);
                         }
                     } catch (IOException ex) {
@@ -214,14 +214,14 @@ implements InputService<TarDriverEntry> {
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                return getInputSocket().newSeekableByteChannel();
+            public SeekableByteChannel newChannel() throws IOException {
+                return getInputSocket().newChannel();
             }
 
             @Override
-            public InputStream newInputStream()
+            public InputStream newStream()
             throws IOException {
-                return getInputSocket().newInputStream();
+                return getInputSocket().newStream();
             }
 
             InputSocket<? extends IOEntry<?>> getInputSocket()

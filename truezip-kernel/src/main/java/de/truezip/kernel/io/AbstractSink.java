@@ -13,12 +13,12 @@ import java.nio.channels.SeekableByteChannel;
  */
 public abstract class AbstractSink implements Sink {
     @Override
-    public OutputStream newOutputStream() throws IOException {
-        return new SeekableByteChannelOutputStream(newSeekableByteChannel());
+    public OutputStream newStream() throws IOException {
+        return new SeekableByteChannelOutputStream(newChannel());
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+    public SeekableByteChannel newChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

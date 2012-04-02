@@ -39,7 +39,7 @@ public class HttpOutputSocket extends OutputSocket<HttpEntry> {
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
+    public OutputStream newStream() throws IOException {
         return entry.getOutputStream();
     }
 }

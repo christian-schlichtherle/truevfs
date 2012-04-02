@@ -430,12 +430,12 @@ final class FsCache implements Flushable, Closeable {
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            public SeekableByteChannel newChannel() throws IOException {
                 class Channel extends DecoratingSeekableByteChannel {
                     boolean closed;
 
                     Channel() throws IOException {
-                        super(getBoundSocket().newSeekableByteChannel());
+                        super(getBoundSocket().newChannel());
                     }
 
                     @Override
@@ -452,12 +452,12 @@ final class FsCache implements Flushable, Closeable {
             }
 
             @Override
-            public InputStream newInputStream() throws IOException {
+            public InputStream newStream() throws IOException {
                 class Stream extends DecoratingInputStream {
                     boolean closed;
 
                     Stream() throws IOException {
-                        super(getBoundSocket().newInputStream());
+                        super(getBoundSocket().newStream());
                     }
 
                     @Override
@@ -481,12 +481,12 @@ final class FsCache implements Flushable, Closeable {
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            public SeekableByteChannel newChannel() throws IOException {
                 class Channel extends DecoratingSeekableByteChannel {
                     boolean closed;
 
                     Channel() throws IOException {
-                        super(getBoundSocket().newSeekableByteChannel());
+                        super(getBoundSocket().newChannel());
                     }
 
                     @Override
@@ -503,12 +503,12 @@ final class FsCache implements Flushable, Closeable {
             }
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 class Stream extends DecoratingOutputStream {
                     boolean closed;
 
                     Stream() throws IOException {
-                        super(getBoundSocket().newOutputStream());
+                        super(getBoundSocket().newStream());
                     }
 
                     @Override

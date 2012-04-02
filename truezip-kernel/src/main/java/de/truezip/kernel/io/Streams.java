@@ -48,8 +48,8 @@ public final class Streams {
     private Streams() { }
 
     public static void copy(Source source, Sink sink) throws IOException {
-        try (InputStream in = new InputExceptionSource(source).newInputStream();
-             OutputStream out = sink.newOutputStream()) {
+        try (InputStream in = new InputExceptionSource(source).newStream();
+             OutputStream out = sink.newStream()) {
             cat(in, out);
         }
     }

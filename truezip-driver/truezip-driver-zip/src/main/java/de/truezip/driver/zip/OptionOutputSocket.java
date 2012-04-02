@@ -39,12 +39,12 @@ extends DecoratingOutputSocket<Entry> {
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
+    public SeekableByteChannel newChannel() throws IOException {
+        return getBoundSocket().newChannel();
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
-        return getBoundSocket().newOutputStream();
+    public OutputStream newStream() throws IOException {
+        return getBoundSocket().newStream();
     }
 }

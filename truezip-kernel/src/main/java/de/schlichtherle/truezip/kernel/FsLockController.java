@@ -412,12 +412,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundSocket().newChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -425,12 +425,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newStream() throws IOException {
             class NewInputStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
                     return new LockInputStream(
-                            getBoundSocket().newInputStream());
+                            getBoundSocket().newStream());
                 }
             } // NewInputStream
 
@@ -459,12 +459,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundSocket().newChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -472,12 +472,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newStream() throws IOException {
             class NewOutputStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
                     return new LockOutputStream(
-                            getBoundSocket().newOutputStream());
+                            getBoundSocket().newStream());
                 }
             } // NewOutputStream
 

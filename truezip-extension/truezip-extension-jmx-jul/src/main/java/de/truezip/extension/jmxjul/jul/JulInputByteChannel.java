@@ -27,7 +27,7 @@ final class JulInputByteChannel extends DecoratingSeekableByteChannel {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     JulInputByteChannel(final InputSocket<?> socket) throws IOException {
-        super(socket.newSeekableByteChannel());
+        super(socket.newChannel());
         this.socket = socket;
         log("Random reading ");
     }

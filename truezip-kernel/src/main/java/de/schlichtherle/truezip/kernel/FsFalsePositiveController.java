@@ -303,7 +303,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             } // NewReadOnlyFile
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel()
+            public SeekableByteChannel newChannel()
             throws IOException {
                 return call(new NewSeekableByteChannel(), name);
             }
@@ -316,12 +316,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         final FsEntryName name)
                 throws IOException {
                     return getBoundDelegate(controller, name)
-                            .newSeekableByteChannel();
+                            .newChannel();
                 }
             } // NewSeekableByteChannel
 
             @Override
-            public InputStream newInputStream() throws IOException {
+            public InputStream newStream() throws IOException {
                 return call(new NewInputStream(), name);
             }
 
@@ -333,7 +333,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         final FsEntryName name)
                 throws IOException {
                     return getBoundDelegate(controller, name)
-                            .newInputStream();
+                            .newStream();
                 }
             } // NewInputStream
         } // Input
@@ -379,7 +379,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             } // GetLocalTarget
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel()
+            public SeekableByteChannel newChannel()
             throws IOException {
                 return call(new NewSeekableByteChannel(), name);
             }
@@ -392,12 +392,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         final FsEntryName name)
                 throws IOException {
                     return getBoundDelegate(controller, name)
-                            .newSeekableByteChannel();
+                            .newChannel();
                 }
             } // NewSeekableByteChannel
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 return call(new NewOutputStream(), name);
             }
 
@@ -409,7 +409,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         final FsEntryName name)
                 throws IOException {
                     return getBoundDelegate(controller, name)
-                            .newOutputStream();
+                            .newStream();
                 }
             } // NewOutputStream
         } // Output

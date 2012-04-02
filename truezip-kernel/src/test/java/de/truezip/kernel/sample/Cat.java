@@ -83,7 +83,7 @@ public final class Cat {
                     .getController(     path.getMountPoint(), driver)
                     .getInputSocket(    path.getEntryName(),
                                         BitField.noneOf(AccessOption.class));
-            try (final InputStream in = socket.newInputStream()) {
+            try (final InputStream in = socket.newStream()) {
                 Streams.cat(in, System.out); // copy the data
             }
         } finally {

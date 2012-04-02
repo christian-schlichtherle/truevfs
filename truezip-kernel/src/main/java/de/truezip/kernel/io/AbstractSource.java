@@ -13,12 +13,12 @@ import java.nio.channels.SeekableByteChannel;
  */
 public abstract class AbstractSource implements Source {
     @Override
-    public InputStream newInputStream() throws IOException {
-        return new SeekableByteChannelInputStream(newSeekableByteChannel());
+    public InputStream newStream() throws IOException {
+        return new SeekableByteChannelInputStream(newChannel());
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+    public SeekableByteChannel newChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

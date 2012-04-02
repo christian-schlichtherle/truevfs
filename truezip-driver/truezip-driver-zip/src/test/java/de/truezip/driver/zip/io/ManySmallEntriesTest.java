@@ -43,7 +43,7 @@ public final class ManySmallEntriesTest {
         final HashSet<String> set = new HashSet<>(Maps.initialCapacity(NUM_ENTRIES));
 
         try (final ZipOutputStream zipOut = new ZipOutputStream(
-               buffer.getOutputSocket().newOutputStream())) {
+               buffer.getOutputSocket().newStream())) {
             for (int i = FIRST_ENTRY; i <= LAST_ENTRY; i++) {
                 final String name = Integer.toString(i);
                 final ZipEntry entry = new ZipEntry(name);

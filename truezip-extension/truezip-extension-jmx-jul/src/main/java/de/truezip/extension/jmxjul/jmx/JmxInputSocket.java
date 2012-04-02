@@ -34,12 +34,12 @@ extends InstrumentingInputSocket<E> {
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return new JmxSeekableByteChannel(getBoundSocket().newSeekableByteChannel(), stats);
+    public SeekableByteChannel newChannel() throws IOException {
+        return new JmxSeekableByteChannel(getBoundSocket().newChannel(), stats);
     }
 
     @Override
-    public InputStream newInputStream() throws IOException {
-        return new JmxInputStream(getBoundSocket().newInputStream(), stats);
+    public InputStream newStream() throws IOException {
+        return new JmxInputStream(getBoundSocket().newStream(), stats);
     }
 }

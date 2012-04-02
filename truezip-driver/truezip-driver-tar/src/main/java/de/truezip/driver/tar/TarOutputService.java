@@ -98,7 +98,7 @@ implements OutputService<TarDriverEntry> {
             }
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(entry.getName());
                 if (entry.isDirectory()) {
@@ -194,7 +194,7 @@ implements OutputService<TarDriverEntry> {
                 final IOBuffer<?> buffer,
                 final TarDriverEntry entry)
         throws IOException {
-            super(buffer.getOutputSocket().newOutputStream());
+            super(buffer.getOutputSocket().newStream());
             this.buffer = buffer;
             this.entry = entry;
             entries.put(entry.getName(), entry);
@@ -219,7 +219,7 @@ implements OutputService<TarDriverEntry> {
 
             TarOutputService.this.busy = false;
             try {
-                try (final InputStream in = buffer.getInputSocket().newInputStream()) {
+                try (final InputStream in = buffer.getInputSocket().newStream()) {
                     entry.setSize(buffer.getSize(DATA));
                     if (UNKNOWN == entry.getModTime().getTime())
                         entry.setModTime(System.currentTimeMillis());

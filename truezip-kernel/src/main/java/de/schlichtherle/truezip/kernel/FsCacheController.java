@@ -310,7 +310,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel(){
+            public SeekableByteChannel newChannel(){
                 throw new UnsupportedOperationException();
             }
 
@@ -320,7 +320,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             }
 
             @Override
-            public InputStream newInputStream() throws IOException {
+            public InputStream newStream() throws IOException {
                 return new Stream();
             }
 
@@ -328,7 +328,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 @CreatesObligation
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
-                    super(Input.super.newInputStream());
+                    super(Input.super.newStream());
                     assert getModel().isTouched();
                 }
 
@@ -372,7 +372,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 return getBoundSocket().getLocalTarget();
             }
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            public SeekableByteChannel newChannel() throws IOException {
                 preOutput();
                 return new Channel();
             }
@@ -384,8 +384,8 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                     // Note that the super class implementation MUST get
                     // bypassed because the sbc MUST get kept even upon an
                     // exception!
-                    //super(Nio2Output.super.newSeekableByteChannel());
-                    super(getBoundSocket().newSeekableByteChannel());
+                    //super(Nio2Output.super.newChannel());
+                    super(getBoundSocket().newChannel());
                     register();
                 }
 
@@ -397,7 +397,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             } // Channel
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 preOutput();
                 return new Stream();
             }
@@ -409,8 +409,8 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                     // Note that the super class implementation MUST get
                     // bypassed because the sbc MUST get kept even upon an
                     // exception!
-                    //super(Output.super.newOutputStream());
-                    super(getBoundSocket().newOutputStream());
+                    //super(Output.super.newStream());
+                    super(getBoundSocket().newStream());
                     register();
                 }
 

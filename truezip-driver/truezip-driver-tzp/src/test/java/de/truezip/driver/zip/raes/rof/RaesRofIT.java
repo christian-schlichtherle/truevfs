@@ -36,11 +36,11 @@ public final class RaesRofIT extends ReadOnlyFileTestSuite {
                 final RaesOutputStream out = new RaesSink(
                         new AbstractSink() {
                             @Override
-                            public OutputStream newOutputStream() throws IOException {
+                            public OutputStream newStream() throws IOException {
                                 return new FileOutputStream(cipherFile);
                             }
                         },
-                        newRaesParameters()).newOutputStream();
+                        newRaesParameters()).newStream();
                 Streams.copy(in, out);
                 logger.log(Level.FINEST,
                         "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PKCS#12v1",

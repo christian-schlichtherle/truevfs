@@ -186,7 +186,7 @@ extends FsArchiveDriverTestBase<D> {
         assertEquals(i, service.size());
 
         boolean failure = true;
-        final OutputStream out = output.newOutputStream();
+        final OutputStream out = output.newStream();
         try {
             assertSame(entry, service.getEntry(name));
             assertEquals(i + 1, service.size());
@@ -276,7 +276,7 @@ extends FsArchiveDriverTestBase<D> {
             final byte[] buf = new byte[getDataLength()];
             SeekableByteChannel sbc;
             try {
-                sbc = input.newSeekableByteChannel();
+                sbc = input.newChannel();
             } catch (UnsupportedOperationException ex) {
                 sbc = null;
                 logger.log(Level.FINE,
@@ -299,7 +299,7 @@ extends FsArchiveDriverTestBase<D> {
         {
             final byte[] buf = new byte[getDataLength()];
             boolean failure = true;
-            final InputStream in = input.newInputStream();
+            final InputStream in = input.newStream();
             try {
                 readFully(in, buf);
                 assertTrue(Arrays.equals(getData(), buf));
@@ -485,17 +485,17 @@ extends FsArchiveDriverTestBase<D> {
                 }
 
                 @Override
-                public SeekableByteChannel newSeekableByteChannel()
+                public SeekableByteChannel newChannel()
                 throws IOException {
                     return new TestSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundSocket().newChannel());
                 }
 
                 @Override
-                public InputStream newInputStream()
+                public InputStream newStream()
                 throws IOException {
                     return new TestInputStream(
-                            getBoundSocket().newInputStream());
+                            getBoundSocket().newStream());
                 }
             } // Input
 
@@ -516,17 +516,17 @@ extends FsArchiveDriverTestBase<D> {
                 }
 
                 @Override
-                public SeekableByteChannel newSeekableByteChannel()
+                public SeekableByteChannel newChannel()
                 throws IOException {
                     return new TestSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundSocket().newChannel());
                 }
 
                 @Override
-                public OutputStream newOutputStream()
+                public OutputStream newStream()
                 throws IOException {
                     return new TestOutputStream(
-                            getBoundSocket().newOutputStream());
+                            getBoundSocket().newStream());
                 }
             } // Output
 

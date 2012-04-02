@@ -175,7 +175,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     @Override
     @SuppressWarnings("deprecation")
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+    public SeekableByteChannel newChannel() throws IOException {
         final FileEntry temp = begin();
 
         final class Channel extends IOExceptionSeekableByteChannel {
@@ -206,7 +206,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     @Override
     @SuppressWarnings("deprecation")
-    public OutputStream newOutputStream() throws IOException {
+    public OutputStream newStream() throws IOException {
         final FileEntry temp = begin();
 
         final class Stream extends IOExceptionOutputStream {

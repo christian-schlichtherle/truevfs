@@ -287,18 +287,18 @@ extends FsFileSystemArchiveController<E> {
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            public SeekableByteChannel newChannel() throws IOException {
                 try {
-                    return super.newSeekableByteChannel();
+                    return super.newChannel();
                 } catch (InputClosedException ex) {
                     throw map(ex);
                 }
             }
 
             @Override
-            public InputStream newInputStream() throws IOException {
+            public InputStream newStream() throws IOException {
                 try {
-                    return super.newInputStream();
+                    return super.newStream();
                 } catch (InputClosedException ex) {
                     throw map(ex);
                 }
@@ -334,18 +334,18 @@ extends FsFileSystemArchiveController<E> {
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            public SeekableByteChannel newChannel() throws IOException {
                 try {
-                    return super.newSeekableByteChannel();
+                    return super.newChannel();
                 } catch (OutputClosedException ex) {
                     throw map(ex);
                 }
             }
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 try {
-                    return super.newOutputStream();
+                    return super.newStream();
                 } catch (OutputClosedException ex) {
                     throw map(ex);
                 }
@@ -537,7 +537,7 @@ extends FsFileSystemArchiveController<E> {
                     if (DIRECTORY == ae.getType()) {
                         if (!fse.isRoot()) // never output the root directory!
                             if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
-                                os.getOutputSocket(ae).newOutputStream().close();
+                                os.getOutputSocket(ae).newStream().close();
                     } else if (null != is.getEntry(aen)) {
                         IOSocket.copy(  is.getInputSocket(aen),
                                         os.getOutputSocket(ae));
@@ -549,7 +549,7 @@ extends FsFileSystemArchiveController<E> {
                         for (final Size size : ALL_SIZE_SET)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
-                        os.getOutputSocket(ae).newOutputStream().close();
+                        os.getOutputSocket(ae).newStream().close();
                     }
                 } catch (final IOException ex) {
                     handler.warn(ex);

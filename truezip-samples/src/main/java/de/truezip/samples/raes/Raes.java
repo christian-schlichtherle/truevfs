@@ -65,7 +65,7 @@ public final class Raes {
         final Sink sink = new RaesSink(
                 new AbstractSink() {
                     @Override
-                    public OutputStream newOutputStream() throws IOException {
+                    public OutputStream newStream() throws IOException {
                         return new TFileOutputStream(raesFile);
                     }
                 },
@@ -75,7 +75,7 @@ public final class Raes {
         final @WillClose InputStream in = new TFileInputStream(plainFile);
         final @WillClose OutputStream out;
         try {
-            out = sink.newOutputStream();
+            out = sink.newStream();
         } catch (final IOException ex) {
             try {
                 in.close();

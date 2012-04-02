@@ -115,7 +115,7 @@ extends IOSocket<E, Entry> implements Source {
      * {@link UnsupportedOperationException}.
      */
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+    public SeekableByteChannel newChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
 
@@ -130,7 +130,7 @@ extends IOSocket<E, Entry> implements Source {
      * {@link UnsupportedOperationException} while this method is not!
      */
     @Override
-    public InputStream newInputStream() throws IOException {
+    public InputStream newStream() throws IOException {
         return new ReadOnlyFileInputStream(newReadOnlyFile());
     }
 }

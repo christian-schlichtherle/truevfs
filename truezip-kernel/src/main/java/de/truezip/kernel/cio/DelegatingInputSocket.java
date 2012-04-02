@@ -52,12 +52,12 @@ extends InputSocket<E> {
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return getBoundSocket().newSeekableByteChannel();
+    public SeekableByteChannel newChannel() throws IOException {
+        return getBoundSocket().newChannel();
     }
 
     @Override
-    public InputStream newInputStream() throws IOException {
-        return getBoundSocket().newInputStream();
+    public InputStream newStream() throws IOException {
+        return getBoundSocket().newStream();
     }
 }

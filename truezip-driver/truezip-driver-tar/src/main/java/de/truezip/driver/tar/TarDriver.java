@@ -148,7 +148,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
         if (null == model)
             throw new NullPointerException();
         TarInputService is = null;
-        final @WillClose InputStream in = input.newInputStream();
+        final @WillClose InputStream in = input.newStream();
         try {
             return is = newTarInputService(model, in);
         } finally {
@@ -192,7 +192,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final OutputStream out = output.newOutputStream();
+        final OutputStream out = output.newStream();
         try {
             return new MultiplexedOutputService<>(
                     newTarOutputService(model, out, (TarInputService) source),

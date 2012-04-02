@@ -130,7 +130,7 @@ public final class FsArchiveFileSystemTest {
             assertEquals(aen, ae.getName());
             archive   .newOutputService()
                         .getOutputSocket(ae)
-                        .newOutputStream()
+                        .newStream()
                         .close();
             assertSame(ae, archive.getEntry(aen));
         }

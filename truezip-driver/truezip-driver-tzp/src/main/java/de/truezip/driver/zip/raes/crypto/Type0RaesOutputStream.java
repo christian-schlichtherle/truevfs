@@ -117,7 +117,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         klac.update(cipherKey, 0, cipherKey.length);
 
         // Init chain of output streams as Encrypt-then-MAC.
-        final OutputStream out = sink.newOutputStream();
+        final OutputStream out = sink.newStream();
         final LEDataOutputStream dos =
                 this.dos = out instanceof LEDataOutputStream
                     ? (LEDataOutputStream) out

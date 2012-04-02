@@ -532,7 +532,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             final @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
         assert null != model;
-        final OutputStream out = output.newOutputStream();
+        final OutputStream out = output.newStream();
         try {
             return newOutputService(model, out, source);
         } catch (final IOException ex) {

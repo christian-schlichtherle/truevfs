@@ -35,7 +35,7 @@ final class FileInputSocket extends InputSocket<FileEntry> {
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+    public SeekableByteChannel newChannel() throws IOException {
         return Files.newByteChannel(entry.getPath());
     }
 
@@ -46,7 +46,7 @@ final class FileInputSocket extends InputSocket<FileEntry> {
     }
 
     @Override
-    public InputStream newInputStream() throws IOException {
+    public InputStream newStream() throws IOException {
         return Files.newInputStream(entry.getPath());
     }
 }

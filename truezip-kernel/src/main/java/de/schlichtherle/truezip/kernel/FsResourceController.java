@@ -170,15 +170,15 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             return new ResourceSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundSocket().newChannel());
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newStream() throws IOException {
             return new ResourceInputStream(
-                    getBoundSocket().newInputStream());
+                    getBoundSocket().newStream());
         }
     } // Input
 
@@ -191,15 +191,15 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             return new ResourceSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundSocket().newChannel());
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newStream() throws IOException {
             return new ResourceOutputStream(
-                    getBoundSocket().newOutputStream());
+                    getBoundSocket().newStream());
         }
     } // Output
 

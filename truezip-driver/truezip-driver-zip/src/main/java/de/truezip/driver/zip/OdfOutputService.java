@@ -59,13 +59,13 @@ public class OdfOutputService extends MultiplexedOutputService<ZipDriverEntry> {
             }
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 if (MIMETYPE.equals(entry.getName())) {
                     mimetype = true;
                     if (UNKNOWN == entry.getMethod())
                         entry.setMethod(STORED);
                 }
-                return super.newOutputStream();
+                return super.newStream();
             }
         } // Output
 

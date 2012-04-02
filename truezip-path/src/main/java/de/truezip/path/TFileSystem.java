@@ -247,14 +247,14 @@ public final class TFileSystem extends FileSystem {
                     o = path.mapInput(options).set(AccessOption.CACHE);
             return controller
                     .getInputSocket(name, o)
-                    .newSeekableByteChannel();
+                    .newChannel();
         } else {
             final BitField<AccessOption>
                     o = path.mapOutput(options).set(AccessOption.CACHE);
             try {
                 return controller
                         .getOutputSocket(name, o, null)
-                        .newSeekableByteChannel();
+                        .newChannel();
             } catch (final IOException ex) {
                 if (o.get(EXCLUSIVE) && null != controller.getEntry(name))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
@@ -270,7 +270,7 @@ public final class TFileSystem extends FileSystem {
                 .getInputSocket(
                     path.getEntryName(),
                     path.mapInput(options))
-                .newInputStream();
+                .newStream();
     }
 
     OutputStream newOutputStream(TPath path, OpenOption... options)
@@ -280,7 +280,7 @@ public final class TFileSystem extends FileSystem {
                     path.getEntryName(),
                     path.mapOutput(options),
                     null)
-                .newOutputStream();
+                .newStream();
     }
 
     DirectoryStream<Path> newDirectoryStream(
