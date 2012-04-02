@@ -20,7 +20,7 @@ import org.junit.Test;
 public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tzp";
     }
 
@@ -60,7 +60,7 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
     @Test
     public void testFileStatus() throws IOException {
         final TFile archive = getArchive();
-        final TFile inner = new TFile(archive, "inner" + getSuffix());
+        final TFile inner = new TFile(archive, "inner" + getExtension());
 
         assertTrue(archive.mkdir());
         assertTrue(inner.mkdir());

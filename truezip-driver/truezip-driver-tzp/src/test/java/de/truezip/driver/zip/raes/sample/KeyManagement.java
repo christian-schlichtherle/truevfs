@@ -4,9 +4,6 @@
  */
 package de.truezip.driver.zip.raes.sample;
 
-import de.truezip.key.PromptingKeyProviderController;
-import de.truezip.key.PromptingKeyProviderView;
-import de.truezip.key.PromptingKeyManagerProvider;
 import de.truezip.driver.zip.raes.SafeZipRaesDriver;
 import de.truezip.driver.zip.raes.crypto.RaesKeyException;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
@@ -17,8 +14,7 @@ import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.sl.IOPoolLocator;
-import de.truezip.key.KeyManagerProvider;
-import de.truezip.key.UnknownKeyException;
+import de.truezip.key.*;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.param.AesPbeParameters;
 
@@ -45,7 +41,7 @@ public final class KeyManagement {
 // START SNIPPET: newArchiveDetector1
     /**
      * Returns a new archive detector which uses the given password for all
-     * RAES encrypted ZIP files with the given list of suffixes.
+     * RAES encrypted ZIP files with the given list of extensions.
      * <p>
      * When used for encryption, the AES key strength will be set to 128 bits.
      * <p>
@@ -54,19 +50,19 @@ public final class KeyManagement {
      * data after calling this method.
      *
      * @param  delegate the file system driver provider to decorate.
-     * @param  suffixes A list of file name suffixes which shall identify
+     * @param  extensions A list of file name extensions which shall identify
      *         prospective archive files.
      *         This must not be {@code null} and must not be empty.
      * @param  password the password char array to be copied for internal use.
      * @return A new archive detector which uses the given password for all
-     *         RAES encrypted ZIP files with the given list of suffixes.
+     *         RAES encrypted ZIP files with the given list of extensions.
      */
     public static TArchiveDetector newArchiveDetector1(
             FsDriverProvider delegate,
-            String suffixes,
+            String extensions,
             char[] password) {
         return new TArchiveDetector(delegate,
-                suffixes, new CustomZipRaesDriver(password));
+                extensions, new CustomZipRaesDriver(password));
     }
     
     private static final class CustomZipRaesDriver extends SafeZipRaesDriver {
@@ -142,7 +138,7 @@ public final class KeyManagement {
 // START SNIPPET: newArchiveDetector2
     /**
      * Returns a new archive detector which uses the given password for all
-     * RAES encrypted ZIP files with the given list of suffixes.
+     * RAES encrypted ZIP files with the given list of extensions.
      * <p>
      * When used for encryption, the AES key strength will be set to 128 bits.
      * <p>
@@ -151,19 +147,19 @@ public final class KeyManagement {
      * data after calling this method.
      *
      * @param  delegate the file system driver provider to decorate.
-     * @param  suffixes A list of file name suffixes which shall identify
+     * @param  extensions A list of file name extensions which shall identify
      *         prospective archive files.
      *         This must not be {@code null} and must not be empty.
      * @param  password the password char array to be copied for internal use.
      * @return A new archive detector which uses the given password for all
-     *         RAES encrypted ZIP files with the given list of suffixes.
+     *         RAES encrypted ZIP files with the given list of extensions.
      */
     public static TArchiveDetector newArchiveDetector2(
             FsDriverProvider delegate,
-            String suffixes,
+            String extensions,
             char[] password) {
         return new TArchiveDetector(delegate,
-                    suffixes, new CustomZipRaesDriver2(password));
+                    extensions, new CustomZipRaesDriver2(password));
     }
     
     private static final class CustomZipRaesDriver2 extends SafeZipRaesDriver {

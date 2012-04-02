@@ -13,7 +13,7 @@ import de.truezip.file.TFileITSuite;
 public final class JarFileIT extends TFileITSuite<JarDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "jar";
     }
 

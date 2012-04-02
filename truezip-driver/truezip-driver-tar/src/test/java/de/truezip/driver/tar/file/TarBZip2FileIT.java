@@ -13,7 +13,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 public final class TarBZip2FileIT extends TarFileITSuite<TarBZip2Driver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tar.bz2";
     }
 

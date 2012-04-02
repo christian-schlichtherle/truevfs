@@ -4,12 +4,12 @@
  */
 package de.truezip.file;
 
+import de.schlichtherle.truezip.kernel.FsFailSafeManagerService;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsArchiveDriverTestBase;
-import de.schlichtherle.truezip.kernel.FsFailSafeManagerService;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.util.SuffixSet;
+import de.truezip.kernel.util.ExtensionSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -48,7 +48,7 @@ extends FsArchiveDriverTestBase<D> {
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        detector = new TArchiveDetector(getSuffixList(), getArchiveDriver());
+        detector = new TArchiveDetector(getExtensionList(), getArchiveDriver());
         environment = Collections.singletonMap(ARCHIVE_DETECTOR, detector);
         final TConfig config = TConfig.push();
         // Using a private file system manager would normally violate the third
@@ -76,13 +76,13 @@ extends FsArchiveDriverTestBase<D> {
         }
     }
 
-    protected abstract String getSuffixList();
+    protected abstract String getExtensionList();
 
     protected final FsScheme getScheme() {
-        return FsScheme.create(new SuffixSet(getSuffixList()).iterator().next());
+        return FsScheme.create(new ExtensionSet(getExtensionList()).iterator().next());
     }
 
-    protected final String getSuffix() {
+    protected final String getExtension() {
         return "." + getScheme();
     }
 

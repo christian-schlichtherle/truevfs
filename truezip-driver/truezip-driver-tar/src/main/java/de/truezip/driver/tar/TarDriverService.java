@@ -6,8 +6,8 @@ package de.truezip.driver.tar;
 
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.spi.FsDriverService;
 import de.truezip.kernel.sl.IOPoolLocator;
+import de.truezip.kernel.spi.FsDriverService;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 
@@ -18,7 +18,7 @@ import javax.annotation.concurrent.Immutable;
 <table border=1 cellpadding=5 summary="">
 <thead>
 <tr>
-<th>URI Schemes / Archive File Suffixes</th>
+<th>URI Schemes / Archive File Extensions</th>
 <th>File System Driver Class</th>
 </tr>
 </thead>

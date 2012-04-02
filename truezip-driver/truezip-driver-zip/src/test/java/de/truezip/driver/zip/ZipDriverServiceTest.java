@@ -12,7 +12,7 @@ import de.truezip.kernel.spi.FsDriverServiceTestSuite;
  */
 public final class ZipDriverServiceTest extends FsDriverServiceTestSuite {
     @Override
-    protected String getSuffixes() {
+    protected String getExtensions() {
         return "zip|ear|jar|war|odg|odp|ods|odt|otg|otp|ots|ott|odb|odf|odm|oth|exe";
     }
 

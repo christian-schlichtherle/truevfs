@@ -18,9 +18,9 @@ public final class MockDriverService extends FsDriverService {
 
     private final Map<FsScheme, FsDriver> drivers;
 
-    public MockDriverService(String suffixes) {
+    public MockDriverService(String extensions) {
         this.drivers = newMap(new Object[][] {
-            { suffixes, new MockDriver() },
+            { extensions, new MockDriver() },
         });
     }
 

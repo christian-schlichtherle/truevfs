@@ -16,18 +16,18 @@ public final class KeyManagementIT extends KeyManagementITSuite {
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
 
     @Override
-    protected TArchiveDetector newArchiveDetector1(String suffix, String password) {
+    protected TArchiveDetector newArchiveDetector1(String extension, String password) {
         return KeyManagement.newArchiveDetector1(
                 TConfig.get().getArchiveDetector(),
-                suffix,
+                extension,
                 password.getBytes(US_ASCII));
     }
 
     @Override
-    protected TArchiveDetector newArchiveDetector2(String suffix, String password) {
+    protected TArchiveDetector newArchiveDetector2(String extension, String password) {
         return KeyManagement.newArchiveDetector2(
                 TConfig.get().getArchiveDetector(),
-                suffix,
+                extension,
                 password.toCharArray());
     }
 }

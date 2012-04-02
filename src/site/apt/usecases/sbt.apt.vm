@@ -34,9 +34,9 @@ new TFile("file").cp_rp(new TFile("archive.tar.gz/file"));
     for more information.
     
     The type of the prospective archive file is detected by its
-    suffix in a path name.
+    extension in a path name.
     In this case <<<.tar.gz>>> was used, but you could use any other
-    registered archive file suffix, too (see below).
+    registered archive file extension, too (see below).
     And of course, archive files can not only be used as the destination of a
     copy method, but also as the source or both.
     So here's how to unzip a ZIP file to a directory:

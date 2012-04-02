@@ -32,6 +32,9 @@ public final class UriCat extends TApplication<Exception> {
     }
 
     @Override
+    protected void setup() { }
+
+    @Override
     protected int work(String[] args) throws Exception {
         for (String path : args)
             uriCat(path);
@@ -42,7 +45,7 @@ public final class UriCat extends TApplication<Exception> {
     /**
      * Copies the contents of the parameter resource to the standard output.
      * <p>
-     * The set of archive file suffixes detected by this method is determined
+     * The set of archive file extensions detected by this method is determined
      * by the {@linkplain TConfig#getArchiveDetector default archive detector}
      * and the respective file system driver providers on the class path.
      *

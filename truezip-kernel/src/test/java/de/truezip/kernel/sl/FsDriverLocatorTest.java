@@ -12,7 +12,7 @@ import de.truezip.kernel.FsDriverProviderTestSuite;
  */
 public class FsDriverLocatorTest extends FsDriverProviderTestSuite {
     @Override
-    protected String getSuffixes() {
+    protected String getExtensions() {
         return "null";
     }
 

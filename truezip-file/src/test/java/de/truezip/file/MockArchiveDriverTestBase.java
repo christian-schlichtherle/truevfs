@@ -13,7 +13,7 @@ public abstract class MockArchiveDriverTestBase
 extends ConfiguredClientTestBase<MockArchiveDriver> {
 
     @Override
-    protected final String getSuffixList() {
+    protected final String getExtensionList() {
         return "mok|mok1|mok2";
     }
 

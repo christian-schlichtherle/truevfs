@@ -38,6 +38,9 @@ public final class TApplicationTest {
     private static final class TestApplication
     extends TApplication<RuntimeException> {
         @Override
+        protected void setup() { }
+
+        @Override
         protected int work(String[] args) {
             return args.length;
         }

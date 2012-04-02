@@ -4,7 +4,6 @@
  */
 package de.truezip.driver.file;
 
-import de.truezip.driver.file.FileDriverService;
 import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.spi.FsDriverServiceTestSuite;
 
@@ -13,7 +12,7 @@ import de.truezip.kernel.spi.FsDriverServiceTestSuite;
  */
 public final class FileDriverServiceTest extends FsDriverServiceTestSuite {
     @Override
-    protected String getSuffixes() {
+    protected String getExtensions() {
         return "file";
     }
 

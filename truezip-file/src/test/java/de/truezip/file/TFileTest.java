@@ -37,13 +37,13 @@ public final class TFileTest extends MockArchiveDriverTestBase {
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        archive = new TFile("archive" + getSuffix());
+        archive = new TFile("archive" + getExtension());
     }
 
     @Override
     public void tearDown() {
         try {
-            assert !new File("archive" + getSuffix()).exists();
+            assert !new File("archive" + getExtension()).exists();
         } finally {
             super.tearDown();
         }
@@ -524,7 +524,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
     /**
      * Tests issue #TRUEZIP-154.
      * 
-     * @see    <a href="http://java.net/jira/browse/TRUEZIP-154">ServiceConfigurationError: Unknown file system scheme for path without a suffix</a>
+     * @see    <a href="http://java.net/jira/browse/TRUEZIP-154">ServiceConfigurationError: Unknown file system scheme for path without a extension</a>
      */
     @Test
     public void testIssue154() {

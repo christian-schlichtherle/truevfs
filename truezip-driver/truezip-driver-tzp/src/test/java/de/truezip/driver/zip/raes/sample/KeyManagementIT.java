@@ -14,18 +14,18 @@ import de.truezip.file.TConfig;
 public final class KeyManagementIT extends KeyManagementITSuite {
 
     @Override
-    protected TArchiveDetector newArchiveDetector1(String suffix, String password) {
+    protected TArchiveDetector newArchiveDetector1(String extension, String password) {
         return KeyManagement.newArchiveDetector1(
                 TConfig.get().getArchiveDetector(),
-                suffix,
+                extension,
                 password.toCharArray());
     }
 
     @Override
-    protected TArchiveDetector newArchiveDetector2(String suffix, String password) {
+    protected TArchiveDetector newArchiveDetector2(String extension, String password) {
         return KeyManagement.newArchiveDetector2(
                 TConfig.get().getArchiveDetector(),
-                suffix,
+                extension,
                 password.toCharArray());
     }
 }

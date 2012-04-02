@@ -16,7 +16,7 @@ import java.io.IOException;
 public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestWinZipAesDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "zip";
     }
 

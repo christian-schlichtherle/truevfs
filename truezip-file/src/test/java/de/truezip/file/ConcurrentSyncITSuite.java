@@ -43,7 +43,7 @@ extends ConfiguredClientTestBase<D> {
     private File createTempFile() throws IOException {
         // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
-        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
+        return File.createTempFile(TEMP_FILE_PREFIX, getExtension()).getCanonicalFile();
     }
 
     @Test
@@ -95,14 +95,14 @@ extends ConfiguredClientTestBase<D> {
         final File temp = createTempFile();
         TFile.rm(temp);
         final TFile archive = new TFile(temp);
-        final TFile file = new TFile(archive, i + getSuffix() + "/" + i);
+        final TFile file = new TFile(archive, i + getExtension() + "/" + i);
         roundTrip(file);
         archive.rm_r();
     }
 
     private void roundTrip(final TFile outer) throws IOException {
         final TFile inner = new TFile(outer.getParentFile(),
-                "inner" + getSuffix() + "/" + outer.getName());
+                "inner" + getExtension() + "/" + outer.getName());
         // This particular sequence has been selected because of its increased
         // likeliness to fail in case the cache sync logic is not correct.
         create(inner);

@@ -126,8 +126,8 @@ src.cp_rp(dst);
                 <p>
                     This will append the base name of the source path to the
                     destination path if either the destination path name ends
-                    with a recognized archive file suffix like e.g. ".zip" or
-                    if the destination file system entry already exists as a
+                    with a recognized archive file extension like e.g. ".zip"
+                    or if the destination file system entry already exists as a
                     directory.
                     If 
                     <code>TFile.setLenient(false)</code> is never called by
@@ -156,16 +156,16 @@ src.cp_rp(dst);
         </faq>
         <faq id="filterTArchiveDetector">
             <question>
-                The set of detected suffixes for archive files is too large.
+                The set of detected extensions for archive files is too large.
                 How can I change it?
             </question>
             <answer>
                 <p>
-                    You can easily filter the set of canonical suffixes
+                    You can easily filter the set of canonical extensions
                     installed by the file system driver modules on the run time
                     class path.
                     For example, the TrueZIP Driver ZIP module will install a
-                    large set of canonical file suffixes for ZIP files.
+                    large set of canonical file extensions for ZIP files.
                     If all you want is to detect <code>*.zip</code> files
                     however, you can do so easily using the following statement:
                 </p>
@@ -195,14 +195,14 @@ TConfig.get().setArchiveDetector(
 </source>
                 <p>
                     This example presumes that you are going to map the file
-                    suffix <code>.zip</code> to the <code>ZipDriver</code>.
+                    extension <code>.zip</code> to the <code>ZipDriver</code>.
                     This is actually the default if you add the JAR artifact of
                     the module TrueZIP&nbsp;Driver&nbsp;ZIP to the run time
                     class path.
                 </p>
                 <p>
                     Furthermore, this example presumes that you want no other
-                    archive file suffixes to get detected, hence the use of
+                    archive file extensions to get detected, hence the use of
                     <a href="apidocs/de/truezip/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
                     as the decorated archive detector.
                     The class <code>TArchiveDetector</code> has many different
@@ -221,8 +221,8 @@ TConfig.get().setArchiveDetector(
             <answer>
                 <p>
                     Most likely the TrueZIP File* module is not set up
-                    correctly in order to detect the file suffix of the archive
-                    type you want to access.
+                    correctly in order to detect the file extension of the
+                    archive type you want to access.
                     To make sure it does, make the following call early in your
                     application:
                 </p>
@@ -271,7 +271,8 @@ TConfig.get().setArchiveDetector(
                     You can easily solve this issue by committing any pending
                     changes and then calling <code>length()</code> on a new
                     <code>TFile</code> object which has been instructed to
-                    ignore an archive file name suffix in the last path element.
+                    ignore an archive file name extension in the last path
+                    element.
                     This could look as follows:
                 </p>
 <source>
@@ -527,7 +528,8 @@ TFile.cp(src.toFile(), dst.toFile());
                     You can easily solve this issue by committing any pending
                     changes and then calling <code>Files.size(Path)</code> with
                     a new <code>TPath</code> object which has been instructed to
-                    ignore an archive file name suffix in the last path element.
+                    ignore an archive file name extension in the last path
+                    element.
                     This could look as follows:
                 </p>
 <source>

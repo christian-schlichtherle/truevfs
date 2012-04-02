@@ -12,7 +12,7 @@ import de.truezip.kernel.spi.FsDriverServiceTestSuite;
  */
 public final class HttpDriverServiceTest extends FsDriverServiceTestSuite {
     @Override
-    protected String getSuffixes() {
+    protected String getExtensions() {
         return "http|https";
     }
 

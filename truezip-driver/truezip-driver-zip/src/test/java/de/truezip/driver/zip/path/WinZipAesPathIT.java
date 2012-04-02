@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "zip";
     }
 
@@ -65,7 +65,7 @@ public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
     @Test
     public void testFileStatus() throws IOException {
         final TPath archive = getArchive();
-        final TPath inner = archive.resolve("inner" + getSuffix());
+        final TPath inner = archive.resolve("inner" + getExtension());
 
         createDirectory(archive);
         createDirectory(inner);

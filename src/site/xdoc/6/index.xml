@@ -135,7 +135,7 @@
                     For example, the path name <code>&quot;archive.zip/readme&quot;</code>
                     addresses the archive entry <code>&quot;readme&quot;</code> within
                     the ZIP file <code>&quot;archive.zip&quot;</code>.
-                    Note that file name suffixes are fully configurable and
+                    Note that file name extensions are fully configurable and
                     TrueZIP automatically detects false positives and falls
                     back to treat them like ordinary files or directories.
                     This works recursively, so an archive file may even be enclosed
@@ -210,7 +210,7 @@
                     <li>Supports <code>IBM437</code> and any other character
                         set encodings for ZIP compatible files with international
                         entry names and comments.</li>
-                    <li>Configurable file suffixes for ZIP compatible files
+                    <li>Configurable file extensions for ZIP compatible files
                         (.zip, .jar, .tzp, .tar, .tbz2, whatever).</li>
                     <li>Provides an enhanced ZIP API which is fully interoperable
                         with the genuine <code>java.util.zip</code> package.</li>

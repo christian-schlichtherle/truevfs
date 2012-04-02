@@ -102,7 +102,7 @@ extends ConfiguredClientTestBase<D> {
     private File createTempFile() throws IOException {
         // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
-        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
+        return File.createTempFile(TEMP_FILE_PREFIX, getExtension()).getCanonicalFile();
     }
 
     private void createTestFile(final TFile file) throws IOException {
@@ -177,7 +177,7 @@ extends ConfiguredClientTestBase<D> {
         assertFalsePositive(archive);
 
         // Dito for entry.
-        final TFile entry = new TFile(archive, "entry" + getSuffix());
+        final TFile entry = new TFile(archive, "entry" + getExtension());
 
         assertTrue(archive.toNonArchiveFile().mkdir());
         assertFalsePositive(entry);
@@ -356,7 +356,7 @@ extends ConfiguredClientTestBase<D> {
     public final void testIllegalDirectoryOperations() throws IOException {
         try {
             final String[] names = {
-                "inner" + getSuffix(),
+                "inner" + getExtension(),
                 "dir",
             };
             TFile file = archive;
@@ -426,7 +426,7 @@ extends ConfiguredClientTestBase<D> {
     
     @Test
     public final void testLenientFileOutputStream() throws IOException {
-        TFile file = new TFile(archive, "dir/inner" + getSuffix() + "/dir/test.txt");
+        TFile file = new TFile(archive, "dir/inner" + getExtension() + "/dir/test.txt");
 
         assertFileOutputStream(file);
 
@@ -646,9 +646,9 @@ extends ConfiguredClientTestBase<D> {
     public final void testMkdir() throws IOException {
         final TFile dir1 = archive;
         final TFile dir2 = new TFile(dir1, "dir");
-        final TFile dir3 = new TFile(dir2, "inner" + getSuffix());
+        final TFile dir3 = new TFile(dir2, "inner" + getExtension());
         final TFile dir4 = new TFile(dir3, "dir");
-        final TFile dir5 = new TFile(dir4, "nuts" + getSuffix());
+        final TFile dir5 = new TFile(dir4, "nuts" + getExtension());
         final TFile dir6 = new TFile(dir5, "dir");
         
         assert TConfig.get().isLenient();
@@ -698,7 +698,7 @@ extends ConfiguredClientTestBase<D> {
     public final void testDirectoryTree() throws IOException {
         assertDirectoryTree(
                 new TFile(System.getProperty("java.io.tmpdir")), // base directory
-                new TFile("dir/inner" + getSuffix() + "/dir/outer" + getSuffix() + "/" + archive.getName())); // this path is reversed!!!
+                new TFile("dir/inner" + getExtension() + "/dir/outer" + getExtension() + "/" + archive.getName())); // this path is reversed!!!
     }
 
     private void assertDirectoryTree(TFile basePath, TFile reversePath)
@@ -746,7 +746,7 @@ extends ConfiguredClientTestBase<D> {
         final TFile archiveTest = new TFile(archive, "test");
         assertInputOutput(archiveTest);
         
-        final TFile archiveInner = new TFile(archive, "inner" + getSuffix());
+        final TFile archiveInner = new TFile(archive, "inner" + getExtension());
         final TFile archiveInnerTest = new TFile(archiveInner, "test");
         assertInputOutput(archiveInnerTest);
         archiveInner.rm();
@@ -830,9 +830,9 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public final void testCopyDelete() throws IOException {
         final String[] names = {
-            "0" + getSuffix(),
-            "1" + getSuffix(),
-            //"2" + getSuffix(),
+            "0" + getExtension(),
+            "1" + getExtension(),
+            //"2" + getExtension(),
         };
 
         assertTrue(archive.mkdir()); // create valid archive file
@@ -865,9 +865,9 @@ extends ConfiguredClientTestBase<D> {
     private void assertCopyDelete(final TFile parent, final TFile dir)
     throws IOException {
         final TFile parentFile = new TFile(parent, "file");
-        final TFile parentArchive = new TFile(parent, "archive" + getSuffix());
+        final TFile parentArchive = new TFile(parent, "archive" + getExtension());
         final TFile dirFile = new TFile(dir, "file");
-        final TFile dirArchive = new TFile(dir, "archive" + getSuffix());
+        final TFile dirArchive = new TFile(dir, "archive" + getExtension());
 
         assertCopyDelete0(dirFile, dirArchive);
         assertCopyDelete0(dirFile, parentFile);
@@ -1022,7 +1022,7 @@ extends ConfiguredClientTestBase<D> {
         // Create false positive archive.
         // Note that archive is a TFile instance which returns isArchive()
         // == true, so we must create a new TFile instance which is guaranteed
-        // to ignore the archive getSuffix() in the path.
+        // to ignore the archive getExtension() in the path.
         // Furthermore, data is an array containing random data
         // - not a regular archive.
         // So upon completion of this step, the object "archive" refers to a
@@ -1061,8 +1061,8 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public final void testRenameRecursively() throws IOException {
         final TFile temp = new TFile(createTempFile());
-        final TFile archive2 = new TFile(archive, "inner" + getSuffix());
-        final TFile archive3 = new TFile(archive2, "nuts" + getSuffix());
+        final TFile archive2 = new TFile(archive, "inner" + getExtension());
+        final TFile archive3 = new TFile(archive2, "nuts" + getExtension());
         final TFile archive1a = new TFile(archive, "a");
         final TFile archive1b = new TFile(archive, "b");
         final TFile archive2a = new TFile(archive2, "a");
