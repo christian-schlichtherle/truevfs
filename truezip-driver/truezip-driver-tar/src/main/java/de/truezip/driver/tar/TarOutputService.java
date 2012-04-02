@@ -63,7 +63,7 @@ implements OutputService<TarDriverEntry> {
     private boolean busy;
 
     @CreatesObligation
-    public TarOutputService(   final TarDriver driver,
+    public TarOutputService(final TarDriver driver,
                             final @WillCloseWhenClosed OutputStream out) {
         super(out);
         this.delegate = out;
@@ -219,8 +219,7 @@ implements OutputService<TarDriverEntry> {
 
             TarOutputService.this.busy = false;
             try {
-                final InputStream in = buffer.getInputSocket().newInputStream();
-                try {
+                try (final InputStream in = buffer.getInputSocket().newInputStream()) {
                     entry.setSize(buffer.getSize(DATA));
                     if (UNKNOWN == entry.getModTime().getTime())
                         entry.setModTime(System.currentTimeMillis());
@@ -230,8 +229,6 @@ implements OutputService<TarDriverEntry> {
                     } finally {
                         closeArchiveEntry();
                     }
-                } finally {
-                    in.close();
                 }
             } finally {
                 buffer.release();
