@@ -219,7 +219,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                         final ZipInputService source)
     throws IOException {
         final RaesOutputStream ros = new RaesSink(output, raesParameters(model))
-                .newOutputStream();
+                .newStream();
         try {
             return newOutputService(model, ros, source);
         } catch (final Throwable ex) {

@@ -27,7 +27,7 @@ final class JulOutputStream extends DecoratingOutputStream {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     JulOutputStream(final OutputSocket<?> socket) throws IOException {
-        super(socket.newOutputStream());
+        super(socket.newStream());
         this.socket = socket;
         log("Stream writing ");
     }

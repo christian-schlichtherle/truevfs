@@ -45,7 +45,7 @@ public final class RaesSink implements Sink {
 
     /** @throws UnsupportedOperationException */
     @Override
-    public SeekableByteChannel newSeekableByteChannel() {
+    public SeekableByteChannel newChannel() {
         throw new UnsupportedOperationException();
     }
 
@@ -56,7 +56,7 @@ public final class RaesSink implements Sink {
      *         no suitable RAES parameters can be found.
      */
     @Override
-    public RaesOutputStream newOutputStream() throws IOException {
+    public RaesOutputStream newStream() throws IOException {
         RaesParameters param = this.param;
         while (null != param) {
             // HC SUNT DRACONES!

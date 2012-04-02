@@ -116,17 +116,17 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            public SeekableByteChannel newChannel() throws IOException {
                 throw new UnsupportedOperationException("TODO: Implement this!");
             }
 
             @Override
             @GuardedBy("lock")
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 final OutputStream out;
                 lock.lock();
                 try {
-                    out = getBoundSocket().newOutputStream();
+                    out = getBoundSocket().newStream();
                 } finally {
                     lock.unlock();
                 }

@@ -76,7 +76,7 @@ implements OutputService<ZipDriverEntry> {
             if (0 < source.getPostambleLength()) {
                 this.postamble = getPool().allocate();
                 Streams.copy(   source.getPostambleInputStream(),
-                                this.postamble.getOutputSocket().newOutputStream());
+                                this.postamble.getOutputSocket().newStream());
             }
         }
     }
@@ -138,7 +138,7 @@ implements OutputService<ZipDriverEntry> {
             }
 
             @Override
-            public OutputStream newOutputStream()
+            public OutputStream newStream()
             throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(entry.getName());
@@ -215,7 +215,7 @@ implements OutputService<ZipDriverEntry> {
             this.postamble = null;
             final InputSocket<?> is = pa.getInputSocket();
             try {
-                try (final InputStream in = is.newInputStream()) {
+                try (final InputStream in = is.newStream()) {
                     // If the output ZIP file differs in length from the
                     // input ZIP file then pad the output to the next four
                     // byte boundary before appending the postamble.
@@ -277,7 +277,7 @@ implements OutputService<ZipDriverEntry> {
                 final ZipDriverEntry entry,
                 final boolean process)
         throws IOException {
-            super(buffer.getOutputSocket().newOutputStream(), new CRC32());
+            super(buffer.getOutputSocket().newStream(), new CRC32());
             assert STORED == entry.getMethod();
             this.buffer = buffer;
             ZipOutputService.this.bufferedEntry = entry;
@@ -304,7 +304,7 @@ implements OutputService<ZipDriverEntry> {
 
             ZipOutputService.this.bufferedEntry = null;
             try {
-                try (final InputStream in = buffer.getInputSocket().newInputStream()) {
+                try (final InputStream in = buffer.getInputSocket().newStream()) {
                     final long length = buffer.getSize(DATA);
                     entry.setCrc(getChecksum().getValue());
                     entry.setCompressedSize(length);

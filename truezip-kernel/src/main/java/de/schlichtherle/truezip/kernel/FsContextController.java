@@ -257,26 +257,26 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             final FsTargetArchiveController<?>
                     controller = FsContextController.this.controller;
             final FsOperationContext context = controller.getContext();
             controller.setContext(NONE);
             try {
-                return getBoundSocket().newSeekableByteChannel();
+                return getBoundSocket().newChannel();
             } finally {
                 controller.setContext(context);
             }
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newStream() throws IOException {
             final FsTargetArchiveController<?>
                     controller = FsContextController.this.controller;
             final FsOperationContext context = controller.getContext();
             controller.setContext(NONE);
             try {
-                return getBoundSocket().newInputStream();
+                return getBoundSocket().newStream();
             } finally {
                 controller.setContext(context);
             }
@@ -307,26 +307,26 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             final FsTargetArchiveController<?>
                     controller = FsContextController.this.controller;
             final FsOperationContext context = controller.getContext();
             controller.setContext(operation);
             try {
-                return getBoundSocket().newSeekableByteChannel();
+                return getBoundSocket().newChannel();
             } finally {
                 controller.setContext(context);
             }
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newStream() throws IOException {
             final FsTargetArchiveController<?>
                     controller = FsContextController.this.controller;
             final FsOperationContext context = controller.getContext();
             controller.setContext(operation);
             try {
-                return getBoundSocket().newOutputStream();
+                return getBoundSocket().newStream();
             } finally {
                 controller.setContext(context);
             }

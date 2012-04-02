@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * A source which wraps any {@link IOException} in an {@link InputException}.
+ * 
  * @author Christian Schlichtherle
  */
 public class InputExceptionSource extends AbstractSource {
@@ -20,9 +22,9 @@ public class InputExceptionSource extends AbstractSource {
     }
 
     @Override
-    public InputStream newInputStream() throws IOException {
+    public InputStream newStream() throws IOException {
         try {
-            return new InputExceptionStream(source.newInputStream());
+            return new InputExceptionStream(source.newStream());
         } catch (IOException ex) {
             throw new InputException(ex);
         }

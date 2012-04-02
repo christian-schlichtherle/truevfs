@@ -48,7 +48,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
         try {
             temp = entry.getPool().allocate();
             try {
-                try (final OutputStream out = temp.getOutputSocket().newOutputStream()) {
+                try (final OutputStream out = temp.getOutputSocket().newStream()) {
                     Streams.cat(in, out);
                 }
             } catch (IOException ex) {
@@ -86,7 +86,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
     }
 
     @Override
-    public InputStream newInputStream() throws IOException {
+    public InputStream newStream() throws IOException {
         return entry.getInputStream();
     }
 }

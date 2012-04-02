@@ -51,10 +51,10 @@ extends DecoratingOutputSocket<E> {
     }
 
     @Override
-    public SeekableByteChannel newSeekableByteChannel()
+    public SeekableByteChannel newChannel()
     throws IOException {
         try {
-            return getBoundSocket().newSeekableByteChannel();
+            return getBoundSocket().newChannel();
         } catch (final Throwable ex) {
             reset();
             throw ex;
@@ -62,9 +62,9 @@ extends DecoratingOutputSocket<E> {
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
+    public OutputStream newStream() throws IOException {
         try {
-            return getBoundSocket().newOutputStream();
+            return getBoundSocket().newStream();
         } catch (final Throwable ex) {
             reset();
             throw ex;

@@ -28,7 +28,7 @@ public interface Sink {
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
-    OutputStream newOutputStream() throws IOException;
+    OutputStream newStream() throws IOException;
 
     /**
      * <b>Optional operation:</b> Returns a new seekable byte channel for
@@ -46,5 +46,5 @@ public interface Sink {
      * by the implementation.
      */
     @CreatesObligation
-    SeekableByteChannel newSeekableByteChannel() throws IOException;
+    SeekableByteChannel newChannel() throws IOException;
 }

@@ -303,7 +303,7 @@ public final class FsCacheTest {
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newStream() throws IOException {
             return new BrokenInputStream();
         }
 
@@ -332,7 +332,7 @@ public final class FsCacheTest {
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newStream() throws IOException {
             return new BrokenOutputStream();
         }
 

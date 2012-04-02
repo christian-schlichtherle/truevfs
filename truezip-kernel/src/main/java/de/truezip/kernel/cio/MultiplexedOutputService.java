@@ -124,7 +124,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
 
             @Override
-            public OutputStream newOutputStream() throws IOException {
+            public OutputStream newStream() throws IOException {
                 return isBusy()
                         ? newBufferedEntryOutputStream(getBoundSocket())
                         : new EntryOutputStream(getBoundSocket());
@@ -198,7 +198,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
-            super(output.newOutputStream());
+            super(output.newStream());
             busy = true;
         }
 
@@ -232,7 +232,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         BufferedEntryOutputStream(  final IOBuffer<?> buffer,
                                     final OutputSocket<? extends E> output)
         throws IOException {
-            super(buffer.getOutputSocket().newOutputStream());
+            super(buffer.getOutputSocket().newStream());
             this.output = output;
             this.local = output.getLocalTarget();
             final Entry remote = output.getRemoteTarget();

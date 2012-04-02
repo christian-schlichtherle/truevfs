@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * An input stream which wraps any {@link IOException} in an
+ * {@link InputException}.
+ * 
  * @author Christian Schlichtherle
  */
 public final class InputExceptionStream extends DecoratingInputStream {

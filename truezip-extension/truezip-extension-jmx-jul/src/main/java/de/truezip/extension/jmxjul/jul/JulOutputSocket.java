@@ -23,7 +23,7 @@ extends InstrumentingOutputSocket<E> {
     }
 
     @Override
-    public OutputStream newOutputStream() throws IOException {
+    public OutputStream newStream() throws IOException {
         return new JulOutputStream(getBoundSocket());
     }
 }

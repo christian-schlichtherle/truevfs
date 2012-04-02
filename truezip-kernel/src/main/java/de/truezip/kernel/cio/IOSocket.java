@@ -85,7 +85,7 @@ public abstract class IOSocket<LT, PT> {
     public abstract @CheckForNull PT getRemoteTarget() throws IOException;
 
     /**
-     * Copies an input stream {@link InputSocket#newInputStream created}
+     * Copies an input stream {@link InputSocket#newStream created}
      * by the given input socket {@code input} to an output stream
      * {@link OutputSocket#newOutputStream created} by the given output socket
      * {@code output}.

@@ -132,9 +132,9 @@ implements Container<MockArchiveDriverEntry> {
                 }
 
                 @Override
-                public SeekableByteChannel newSeekableByteChannel()
+                public SeekableByteChannel newChannel()
                 throws IOException {
-                    return getBufferInputSocket().newSeekableByteChannel();
+                    return getBufferInputSocket().newChannel();
                 }
 
                 @Override
@@ -143,8 +143,8 @@ implements Container<MockArchiveDriverEntry> {
                 }
 
                 @Override
-                public InputStream newInputStream() throws IOException {
-                    return getBufferInputSocket().newInputStream();
+                public InputStream newStream() throws IOException {
+                    return getBufferInputSocket().newStream();
                 }
 
                 InputSocket<? extends IOEntry<?>>
@@ -184,17 +184,17 @@ implements Container<MockArchiveDriverEntry> {
                 }
 
                 @Override
-                public SeekableByteChannel newSeekableByteChannel()
+                public SeekableByteChannel newChannel()
                 throws IOException {
-                    return getBufferOutputSocket().newSeekableByteChannel();
+                    return getBufferOutputSocket().newChannel();
                 }
 
                 @Override
-                public OutputStream newOutputStream()
+                public OutputStream newStream()
                 throws IOException {
                     class MockOutputStream extends DecoratingOutputStream {
                         MockOutputStream() throws IOException {
-                            super(getBufferOutputSocket().newOutputStream());
+                            super(getBufferOutputSocket().newStream());
                         }
 
                         @Override

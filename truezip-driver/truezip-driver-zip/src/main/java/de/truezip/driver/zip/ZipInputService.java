@@ -109,7 +109,7 @@ implements InputService<ZipDriverEntry> {
             }
 
             @Override
-            public InputStream newInputStream() throws IOException {
+            public InputStream newStream() throws IOException {
                 final ZipDriverEntry lt = getLocalTarget();
                 final Entry pt = getRemoteTarget();
                 final ZipDriverEntry zpt = pt instanceof ZipDriverEntry

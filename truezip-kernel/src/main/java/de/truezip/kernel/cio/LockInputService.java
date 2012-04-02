@@ -131,17 +131,17 @@ extends DecoratingInputService<E, InputService<E>> {
             }
 
             @Override
-            public SeekableByteChannel newSeekableByteChannel() throws IOException {
+            public SeekableByteChannel newChannel() throws IOException {
                 throw new UnsupportedOperationException("TODO: Implement this!");
             }
 
             @Override
             @GuardedBy("lock")
-            public InputStream newInputStream() throws IOException {
+            public InputStream newStream() throws IOException {
                 final InputStream in;
                 lock.lock();
                 try {
-                    in = getBoundSocket().newInputStream();
+                    in = getBoundSocket().newStream();
                 } finally {
                     lock.unlock();
                 }

@@ -53,12 +53,12 @@ public class StreamsTest {
 
     private static TestInputStream newTestInputStream(ByteArrayIOBuffer buffer)
     throws IOException {
-        return new TestInputStream(buffer.getInputSocket().newInputStream());
+        return new TestInputStream(buffer.getInputSocket().newStream());
     }
 
     private static TestOutputStream newTestOutputStream(ByteArrayIOBuffer buffer)
     throws IOException {
-        return new TestOutputStream(buffer.getOutputSocket().newOutputStream());
+        return new TestOutputStream(buffer.getOutputSocket().newStream());
     }
 
     @Test

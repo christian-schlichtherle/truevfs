@@ -94,7 +94,7 @@ extends IOSocket<E, Entry> implements Sink {
      * {@link UnsupportedOperationException}.
      */
     @Override
-    public SeekableByteChannel newSeekableByteChannel() throws IOException {
+    public SeekableByteChannel newChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

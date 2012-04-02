@@ -99,15 +99,15 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             return new FinalizeSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundSocket().newChannel());
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newStream() throws IOException {
             return new FinalizeInputStream(
-                    getBoundSocket().newInputStream());
+                    getBoundSocket().newStream());
         }
     } // Input
 
@@ -120,16 +120,16 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             return new FinalizeSeekableByteChannel(
-                    getBoundSocket().newSeekableByteChannel());
+                    getBoundSocket().newChannel());
         }
 
         @Override
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newStream() throws IOException {
             return new FinalizeOutputStream(
-                    getBoundSocket().newOutputStream());
+                    getBoundSocket().newStream());
         }
     } // Output
 

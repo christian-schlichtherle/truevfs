@@ -28,7 +28,7 @@ public interface Source {
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
-    InputStream newInputStream() throws IOException;    
+    InputStream newStream() throws IOException;    
 
     /**
      * <b>Optional operation:</b> Returns a new seekable byte channel for
@@ -46,5 +46,5 @@ public interface Source {
      *         by the implementation.
      */
     @CreatesObligation
-    SeekableByteChannel newSeekableByteChannel() throws IOException;
+    SeekableByteChannel newChannel() throws IOException;
 }

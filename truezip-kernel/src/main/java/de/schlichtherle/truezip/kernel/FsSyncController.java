@@ -238,11 +238,11 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             while (true) {
                 try {
                     return new SyncSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundSocket().newChannel());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -250,11 +250,11 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public InputStream newInputStream() throws IOException {
+        public InputStream newStream() throws IOException {
             while (true) {
                 try {
                     return new SyncInputStream(
-                            getBoundSocket().newInputStream());
+                            getBoundSocket().newStream());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -282,11 +282,11 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public SeekableByteChannel newSeekableByteChannel() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             while (true) {
                 try {
                     return new SyncSeekableByteChannel(
-                            getBoundSocket().newSeekableByteChannel());
+                            getBoundSocket().newChannel());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -294,11 +294,11 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newStream() throws IOException {
             while (true) {
                 try {
                     return new SyncOutputStream(
-                            getBoundSocket().newOutputStream());
+                            getBoundSocket().newStream());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }

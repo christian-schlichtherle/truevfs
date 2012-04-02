@@ -266,14 +266,14 @@ extends FsLockModelController {
         }
 
         @Override
-        public OutputStream newOutputStream() throws IOException {
+        public OutputStream newStream() throws IOException {
             mknod = null;
             final FsArchiveFileSystemOperation<E> mknod = mknod();
             final E ae = mknod.getTarget().getEntry();
             InputStream in = null;
             if (options.get(APPEND)) {
                 try {
-                    in = new InputExceptionSource(new Input(name)).newInputStream();
+                    in = new InputExceptionSource(new Input(name)).newStream();
                 } catch (IOException ex) {
                     // When appending, there is no need for the entry to exist,
                     // so we can safely ignore this - fall through!
@@ -283,7 +283,7 @@ extends FsLockModelController {
                 final OutputSocket<? extends E> os = getOutputSocket(ae);
                 if (null == in2) // do NOT bind when appending!
                     os.bind(this);
-                final OutputStream out = os.newOutputStream();
+                final OutputStream out = os.newStream();
                 try {
                     mknod.commit();
                     if (null != in2)
