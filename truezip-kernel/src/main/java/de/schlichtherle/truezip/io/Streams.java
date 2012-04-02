@@ -60,9 +60,9 @@ public class Streams {
      * @param  in the input stream.
      * @param  out the output stream.
      * @throws InputException if copying the data fails because of an
-     *         {@code IOException} in the <em>input stream</em>.
+     *         {@code IOException} thrown by the <em>input stream</em>.
      * @throws IOException if copying the data fails because of an
-     *         {@code IOException} in the <em>output stream</em>.
+     *         {@code IOException} thrown by the <em>output stream</em>.
      */
     public static void copy(final @WillClose InputStream in,
                             final @WillClose OutputStream out)
@@ -100,9 +100,9 @@ public class Streams {
      * @param  in the input stream.
      * @param  out the output stream.
      * @throws InputException if copying the data fails because of an
-     *         {@code IOException} in the <em>input stream</em>.
+     *         {@code IOException} thrown by the <em>input stream</em>.
      * @throws IOException if copying the data fails because of an
-     *         {@code IOException} in the <em>output stream</em>.
+     *         {@code IOException} thrown by the <em>output stream</em>.
      */
     public static void cat( final @WillNotClose InputStream in,
                             final @WillNotClose OutputStream out)
@@ -118,8 +118,8 @@ public class Streams {
         // The FIFO is simply implemented as a cached array or byte buffers
         // with an offset and a size which is used like a ring buffer.
 
-        final Lock mutex = new ReentrantLock();
-        final Condition signal = mutex.newCondition();
+        final Lock lock = new ReentrantLock();
+        final Condition signal = lock.newCondition();
         final Buffer[] buffers = Buffer.allocate();
 
         /*
@@ -139,9 +139,9 @@ public class Streams {
             @Override
             public void run() {
                 // Cache some fields for better performance.
-                final InputStream _in = in;
-                final Buffer[] _buffers = buffers;
-                final int _buffersLength = _buffers.length;
+                final InputStream in2 = in;
+                final Buffer[] buffers2 = buffers;
+                final int buffers2Length = buffers2.length;
 
                 // The writer executor interrupts this executor to signal
                 // that it cannot handle more input because there has been
@@ -151,18 +151,18 @@ public class Streams {
                 do {
                     // Wait until a buffer is available.
                     final Buffer buffer;
-                    mutex.lock();
+                    lock.lock();
                     try {
-                        while (size >= _buffersLength) {
+                        while (size >= buffers2Length) {
                             try {
                                 signal.await();
                             } catch (InterruptedException cancel) {
                                 return;
                             }
                         }
-                        buffer = _buffers[(off + size) % _buffersLength];
+                        buffer = buffers2[(off + size) % buffers2Length];
                     } finally {
-                        mutex.unlock();
+                        lock.unlock();
                     }
 
                     // Fill buffer until end of file or buffer.
@@ -171,7 +171,7 @@ public class Streams {
                     // of InputStream's contract.
                     try {
                         final byte[] buf = buffer.buf;
-                        read = _in.read(buf, 0, buf.length);
+                        read = in2.read(buf, 0, buf.length);
                     } catch (final Throwable ex) {
                         exception = ex;
                         read = -1;
@@ -179,12 +179,12 @@ public class Streams {
                     buffer.read = read;
 
                     // Advance head and signal writer.
-                    mutex.lock();
+                    lock.lock();
                     try {
                         size++;
                         signal.signal(); // only the writer could be waiting now!
                     } finally {
-                        mutex.unlock();
+                        lock.unlock();
                     }
                 } while (0 <= read);
             }
@@ -203,7 +203,7 @@ public class Streams {
                 // Wait until a buffer is available.
                 final int off;
                 final Buffer buffer;
-                mutex.lock();
+                lock.lock();
                 try {
                     while (0 >= reader.size) {
                         try {
@@ -215,7 +215,7 @@ public class Streams {
                     off = reader.off;
                     buffer = buffers[off];
                 } finally {
-                    mutex.unlock();
+                    lock.unlock();
                 }
 
                 // Stop on last buffer.
@@ -239,24 +239,26 @@ public class Streams {
                 }
 
                 // Advance tail and signal reader.
-                mutex.lock();
+                lock.lock();
                 try {
                     reader.off = (off + 1) % buffersLength;
                     reader.size--;
                     signal.signal(); // only the reader could be waiting now!
                 } finally {
-                    mutex.unlock();
+                    lock.unlock();
                 }
             }
             out.flush();
 
             final Throwable ex = reader.exception;
             if (null != ex) {
-                if (ex instanceof RuntimeException)
-                    throw wrap((RuntimeException) ex);
-                else if (ex instanceof Error)
-                    throw wrap((Error) ex);
-                throw new InputException(ex);
+                if (ex instanceof InputException)
+                    throw (InputException) ex;
+                else if (ex instanceof IOException)
+                    throw new InputException((IOException) ex);
+                else if (ex instanceof RuntimeException)
+                    throw (RuntimeException) wrap(ex).fillInStackTrace();
+                throw (Error) wrap(ex).fillInStackTrace();
             }
         } finally {
             if (interrupted)

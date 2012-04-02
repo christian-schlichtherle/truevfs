@@ -84,9 +84,9 @@ public abstract class IOSocket<LT, PT> {
      * @param  input an input socket for the input target.
      * @param  output an output socket for the output target.
      * @throws InputException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>input stream</em>.
+     *         {@code IOException} thrown by the <em>input socket</em>.
      * @throws IOException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>output stream</em>.
+     *         {@code IOException} thrown by the <em>output socket</em>.
      */
     public static void copy(final InputSocket <?> input,
                             final OutputSocket<?> output)
@@ -94,8 +94,13 @@ public abstract class IOSocket<LT, PT> {
         if (null == output)
             throw new NullPointerException();
 
-        final @WillClose InputStream in = input.connect(output).newInputStream();
         @WillClose OutputStream out = null;
+        final @WillClose InputStream in;
+        try {
+            in = input.connect(output).newInputStream();
+        } catch (final IOException ex) {
+            throw new InputException(ex);
+        }
         try {
             // .connect(input) is redundant unless .newInputStream() messed
             // with the connection, which is impossible outside this package.
@@ -110,12 +115,9 @@ public abstract class IOSocket<LT, PT> {
             }
         }
 
-        try {
-            Streams.copy(in, out);
-        } finally {
-            // Disconnect for subsequent use, if any.
-            input.connect(null); // or output.connect(null)
-        }
+        Streams.copy(in, out);
+        // Disconnect for subsequent use, if any.
+        input.connect(null); // or output.connect(null)
     }
 
     /**
