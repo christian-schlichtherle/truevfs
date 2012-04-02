@@ -4,10 +4,10 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.cio.Entry.Type;
-import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.cio.Entry.Type;
+import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import java.io.CharConversionException;
 import java.nio.charset.Charset;
