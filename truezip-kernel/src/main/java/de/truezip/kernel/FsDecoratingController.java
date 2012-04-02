@@ -140,7 +140,7 @@ extends FsController<M> {
 
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[controller=%s]",
                 getClass().getName(),
                 delegate);
     }

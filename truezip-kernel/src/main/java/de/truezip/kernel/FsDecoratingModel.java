@@ -44,7 +44,7 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[model=%s]",
                 getClass().getName(),
                 model);
     }

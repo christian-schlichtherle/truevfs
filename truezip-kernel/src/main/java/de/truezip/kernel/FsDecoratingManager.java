@@ -62,7 +62,7 @@ extends FsManager {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[manager=%s]",
                 getClass().getName(),
                 manager);
     }

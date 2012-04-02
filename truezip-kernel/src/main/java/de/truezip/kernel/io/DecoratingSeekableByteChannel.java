@@ -87,7 +87,7 @@ implements SeekableByteChannel {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[sbc=%s]",
                 getClass().getName(),
                 sbc);
     }
