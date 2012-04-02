@@ -4,15 +4,15 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown if there is an issue when reading or writing a RAES file which is
  * specific to the RAES file format.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class RaesException extends IOException {
