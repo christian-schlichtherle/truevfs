@@ -4,9 +4,8 @@
  */
 package de.truezip.kernel.cio;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import de.truezip.kernel.io.Sink;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -25,10 +24,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    InputSocket
  * @author Christian Schlichtherle
  */
-// TODO: Extract Sink interface for the new*() methods.
 @NotThreadSafe
 public abstract class OutputSocket<E extends Entry>
-extends IOSocket<E, Entry> {
+extends IOSocket<E, Entry> implements Sink {
 
     @CheckForNull
     private InputSocket<?> remote;
@@ -90,37 +88,13 @@ extends IOSocket<E, Entry> {
     }
 
     /**
-     * <b>Optional:</b> Returns a new seekable byte channel for writing bytes
-     * to the {@link #getLocalTarget() local target} in arbitrary order.
+     * {@inheritDoc}
      * <p>
-     * If this method is supported, implementations must enable calling it
-     * any number of times.
-     * Furthermore, the returned seekable byte channel should <em>not</em> be
-     * buffered.
-     * Buffering should be addressed by client applications instead.
-     * 
-     * @return A new seekable byte channel.
-     * @throws IOException On any I/O failure.
-     * @throws UnsupportedOperationException if this operation is not supported
-     *         by the implementation.
+     * The implementation in the abstract class {@link OutputSocket} throws an
+     * {@link UnsupportedOperationException}.
      */
-    @CreatesObligation
+    @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
-
-    /**
-     * Returns a new output stream for writing bytes to the
-     * {@link #getLocalTarget() local target}.
-     * <p>
-     * Implementations must enable calling this method any number of times.
-     * Furthermore, the returned output stream should <em>not</em> be buffered.
-     * Buffering should be addressed by the caller instead - see
-     * {@link IOSocket#copy}.
-     *
-     * @return A new output stream.
-     * @throws IOException On any I/O failure.
-     */
-    @CreatesObligation
-    public abstract OutputStream newOutputStream() throws IOException;
 }
