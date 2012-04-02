@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel.util;
 
-import de.truezip.kernel.util.PriorityExceptionBuilderTest.TestException;
-import java.util.Arrays;
 import java.util.Comparator;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -13,7 +11,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class PriorityExceptionBuilderTest
+public class PriorityExceptionBuilderTest
 extends ExceptionBuilderTestSuite<  PriorityExceptionBuilder<TestException>,
                                     TestException,
                                     TestException> {
@@ -66,6 +64,7 @@ extends ExceptionBuilderTestSuite<  PriorityExceptionBuilder<TestException>,
             {   new TestException(0, new WarningException(1)),
                 new TestException(0),
                 new WarningException(1), },
+
             {   new TestException(0, new WarningException(1), new WarningException(2)),
                 new WarningException(1),
                 new WarningException(2),
@@ -78,6 +77,19 @@ extends ExceptionBuilderTestSuite<  PriorityExceptionBuilder<TestException>,
                 new TestException(0),
                 new WarningException(1),
                 new WarningException(2), },
+
+            {   new TestException(0, new WarningException(1), new TestException(2)),
+                new WarningException(1),
+                new TestException(0),
+                new TestException(2), },
+            {   new TestException(0, new WarningException(1), new TestException(2)),
+                new TestException(0),
+                new WarningException(1),
+                new TestException(2), },
+            {   new TestException(0, new TestException(1), new WarningException(2)),
+                new TestException(0),
+                new TestException(1),
+                new WarningException(2), },
         }) {
             final TestException expected = params[0];
             int i = 1;
@@ -88,53 +100,6 @@ extends ExceptionBuilderTestSuite<  PriorityExceptionBuilder<TestException>,
             assertEquals(expected, assembly);
         }
     }
-
-    @SuppressWarnings("serial")
-    static class TestException extends Exception {
-        final int id;
-
-        TestException(final int id, final TestException... suppressed) {
-            this.id = id;
-            for (TestException ex : suppressed)
-                super.addSuppressed(ex);
-        }
-
-        int getPriority() {
-            return 0;
-        }
-
-        @Override
-        public synchronized Throwable fillInStackTrace() {
-            return this;
-        }
-
-        public boolean equals(Object that) {
-            if (this == that)
-                return true;
-            if (!(that instanceof TestException))
-                return false;
-            final TestException other = (TestException) that;
-            return id == other.id
-                    && getPriority() == other.getPriority()
-                    && Arrays.equals(getSuppressed(), other.getSuppressed());
-        }
-
-        public int hashCode() {
-            throw new UnsupportedOperationException();
-        }
-    } // TestException
-
-    @SuppressWarnings("serial")
-    static class WarningException extends TestException {
-        WarningException(final int id, final TestException... suppressed) {
-            super(id, suppressed);
-        }
-
-        @Override
-        int getPriority() {
-            return -1;
-        }
-    } // WarningException
 
     private static final class TestComparator
     implements Comparator<TestException> {

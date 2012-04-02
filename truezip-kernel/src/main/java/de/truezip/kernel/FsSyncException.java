@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.io.SequentialIOException;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -17,32 +16,22 @@ import javax.annotation.concurrent.ThreadSafe;
  * an exception of this class implies that some or all
  * of the data of the federated file system has been lost.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FsSyncException extends SequentialIOException {
+public class FsSyncException extends IOException {
 
     private static final long serialVersionUID = 4893219420357369739L;
 
-    /**
-     * This constructor is for exclusive use by {@link FsSyncExceptionBuilder}.
-     *
-     * @deprecated This method is only public in order to allow reflective
-     *             access - do <em>not</em> call it directly!
-     */
-    @Deprecated
-    public FsSyncException(@CheckForNull String message) {
-        super(message);
-    }
-
     public FsSyncException(FsModel model, IOException cause) {
-        this(model, cause, 0);
+        super(model.getMountPoint().toString(), cause);
     }
 
-    FsSyncException(FsModel model, IOException cause, int priority) {
-        super(model.getMountPoint().toString(), cause, priority);
+    /** @return {@code 0}. */
+    public int getPriority() {
+        return 0;
     }
-
+    
     @Override
     public @Nullable IOException getCause() {
         return (IOException) super.getCause();

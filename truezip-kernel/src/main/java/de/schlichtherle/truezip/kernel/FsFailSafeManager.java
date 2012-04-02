@@ -4,10 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsCompositeDriver;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsDecoratingManager;
-import de.truezip.kernel.FsManager;
+import de.truezip.kernel.*;
 import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.option.SyncOptions;
@@ -88,7 +85,7 @@ final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
     @Override
     public <X extends IOException> void
     sync(   final BitField<SyncOption> options,
-            final ExceptionHandler<? super IOException, X> handler)
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         if (null != this.shutdownHook) {
             synchronized (this) {

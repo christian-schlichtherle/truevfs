@@ -58,7 +58,7 @@ Using TrueZIP File*
 ** Properly Closing Archive Entry Streams
 
     In general, when using streams, an application should always close them in a
-    <<<finally>>>-block like this:
+    <<<finally>>>-block or use a try-with-resources statement like this:
 
 %{snippet|id=cat1|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
 
@@ -200,7 +200,7 @@ Using TrueZIP File*
 
     []
 
-    <<FAILURE TO COMPLY WITH THESE CONSTRAINTS MAY RESULT IN UNPREDICTABLE
+    <<FAILURE TO COMPLY TO THESE CONSTRAINTS MAY RESULT IN UNPREDICTABLE
     BEHAVIOR AND EVEN CAUSE LOSS OF DATA!>>
 
     As a rule of thumb, to ensure that all <<<TFile>>> objects recognize the
@@ -222,68 +222,44 @@ Using TrueZIP File*
 
     {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
     and
-    {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
-    and their many variants and incarnations are guaranteed to process <all>
-    archive files which are mounted or have been updated by an application.
-    However, processing some of these archive files may fail for any I/O
-    related reason.
-    Hence the TrueZIP Kernel assembles a <sequential I/O exception> chain from
-    any I/O exception which occurs during synchronization of the archive files.
-    Upon finishing the processing, when this chain is not empty, it gets sorted
-    according to (1) descending order of priority and (2) ascending order of
-    appearance, and finally the head of the resulting exception chain gets
-    thrown.
+    {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.option.SyncOption[])}<<<TVFS.sync(SyncOption...)>>>}}
+    process <all> archive files which are currently mounted.
+    However, an <<<IOException>>> may occur for each archive file.
+    Hence, the TrueZIP Kernel assembles all I/O exceptions which occur
+    during the processing into a single I/O exception by using a
+    {{{../apidocs/de/truezip/kernel/util/PriorityExceptionBuilder.html}<<<PriorityExceptionBuilder>>>}}.
+    The priority exception builder suppresses all but the first input exception
+    with the highest priority by using <exception suppressing>, which is a new
+    feature in JSE&#160;7 (see <<<Throwable.addSuppressed(Throwable)>>>).
 
-    Note that sequential I/O exception chaining is a concept which is
-    completely orthogonal to Java's general exception cause chaining:
-    In a sequential I/O exception chain, each exception may still have a
-    chain of other exceptions as its cause.
-
-    When catching a sequential I/O exception chain, an application could
-    either use it as it is or rearrange this chain striclty in order of
-    appearance.
-    The following snippet demonstrates the default priority/appearance sorting
-    order if a sequential I/O exception chain is catched and printed:
+    Catching and dealing with such an I/O exception is easy - just apply the
+    standard idioms for exception handling:
 
 %{snippet|id=umount1|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
 
-    Rearranging a sequential I/O exception chain strictly in order of
-    appearance is done like this instead:
-
-%{snippet|id=umount2|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
-
-    In either case, at most the first three sequential I/O exceptions in the
-    chain get printed by default.
-    You can change this by calling
-    {{{../apidocs/de/truezip/kernel/io/SequentialIOException.html#setMaxPrintExceptions(int)}<<<SequentialIOException.setMaxPrintExceptions(int)>>>}}.
-
-    The default priority/appearance sorting order enables applications to
-    selectively catch the following sequential I/O exception chain sub-classes:
+    The priority of a file system sync exception is obtained by calling
+    {{{../apidocs/de/truezip/kernel/FsSyncException.html#getPriority()}<<<FsSyncException.getPriority()>>>}}:
 
     [[1]] The class
         {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}
-        is the root of the synchronization exception chain types.
-        An exception of this type is thrown if an archive file could not get
+        is the root of the file system sync exception class hierarchy.
+        An exception of this type gets thrown if an archive file could not get
         updated and some or all of its data got lost.
+        Its priority is <<<0>>>.
 
     [[2]] The class
         {{{../apidocs/de/truezip/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
-        is the root of the synchronization warning exception chain types.
-        An exception of this type is thrown if an archive file has been updated,
-        but some warning conditions apply.
-        No data has been lost, however.
+        is used to indicate warning conditions.
+        An exception of this type gets thrown if an archive file has been
+        synchronized without loss of data, but some warning conditions apply.
+        Its priority is <<<-10>>>.
 
     []
 
-    Now, because
-    {{{../apidocs/de/truezip/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}s
-    have a lower priority than
-    {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}s,
-    they are always pushed back to the end before the exception chain is thrown,
-    so that an application could use the following snippet to detect if only
-    some warnings or at least one severe error condition has occured:
+    This strategy enables applications to selectively catch and filter file
+    system sync exceptions according to the following standard idiom:
 
-%{snippet|id=umount3|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=umount2|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
 
 ** Performance Considerations
 

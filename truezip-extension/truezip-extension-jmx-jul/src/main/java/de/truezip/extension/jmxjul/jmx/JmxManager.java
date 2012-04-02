@@ -6,6 +6,7 @@ package de.truezip.extension.jmxjul.jmx;
 
 import de.truezip.extension.jmxjul.InstrumentingManager;
 import de.truezip.kernel.FsManager;
+import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -38,7 +39,7 @@ final class JmxManager extends InstrumentingManager {
     @Override
     public <X extends IOException> void
     sync(   BitField<SyncOption> options,
-            ExceptionHandler<? super IOException, X> handler)
+            ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         try {
             delegate.sync(options, handler);
