@@ -16,26 +16,26 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
 
     /** The decorated file system model. */
-    protected final M delegate;
+    protected final M model;
 
     /**
      * Constructs a new decorating file system model.
      *
-     * @param delegate the file system model to decorate.
+     * @param model the file system model to decorate.
      */
-    protected FsDecoratingModel(final M delegate) {
-        super(delegate.getMountPoint(), delegate.getParent());
-        this.delegate = delegate;
+    protected FsDecoratingModel(final M model) {
+        super(model.getMountPoint(), model.getParent());
+        this.model = model;
     }
 
     @Override
     public boolean isTouched() {
-        return delegate.isTouched();
+        return model.isTouched();
     }
 
     @Override
     public void setTouched(boolean touched) {
-        delegate.setTouched(touched);
+        model.setTouched(touched);
     }
 
     /**
@@ -46,6 +46,6 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                model);
     }
 }
