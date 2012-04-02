@@ -63,7 +63,7 @@ public final class ThrowControl {
         final Throwable toThrow = throwables.remove(thiz);
         if (null != toThrow)
             if (throwz.isInstance(toThrow))
-                throw wrap(throwz.cast(toThrow));
+                throw throwz.cast(wrap(toThrow).fillInStackTrace());
             else
                 throwables.put(thiz, toThrow); // restore
 
