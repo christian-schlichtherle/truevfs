@@ -178,7 +178,6 @@ public abstract class ZipRaesDriver extends JarDriver {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
             final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
