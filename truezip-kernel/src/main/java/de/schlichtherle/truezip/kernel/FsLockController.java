@@ -511,7 +511,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(sbc);
         }
     } // LockSeekableByteChannel
 

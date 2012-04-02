@@ -58,50 +58,50 @@ public final class ThrowingSeekableByteChannel extends DecoratingSeekableByteCha
     @Override
     public int read(ByteBuffer dst) throws IOException {
         checkAllExceptions();
-        return delegate.read(dst);
+        return sbc.read(dst);
     }
 
     @Override
     public int write(ByteBuffer src) throws IOException {
         checkAllExceptions();
-        return delegate.write(src);
+        return sbc.write(src);
     }
 
     @Override
     public long position() throws IOException {
         checkAllExceptions();
-        return delegate.position();
+        return sbc.position();
     }
 
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
         checkAllExceptions();
-        delegate.position(newPosition);
+        sbc.position(newPosition);
         return this;
     }
 
     @Override
     public long size() throws IOException {
         checkAllExceptions();
-        return delegate.size();
+        return sbc.size();
     }
 
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
         checkAllExceptions();
-        delegate.truncate(size);
+        sbc.truncate(size);
         return this;
     }
 
     @Override
     public boolean isOpen() {
         checkUndeclaredExceptions();
-        return delegate.isOpen();
+        return sbc.isOpen();
     }
 
     @Override
     public void close() throws IOException {
         checkAllExceptions();
-        delegate.close();
+        sbc.close();
     }
 }

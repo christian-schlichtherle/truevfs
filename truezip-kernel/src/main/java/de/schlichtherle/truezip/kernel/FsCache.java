@@ -442,7 +442,7 @@ final class FsCache implements Flushable, Closeable {
                     public void close() throws IOException {
                         if (closed)
                             return;
-                        delegate.close();
+                        sbc.close();
                         getInputBufferPool().release(Buffer.this);
                         closed = true;
                     }
@@ -493,7 +493,7 @@ final class FsCache implements Flushable, Closeable {
                     public void close() throws IOException {
                         if (closed)
                             return;
-                        delegate.close();
+                        sbc.close();
                         getOutputBufferPool().release(Buffer.this);
                         closed = true;
                     }

@@ -42,7 +42,7 @@ final class JmxManager extends InstrumentingManager {
             ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         try {
-            delegate.sync(options, handler);
+            manager.sync(options, handler);
         } finally {
             JmxDirector d = ((JmxDirector) director);
             d.setApplicationIOStatistics(new JmxIOStatistics());

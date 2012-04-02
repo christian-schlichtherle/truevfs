@@ -35,7 +35,7 @@ final class JulOutputByteChannel extends DecoratingSeekableByteChannel {
     @Override
     public void close() throws IOException {
         log("Closing ");
-        delegate.close();
+        sbc.close();
     }
 
     private void log(String message) {

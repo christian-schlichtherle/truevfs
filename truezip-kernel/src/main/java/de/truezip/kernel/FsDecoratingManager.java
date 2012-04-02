@@ -19,23 +19,23 @@ public abstract class FsDecoratingManager<M extends FsManager>
 extends FsManager {
 
     /** The decorated file system manager. */
-    protected final M delegate;
+    protected final M manager;
 
     /**
      * Constructs a new decorating file system manager.
      *
-     * @param delegate the file system manager to decorate.
+     * @param manager the file system manager to decorate.
      */
     protected FsDecoratingManager(final M delegate) {
         if (null == delegate)
             throw new NullPointerException();
-        this.delegate = delegate;
+        this.manager = delegate;
     }
 
     @Override
     public FsController<?>
     getController(FsMountPoint mountPoint, FsCompositeDriver driver) {
-        return delegate.getController(mountPoint, driver);
+        return manager.getController(mountPoint, driver);
     }
 
     @Override
@@ -44,17 +44,17 @@ extends FsManager {
                     FsModel model,
                     FsController<?> parent) {
         assert false : "This method should never get called on this class!";
-        return delegate.newController(driver, model, parent);
+        return manager.newController(driver, model, parent);
     }
 
     @Override
     public int size() {
-        return delegate.size();
+        return manager.size();
     }
 
     @Override
     public Iterator<FsController<?>> iterator() {
-        return delegate.iterator();
+        return manager.iterator();
     }
 
     /**
@@ -65,6 +65,6 @@ extends FsManager {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                manager);
     }
 }

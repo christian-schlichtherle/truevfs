@@ -293,7 +293,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
         }
 
         /**
-         * This class requires LAZY INITIALIZATION of its delegate and
+         * This class requires LAZY INITIALIZATION of its sbc and
          * automatic decoupling on exceptions!
          */
         @NotThreadSafe
@@ -341,7 +341,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
         } // Input
 
         /**
-         * This class requires LAZY INITIALIZATION of its delegate, but NO
+         * This class requires LAZY INITIALIZATION of its sbc, but NO
          * automatic decoupling on exceptions!
          */
         @NotThreadSafe
@@ -367,7 +367,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             @Override
             public Entry getLocalTarget() throws IOException {
                 // Note that the super class implementation MUST get
-                // bypassed because the delegate MUST get kept even upon an
+                // bypassed because the sbc MUST get kept even upon an
                 // exception!
                 return getBoundSocket().getLocalTarget();
             }
@@ -382,7 +382,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Channel() throws IOException {
                     // Note that the super class implementation MUST get
-                    // bypassed because the delegate MUST get kept even upon an
+                    // bypassed because the sbc MUST get kept even upon an
                     // exception!
                     //super(Nio2Output.super.newSeekableByteChannel());
                     super(getBoundSocket().newSeekableByteChannel());
@@ -391,7 +391,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
                 @Override
                 public void close() throws IOException {
-                    delegate.close();
+                    sbc.close();
                     postOutput();
                 }
             } // Channel
@@ -407,7 +407,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
                     // Note that the super class implementation MUST get
-                    // bypassed because the delegate MUST get kept even upon an
+                    // bypassed because the sbc MUST get kept even upon an
                     // exception!
                     //super(Output.super.newOutputStream());
                     super(getBoundSocket().newOutputStream());

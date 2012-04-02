@@ -234,7 +234,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @Override
         public void close() throws IOException {
             getAccountant().stopAccountingFor(this);
-            delegate.close();
+            sbc.close();
         }
     } // ResourceSeekableByteChannel
 

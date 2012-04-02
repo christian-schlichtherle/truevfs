@@ -28,6 +28,6 @@ public class InstrumentingManager extends FsDecoratingManager<FsManager> {
 
     @Override
     public FsController<?> getController(FsMountPoint mountPoint, FsCompositeDriver driver) {
-        return director.instrument(delegate.getController(mountPoint, director.instrument(driver, this)), this);
+        return director.instrument(manager.getController(mountPoint, director.instrument(driver, this)), this);
     }
 }

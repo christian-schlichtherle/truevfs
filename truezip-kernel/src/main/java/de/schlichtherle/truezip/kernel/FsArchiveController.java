@@ -315,17 +315,17 @@ extends FsLockModelController {
 
         @Override
         public Type getType() {
-            return delegate.getType();
+            return entry.getType();
         }
 
         @Override
         public boolean setSize(Size type, long value) {
-            return delegate.setSize(type, value);
+            return entry.setSize(type, value);
         }
 
         @Override
         public boolean setTime(Access type, long value) {
-            return delegate.setTime(type, value);
+            return entry.setTime(type, value);
         }
     } // ProxyEntry
 

@@ -17,7 +17,7 @@ public abstract class DecoratingEntry<E extends Entry>
 implements Entry {
 
     /** The decorated entry. */
-    protected final E delegate;
+    protected final E entry;
 
     /**
      * Constructs a new decorating file system entry.
@@ -25,24 +25,23 @@ implements Entry {
      * @param entry the decorated entry.
      */
     protected DecoratingEntry(final E entry) {
-        if (null == entry)
+        if (null == (this.entry = entry))
             throw new NullPointerException();
-        this.delegate = entry;
     }
 
     @Override
     public String getName() {
-        return delegate.getName();
+        return entry.getName();
     }
 
     @Override
     public long getSize(Size type) {
-        return delegate.getSize(type);
+        return entry.getSize(type);
     }
 
     @Override
     public long getTime(Access type) {
-        return delegate.getTime(type);
+        return entry.getTime(type);
     }
 
     /**
@@ -53,6 +52,6 @@ implements Entry {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                entry);
     }
 }
