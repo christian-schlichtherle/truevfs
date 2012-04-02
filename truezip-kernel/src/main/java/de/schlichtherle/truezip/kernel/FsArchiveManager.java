@@ -29,8 +29,8 @@ final class FsArchiveManager extends FsManager {
      * keyed by the mount point of their respective file system model.
      * All access to this map must be externally synchronized!
      */
-    private final Map<FsMountPoint, Link<FsController<?>>> schedulers
-            = new WeakHashMap<FsMountPoint, Link<FsController<?>>>();
+    private final Map<FsMountPoint, Link<FsController<?>>>
+            schedulers = new WeakHashMap<>();
 
     private final Type optionalScheduleType;
 
@@ -88,7 +88,7 @@ final class FsArchiveManager extends FsManager {
                                         new FsCacheController(
                                             new FsResourceController(
                                                 new FsContextController(
-                                                    new FsTargetArchiveController<E>(
+                                                    new FsTargetArchiveController<>(
                                                         lockModel, parent, driver))),
                                             driver.getIOPool())))))));
     }
@@ -104,8 +104,8 @@ final class FsArchiveManager extends FsManager {
     }
 
     private synchronized Set<FsController<?>> getControllers() {
-        final Set<FsController<?>> snapshot
-                = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
+        final Set<FsController<?>>
+                snapshot = new TreeSet<>(FsControllerComparator.REVERSE);
         for (final Link<FsController<?>> link : schedulers.values()) {
             final FsController<?> controller = getTarget(link);
             if (null != controller)
