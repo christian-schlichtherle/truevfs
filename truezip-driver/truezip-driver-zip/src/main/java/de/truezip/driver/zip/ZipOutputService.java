@@ -38,7 +38,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class ZipOutputService
+public final class ZipOutputService
 extends RawZipOutputStream<ZipDriverEntry>
 implements OutputService<ZipDriverEntry> {
 
@@ -200,7 +200,7 @@ implements OutputService<ZipDriverEntry> {
      *         or not.
      */
     @Override
-    public final boolean isBusy() {
+    public boolean isBusy() {
         return super.isBusy() || null != this.bufferedEntry;
     }
 

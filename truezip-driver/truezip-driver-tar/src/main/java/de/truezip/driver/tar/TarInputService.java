@@ -4,10 +4,10 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import static de.truezip.kernel.util.Maps.initialCapacity;
@@ -39,7 +39,7 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class TarInputService
+public final class TarInputService
 implements InputService<TarDriverEntry> {
 
     /** Default record size */
@@ -179,17 +179,17 @@ implements InputService<TarDriverEntry> {
     }
 
     @Override
-    public final int size() {
+    public int size() {
         return entries.size();
     }
 
     @Override
-    public final Iterator<TarDriverEntry> iterator() {
+    public Iterator<TarDriverEntry> iterator() {
         return Collections.unmodifiableCollection(entries.values()).iterator();
     }
 
     @Override
-    public final @CheckForNull TarDriverEntry getEntry(String name) {
+    public @CheckForNull TarDriverEntry getEntry(String name) {
         return entries.get(name);
     }
 

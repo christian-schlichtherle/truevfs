@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.zip;
 
+import de.truezip.driver.zip.io.RawZipFile;
+import de.truezip.driver.zip.io.ZipCryptoParameters;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.FsModel;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.driver.zip.io.RawZipFile;
-import de.truezip.driver.zip.io.ZipCryptoParameters;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class ZipInputService
+public final class ZipInputService
 extends RawZipFile<ZipDriverEntry>
 implements InputService<ZipDriverEntry> {
 
@@ -85,7 +85,7 @@ implements InputService<ZipDriverEntry> {
      * @param appendee {@code true} if and only if the target archive file gets
      *        entries appended to it.
      */
-    final void setAppendee(boolean appendee) {
+    void setAppendee(boolean appendee) {
         this.appendee = appendee;
     }
 
