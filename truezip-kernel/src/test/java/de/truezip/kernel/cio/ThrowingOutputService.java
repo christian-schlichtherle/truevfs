@@ -56,30 +56,30 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @Override
     public int size() {
         checkUndeclaredExceptions();
-        return delegate.size();
+        return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
         checkUndeclaredExceptions();
-        return delegate.iterator();
+        return container.iterator();
     }
 
     @Override
     public E getEntry(String name) {
         checkUndeclaredExceptions();
-        return delegate.getEntry(name);
+        return container.getEntry(name);
     }
 
     @Override
     public void close() throws IOException {
         checkAllExceptions();
-        delegate.close();
+        container.close();
     }
 
     @Override
     public OutputSocket<E> getOutputSocket(E entry) {
         checkUndeclaredExceptions();
-        return delegate.getOutputSocket(entry);
+        return container.getOutputSocket(entry);
     }
 }

@@ -70,13 +70,13 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     public int size() {
-        return delegate.size() + buffers.size();
+        return container.size() + buffers.size();
     }
 
     @Override
     public Iterator<E> iterator() {
         return new JointIterator<>(
-                delegate.iterator(),
+                container.iterator(),
                 new BufferedEntriesIterator());
     }
 
@@ -101,7 +101,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     public @CheckForNull E getEntry(String name) {
-        final E entry = delegate.getEntry(name);
+        final E entry = container.getEntry(name);
         if (null != entry)
             return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
@@ -163,7 +163,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             throw new IOException("Output service is still busy!");
         storeBuffers();
         assert buffers.isEmpty();
-        delegate.close();
+        container.close();
     }
 
     private void storeBuffers() throws IOException {

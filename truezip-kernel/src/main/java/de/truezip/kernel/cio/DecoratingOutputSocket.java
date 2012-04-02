@@ -23,8 +23,8 @@ extends DelegatingOutputSocket<E> {
     protected @Nullable OutputSocket<? extends E> socket;
 
     protected DecoratingOutputSocket(
-            final @Nullable OutputSocket<? extends E> delegate) {
-        this.socket = delegate;
+            final @Nullable OutputSocket<? extends E> socket) {
+        this.socket = socket;
     }
 
     @Override

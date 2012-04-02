@@ -63,24 +63,24 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @Override
     public int size() {
         assertOpen();
-        return delegate.size();
+        return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
         assertOpen();
-        return delegate.iterator();
+        return container.iterator();
     }
 
     @Override
     public E getEntry(String name) {
         assertOpen();
-        return delegate.getEntry(name);
+        return container.getEntry(name);
     }
 
     @Override
     public final OutputSocket<E> getOutputSocket(E entry) {
-        return new Output(delegate.getOutputSocket(entry));
+        return new Output(container.getOutputSocket(entry));
     }
 
     /**
@@ -96,7 +96,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @Override
     public void close() throws IOException {
         closed = true;
-        delegate.close();
+        container.close();
     }
 
     private final class Output extends DecoratingOutputSocket<E> {

@@ -657,7 +657,7 @@ extends FsFileSystemArchiveController<E> {
         }
 
         DisconnectingInputService<E> getClutch() {
-            return (DisconnectingInputService<E>) delegate;
+            return (DisconnectingInputService<E>) container;
         }
 
         /**
@@ -683,7 +683,7 @@ extends FsFileSystemArchiveController<E> {
         }
 
         DisconnectingOutputService<E> getClutch() {
-            return (DisconnectingOutputService<E>) delegate;
+            return (DisconnectingOutputService<E>) container;
         }
     } // OutputArchive
 
