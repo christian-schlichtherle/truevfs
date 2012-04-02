@@ -9,7 +9,6 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -38,7 +37,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 public class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for preprocessing the output. */
-    protected @Nullable BufferedBlockCipher cipher;
+    protected @CheckForNull BufferedBlockCipher cipher;
 
     /**
      * The cipher output buffer used for preprocessing the output
@@ -70,14 +69,16 @@ public class CipherOutputStream extends DecoratingOutputStream {
     }
 
     /**
-     * Asserts that this cipher output stream is in open state, which requires
+     * Checks that this cipher output stream is in open state, which requires
      * that {@link #cipher} is not {@code null}.
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void checkOpen() throws IOException {
+    private BufferedBlockCipher cipher() throws IOException {
+        final BufferedBlockCipher cipher = this.cipher;
         if (null == cipher)
-            throw new IOException("cipher output stream is not in open state");
+            throw new IOException("Cipher output stream has been closed!");
+        return cipher;
     }
 
     /**
@@ -90,8 +91,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
     @Override
     public void write(final int b)
     throws IOException {
-        checkOpen();
-
+        final BufferedBlockCipher cipher = cipher();
         int cipherLen = cipher.getUpdateOutputSize(1);
         byte[] cipherOut = this.cipherOut;
         if (cipherLen > cipherOut.length)
@@ -114,8 +114,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
     @Override
     public void write(final byte[] buf, final int off, final int len)
     throws IOException {
-        checkOpen();
-
+        final BufferedBlockCipher cipher = cipher();
         int cipherLen = cipher.getUpdateOutputSize(len);
         byte[] cipherOut = this.cipherOut;
         if (cipherLen > cipherOut.length)
@@ -139,8 +138,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
      */
     @OverridingMethodsMustInvokeSuper
     protected void finish() throws IOException {
-        checkOpen();
-
+        final BufferedBlockCipher cipher = cipher();
         int cipherLen = cipher.getOutputSize(0);
         byte[] cipherOut = this.cipherOut;
         if (cipherLen > cipherOut.length)
