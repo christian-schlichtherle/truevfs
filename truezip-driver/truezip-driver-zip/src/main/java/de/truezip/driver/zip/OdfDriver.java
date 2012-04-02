@@ -5,9 +5,9 @@
 package de.truezip.driver.zip;
 
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.cio.MultiplexedOutputService;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.MultiplexedOutputService;
 import de.truezip.kernel.cio.OutputService;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -53,7 +53,7 @@ public class OdfDriver extends JarDriver {
         final ZipOutputService service = new ZipOutputService(this, model, out, source);
         final IOPool<?> pool = getIOPool();
         return null != source && source.isAppendee()
-                ? new MultiplexedOutputService<ZipDriverEntry>(service, pool)
+                ? new MultiplexedOutputService<>(service, pool)
                 : new OdfOutputService(service, pool);
     }
 }
