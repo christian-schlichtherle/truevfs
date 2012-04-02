@@ -112,8 +112,8 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         mac.init(sha1HMacParam);
 
         // Reinit chain of output streams as Encrypt-then-MAC.
-        this.dos = (LEDataOutputStream) this.delegate;
-        this.delegate = new MacOutputStream(this.dos, mac);
+        this.dos = (LEDataOutputStream) this.out;
+        this.out = new MacOutputStream(this.dos, mac);
 
         // Write header.
         this.dos.write(salt);

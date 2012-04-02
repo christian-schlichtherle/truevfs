@@ -71,7 +71,7 @@ implements DataOutput {
      */
     @Override
     public void write(int b) throws IOException {
-	delegate.write(b);
+	out.write(b);
         inc(1);
     }
 
@@ -88,7 +88,7 @@ implements DataOutput {
      */
     @Override
     public void write(byte b[], int off, int len) throws IOException {
-	delegate.write(b, off, len);
+	out.write(b, off, len);
 	inc(len);
     }
 
@@ -105,7 +105,7 @@ implements DataOutput {
      */
     @Override
     public final void writeBoolean(boolean b) throws IOException {
-	delegate.write(b ? 1 : 0);
+	out.write(b ? 1 : 0);
 	inc(1);
     }
 
@@ -120,7 +120,7 @@ implements DataOutput {
      */
     @Override
     public final void writeByte(int b) throws IOException {
-	delegate.write(b);
+	out.write(b);
         inc(1);
     }
 
@@ -152,7 +152,7 @@ implements DataOutput {
         buf[0] = (byte) s;
         s >>= 8;
         buf[1] = (byte) s;
-        delegate.write(buf, 0, 2);
+        out.write(buf, 0, 2);
         inc(2);
     }
 
@@ -174,7 +174,7 @@ implements DataOutput {
         buf[2] = (byte) i;
         i >>= 8;
         buf[3] = (byte) i;
-        delegate.write(buf, 0, 4);
+        out.write(buf, 0, 4);
         inc(4);
     }
 
@@ -204,7 +204,7 @@ implements DataOutput {
         buf[6] = (byte) l;
         l >>= 8;
         buf[7] = (byte) l;
-        delegate.write(buf, 0, 8);
+        out.write(buf, 0, 8);
 	inc(8);
     }
 

@@ -107,27 +107,27 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
-        protected InputSocket<? extends E> getDelegate() throws IOException {
+        protected InputSocket<? extends E> getSocket() throws IOException {
             checkOpen();
-            return delegate;
+            return socket;
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             return new DisconnectingReadOnlyFile(
-                    getBoundDelegate().newReadOnlyFile());
+                    getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new DisconnectingSeekableByteChannel(
-                    getBoundDelegate().newSeekableByteChannel());
+                    getBoundSocket().newSeekableByteChannel());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
             return new DisconnectingInputStream(
-                    getBoundDelegate().newInputStream());
+                    getBoundSocket().newInputStream());
         }
     } // Input
 
@@ -141,37 +141,37 @@ extends DecoratingInputService<E, InputService<E>> {
         @Override
         public long length() throws IOException {
             checkOpen();
-            return delegate.length();
+            return rof.length();
         }
 
         @Override
         public long getFilePointer() throws IOException {
             checkOpen();
-            return delegate.getFilePointer();
+            return rof.getFilePointer();
         }
 
         @Override
         public void seek(long pos) throws IOException {
             checkOpen();
-            delegate.seek(pos);
+            rof.seek(pos);
         }
 
         @Override
         public int read() throws IOException {
             checkOpen();
-            return delegate.read();
+            return rof.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             checkOpen();
-            return delegate.read(b, off, len);
+            return rof.read(b, off, len);
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                delegate.close();
+                rof.close();
         }
     } // DisconnectingReadOnlyFile
 
@@ -242,43 +242,43 @@ extends DecoratingInputService<E, InputService<E>> {
         @Override
         public int read() throws IOException {
             checkOpen();
-            return delegate.read();
+            return in.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
             checkOpen();
-            return delegate.read(b, off, len);
+            return in.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
             checkOpen();
-            return delegate.skip(n);
+            return in.skip(n);
         }
 
         @Override
         public int available() throws IOException {
             checkOpen();
-            return delegate.available();
+            return in.available();
         }
 
         @Override
         public void mark(int readlimit) {
             if (!closed)
-                delegate.mark(readlimit);
+                in.mark(readlimit);
         }
 
         @Override
         public void reset() throws IOException {
             checkOpen();
-            delegate.reset();
+            in.reset();
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                delegate.close();
+                in.close();
         }
     } // DisconnectingInputStream
 }

@@ -30,16 +30,16 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new JmxReadOnlyFile(getBoundDelegate().newReadOnlyFile(), stats);
+        return new JmxReadOnlyFile(getBoundSocket().newReadOnlyFile(), stats);
     }
 
     @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return new JmxSeekableByteChannel(getBoundDelegate().newSeekableByteChannel(), stats);
+        return new JmxSeekableByteChannel(getBoundSocket().newSeekableByteChannel(), stats);
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return new JmxInputStream(getBoundDelegate().newInputStream(), stats);
+        return new JmxInputStream(getBoundSocket().newInputStream(), stats);
     }
 }

@@ -224,7 +224,7 @@ public class StreamsTest {
 
         @Override
         public void close() throws IOException {
-            delegate.close();
+            in.close();
             closed = true;
         }
 
@@ -259,13 +259,13 @@ public class StreamsTest {
 
         @Override
         public void flush() throws IOException {
-            delegate.flush();
+            out.flush();
             flushed = true;
         }
 
         @Override
         public void close() throws IOException {
-            delegate.close();
+            out.close();
             closed = true;
         }
     }

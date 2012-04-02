@@ -46,7 +46,7 @@ public class LockInputStream extends DecoratingInputStream {
     public int read() throws IOException {
         lock.lock();
         try {
-            return delegate.read();
+            return in.read();
         } finally {
             lock.unlock();
         }
@@ -57,7 +57,7 @@ public class LockInputStream extends DecoratingInputStream {
     public int read(byte[] b, int off, int len) throws IOException {
         lock.lock();
         try {
-            return delegate.read(b, off, len);
+            return in.read(b, off, len);
         } finally {
             lock.unlock();
         }
@@ -68,7 +68,7 @@ public class LockInputStream extends DecoratingInputStream {
     public long skip(long n) throws IOException {
         lock.lock();
         try {
-            return delegate.skip(n);
+            return in.skip(n);
         } finally {
             lock.unlock();
         }
@@ -79,7 +79,7 @@ public class LockInputStream extends DecoratingInputStream {
     public int available() throws IOException {
         lock.lock();
         try {
-            return delegate.available();
+            return in.available();
         } finally {
             lock.unlock();
         }
@@ -90,7 +90,7 @@ public class LockInputStream extends DecoratingInputStream {
     public void close() throws IOException {
         lock.lock();
         try {
-            delegate.close();
+            in.close();
         } finally {
             lock.unlock();
         }
@@ -101,7 +101,7 @@ public class LockInputStream extends DecoratingInputStream {
     public void mark(int readlimit) {
         lock.lock();
         try {
-            delegate.mark(readlimit);
+            in.mark(readlimit);
         } finally {
             lock.unlock();
         }
@@ -112,7 +112,7 @@ public class LockInputStream extends DecoratingInputStream {
     public void reset() throws IOException {
         lock.lock();
         try {
-            delegate.reset();
+            in.reset();
         } finally {
             lock.unlock();
         }
@@ -123,7 +123,7 @@ public class LockInputStream extends DecoratingInputStream {
     public boolean markSupported() {
         lock.lock();
         try {
-            return delegate.markSupported();
+            return in.markSupported();
         } finally {
             lock.unlock();
         }

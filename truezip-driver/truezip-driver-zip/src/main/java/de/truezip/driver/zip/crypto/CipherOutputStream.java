@@ -98,7 +98,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
             this.cipherOut = cipherOut = new byte[cipherLen];
         cipherLen = cipher.processByte((byte) b, cipherOut, 0);
         if (cipherLen > 0)
-            delegate.write(cipherOut, 0, cipherLen);
+            out.write(cipherOut, 0, cipherLen);
     }
 
     /**
@@ -121,7 +121,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
         if (cipherLen > cipherOut.length)
             this.cipherOut = cipherOut = new byte[cipherLen];
         cipherLen = cipher.processBytes(buf, off, len, cipherOut, 0);
-        delegate.write(cipherOut, 0, cipherLen);
+        out.write(cipherOut, 0, cipherLen);
     }
 
     /**
@@ -150,14 +150,14 @@ public class CipherOutputStream extends DecoratingOutputStream {
         } catch (InvalidCipherTextException ex) {
             throw new IOException(ex);
         }
-        delegate.write(cipherOut, 0, cipherLen);
+        out.write(cipherOut, 0, cipherLen);
     }
 
     /**
      * Closes this output stream and releases any resources associated with it.
      * Upon the first call to this method, {@link #finish()} gets called and
      * {@link #cipher} gets set to {@code null} upon success.
-     * Next, the {@link #delegate} gets unconditionally
+     * Next, the {@link #out} gets unconditionally
      * {@linkplain #close() closed}.
      *
      * @throws IOException On any I/O failure.
@@ -168,6 +168,6 @@ public class CipherOutputStream extends DecoratingOutputStream {
             finish();
             cipher = null;
         }
-        delegate.close();
+        out.close();
     }
 }

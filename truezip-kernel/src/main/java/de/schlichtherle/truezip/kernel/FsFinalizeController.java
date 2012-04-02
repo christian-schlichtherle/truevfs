@@ -96,19 +96,19 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             return new FinalizeReadOnlyFile(
-                    getBoundDelegate().newReadOnlyFile());
+                    getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new FinalizeSeekableByteChannel(
-                    getBoundDelegate().newSeekableByteChannel());
+                    getBoundSocket().newSeekableByteChannel());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
             return new FinalizeInputStream(
-                    getBoundDelegate().newInputStream());
+                    getBoundSocket().newInputStream());
         }
     } // Input
 
@@ -124,14 +124,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new FinalizeSeekableByteChannel(
-                    getBoundDelegate().newSeekableByteChannel());
+                    getBoundSocket().newSeekableByteChannel());
         }
 
         @Override
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
         public OutputStream newOutputStream() throws IOException {
             return new FinalizeOutputStream(
-                    getBoundDelegate().newOutputStream());
+                    getBoundSocket().newOutputStream());
         }
     } // Output
 
@@ -148,7 +148,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @Override
         public void close() throws IOException {
             try {
-                delegate.close();
+                rof.close();
             } catch (final FsControllerException ex) {
                 assert ex instanceof FsNeedsLockRetryException : ex;
                 // This is a non-local control flow exception.
@@ -166,7 +166,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, close);
+                finalize(rof, close);
             } finally {
                 super.finalize();
             }
@@ -224,7 +224,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @Override
         public void close() throws IOException {
             try {
-                delegate.close();
+                in.close();
             } catch (final FsControllerException ex) {
                 assert ex instanceof FsNeedsLockRetryException : ex;
                 // This is a non-local control flow exception.
@@ -242,7 +242,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, close);
+                finalize(in, close);
             } finally {
                 super.finalize();
             }
@@ -262,7 +262,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @Override
         public void close() throws IOException {
             try {
-                delegate.close();
+                out.close();
             } catch (final FsControllerException ex) {
                 assert ex instanceof FsNeedsLockRetryException : ex;
                 // This is a non-local control flow exception.
@@ -280,7 +280,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, close);
+                finalize(out, close);
             } finally {
                 super.finalize();
             }

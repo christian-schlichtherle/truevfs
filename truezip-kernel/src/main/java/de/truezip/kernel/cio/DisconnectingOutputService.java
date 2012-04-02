@@ -105,21 +105,21 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
-        protected OutputSocket<? extends E> getDelegate() throws IOException {
+        protected OutputSocket<? extends E> getSocket() throws IOException {
             checkOpen();
-            return delegate;
+            return socket;
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             return new DisconnectingSeekableByteChannel(
-                    getBoundDelegate().newSeekableByteChannel());
+                    getBoundSocket().newSeekableByteChannel());
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
             return new DisconnectingOutputStream(
-                    getBoundDelegate().newOutputStream());
+                    getBoundSocket().newOutputStream());
         }
     } // Output
 
@@ -190,25 +190,25 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         public void write(int b) throws IOException {
             checkOpen();
-            delegate.write(b);
+            out.write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
             checkOpen();
-            delegate.write(b, off, len);
+            out.write(b, off, len);
         }
 
         @Override
         public void flush() throws IOException {
             checkOpen();
-            delegate.flush();
+            out.flush();
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                delegate.close();
+                out.close();
         }
     } // DisconnectingOutputStream
 }

@@ -97,7 +97,7 @@ implements Iterable<E> {
             final @CheckForNull @WillNotClose RawZipFile<E> appendee,
             final ZipOutputStreamParameters param) {
         super(newLEDataOutputStream(out, appendee));
-        this.dos = (LEDataOutputStream) this.delegate;
+        this.dos = (LEDataOutputStream) this.out;
         if (null != appendee) {
             this.charset = appendee.getRawCharset();
             this.comment = appendee.getRawComment();
@@ -341,7 +341,7 @@ implements Iterable<E> {
         final OutputMethod method = newOutputMethod(entry, process);
         method.init(entry.clone()); // test!
         method.init(entry);
-        this.delegate = method.start();
+        this.out = method.start();
         this.processor = method;
         // Store entry now so that a subsequent call to getEntry(...) returns
         // it.
@@ -461,8 +461,8 @@ implements Iterable<E> {
         if (null == entry)
             return;
         this.processor.finish();
-        this.delegate.flush();
-        this.delegate = this.dos;
+        this.out.flush();
+        this.out = this.dos;
         this.processor = null;
         this.entry = null;
     }
@@ -678,7 +678,7 @@ implements Iterable<E> {
     @Override
     public void close() throws IOException {
         finish();
-        delegate.close();
+        out.close();
     }
 
     /** Adjusts the number of written bytes in the offset for appending mode. */
@@ -871,7 +871,7 @@ implements Iterable<E> {
                     method = field.getMethod();
                     if (UNKNOWN != csize)
                         csize -= overhead(field.getKeyStrength());
-                    entry.setRawMethod(method); // restore for delegate.init(*)
+                    entry.setRawMethod(method); // restore for out.init(*)
                 }
             }
             if (null == field)

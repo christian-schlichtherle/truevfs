@@ -52,10 +52,10 @@ extends DecoratingOutputSocket<E> {
         }
 
         OutputStream getDelegate() throws IOException {
-            final OutputStream out = delegate;
+            final OutputStream out = this.out;
             return null != out
                     ? out
-                    : (delegate = getBoundDelegate().newOutputStream());
+                    : (this.out = getBoundSocket().newOutputStream());
         }
 
         @Override
@@ -75,7 +75,7 @@ extends DecoratingOutputSocket<E> {
 
         @Override
         public void close() throws IOException {
-            final OutputStream out = delegate;
+            final OutputStream out = this.out;
             if (null != out)
                 out.close();
         }

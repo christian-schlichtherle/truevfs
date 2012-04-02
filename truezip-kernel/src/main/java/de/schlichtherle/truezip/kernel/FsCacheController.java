@@ -103,10 +103,10 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
             final BitField<AccessOption> options) {
-        /** This class requires ON-DEMAND LOOKUP of its delegate! */
+        /** This class requires ON-DEMAND LOOKUP of its in! */
         class Input extends DelegatingInputSocket<Entry> {
             @Override
-            protected InputSocket<?> getDelegate() {
+            protected InputSocket<?> getSocket() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
@@ -127,10 +127,10 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             final FsEntryName name,
             final BitField<AccessOption> options,
             final @CheckForNull Entry template) {
-        /** This class requires ON-DEMAND LOOKUP of its delegate! */
+        /** This class requires ON-DEMAND LOOKUP of its in! */
         class Output extends DelegatingOutputSocket<Entry> {
             @Override
-            protected OutputSocket<?> getDelegate() {
+            protected OutputSocket<?> getSocket() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
@@ -306,7 +306,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
             @Override
             protected InputSocket<? extends Entry> getLazyDelegate() {
-                return FsCacheController.this.delegate.getInputSocket(name, options);
+                return delegate.getInputSocket(name, options);
             }
 
             @Override
@@ -334,7 +334,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
                 @Override
                 public void close() throws IOException {
-                    delegate.close();
+                    in.close();
                     register();
                 }
             } // Stream
@@ -357,7 +357,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
             @Override
             protected OutputSocket<? extends Entry> getLazyDelegate() {
-                return cache.configure( FsCacheController.this.delegate.getOutputSocket(
+                return cache.configure( delegate.getOutputSocket(
                                             name,
                                             options.clear(EXCLUSIVE),
                                             template))
@@ -369,7 +369,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 // Note that the super class implementation MUST get
                 // bypassed because the delegate MUST get kept even upon an
                 // exception!
-                return getBoundDelegate().getLocalTarget();
+                return getBoundSocket().getLocalTarget();
             }
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
@@ -385,7 +385,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                     // bypassed because the delegate MUST get kept even upon an
                     // exception!
                     //super(Nio2Output.super.newSeekableByteChannel());
-                    super(getBoundDelegate().newSeekableByteChannel());
+                    super(getBoundSocket().newSeekableByteChannel());
                     register();
                 }
 
@@ -410,13 +410,13 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                     // bypassed because the delegate MUST get kept even upon an
                     // exception!
                     //super(Output.super.newOutputStream());
-                    super(getBoundDelegate().newOutputStream());
+                    super(getBoundSocket().newOutputStream());
                     register();
                 }
 
                 @Override
                 public void close() throws IOException {
-                    delegate.close();
+                    out.close();
                     postOutput();
                 }
             } // Stream
@@ -436,7 +436,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             throws IOException {
                 while (true) {
                     try {
-                        FsCacheController.this.delegate.mknod(name, FILE, options, template);
+                        delegate.mknod(name, FILE, options, template);
                         break;
                     } catch (final FsNeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
@@ -448,7 +448,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            FsCacheController.this.delegate.sync(mknodEx);
+                            delegate.sync(mknodEx);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             // sync() failed, maybe just because the current

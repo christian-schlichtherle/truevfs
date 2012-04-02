@@ -26,47 +26,47 @@ import javax.annotation.concurrent.NotThreadSafe;
 public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
 
     /** The nullable decorated read only file. */
-    protected @Nullable ReadOnlyFile delegate;
+    protected @Nullable ReadOnlyFile rof;
 
     /**
      * Constructs a new decorating read only file.
      *
-     * @param delegate the nullable read only file to decorate.
+     * @param rof the nullable read only file to decorate.
      */
     @CreatesObligation
     protected DecoratingReadOnlyFile(
-            final @Nullable @WillCloseWhenClosed ReadOnlyFile delegate) {
-        this.delegate = delegate;
+            final @Nullable @WillCloseWhenClosed ReadOnlyFile rof) {
+        this.rof = rof;
     }
 
     @Override
     public long length() throws IOException {
-        return delegate.length();
+        return rof.length();
     }
 
     @Override
     public long getFilePointer() throws IOException {
-        return delegate.getFilePointer();
+        return rof.getFilePointer();
     }
 
     @Override
     public void seek(long pos) throws IOException {
-        delegate.seek(pos);
+        rof.seek(pos);
     }
 
     @Override
     public int read() throws IOException {
-        return delegate.read();
+        return rof.read();
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        return delegate.read(b, off, len);
+        return rof.read(b, off, len);
     }
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        rof.close();
     }
 
     /**
@@ -77,6 +77,6 @@ public abstract class DecoratingReadOnlyFile extends AbstractReadOnlyFile {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                rof);
     }
 }

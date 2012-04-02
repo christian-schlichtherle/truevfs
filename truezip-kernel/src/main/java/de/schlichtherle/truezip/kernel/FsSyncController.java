@@ -219,7 +219,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         public Entry getLocalTarget() throws IOException {
             while (true) {
                 try {
-                    return getBoundDelegate().getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -231,7 +231,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             while (true) {
                 try {
                     return new SyncReadOnlyFile(
-                            getBoundDelegate().newReadOnlyFile());
+                            getBoundSocket().newReadOnlyFile());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -243,7 +243,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             while (true) {
                 try {
                     return new SyncSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -255,7 +255,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             while (true) {
                 try {
                     return new SyncInputStream(
-                            getBoundDelegate().newInputStream());
+                            getBoundSocket().newInputStream());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -276,7 +276,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         public Entry getLocalTarget() throws IOException {
             while (true) {
                 try {
-                    return getBoundDelegate().getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -288,7 +288,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             while (true) {
                 try {
                     return new SyncSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -300,7 +300,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             while (true) {
                 try {
                     return new SyncOutputStream(
-                            getBoundDelegate().newOutputStream());
+                            getBoundSocket().newOutputStream());
                 } catch (FsNeedsSyncException ex) {
                     sync(ex);
                 }
@@ -318,7 +318,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(rof);
         }
     } // SyncReadOnlyFile
 
@@ -346,7 +346,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(in);
         }
     } // SyncInputStream
 
@@ -360,7 +360,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(out);
         }
     } // SyncOutputStream
 }

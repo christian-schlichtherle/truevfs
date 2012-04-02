@@ -56,24 +56,24 @@ public final class ThrowingOutputStream extends DecoratingOutputStream {
     @Override
     public void write(int b) throws IOException {
         checkAllExceptions();
-        delegate.write(b);
+        out.write(b);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         checkAllExceptions();
-        delegate.write(b, off, len);
+        out.write(b, off, len);
     }
 
     @Override
     public void flush() throws IOException {
         checkAllExceptions();
-        delegate.flush();
+        out.flush();
     }
 
     @Override
     public void close() throws IOException {
         checkAllExceptions();
-        delegate.close();
+        out.close();
     }
 }

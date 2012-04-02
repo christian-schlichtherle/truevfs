@@ -20,16 +20,16 @@ public abstract class DecoratingInputSocket<E extends Entry>
 extends DelegatingInputSocket<E> {
 
     /** The nullable decorated input socket. */
-    protected @Nullable InputSocket<? extends E> delegate;
+    protected @Nullable InputSocket<? extends E> socket;
 
     protected DecoratingInputSocket(
             final @Nullable InputSocket<? extends E> delegate) {
-        this.delegate = delegate;
+        this.socket = delegate;
     }
 
     @Override
-    protected InputSocket<? extends E> getDelegate() throws IOException {
-        return delegate;
+    protected InputSocket<? extends E> getSocket() throws IOException {
+        return socket;
     }
 
     /**
@@ -40,6 +40,6 @@ extends DelegatingInputSocket<E> {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                socket);
     }
 }

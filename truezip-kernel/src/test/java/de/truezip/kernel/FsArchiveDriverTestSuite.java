@@ -481,21 +481,21 @@ extends FsArchiveDriverTestBase<D> {
                 public ReadOnlyFile newReadOnlyFile()
                 throws IOException {
                     return new TestReadOnlyFile(
-                            getBoundDelegate().newReadOnlyFile());
+                            getBoundSocket().newReadOnlyFile());
                 }
 
                 @Override
                 public SeekableByteChannel newSeekableByteChannel()
                 throws IOException {
                     return new TestSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 }
 
                 @Override
                 public InputStream newInputStream()
                 throws IOException {
                     return new TestInputStream(
-                            getBoundDelegate().newInputStream());
+                            getBoundSocket().newInputStream());
                 }
             } // Input
 
@@ -519,14 +519,14 @@ extends FsArchiveDriverTestBase<D> {
                 public SeekableByteChannel newSeekableByteChannel()
                 throws IOException {
                     return new TestSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 }
 
                 @Override
                 public OutputStream newOutputStream()
                 throws IOException {
                     return new TestOutputStream(
-                            getBoundDelegate().newOutputStream());
+                            getBoundSocket().newOutputStream());
                 }
             } // Output
 
@@ -548,7 +548,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public void close() throws IOException {
             checkAllExceptions(this);
-            delegate.close();
+            rof.close();
         }
     } // TestReadOnlyfile
 
@@ -576,7 +576,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public void close() throws IOException {
             checkAllExceptions(this);
-            delegate.close();
+            in.close();
         }
     } // TestInputStream
 
@@ -590,7 +590,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public void close() throws IOException {
             checkAllExceptions(this);
-            delegate.close();
+            out.close();
         }
     } // TestOutputStream
 }

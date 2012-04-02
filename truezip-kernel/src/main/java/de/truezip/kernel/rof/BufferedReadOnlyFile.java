@@ -135,7 +135,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     throws IOException {
         super(check(rof, file, windowLen));
 
-        this.fp = delegate.getFilePointer();
+        this.fp = this.rof.getFilePointer();
         this.window = new byte[windowLen];
         invalidateWindow();
 
@@ -164,7 +164,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
      * @throws IOException If the preconditions do not hold.
      */
     protected final void assertOpen() throws IOException {
-        if (null == delegate)
+        if (null == rof)
             throw new IOException("File is closed!");
     }
 
@@ -173,7 +173,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         // Check state.
         assertOpen();
 
-        final long length = delegate.length();
+        final long length = rof.length();
         if (length != this.length) {
             this.length = length;
             invalidateWindow();
@@ -282,16 +282,16 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     /**
      * Closes this read only file.
      * As a side effect, this will set the reference to the decorated read
-     * only file ({@link #delegate} to {@code null}.
+     * only file ({@link #rof} to {@code null}.
      */
     @Override
     public void close()
     throws IOException {
         // Order is important here!
-        if (null == delegate)
+        if (null == rof)
             return;
-        delegate.close();
-        delegate = null;
+        rof.close();
+        rof = null;
     }
 
     //
@@ -318,7 +318,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
             // Move window in the buffered file.
             windowOff = (fp / windowLen) * windowLen; // round down to multiple of window size
             if (windowOff != nextWindowOff)
-                delegate.seek(windowOff);
+                rof.seek(windowOff);
 
             // Fill window until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
@@ -326,7 +326,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
             // contract.
             int n = 0;
             do {
-                int read = delegate.read(window, n, windowLen - n);
+                int read = rof.read(window, n, windowLen - n);
                 if (read < 0)
                     break;
                 n += read;

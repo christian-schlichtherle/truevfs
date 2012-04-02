@@ -267,7 +267,7 @@ final class FsCache implements Flushable, Closeable {
         @CheckForNull Buffer buffer;
 
         @Override
-        protected InputSocket<? extends Entry> getDelegate() throws IOException {
+        protected InputSocket<? extends Entry> getSocket() throws IOException {
             return (buffer = getInputBufferPool().allocate()).getInputSocket();
         }
 
@@ -283,7 +283,7 @@ final class FsCache implements Flushable, Closeable {
         @CheckForNull Buffer buffer;
 
         @Override
-        protected OutputSocket<? extends Entry> getDelegate() throws IOException {
+        protected OutputSocket<? extends Entry> getSocket() throws IOException {
             return (buffer = getOutputBufferPool().allocate()).getOutputSocket();
         }
 
@@ -413,14 +413,14 @@ final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     File() throws IOException {
-                        super(getBoundDelegate().newReadOnlyFile());
+                        super(getBoundSocket().newReadOnlyFile());
                     }
 
                     @Override
                     public void close() throws IOException {
                         if (closed)
                             return;
-                        delegate.close();
+                        rof.close();
                         getInputBufferPool().release(Buffer.this);
                         closed = true;
                     }
@@ -435,7 +435,7 @@ final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Channel() throws IOException {
-                        super(getBoundDelegate().newSeekableByteChannel());
+                        super(getBoundSocket().newSeekableByteChannel());
                     }
 
                     @Override
@@ -457,14 +457,14 @@ final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Stream() throws IOException {
-                        super(getBoundDelegate().newInputStream());
+                        super(getBoundSocket().newInputStream());
                     }
 
                     @Override
                     public void close() throws IOException {
                         if (closed)
                             return;
-                        delegate.close();
+                        in.close();
                         getInputBufferPool().release(Buffer.this);
                         closed = true;
                     }
@@ -486,7 +486,7 @@ final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Channel() throws IOException {
-                        super(getBoundDelegate().newSeekableByteChannel());
+                        super(getBoundSocket().newSeekableByteChannel());
                     }
 
                     @Override
@@ -508,14 +508,14 @@ final class FsCache implements Flushable, Closeable {
                     boolean closed;
 
                     Stream() throws IOException {
-                        super(getBoundDelegate().newOutputStream());
+                        super(getBoundSocket().newOutputStream());
                     }
 
                     @Override
                     public void close() throws IOException {
                         if (closed)
                             return;
-                        delegate.close();
+                        out.close();
                         getOutputBufferPool().release(Buffer.this);
                         closed = true;
                     }

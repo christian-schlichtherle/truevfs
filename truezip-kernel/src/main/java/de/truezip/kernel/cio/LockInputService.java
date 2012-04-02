@@ -111,7 +111,7 @@ extends DecoratingInputService<E, InputService<E>> {
             public E getLocalTarget() throws IOException {
                 lock.lock();
                 try {
-                    return getBoundDelegate().getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } finally {
                     lock.unlock();
                 }
@@ -123,7 +123,7 @@ extends DecoratingInputService<E, InputService<E>> {
                 final ReadOnlyFile rof;
                 lock.lock();
                 try {
-                    rof = getBoundDelegate().newReadOnlyFile();
+                    rof = getBoundSocket().newReadOnlyFile();
                 } finally {
                     lock.unlock();
                 }
@@ -141,7 +141,7 @@ extends DecoratingInputService<E, InputService<E>> {
                 final InputStream in;
                 lock.lock();
                 try {
-                    in = getBoundDelegate().newInputStream();
+                    in = getBoundSocket().newInputStream();
                 } finally {
                     lock.unlock();
                 }
