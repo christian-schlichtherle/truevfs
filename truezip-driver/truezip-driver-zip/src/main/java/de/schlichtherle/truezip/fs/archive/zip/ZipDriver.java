@@ -482,7 +482,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final ZipInputShop input = new ZipInputShop(this, model, rof);
         try {
             input.recoverLostEntries();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             logger.log(Level.WARNING, "junkInTheTrunk.warning", new Object[] {
                 mountPointUri(model),
                 input.getPostambleLength(),
@@ -570,7 +570,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final OutputStream out = output.newOutputStream();
         try {
             return newOutputShop(model, out, source);
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             out.close();
             throw ex;
         }
