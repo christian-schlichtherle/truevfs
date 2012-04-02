@@ -18,67 +18,67 @@ import javax.annotation.WillCloseWhenClosed;
  * This is optimized for performance and <em>without</em> multithreading
  * support.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @CleanupObligation
 public abstract class DecoratingSeekableByteChannel
 implements SeekableByteChannel {
 
     /** The nullable decorated seekable byte channel. */
-    protected @Nullable SeekableByteChannel delegate;
+    protected @Nullable SeekableByteChannel sbc;
 
     /**
      * Constructs a new decorating seekable byte channel.
      *
-     * @param delegate the nullable seekable byte channel to decorate.
+     * @param sbc the nullable seekable byte channel to decorate.
      */
     @CreatesObligation
     protected DecoratingSeekableByteChannel(
-            final @Nullable @WillCloseWhenClosed SeekableByteChannel delegate) {
-        this.delegate = delegate;
+            final @Nullable @WillCloseWhenClosed SeekableByteChannel sbc) {
+        this.sbc = sbc;
     }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        return delegate.read(dst);
+        return sbc.read(dst);
     }
 
     @Override
     public int write(ByteBuffer src) throws IOException {
-        return delegate.write(src);
+        return sbc.write(src);
     }
 
     @Override
     public long position() throws IOException {
-        return delegate.position();
+        return sbc.position();
     }
 
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
-        delegate.position(newPosition);
+        sbc.position(newPosition);
         return this;
     }
 
     @Override
     public long size() throws IOException {
-        return delegate.size();
+        return sbc.size();
     }
 
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
-        delegate.truncate(size);
+        sbc.truncate(size);
         return this;
     }
 
     @Override
     public boolean isOpen() {
-        return delegate.isOpen();
+        return sbc.isOpen();
     }
 
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        delegate.close();
+        sbc.close();
     }
 
     /**
@@ -89,6 +89,6 @@ implements SeekableByteChannel {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                sbc);
     }
 }

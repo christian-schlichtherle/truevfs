@@ -37,7 +37,7 @@ extends InstrumentingIOPool<B> {
         @Override
         public void release() throws IOException {
             try {
-                delegate.release();
+                entry.release();
             } finally {
                 JmxIOBufferView.unregister(this);
             }

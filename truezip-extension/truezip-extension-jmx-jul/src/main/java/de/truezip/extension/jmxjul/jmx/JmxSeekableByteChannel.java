@@ -29,7 +29,7 @@ final class JmxSeekableByteChannel extends DecoratingSeekableByteChannel {
 
     @Override
     public int read(ByteBuffer buf) throws IOException {
-        int ret = delegate.read(buf);
+        int ret = sbc.read(buf);
         if (0 < ret)
             stats.incBytesRead(ret);
         return ret;
@@ -37,7 +37,7 @@ final class JmxSeekableByteChannel extends DecoratingSeekableByteChannel {
 
     @Override
     public int write(ByteBuffer buf) throws IOException {
-        int ret = delegate.write(buf);
+        int ret = sbc.write(buf);
         stats.incBytesWritten(ret);
         return ret;
     }

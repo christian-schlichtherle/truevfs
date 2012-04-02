@@ -562,7 +562,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public void close() throws IOException {
             checkAllExceptions(this);
-            delegate.close();
+            sbc.close();
         }
     } // TestSeekableByteChannel
 

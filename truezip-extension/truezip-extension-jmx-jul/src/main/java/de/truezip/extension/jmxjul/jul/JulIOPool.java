@@ -34,15 +34,15 @@ extends InstrumentingIOPool<B> {
     private final class JulBuffer extends InstrumentingBuffer {
         JulBuffer(IOBuffer<B> model) {
             super(model);
-            logger.log(FINE, "Allocated " + delegate, new NeverThrowable());
+            logger.log(FINE, "Allocated " + entry, new NeverThrowable());
         }
 
         @Override
         public void release() throws IOException {
             try {
-                delegate.release();
+                entry.release();
             } finally {
-                logger.log(FINE, "Released " + delegate, new NeverThrowable());
+                logger.log(FINE, "Released " + entry, new NeverThrowable());
             }
         }
     } // JulBuffer

@@ -332,7 +332,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(sbc);
         }
     } // SyncSeekableByteChannel
 

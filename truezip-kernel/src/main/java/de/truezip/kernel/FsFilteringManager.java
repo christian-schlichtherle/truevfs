@@ -60,7 +60,7 @@ extends FsDecoratingManager<FsManager> {
         final boolean pps = SEPARATOR_CHAR == pp.charAt(ppl - 1);
 
         FilteredControllerIterator() {
-            super(delegate.iterator());
+            super(manager.iterator());
         }
 
         @Override

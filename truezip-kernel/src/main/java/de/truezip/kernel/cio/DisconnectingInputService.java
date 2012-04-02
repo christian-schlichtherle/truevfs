@@ -185,50 +185,50 @@ extends DecoratingInputService<E, InputService<E>> {
         @Override
         public int read(ByteBuffer dst) throws IOException {
             checkOpen();
-            return delegate.read(dst);
+            return sbc.read(dst);
         }
 
         @Override
         public int write(ByteBuffer src) throws IOException {
             checkOpen();
-            return delegate.write(src);
+            return sbc.write(src);
         }
 
         @Override
         public long position() throws IOException {
             checkOpen();
-            return delegate.position();
+            return sbc.position();
         }
 
         @Override
         public SeekableByteChannel position(long newPosition) throws IOException {
             checkOpen();
-            delegate.position(newPosition);
+            sbc.position(newPosition);
             return this;
         }
 
         @Override
         public long size() throws IOException {
             checkOpen();
-            return delegate.size();
+            return sbc.size();
         }
 
         @Override
         public SeekableByteChannel truncate(long size) throws IOException {
             checkOpen();
-            delegate.truncate(size);
+            sbc.truncate(size);
             return this;
         }
 
         @Override
         public boolean isOpen() {
-            return !closed && delegate.isOpen();
+            return !closed && sbc.isOpen();
         }
 
         @Override
         public void close() throws IOException {
             if (!closed)
-                delegate.close();
+                sbc.close();
         }
     } // DisconnectingSeekableByteChannel
 

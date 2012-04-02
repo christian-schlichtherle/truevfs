@@ -40,7 +40,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public int read(ByteBuffer dst) throws IOException {
         try {
-            return delegate.read(dst);
+            return sbc.read(dst);
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -49,7 +49,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public int write(ByteBuffer src) throws IOException {
         try {
-            return delegate.write(src);
+            return sbc.write(src);
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -58,7 +58,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public long position() throws IOException {
         try {
-            return delegate.position();
+            return sbc.position();
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -67,7 +67,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
         try {
-            delegate.position(newPosition);
+            sbc.position(newPosition);
             return this;
         } catch (IOException ex) {
             throw exception = ex;
@@ -77,7 +77,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public long size() throws IOException {
         try {
-            return delegate.size();
+            return sbc.size();
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -86,7 +86,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
         try {
-            delegate.truncate(size);
+            sbc.truncate(size);
             return this;
         } catch (IOException ex) {
             throw exception = ex;
@@ -95,13 +95,13 @@ extends DecoratingSeekableByteChannel {
 
     @Override
     public boolean isOpen() {
-        return delegate.isOpen();
+        return sbc.isOpen();
     }
     
     @Override
     public void close() throws IOException {
         try {
-            delegate.close();
+            sbc.close();
         } catch (IOException ex) {
             throw exception = ex;
         }

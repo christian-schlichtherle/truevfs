@@ -47,17 +47,17 @@ public class InstrumentingIOPool<B extends IOBuffer<B>> implements IOPool<B> {
 
         @Override
         public InputSocket<B> getInputSocket() {
-            return director.instrument(delegate.getInputSocket(), this);
+            return director.instrument(entry.getInputSocket(), this);
         }
 
         @Override
         public OutputSocket<B> getOutputSocket() {
-            return director.instrument(delegate.getOutputSocket(), this);
+            return director.instrument(entry.getOutputSocket(), this);
         }
 
         @Override
         public void release() throws IOException {
-            delegate.release();
+            entry.release();
         }
     } // InstrumentingBuffer
 }

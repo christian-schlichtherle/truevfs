@@ -57,12 +57,12 @@ final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
     public FsController<?>
     getController(  final FsMountPoint mountPoint,
                     final FsCompositeDriver driver) {
-        FsController<?> controller = delegate.getController(mountPoint, driver);
+        FsController<?> controller = manager.getController(mountPoint, driver);
         if (null == this.shutdownHook) { // DCL does work with volatile fields since JSE 5!
             synchronized (this) {
                 ShutdownHook shutdown = this.shutdownHook;
                 if (null == shutdown) {
-                    shutdown = new ShutdownHook(delegate);
+                    shutdown = new ShutdownHook(manager);
                     RUNTIME.addShutdownHook(shutdown);
                     this.shutdownHook = shutdown;
                 }
@@ -96,7 +96,7 @@ final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
                 }
             }
         }
-        delegate.sync(options, handler);
+        manager.sync(options, handler);
     }
 
     /** A shutdown hook thread. */

@@ -186,7 +186,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @Override
         public void close() throws IOException {
             try {
-                delegate.close();
+                sbc.close();
             } catch (final FsControllerException ex) {
                 assert ex instanceof FsNeedsLockRetryException : ex;
                 // This is a non-local control flow exception.
@@ -204,7 +204,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(delegate, close);
+                finalize(sbc, close);
             } finally {
                 super.finalize();
             }
