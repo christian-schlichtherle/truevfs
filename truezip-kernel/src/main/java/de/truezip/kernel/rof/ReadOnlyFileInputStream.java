@@ -11,16 +11,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An adapter class turning a provided {@link ReadOnlyFile} into
- * an {@link InputStream}.
- * Note that this stream supports marking.
+ * Adapts a {@link ReadOnlyFile} to the {@link InputStream} interface.
+ * The stream supports marking.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 @CleanupObligation
@@ -28,8 +28,8 @@ public class ReadOnlyFileInputStream extends InputStream {
 
     /**
      * The underlying {@link ReadOnlyFile}.
-     * Any of the methods in this class throw a {@link NullPointerException}
-     * if this hasn't been initialized.
+     * All methods in this class throw a {@link NullPointerException} if this
+     * hasn't been initialized.
      */
     protected @Nullable ReadOnlyFile rof;
 
@@ -48,7 +48,7 @@ public class ReadOnlyFileInputStream extends InputStream {
      */
     @CreatesObligation
     public ReadOnlyFileInputStream(
-            final @Nullable @WillCloseWhenClosed ReadOnlyFile rof) {
+            final @CheckForNull @WillCloseWhenClosed ReadOnlyFile rof) {
         this.rof = rof;
     }
 
@@ -70,10 +70,9 @@ public class ReadOnlyFileInputStream extends InputStream {
     @Override
     public long skip(long n) throws IOException {
         if (n <= 0)
-            return 0; // for compatibility to RandomAccessFile
-
+            return 0;
         final long fp = rof.getFilePointer(); // should fail when closed
-        final long len = rof.length(); // may succeed when closed
+        final long len = rof.length();
         final long rem = len - fp;
         if (n > rem)
             n = (int) rem;
