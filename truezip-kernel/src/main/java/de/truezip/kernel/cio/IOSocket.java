@@ -86,9 +86,9 @@ public abstract class IOSocket<LT, PT> {
 
     /**
      * Copies an input stream {@link InputSocket#newStream created}
-     * by the given input socket {@code input} to an output stream
-     * {@link OutputSocket#newOutputStream created} by the given output socket
-     * {@code output}.
+     * by the given {@code input} socket to an output stream
+     * {@link OutputSocket#newStream created} by the given {@code output}
+     * socket.
      * <p>
      * This is a high performance implementation which uses a pooled background
      * thread to fill a FIFO of pooled buffers which is concurrently flushed by
