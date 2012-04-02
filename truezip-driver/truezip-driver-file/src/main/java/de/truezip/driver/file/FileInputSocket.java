@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An input socket for a file entry.
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @see    FileOutputSocket
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@NotThreadSafe
 final class FileInputSocket extends InputSocket<FileEntry> {
 
     private final FileEntry entry;
