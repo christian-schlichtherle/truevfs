@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.tar;
 
-import static de.truezip.kernel.cio.Entry.Access.WRITE;
-import static de.truezip.kernel.cio.Entry.Size.DATA;
-import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsCharsetArchiveDriver;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Size.DATA;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.COMPRESS;
 import de.truezip.kernel.util.BitField;
@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillClose;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
@@ -146,16 +147,21 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        TarInputService ia = null;
-        final InputStream is = input.newInputStream();
+        TarInputService is = null;
+        final @WillClose InputStream in = input.newInputStream();
         try {
-            return ia = newTarInputService(model, is);
+            return is = newTarInputService(model, in);
         } finally {
             try {
-                is.close();
-            } catch (final IOException ex) {
-                if (null != ia)
-                    ia.close();
+                in.close();
+            } catch (final Throwable ex) {
+                if (null != is) {
+                    try {
+                        is.close();
+                    } catch (final Throwable ex2) {
+                        ex.addSuppressed(ex2);
+                    }
+                }
                 throw ex;
             }
         }
@@ -186,13 +192,17 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final OutputStream os = output.newOutputStream();
+        final OutputStream out = output.newOutputStream();
         try {
             return new MultiplexedOutputService<>(
-                    newTarOutputService(model, os, (TarInputService) source),
+                    newTarOutputService(model, out, (TarInputService) source),
                     getIOPool());
-        } catch (final IOException ex) {
-            os.close();
+        } catch (final Throwable ex) {
+            try {
+                out.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
