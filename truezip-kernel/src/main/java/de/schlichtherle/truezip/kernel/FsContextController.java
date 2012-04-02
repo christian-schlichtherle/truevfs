@@ -224,6 +224,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         return new FsOperationContext(options);
     }
 
+    @NotThreadSafe
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(InputSocket<?> input) {
             super(input);
@@ -282,6 +283,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         }
     } // Input
 
+    @NotThreadSafe
     private final class Output extends DecoratingOutputSocket<Entry> {
         final FsOperationContext operation;
 

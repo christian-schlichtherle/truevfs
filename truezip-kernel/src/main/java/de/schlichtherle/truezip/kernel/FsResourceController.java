@@ -157,7 +157,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             acc.closeAllResources(new IOExceptionHandler());
     }
 
-    @Immutable
+    @NotThreadSafe
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
@@ -184,7 +184,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
     } // Input
 
-    @Immutable
+    @NotThreadSafe
     private final class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
                 final BitField<AccessOption> options,

@@ -27,7 +27,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -207,7 +207,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
     }
 
-    @Immutable
+    @NotThreadSafe
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
@@ -263,7 +263,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
     } // Input
 
-    @Immutable
+    @NotThreadSafe
     private final class Output extends DecoratingOutputSocket<Entry> {
         Output( final FsEntryName name,
                 final BitField<AccessOption> options,
