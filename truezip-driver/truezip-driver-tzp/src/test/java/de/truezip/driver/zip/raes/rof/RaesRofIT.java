@@ -4,10 +4,8 @@
  */
 package de.truezip.driver.zip.raes.rof;
 
-import de.truezip.driver.zip.raes.crypto.MockType0RaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
-import de.truezip.driver.zip.raes.crypto.RaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.driver.zip.raes.crypto.*;
+import de.truezip.kernel.io.AbstractSink;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFileTestSuite;
@@ -35,9 +33,14 @@ public final class RaesRofIT extends ReadOnlyFileTestSuite {
         try (final InputStream in = new FileInputStream(plainFile)) {
             cipherFile = File.createTempFile(TEMP_FILE_PREFIX, null);
             try {
-                final RaesOutputStream out = RaesOutputStream.getInstance(
-                        new FileOutputStream(cipherFile),
-                        newRaesParameters());
+                final RaesOutputStream out = new RaesSink(
+                        new AbstractSink() {
+                            @Override
+                            public OutputStream newOutputStream() throws IOException {
+                                return new FileOutputStream(cipherFile);
+                            }
+                        },
+                        newRaesParameters()).newOutputStream();
                 Streams.copy(in, out);
                 logger.log(Level.FINEST,
                         "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PKCS#12v1",

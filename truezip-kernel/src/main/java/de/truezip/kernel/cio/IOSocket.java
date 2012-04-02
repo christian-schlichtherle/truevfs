@@ -7,10 +7,7 @@ package de.truezip.kernel.cio;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import javax.annotation.CheckForNull;
-import javax.annotation.WillClose;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -100,38 +97,17 @@ public abstract class IOSocket<LT, PT> {
      * @param  input an input socket for the input target.
      * @param  output an output socket for the output target.
      * @throws InputException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>input stream</em>.
+     *         {@code IOException} thrown by the <em>input socket</em>.
      * @throws IOException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>output stream</em>.
+     *         {@code IOException} thrown by the <em>output socket</em>.
      */
     public static void copy(final InputSocket <?> input,
                             final OutputSocket<?> output)
     throws IOException {
-        if (null == output)
-            throw new NullPointerException();
-
-        final @WillClose InputStream in = input.connect(output).newInputStream();
-        @WillClose OutputStream out = null;
-        try {
-            // .connect(input) is redundant unless .newInputStream() messed
-            // with the connection, which is impossible outside this package.
-            out = output/*.connect(input)*/.newOutputStream();
-        } finally {
-            if (null == out) { // exception?
-                try {
-                    in.close();
-                } catch (IOException ex) {
-                    throw new InputException(ex);
-                }
-            }
-        }
-
-        try {
-            Streams.copy(in, out);
-        } finally {
-            // Disconnect for subsequent use, if any.
-            input.connect(null); // or output.connect(null)
-        }
+        // Call connect on output for early NPE check!
+        Streams.copy(input, output.connect(input));
+        // Disconnect for subsequent use, if any.
+        input.connect(null); // or output.connect(null)
     }
 
     /**

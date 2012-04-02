@@ -24,9 +24,9 @@ public class InputException extends IOException {
     /**
      * Constructs a new {@code InputException}.
      *
-     * @param cause the cause for this exception to get thrown.
+     * @param cause the nullable cause for this exception.
      */
-    public InputException(@CheckForNull Throwable cause) {
+    public InputException(@CheckForNull IOException cause) {
         super(cause);
     }
 }

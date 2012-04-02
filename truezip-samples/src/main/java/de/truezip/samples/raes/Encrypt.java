@@ -39,7 +39,7 @@ public class Encrypt extends Application {
     throws IllegalUsageException, IOException {
         if (args.length != 2)
             throw new IllegalUsageException(resources.getString("usage"));
-        RaesFiles.encrypt(args[0], args[1]);
+        Raes.encrypt(args[0], args[1]);
         return 0;
     }
 }

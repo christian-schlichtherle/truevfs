@@ -7,13 +7,13 @@ package de.truezip.driver.zip.raes.crypto;
 import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.*;
 import de.truezip.kernel.io.LEDataOutputStream;
+import de.truezip.kernel.io.Sink;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Random;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -59,15 +59,13 @@ final class Type0RaesOutputStream extends RaesOutputStream {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    Type0RaesOutputStream(
-            final @WillCloseWhenClosed OutputStream out,
-            final Type0RaesParameters param)
+    Type0RaesOutputStream(final Sink sink, final Type0RaesParameters param)
     throws IOException{
-        super(out, new BufferedBlockCipher(
+        super(new BufferedBlockCipher(
                 new SICSeekableBlockCipher( // or new SICBlockCipher(
                     new AESFastEngine())));
 
-        assert null != out;
+        assert null != sink;
         assert null != param;
 
         // Init key strength.
@@ -118,7 +116,8 @@ final class Type0RaesOutputStream extends RaesOutputStream {
                 .getKey();
         klac.update(cipherKey, 0, cipherKey.length);
 
-        // Reinit chain of output streams as Encrypt-then-MAC.
+        // Init chain of output streams as Encrypt-then-MAC.
+        final OutputStream out = sink.newOutputStream();
         final LEDataOutputStream dos =
                 this.dos = out instanceof LEDataOutputStream
                     ? (LEDataOutputStream) out

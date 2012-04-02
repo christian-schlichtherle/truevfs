@@ -18,6 +18,19 @@ import java.nio.channels.SeekableByteChannel;
 public interface Sink {
 
     /**
+     * Returns a new output stream for writing bytes.
+     * <p>
+     * The implementation must enable calling this method any number of times.
+     * Furthermore, the returned output stream should <em>not</em> be buffered.
+     * Buffering should get addressed by the caller instead.
+     *
+     * @return A new output stream.
+     * @throws IOException on any I/O failure.
+     */
+    @CreatesObligation
+    OutputStream newOutputStream() throws IOException;
+
+    /**
      * <b>Optional operation:</b> Returns a new seekable byte channel for
      * writing bytes in random order.
      * <p>
@@ -34,17 +47,4 @@ public interface Sink {
      */
     @CreatesObligation
     SeekableByteChannel newSeekableByteChannel() throws IOException;
-
-    /**
-     * Returns a new output stream for writing bytes.
-     * <p>
-     * The implementation must enable calling this method any number of times.
-     * Furthermore, the returned output stream should <em>not</em> be buffered.
-     * Buffering should get addressed by the caller instead.
-     *
-     * @return A new output stream.
-     * @throws IOException on any I/O failure.
-     */
-    @CreatesObligation
-    OutputStream newOutputStream() throws IOException;
 }

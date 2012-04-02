@@ -7,10 +7,8 @@ package de.truezip.driver.zip.raes.zip;
 import de.truezip.driver.zip.io.ZipFile;
 import de.truezip.driver.zip.io.ZipOutputStream;
 import de.truezip.driver.zip.io.ZipTestSuite;
-import de.truezip.driver.zip.raes.crypto.MockType0RaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
-import de.truezip.driver.zip.raes.crypto.RaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.driver.zip.raes.crypto.*;
+import de.truezip.kernel.io.AbstractSink;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.File;
 import java.io.IOException;
@@ -33,8 +31,8 @@ public final class RaesZipIT extends ZipTestSuite {
     @Override
     protected ZipOutputStream newZipOutputStream(final OutputStream out)
     throws IOException {
-        final RaesOutputStream ros = RaesOutputStream.getInstance(
-                out, raesParameters);
+        final RaesOutputStream ros = new RaesSink(new InvalidSink(out),
+                raesParameters).newOutputStream();
         try {
             return new ZipOutputStream(ros);
         } catch (RuntimeException ex) {
@@ -47,8 +45,8 @@ public final class RaesZipIT extends ZipTestSuite {
     protected ZipOutputStream newZipOutputStream(
             final OutputStream out, final Charset cs)
     throws IOException {
-        final RaesOutputStream ros = RaesOutputStream.getInstance(
-                out, raesParameters);
+        final RaesOutputStream ros = new RaesSink(new InvalidSink(out),
+                raesParameters).newOutputStream();
         try {
             return new ZipOutputStream(ros, cs);
         } catch (RuntimeException ex) {
@@ -56,6 +54,19 @@ public final class RaesZipIT extends ZipTestSuite {
             throw ex;
         }
     }
+
+    private static final class InvalidSink extends AbstractSink {
+        private final OutputStream out;
+
+        InvalidSink(final OutputStream out) {
+            this.out = out;
+        }
+
+        @Override
+        public OutputStream newOutputStream() throws IOException {
+            return out; // TODO: Upon the second call, this is an invalid stream!
+        }
+    } // InvalidSink
 
     @Override
     protected ZipFile newZipFile(final String name)

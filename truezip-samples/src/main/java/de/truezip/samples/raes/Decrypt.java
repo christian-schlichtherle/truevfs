@@ -39,7 +39,7 @@ public class Decrypt extends Application {
     throws IllegalUsageException, IOException {
         if (args.length != 2)
             throw new IllegalUsageException(resources.getString("usage"));
-        RaesFiles.decrypt(args[0], args[1], true);
+        Raes.decrypt(args[0], args[1], true);
         return 0;
     }
 }

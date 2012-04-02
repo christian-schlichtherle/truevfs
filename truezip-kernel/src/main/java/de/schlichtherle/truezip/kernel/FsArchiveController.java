@@ -4,6 +4,11 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsArchiveEntry;
+import de.truezip.kernel.FsCovariantEntry;
+import de.truezip.kernel.FsEntry;
+import de.truezip.kernel.FsEntryNotFoundException;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
@@ -11,16 +16,11 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsCovariantEntry;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsEntryNotFoundException;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.io.InputExceptionSource;
+import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.APPEND;
 import static de.truezip.kernel.option.AccessOption.CREATE_PARENTS;
-import de.truezip.kernel.io.InputException;
-import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,8 +61,7 @@ extends FsLockModelController {
             FsArchiveController.class.getName(),
             FsArchiveController.class.getName());
 
-    private final ThreadLocal<FsOperationContext>
-            context = new ThreadLocal<FsOperationContext>();
+    private final ThreadLocal<FsOperationContext> context = new ThreadLocal<>();
 
     /**
      * Constructs a new basic archive controller.
@@ -274,34 +273,30 @@ extends FsLockModelController {
             InputStream in = null;
             if (options.get(APPEND)) {
                 try {
-                    in = new Input(name).newInputStream();
+                    in = new InputExceptionSource(new Input(name)).newInputStream();
                 } catch (IOException ex) {
                     // When appending, there is no need for the entry to exist,
                     // so we can safely ignore this - fall through!
                 }
             }
-            try {
+            try (final InputStream in2 = in) {
                 final OutputSocket<? extends E> os = getOutputSocket(ae);
-                if (null == in) // do NOT bind when appending!
+                if (null == in2) // do NOT bind when appending!
                     os.bind(this);
                 final OutputStream out = os.newOutputStream();
                 try {
                     mknod.commit();
-                    if (in != null)
-                        Streams.cat(in, out);
-                } catch (IOException ex) {
-                    out.close(); // may throw another exception!
+                    if (null != in2)
+                        Streams.cat(in2, out);
+                } catch (final Throwable ex) {
+                    try {
+                        out.close();
+                    } catch (final Throwable ex2) {
+                        ex.addSuppressed(ex2);
+                    }
                     throw ex;
                 }
                 return out;
-            } finally {
-                if (null != in) {
-                    try {
-                        in.close();
-                    } catch (IOException ex) {
-                        throw new InputException(ex);
-                    }
-                }
             }
         }
     } // Output

@@ -18,6 +18,19 @@ import java.nio.channels.SeekableByteChannel;
 public interface Source {
 
     /**
+     * Returns a new input stream for reading bytes.
+     * <p>
+     * The implementation must enable calling this method any number of times.
+     * Furthermore, the returned input stream should <em>not</em> be buffered.
+     * Buffering should get addressed by the caller instead.
+     *
+     * @return A new input stream.
+     * @throws IOException on any I/O failure.
+     */
+    @CreatesObligation
+    InputStream newInputStream() throws IOException;    
+
+    /**
      * <b>Optional operation:</b> Returns a new seekable byte channel for
      * reading bytes in random order.
      * <p>
@@ -34,17 +47,4 @@ public interface Source {
      */
     @CreatesObligation
     SeekableByteChannel newSeekableByteChannel() throws IOException;
-
-    /**
-     * Returns a new input stream for reading bytes.
-     * <p>
-     * The implementation must enable calling this method any number of times.
-     * Furthermore, the returned input stream should <em>not</em> be buffered.
-     * Buffering should get addressed by the caller instead.
-     *
-     * @return A new input stream.
-     * @throws IOException on any I/O failure.
-     */
-    @CreatesObligation
-    InputStream newInputStream() throws IOException;    
 }
