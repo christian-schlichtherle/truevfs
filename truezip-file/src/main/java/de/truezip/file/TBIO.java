@@ -4,14 +4,14 @@
  */
 package de.truezip.file;
 
+import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.addr.FsPath;
+import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.CREATE_PARENTS;
-import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.util.BitField;
 import java.io.File;
 import java.io.IOException;
