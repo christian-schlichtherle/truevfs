@@ -70,7 +70,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-abstract class FsControllerException extends IOException {
+public abstract class FsControllerException extends IOException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
