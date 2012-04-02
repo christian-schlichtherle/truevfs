@@ -6,15 +6,15 @@ package de.truezip.driver.zip;
 
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import de.truezip.driver.zip.io.*;
+import de.truezip.kernel.FsCharsetArchiveDriver;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsModel;
+import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.FsCharsetArchiveDriver;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.rof.ReadOnlyFile;
@@ -428,8 +428,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final ReadOnlyFile rof = input.newReadOnlyFile();
         try {
             return newInputService(model, rof);
-        } catch (final IOException ex) {
-            rof.close();
+        } catch (final Throwable ex) {
+            try {
+                rof.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -443,7 +447,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final ZipInputService input = new ZipInputService(this, model, rof);
         try {
             input.recoverLostEntries();
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             logger.log(Level.WARNING, "junkInTheTrunk.warning", new Object[] {
                 mountPointUri(model),
                 input.getPostambleLength(),
@@ -531,8 +535,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final OutputStream out = output.newOutputStream();
         try {
             return newOutputService(model, out, source);
-        } catch (IOException ex) {
-            out.close();
+        } catch (final IOException ex) {
+            try {
+                out.close();
+            } catch (final IOException ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -544,7 +552,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             @WillCloseWhenClosed OutputStream out,
             @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
-        return new MultiplexedOutputService<ZipDriverEntry>(
+        return new MultiplexedOutputService<>(
                 new ZipOutputService(this, model, out, source),
                 getIOPool());
     }
