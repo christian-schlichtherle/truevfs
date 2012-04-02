@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -79,7 +78,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         assert isWriteLockedByCurrentThread();
         waitIdle(options, handler);
         closeAll(handler);
-        delegate.sync(options, handler);
+        controller.sync(options, handler);
     }
 
     /**
@@ -161,8 +160,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
-            super(FsResourceController.this.delegate
-                    .getInputSocket(name, options));
+            super(controller.getInputSocket(name, options));
         }
 
         @Override
@@ -189,8 +187,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         Output( final FsEntryName name,
                 final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
-            super(FsResourceController.this.delegate
-                    .getOutputSocket(name, options, template));
+            super(controller.getOutputSocket(name, options, template));
         }
 
         @Override

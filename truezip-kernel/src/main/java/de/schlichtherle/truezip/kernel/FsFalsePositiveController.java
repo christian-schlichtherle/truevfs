@@ -116,7 +116,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     public FsController<?> getParent() {
         final FsController<?> parent = this.parent;
-        return null != parent ? parent : (this.parent = delegate.getParent());
+        return null != parent ? parent : (this.parent = controller.getParent());
     }
 
     FsEntryName resolveParent(FsEntryName name) {
@@ -450,7 +450,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             throws IOException {
                 controller.unlink(name, options);
                 if (name.isRoot()) {
-                    assert controller == FsFalsePositiveController.this.delegate;
+                    assert controller == FsFalsePositiveController.this.controller;
                     // We have successfully removed the virtual root directory
                     // of a federated file system, i.e. an archive file.
                     // Now unlink the target archive file from the parent file
@@ -485,7 +485,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         try {
-            delegate.sync(options, handler);
+            controller.sync(options, handler);
         } catch (FsFalsePositiveException ex) {
             throw new AssertionError(ex);
         }
@@ -508,7 +508,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public <T> T call(  final IOOperation<T> operation,
                             final FsEntryName name)
         throws IOException {
-            return operation.call(delegate, name);
+            return operation.call(controller, name);
         }
     } // TryChild
 

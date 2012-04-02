@@ -89,8 +89,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
-            super(FsFinalizeController.this.delegate
-                    .getInputSocket(name, options));
+            super(controller.getInputSocket(name, options));
         }
 
         @Override
@@ -117,8 +116,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         Output( final FsEntryName name,
                 final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
-            super(FsFinalizeController.this.delegate
-                    .getOutputSocket(name, options, template));
+            super(controller.getOutputSocket(name, options, template));
         }
 
         @Override

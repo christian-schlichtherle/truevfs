@@ -32,7 +32,7 @@ public abstract class FsDecoratingController<
 extends FsController<M> {
 
     /** The decorated file system controller. */
-    protected final C delegate;
+    protected final C controller;
 
     /**
      * Constructs a new decorating file system controller.
@@ -41,43 +41,43 @@ extends FsController<M> {
      */
     protected FsDecoratingController(final C controller) {
         super(controller.getModel());
-        this.delegate = controller;
+        this.controller = controller;
     }
 
     @Override
     public FsController<?> getParent() {
-        return delegate.getParent();
+        return controller.getParent();
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
-        return delegate.isReadOnly();
+        return controller.isReadOnly();
     }
 
     @Override
     public FsEntry getEntry(FsEntryName name)
     throws IOException {
-        return delegate.getEntry(name);
+        return controller.getEntry(name);
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        return delegate.isReadable(name);
+        return controller.isReadable(name);
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
-        return delegate.isWritable(name);
+        return controller.isWritable(name);
     }
 
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
-        return delegate.isExecutable(name);
+        return controller.isExecutable(name);
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        delegate.setReadOnly(name);
+        controller.setReadOnly(name);
     }
 
     @Override
@@ -86,7 +86,7 @@ extends FsController<M> {
             Map<Access, Long> times,
             BitField<AccessOption> options)
     throws IOException {
-        return delegate.setTime(name, times, options);
+        return controller.setTime(name, times, options);
     }
 
     @Override
@@ -96,14 +96,14 @@ extends FsController<M> {
             long value,
             BitField<AccessOption> options)
     throws IOException {
-        return delegate.setTime(name, types, value, options);
+        return controller.setTime(name, types, value, options);
     }
 
     @Override
     public InputSocket<?>
     getInputSocket( FsEntryName name,
                     BitField<AccessOption> options) {
-        return delegate.getInputSocket(name, options);
+        return controller.getInputSocket(name, options);
     }
 
     @Override
@@ -111,7 +111,7 @@ extends FsController<M> {
     getOutputSocket(    FsEntryName name,
                         BitField<AccessOption> options,
                         Entry template) {
-        return delegate.getOutputSocket(name, options, template);
+        return controller.getOutputSocket(name, options, template);
     }
 
     @Override
@@ -121,13 +121,13 @@ extends FsController<M> {
             BitField<AccessOption> options,
             Entry template)
     throws IOException {
-        delegate.mknod(name, type, options, template);
+        controller.mknod(name, type, options, template);
     }
 
     @Override
     public void unlink(FsEntryName name, BitField<AccessOption> options)
     throws IOException {
-        delegate.unlink(name, options);
+        controller.unlink(name, options);
     }
 
     @Override
@@ -135,13 +135,13 @@ extends FsController<M> {
     sync(   BitField<SyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        delegate.sync(options, handler);
+        controller.sync(options, handler);
     }
 
     @Override
     public String toString() {
         return String.format("%s[controller=%s]",
                 getClass().getName(),
-                delegate);
+                controller);
     }
 }

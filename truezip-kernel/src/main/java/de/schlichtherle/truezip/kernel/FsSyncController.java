@@ -55,7 +55,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public boolean isReadOnly() throws IOException {
         while (true) {
             try {
-                return delegate.isReadOnly();
+                return controller.isReadOnly();
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
             }
@@ -67,7 +67,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         while (true) {
             try {
-                return delegate.getEntry(name);
+                return controller.getEntry(name);
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
             }
@@ -78,7 +78,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public boolean isReadable(final FsEntryName name) throws IOException {
         while (true) {
             try {
-                return delegate.isReadable(name);
+                return controller.isReadable(name);
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
             }
@@ -89,7 +89,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public boolean isWritable(final FsEntryName name) throws IOException {
         while (true) {
             try {
-                return delegate.isWritable(name);
+                return controller.isWritable(name);
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
             }
@@ -100,7 +100,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public boolean isExecutable(final FsEntryName name) throws IOException {
         while (true) {
             try {
-                return delegate.isExecutable(name);
+                return controller.isExecutable(name);
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
             }
@@ -111,7 +111,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     public void setReadOnly(final FsEntryName name) throws IOException {
         while (true) {
             try {
-                delegate.setReadOnly(name);
+                controller.setReadOnly(name);
                 return;
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
@@ -127,7 +127,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         while (true) {
             try {
-                return delegate.setTime(name, times, options);
+                return controller.setTime(name, times, options);
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
             }
@@ -143,7 +143,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         while (true) {
             try {
-                return delegate.setTime(name, types, value, options);
+                return controller.setTime(name, types, value, options);
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
             }
@@ -173,7 +173,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         while (true) {
             try {
-                delegate.mknod(name, type, options, template);
+                controller.mknod(name, type, options, template);
                 return;
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
@@ -188,7 +188,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         while (true) {
             try {
-                delegate.unlink(name, options);
+                controller.unlink(name, options);
                 return;
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
@@ -211,8 +211,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
-            super(FsSyncController.this.delegate
-                    .getInputSocket(name, options));
+            super(controller.getInputSocket(name, options));
         }
 
         @Override
@@ -268,8 +267,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         Output( final FsEntryName name,
                 final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
-            super(FsSyncController.this.delegate
-                    .getOutputSocket(name, options, template));
+            super(controller.getOutputSocket(name, options, template));
         }
 
         @Override

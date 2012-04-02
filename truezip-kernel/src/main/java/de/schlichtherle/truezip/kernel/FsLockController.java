@@ -180,7 +180,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     private final class IsReadOnly implements IOOperation<Boolean> {
         @Override
         public Boolean call() throws IOException {
-            return delegate.isReadOnly();
+            return controller.isReadOnly();
         }
     } // IsReadOnly
     
@@ -189,7 +189,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class GetEntry implements IOOperation<FsEntry> {
             @Override
             public FsEntry call() throws IOException {
-                return delegate.getEntry(name);
+                return controller.getEntry(name);
             }
         } // GetEntry
 
@@ -201,7 +201,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class IsReadable implements IOOperation<Boolean> {
             @Override
             public Boolean call() throws IOException {
-                return delegate.isReadable(name);
+                return controller.isReadable(name);
             }
         } // IsReadable
 
@@ -213,7 +213,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class IsWritable implements IOOperation<Boolean> {
             @Override
             public Boolean call() throws IOException {
-                return delegate.isWritable(name);
+                return controller.isWritable(name);
             }
         } // IsWritable
 
@@ -225,7 +225,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class IsExecutable implements IOOperation<Boolean> {
             @Override
             public Boolean call() throws IOException {
-                return delegate.isExecutable(name);
+                return controller.isExecutable(name);
             }
         } // IsExecutable
 
@@ -237,7 +237,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class SetReadOnly implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                delegate.setReadOnly(name);
+                controller.setReadOnly(name);
                 return null;
             }
         } // SetReadOnly
@@ -254,7 +254,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call() throws IOException {
-                return delegate.setTime(name, times, options);
+                return controller.setTime(name, times, options);
             }
         } // class SetTime
 
@@ -271,7 +271,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call() throws IOException {
-                return delegate.setTime(name, types, value, options);
+                return controller.setTime(name, types, value, options);
             }
         } // class SetTime
 
@@ -302,7 +302,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class Mknod implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                delegate.mknod(name, type, options, template);
+                controller.mknod(name, type, options, template);
                 return null;
             }
         } // Mknod
@@ -318,7 +318,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         final class Unlink implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                delegate.unlink(name, options);
+                controller.unlink(name, options);
                 return null;
             }
         } // Unlink
@@ -347,7 +347,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 // when accessing deeply nested archive files, e.g. for the
                 // integration tests.
                 try {
-                    delegate.sync(sync, handler);
+                    controller.sync(sync, handler);
                 } catch (final FsSyncWarningException ex) {
                     throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
                 } catch (final FsSyncException ex) {
@@ -383,8 +383,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     private final class Input extends DecoratingInputSocket<Entry> {
         Input(  final FsEntryName name,
                 final BitField<AccessOption> options) {
-            super(FsLockController.this.delegate
-                    .getInputSocket(name, options));
+            super(controller.getInputSocket(name, options));
         }
 
         @Override
@@ -444,8 +443,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         Output( final FsEntryName name,
                 final BitField<AccessOption> options,
                 final @CheckForNull Entry template) {
-            super(FsLockController.this.delegate
-                    .getOutputSocket(name, options, template));
+            super(controller.getOutputSocket(name, options, template));
         }
 
         @Override

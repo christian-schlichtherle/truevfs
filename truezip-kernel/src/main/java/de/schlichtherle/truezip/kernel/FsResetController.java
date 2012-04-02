@@ -37,7 +37,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     throws IOException {
         boolean checkRoot = true;
         try {
-            delegate.unlink(name, options);
+            controller.unlink(name, options);
         } catch (final FsFalsePositiveException ex) {
             throw ex;
         } catch (final IOException ex) {
@@ -53,7 +53,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 // that the mount state gets reset so that the file system can
                 // get subsequently mounted if the target archive file has been
                 // modified to be a true archive file meanwhile.
-                delegate.sync(RESET);
+                controller.sync(RESET);
             }
         }
     }
