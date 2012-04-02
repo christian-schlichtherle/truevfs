@@ -4,13 +4,13 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.cio.Entry.Access;
-import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsDecoratingController;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.cio.Entry.Access;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.option.SyncOption;
@@ -36,7 +36,7 @@ final class FsContextController
 extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
 
     private static final FsOperationContext
-            NULL = new FsOperationContext(AccessOptions.NONE);
+            NONE = new FsOperationContext(AccessOptions.NONE);
 
     /**
      * Constructs a new file system context controller.
@@ -49,74 +49,74 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
 
     @Override
     public boolean isReadOnly() throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(NONE);
         try {
-            return delegate.isReadOnly();
+            return controller.isReadOnly();
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
     @Override
     public FsEntry getEntry(final FsEntryName name)
     throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(NONE);
         try {
-            return delegate.getEntry(name);
+            return controller.getEntry(name);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
     @Override
     public boolean isReadable(final FsEntryName name) throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(NONE);
         try {
-            return delegate.isReadable(name);
+            return controller.isReadable(name);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
     @Override
     public boolean isWritable(final FsEntryName name) throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(NONE);
         try {
-            return delegate.isWritable(name);
+            return controller.isWritable(name);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
     @Override
     public boolean isExecutable(final FsEntryName name) throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(NONE);
         try {
-            return delegate.isExecutable(name);
+            return controller.isExecutable(name);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
     @Override
     public void setReadOnly(final FsEntryName name) throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(NONE);
         try {
-            delegate.setReadOnly(name);
+            controller.setReadOnly(name);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
@@ -126,13 +126,13 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
             final Map<Access, Long> times,
             final BitField<AccessOption> options)
     throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(makeContext(options));
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(makeContext(options));
         try {
-            return delegate.setTime(name, times, options);
+            return controller.setTime(name, times, options);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
@@ -143,27 +143,27 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
             final long value,
             final BitField<AccessOption> options)
     throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(makeContext(options));
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(makeContext(options));
         try {
-            return delegate.setTime(name, types, value, options);
+            return controller.setTime(name, types, value, options);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
     @Override
     public InputSocket<?> getInputSocket(   FsEntryName name,
                                             BitField<AccessOption> options) {
-        return new Input(delegate.getInputSocket(name, options));
+        return new Input(controller.getInputSocket(name, options));
     }
 
     @Override
     public OutputSocket<?> getOutputSocket( FsEntryName name,
                                             BitField<AccessOption> options,
                                             @CheckForNull Entry template) {
-        return new Output(delegate.getOutputSocket(name, options, template),
+        return new Output(controller.getOutputSocket(name, options, template),
                 options);
     }
 
@@ -174,13 +174,13 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
             final BitField<AccessOption> options,
             final @CheckForNull Entry template)
     throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(makeContext(options));
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(makeContext(options));
         try {
-            delegate.mknod(name, type, options, template);
+            controller.mknod(name, type, options, template);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
@@ -188,13 +188,13 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
     public void unlink( final FsEntryName name,
                         final BitField<AccessOption> options)
     throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(makeContext(options));
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(makeContext(options));
         try {
-            delegate.unlink(name, options);
+            controller.unlink(name, options);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
@@ -203,13 +203,13 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
     void sync(  final BitField<SyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
+        final FsTargetArchiveController<?> controller = this.controller;
+        final FsOperationContext context = controller.getContext();
+        controller.setContext(NONE);
         try {
-            delegate.sync(options, handler);
+            controller.sync(options, handler);
         } finally {
-            delegate.setContext(context);
+            controller.setContext(context);
         }
     }
 
@@ -233,52 +233,52 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         @Override
         public Entry getLocalTarget() throws IOException {
             final FsTargetArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
+                    controller = FsContextController.this.controller;
+            final FsOperationContext context = controller.getContext();
+            controller.setContext(NONE);
             try {
                 return getBoundSocket().getLocalTarget();
             } finally {
-                delegate.setContext(context);
+                controller.setContext(context);
             }
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
             final FsTargetArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
+                    controller = FsContextController.this.controller;
+            final FsOperationContext context = controller.getContext();
+            controller.setContext(NONE);
             try {
                 return getBoundSocket().newReadOnlyFile();
             } finally {
-                delegate.setContext(context);
+                controller.setContext(context);
             }
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             final FsTargetArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
+                    controller = FsContextController.this.controller;
+            final FsOperationContext context = controller.getContext();
+            controller.setContext(NONE);
             try {
                 return getBoundSocket().newSeekableByteChannel();
             } finally {
-                delegate.setContext(context);
+                controller.setContext(context);
             }
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
             final FsTargetArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(NULL);
+                    controller = FsContextController.this.controller;
+            final FsOperationContext context = controller.getContext();
+            controller.setContext(NONE);
             try {
                 return getBoundSocket().newInputStream();
             } finally {
-                delegate.setContext(context);
+                controller.setContext(context);
             }
         }
     } // Input
@@ -296,39 +296,39 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         @Override
         public Entry getLocalTarget() throws IOException {
             final FsTargetArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(operation);
+                    controller = FsContextController.this.controller;
+            final FsOperationContext context = controller.getContext();
+            controller.setContext(operation);
             try {
                 return getBoundSocket().getLocalTarget();
             } finally {
-                delegate.setContext(context);
+                controller.setContext(context);
             }
         }
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
             final FsTargetArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(operation);
+                    controller = FsContextController.this.controller;
+            final FsOperationContext context = controller.getContext();
+            controller.setContext(operation);
             try {
                 return getBoundSocket().newSeekableByteChannel();
             } finally {
-                delegate.setContext(context);
+                controller.setContext(context);
             }
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
             final FsTargetArchiveController<?>
-                    delegate = FsContextController.this.delegate;
-            final FsOperationContext context = delegate.getContext();
-            delegate.setContext(operation);
+                    controller = FsContextController.this.controller;
+            final FsOperationContext context = controller.getContext();
+            controller.setContext(operation);
             try {
                 return getBoundSocket().newOutputStream();
             } finally {
-                delegate.setContext(context);
+                controller.setContext(context);
             }
         }
     } // Output

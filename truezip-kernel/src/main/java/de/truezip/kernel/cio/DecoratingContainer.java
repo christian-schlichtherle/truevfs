@@ -25,10 +25,10 @@ implements Container<E> {
     /**
      * Constructs a new filter entry container.
      *
-     * @param  container the entry container to decorate.
+     * @param container the entry container to decorate.
      */
-    protected DecoratingContainer(final C delegate) {
-        if (null == (this.container = delegate))
+    protected DecoratingContainer(final C container) {
+        if (null == (this.container = container))
             throw new NullPointerException();
     }
 

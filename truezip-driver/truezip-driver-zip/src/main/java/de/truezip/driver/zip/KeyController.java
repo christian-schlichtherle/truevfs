@@ -69,7 +69,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     public final FsEntry getEntry(final FsEntryName name)
     throws IOException {
         try {
-            return delegate.getEntry(name);
+            return controller.getEntry(name);
         } catch (final IOException ex) {
             if (!name.isRoot() || null == findKeyException(ex))
                 throw ex;
@@ -100,7 +100,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                                 final BitField<AccessOption> options)
     throws IOException {
         try {
-            delegate.unlink(name, options);
+            controller.unlink(name, options);
         } catch (final IOException ex) {
             // If the exception is caused by a key exception, then throw this
             // cause instead in order to avoid treating the target archive file
@@ -138,7 +138,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     sync(   final BitField<SyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        delegate.sync(options, handler);
+        controller.sync(options, handler);
         try {
             getKeyManager().unlock(driver.mountPointUri(getModel()));
         } catch (final ServiceConfigurationError ignore) {

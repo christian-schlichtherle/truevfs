@@ -111,7 +111,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(AccessOption.CACHE))
-                        return delegate.getInputSocket(name, options);
+                        return controller.getInputSocket(name, options);
                     cache = new EntryCache(name);
                 }
                 return cache.getInputSocket(options);
@@ -135,7 +135,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(AccessOption.CACHE))
-                        return delegate.getOutputSocket(name, options, template);
+                        return controller.getOutputSocket(name, options, template);
                     cache = new EntryCache(name);
                 }
                 return cache.getOutputSocket(options, template);
@@ -152,7 +152,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                         final @CheckForNull Entry template)
     throws IOException {
         assert isWriteLockedByCurrentThread();
-        delegate.mknod(name, type, options, template);
+        controller.mknod(name, type, options, template);
         final EntryCache cache = caches.remove(name);
         if (null != cache)
             cache.clear();
@@ -163,7 +163,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                         final BitField<AccessOption> options)
     throws IOException {
         assert isWriteLockedByCurrentThread();
-        delegate.unlink(name, options);
+        controller.unlink(name, options);
         final EntryCache cache = caches.remove(name);
         if (null != cache)
             cache.clear();
@@ -215,7 +215,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             }
             // TODO: Consume SyncOption.CLEAR_CACHE and clear a flag in
             // the model instead.
-            delegate.sync(options/*.clear(CLEAR_CACHE)*/, handler);
+            controller.sync(options/*.clear(CLEAR_CACHE)*/, handler);
         } while (null != preSyncEx);
     }
 
@@ -306,7 +306,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
             @Override
             protected InputSocket<? extends Entry> getLazyDelegate() {
-                return delegate.getInputSocket(name, options);
+                return controller.getInputSocket(name, options);
             }
 
             @Override
@@ -357,7 +357,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
             @Override
             protected OutputSocket<? extends Entry> getLazyDelegate() {
-                return cache.configure( delegate.getOutputSocket(
+                return cache.configure( controller.getOutputSocket(
                                             name,
                                             options.clear(EXCLUSIVE),
                                             template))
@@ -436,7 +436,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             throws IOException {
                 while (true) {
                     try {
-                        delegate.mknod(name, FILE, options, template);
+                        controller.mknod(name, FILE, options, template);
                         break;
                     } catch (final FsNeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
@@ -448,7 +448,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            delegate.sync(mknodEx);
+                            controller.sync(mknodEx);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             // sync() failed, maybe just because the current
