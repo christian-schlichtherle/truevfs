@@ -8,6 +8,8 @@ import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import static java.lang.Math.min;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -24,8 +26,8 @@ import org.bouncycastle.crypto.Mac;
  * you should synchronize their file pointers using the pattern as described
  * in the base class {@link DecoratingReadOnlyFile}.
  *
- * @see     CipherOutputStream
- * @author  Christian Schlichtherle
+ * @see    CipherOutputStream
+ * @author Christian Schlichtherle
  */
 //
 // Implementation notes:
@@ -58,16 +60,6 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      */
     private static final int MAX_WINDOW_LEN = 1024;
 
-    /** Returns the smaller parameter. */
-    private static long min(long a, long b) {
-        return a < b ? a : b;
-    }
-
-    /** Returns the greater parameter. */
-    /*private static final long max(long a, long b) {
-        return a < b ? b : a;
-    }*/
-
     /** Start offset of the encrypted data. */
     private long start;
 
@@ -95,7 +87,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     private byte[] window;
 
     /** The seekable block cipher which allows random access. */
-    private @Nullable SeekableBlockCipher cipher;
+    private @CheckForNull SeekableBlockCipher cipher;
 
     /**
      * The current offset in the encrypted file where the data starts that
@@ -109,9 +101,6 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * Note that this buffer contains decrypted data only.
      */
     private byte[] block;
-
-    /** Whether this read only file has been closed or not. */
-    private boolean closed;
 
     /**
      * Creates a read only file for transparent random read access to an
@@ -130,14 +119,16 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     }
 
     /**
-     * Asserts that this cipher output stream is in open state, which requires
+     * Checks that this cipher read only file is in open state, which requires
      * that {@link #cipher} is not {@code null}.
      *
      * @throws IOException If the preconditions do not hold.
      */
-    private void assertOpen() throws IOException {
+    private SeekableBlockCipher cipher() throws IOException {
+        final SeekableBlockCipher cipher = this.cipher;
         if (null == cipher)
-            throw new IOException("cipher read only file is not in open state");
+            throw new IOException("Cipher read only file has been closed!");
+        return cipher;
     }
 
     /**
@@ -148,37 +139,28 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * @param  length The length of the encrypted data in this file.
      * @throws IOException If this read only file has already been closed.
      *         This exception is <em>not</em> recoverable.
-     * @throws IllegalStateException If this object has already been
-     *         initialized.
-     *         This exception is <em>not</em> recoverable.
-     * @throws NullPointerException If {@link #rof} or {@code cipher} is
-     *         {@code null}.
-     *         This exception <em>is</em> recoverable.
+     * @throws IllegalStateException if {@link #rof} is {@code null} or
+     *         if this object has already been initialized.
+     * @throws IllegalArgumentException if {@code cipher} is {@code null} or
+     *         if {@code start} or {@code length} are less than zero.
      */
     protected final void init(
             final SeekableBlockCipher cipher,
             final long start,
-            final long length)
-    throws IOException {
+            final long length) {
         // Check state.
-        if (this.closed)
-            throw new IOException("file has been closed");
-        if (null != this.cipher)
-            throw new IllegalStateException("file is already initialized");
-
-        // Check state (recoverable).
         if (null == this.rof)
-            throw new NullPointerException();
+            throw new IllegalStateException();
+        if (null != this.cipher)
+            throw new IllegalStateException();
 
-        // Check parameters (fail fast).
-        if (null == cipher)
-            throw new NullPointerException();
-        if (start < 0 || length < 0)
+        // Check parameters.
+        if (null == (this.cipher = cipher))
             throw new IllegalArgumentException();
-
-        this.cipher = cipher;
-        this.start = start;
-        this.length = length;
+        if (0 > (this.start = start))
+            throw new IllegalArgumentException();
+        if (0 > (this.length = length))
+            throw new IllegalArgumentException();
 
         this.blockOff = length;
         final int blockLen = cipher.getBlockSize();
@@ -222,20 +204,19 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
     @Override
     public long length() throws IOException {
-        assertOpen();
+        cipher();
         return length;
     }
 
     @Override
     public long getFilePointer() throws IOException {
-        assertOpen();
+        cipher();
         return fp;
     }
 
     @Override
     public void seek(final long fp) throws IOException {
-        assertOpen();
-
+        cipher();
         if (fp < 0)
             throw new IOException("file pointer must not be negative");
         if (fp > length)
@@ -248,7 +229,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     @Override
     public int read() throws IOException {
         // Check state.
-        assertOpen();
+        cipher();
         if (fp >= length)
             return -1;
 
@@ -264,7 +245,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             return 0; // be fault-tolerant and compatible to RandomAccessFile
 
         // Check state.
-        assertOpen();
+        final SeekableBlockCipher cipher = cipher();
         if (fp >= length)
             return -1;
 
@@ -285,7 +266,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             if (o != 0) {
                 // The file pointer is not on a block boundary.
                 positionBlock();
-                read = (int) min(len, blockLen - o);
+                read = min(len, blockLen - o);
                 read = (int) min(read, length - fp);
                 System.arraycopy(block, o, buf, off, read);
                 fp += read;
@@ -330,10 +311,6 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      */
     @Override
     public void close() throws IOException {
-        // Order is important here!
-        if (closed)
-            return;
-        closed = true;
         cipher = null;
         rof.close();
     }
