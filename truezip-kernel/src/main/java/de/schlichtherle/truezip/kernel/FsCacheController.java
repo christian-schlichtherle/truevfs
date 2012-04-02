@@ -306,7 +306,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
             @Override
             protected InputSocket<? extends Entry> getLazyDelegate() {
-                return delegate.getInputSocket(name, options);
+                return FsCacheController.this.delegate.getInputSocket(name, options);
             }
 
             @Override
@@ -357,7 +357,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
             @Override
             protected OutputSocket<? extends Entry> getLazyDelegate() {
-                return cache.configure( delegate.getOutputSocket(
+                return cache.configure( FsCacheController.this.delegate.getOutputSocket(
                                             name,
                                             options.clear(EXCLUSIVE),
                                             template))
@@ -436,7 +436,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             throws IOException {
                 while (true) {
                     try {
-                        delegate.mknod(name, FILE, options, template);
+                        FsCacheController.this.delegate.mknod(name, FILE, options, template);
                         break;
                     } catch (final FsNeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
@@ -448,7 +448,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            delegate.sync(mknodEx);
+                            FsCacheController.this.delegate.sync(mknodEx);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             // sync() failed, maybe just because the current

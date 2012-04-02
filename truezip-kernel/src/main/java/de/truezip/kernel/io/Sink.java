@@ -21,14 +21,14 @@ public interface Sink {
      * <b>Optional operation:</b> Returns a new seekable byte channel for
      * writing bytes in random order.
      * <p>
-     * If this method is supported, implementations must enable calling it
+     * If this method is supported, the implementation must enable calling it
      * any number of times.
      * Furthermore, the returned seekable byte channel should <em>not</em> be
      * buffered.
      * Buffering should get addressed by the caller instead.
      *
      * @return A new seekable byte channel.
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O failure.
      * @throws UnsupportedOperationException if this operation is not supported
      * by the implementation.
      */
@@ -38,12 +38,12 @@ public interface Sink {
     /**
      * Returns a new output stream for writing bytes.
      * <p>
-     * Implementations must enable calling this method any number of times.
+     * The implementation must enable calling this method any number of times.
      * Furthermore, the returned output stream should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
      *
      * @return A new output stream.
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O failure.
      */
     @CreatesObligation
     OutputStream newOutputStream() throws IOException;

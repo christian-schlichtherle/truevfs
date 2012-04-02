@@ -105,9 +105,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
-        protected OutputSocket<? extends E> getBoundDelegate() throws IOException {
+        protected OutputSocket<? extends E> getDelegate() throws IOException {
             checkOpen();
-            return getDelegate().bind(this);
+            return delegate;
         }
 
         @Override

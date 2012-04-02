@@ -92,16 +92,16 @@ extends IOSocket<E, Entry> implements Source {
     }
 
     /**
-     * <b>Optional:</b> Returns a new read only file for reading bytes from
-     * the {@link #getLocalTarget() local target} in arbitrary order.
+     * <b>Optional operation:</b> Returns a new read only file for reading
+     * bytes from the {@link #getLocalTarget() local target} in random order.
      * <p>
-     * If this method is supported, implementations must enable calling it
+     * If this method is supported, the implementation must enable calling it
      * any number of times.
      * Furthermore, the returned read only file should <em>not</em> be buffered.
-     * Buffering should be addressed by client applications instead.
+     * Buffering should get addressed by the caller instead.
      *
      * @return A new read only file.
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O failure.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
      */
