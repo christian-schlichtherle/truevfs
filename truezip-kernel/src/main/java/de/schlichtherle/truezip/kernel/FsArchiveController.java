@@ -181,6 +181,7 @@ extends FsLockModelController {
         return new Input(name);
     }
 
+    @NotThreadSafe
     private final class Input extends DelegatingInputSocket<FsArchiveEntry> {
         final FsEntryName name;
         @CheckForNull FsArchiveEntry localTarget;
@@ -225,6 +226,7 @@ extends FsLockModelController {
         return new Output(name, options, template);
     }
 
+    @NotThreadSafe
     private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
         final BitField<AccessOption> options;

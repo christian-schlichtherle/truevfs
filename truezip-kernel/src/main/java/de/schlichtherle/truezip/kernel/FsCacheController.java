@@ -296,7 +296,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
          * This class requires LAZY INITIALIZATION of its delegate and
          * automatic decoupling on exceptions!
          */
-        @Immutable
+        @NotThreadSafe
         final class Input extends ClutchInputSocket<Entry> {
             final BitField<AccessOption> options;
 
@@ -344,7 +344,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
          * This class requires LAZY INITIALIZATION of its delegate, but NO
          * automatic decoupling on exceptions!
          */
-        @Immutable
+        @NotThreadSafe
         final class Output extends ClutchOutputSocket<Entry> {
             final BitField<AccessOption> options;
             final @CheckForNull Entry template;
