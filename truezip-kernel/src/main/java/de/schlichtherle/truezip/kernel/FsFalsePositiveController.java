@@ -4,15 +4,15 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.*;
+import de.truezip.kernel.addr.FsEntryName;
+import static de.truezip.kernel.addr.FsEntryName.ROOT;
+import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsEntryName;
-import static de.truezip.kernel.addr.FsEntryName.ROOT;
-import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.rof.ReadOnlyFile;
@@ -450,7 +450,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             throws IOException {
                 controller.unlink(name, options);
                 if (name.isRoot()) {
-                    assert controller == delegate;
+                    assert controller == FsFalsePositiveController.this.delegate;
                     // We have successfully removed the virtual root directory
                     // of a federated file system, i.e. an archive file.
                     // Now unlink the target archive file from the parent file
