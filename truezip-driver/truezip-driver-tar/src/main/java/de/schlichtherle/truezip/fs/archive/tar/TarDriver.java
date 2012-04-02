@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillClose;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
@@ -145,16 +146,16 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        TarInputShop ia = null;
-        final InputStream is = input.newInputStream();
+        TarInputShop is = null;
+        final @WillClose InputStream in = input.newInputStream();
         try {
-            return ia = newTarInputShop(model, is);
+            return is = newTarInputShop(model, in);
         } finally {
             try {
-                is.close();
+                in.close();
             } catch (final IOException ex) {
-                if (null != ia)
-                    ia.close();
+                if (null != is)
+                    is.close();
                 throw ex;
             }
         }
@@ -185,13 +186,13 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final OutputStream os = output.newOutputStream();
+        final OutputStream out = output.newOutputStream();
         try {
             return new FsMultiplexedOutputShop<TarDriverEntry>(
-                    newTarOutputShop(model, os, (TarInputShop) source),
+                    newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (final IOException ex) {
-            os.close();
+            out.close();
             throw ex;
         }
     }
