@@ -44,8 +44,9 @@ extends DecoratingOutputSocket<E> {
     public E getLocalTarget() throws IOException {
         try {
             return getBoundSocket().getLocalTarget();
-        } catch (Throwable ex) {
-            throw reset(ex);
+        } catch (final Throwable ex) {
+            reset();
+            throw ex;
         }
     }
 
@@ -54,8 +55,9 @@ extends DecoratingOutputSocket<E> {
     throws IOException {
         try {
             return getBoundSocket().newSeekableByteChannel();
-        } catch (Throwable ex) {
-            throw reset(ex);
+        } catch (final Throwable ex) {
+            reset();
+            throw ex;
         }
     }
 
@@ -63,18 +65,10 @@ extends DecoratingOutputSocket<E> {
     public OutputStream newOutputStream() throws IOException {
         try {
             return getBoundSocket().newOutputStream();
-        } catch (Throwable ex) {
-            throw reset(ex);
+        } catch (final Throwable ex) {
+            reset();
+            throw ex;
         }
-    }
-
-    private IOException reset(final Throwable ex) {
-        reset();
-        if (ex instanceof RuntimeException)
-            throw (RuntimeException) ex;
-        else if (ex instanceof Error)
-            throw (Error) ex;
-        return (IOException) ex;
     }
 
     protected final void reset() {
