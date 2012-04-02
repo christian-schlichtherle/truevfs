@@ -31,7 +31,7 @@ public final class RaesZipIT extends ZipTestSuite {
     @Override
     protected ZipOutputStream newZipOutputStream(final OutputStream out)
     throws IOException {
-        final RaesOutputStream ros = new RaesSink(new InvalidSink(out),
+        final OutputStream ros = new RaesSink(new InvalidSink(out),
                 raesParameters).newStream();
         try {
             return new ZipOutputStream(ros);
@@ -45,7 +45,7 @@ public final class RaesZipIT extends ZipTestSuite {
     protected ZipOutputStream newZipOutputStream(
             final OutputStream out, final Charset cs)
     throws IOException {
-        final RaesOutputStream ros = new RaesSink(new InvalidSink(out),
+        final OutputStream ros = new RaesSink(new InvalidSink(out),
                 raesParameters).newStream();
         try {
             return new ZipOutputStream(ros, cs);
