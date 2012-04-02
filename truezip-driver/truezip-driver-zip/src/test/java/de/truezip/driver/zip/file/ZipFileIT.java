@@ -13,7 +13,7 @@ import de.truezip.file.TFileITSuite;
 public final class ZipFileIT extends TFileITSuite<ZipDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "zip";
     }
 

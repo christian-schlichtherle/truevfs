@@ -13,7 +13,7 @@ import de.truezip.file.ConcurrentSyncITSuite;
 public final class OdfConcurrentSyncIT extends ConcurrentSyncITSuite<OdfDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "odf";
     }
 

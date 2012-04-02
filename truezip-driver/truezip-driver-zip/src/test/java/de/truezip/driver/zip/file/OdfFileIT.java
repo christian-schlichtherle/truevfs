@@ -13,7 +13,7 @@ import de.truezip.file.TFileITSuite;
 public final class OdfFileIT extends TFileITSuite<OdfDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "odf";
     }
 

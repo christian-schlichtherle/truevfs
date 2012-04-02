@@ -13,7 +13,7 @@ import de.truezip.file.ConcurrentSyncITSuite;
 public final class ZipConcurrentSyncIT extends ConcurrentSyncITSuite<ZipDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "zip";
     }
 

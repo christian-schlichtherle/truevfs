@@ -97,7 +97,7 @@
         </dependency>
 
         <!-- This driver provides access to the following URI schemes and
-             archive file suffixes:
+             archive file extensions:
              tar: TAR file format.
              tgz|tar.gz: GZIP compressed TAR file format.
              tb2|tbz|tar.bz2: BZIP2 compressed TAR file format.
@@ -110,7 +110,7 @@
         </dependency>
 
         <!-- This driver provides access to the following URI schemes and
-             archive file suffixes:
+             archive file extensions:
              tzp|zip.rae|zip.raes: RAES encrypted ZIP file format.
              -->
         <dependency>
@@ -121,7 +121,7 @@
         </dependency>
 
         <!-- This driver provides access to the following URI schemes and
-             archive file suffixes:
+             archive file extensions:
              zip: ZIP file format.
              ear|jar|war: JAR file format.
              odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb: Open Document File format.

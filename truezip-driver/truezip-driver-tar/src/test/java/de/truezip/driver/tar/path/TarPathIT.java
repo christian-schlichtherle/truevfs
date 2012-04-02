@@ -12,7 +12,7 @@ import de.truezip.driver.tar.TarDriver;
 public final class TarPathIT extends TarPathITSuite<TarDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tar";
     }
 

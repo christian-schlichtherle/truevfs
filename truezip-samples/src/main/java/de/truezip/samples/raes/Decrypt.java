@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
  * <p>
  * Please note that you should not use this utility to decrypt an RAES
  * encrypted ZIP file (usually a file with a {@code ".tzp"} or
- * {@code ".zip.rae"} suffix) back to a plain ZIP file.
+ * {@code ".zip.rae"} extension) back to a plain ZIP file.
  * This is because RAES encrypted ZIP files use the &quot;UTF-8&quot;
  * as their character set, whereas plain ZIP files use &quot;IBM437&quot;,
  * a.k.a. &quot;CP437&quot;.

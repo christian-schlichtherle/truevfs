@@ -13,7 +13,7 @@ import de.truezip.file.ConcurrentSyncITSuite;
 public final class JarConcurrentSyncIT extends ConcurrentSyncITSuite<JarDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "jar";
     }
 

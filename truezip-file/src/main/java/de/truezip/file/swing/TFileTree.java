@@ -39,22 +39,22 @@ public final class TFileTree extends JTree {
 
     private static final long serialVersionUID = 1064787562479927601L;
 
-    /** The name of the property {@code displayingSuffixes}. */
-    private static final String PROPERTY_DISPLAYING_SUFFIXES = "displayingSuffixes"; // NOI18N
+    /** The name of the property {@code displayingExtensions}. */
+    private static final String PROPERTY_DISPLAYING_EXTENSIONS = "displayingExtensions"; // NOI18N
 
-    /** The name of the property {@code editingSuffixes}. */
-    private static final String PROPERTY_EDITING_SUFFIXES = "editingSuffixes"; // NOI18N
+    /** The name of the property {@code editingExtensions}. */
+    private static final String PROPERTY_EDITING_EXTENSIONS = "editingExtensions"; // NOI18N
 
-    /** The name of the property {@code defaultSuffix}. */
-    private static final String PROPERTY_DEFAULT_SUFFIX = "defaultSuffix"; // NOI18N
+    /** The name of the property {@code defaultExtension}. */
+    private static final String PROPERTY_DEFAULT_EXTENSION = "defaultExtension"; // NOI18N
 
     private final Controller controller = new Controller();
 
-    private boolean displayingSuffixes = true;
+    private boolean displayingExtensions = true;
 
-    private boolean editingSuffixes = true;
+    private boolean editingExtensions = true;
 
-    private @CheckForNull String defaultSuffix;
+    private @CheckForNull String defaultExtension;
 
     private transient @CheckForNull TFile editedNode;
 
@@ -118,86 +118,86 @@ public final class TFileTree extends JTree {
     }
 
     /**
-     * Getter for bound property displayingSuffixes.
+     * Getter for bound property displayingExtensions.
      *
-     * @return Value of property displayingSuffixes.
+     * @return Value of property displayingExtensions.
      */
-    public boolean isDisplayingSuffixes() {
-        return this.displayingSuffixes;
+    public boolean isDisplayingExtensions() {
+        return this.displayingExtensions;
     }
 
     /**
-     * Setter for bound property displayingSuffixes.
-     * If this is {@code false}, the suffix of files will not be displayed
+     * Setter for bound property displayingExtensions.
+     * If this is {@code false}, the extension of files will not be displayed
      * in this tree.
      * Defaults to {@code true}.
      *
-     * @param displayingSuffixes New value of property displayingSuffixes.
+     * @param displayingExtensions New value of property displayingExtensions.
      */
-    public void setDisplayingSuffixes(boolean displayingSuffixes) {
-        boolean oldDisplayingSuffixes = this.displayingSuffixes;
-        this.displayingSuffixes = displayingSuffixes;
-        firePropertyChange(PROPERTY_DISPLAYING_SUFFIXES,
-                oldDisplayingSuffixes, displayingSuffixes);
+    public void setDisplayingExtensions(boolean displayingExtensions) {
+        boolean oldDisplayingExtensions = this.displayingExtensions;
+        this.displayingExtensions = displayingExtensions;
+        firePropertyChange(PROPERTY_DISPLAYING_EXTENSIONS,
+                oldDisplayingExtensions, displayingExtensions);
     }
 
     /**
-     * Getter for bound property editingSuffixes.
+     * Getter for bound property editingExtensions.
      *
-     * @return Value of property editingSuffixes.
+     * @return Value of property editingExtensions.
      */
-    public boolean isEditingSuffixes() {
-        return this.editingSuffixes;
+    public boolean isEditingExtensions() {
+        return this.editingExtensions;
     }
 
     /**
-     * Setter for bound property editingSuffixes.
-     * If this is {@code false}, the suffix of a file will be truncated
+     * Setter for bound property editingExtensions.
+     * If this is {@code false}, the extension of a file will be truncated
      * before editing its name starts.
      * Defaults to {@code true}.
      *
-     * @param editingSuffixes New value of property editingSuffixes.
+     * @param editingExtensions New value of property editingExtensions.
      */
-    public void setEditingSuffixes(boolean editingSuffixes) {
-        boolean oldEditingSuffixes = this.editingSuffixes;
-        this.editingSuffixes = editingSuffixes;
-        firePropertyChange(PROPERTY_EDITING_SUFFIXES,
-                oldEditingSuffixes, editingSuffixes);
+    public void setEditingExtensions(boolean editingExtensions) {
+        boolean oldEditingExtensions = this.editingExtensions;
+        this.editingExtensions = editingExtensions;
+        firePropertyChange(PROPERTY_EDITING_EXTENSIONS,
+                oldEditingExtensions, editingExtensions);
     }
 
     /**
-     * Getter for bound property defaultSuffix.
+     * Getter for bound property defaultExtension.
      *
-     * @return Value of property defaultSuffix.
+     * @return Value of property defaultExtension.
      */
-    public @Nullable String getDefaultSuffix() {
-        return this.defaultSuffix;
+    public @Nullable String getDefaultExtension() {
+        return this.defaultExtension;
     }
 
     /**
-     * Setter for bound property defaultSuffixes.
-     * Sets the default suffix to use when suffixes are shown and allowed to
-     * be edited, but the user did not provide a suffix when editing a file
+     * Setter for bound property defaultExtension.
+     * Sets the default extension to use when extensions are shown and allowed to
+     * be edited, but the user did not provide an extension when editing a file
      * name.
      * This property defaults to {@code null} and is ignored for
      * directories.
      *
-     * @param defaultSuffix The new default suffix.
+     * @param defaultExtension The new default extension.
      *        If not {@code null}, this parameter is fixed to always
      *        start with a {@code '.'}.
      */
-    public void setDefaultSuffix(@CheckForNull String defaultSuffix) {
-        final String oldDefaultSuffix = this.defaultSuffix;
-        if (null != defaultSuffix) {
-            defaultSuffix = defaultSuffix.trim();
-            if (defaultSuffix.length() <= 0)
-                defaultSuffix = null;
-            else if (defaultSuffix.charAt(0) != '.')
-                defaultSuffix = "." + defaultSuffix;
+    public void setDefaultExtension(@CheckForNull String defaultExtension) {
+        final String oldDefaultExtension = this.defaultExtension;
+        if (null != defaultExtension) {
+            defaultExtension = defaultExtension.trim();
+            if (defaultExtension.length() <= 0)
+                defaultExtension = null;
+            else if (defaultExtension.charAt(0) != '.')
+                defaultExtension = "." + defaultExtension;
         }
-        this.defaultSuffix = defaultSuffix;
-        firePropertyChange(PROPERTY_DEFAULT_SUFFIX,
-                oldDefaultSuffix, defaultSuffix);
+        this.defaultExtension = defaultExtension;
+        firePropertyChange(PROPERTY_DEFAULT_EXTENSION,
+                oldDefaultExtension, defaultExtension);
     }
 
     /** Returns the node that is currently edited, if any. */
@@ -233,7 +233,7 @@ public final class TFileTree extends JTree {
     /**
      * Called when the editing of a cell has been stopped.
      * The implementation in this class will rename the edited file,
-     * obeying the rules for suffix handling and updating the expanded and
+     * obeying the rules for extension handling and updating the expanded and
      * selected paths accordingly.
      *
      * @param evt The change event passed to
@@ -247,17 +247,17 @@ public final class TFileTree extends JTree {
         final TFile parent = oldNode.getParentFile();
         assert parent != null;
         if (!oldNode.isDirectory()) {
-            if (isDisplayingSuffixes() && isEditingSuffixes()) {
-                final String suffix = getSuffix(member);
-                if (null == suffix) {
-                    final String defaultSuffix = getDefaultSuffix();
-                    if (defaultSuffix != null)
-                        member += defaultSuffix;
+            if (isDisplayingExtensions() && isEditingExtensions()) {
+                final String extension = getExtension(member);
+                if (null == extension) {
+                    final String defaultExtension = getDefaultExtension();
+                    if (defaultExtension != null)
+                        member += defaultExtension;
                 }
             } else {
-                final String suffix = getSuffix(oldNode.getName());
-                if (null != suffix)
-                    member += suffix;
+                final String extension = getExtension(oldNode.getName());
+                if (null != extension)
+                    member += extension;
             }
         }
         final TFile node = new TFile(parent, member);
@@ -270,7 +270,7 @@ public final class TFileTree extends JTree {
         }
     }
 
-    private @Nullable String getSuffix(final String base) {
+    private @Nullable String getExtension(final String base) {
         final int i = base.lastIndexOf('.');
         return i != -1 ? base.substring(i) : null;
     }
@@ -297,8 +297,8 @@ public final class TFileTree extends JTree {
         if (base.length() <= 0)
             return node.getPath(); // This is a file system root.
         if (node.isDirectory() ||
-                isDisplayingSuffixes()
-                && (!node.equals(editedNode) || isEditingSuffixes()))
+                isDisplayingExtensions()
+                && (!node.equals(editedNode) || isEditingExtensions()))
             return base;
         final int i = base.lastIndexOf('.');
         return i != -1 ? base.substring(0, i) : base;
@@ -582,7 +582,7 @@ public final class TFileTree extends JTree {
 
     public void setSelectionNodes(final TFile[] nodes) {
         final TFileTreeModel ftm = getModel();
-        final java.util.List<TreePath> list = new LinkedList<TreePath>();
+        final java.util.List<TreePath> list = new LinkedList<>();
         for (int i = 0, l = nodes.length; i < l; i++) {
             final TreePath lastPath = ftm.newTreePath(nodes[i]);
             if (lastPath != null)

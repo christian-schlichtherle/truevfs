@@ -11,7 +11,7 @@ About TrueZIP Driver ZIP.RAES (TZP)
     which provides the following map of file system drivers:
 
 *--*--*
-||URI Schemes / Archive File Suffixes||File System Driver Class|
+||URI Schemes / Archive File Extension||File System Driver Class|
 *--+--+
 |<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
 *--+--+
@@ -19,7 +19,7 @@ About TrueZIP Driver ZIP.RAES (TZP)
     Add the JAR artifact of this module to the run time class path to
     make its file system drivers available for service location in the
     client API modules.
-    The URI schemes will then get recognized as default archive file suffixes
+    The URI schemes will then get recognized as default archive file extensions
     by the class
     {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
 

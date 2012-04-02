@@ -13,7 +13,7 @@ import de.truezip.file.ConcurrentSyncITSuite;
 public final class ZipRaesConcurrentSyncIT extends ConcurrentSyncITSuite<TestZipRaesDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tzp";
     }
 

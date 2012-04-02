@@ -25,7 +25,7 @@ public abstract class KeyManagementITSuite {
             logger = Logger.getLogger(KeyManagementITSuite.class.getName());
 
     private static final String PREFIX = "tzp";
-    private static final String SUFFIX = "eaff";
+    private static final String EXTENSION = "eaff";
     private static final String PASSWORD = "top secret";
 
     /** The data to get compressed. */
@@ -68,7 +68,7 @@ public abstract class KeyManagementITSuite {
         // TODO: Removing .getCanonicalFile() may cause archive.rm_r() to
         // fail in some cases - explain why!
         // For more info, refer to TFileTestSuite.
-        return File.createTempFile(PREFIX, "." + SUFFIX).getCanonicalFile();
+        return File.createTempFile(PREFIX, "." + EXTENSION).getCanonicalFile();
     }
 
     private void umount() throws FsSyncException {
@@ -78,21 +78,21 @@ public abstract class KeyManagementITSuite {
 
     @Test
     public void testSetPasswords1() throws IOException {
-        archive = new TFile(temp, newArchiveDetector1(SUFFIX, PASSWORD));
+        archive = new TFile(temp, newArchiveDetector1(EXTENSION, PASSWORD));
         roundTrip();
     }
 
     protected abstract TArchiveDetector
-    newArchiveDetector1(String suffix, String password);
+    newArchiveDetector1(String extension, String password);
 
     @Test
     public void testSetPasswords2() throws IOException {
-        archive = new TFile(temp, newArchiveDetector2(SUFFIX, PASSWORD));
+        archive = new TFile(temp, newArchiveDetector2(EXTENSION, PASSWORD));
         roundTrip();
     }
 
     protected abstract TArchiveDetector
-    newArchiveDetector2(String suffix, String password);
+    newArchiveDetector2(String extension, String password);
 
     private void roundTrip() throws IOException {
         final TFile file = new TFile(archive, "entry");

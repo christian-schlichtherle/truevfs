@@ -11,7 +11,7 @@ About TrueZIP Driver TAR
     which provides the following map of file system drivers:
 
 *--*--*
-||URI Schemes / Archive File Suffixes||File System Driver Class|
+||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
 |<<<tar>>>|{{{./apidocs/de/truezip/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
 *--+--+
@@ -23,6 +23,6 @@ About TrueZIP Driver TAR
     Add the JAR artifact of this module to the run time class path to
     make its file system drivers available for service location in the
     client API modules.
-    The URI schemes will then get recognized as default archive file suffixes
+    The URI schemes will then get recognized as default archive file extensions
     by the class
     {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.

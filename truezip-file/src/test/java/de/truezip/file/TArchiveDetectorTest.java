@@ -8,7 +8,7 @@ import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.mock.MockArchiveDriver;
-import de.truezip.kernel.util.SuffixSet;
+import de.truezip.kernel.util.ExtensionSet;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
@@ -77,37 +77,37 @@ public final class TArchiveDetectorTest {
                     { "DEFAULT" },
                     { "NULL" },
                     { "ALL" },
-                    { "unknownSuffix" },
-                    { "", driver }, // empty suffix set
-                    { ".", driver }, // empty suffix set
-                    { "|", driver }, // empty suffix set
-                    { "|.", driver }, // empty suffix set
-                    { "||", driver }, // empty suffix set
-                    { "||.", driver }, // empty suffix set
-                    { "|.|", driver }, // empty suffix set
-                    { "|.|.", driver }, // empty suffix set
-                    { NIL, "", driver }, // empty suffix set
-                    { NIL, ".", driver }, // empty suffix set
-                    { NIL, "|", driver }, // empty suffix set
-                    { NIL, "|.", driver }, // empty suffix set
-                    { NIL, "||", driver }, // empty suffix set
-                    { NIL, "||.", driver }, // empty suffix set
-                    { NIL, "|.|", driver }, // empty suffix set
-                    { NIL, "|.|.", driver }, // empty suffix set
-                    { NIL, new Object[][] {{ "", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ ".", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ "|", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ "|.", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ "||", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ "||.", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ "|.|", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ "|.|.", driver }} }, // empty suffix set
-                    { NIL, new Object[][] {{ "anySuffix", "" }} }, // empty class name
-                    { NIL, new Object[][] {{ "anySuffix", "xyz" }} }, // not a class name
-                    { NIL, new Object[][] {{ MockArchiveDriver.class, driver }} }, // not a suffix list
-                    { NIL, new Object[][] {{ driver, driver }} }, // not a suffix list
-                    { NIL, new Object[][] {{ "anySuffix", new Object() }} }, // not an archive driver
-                    { NIL, new Object[][] {{ "anySuffix", Object.class }} }, // not an archive driver class
+                    { "unknownExtension" },
+                    { "", driver }, // empty extension set
+                    { ".", driver }, // empty extension set
+                    { "|", driver }, // empty extension set
+                    { "|.", driver }, // empty extension set
+                    { "||", driver }, // empty extension set
+                    { "||.", driver }, // empty extension set
+                    { "|.|", driver }, // empty extension set
+                    { "|.|.", driver }, // empty extension set
+                    { NIL, "", driver }, // empty extension set
+                    { NIL, ".", driver }, // empty extension set
+                    { NIL, "|", driver }, // empty extension set
+                    { NIL, "|.", driver }, // empty extension set
+                    { NIL, "||", driver }, // empty extension set
+                    { NIL, "||.", driver }, // empty extension set
+                    { NIL, "|.|", driver }, // empty extension set
+                    { NIL, "|.|.", driver }, // empty extension set
+                    { NIL, new Object[][] {{ "", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ ".", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ "|", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ "|.", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ "||", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ "||.", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ "|.|", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ "|.|.", driver }} }, // empty extension set
+                    { NIL, new Object[][] {{ "anyExtension", "" }} }, // empty class name
+                    { NIL, new Object[][] {{ "anyExtension", "xyz" }} }, // not a class name
+                    { NIL, new Object[][] {{ MockArchiveDriver.class, driver }} }, // not a extension list
+                    { NIL, new Object[][] {{ driver, driver }} }, // not a extension list
+                    { NIL, new Object[][] {{ "anyExtension", new Object() }} }, // not an archive driver
+                    { NIL, new Object[][] {{ "anyExtension", Object.class }} }, // not an archive driver class
                 });
     }
 
@@ -211,8 +211,8 @@ public final class TArchiveDetectorTest {
     }
 
     @Test
-    public void testGetSuffixes() {
-        assertSuffixes(new String[] {
+    public void testGetExtensions() {
+        assertExtensions(new String[] {
             "zip", "zip",
             "zip", ".zip",
             "zip", "|zip",
@@ -271,16 +271,16 @@ public final class TArchiveDetectorTest {
         });
     }
 
-    private void assertSuffixes(final String[] args) {
+    private void assertExtensions(final String[] args) {
         for (int i = 0; i < args.length; ) {
             final String result = args[i++];
-            final String suffixes = args[i++];
+            final String extensions = args[i++];
             TArchiveDetector
-            detector = new TArchiveDetector(suffixes, driver);
+            detector = new TArchiveDetector(extensions, driver);
             assertEquals(result, detector.toString());
-            detector = new TArchiveDetector(NIL, suffixes, driver);
+            detector = new TArchiveDetector(NIL, extensions, driver);
             assertEquals(result, detector.toString());
-            detector = new TArchiveDetector(NIL, new Object[][] {{ suffixes, driver }});
+            detector = new TArchiveDetector(NIL, new Object[][] {{ extensions, driver }});
             assertEquals(result, detector.toString());
         }
     }
@@ -292,11 +292,11 @@ public final class TArchiveDetectorTest {
             ALL,
         }) {
             TArchiveDetector detector = new TArchiveDetector(
-                    delegate, "zip", null); // remove zip suffix
-            assertFalse(new SuffixSet(detector.toString()).contains("zip"));
+                    delegate, "zip", null); // remove zip extension
+            assertFalse(new ExtensionSet(detector.toString()).contains("zip"));
             detector = new TArchiveDetector(
-                    delegate, ".ZIP", null); // remove zip suffix
-            assertFalse(new SuffixSet(detector.toString()).contains("zip"));
+                    delegate, ".ZIP", null); // remove zip extension
+            assertFalse(new ExtensionSet(detector.toString()).contains("zip"));
         }
     }
 

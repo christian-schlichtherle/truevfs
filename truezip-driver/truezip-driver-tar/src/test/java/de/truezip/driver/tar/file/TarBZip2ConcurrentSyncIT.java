@@ -14,7 +14,7 @@ public final class TarBZip2ConcurrentSyncIT
 extends ConcurrentSyncITSuite<TarBZip2Driver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tar.bz2";
     }
 

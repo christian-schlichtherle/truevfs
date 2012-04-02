@@ -13,7 +13,7 @@ import de.truezip.path.TPathITSuite;
 public final class OdfPathIT extends TPathITSuite<OdfDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "odf";
     }
 

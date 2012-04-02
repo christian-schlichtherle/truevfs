@@ -8,7 +8,7 @@ import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.sl.FsDriverLocator;
-import de.truezip.kernel.util.SuffixSet;
+import de.truezip.kernel.util.ExtensionSet;
 import java.io.PrintStream;
 import java.util.Map.Entry;
 import java.util.*;
@@ -47,7 +47,7 @@ public final class DriverMap implements Runnable {
     @Override
     public void run() {
         final Map<FsScheme, FsDriver> map = provider.get();
-        final Map<String, SuffixSet> compact = compact(map);
+        final Map<String, ExtensionSet> compact = compact(map);
         out     .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
                 .append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n")
                 .append("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
@@ -65,7 +65,7 @@ public final class DriverMap implements Runnable {
                 .append("        </tr>\n")
                 .append("      </thead>\n")
                 .append("      <tbody>\n");
-        for (Entry<String, SuffixSet> entry : compact.entrySet()) {
+        for (Entry<String, ExtensionSet> entry : compact.entrySet()) {
             String clazz = entry.getKey();
             List<String> set = new ArrayList<String>(entry.getValue());
             String federated = Boolean.toString(
@@ -89,19 +89,19 @@ public final class DriverMap implements Runnable {
                 .append("</html>\n");
     }
 
-    private static Map<String, SuffixSet> compact(
+    private static Map<String, ExtensionSet> compact(
             final Map<FsScheme, FsDriver> input) {
-        final Map<String, SuffixSet>
-                output = new TreeMap<String, SuffixSet>();
+        final Map<String, ExtensionSet>
+                output = new TreeMap<String, ExtensionSet>();
         for (final Entry<FsScheme, FsDriver> entry : input.entrySet()) {
             final String scheme = entry.getKey().toString();
             final String clazz = entry.getValue().getClass().getName();
-            SuffixSet suffixes = output.get(clazz);
-            if (null == suffixes) {
-                suffixes = new SuffixSet();
-                output.put(clazz, suffixes);
+            ExtensionSet extensions = output.get(clazz);
+            if (null == extensions) {
+                extensions = new ExtensionSet();
+                output.put(clazz, extensions);
             }
-            suffixes.add(scheme);
+            extensions.add(scheme);
         }
         return Collections.unmodifiableMap(output);
     }

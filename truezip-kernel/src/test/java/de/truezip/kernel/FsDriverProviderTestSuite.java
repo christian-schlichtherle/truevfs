@@ -5,7 +5,7 @@
 package de.truezip.kernel;
 
 import de.truezip.kernel.addr.FsScheme;
-import de.truezip.kernel.util.SuffixSet;
+import de.truezip.kernel.util.ExtensionSet;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -18,7 +18,7 @@ public abstract class FsDriverProviderTestSuite {
 
     private FsDriverProvider provider;
 
-    protected abstract String getSuffixes();
+    protected abstract String getExtensions();
     protected abstract FsDriverProvider newDriverProvider();
 
     @Before
@@ -28,15 +28,15 @@ public abstract class FsDriverProviderTestSuite {
 
     @Test
     public void testGet() {
-        for (final String suffix : new SuffixSet(getSuffixes()))
-            assertNotNull(provider.get().get(FsScheme.create(suffix)));
+        for (final String extension : new ExtensionSet(getExtensions()))
+            assertNotNull(provider.get().get(FsScheme.create(extension)));
     }
 
     @Test
     public void testImmutability() {
-        for (final String suffix : new SuffixSet(getSuffixes()) ) {
+        for (final String extension : new ExtensionSet(getExtensions()) ) {
             try {
-                provider.get().remove(FsScheme.create(suffix));
+                provider.get().remove(FsScheme.create(extension));
                 fail();
             } catch (UnsupportedOperationException expected) {
             }

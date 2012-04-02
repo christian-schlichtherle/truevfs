@@ -21,7 +21,7 @@ import org.junit.Test;
 public final class ZipRaesPathIT extends TPathITSuite<TestZipRaesDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tzp";
     }
 
@@ -69,7 +69,7 @@ public final class ZipRaesPathIT extends TPathITSuite<TestZipRaesDriver> {
     @Test
     public void testFileStatus() throws IOException {
         final TPath archive = getArchive();
-        final TPath inner = archive.resolve("inner" + getSuffix());
+        final TPath inner = archive.resolve("inner" + getExtension());
 
         createDirectory(archive);
         createDirectory(inner);

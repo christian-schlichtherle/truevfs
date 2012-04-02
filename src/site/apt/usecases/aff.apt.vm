@@ -10,7 +10,7 @@ Application File Format
 * Motivation
 
     Suppose you're writing a plug-in for the next generation application
-    which shall use an archive file format with a custom file suffix
+    which shall use an archive file format with a custom file extension
     (extension) as a persistent container for some application data, e.g. a
     text document.
 
@@ -31,7 +31,7 @@ Application File Format
     archive file as if they were plain files in regular directories in the file
     system.
 
-    First, you need to register your custom application file format suffix
+    First, you need to register your custom application file format extension
     with an instance of an archive driver class like this:
 
 +--+
@@ -42,12 +42,12 @@ TConfig.get().setArchiveDetector(
 +--+
 
     Once this has been called, any new <<<TFile>>> object will recognize the
-    file suffixes <<<foo>>> and <<<bar>>>, whereby case is ignored,
+    file extensions <<<foo>>> and <<<bar>>>, whereby case is ignored,
     and assume the JAR file format to read or write these files.
 
     Note that TrueZIP automatically recognizes false positive archive files,
     so it cannot get confused by files with arbitrary content which accidently
-    use the suffix of your custom application file format.
+    use the extensions of your custom application file format.
 
     Please also note the usage of the class
     {{{../apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}

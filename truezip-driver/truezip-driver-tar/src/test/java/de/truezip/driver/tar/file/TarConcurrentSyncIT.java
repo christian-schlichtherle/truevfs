@@ -14,7 +14,7 @@ public final class TarConcurrentSyncIT
 extends ConcurrentSyncITSuite<TarDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tar";
     }
 

@@ -154,7 +154,7 @@ import javax.swing.filechooser.FileSystemView;
  * 
  * <a name="falsePositives"/><h3>Detecting Archive Files and False Positives</h3>
  * <p>
- * Whenever an archive file suffix is detected in a path, this class treats
+ * Whenever an archive file extension is detected in a path, this class treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
  * The word &quot;prospective&quot; suggests that just because a file is named
  * <i>archive.zip</i> it isn't necessarily a valid ZIP file.
@@ -329,7 +329,7 @@ import javax.swing.filechooser.FileSystemView;
  * <ol>
  * <li>{@link #isArchive} doesn't check the true state of the file - it just
  *     looks at its path: If the path ends with a configured archive file
- *     suffix, {@code isArchive()} always returns {@code true}.
+ *     extension, {@code isArchive()} always returns {@code true}.
  * <li>{@link #length} always returns {@code 0} if the path denotes a
  *     valid archive file.
  *     Otherwise, the return value of {@code length()} depends on the
@@ -3374,14 +3374,14 @@ public final class TFile extends File {
         assert grown.isArchive();
 
         final File dir = getParent(grown);
-        final String suffix = getSuffix(grown);
+        final String extension = getExtension(grown);
         try (final TConfig config = TConfig.push()) {
             // Switch off AccessOption.GROW.
             config.setAccessPreferences(
                     config.getAccessPreferences().clear(GROW));
 
             // Create temp file.
-            final TFile compact = new TFile(createTempFile("tzp", suffix, dir));
+            final TFile compact = new TFile(createTempFile("tzp", extension, dir));
             compact.rm();
             try {
                 // Make a structural copy of the grown archive file, thereby
@@ -3409,7 +3409,7 @@ public final class TFile extends File {
         return null != parent ? parent : CURRENT_DIRECTORY;
     }
 
-    private static @Nullable String getSuffix(final TFile file) {
+    private static @Nullable String getExtension(final TFile file) {
         final FsScheme scheme = file.getScheme();
         return null != scheme ? "." + scheme : null;
     }

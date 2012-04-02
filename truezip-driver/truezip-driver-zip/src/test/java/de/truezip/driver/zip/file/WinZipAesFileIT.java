@@ -22,7 +22,7 @@ import org.junit.Test;
 public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "zip";
     }
 
@@ -65,7 +65,7 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
     @Test
     public void testFileStatus() throws IOException {
         final TFile archive = getArchive();
-        final TFile inner = new TFile(archive, "inner" + getSuffix());
+        final TFile inner = new TFile(archive, "inner" + getExtension());
 
         assertTrue(archive.mkdir());
         assertTrue(inner.mkdir());

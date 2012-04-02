@@ -22,7 +22,7 @@ abstract class Application<E extends Exception> extends TApplication<E> {
      * Its task is to configure the default behavior of the TrueZIP FSP JSE7 API
      * in order to answer the following questions:
      * <ul>
-     * <li>What are the file suffixes which shall be recognized as archive
+     * <li>What are the file extensions which shall get recognized as archive
      *     files and hence as virtual directories?
      * <li>Shall missing archive files and directory entries get automatically
      *     created whenever required?

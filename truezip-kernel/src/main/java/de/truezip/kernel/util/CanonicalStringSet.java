@@ -4,14 +4,10 @@
  */
 package de.truezip.kernel.util;
 
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import java.util.AbstractSet;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An abstract set of the canonical string representation of objects in
@@ -40,6 +36,7 @@ import java.util.TreeSet;
  *
  * @author Christian Schlichtherle
  */
+@NotThreadSafe
 public class CanonicalStringSet extends AbstractSet<String> {
 
     /**
@@ -48,6 +45,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
      *
      * @see <a href="http://en.wikipedia.org/wiki/Idempotence>Idempotence</a>
      */
+    @SuppressWarnings("PublicInnerClass")
     public interface Canonicalizer {
 
         /**
@@ -77,7 +75,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
     private final char separator;
 
     /** The sorted map which implements the behaviour of this class. */
-    private final Set<String> set = new TreeSet<String>();
+    private final Set<String> set = new TreeSet<>();
 
     /**
      * Constructs a new, empty set of canonical strings.

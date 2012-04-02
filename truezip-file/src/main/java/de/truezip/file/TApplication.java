@@ -6,15 +6,6 @@ package de.truezip.file;
 
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
-//import de.truezip.kernel.spi.ByteArrayIOPoolService;
-//import de.truezip.kernel.tar.TarBZip2Driver;
-//import de.truezip.kernel.tar.TarDriver;
-//import de.truezip.kernel.tar.TarGZipDriver;
-//import de.truezip.kernel.zip.JarDriver;
-//import de.truezip.kernel.zip.ZipDriver;
-//import de.truezip.kernel.zip.raes.ParanoidZipRaesDriver;
-//import de.truezip.kernel.zip.raes.SafeZipRaesDriver;
-//import de.truezip.kernel.sl.IOPoolLocator;
 
 /**
  * A template class which aids in establishing the typical
@@ -47,6 +38,7 @@ public abstract class TApplication<E extends Exception> {
      * (i.e. archive files) get committed to their respective parent file
      * system, even if {@link #work} throws an exception.
      * 
+     * @param  args an array of arguments for this application.
      * @throws E At the discretion of the {@link #work} method.
      * @throws FsSyncException At the discretion of the {@link #sync} method.
      */
@@ -70,7 +62,7 @@ public abstract class TApplication<E extends Exception> {
      * Its task is to configure the default behavior of the TrueZIP File* API
      * in order to answer the following questions:
      * <ul>
-     * <li>Which file suffixes shall get detected to indicate archive
+     * <li>Which file extensions shall get detected to indicate archive
      *     files and hence as virtual directories?
      * <li>Which kind of temporary buffers shall get used?
      * <li>Shall missing archive files and directory entries get automatically
@@ -91,7 +83,7 @@ public abstract class TApplication<E extends Exception> {
      * <h3>Examples</h3>
      * <p>
      * As the most simple use case, a client application might want to filter
-     * the initial setup for the archive file suffixes it wants to detect.
+     * the initial setup for the archive file extensions it wants to detect.
      * This is done as follows:
      * <pre>{@code
      * TConfig.get().setArchiveDetector(new TArchiveDetector("ear|jar|war"));
@@ -101,7 +93,7 @@ public abstract class TApplication<E extends Exception> {
      * initial setup so that only files with the pattern {@code *.ear},
      * {@code *.jar} or {@code *.war} (case ignoring) are detected
      * as prospective archive files.
-     * If no file system driver is present for a named suffix in the initial
+     * If no file system driver is present for a named extension in the initial
      * setup, an {@link IllegalArgumentException} is thrown.
      * <p>
      * The beauty of this simple example is that it does not require to change
@@ -111,7 +103,7 @@ public abstract class TApplication<E extends Exception> {
      * class path.
      * <p>
      * The constructors of the {@link TFile} class use the
-     * {@link TArchiveDetector} class to scan a path name for suffixes of
+     * {@link TArchiveDetector} class to scan a path name for extensions of
      * archive files which shall be treated like virtual directories.
      * You can either explicitly inject this ArchiveDetector dependency into a
      * TFile constructor or you can rely on the value of the class property
@@ -119,14 +111,14 @@ public abstract class TApplication<E extends Exception> {
      * <p>
      * By default, all new {@link TFile} objects will use a default
      * {@link TArchiveDetector} which recognizes the canonical archive file
-     * suffixes registered by all archive driver modules which are present on
+     * extensions registered by all archive driver modules which are present on
      * the class path at run time - these can be configured by editing the
      * file {@code pom.xml}.
      * <p>
      * However, if you use the following statement, all {@link TFile} objects
      * will use the given default {@link TArchiveDetector} which recognizes
-     * only the given canonical file suffixes for TAR, TAR.GZ, TAR.BZ2 and ZIP
-     * files as archive files and hence as virtual directories.
+     * only the given canonical file extensions for TAR, TAR.GZ, TAR.BZ2 and
+     * ZIP files as archive files and hence as virtual directories.
      * This requires the JARs for the archive driver modules
      * {@code truezip-driver-tar} and {@code truezip-driver-zip} to be present
      * on the class path at compile time:
@@ -212,8 +204,7 @@ public abstract class TApplication<E extends Exception> {
      * TConfig.get().setLenient(false);
      * }</pre>
      */
-    protected void setup() {
-    }
+    protected abstract void setup();
 
     /**
      * Runs the work phase.
@@ -234,6 +225,7 @@ public abstract class TApplication<E extends Exception> {
      *         in a loop.
      *         Otherwise, the return value is used as the
      *         {@link System#exit(int) exit status} of the VM.
+     * @throws E At the discretion of the implementation.
      */
     protected abstract int work(String[] args) throws E;
 

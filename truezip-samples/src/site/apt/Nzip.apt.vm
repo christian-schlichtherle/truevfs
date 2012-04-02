@@ -98,15 +98,15 @@ java %PROPS% -jar "%JAR%" %*
     Furthermore, the start time of a JVM makes Java almost useless for short
     running command line utilities anyway.
 
-    Of course, you can substitute the <<<.zip>>> suffix in the examples above
-    with any other canonical file type suffix recognized by the archive file
-    drivers which are available on the run time class path
+    Of course, you can substitute the <<<.zip>>> extension in the examples
+    above with any other canonical file type extension recognized by the
+    archive file drivers which are available on the run time class path
     (<<<.ear>>>, <<<.jar>>>, <<<.war>>>, <<<.tar>>>, <<<.tgz>>>, <<<.tar.gz>>>,
     <<<.tb2>>>, <<<.tbz>>>,  <<<.tar.bz2>>>, <<<.tzp>>>, <<<.zip.rae>>>,
     <<<.zip.raes>>>).
 
     For example, if you would like to use RAES encrypted ZIP files you would
-    simply name the suffix <<<.tzp>>> in a path.
+    simply name the extension <<<.tzp>>> in a path.
     So in order to copy the directory <<<directory>>> to an RAES encrypted ZIP
     file <<<safe.tzp>>>, you could run:
 

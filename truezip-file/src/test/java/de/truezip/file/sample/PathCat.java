@@ -30,6 +30,9 @@ public final class PathCat extends TApplication<IOException> {
     }
 
     @Override
+    protected void setup() { }
+
+    @Override
     protected int work(String[] args) throws IOException {
         for (String path : args)
             pathCat(path);
@@ -40,7 +43,7 @@ public final class PathCat extends TApplication<IOException> {
     /**
      * Copies the contents of the parameter resource to the standard output.
      * <p>
-     * The set of archive file suffixes detected by this method is determined
+     * The set of archive file extensions detected by this method is determined
      * by the {@linkplain TConfig#getArchiveDetector default archive detector}
      * and the respective file system driver providers on the class path.
      *

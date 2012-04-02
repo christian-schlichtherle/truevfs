@@ -7,7 +7,7 @@ package de.truezip.kernel;
 import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.util.Maps;
 import de.truezip.kernel.util.ServiceLocator;
-import de.truezip.kernel.util.SuffixSet;
+import de.truezip.kernel.util.ExtensionSet;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -30,8 +30,8 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can get converted to a set of file name suffixes by calling
-     *         <code> new {@link SuffixSet#SuffixSet(String) SuffixSet}(o.toString())</code>
+     *         can get converted to a set of file name extensions by calling
+     *         <code> new {@link ExtensionSet#ExtensionSet(String) ExtensionSet}(o.toString())</code>
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
      *         {@link FsDriver file system driver instance}, a
@@ -43,7 +43,7 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
      *         {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold.
-     * @see    SuffixSet Syntax contraints for suffix lists.
+     * @see    ExtensionSet Syntax contraints for extension lists.
      */
     public static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>(Maps.initialCapacity(config.length) * 2); // heuristics
@@ -71,12 +71,12 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
                     if (p instanceof FsScheme)
                         set.add((FsScheme) p);
                     else
-                        for (String q : new SuffixSet(p.toString()))
+                        for (String q : new ExtensionSet(p.toString()))
                             set.add(new FsScheme(q));
             else if (o instanceof FsScheme)
                 set.add((FsScheme) o);
             else
-                for (final String p : new SuffixSet(o.toString()))
+                for (final String p : new ExtensionSet(o.toString()))
                     set.add(new FsScheme(p));
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);

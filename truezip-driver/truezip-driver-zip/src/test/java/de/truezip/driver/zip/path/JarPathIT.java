@@ -13,7 +13,7 @@ import de.truezip.path.TPathITSuite;
 public final class JarPathIT extends TPathITSuite<JarDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "jar";
     }
 

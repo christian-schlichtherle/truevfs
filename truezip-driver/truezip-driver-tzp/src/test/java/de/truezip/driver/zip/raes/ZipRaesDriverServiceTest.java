@@ -13,7 +13,7 @@ import de.truezip.kernel.spi.FsDriverServiceTestSuite;
 public class ZipRaesDriverServiceTest extends FsDriverServiceTestSuite {
 
     @Override
-    protected String getSuffixes() {
+    protected String getExtensions() {
         return "tzp|zip.rae|zip.raes";
     }
 

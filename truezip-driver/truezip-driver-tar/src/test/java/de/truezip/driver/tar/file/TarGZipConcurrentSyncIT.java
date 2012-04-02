@@ -14,7 +14,7 @@ public final class TarGZipConcurrentSyncIT
 extends ConcurrentSyncITSuite<TarGZipDriver> {
 
     @Override
-    protected String getSuffixList() {
+    protected String getExtensionList() {
         return "tar.gz";
     }
 

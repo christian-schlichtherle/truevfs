@@ -13,7 +13,7 @@ import de.truezip.kernel.spi.FsDriverServiceTestSuite;
 public class TarDriverServiceTest extends FsDriverServiceTestSuite {
 
     @Override
-    protected String getSuffixes() {
+    protected String getExtensions() {
         return "tar|tar.bz2|tar.gz|tbz|tb2|tgz";
     }
 

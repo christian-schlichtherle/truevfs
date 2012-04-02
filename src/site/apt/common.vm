@@ -1,9 +1,9 @@
 ## This file contains macros for common use within this directory.
-#macro(configuring $suffix $file $modules_need $artifactId)
+#macro(configuring $extension $file $modules_need $artifactId)
 * Configuring Archive Detection
 
     You may wonder how TrueZIP gets configured to treat a file name with a
-    $suffix suffix as a $file file instead of a plain old file.
+    $extension extension as a $file file instead of a plain old file.
     For now, let it suffice to say that TrueZIP follows the
     convention-over-configuration principle as much as possible,
     so there are reasonable defaults for everything in order to relieve you
