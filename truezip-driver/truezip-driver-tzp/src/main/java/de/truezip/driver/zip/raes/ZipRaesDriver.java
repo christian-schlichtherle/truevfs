@@ -11,11 +11,11 @@ import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
-import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.rof.ReadOnlyFile;
@@ -121,8 +121,8 @@ public abstract class ZipRaesDriver extends JarDriver {
      * locatable key manager to resolve passwords for RAES encryption.
      */
     @Override
-    public <M extends FsModel> FsController<M> decorate(
-            FsController<M> controller) {
+    public <M extends FsModel> FsController<M>
+    decorate(FsController<M> controller) {
         return new ZipRaesKeyController<>(controller, this);
     }
 
@@ -141,11 +141,11 @@ public abstract class ZipRaesDriver extends JarDriver {
      * of the resulting archive file and unecessarily heat the CPU.
      */
     @Override
-    public ZipDriverEntry newEntry(
-            final String path,
-            final Type type,
-            final Entry template,
-            final BitField<AccessOption> mknod)
+    public ZipDriverEntry
+    newEntry(   final String path,
+                final Type type,
+                final Entry template,
+                final BitField<AccessOption> mknod)
     throws CharConversionException {
         final ZipDriverEntry entry
                 = super.newEntry(path, type, template, mknod.set(COMPRESS));
@@ -173,7 +173,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     @Override
     public final InputService<ZipDriverEntry>
-    newInputService(   final FsModel model,
+    newInputService(final FsModel model,
                     final InputSocket<?> input)
     throws IOException {
         if (null == model)
@@ -197,26 +197,25 @@ public abstract class ZipRaesDriver extends JarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    public final OptionOutputSocket getOutputSocket(
-            final FsController<?> controller,
-            final FsEntryName name,
-            BitField<AccessOption> options,
-            final @CheckForNull Entry template) {
+    public final OptionOutputSocket
+    getOutputSocket(final FsController<?> controller,
+                    final FsEntryName name,
+                    BitField<AccessOption> options,
+                    final @CheckForNull Entry template) {
         options = options.clear(GROW);
-        // Leave AccessOption.COMPRESS untouched - the driver shall be given
+        // Leave AccessOption.COMPRESS untouched - the controller shall have the
         // opportunity to apply its own preferences to sort out such a conflict.
-        BitField<AccessOption> options2 = options.set(STORE);
         return new OptionOutputSocket(
-                controller.getOutputSocket(name, options2, template),
+                controller.getOutputSocket(name, options.set(STORE), template),
                 options); // use modified options!
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final OptionOutputSocket output,
-            final ZipInputService source)
+    protected OutputService<ZipDriverEntry>
+    newOutputService(   final FsModel model,
+                        final OptionOutputSocket output,
+                        final ZipInputService source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
