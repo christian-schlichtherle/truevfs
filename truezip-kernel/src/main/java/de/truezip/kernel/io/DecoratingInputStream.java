@@ -26,22 +26,22 @@ import javax.annotation.WillCloseWhenClosed;
 public abstract class DecoratingInputStream extends InputStream {
 
     /** The nullable decorated input stream. */
-    protected @Nullable InputStream delegate;
+    protected @Nullable InputStream in;
 
     /**
      * Constructs a new decorating input stream.
      *
-     * @param delegate the nullable input stream to decorate.
+     * @param in the nullable input stream to decorate.
      */
     @CreatesObligation
     protected DecoratingInputStream(
-            final @Nullable @WillCloseWhenClosed InputStream delegate) {
-        this.delegate = delegate;
+            final @Nullable @WillCloseWhenClosed InputStream in) {
+        this.in = in;
     }
 
     @Override
     public int read() throws IOException {
-        return delegate.read();
+        return in.read();
     }
 
     @Override
@@ -51,38 +51,38 @@ public abstract class DecoratingInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        return delegate.read(b, off, len);
+        return in.read(b, off, len);
     }
 
     @Override
     public long skip(long n) throws IOException {
-        return delegate.skip(n);
+        return in.skip(n);
     }
 
     @Override
     public int available() throws IOException {
-        return delegate.available();
+        return in.available();
     }
 
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        delegate.close();
+        in.close();
     }
 
     @Override
     public void mark(int readlimit) {
-        delegate.mark(readlimit);
+        in.mark(readlimit);
     }
 
     @Override
     public void reset() throws IOException {
-        delegate.reset();
+        in.reset();
     }
 
     @Override
     public boolean markSupported() {
-        return delegate.markSupported();
+        return in.markSupported();
     }
 
     /**
@@ -93,6 +93,6 @@ public abstract class DecoratingInputStream extends InputStream {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                in);
     }
 }

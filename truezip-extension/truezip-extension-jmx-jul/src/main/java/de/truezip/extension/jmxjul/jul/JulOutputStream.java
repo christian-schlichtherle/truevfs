@@ -35,7 +35,7 @@ final class JulOutputStream extends DecoratingOutputStream {
     @Override
     public void close() throws IOException {
         log("Closing ");
-        delegate.close();
+        out.close();
     }
 
     private void log(String message) {

@@ -20,16 +20,16 @@ public abstract class DecoratingOutputSocket<E extends Entry>
 extends DelegatingOutputSocket<E> {
 
     /** The nullable decorated output socket. */
-    protected @Nullable OutputSocket<? extends E> delegate;
+    protected @Nullable OutputSocket<? extends E> socket;
 
     protected DecoratingOutputSocket(
             final @Nullable OutputSocket<? extends E> delegate) {
-        this.delegate = delegate;
+        this.socket = delegate;
     }
 
     @Override
-    protected OutputSocket<? extends E> getDelegate() throws IOException {
-        return delegate;
+    protected OutputSocket<? extends E> getSocket() throws IOException {
+        return socket;
     }
 
     /**
@@ -40,6 +40,6 @@ extends DelegatingOutputSocket<E> {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                socket);
     }
 }

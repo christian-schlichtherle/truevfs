@@ -42,7 +42,7 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
     public long length() throws IOException {
         lock.lock();
         try {
-            return delegate.length();
+            return rof.length();
         } finally {
             lock.unlock();
         }
@@ -52,7 +52,7 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
     public long getFilePointer() throws IOException {
         lock.lock();
         try {
-            return delegate.getFilePointer();
+            return rof.getFilePointer();
         } finally {
             lock.unlock();
         }
@@ -62,7 +62,7 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
     public void seek(long pos) throws IOException {
         lock.lock();
         try { 
-            delegate.seek(pos);
+            rof.seek(pos);
         } finally {
             lock.unlock();
         }
@@ -72,7 +72,7 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
     public int read() throws IOException {
         lock.lock();
         try {
-            return delegate.read();
+            return rof.read();
         } finally {
             lock.unlock();
         }
@@ -82,7 +82,7 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
     public int read(byte[] b, int off, int len) throws IOException {
         lock.lock();
         try {
-            return delegate.read(b, off, len);
+            return rof.read(b, off, len);
         } finally {
             lock.unlock();
         }
@@ -92,7 +92,7 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
     public void readFully(byte[] b, int off, int len) throws IOException {
         lock.lock();
         try {
-            delegate.readFully(b, off, len);
+            rof.readFully(b, off, len);
         } finally {
             lock.unlock();
         }
@@ -102,7 +102,7 @@ public class LockReadOnlyFile extends DecoratingReadOnlyFile {
     public void close() throws IOException {
         lock.lock();
         try {
-            delegate.close();
+            rof.close();
         } finally {
             lock.unlock();
         }

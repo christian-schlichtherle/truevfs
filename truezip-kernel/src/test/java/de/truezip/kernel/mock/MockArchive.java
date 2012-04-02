@@ -199,7 +199,7 @@ implements Container<MockArchiveDriverEntry> {
 
                         @Override
                         public void close() throws IOException {
-                            delegate.close();
+                            out.close();
                             copyProperties();
                         }
                     } // MockOutputStream

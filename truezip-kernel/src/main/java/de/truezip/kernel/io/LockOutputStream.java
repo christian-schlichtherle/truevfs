@@ -46,7 +46,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     public void write(int b) throws IOException {
         lock.lock();
         try {
-            delegate.write(b);
+            out.write(b);
         } finally {
             lock.unlock();
         }
@@ -57,7 +57,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     public void write(byte[] b, int off, int len) throws IOException {
         lock.lock();
         try {
-            delegate.write(b, off, len);
+            out.write(b, off, len);
         } finally {
             lock.unlock();
         }
@@ -68,7 +68,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     public void flush() throws IOException {
         lock.lock();
         try {
-            delegate.flush();
+            out.flush();
         } finally {
             lock.unlock();
         }
@@ -79,7 +79,7 @@ public class LockOutputStream extends DecoratingOutputStream {
     public void close() throws IOException {
         lock.lock();
         try {
-            delegate.close();
+            out.close();
         } finally {
             lock.unlock();
         }

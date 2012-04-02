@@ -10,7 +10,7 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An output socket which obtains its delegate lazily and {@link #reset()}s it
+ * An output socket which obtains its socket lazily and {@link #reset()}s it
  * upon any {@link Throwable}.
  *
  * @see    ClutchInputSocket
@@ -26,15 +26,15 @@ extends DecoratingOutputSocket<E> {
     }
 
     @Override
-    protected final OutputSocket<? extends E> getDelegate() throws IOException {
-        final OutputSocket<? extends E> delegate = this.delegate;
-        return null != delegate ? delegate : (this.delegate = getLazyDelegate());
+    protected final OutputSocket<? extends E> getSocket() throws IOException {
+        final OutputSocket<? extends E> socket = this.socket;
+        return null != socket ? socket : (this.socket = getLazyDelegate());
     };
 
     /**
-     * Returns the delegate socket for lazy initialization.
+     * Returns the socket socket for lazy initialization.
      * 
-     * @return the delegate socket for lazy initialization.
+     * @return the socket socket for lazy initialization.
      * @throws IOException on any I/O failure. 
      */
     protected abstract OutputSocket<? extends E> getLazyDelegate()
@@ -43,7 +43,7 @@ extends DecoratingOutputSocket<E> {
     @Override
     public E getLocalTarget() throws IOException {
         try {
-            return getBoundDelegate().getLocalTarget();
+            return getBoundSocket().getLocalTarget();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -53,7 +53,7 @@ extends DecoratingOutputSocket<E> {
     public SeekableByteChannel newSeekableByteChannel()
     throws IOException {
         try {
-            return getBoundDelegate().newSeekableByteChannel();
+            return getBoundSocket().newSeekableByteChannel();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -62,7 +62,7 @@ extends DecoratingOutputSocket<E> {
     @Override
     public OutputStream newOutputStream() throws IOException {
         try {
-            return getBoundDelegate().newOutputStream();
+            return getBoundSocket().newOutputStream();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -78,6 +78,6 @@ extends DecoratingOutputSocket<E> {
     }
 
     protected final void reset() {
-        this.delegate = null;
+        this.socket = null;
     }
 }

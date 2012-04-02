@@ -28,7 +28,7 @@ final class JmxInputStream extends DecoratingInputStream {
 
     @Override
     public int read() throws IOException {
-        int ret = delegate.read();
+        int ret = in.read();
         if (0 < ret)
             stats.incBytesRead(1);
         return ret;
@@ -36,7 +36,7 @@ final class JmxInputStream extends DecoratingInputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        int ret = delegate.read(b, off, len);
+        int ret = in.read(b, off, len);
         if (0 < ret)
             stats.incBytesRead(ret);
         return ret;

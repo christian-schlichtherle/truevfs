@@ -392,7 +392,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return getBoundDelegate().getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 }
             } // GetLocalTarget
 
@@ -405,7 +405,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
                     return new LockReadOnlyFile(
-                            getBoundDelegate().newReadOnlyFile());
+                            getBoundSocket().newReadOnlyFile());
                 }
             } // NewReadOnlyFile
 
@@ -418,7 +418,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -431,7 +431,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @Override
                 public InputStream call() throws IOException {
                     return new LockInputStream(
-                            getBoundDelegate().newInputStream());
+                            getBoundSocket().newInputStream());
                 }
             } // NewInputStream
 
@@ -453,7 +453,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return getBoundDelegate().getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 }
             } // GetLocalTarget
 
@@ -466,7 +466,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
-                            getBoundDelegate().newSeekableByteChannel());
+                            getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
 
@@ -479,7 +479,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @Override
                 public OutputStream call() throws IOException {
                     return new LockOutputStream(
-                            getBoundDelegate().newOutputStream());
+                            getBoundSocket().newOutputStream());
                 }
             } // NewOutputStream
 
@@ -497,7 +497,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(rof);
         }
     } // LockReadOnlyFile
 
@@ -525,7 +525,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(in);
         }
     } // LockInputStream
 
@@ -539,7 +539,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            close(delegate);
+            close(out);
         }
     } // LockOutputStream
 

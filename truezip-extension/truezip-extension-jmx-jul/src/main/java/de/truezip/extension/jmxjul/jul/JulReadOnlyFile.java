@@ -35,7 +35,7 @@ final class JulReadOnlyFile extends DecoratingReadOnlyFile {
     @Override
     public void close() throws IOException {
         log("Closing ");
-        delegate.close();
+        rof.close();
     }
 
     private void log(String message) {

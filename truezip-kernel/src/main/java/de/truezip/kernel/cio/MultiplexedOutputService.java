@@ -126,8 +126,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
             @Override
             public OutputStream newOutputStream() throws IOException {
                 return isBusy()
-                        ? newBufferedEntryOutputStream(getBoundDelegate())
-                        : new EntryOutputStream(getBoundDelegate());
+                        ? newBufferedEntryOutputStream(getBoundSocket())
+                        : new EntryOutputStream(getBoundSocket());
             }
         } // Output
 
@@ -206,7 +206,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         public void close() throws IOException {
             if (closed)
                 return;
-            delegate.close();
+            out.close();
             closed = true;
             busy = false;
             storeBuffers();
@@ -262,7 +262,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         public void close() throws IOException {
             if (closed)
                 return;
-            delegate.close();
+            out.close();
             closed = true;
             copyProperties();
             storeBuffers();

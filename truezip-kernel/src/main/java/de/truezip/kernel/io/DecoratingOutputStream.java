@@ -26,22 +26,22 @@ import javax.annotation.WillCloseWhenClosed;
 public abstract class DecoratingOutputStream extends OutputStream {
 
     /** The nullable decorated output stream. */
-    protected @Nullable OutputStream delegate;
+    protected @Nullable OutputStream out;
 
     /**
      * Constructs a new decorating output stream.
      *
-     * @param delegate the nullable output stream to decorate.
+     * @param out the nullable output stream to decorate.
      */
     @CreatesObligation
     protected DecoratingOutputStream(
-            final @Nullable @WillCloseWhenClosed OutputStream delegate) {
-        this.delegate = delegate;
+            final @Nullable @WillCloseWhenClosed OutputStream out) {
+        this.out = out;
     }
 
     @Override
     public void write(int b) throws IOException {
-        delegate.write(b);
+        out.write(b);
     }
 
     @Override
@@ -51,18 +51,18 @@ public abstract class DecoratingOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        delegate.write(b, off, len);
+        out.write(b, off, len);
     }
 
     @Override
     public void flush() throws IOException {
-        delegate.flush();
+        out.flush();
     }
 
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        delegate.close();
+        out.close();
     }
 
     /**
@@ -73,6 +73,6 @@ public abstract class DecoratingOutputStream extends OutputStream {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                out);
     }
 }

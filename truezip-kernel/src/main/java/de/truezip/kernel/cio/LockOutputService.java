@@ -126,7 +126,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 final OutputStream out;
                 lock.lock();
                 try {
-                    out = getBoundDelegate().newOutputStream();
+                    out = getBoundSocket().newOutputStream();
                 } finally {
                     lock.unlock();
                 }

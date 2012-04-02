@@ -56,48 +56,48 @@ public final class ThrowingInputStream extends DecoratingInputStream {
     @Override
     public int read() throws IOException {
         checkAllExceptions();
-        return delegate.read();
+        return in.read();
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         checkAllExceptions();
-        return delegate.read(b, off, len);
+        return in.read(b, off, len);
     }
 
     @Override
     public long skip(long n) throws IOException {
         checkAllExceptions();
-        return delegate.skip(n);
+        return in.skip(n);
     }
 
     @Override
     public int available() throws IOException {
         checkAllExceptions();
-        return delegate.available();
+        return in.available();
     }
 
     @Override
     public void close() throws IOException {
         checkAllExceptions();
-        delegate.close();
+        in.close();
     }
 
     @Override
     public void mark(int readlimit) {
         checkUndeclaredExceptions();
-        delegate.mark(readlimit);
+        in.mark(readlimit);
     }
 
     @Override
     public void reset() throws IOException {
         checkAllExceptions();
-        delegate.reset();
+        in.reset();
     }
 
     @Override
     public boolean markSupported() {
         checkUndeclaredExceptions();
-        return delegate.markSupported();
+        return in.markSupported();
     }
 }

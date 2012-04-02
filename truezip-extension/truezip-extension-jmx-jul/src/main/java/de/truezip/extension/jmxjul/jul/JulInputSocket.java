@@ -25,16 +25,16 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new JulReadOnlyFile(getBoundDelegate());
+        return new JulReadOnlyFile(getBoundSocket());
     }
 
     @Override
     public java.nio.channels.SeekableByteChannel newSeekableByteChannel() throws IOException {
-        return new JulInputByteChannel(getBoundDelegate());
+        return new JulInputByteChannel(getBoundSocket());
     }
 
     @Override
     public InputStream newInputStream() throws IOException {
-        return new JulInputStream(getBoundDelegate());
+        return new JulInputStream(getBoundSocket());
     }
 }

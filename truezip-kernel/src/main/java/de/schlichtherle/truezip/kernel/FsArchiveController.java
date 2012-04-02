@@ -205,7 +205,7 @@ extends FsLockModelController {
         }
 
         @Override
-        protected InputSocket<? extends FsArchiveEntry> getDelegate()
+        protected InputSocket<? extends FsArchiveEntry> getSocket()
         throws IOException {
             localTarget = null;
             final FsArchiveEntry ae = getLocalTarget();

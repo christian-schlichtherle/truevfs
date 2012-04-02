@@ -164,7 +164,7 @@ implements OutputService<TarDriverEntry> {
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            delegate.write(b, off, len);
+            out.write(b, off, len);
         }
 
         @Override
@@ -205,7 +205,7 @@ implements OutputService<TarDriverEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-            delegate.close();
+            out.close();
             closed = true;
             store();
         }

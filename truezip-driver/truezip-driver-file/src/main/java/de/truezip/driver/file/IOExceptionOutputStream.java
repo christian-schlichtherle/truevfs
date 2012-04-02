@@ -26,7 +26,7 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     /**
      * Constructs a new I/O exception output stream.
      *
-     * @param delegate the nullable output stream to decorate.
+     * @param out the nullable output stream to decorate.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -38,7 +38,7 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     @Override
     public void write(int b) throws IOException {
         try {
-            delegate.write(b);
+            out.write(b);
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -47,7 +47,7 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         try {
-            delegate.write(b, off, len);
+            out.write(b, off, len);
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -56,7 +56,7 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     @Override
     public void flush() throws IOException {
         try {
-            delegate.flush();
+            out.flush();
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -65,7 +65,7 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     @Override
     public void close() throws IOException {
         try {
-            delegate.close();
+            out.close();
         } catch (IOException ex) {
             throw exception = ex;
         }

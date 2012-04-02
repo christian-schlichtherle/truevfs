@@ -37,7 +37,7 @@ final class CountingInputStream extends DecoratingInputStream {
     @Override
     public int read(final byte[] b, final int off, final int len)
     throws IOException {
-        final int read = delegate.read(b, off, len);
+        final int read = in.read(b, off, len);
         if (read > 0)
             this.bytesRead += read;
         return read;
@@ -45,7 +45,7 @@ final class CountingInputStream extends DecoratingInputStream {
 
     @Override
     public int read() throws IOException {
-        final int read = delegate.read();
+        final int read = in.read();
         if (read != -1)
             this.bytesRead++;
         return read;
@@ -53,7 +53,7 @@ final class CountingInputStream extends DecoratingInputStream {
 
     @Override
     public long skip(final long n) throws IOException {
-        final long skipped = delegate.skip(n);
+        final long skipped = in.skip(n);
         this.bytesRead += skipped;
         return skipped;
     }

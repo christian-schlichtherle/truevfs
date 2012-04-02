@@ -115,7 +115,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
     public long length() throws IOException {
         // Check state.
         final long length = this.length;
-        if (this.delegate.length() < this.offset + length)
+        if (this.rof.length() < this.offset + length)
             throw new IOException("Read Only File has been changed!");
 
         return length;
@@ -125,7 +125,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
     public long getFilePointer()
     throws IOException {
         // Check state.
-        this.delegate.getFilePointer();
+        this.rof.getFilePointer();
 
         return this.fp;
     }
@@ -142,7 +142,7 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
                     + ") is larger than file length (" + length + ")!");
 
         // Operate.
-        this.delegate.seek(fp + this.offset);
+        this.rof.seek(fp + this.offset);
         this.fp = fp;
     }
 
@@ -156,8 +156,8 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Operate.
         if (!this.exclusive)
-            this.delegate.seek(fp + this.offset);
-        final int read = this.delegate.read();
+            this.rof.seek(fp + this.offset);
+        final int read = this.rof.read();
 
         // Update state.
         this.fp = fp + 1;
@@ -183,14 +183,14 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Operate.
         if (!this.exclusive)
-            this.delegate.seek(fp + this.offset);
-        final int read = this.delegate.read(buf, off, len);
+            this.rof.seek(fp + this.offset);
+        final int read = this.rof.read(buf, off, len);
 
         // Post-check state.
         if (0 == len) {
             // This was an attempt to read past the end of the file.
             // This could have been checked in advance, but its still desirable
-            // to have the delegate test its state - it might throw an
+            // to have the rof test its state - it might throw an
             // IOException if it has been closed before.
             assert 0 >= read;
             return -1;
@@ -211,6 +211,6 @@ public class IntervalReadOnlyFile extends DecoratingReadOnlyFile {
     @Override
     public void close() throws IOException {
         if (exclusive)
-            delegate.close();
+            rof.close();
     }
 }

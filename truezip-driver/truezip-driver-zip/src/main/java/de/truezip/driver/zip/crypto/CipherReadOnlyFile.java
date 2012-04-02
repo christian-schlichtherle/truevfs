@@ -151,7 +151,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * @throws IllegalStateException If this object has already been
      *         initialized.
      *         This exception is <em>not</em> recoverable.
-     * @throws NullPointerException If {@link #delegate} or {@code cipher} is
+     * @throws NullPointerException If {@link #rof} or {@code cipher} is
      *         {@code null}.
      *         This exception <em>is</em> recoverable.
      */
@@ -167,7 +167,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             throw new IllegalStateException("file is already initialized");
 
         // Check state (recoverable).
-        if (null == this.delegate)
+        if (null == this.rof)
             throw new NullPointerException();
 
         // Check parameters (fail fast).
@@ -335,7 +335,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             return;
         closed = true;
         cipher = null;
-        delegate.close();
+        rof.close();
     }
 
     /**
@@ -386,7 +386,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             final int blockLen = block.length;
             windowOff = fp / blockLen * blockLen; // round down to multiple of block size
             if (windowOff != nextWindowOff)
-                delegate.seek(windowOff + start);
+                rof.seek(windowOff + start);
 
             // Fill window until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
@@ -394,7 +394,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             // contract.
             int n = 0;
             do {
-                int read = delegate.read(window, n, windowLen - n);
+                int read = rof.read(window, n, windowLen - n);
                 if (read < 0)
                     break;
                 n += read;

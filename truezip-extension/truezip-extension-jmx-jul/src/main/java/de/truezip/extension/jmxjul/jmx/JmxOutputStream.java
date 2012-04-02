@@ -28,13 +28,13 @@ final class JmxOutputStream extends DecoratingOutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        delegate.write(b);
+        out.write(b);
         stats.incBytesWritten(1);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        delegate.write(b, off, len);
+        out.write(b, off, len);
         stats.incBytesWritten(len);
     }    
 }

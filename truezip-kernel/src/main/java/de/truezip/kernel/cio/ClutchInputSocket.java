@@ -11,7 +11,7 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An input socket which obtains its delegate lazily and {@link #reset()}s it
+ * An input socket which obtains its socket lazily and {@link #reset()}s it
  * upon any {@link Throwable}.
  *
  * @see    ClutchOutputSocket
@@ -27,15 +27,15 @@ extends DecoratingInputSocket<E> {
     }
 
     @Override
-    protected final InputSocket<? extends E> getDelegate() throws IOException {
-        final InputSocket<? extends E> delegate = this.delegate;
-        return null != delegate ? delegate : (this.delegate = getLazyDelegate());
+    protected final InputSocket<? extends E> getSocket() throws IOException {
+        final InputSocket<? extends E> socket = this.socket;
+        return null != socket ? socket : (this.socket = getLazyDelegate());
     };
 
     /**
-     * Returns the delegate socket for lazy initialization.
+     * Returns the socket socket for lazy initialization.
      * 
-     * @return the delegate socket for lazy initialization.
+     * @return the socket socket for lazy initialization.
      * @throws IOException on any I/O failure. 
      */
     protected abstract InputSocket<? extends E> getLazyDelegate()
@@ -44,7 +44,7 @@ extends DecoratingInputSocket<E> {
     @Override
     public E getLocalTarget() throws IOException {
         try {
-            return getBoundDelegate().getLocalTarget();
+            return getBoundSocket().getLocalTarget();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -53,7 +53,7 @@ extends DecoratingInputSocket<E> {
     @Override
     public ReadOnlyFile newReadOnlyFile() throws IOException {
         try {
-            return getBoundDelegate().newReadOnlyFile();
+            return getBoundSocket().newReadOnlyFile();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -63,7 +63,7 @@ extends DecoratingInputSocket<E> {
     public SeekableByteChannel newSeekableByteChannel()
     throws IOException {
         try {
-            return getBoundDelegate().newSeekableByteChannel();
+            return getBoundSocket().newSeekableByteChannel();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -72,7 +72,7 @@ extends DecoratingInputSocket<E> {
     @Override
     public InputStream newInputStream() throws IOException {
         try {
-            return getBoundDelegate().newInputStream();
+            return getBoundSocket().newInputStream();
         } catch (Throwable ex) {
             throw reset(ex);
         }
@@ -88,6 +88,6 @@ extends DecoratingInputSocket<E> {
     }
 
     protected final void reset() {
-        this.delegate = null;
+        this.socket = null;
     }
 }
