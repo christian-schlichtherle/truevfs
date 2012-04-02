@@ -11,6 +11,7 @@ import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.driver.zip.raes.crypto.RaesSink;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
@@ -23,7 +24,6 @@ import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
@@ -61,17 +61,15 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns the RAES parameters for the given file system model
-     * or {@code null} if not available.
+     * Returns the RAES parameters for the given file system model.
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns
-     * {@code new KeyManagerRaesParameters(getKeyManager(), mountPointUri(model))}.
+     * {@code new KeyManagerRaesParameters(getKeyManagerProvider().get(AesPbeParameters.class), mountPointUri(model))}.
      * 
      * @param  model the file system model.
-     * @return The RAES parameters for the given file system model
-     *         or {@code null} if not available.
+     * @return The RAES parameters for the given file system model.
      */
-    protected @CheckForNull RaesParameters raesParameters(FsModel model) {
+    protected RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
                 getKeyManagerProvider().get(AesPbeParameters.class),
                 mountPointUri(model));
@@ -185,8 +183,12 @@ public abstract class ZipRaesDriver extends JarDriver {
             if (rrof.length() <= getAuthenticationTrigger()) // compare rrof, not rof!
                 rrof.authenticate();
             return newInputService(model, rrof);
-        } catch (IOException ex) {
-            rof.close();
+        } catch (final Throwable ex) {
+            try {
+                rof.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -216,15 +218,16 @@ public abstract class ZipRaesDriver extends JarDriver {
                         final OptionOutputSocket output,
                         final ZipInputService source)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        final OutputStream out = new LazyOutputSocket<>(output).newOutputStream();
+        final RaesOutputStream ros = new RaesSink(output, raesParameters(model))
+                .newOutputStream();
         try {
-            final RaesOutputStream ros = RaesOutputStream.getInstance(
-                    out, raesParameters(model));
             return newOutputService(model, ros, source);
-        } catch (IOException ex) {
-            out.close();
+        } catch (final Throwable ex) {
+            try {
+                ros.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }

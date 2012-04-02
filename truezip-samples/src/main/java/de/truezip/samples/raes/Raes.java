@@ -5,10 +5,12 @@
 package de.truezip.samples.raes;
 
 import de.truezip.driver.zip.raes.KeyManagerRaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.driver.zip.raes.crypto.RaesSink;
 import de.truezip.file.*;
+import de.truezip.kernel.io.AbstractSink;
+import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.rof.DefaultReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFileInputStream;
@@ -16,6 +18,7 @@ import de.truezip.key.sl.KeyManagerLocator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.annotation.WillClose;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
@@ -27,10 +30,10 @@ import java.io.OutputStream;
  *
  * @author Christian Schlichtherle
  */
-public class RaesFiles {
+public final class Raes {
 
     /** Can't touch this - hammer time! */
-    private RaesFiles() { }
+    private Raes() { }
 
     /**
      * Encrypts the given plain file to the given RAES file.
@@ -59,18 +62,27 @@ public class RaesFiles {
     throws IOException {
         final TFile plainFile = new TFile(plainFilePath, detector).toNonArchiveFile();
         final TFile raesFile = new TFile(raesFilePath, detector).toNonArchiveFile();
-        final RaesParameters params = new KeyManagerRaesParameters(
-                KeyManagerLocator.SINGLETON,
-                raesFile/*.getCanonicalFile()*/.toURI());
-        final InputStream in = new TFileInputStream(plainFile);
-        RaesOutputStream out = null;
+        final Sink sink = new RaesSink(
+                new AbstractSink() {
+                    @Override
+                    public OutputStream newOutputStream() throws IOException {
+                        return new TFileOutputStream(raesFile);
+                    }
+                },
+                new KeyManagerRaesParameters(
+                    KeyManagerLocator.SINGLETON,
+                    raesFile/*.getCanonicalFile()*/.toURI()));
+        final @WillClose InputStream in = new TFileInputStream(plainFile);
+        final @WillClose OutputStream out;
         try {
-            out = RaesOutputStream.getInstance(
-                    new TFileOutputStream(raesFile, false),
-                    params);
-        } finally {
-            if (null == out) // exception?
+            out = sink.newOutputStream();
+        } catch (final IOException ex) {
+            try {
                 in.close();
+            } catch (final IOException ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
         }
         TFile.cp(in, out);
     }
@@ -111,21 +123,25 @@ public class RaesFiles {
     throws IOException {
         final TFile raesFile = new TFile(raesFilePath, detector).toNonArchiveFile();
         final TFile plainFile = new TFile(plainFilePath, detector).toNonArchiveFile();
-        final RaesParameters params = new KeyManagerRaesParameters(
+        final RaesParameters param = new KeyManagerRaesParameters(
                 KeyManagerLocator.SINGLETON,
                 raesFile/*.getCanonicalFile()*/.toURI());
         try (final ReadOnlyFile rof = new DefaultReadOnlyFile(raesFile)) {
             final RaesReadOnlyFile rrof
-                    = RaesReadOnlyFile.getInstance(rof, params);
+                    = RaesReadOnlyFile.getInstance(rof, param);
             if (authenticate)
                 rrof.authenticate();
-            final InputStream in = new ReadOnlyFileInputStream(rrof);
-            OutputStream out = null;
+            final @WillClose InputStream in = new ReadOnlyFileInputStream(rrof);
+            @WillClose OutputStream out = null;
             try {
-                out = new TFileOutputStream(plainFile, false);
-            } finally {
-                if (null == out) // exception?
+                out = new TFileOutputStream(plainFile);
+            } catch (final IOException ex) {
+                try {
                     in.close();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
+                throw ex;
             }
             TFile.cp(in, out);
         }
