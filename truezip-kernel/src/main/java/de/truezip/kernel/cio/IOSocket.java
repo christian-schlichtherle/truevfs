@@ -54,8 +54,7 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class IOSocket<LT, PT> {
 
     /** You cannot instantiate this class outside its package. */
-    IOSocket() {
-    }
+    IOSocket() { }
 
     /**
      * Resolves the <i>local target</i> for I/O operations.
