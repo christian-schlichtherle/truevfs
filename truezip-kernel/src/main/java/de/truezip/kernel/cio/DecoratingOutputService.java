@@ -28,11 +28,11 @@ implements OutputService<E> {
 
     @Override
     public OutputSocket<E> getOutputSocket(E entry) {
-        return delegate.getOutputSocket(entry);
+        return container.getOutputSocket(entry);
     }
 
     @Override
     public void close() throws IOException {
-        delegate.close();
+        container.close();
     }
 }

@@ -66,7 +66,7 @@ extends DecoratingInputService<E, InputService<E>> {
     public void close() throws IOException {
         lock.lock();
         try {
-            delegate.close();
+            container.close();
         } finally {
             lock.unlock();
         }
@@ -77,7 +77,7 @@ extends DecoratingInputService<E, InputService<E>> {
     public @CheckForNull E getEntry(String name) {
         lock.lock();
         try {
-            return delegate.getEntry(name);
+            return container.getEntry(name);
         } finally {
             lock.unlock();
         }
@@ -88,7 +88,7 @@ extends DecoratingInputService<E, InputService<E>> {
     public int size() {
         lock.lock();
         try {
-            return delegate.size();
+            return container.size();
         } finally {
             lock.unlock();
         }

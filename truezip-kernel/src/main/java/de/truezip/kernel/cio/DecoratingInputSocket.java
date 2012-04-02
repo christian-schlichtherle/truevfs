@@ -23,8 +23,8 @@ extends DelegatingInputSocket<E> {
     protected @Nullable InputSocket<? extends E> socket;
 
     protected DecoratingInputSocket(
-            final @Nullable InputSocket<? extends E> delegate) {
-        this.socket = delegate;
+            final @Nullable InputSocket<? extends E> socket) {
+        this.socket = socket;
     }
 
     @Override

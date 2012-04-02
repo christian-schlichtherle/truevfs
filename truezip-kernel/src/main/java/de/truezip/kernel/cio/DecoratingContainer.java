@@ -20,31 +20,31 @@ public abstract class DecoratingContainer<
 implements Container<E> {
 
     /** The decorated entry container. */
-    protected final C delegate;
+    protected final C container;
 
     /**
      * Constructs a new filter entry container.
      *
-     * @param  delegate the entry container to decorate.
+     * @param  container the entry container to decorate.
      */
     protected DecoratingContainer(final C delegate) {
-        if (null == (this.delegate = delegate))
+        if (null == (this.container = delegate))
             throw new NullPointerException();
     }
 
     @Override
     public int size() {
-        return delegate.size();
+        return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
-        return delegate.iterator();
+        return container.iterator();
     }
 
     @Override
     public @CheckForNull E getEntry(String name) {
-        return delegate.getEntry(name);
+        return container.getEntry(name);
     }
 
     /**
@@ -55,6 +55,6 @@ implements Container<E> {
     public String toString() {
         return String.format("%s[delegate=%s]",
                 getClass().getName(),
-                delegate);
+                container);
     }
 }

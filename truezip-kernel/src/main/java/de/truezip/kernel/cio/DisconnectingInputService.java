@@ -65,24 +65,24 @@ extends DecoratingInputService<E, InputService<E>> {
     @Override
     public int size() {
         assertOpen();
-        return delegate.size();
+        return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
         assertOpen();
-        return delegate.iterator();
+        return container.iterator();
     }
 
     @Override
     public E getEntry(String name) {
         assertOpen();
-        return delegate.getEntry(name);
+        return container.getEntry(name);
     }
 
     @Override
     public InputSocket<E> getInputSocket(String name) {
-        return new Input(delegate.getInputSocket(name));
+        return new Input(container.getInputSocket(name));
     }
 
     /**
@@ -98,7 +98,7 @@ extends DecoratingInputService<E, InputService<E>> {
     @Override
     public void close() throws IOException {
         closed = true;
-        delegate.close();
+        container.close();
     }
 
     private final class Input extends DecoratingInputSocket<E> {
