@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.cio;
 
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFileInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -27,10 +28,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    OutputSocket
  * @author Christian Schlichtherle
  */
-// TODO: Extract Source interface for the new*() methods.
 @NotThreadSafe
 public abstract class InputSocket<E extends Entry>
-extends IOSocket<E, Entry> {
+extends IOSocket<E, Entry> implements Source {
 
     @CheckForNull
     private OutputSocket<?> remote;
@@ -109,45 +109,27 @@ extends IOSocket<E, Entry> {
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
 
     /**
-     * <b>Optional:</b> Returns a new seekable byte channel for reading bytes
-     * from the {@link #getLocalTarget() local target} in arbitrary order.
+     * {@inheritDoc}
      * <p>
-     * If this method is supported, implementations must enable calling it
-     * any number of times.
-     * Furthermore, the returned seekable byte channel should <em>not</em> be
-     * buffered.
-     * Buffering should be addressed by client applications instead.
-     * 
-     * @return A new seekable byte channel.
-     * @throws IOException On any I/O failure.
-     * @throws UnsupportedOperationException if this operation is not supported
-     *         by the implementation.
+     * The implementation in the abstract class {@link InputSocket} throws an
+     * {@link UnsupportedOperationException}.
      */
-    @CreatesObligation
+    @Override
     public SeekableByteChannel newSeekableByteChannel() throws IOException {
         throw new UnsupportedOperationException();
     }
 
     /**
-     * Returns a new input stream for reading bytes from the
-     * {@link #getLocalTarget() local target}.
-     * <p>
-     * Implementations must enable calling this method any number of times.
-     * Furthermore, the returned input stream should <em>not</em> be buffered.
-     * Buffering should be addressed by the caller instead - see
-     * {@link IOSocket#copy}.
+     * {@inheritDoc}
      * <p>
      * The implementation in the class {@link InputSocket} calls
-     * {@link #newReadOnlyFile()} and wraps the resulting object in a new
-     * {@link ReadOnlyFileInputStream} as an adapter.
+     * {@link #newReadOnlyFile()} and wraps the result in an
+     * {@link ReadOnlyFileInputStream} adapter.
      * Note that this may <em>violate</em> the contract for this method because
      * {@link #newReadOnlyFile()} is allowed to throw an
      * {@link UnsupportedOperationException} while this method is not!
-     *
-     * @return A new input stream.
-     * @throws IOException On any I/O failure.
      */
-    @CreatesObligation
+    @Override
     public InputStream newInputStream() throws IOException {
         return new ReadOnlyFileInputStream(newReadOnlyFile());
     }
