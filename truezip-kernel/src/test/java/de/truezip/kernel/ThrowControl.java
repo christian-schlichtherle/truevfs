@@ -22,7 +22,7 @@ public final class ThrowControl {
     /** Default constructor. */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     public ThrowControl() {
-        this.throwables = new HashMap<Class<?>, Throwable>();
+        this.throwables = new HashMap<>();
     }
 
     /**
@@ -31,7 +31,7 @@ public final class ThrowControl {
      * @param template The template to copy.
      */
     public ThrowControl(final ThrowControl template) {
-        this.throwables = new HashMap<Class<?>, Throwable>(template.throwables);
+        this.throwables = new HashMap<>(template.throwables);
     }
 
     public Throwable trigger(Throwable toThrow) {
@@ -62,7 +62,7 @@ public final class ThrowControl {
         final Throwable toThrow = throwables.remove(thiz);
         if (null != toThrow)
             if (throwz.isInstance(toThrow))
-                throw wrap(throwz.cast(toThrow));
+                throw throwz.cast(wrap(toThrow).fillInStackTrace());
             else
                 throwables.put(thiz, toThrow); // restore
 
