@@ -118,22 +118,31 @@ final class Type0RaesOutputStream extends RaesOutputStream {
 
         // Init chain of output streams as Encrypt-then-MAC.
         final OutputStream out = sink.newStream();
-        final LEDataOutputStream dos =
-                this.dos = out instanceof LEDataOutputStream
-                    ? (LEDataOutputStream) out
-                    : new LEDataOutputStream(out);
-        this.out = new MacOutputStream(dos, mac);
+        try {
+            final LEDataOutputStream dos =
+                    this.dos = out instanceof LEDataOutputStream
+                        ? (LEDataOutputStream) out
+                        : new LEDataOutputStream(out);
+            this.out = new MacOutputStream(dos, mac);
 
-        // Write data envelope header.
-        dos.writeInt(SIGNATURE);
-        dos.writeByte(ENVELOPE_TYPE_0);
-        dos.writeByte(keyStrengthOrdinal);
-        dos.writeShort(ITERATION_COUNT);
-        dos.write(salt);
+            // Write data envelope header.
+            dos.writeInt(SIGNATURE);
+            dos.writeByte(ENVELOPE_TYPE_0);
+            dos.writeByte(keyStrengthOrdinal);
+            dos.writeShort(ITERATION_COUNT);
+            dos.write(salt);
 
-        // Init start.
-        this.start = dos.size();
-        assert ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length == start;
+            // Init start.
+            this.start = dos.size();
+            assert ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length == start;
+        } catch (final Throwable ex) {
+            try {
+                out.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
     }
 
     /** Wipe the given array. */
