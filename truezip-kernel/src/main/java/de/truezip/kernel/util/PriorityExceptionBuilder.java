@@ -7,44 +7,38 @@ package de.truezip.kernel.util;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Assembles an {@link Exception} from one or more {@link Exception}s by
- * {@linkplain Exception#addSuppressed(Throwable) suppressing} and optionally
- * prioritizing them with the help of a {@link Comparator}.
+ * Assembles an {@link Exception} from one or more input exceptions by
+ * {@linkplain Exception#addSuppressed(Throwable) suppressing} all but the
+ * first input exception with the highest priority.
+ * The priority of the exceptions is determined by the {@link Comparator}
+ * provided to the constructor.
  * 
  * @param  <X> the type of the input and assembled (output) exceptions.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class PriorityExceptionBuilder<X extends Exception>
+public class PriorityExceptionBuilder<X extends Exception>
 extends AbstractExceptionBuilder<X, X> {
 
     private final Comparator<? super X> comparator;
-    private LinkedList<X> suppressed;
+    private final List<X> exceptions;
 
     /**
      * Constructs a new priority exception builder.
-     * This builder will use the first exception as the assembly and
-     * {@linkplain Exception#addSuppressed(Throwable) suppress} all other
-     * exceptions.
-     */
-    public PriorityExceptionBuilder() {
-        this(NullComparator.INSTANCE);
-    }
-
-    /**
-     * Constructs a new priority exception builder.
-     * This builder will use the first exception as its initial assembly.
-     * Whenever a new exception gets added, the given comparator will get used
-     * to determine if the new exception shall get suppressed by the current
-     * assembly or shall suppress the current assembly and take its place.
+     * This builder will use the first input exception as its initial assembly.
+     * Whenever a new input exception gets added, the given comparator will get
+     * used to determine if the new input exception shall get suppressed by the
+     * current assembly or shall suppress the current assembly and take its
+     * place.
      * The comparator will get called like this:
-     * {@code comparator.compare(assembly, exception)} where {@code assembly}
-     * is the current assembly and {@code exception} is the exception to add to
-     * the assembly.
+     * {@code comparator.compare(assembly, input)} where {@code assembly}
+     * is the current assembly and {@code input} is the input exception to add
+     * to the assembly.
      * 
      * @param comparator the comparator used for prioritizing the exceptions in
      *        the assembly.
@@ -52,39 +46,27 @@ extends AbstractExceptionBuilder<X, X> {
     public PriorityExceptionBuilder(final Comparator<? super X> comparator) {
         if (null == (this.comparator = comparator))
             throw new NullPointerException();
-        suppressed = new LinkedList<>();
+        exceptions = new LinkedList<>();
     }
 
     @Override
-    protected X update(final X input, final @CheckForNull X previous) {
-        if (null == previous)
-            return input;
-        if (comparator.compare(previous, input) >= 0) {
-            suppressed.addLast(input);
-            return previous;
-        } else {
-            suppressed.addFirst(previous);
-            return input;
-        }
+    protected final X update(final X input, final @CheckForNull X assembly) {
+        exceptions.add(input);
+        return null == assembly
+                ? input
+                : comparator.compare(assembly, input) >= 0 ? assembly : input;
     }
 
     @Override
-    protected X post(final X assembly) {
-        final Iterator<X> i = suppressed.iterator();
-        while (i.hasNext()) {
-            assembly.addSuppressed(i.next());
-            i.remove();
+    protected final X post(final X assembly) {
+        for (   final Iterator<X> i = exceptions.iterator();
+                i.hasNext();
+                i.remove()) {
+            final X exception = i.next();
+            if (exception != assembly)
+                assembly.addSuppressed(exception);
         }
-        assert suppressed.isEmpty();
+        assert exceptions.isEmpty();
         return assembly;
     }
-
-    private static final class NullComparator implements Comparator<Exception> {
-        static final NullComparator INSTANCE = new NullComparator();
-
-        @Override
-        public int compare(Exception o1, Exception o2) {
-            return 0;
-        }
-    } // NullComparator
 }

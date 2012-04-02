@@ -24,20 +24,20 @@ implements ExceptionBuilder<I, O> {
     private @CheckForNull O assembly;
 
     /**
-     * This method is called to update the given {@code previous} result of
-     * the assembly with the given {@code exception}.
+     * This funcion gets called to update the given {@code previous} result of
+     * the assembly with the given input exception.
      * 
      * @param  input the input exception to handle.
-     * @param  previous the previous result of the assembly or {@code null} if
-     *         this is the first call since the creation of this instance or the
-     *         last assembly has been checked out.
-     * @return The assembled (output) exception..
+     * @param  assembly the current assembled (output) exception or {@code null}
+     *         if this is the first call to this method or the last assembly
+     *         has already been checked out.
+     * @return The next assembled (output) exception.
      */
-    protected abstract O update(I input, @CheckForNull O previous);
+    protected abstract O update(I input, @CheckForNull O assembly);
 
     /**
-     * This method is called to post-process the given result of the assembled
-     * (output) exception after it has been checked out.
+     * This function gets called to post-process the given result of the
+     * assembly after it has been checked out.
      * <p>
      * The implementation in the class {@link AbstractExceptionBuilder} simply
      * returns the given parameter.

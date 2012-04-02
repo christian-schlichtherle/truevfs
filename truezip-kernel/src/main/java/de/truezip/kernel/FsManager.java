@@ -41,6 +41,15 @@ public abstract class FsManager implements Iterable<FsController<?>> {
     public abstract FsController<?>
     getController(FsMountPoint mountPoint, FsCompositeDriver driver);
 
+    /**
+     * Returns a new archive file system controller.
+     * 
+     * @param <E> the type of the archive entries.
+     * @param driver the archive driver.
+     * @param model the file system model.
+     * @param parent the parent file system controller.
+     * @return A new archive file system controller.
+     */
     public abstract <E extends FsArchiveEntry> FsController<?>
     newController(  FsArchiveDriver<E> driver,
                     FsModel model,
@@ -123,15 +132,17 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      */
     public <X extends IOException> void
     sync(   final BitField<SyncOption> options,
-            final ExceptionHandler<? super IOException, X> handler)
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         if (options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
         for (final FsController<?> controller : this) {
             try {
                 controller.sync(options, handler);
-            } catch (final IOException ex) {
+            } catch (final FsSyncException ex) {
                 handler.warn(ex);
+            } catch (final IOException ex) {
+                handler.warn(new FsSyncException(controller.getModel(), ex));
             }
         }
     }

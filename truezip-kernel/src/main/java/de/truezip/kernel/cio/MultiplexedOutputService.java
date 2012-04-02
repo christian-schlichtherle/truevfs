@@ -10,9 +10,8 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.InputException;
-import de.truezip.kernel.io.SequentialIOException;
-import de.truezip.kernel.io.SequentialIOExceptionBuilder;
 import de.truezip.kernel.util.JointIterator;
+import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -171,8 +170,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
         if (isBusy())
             return;
 
-        final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
-                = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
+        final SuppressedExceptionBuilder<IOException>
+                builder = new SuppressedExceptionBuilder<>();
         final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
         while (i.hasNext()) {
             final BufferedEntryOutputStream out = i.next();

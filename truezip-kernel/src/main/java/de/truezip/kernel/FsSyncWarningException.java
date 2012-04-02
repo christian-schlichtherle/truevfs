@@ -21,6 +21,12 @@ public class FsSyncWarningException extends FsSyncException {
     private static final long serialVersionUID = 2302357394858347366L;
 
     public FsSyncWarningException(FsModel model, IOException cause) {
-        super(model, cause, -1);
+        super(model, cause);
+    }
+
+    /** @return {@code -10}. */
+    @Override
+    public int getPriority() {
+        return -10;
     }
 }

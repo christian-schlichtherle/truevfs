@@ -7,7 +7,6 @@ package de.truezip.path.sample;
 import de.truezip.file.TVFS;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
-import de.truezip.kernel.io.SequentialIOException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.path.TPath;
 import java.io.IOException;
@@ -27,9 +26,8 @@ import java.nio.file.Files;
 @SuppressWarnings("CallToThreadDumpStack")
 abstract class Usage {
 
-    /** Nope! */
-    private Usage() {
-    }
+    /** Can't touch this - hammer time! */
+    private Usage() { }
 
     void cat1(String name) throws IOException {
 // START SNIPPET: cat1
@@ -54,12 +52,11 @@ abstract class Usage {
     void umount1() {
 // START SNIPPET: umount1
         try {
-            TVFS.umount(); // with or without parameters
-        } catch (SequentialIOException ouch) {
-            // Print the sequential I/O exception chain in order of
-            // descending priority and ascending appearance.
-            ouch.sortPriority().printStackTrace();
-            //ouch.printStackTrace(); // equivalent
+            TVFS.umount();
+        } catch (FsSyncException ouch) {
+            // This exception may have several suppressed exceptions for
+            // different archive files.
+            ouch.printStackTrace();
         }
 // END SNIPPET: umount1
     }
@@ -67,31 +64,16 @@ abstract class Usage {
     void umount2() {
 // START SNIPPET: umount2
         try {
-            TVFS.umount(); // with or without parameters
-        } catch (SequentialIOException ouch) {
-            // Print the sequential I/O exception chain in order of
-            // appearance instead.
-            ouch.sortAppearance().printStackTrace();
-        }
-// END SNIPPET: umount2
-    }
-
-    void umount3() {
-// START SNIPPET: umount3
-        try {
-            TVFS.umount(); // with or without parameters
+            TVFS.umount();
         } catch (FsSyncWarningException oops) {
-            // Only objects of the class FsSyncWarningException exist in
-            // the exception chain - we ignore this.
+            // Only objects of the class FsSyncWarningException may be
+            // suppressed in this exception - we ignore this.
         } catch (FsSyncException ouch) {
             // At least one exception occured which is not just an
             // FsSyncWarningException.
-            // This indicates loss of data and needs to be handled.
-            // Print the sequential I/O exception chain in order of
-            // descending priority and ascending appearance.
+            // This indicates loss of data and needs to get handled.
             ouch.printStackTrace();
-            //ouch.sortPriority().printStackTrace(); // equivalent
         }
-// END SNIPPET: umount3
+// END SNIPPET: umount2
     }
 }

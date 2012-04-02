@@ -4,24 +4,33 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.io.SequentialIOException;
-import de.truezip.kernel.io.SequentialIOExceptionBuilder;
-import java.io.IOException;
+import de.truezip.kernel.util.PriorityExceptionBuilder;
+import java.util.Comparator;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Assembles a {@link FsSyncException} from one or more {@link IOException}s by
- * {@link SequentialIOException#initPredecessor(SequentialIOException) chaining}
- * them.
- * When the assembly is thrown or returned later, it is sorted by
- * {@link SequentialIOException#sortPriority() priority}.
+ * Assembles an {@link FsSyncException} from one or more sync exceptions by
+ * {@linkplain Exception#addSuppressed(Throwable) suppressing} and optionally
+ * {@linkplain FsSyncException#getPriority() prioritizing} them.
  *
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class FsSyncExceptionBuilder
-extends SequentialIOExceptionBuilder<IOException, FsSyncException> {
+extends PriorityExceptionBuilder<FsSyncException> {
+
     public FsSyncExceptionBuilder() {
-        super(IOException.class, FsSyncException.class);
+        super(FsSyncExceptionComparator.INSTANCE);
+    }
+
+    private static final class FsSyncExceptionComparator
+    implements Comparator<FsSyncException> {
+        static final FsSyncExceptionComparator
+                INSTANCE = new FsSyncExceptionComparator();
+
+        @Override
+        public int compare(FsSyncException o1, FsSyncException o2) {
+            return o1.getPriority() - o2.getPriority();
+        }
     }
 }
