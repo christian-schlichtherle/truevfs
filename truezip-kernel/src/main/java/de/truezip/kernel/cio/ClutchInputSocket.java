@@ -8,7 +8,6 @@ import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -21,13 +20,16 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public abstract class ClutchInputSocket<E extends Entry>
-extends DelegatingInputSocket<E> {
-    @CheckForNull InputSocket<? extends E> delegate;
+extends DecoratingInputSocket<E> {
+
+    public ClutchInputSocket() {
+        super(null);
+    }
 
     @Override
     protected final InputSocket<? extends E> getDelegate() throws IOException {
-        final InputSocket<? extends E> is = delegate;
-        return null != is ? is : (delegate = getLazyDelegate());
+        final InputSocket<? extends E> delegate = this.delegate;
+        return null != delegate ? delegate : (this.delegate = getLazyDelegate());
     };
 
     /**

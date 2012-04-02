@@ -28,7 +28,7 @@ public interface Source {
      * Buffering should get addressed by the caller instead.
      *
      * @return A new seekable byte channel.
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O failure.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
      */
@@ -38,12 +38,12 @@ public interface Source {
     /**
      * Returns a new input stream for reading bytes.
      * <p>
-     * Implementations must enable calling this method any number of times.
+     * The implementation must enable calling this method any number of times.
      * Furthermore, the returned input stream should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
      *
      * @return A new input stream.
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O failure.
      */
     @CreatesObligation
     InputStream newInputStream() throws IOException;    

@@ -4,11 +4,9 @@
  */
 package de.truezip.kernel.cio;
 
-import de.truezip.kernel.cio.Entry;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -21,13 +19,16 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public abstract class ClutchOutputSocket<E extends Entry>
-extends DelegatingOutputSocket<E> {
-    @CheckForNull OutputSocket<? extends E> delegate;
+extends DecoratingOutputSocket<E> {
+
+    public ClutchOutputSocket() {
+        super(null);
+    }
 
     @Override
     protected final OutputSocket<? extends E> getDelegate() throws IOException {
-        final OutputSocket<? extends E> os = delegate;
-        return null != os ? os : (delegate = getLazyDelegate());
+        final OutputSocket<? extends E> delegate = this.delegate;
+        return null != delegate ? delegate : (this.delegate = getLazyDelegate());
     };
 
     /**

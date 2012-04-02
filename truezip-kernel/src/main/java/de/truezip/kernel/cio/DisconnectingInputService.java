@@ -107,9 +107,9 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
-        protected InputSocket<? extends E> getBoundDelegate() throws IOException {
+        protected InputSocket<? extends E> getDelegate() throws IOException {
             checkOpen();
-            return getDelegate().bind(this);
+            return delegate;
         }
 
         @Override

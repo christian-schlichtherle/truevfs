@@ -4,6 +4,8 @@
  */
 package de.truezip.kernel.cio;
 
+import java.io.IOException;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -17,18 +19,16 @@ import javax.annotation.concurrent.NotThreadSafe;
 public abstract class DecoratingOutputSocket<E extends Entry>
 extends DelegatingOutputSocket<E> {
 
-    private final OutputSocket<? extends E> delegate;
+    /** The nullable decorated output socket. */
+    protected @Nullable OutputSocket<? extends E> delegate;
 
-    protected DecoratingOutputSocket(final OutputSocket<? extends E> delegate) {
-        if (null == (this.delegate = delegate))
-            throw new NullPointerException();
+    protected DecoratingOutputSocket(
+            final @Nullable OutputSocket<? extends E> delegate) {
+        this.delegate = delegate;
     }
 
-    // TODO: Either declare throws IOException or declare final and declare the
-    // delegate field protected final for symmetry with other Decorating*
-    // classes.
     @Override
-    protected OutputSocket<? extends E> getDelegate() {
+    protected OutputSocket<? extends E> getDelegate() throws IOException {
         return delegate;
     }
 

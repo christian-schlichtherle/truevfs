@@ -25,19 +25,19 @@ extends InputSocket<E> {
      * Returns the delegate socket.
      * 
      * @return The delegate socket.
-     * @throws IOException On any I/O failure. 
+     * @throws IOException on any I/O failure. 
      */
     protected abstract InputSocket<? extends E> getDelegate()
     throws IOException;
 
     /**
-     * Binds the decorated socket to this socket and returns it.
+     * Binds the delegate socket to this socket and returns it.
      *
      * @return The bound delegate socket.
-     * @throws IOException On any I/O failure. 
+     * @throws IOException on any I/O failure. 
      */
-    // TODO: Consider to declare this final!
-    protected InputSocket<? extends E> getBoundDelegate() throws IOException {
+    protected final InputSocket<? extends E> getBoundDelegate()
+    throws IOException {
         return getDelegate().bind(this);
     }
 

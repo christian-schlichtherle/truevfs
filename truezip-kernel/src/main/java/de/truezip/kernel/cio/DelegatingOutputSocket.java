@@ -24,7 +24,7 @@ extends OutputSocket<E> {
      * Returns the delegate socket.
      * 
      * @return The delegate socket.
-     * @throws IOException On any I/O failure. 
+     * @throws IOException on any I/O failure. 
      */
     protected abstract OutputSocket<? extends E> getDelegate()
     throws IOException;
@@ -33,10 +33,10 @@ extends OutputSocket<E> {
      * Binds the delegate socket to this socket and returns it.
      *
      * @return The bound delegate socket.
-     * @throws IOException On any I/O failure. 
+     * @throws IOException on any I/O failure. 
      */
-    // TODO: Consider declaring this final!
-    protected OutputSocket<? extends E> getBoundDelegate() throws IOException {
+    protected final OutputSocket<? extends E> getBoundDelegate()
+    throws IOException {
         return getDelegate().bind(this);
     }
 
