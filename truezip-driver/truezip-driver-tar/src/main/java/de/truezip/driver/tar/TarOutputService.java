@@ -44,7 +44,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class TarOutputService
+public final class TarOutputService
 extends TarArchiveOutputStream
 implements OutputService<TarDriverEntry> {
 
