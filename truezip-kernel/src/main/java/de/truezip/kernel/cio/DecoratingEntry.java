@@ -50,7 +50,7 @@ implements Entry {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[entry=%s]",
                 getClass().getName(),
                 entry);
     }

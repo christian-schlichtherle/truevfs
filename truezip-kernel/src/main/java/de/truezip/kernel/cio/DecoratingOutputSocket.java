@@ -38,7 +38,7 @@ extends DelegatingOutputSocket<E> {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[socket=%s]",
                 getClass().getName(),
                 socket);
     }

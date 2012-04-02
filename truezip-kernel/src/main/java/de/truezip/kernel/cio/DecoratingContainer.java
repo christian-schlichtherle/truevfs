@@ -53,7 +53,7 @@ implements Container<E> {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[container=%s]",
                 getClass().getName(),
                 container);
     }
