@@ -110,9 +110,6 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      */
     private byte[] block;
 
-    /** Whether this read only file has been closed or not. */
-    private boolean closed;
-
     /**
      * Creates a read only file for transparent random read access to an
      * encrypted file.
@@ -148,12 +145,10 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * @param  length The length of the encrypted data in this file.
      * @throws IOException If this read only file has already been closed.
      *         This exception is <em>not</em> recoverable.
-     * @throws IllegalStateException If this object has already been
-     *         initialized.
-     *         This exception is <em>not</em> recoverable.
-     * @throws NullPointerException If {@link #delegate} or {@code cipher} is
-     *         {@code null}.
-     *         This exception <em>is</em> recoverable.
+     * @throws IllegalStateException if {@link #delegate} is {@code null} or
+     *         if this object has already been initialized.
+     * @throws IllegalArgumentException if {@code cipher} is {@code null} or
+     *         if {@code start} or {@code length} are less than zero.
      */
     protected final void init(
             final SeekableBlockCipher cipher,
@@ -161,24 +156,18 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             final long length)
     throws IOException {
         // Check state.
-        if (this.closed)
-            throw new IOException("file has been closed");
-        if (null != this.cipher)
-            throw new IllegalStateException("file is already initialized");
-
-        // Check state (recoverable).
         if (null == this.delegate)
-            throw new NullPointerException();
+            throw new IllegalStateException();
+        if (null != this.cipher)
+            throw new IllegalStateException();
 
-        // Check parameters (fail fast).
-        if (null == cipher)
-            throw new NullPointerException();
-        if (start < 0 || length < 0)
+        // Check parameters.
+        if (null == (this.cipher = cipher))
             throw new IllegalArgumentException();
-
-        this.cipher = cipher;
-        this.start = start;
-        this.length = length;
+        if (0 > (this.start = start))
+            throw new IllegalArgumentException();
+        if (0 > (this.length = length))
+            throw new IllegalArgumentException();
 
         this.blockOff = length;
         final int blockLen = cipher.getBlockSize();
@@ -330,10 +319,6 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      */
     @Override
     public void close() throws IOException {
-        // Order is important here!
-        if (closed)
-            return;
-        closed = true;
         cipher = null;
         delegate.close();
     }
