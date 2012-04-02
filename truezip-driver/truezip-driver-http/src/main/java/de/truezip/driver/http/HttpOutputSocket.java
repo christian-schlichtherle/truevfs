@@ -5,13 +5,13 @@
 package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An output socket for HTTP(S) entries.
@@ -20,7 +20,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @see     HttpInputSocket
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
+@NotThreadSafe
 public class HttpOutputSocket extends OutputSocket<HttpEntry> {
 
     private final HttpEntry entry;

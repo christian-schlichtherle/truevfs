@@ -16,7 +16,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An input socket for HTTP(S) entries.
@@ -24,7 +24,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @see     HttpOutputSocket
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
+@NotThreadSafe
 public class HttpInputSocket extends InputSocket<HttpEntry> {
 
     private final HttpEntry entry;
