@@ -76,17 +76,13 @@ extends FsArchiveDriver<E> {
     }
 
     /**
-     * Ensures that the given entry name can get encoded using this driver's
-     * character set.
-     * Should be called by sub classes in their implementation of the method
-     * {@link FsArchiveDriver#newEntry}.
-     * 
-     * @param  name an entry name.
-     * @see    #getCharset
-     * @throws CharConversionException If the path name contains characters
-     *         which cannot get encoded.
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsCharsetArchiveDriver} uses the
+     * driver's {@linkplain #getCharset() character set} for the check.
      */
-    protected final void checkEncodable(final String name)
+    @Override
+    public final void checkEncodable(final String name)
     throws CharConversionException {
         if (!encoder.canEncode(name))
             throw new CharConversionException(name +

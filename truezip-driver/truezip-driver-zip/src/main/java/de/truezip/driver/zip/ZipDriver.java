@@ -24,7 +24,6 @@ import de.truezip.key.KeyManagerProvider;
 import de.truezip.key.KeyProvider;
 import de.truezip.key.sl.KeyManagerLocator;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -358,9 +357,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             String name,
             final Type type,
             final Entry template,
-            final BitField<AccessOption> mknod)
-    throws CharConversionException {
-        checkEncodable(name);
+            final BitField<AccessOption> mknod) {
         name = normalize(name, type);
         final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {

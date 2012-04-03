@@ -4,11 +4,7 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.FsArchiveDriver;
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsEntry;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
-import java.io.CharConversionException;
 import java.util.*;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -29,7 +25,7 @@ extends FsEntry
 implements Cloneable {
 
     private final String name;
-    private EnumMap<Type, E> map = new EnumMap<Type, E>(Type.class);
+    private EnumMap<Type, E> map = new EnumMap<>(Type.class);
     private @Nullable Type key;
     private @Nullable LinkedHashSet<String> members;
 
@@ -57,17 +53,13 @@ implements Cloneable {
         } catch (CloneNotSupportedException ex) {
             throw new AssertionError(ex);
         }
-        final Map<Type, E> cloneMap = clone.map = new EnumMap<Type, E>(Type.class);
-        try {
-            for (final Map.Entry<Type, E> entry : this.map.entrySet()) {
-                final FsArchiveEntry delegate = entry.getValue();
-                cloneMap.put(entry.getKey(),
-                            driver.newEntry(delegate.getName(),
-                                            delegate.getType(),
-                                            delegate));
-            }
-        } catch (CharConversionException ex) {
-            throw new AssertionError(ex);
+        final Map<Type, E> cloneMap = clone.map = new EnumMap<>(Type.class);
+        for (final Map.Entry<Type, E> entry : this.map.entrySet()) {
+            final FsArchiveEntry delegate = entry.getValue();
+            cloneMap.put(entry.getKey(),
+                        driver.newEntry(delegate.getName(),
+                                        delegate.getType(),
+                                        delegate));
         }
         final LinkedHashSet<String> members = this.members;
         if (null != members)
@@ -238,7 +230,7 @@ implements Cloneable {
         if (!map.containsKey(DIRECTORY))
             return members = null;
         final Set<String> m = members;
-        return null != m ? m : (members = new LinkedHashSet<String>());
+        return null != m ? m : (members = new LinkedHashSet<>());
     }
 
     /**

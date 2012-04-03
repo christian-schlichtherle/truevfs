@@ -16,7 +16,6 @@ import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.COMPRESS;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -43,10 +42,10 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
 
     /**
-     * The default character set for entry names and comments, which is
-     * {@code "US-ASCII"}.
+     * The character set for entry names and comments, which is the default
+     * character set.
      */
-    public static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
+    public static final Charset TAR_CHARSET = Charset.defaultCharset();
 
     private final IOPool<?> ioPool;
 
@@ -109,9 +108,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             String name,
             final Type type,
             final Entry template,
-            final BitField<AccessOption> mknod)
-    throws CharConversionException {
-        checkEncodable(name);
+            final BitField<AccessOption> mknod) {
         name = normalize(name, type);
         final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {

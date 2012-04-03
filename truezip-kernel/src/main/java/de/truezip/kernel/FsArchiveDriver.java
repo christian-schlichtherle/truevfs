@@ -4,9 +4,9 @@
  */
 package de.truezip.kernel;
 
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.util.BitField;
@@ -264,16 +264,13 @@ extends FsDriver {
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
      * @return A new entry for the given name.
-     * @throws CharConversionException if {@code name} contains characters
-     *         which are invalid.
      */
-    public final E newEntry(String name, Type type, @CheckForNull Entry template)
-    throws CharConversionException {
+    public final E newEntry(String name, Type type, @CheckForNull Entry template) {
         return newEntry(name, type, template, AccessOptions.NONE);
     }
 
     /**
-     * Returns a new archive entry for the given name.
+     * Returns a new entry for the given name.
      * The implementation may need to fix this name in order to 
      * form a valid {@link Entry#getName() entry name} for their
      * particular requirements.
@@ -293,13 +290,21 @@ extends FsDriver {
      * @param  mknod when called from {@link FsController#mknod}, this is its
      *         {@code options} parameter, otherwise it's typically an empty set.
      * @return A new entry for the given name.
-     * @throws CharConversionException if {@code name} contains characters
-     *         which are invalid.
      */
     public abstract E newEntry(
             String name,
             Type type,
             @CheckForNull Entry template,
-            BitField<AccessOption> mknod)
+            BitField<AccessOption> mknod);
+
+    /**
+     * Ensures that the given entry name can get encoded by this driver's
+     * character set.
+     * 
+     * @param  name an entry name.
+     * @throws CharConversionException If the entry name contains characters
+     *         which cannot get encoded.
+     */
+    public abstract void checkEncodable(String name)
     throws CharConversionException;
 }
