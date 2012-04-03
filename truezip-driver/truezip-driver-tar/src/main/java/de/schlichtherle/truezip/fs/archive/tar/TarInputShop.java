@@ -86,7 +86,7 @@ implements InputShop<TarDriverEntry> {
                 TarDriverEntry entry = entries.get(name);
                 if (null != entry)
                     entry.release();
-                entry = new TarDriverEntry(name, tinEntry);
+                entry = driver.newEntry(name, tinEntry);
                 if (!tinEntry.isDirectory()) {
                     final Entry<?> temp = pool.allocate();
                     entry.setTemp(temp);

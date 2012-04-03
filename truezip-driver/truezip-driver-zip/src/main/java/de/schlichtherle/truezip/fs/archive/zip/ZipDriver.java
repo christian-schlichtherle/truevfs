@@ -399,7 +399,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             final Entry template,
             final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {

@@ -288,7 +288,7 @@ extends FsDriver {
     }
 
     /**
-     * Returns a new archive entry for the given name.
+     * Returns a new entry for the given name.
      * The implementation may need to fix this name in order to 
      * form a valid {@link Entry#getName() entry name} for their
      * particular requirements.
@@ -309,8 +309,8 @@ extends FsDriver {
      *         is its {@code options} parameter, otherwise it's typically an
      *         empty set.
      * @return A new entry for the given name.
-     * @throws CharConversionException if {@code name} contains characters
-     *         which are invalid.
+     * @throws CharConversionException TODO: This has been deprecated and
+     *         should get removed.
      */
     public abstract E newEntry(
             String name,
@@ -318,4 +318,20 @@ extends FsDriver {
             @CheckForNull Entry template,
             BitField<FsOutputOption> mknod)
     throws CharConversionException;
+
+    /**
+     * Ensures that the given entry name can get encoded by this driver's
+     * character set.
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} is just a stub
+     * and does nothing.
+     *
+     * @param  name an entry name.
+     * @throws CharConversionException If the entry name contains characters
+     *         which cannot get encoded.
+     */
+    // TODO: Consider naming this checkEncodable because of throws declaration.
+    @SuppressWarnings("NoopMethodInAbstractClass")
+    protected void assertEncodable(String name) throws CharConversionException {
+    }
 }
