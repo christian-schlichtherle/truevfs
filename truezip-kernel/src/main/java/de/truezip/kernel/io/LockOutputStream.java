@@ -14,22 +14,23 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * A decorator which protects all access to it via a {@link Lock}.
+ * A decorator which protects all access to its output stream
+ * via a {@link Lock}.
  *
  * @see     LockInputStream
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public class LockOutputStream extends DecoratingOutputStream {
+public final class LockOutputStream extends DecoratingOutputStream {
 
     /** The lock on which this object synchronizes. */
-    protected final Lock lock;
+    private final Lock lock;
 
     /**
-     * Constructs a new synchronized output stream.
+     * Constructs a new lock output stream.
      *
-     * @param out the output stream to wrap in this decorator.
-     * @param lock the object to synchronize on.
+     * @param out the output stream to decorate.
+     * @param lock the lock to use.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
