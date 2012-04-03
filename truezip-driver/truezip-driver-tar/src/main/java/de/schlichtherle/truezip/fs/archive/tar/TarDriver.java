@@ -42,10 +42,10 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
 
     /**
-     * The default character set for entry names and comments, which is
-     * {@code "US-ASCII"}.
+     * The character set for entry names and comments, which is the default
+     * character set.
      */
-    public static final Charset TAR_CHARSET = Charset.forName("US-ASCII");
+    public static final Charset TAR_CHARSET = Charset.defaultCharset();
 
     private final IOPool<?> ioPool;
 
@@ -110,7 +110,6 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             final Entry template,
             final BitField<FsOutputOption> mknod)
     throws CharConversionException {
-        assertEncodable(name);
         name = toZipOrTarEntryName(name, type);
         final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {
