@@ -11,7 +11,6 @@ import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -298,11 +297,6 @@ public final class FsCacheTest {
         }
 
         @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
         public InputStream newStream() throws IOException {
             return new BrokenInputStream();
         }
@@ -337,7 +331,6 @@ public final class FsCacheTest {
         }
 
         static class BrokenOutputStream extends OutputStream {
-
             @Override
             public void write(int b) throws IOException {
                 throw new IOException();
