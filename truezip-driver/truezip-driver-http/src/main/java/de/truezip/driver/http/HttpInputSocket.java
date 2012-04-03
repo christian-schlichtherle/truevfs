@@ -51,19 +51,19 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
                 try (final OutputStream out = temp.getOutputSocket().newStream()) {
                     Streams.cat(in, out);
                 }
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 temp.release();
                 throw ex;
             }
         } finally {
             try {
                 in.close();
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 throw new InputException(ex);
             }
         }
 
-        class TempReadOnlyFile extends DecoratingReadOnlyFile {
+        final class TempReadOnlyFile extends DecoratingReadOnlyFile {
             boolean closed;
 
             @CreatesObligation
@@ -76,7 +76,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
             public void close() throws IOException {
                 if (closed)
                     return;
-                super.close();
+                rof.close();
                 closed = true;
                 temp.release();
             }
