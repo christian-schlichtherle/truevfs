@@ -4,8 +4,10 @@
  */
 package de.truezip.kernel.cio;
 
+import de.truezip.kernel.io.SeekableByteChannelOutputStream;
 import de.truezip.kernel.io.Sink;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -90,8 +92,29 @@ extends IOSocket<E, Entry> implements Sink {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the abstract class {@link OutputSocket} throws an
-     * {@link UnsupportedOperationException}.
+     * Implementations must support calling this method multiple times.
+     * <p>
+     * The implementation in the class {@link OutputSocket} calls
+     * {@link #newChannel()} and wraps the result in a
+     * {@link SeekableByteChannelOutputStream} adapter.
+     * Note that this may intentionally violate the contract for this method
+     * because {@link #newChannel()} may throw an
+     * {@link UnsupportedOperationException} while this method may not,
+     * so override appropriately.
+     */
+    @Override
+    public OutputStream newStream() throws IOException {
+        return new SeekableByteChannelOutputStream(newChannel());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Implementations must support calling this method multiple times.
+     * 
+     * @throws UnsupportedOperationException the implementation in the class
+     *         {@link OutputSocket} <em>always</em> throws an exception of
+     *         this type.
      */
     @Override
     public SeekableByteChannel newChannel() throws IOException {
