@@ -6,7 +6,7 @@ package de.truezip.driver.zip;
 
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import de.truezip.driver.zip.io.*;
-import de.truezip.kernel.FsCharsetArchiveDriver;
+import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
@@ -62,7 +62,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public class ZipDriver
-extends FsCharsetArchiveDriver<ZipDriverEntry>
+extends FsArchiveDriver<ZipDriverEntry>
 implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
 
     private static final Logger logger = Logger.getLogger(

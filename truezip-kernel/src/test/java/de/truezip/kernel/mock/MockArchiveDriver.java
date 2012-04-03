@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.mock;
 
-import de.truezip.kernel.FsCharsetArchiveDriver;
+import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.addr.FsMountPoint;
@@ -25,8 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class MockArchiveDriver
-extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
+public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
     private static final Charset charset = Charset.forName("UTF-8");
     

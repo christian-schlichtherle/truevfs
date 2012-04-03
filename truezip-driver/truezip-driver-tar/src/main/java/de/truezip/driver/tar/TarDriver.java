@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.FsCharsetArchiveDriver;
+import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
@@ -39,7 +39,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
+public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     /**
      * The character set for entry names and comments, which is the default

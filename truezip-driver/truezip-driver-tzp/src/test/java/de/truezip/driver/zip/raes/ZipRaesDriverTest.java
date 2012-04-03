@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.kernel.FsCharsetArchiveDriverTestSuite;
 import de.truezip.driver.zip.ZipDriverEntry;
+import de.truezip.kernel.FsArchiveDriverTestSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
 public final class ZipRaesDriverTest
-extends FsCharsetArchiveDriverTestSuite<ZipDriverEntry, ZipRaesDriver> {
+extends FsArchiveDriverTestSuite<ZipDriverEntry, ZipRaesDriver> {
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {

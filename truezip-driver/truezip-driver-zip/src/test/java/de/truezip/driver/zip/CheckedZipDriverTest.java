@@ -4,15 +4,13 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.FsCharsetArchiveDriverTestSuite;
-import de.truezip.driver.zip.CheckedZipDriver;
-import de.truezip.driver.zip.ZipDriverEntry;
+import de.truezip.kernel.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class CheckedZipDriverTest
-extends FsCharsetArchiveDriverTestSuite<ZipDriverEntry, CheckedZipDriver> {
+extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedZipDriver> {
 
     @Override
     protected CheckedZipDriver newArchiveDriver() {
