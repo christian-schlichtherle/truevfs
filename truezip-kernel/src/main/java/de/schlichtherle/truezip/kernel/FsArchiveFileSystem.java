@@ -29,7 +29,6 @@ import static de.truezip.kernel.util.Maps.OVERHEAD_SIZE;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.nio.charset.CharsetEncoder;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -210,10 +209,8 @@ implements Iterable<FsCovariantEntry<E>> {
      * Marks this (virtual) archive file system as touched and notifies the
      * listener if and only if the touch status is changing.
      *
-     * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
-     *         file system is read only.
-     * @throws FsFileSystemException If the listener vetoed the beforeTouch
-     *         operation for any reason.
+     * @throws IOException If the listener's beforeTouch implementation vetoed
+     *         the operation for any reason.
      */
     private void touch() throws IOException {
         if (touched)
@@ -327,22 +324,18 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  type the type of the archive entry to create.
      * @param  template the nullable template for the archive entry to create.
      * @return A new archive entry.
-     * @throws FsFileSystemException if a {@link CharConversionException}
-     *         occurs as its cause.
+     * @throws CharConversionException If the entry name contains characters
+     *         which cannot get encoded.
      */
     private E newCheckedEntry(
             final String name,
             final Type type,
             final BitField<AccessOption> mknod,
             final @CheckForNull Entry template)
-    throws FsFileSystemException {
+    throws CharConversionException {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        try {
-            driver.checkEncodable(name);
-        } catch (CharConversionException ex) {
-            throw new FsFileSystemException(name, ex);
-        }
+        driver.checkEncodable(name);
         return driver.newEntry(name, type, template, mknod);
     }
 
@@ -394,7 +387,7 @@ implements Iterable<FsCovariantEntry<E>> {
             final Entry.Type type,
             final BitField<AccessOption> options,
             @CheckForNull Entry template)
-    throws FsFileSystemException {
+    throws IOException {
         if (null == type)
             throw new NullPointerException();
         if (FILE != type && DIRECTORY != type) // TODO: Add support for other types.
@@ -436,7 +429,7 @@ implements Iterable<FsCovariantEntry<E>> {
                     final Entry.Type type,
                     final BitField<AccessOption> options,
                     @CheckForNull final Entry template)
-        throws FsFileSystemException {
+        throws IOException {
             // Consume AccessOption.CREATE_PARENTS.
             this.createParents = options.get(CREATE_PARENTS);
             this.options = options.clear(CREATE_PARENTS);
@@ -449,7 +442,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 final String entryName,
                 final Entry.Type entryType,
                 @CheckForNull final Entry template)
-        throws FsFileSystemException {
+        throws IOException {
             splitter.split(entryName);
             final String parentPath = splitter.getParentPath(); // could equal ROOT_PATH
             final String memberName = splitter.getMemberName();
@@ -556,10 +549,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * directory entries (including the file system root) must be empty.
      *
      * @param  name the archive file system entry name.
-     * @throws FsReadOnlyArchiveFileSystemException If this (virtual) archive
-     *         file system is read-only.
-     * @throws FsFileSystemException If the operation fails for some other
-     *         reason.
+     * @throws IOException on any I/O failure.
      */
     void unlink(final FsEntryName name)
     throws IOException {
@@ -653,7 +643,7 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     void setReadOnly(FsEntryName name)
-    throws FsFileSystemException {
+    throws IOException {
         if (!isReadOnly())
             throw new FsFileSystemException(name,
                 "cannot set read-only state");
