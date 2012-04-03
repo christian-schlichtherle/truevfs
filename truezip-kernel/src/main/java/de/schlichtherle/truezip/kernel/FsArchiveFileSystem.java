@@ -29,6 +29,7 @@ import static de.truezip.kernel.util.Maps.OVERHEAD_SIZE;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.nio.charset.CharsetEncoder;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -51,7 +52,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private static final String ROOT_PATH = ROOT.getPath();
 
     private final Splitter splitter = new Splitter();
-    private final FsArchiveDriver<E> factory;
+    private final FsArchiveDriver<E> driver;
     private final EntryTable<E> master;
 
     /** Whether or not this file system has been modified (touched). */
@@ -77,7 +78,7 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
-        this.factory = driver;
+        this.driver = driver;
         final E root = newEntry(ROOT_PATH, DIRECTORY, AccessOptions.NONE, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
@@ -132,7 +133,7 @@ implements Iterable<FsCovariantEntry<E>> {
     FsArchiveFileSystem(final FsArchiveDriver<E> driver,
                         final @WillNotClose Container<E> archive,
                         final @CheckForNull Entry rootTemplate) {
-        this.factory = driver;
+        this.driver = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<>(
                 initialCapacity(archive.size() + OVERHEAD_SIZE));
@@ -293,7 +294,7 @@ implements Iterable<FsCovariantEntry<E>> {
     @Nullable
     final FsCovariantEntry<E> getEntry(final FsEntryName name) {
         final FsCovariantEntry<E> entry = master.get(name.getPath());
-        return null == entry ? null : entry.clone(factory);
+        return null == entry ? null : entry.clone(driver);
     }
 
     /**
@@ -313,13 +314,13 @@ implements Iterable<FsCovariantEntry<E>> {
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        return factory.newEntry(name, type, template, mknod);
+        return driver.newEntry(name, type, template, mknod);
     }
 
     /**
      * Like {@link #newEntry newEntry(name, type, mknod, template)},
-     * but checks any {@link CharConversionException} in an
-     * {@link AssertionError}.
+     * but ensures that the given entry name can get encoded by the driver's
+     * character set.
      *
      * @see    #mknod
      * @param  name the archive entry name.
@@ -338,11 +339,11 @@ implements Iterable<FsCovariantEntry<E>> {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
         try {
-            factory.checkEncodable(name);
+            driver.checkEncodable(name);
         } catch (CharConversionException ex) {
             throw new FsFileSystemException(name, ex);
         }
-        return factory.newEntry(name, type, template, mknod);
+        return driver.newEntry(name, type, template, mknod);
     }
 
     /**
