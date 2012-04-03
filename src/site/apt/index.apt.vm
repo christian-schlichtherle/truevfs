@@ -4,7 +4,7 @@
     Christian Schlichtherle
     -----------------------
 
-Welcome!
+Welcome
 
     TrueZIP is a Java based virtual file system (VFS) which enables client
     applications to perform CRUD (Create, Read, Update, Delete) operations on
