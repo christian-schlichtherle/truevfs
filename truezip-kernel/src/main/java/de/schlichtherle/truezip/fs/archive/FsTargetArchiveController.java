@@ -218,7 +218,13 @@ extends FsFileSystemArchiveController<E> {
                         parent, name, MOUNT_INPUT_OPTIONS);
                 final InputArchive<E> ia = new InputArchive<E>(
                         driver.newInputShop(getModel(), is));
-                fs = newPopulatedFileSystem(driver, ia.getArchive(), pe, ro);
+                // TODO: Remove try-catch
+                try {
+                    fs = newPopulatedFileSystem(driver, ia.getArchive(), pe, ro);
+                } catch (final IOException ex) {
+                    ia.close();
+                    throw ex;
+                }
                 setInputArchive(ia);
             } catch (final FsControllerException ex) {
                 assert ex instanceof FsNeedsLockRetryException;

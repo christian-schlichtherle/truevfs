@@ -30,7 +30,8 @@ extends FsArchiveFileSystem<E> {
 
     FsReadOnlyArchiveFileSystem(final @WillNotClose EntryContainer<E> archive,
                                 final FsArchiveDriver<E> driver,
-                                final @CheckForNull Entry rootTemplate) {
+                                final @CheckForNull Entry rootTemplate)
+    throws FsArchiveFileSystemException {
         super(driver, archive, rootTemplate);
     }
 

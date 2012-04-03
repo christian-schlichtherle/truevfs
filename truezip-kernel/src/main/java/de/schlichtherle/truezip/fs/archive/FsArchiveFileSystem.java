@@ -131,19 +131,23 @@ implements Iterable<FsCovariantEntry<E>> {
      * @throws NullPointerException If {@code factory} or {@code archive} are
      *         {@code null}.
      */
+    // TODO: Remove throws FsArchiveFileSystemException.
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
     newPopulatedFileSystem( FsArchiveDriver<E> driver,
                             @WillNotClose EntryContainer<E> archive,
                             @CheckForNull Entry rootTemplate,
-                            boolean readOnly) {
+                            boolean readOnly)
+    throws FsArchiveFileSystemException {
         return readOnly
             ? new FsReadOnlyArchiveFileSystem<E>(archive, driver, rootTemplate)
             : new FsArchiveFileSystem<E>(driver, archive, rootTemplate);
     }
 
+    // TODO: Remove throws FsArchiveFileSystemException.
     FsArchiveFileSystem(final FsArchiveDriver<E> driver,
                         final @WillNotClose EntryContainer<E> archive,
-                        final @CheckForNull Entry rootTemplate) {
+                        final @CheckForNull Entry rootTemplate)
+    throws FsArchiveFileSystemException {
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<E>(
@@ -186,7 +190,8 @@ implements Iterable<FsCovariantEntry<E>> {
      *
      * @param name the archive file system entry name.
      */
-    private void fix(final String name) {
+    // TODO: Remove throws FsArchiveFileSystemException.
+    private void fix(final String name) throws FsArchiveFileSystemException {
         // When recursing into this method, it may be called with the root
         // directory as its parameter, so we may NOT skip the following test.
         if (isRoot(name))
@@ -197,7 +202,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final String memberName = splitter.getMemberName();
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
-            parent = master.add(parentPath, newEntry(
+            parent = master.add(parentPath, newCheckedEntry(
                     parentPath, DIRECTORY, FsOutputOptions.NONE, null));
         parent.add(memberName);
         fix(parentPath);
@@ -324,7 +329,6 @@ implements Iterable<FsCovariantEntry<E>> {
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-
         try {
             return factory.newEntry(name, type, template, mknod);
         } catch (CharConversionException ex) {
@@ -353,8 +357,8 @@ implements Iterable<FsCovariantEntry<E>> {
     throws FsArchiveFileSystemException {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-
         try {
+            factory.assertEncodable(name);
             return factory.newEntry(name, type, template, mknod);
         } catch (CharConversionException ex) {
             throw new FsArchiveFileSystemException(name, ex);
