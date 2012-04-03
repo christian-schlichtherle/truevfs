@@ -92,13 +92,45 @@ extends IOSocket<E, Entry> implements Source {
     }
 
     /**
-     * <b>Optional operation:</b> Returns a new read only file for reading
-     * bytes from the {@link #getLocalTarget() local target} in random order.
+     * {@inheritDoc}
      * <p>
-     * If this method is supported, the implementation must enable calling it
-     * any number of times.
-     * Furthermore, the returned read only file should <em>not</em> be buffered.
+     * Implementations must support calling this method multiple times.
+     * <p>
+     * The implementation in the class {@link InputSocket} calls
+     * {@link #newReadOnlyFile()} and wraps the result in a
+     * {@link ReadOnlyFileInputStream} adapter.
+     * Note that this may intentionally violate the contract for this method
+     * because {@link #newReadOnlyFile()} may throw an
+     * {@link UnsupportedOperationException} while this method may not,
+     * so override appropriately.
+     */
+    @Override
+    public InputStream newStream() throws IOException {
+        return new ReadOnlyFileInputStream(newReadOnlyFile());
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Implementations must support calling this method multiple times.
+     * 
+     * @throws UnsupportedOperationException the implementation in the class
+     *         {@link InputSocket} <em>always</em> throws an exception of
+     *         this type.
+     */
+    @Override
+    public SeekableByteChannel newChannel() throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * <b>Optional operation:</b> Returns a new read only file for reading
+     * bytes in random order.
+     * If this operation is supported, then the returned read only file
+     * should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
+     * <p>
+     * Implementations must support calling this method multiple times.
      *
      * @return A new read only file.
      * @throws IOException on any I/O failure.
@@ -107,30 +139,4 @@ extends IOSocket<E, Entry> implements Source {
      */
     @CreatesObligation
     public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the abstract class {@link InputSocket} throws an
-     * {@link UnsupportedOperationException}.
-     */
-    @Override
-    public SeekableByteChannel newChannel() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link InputSocket} calls
-     * {@link #newReadOnlyFile()} and wraps the result in an
-     * {@link ReadOnlyFileInputStream} adapter.
-     * Note that this may <em>violate</em> the contract for this method because
-     * {@link #newReadOnlyFile()} is allowed to throw an
-     * {@link UnsupportedOperationException} while this method is not!
-     */
-    @Override
-    public InputStream newStream() throws IOException {
-        return new ReadOnlyFileInputStream(newReadOnlyFile());
-    }
 }
