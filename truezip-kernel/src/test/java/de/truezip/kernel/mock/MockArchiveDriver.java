@@ -4,16 +4,15 @@
  */
 package de.truezip.kernel.mock;
 
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsCharsetArchiveDriver;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.addr.FsMountPoint;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
-import java.io.CharConversionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -92,8 +91,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
             String name,
             Type type,
             Entry template,
-            BitField<AccessOption> mknod)
-    throws CharConversionException {
+            BitField<AccessOption> mknod) {
         return new MockArchiveDriverEntry(normalize(name, type), type, template);
     }
 }

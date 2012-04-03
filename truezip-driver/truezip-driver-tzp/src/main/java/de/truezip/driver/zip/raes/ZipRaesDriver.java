@@ -139,12 +139,11 @@ public abstract class ZipRaesDriver extends JarDriver {
      * of the resulting archive file and unecessarily heat the CPU.
      */
     @Override
-    public ZipDriverEntry
-    newEntry(   final String path,
-                final Type type,
-                final Entry template,
-                final BitField<AccessOption> mknod)
-    throws CharConversionException {
+    public ZipDriverEntry newEntry(
+            final String path,
+            final Type type,
+            final Entry template,
+            final BitField<AccessOption> mknod) {
         final ZipDriverEntry entry
                 = super.newEntry(path, type, template, mknod.set(COMPRESS));
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :

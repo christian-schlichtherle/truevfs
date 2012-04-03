@@ -55,7 +55,7 @@ implements InputService<TarDriverEntry> {
 
     /** Maps entry names to I/O pool entries. */
     private final Map<String, TarDriverEntry>
-            entries = new LinkedHashMap<String, TarDriverEntry>(
+            entries = new LinkedHashMap<>(
                     initialCapacity(TarOutputService.OVERHEAD_SIZE));
 
     /**
@@ -70,8 +70,8 @@ implements InputService<TarDriverEntry> {
      *        of this constructor.
      */
     @CreatesObligation
-    public TarInputService(final TarDriver driver,
-                        final @WillNotClose InputStream in)
+    public TarInputService( final TarDriver driver,
+                            final @WillNotClose InputStream in)
     throws IOException {
         final TarArchiveInputStream tin = newValidatedTarInputStream(in);
         final IOPool<?> pool = driver.getIOPool();
@@ -82,7 +82,7 @@ implements InputService<TarDriverEntry> {
                 TarDriverEntry entry = entries.get(name);
                 if (null != entry)
                     entry.release();
-                entry = new TarDriverEntry(name, tinEntry);
+                entry = driver.newEntry(name, tinEntry);
                 if (!tinEntry.isDirectory()) {
                     final IOBuffer<?> temp = pool.allocate();
                     entry.setTemp(temp);

@@ -73,7 +73,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     static <E extends FsArchiveEntry> FsArchiveFileSystem<E>
     newEmptyFileSystem(FsArchiveDriver<E> driver) {
-        return new FsArchiveFileSystem<E>(driver);
+        return new FsArchiveFileSystem<>(driver);
     }
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
@@ -82,7 +82,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
-        final EntryTable<E> master = new EntryTable<E>(
+        final EntryTable<E> master = new EntryTable<>(
                 initialCapacity(OVERHEAD_SIZE));
         master.add(ROOT_PATH, root);
         this.master = master;
@@ -125,8 +125,8 @@ implements Iterable<FsCovariantEntry<E>> {
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
-            ? new FsReadOnlyArchiveFileSystem<E>(archive, driver, rootTemplate)
-            : new FsArchiveFileSystem<E>(driver, archive, rootTemplate);
+            ? new FsReadOnlyArchiveFileSystem<>(archive, driver, rootTemplate)
+            : new FsArchiveFileSystem<>(driver, archive, rootTemplate);
     }
 
     FsArchiveFileSystem(final FsArchiveDriver<E> driver,
@@ -134,10 +134,10 @@ implements Iterable<FsCovariantEntry<E>> {
                         final @CheckForNull Entry rootTemplate) {
         this.factory = driver;
         // Allocate some extra capacity to create missing parent directories.
-        final EntryTable<E> master = new EntryTable<E>(
+        final EntryTable<E> master = new EntryTable<>(
                 initialCapacity(archive.size() + OVERHEAD_SIZE));
         // Load entries from input archive.
-        final List<String> paths = new ArrayList<String>(archive.size());
+        final List<String> paths = new ArrayList<>(archive.size());
         final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
         for (final E entry : archive) {
             final String path = cutTrailingSeparators(
@@ -219,7 +219,7 @@ implements Iterable<FsCovariantEntry<E>> {
             return;
         // Order is important here because of veto exceptions!
         final FsArchiveFileSystemEvent<E>
-                e = new FsArchiveFileSystemEvent<E>(this);
+                e = new FsArchiveFileSystemEvent<>(this);
         final FsArchiveFileSystemTouchListener<? super E> tl = touchListener;
         if (null != tl)
             tl.beforeTouch(e);
@@ -297,9 +297,9 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * Like {@link #newCheckedEntry newEntryChecked(path, type, null)},
-     * but wraps any {@link CharConversionException} in an
-     * {@link AssertionError}.
+     * Returns a new archive entry.
+     * This is just a factory method and the returned file system entry is not
+     * (yet) linked into this (virtual) archive file system.
      *
      * @param  name the archive entry name.
      * @param  type the type of the archive entry to create.
@@ -313,18 +313,13 @@ implements Iterable<FsCovariantEntry<E>> {
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-
-        try {
-            return factory.newEntry(name, type, template, mknod);
-        } catch (CharConversionException ex) {
-            throw new AssertionError(ex);
-        }
+        return factory.newEntry(name, type, template, mknod);
     }
 
     /**
-     * Returns a new archive entry.
-     * This is just a factory method and the returned file system entry is not
-     * (yet) linked into this (virtual) archive file system.
+     * Like {@link #newEntry newEntry(name, type, mknod, template)},
+     * but checks any {@link CharConversionException} in an
+     * {@link AssertionError}.
      *
      * @see    #mknod
      * @param  name the archive entry name.
@@ -342,12 +337,12 @@ implements Iterable<FsCovariantEntry<E>> {
     throws FsFileSystemException {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-
         try {
-            return factory.newEntry(name, type, template, mknod);
+            factory.checkEncodable(name);
         } catch (CharConversionException ex) {
             throw new FsFileSystemException(name, ex);
         }
+        return factory.newEntry(name, type, template, mknod);
     }
 
     /**
@@ -467,19 +462,19 @@ implements Iterable<FsCovariantEntry<E>> {
                     throw new FsFileSystemException(entryName,
                             "parent entry must be a directory");
                 elements = new SegmentLink[level + 1];
-                elements[0] = new SegmentLink<E>(null, parentEntry);
-                newEntry = new FsCovariantEntry<E>(entryName);
+                elements[0] = new SegmentLink<>(null, parentEntry);
+                newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
                         newCheckedEntry(entryName, entryType, options, template));
-                elements[1] = new SegmentLink<E>(memberName, newEntry);
+                elements[1] = new SegmentLink<>(memberName, newEntry);
             } else if (createParents) {
                 elements = newSegmentLinks(
                         level + 1, parentPath, DIRECTORY, null);
-                newEntry = new FsCovariantEntry<E>(entryName);
+                newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
                         newCheckedEntry(entryName, entryType, options, template));
                 elements[elements.length - level]
-                        = new SegmentLink<E>(memberName, newEntry);
+                        = new SegmentLink<>(memberName, newEntry);
             } else {
                 throw new FsFileSystemException(entryName,
                         "missing parent directory entry");
@@ -678,8 +673,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final Map<String, FsCovariantEntry<E>> map;
 
         EntryTable(int initialCapacity) {
-            this.map = new LinkedHashMap<String, FsCovariantEntry<E>>(
-                    initialCapacity);
+            this.map = new LinkedHashMap<>(initialCapacity);
         }
 
         int getSize() {
@@ -693,7 +687,7 @@ implements Iterable<FsCovariantEntry<E>> {
         FsCovariantEntry<E> add(final String path, final E ae) {
             FsCovariantEntry<E> ce = map.get(path);
             if (null == ce)
-                map.put(path, ce = new FsCovariantEntry<E>(path));
+                map.put(path, ce = new FsCovariantEntry<>(path));
             ce.putEntry(ae.getType(), ae);
             return ce;
         }
