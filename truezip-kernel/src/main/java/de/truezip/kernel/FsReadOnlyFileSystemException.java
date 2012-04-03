@@ -4,17 +4,17 @@
  */
 package de.truezip.kernel;
 
+import java.nio.file.FileSystemException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Indicate that an operation was trying to modify a read-only (federated)
- * file system.
+ * Indicates that an I/O operation was trying to modify a read-only file system.
  */
 @ThreadSafe
-public final class FsReadOnlyFileSystemException extends FsFileSystemException {
+public class FsReadOnlyFileSystemException extends FileSystemException {
     private static final long serialVersionUID = 987645923519873262L;
 
     public FsReadOnlyFileSystemException() {
-        super((String) null, "This is a read-only file system!");
+        super(null);
     }
 }
