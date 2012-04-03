@@ -927,7 +927,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void sync(BitField<FsSyncOption> options)
@@ -937,7 +937,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(TFile, BitField)}.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void sync(TFile archive, BitField<FsSyncOption> options)
@@ -951,7 +951,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount()}.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void umount()
@@ -961,7 +961,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void umount(boolean forceCloseInputAndOutput)
@@ -973,7 +973,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#sync(BitField)}.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void umount(
@@ -989,7 +989,7 @@ public final class TFile extends File {
 
     /**
      * @deprecated As of TrueZIP 7.5, replaced by {@link TVFS#umount(TFile)}.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void umount(TFile archive)
@@ -1005,7 +1005,7 @@ public final class TFile extends File {
      *                  .set(FsSyncOption.FORCE_CLOSE_INPUT, forceCloseInputAndOutput)
      *                  .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseInputAndOutput))
      * }.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void umount(TFile archive, boolean forceCloseInputAndOutput)
@@ -1026,7 +1026,7 @@ public final class TFile extends File {
      *                  .set(FsSyncOption.WAIT_CLOSE_OUTPUT, waitCloseOutput)
      *                  .set(FsSyncOption.FORCE_CLOSE_OUTPUT, forceCloseOutput))
      * }.
-     * @see http://java.net/jira/browse/TRUEZIP-236
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-236">#TRUEZIP-236</a>
      */
     @Deprecated
     public static void umount(TFile archive,
@@ -1044,7 +1044,7 @@ public final class TFile extends File {
     /**
      * @deprecated Calling this method is equivalent to
      * {@link TConfig#isLenient TConfig.get().isLenient()}.
-     * @see http://java.net/jira/browse/TRUEZIP-238
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-238">#TRUEZIP-238</a>
      */
     @Deprecated
     public static boolean isLenient() {
@@ -1054,7 +1054,7 @@ public final class TFile extends File {
     /**
      * @deprecated Calling this method is equivalent to
      * {@link TConfig#setLenient TConfig.get().setLenient(lenient)}.
-     * @see http://java.net/jira/browse/TRUEZIP-238
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-238">#TRUEZIP-238</a>
      */
     @Deprecated
     public static void setLenient(boolean lenient) {
@@ -1064,7 +1064,7 @@ public final class TFile extends File {
     /**
      * @deprecated Calling this method is equivalent to
      * {@link TConfig#getArchiveDetector TConfig.get().getArchiveDetector()}.
-     * @see http://java.net/jira/browse/TRUEZIP-238
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-238">#TRUEZIP-238</a>
      */
     @Deprecated
     public static TArchiveDetector getDefaultArchiveDetector() {
@@ -1074,7 +1074,7 @@ public final class TFile extends File {
     /**
      * @deprecated Calling this method is equivalent to
      * {@link TConfig#setArchiveDetector TConfig.get().setArchiveDetector(detector)}.
-     * @see http://java.net/jira/browse/TRUEZIP-238
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-238">#TRUEZIP-238</a>
      */
     @Deprecated
     public static void setDefaultArchiveDetector(TArchiveDetector detector) {
