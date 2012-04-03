@@ -7,7 +7,6 @@ package de.schlichtherle.truezip.kernel;
 import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.kernel.FsCovariantEntry;
 import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsEntryNotFoundException;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
@@ -25,6 +24,9 @@ import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -198,8 +200,7 @@ extends FsLockModelController {
             checkSync(name, READ);
             final FsCovariantEntry<E> fse = autoMount().getEntry(name);
             if (null == fse)
-                throw new FsEntryNotFoundException(getModel(),
-                        name, "no such entry");
+                throw new NoSuchFileException(name.toString());
             return localTarget = fse.getEntry();
         }
 
@@ -209,8 +210,8 @@ extends FsLockModelController {
             localTarget = null;
             final FsArchiveEntry ae = getLocalTarget();
             if (FILE != ae.getType())
-                throw new FsEntryNotFoundException(getModel(),
-                        name, "entry type is not a file");
+                throw new FileSystemException(name.toString(), null,
+                        "Not a file entry!");
             return getInputSocket(ae.getName());
         }
     } // Input
@@ -342,8 +343,8 @@ extends FsLockModelController {
                 autoMount(true);
                 return;
             }
-            throw new FsEntryNotFoundException(getModel(),
-                    name, "directory entry exists already");
+            throw new FileAlreadyExistsException(name.toString(), null,
+                    "Cannot replace a directory entry!");
         } else {
             checkSync(name, null);
             autoMount(options.get(CREATE_PARENTS))

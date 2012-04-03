@@ -18,7 +18,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsResourceOpenException extends IOException {
+public class FsResourceOpenException extends IOException {
     private static final long serialVersionUID = 1L;
 
     final int total, local;

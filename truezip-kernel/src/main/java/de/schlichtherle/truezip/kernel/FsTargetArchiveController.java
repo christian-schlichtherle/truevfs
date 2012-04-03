@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.TooManyListenersException;
@@ -192,8 +193,8 @@ extends FsFileSystemArchiveController<E> {
                 fs = newEmptyFileSystem(driver);
             } else {
                 throw new FsFalsePositiveException(getModel(),
-                        new FsEntryNotFoundException(parent.getModel(),
-                            name, "no such entry"));
+                        new NoSuchFileException(name.toString(), null,
+                            "Missing parent file entry!"));
             }
         } else {
             try {
