@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 /**
  * Defines the default character set for accessing ZIP files.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface ZipCharsetParameters extends ZipParameters {
 

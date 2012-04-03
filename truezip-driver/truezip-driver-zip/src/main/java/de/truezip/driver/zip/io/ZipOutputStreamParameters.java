@@ -9,7 +9,7 @@ import java.util.zip.Deflater;
 /**
  * An interface for {@link ZipOutputStream} parameters.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface ZipOutputStreamParameters
 extends ZipCharsetParameters {
