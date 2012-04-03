@@ -104,11 +104,6 @@ implements InputService<ZipDriverEntry> {
             }
 
             @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                throw new UnsupportedOperationException(); // TODO: Support this feature for STORED entries.
-            }
-
-            @Override
             public InputStream newStream() throws IOException {
                 final ZipDriverEntry lt = getLocalTarget();
                 final Entry pt = getRemoteTarget();
