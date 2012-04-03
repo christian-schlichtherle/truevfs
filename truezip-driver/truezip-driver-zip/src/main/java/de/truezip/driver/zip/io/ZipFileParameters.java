@@ -10,15 +10,14 @@ package de.truezip.driver.zip.io;
  * <b>Warning:</b> This interface is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  * 
- * @param   <E> The type of the created ZIP entries.
- * @author  Christian Schlichtherle
+ * @param  <E> The type of the created ZIP entries.
+ * @author Christian Schlichtherle
  */
 public interface ZipFileParameters<E extends ZipEntry>
 extends ZipCharsetParameters, ZipEntryFactory<E> {
 
     /**
-     * Returns the flag for allowing a preamble.
-     * <p>
+     * Returns the flag for supporting preambles.
      * If this method returns {@code true}, then a ZIP file is allowed to
      * contain arbitrary data as its preamble before the actual ZIP file data.
      * Self Extracting Archives typically use a preamble to store the
@@ -34,8 +33,7 @@ extends ZipCharsetParameters, ZipEntryFactory<E> {
     boolean getPreambled();
 
     /**
-     * Returns the flag for allowing a postamble of arbitrary length.
-     * <p>
+     * Returns the flag for supporting postambles of arbitrary length.
      * If this method returns {@code true}, then a ZIP file is allowed to
      * contain arbitrary data of arbitrary length as its postamble after the
      * actual ZIP file data.
@@ -52,7 +50,7 @@ extends ZipCharsetParameters, ZipEntryFactory<E> {
      * Central Directory record with the ZIP file comment.
      * This causes the reading of a false positive ZIP file to fail fast.
      *
-     * @return The flag for allowing a postamble of arbitrary length.
+     * @return The flag for supporting postambles of arbitrary length.
      */
     boolean getPostambled();
 }
