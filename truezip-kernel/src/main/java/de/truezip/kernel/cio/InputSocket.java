@@ -7,7 +7,6 @@ package de.truezip.kernel.cio;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFileInputStream;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -124,19 +123,16 @@ extends IOSocket<E, Entry> implements Source {
     }
 
     /**
-     * <b>Optional operation:</b> Returns a new read only file for reading
-     * bytes in random order.
-     * If this operation is supported, then the returned read only file
-     * should <em>not</em> be buffered.
-     * Buffering should get addressed by the caller instead.
+     * {@inheritDoc}
      * <p>
      * Implementations must support calling this method multiple times.
      *
-     * @return A new read only file.
-     * @throws IOException on any I/O failure.
-     * @throws UnsupportedOperationException if this operation is not supported
-     *         by the implementation.
+     * @throws UnsupportedOperationException the implementation in the class
+     *         {@link InputSocket} <em>always</em> throws an exception of
+     *         this type.
      */
-    @CreatesObligation
-    public abstract ReadOnlyFile newReadOnlyFile() throws IOException;
+    @Override
+    public ReadOnlyFile newReadOnlyFile() throws IOException {
+        throw new UnsupportedOperationException();
+    }
 }

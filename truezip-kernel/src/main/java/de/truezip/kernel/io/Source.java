@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.io;
 
+import de.truezip.kernel.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,4 +48,21 @@ public interface Source {
      */
     @CreatesObligation
     SeekableByteChannel newChannel() throws IOException;
+
+    /**
+     * <b>Optional operation:</b> Returns a new read only file for reading
+     * bytes in random order.
+     * If this operation is supported, then the returned read only file
+     * should <em>not</em> be buffered.
+     * Buffering should get addressed by the caller instead.
+     *
+     * @return A new read only file.
+     * @throws IOException on any I/O failure.
+     * @throws UnsupportedOperationException if this operation is not supported
+     *         by the implementation.
+     * @throws IllegalStateException if this method has already been called
+     *         and a new seekable byte channel cannot get created.
+     */
+    @CreatesObligation
+    ReadOnlyFile newReadOnlyFile() throws IOException;
 }
