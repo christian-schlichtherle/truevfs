@@ -357,7 +357,7 @@ extends FsDriver {
     throws CharConversionException {
         if (!encoder.canEncode(name))
             throw new CharConversionException(name +
-                    " (cannot encode all characters to " + getCharset() + ")");
+                    " (some characters are not encodable with " + getCharset() + ")");
     }
 
     private final ThreadLocalCharsetEncoder
