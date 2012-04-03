@@ -39,8 +39,8 @@ Getting Started
 
 * Manual Download
 
-    If you do not want to use Maven, then you need to manually download the
-    TrueZIP artifacts from Maven Central by following this guide:
+    If you do not want to use Maven then you can easily download the TrueZIP
+    artifacts from Maven Central when following this guide:
     {{{./no-maven.html}Using TrueZIP Without Maven}}.
 
     If you are looking for more sample code and applications, then please
