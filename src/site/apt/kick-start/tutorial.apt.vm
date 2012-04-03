@@ -215,10 +215,15 @@ new TFile("archive.zip/dir/HälloWörld.txt").rm();
     TrueZIP is not just about accessing archive files:
     The <<<TFile>>> class provides some very useful methods for standard tasks
     like copying, moving or removing entire directory trees.
+    Here's how to create a TAR.GZ file from a ZIP file:
+
++--+
+new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
++--+
+
     These methods are not only very convenient to use, they also provide
     superior performance because they apply multithreading and in the case of
     archive entries, use a feature called Raw Data Copying (RDC).
-
     For example when copying arbitrary file system entries, one thread reads
     the input entry while another thread writes the output entry.
     When copying ZIP entries from one ZIP file to another, then thanks to RDC
@@ -226,12 +231,6 @@ new TFile("archive.zip/dir/HälloWörld.txt").rm();
     again to the output entry;
     instead, the raw entry data gets copied from the input entry to the output
     entry directly.
-
-    Here's how to convert a ZIP file to a TAR.GZ file:
-
-+--+
-new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
-+--+
 
     For more information about the available bulk I/O methods, please refer to
     the section
