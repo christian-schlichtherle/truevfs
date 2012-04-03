@@ -21,6 +21,9 @@ import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
+import de.truezip.kernel.util.ConcurrencyUtils;
+import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
+import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
 import static de.truezip.kernel.util.Throwables.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -28,9 +31,12 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
@@ -53,6 +59,16 @@ extends FsArchiveDriverTestBase<D> {
     private static final FsEntryName
             name = FsEntryName.create(URI.create("archive"));
 
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
+    private static final String US_ASCII_CHARACTERS;
+    static {
+        final StringBuilder builder = new StringBuilder(128);
+        for (char c = 0; c <= 127; c++)
+            builder.append(c);
+        US_ASCII_CHARACTERS = builder.toString();
+    }
+
     private FsModel model;
     private FsController<?> parent;
 
@@ -65,6 +81,64 @@ extends FsArchiveDriverTestBase<D> {
         config.setIOPoolProvider(null); // reset
         model = newArchiveModel();
         parent = newController(model.getParent());
+        assert !UTF8.equals(getArchiveDriver().getCharset())
+                || null == getUnencodableName() : "Bad test setup!";
+    }
+
+    /**
+     * Returns an unencodable name or {@code null} if all characters are
+     * encodable in entry names for this archive type.
+     * 
+     * @return An unencodable name or {@code null} if all characters are
+     *         encodable in entry names for this archive type.
+     */
+    protected abstract @CheckForNull String getUnencodableName();
+
+    @Test
+    public void testCharsetMustNotBeNull() {
+        assert null != getArchiveDriver().getCharset();
+    }
+
+    @Test(expected = CharConversionException.class)
+    public void testUnencodableNameMustThrowCharConversionException()
+    throws CharConversionException {
+        final String name = getUnencodableName();
+        if (null == name)
+            throw new CharConversionException("Ignore me!");
+        getArchiveDriver().checkEncodable(name);
+    }
+
+    @Test
+    public void testAllUsAsciiCharactersMustBeEncodable()
+    throws CharConversionException {
+        getArchiveDriver().checkEncodable(US_ASCII_CHARACTERS);
+    }
+
+    @Test
+    public void testAllUsAsciiCharactersMustBeEncodableWhenRunningMultithreaded()
+    throws Throwable {
+        final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
+
+        final class CheckFactory implements ConcurrencyUtils.TaskFactory {
+            @Override
+            public Callable<?> newTask(int threadNum) {
+                return new Check();
+            }
+
+            final class Check implements Callable<Void> {
+                @Override
+                public Void call()
+                throws CharConversionException, InterruptedException {
+                    start.countDown();
+                    start.await();
+                    for (int i = 0; i < 100000; i++)
+                        getArchiveDriver().checkEncodable(US_ASCII_CHARACTERS);
+                    return null;
+                }
+            } // Check
+        } // CheckFactory
+
+        runConcurrent(NUM_IO_THREADS, new CheckFactory()).join();
     }
 
     @Test

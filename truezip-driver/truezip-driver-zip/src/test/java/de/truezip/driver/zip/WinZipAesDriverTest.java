@@ -4,15 +4,13 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.FsCharsetArchiveDriverTestSuite;
-import de.truezip.driver.zip.ZipDriver;
-import de.truezip.driver.zip.ZipDriverEntry;
+import de.truezip.kernel.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class WinZipAesDriverTest
-extends FsCharsetArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
+extends FsArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
 
     @Override
     protected ZipDriver newArchiveDriver() {

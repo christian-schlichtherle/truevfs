@@ -4,16 +4,13 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.FsCharsetArchiveDriverTestSuite;
-import de.truezip.driver.zip.JarDriver;
-import de.truezip.driver.zip.OdfDriver;
-import de.truezip.driver.zip.ZipDriverEntry;
+import de.truezip.kernel.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class OdfDriverTest
-extends FsCharsetArchiveDriverTestSuite<ZipDriverEntry, JarDriver> {
+extends FsArchiveDriverTestSuite<ZipDriverEntry, JarDriver> {
 
     @Override
     protected JarDriver newArchiveDriver() {

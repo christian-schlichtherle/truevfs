@@ -4,13 +4,13 @@
  */
 package de.truezip.kernel.mock;
 
-import de.truezip.kernel.FsCharsetArchiveDriverTestSuite;
+import de.truezip.kernel.FsArchiveDriverTestSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
 public final class MockArchiveDriverTest
-extends FsCharsetArchiveDriverTestSuite<MockArchiveDriverEntry, MockArchiveDriver> {
+extends FsArchiveDriverTestSuite<MockArchiveDriverEntry, MockArchiveDriver> {
 
     @Override
     protected MockArchiveDriver newArchiveDriver() {

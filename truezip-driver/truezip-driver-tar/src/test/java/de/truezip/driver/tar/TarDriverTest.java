@@ -4,15 +4,13 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.FsCharsetArchiveDriverTestSuite;
-import de.truezip.driver.tar.TarDriver;
-import de.truezip.driver.tar.TarDriverEntry;
+import de.truezip.kernel.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class TarDriverTest
-extends FsCharsetArchiveDriverTestSuite<TarDriverEntry, TarDriver> {
+extends FsArchiveDriverTestSuite<TarDriverEntry, TarDriver> {
 
     @Override
     protected TarDriver newArchiveDriver() {
