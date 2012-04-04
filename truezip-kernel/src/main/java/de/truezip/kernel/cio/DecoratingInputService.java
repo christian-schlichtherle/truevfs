@@ -11,7 +11,7 @@ import javax.annotation.WillCloseWhenClosed;
 /**
  * An abstract decorator for an input service.
  *
- * @param  <E> the type of the entries served by the decorated input service.
+ * @param  <E> the type of the entries in the decorated input service.
  * @param  <I> the type of the decorated input service.
  * @see    DecoratingOutputService
  * @author Christian Schlichtherle
@@ -22,8 +22,8 @@ extends DecoratingContainer<E, I>
 implements InputService<E> {
 
     @CreatesObligation
-    protected DecoratingInputService(final @WillCloseWhenClosed I service) {
-        super(service);
+    protected DecoratingInputService(final @WillCloseWhenClosed I input) {
+        super(input);
     }
 
     @Override
