@@ -97,7 +97,7 @@ extends DecoratingInputService<E, InputService<E>> {
 
     @Override
     public Iterator<E> iterator() {
-        throw new UnsupportedOperationException("This returned iterator would not be thread-safe!");
+        throw new UnsupportedOperationException("The returned iterator would not be thread-safe!");
     }
 
     @Override
