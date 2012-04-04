@@ -10,7 +10,6 @@ import de.truezip.kernel.util.InheritableThreadLocalStack;
 import de.truezip.kernel.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.Closeable;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -137,25 +136,24 @@ public final class TestConfig extends Resource<RuntimeException> {
     }
 
     public int getDataSize() {
-        return this.dataSize;
+        return dataSize;
     }
 
-    public void setDataSize(final int dataLength) {
-        if (0 > dataLength)
+    public void setDataSize(final int size) {
+        if (0 > size)
             throw new IllegalArgumentException();
-        this.dataSize = dataLength;
+        dataSize = size;
     }
 
     public IOPoolProvider getIOPoolProvider() {
-        final IOPoolProvider ioPoolProvider = this.ioPoolProvider;
-        return null != ioPoolProvider
-                ? ioPoolProvider
-                : (this.ioPoolProvider = new ByteArrayIOPoolService(getDataSize()));
+        final IOPoolProvider iop = ioPoolProvider;
+        return null != iop
+                ? iop
+                : (ioPoolProvider = new ByteArrayIOPoolService(getDataSize()));
     }
 
-    public void setIOPoolProvider(
-            final @CheckForNull IOPoolProvider ioPoolProvider) {
-        this.ioPoolProvider = ioPoolProvider;
+    public void setIOPoolProvider(final @CheckForNull IOPoolProvider iop) {
+        ioPoolProvider = iop;
     }
 
     // This one is just for you, NetBeans.
