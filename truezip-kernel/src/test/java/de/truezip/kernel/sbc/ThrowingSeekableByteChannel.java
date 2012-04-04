@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.io;
+package de.truezip.kernel.sbc;
 
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.ThrowControl;
@@ -56,6 +56,12 @@ public final class ThrowingSeekableByteChannel extends DecoratingSeekableByteCha
     }
 
     @Override
+    public boolean isOpen() {
+        checkUndeclaredExceptions();
+        return sbc.isOpen();
+    }
+
+    @Override
     public int read(ByteBuffer dst) throws IOException {
         checkAllExceptions();
         return sbc.read(dst);
@@ -91,12 +97,6 @@ public final class ThrowingSeekableByteChannel extends DecoratingSeekableByteCha
         checkAllExceptions();
         sbc.truncate(size);
         return this;
-    }
-
-    @Override
-    public boolean isOpen() {
-        checkUndeclaredExceptions();
-        return sbc.isOpen();
     }
 
     @Override

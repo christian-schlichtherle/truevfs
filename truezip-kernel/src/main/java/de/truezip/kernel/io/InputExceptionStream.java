@@ -4,6 +4,8 @@
  */
 package de.truezip.kernel.io;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -15,26 +17,10 @@ import java.io.InputStream;
  */
 public final class InputExceptionStream extends DecoratingInputStream {
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public InputExceptionStream(InputStream in) {
         super(in);
-    }
-
-    @Override
-    public int available() throws IOException {
-        try {
-            return in.available();
-        } catch (IOException ex) {
-            throw new InputException(ex);
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            in.close();
-        } catch (IOException ex) {
-            throw new InputException(ex);
-        }
     }
 
     @Override
@@ -56,6 +42,24 @@ public final class InputExceptionStream extends DecoratingInputStream {
     }
 
     @Override
+    public long skip(long n) throws IOException {
+        try {
+            return in.skip(n);
+        } catch (IOException ex) {
+            throw new InputException(ex);
+        }
+    }
+
+    @Override
+    public int available() throws IOException {
+        try {
+            return in.available();
+        } catch (IOException ex) {
+            throw new InputException(ex);
+        }
+    }
+
+    @Override
     public void reset() throws IOException {
         try {
             in.reset();
@@ -65,9 +69,10 @@ public final class InputExceptionStream extends DecoratingInputStream {
     }
 
     @Override
-    public long skip(long n) throws IOException {
+    @DischargesObligation
+    public void close() throws IOException {
         try {
-            return in.skip(n);
+            in.close();
         } catch (IOException ex) {
             throw new InputException(ex);
         }

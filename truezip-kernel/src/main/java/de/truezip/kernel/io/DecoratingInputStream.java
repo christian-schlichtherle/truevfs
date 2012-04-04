@@ -65,12 +65,6 @@ public abstract class DecoratingInputStream extends InputStream {
     }
 
     @Override
-    @DischargesObligation
-    public void close() throws IOException {
-        in.close();
-    }
-
-    @Override
     public void mark(int readlimit) {
         in.mark(readlimit);
     }
@@ -83,6 +77,12 @@ public abstract class DecoratingInputStream extends InputStream {
     @Override
     public boolean markSupported() {
         return in.markSupported();
+    }
+
+    @Override
+    @DischargesObligation
+    public void close() throws IOException {
+        in.close();
     }
 
     /**

@@ -9,6 +9,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -37,7 +38,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 public class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for preprocessing the output. */
-    protected @CheckForNull BufferedBlockCipher cipher;
+    protected @Nullable BufferedBlockCipher cipher;
 
     /**
      * The cipher output buffer used for preprocessing the output

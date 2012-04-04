@@ -166,7 +166,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
         try (final TConfig config = push(configuration)) {
-            TPath p = new TPath(path);
+            final TPath p = new TPath(path);
             if (null == p.getMountPoint().getParent())
                 throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
             return p.getFileSystem();

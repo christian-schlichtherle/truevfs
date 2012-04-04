@@ -7,7 +7,7 @@ package de.truezip.extension.jmxjul.jul;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;

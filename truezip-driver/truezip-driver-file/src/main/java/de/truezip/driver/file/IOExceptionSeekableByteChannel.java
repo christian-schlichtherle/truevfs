@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.file;
 
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,9 +15,10 @@ import javax.annotation.WillCloseWhenClosed;
 
 /**
  * A decorating seekable byte channel which saves the last {@link IOException}
- * in a {@link #exception protected field} for later use.
+ * from its decorated seekable byte channel in a
+ * {@link #exception protected field} for later use.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 abstract class IOExceptionSeekableByteChannel
 extends DecoratingSeekableByteChannel {
@@ -45,7 +46,7 @@ extends DecoratingSeekableByteChannel {
             throw exception = ex;
         }
     }
-    
+
     @Override
     public int write(ByteBuffer src) throws IOException {
         try {
@@ -93,11 +94,6 @@ extends DecoratingSeekableByteChannel {
         }
     }
 
-    @Override
-    public boolean isOpen() {
-        return sbc.isOpen();
-    }
-    
     @Override
     public void close() throws IOException {
         try {
