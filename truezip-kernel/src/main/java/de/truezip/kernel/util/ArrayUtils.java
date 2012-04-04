@@ -12,9 +12,9 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class ArrayHelper {
+public class ArrayUtils {
 
-    private ArrayHelper() {
+    private ArrayUtils() {
     }
 
     /**

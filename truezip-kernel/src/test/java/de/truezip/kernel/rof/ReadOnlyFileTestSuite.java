@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.rof;
 
-import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.ArrayUtils;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -273,10 +273,10 @@ public abstract class ReadOnlyFileTestSuite {
                 break;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 trof.readFully(buf, 0, read);
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
             } else {
                 assertTrue(read == 0);
                 assertEquals(0, trof.read(buf));
@@ -305,10 +305,10 @@ public abstract class ReadOnlyFileTestSuite {
                 continue;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 trof.readFully(buf, 0, read);
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
             } else {
                 assertTrue(read == 0);
                 assertEquals(0, trof.read(buf));

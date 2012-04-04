@@ -9,7 +9,7 @@ import de.truezip.driver.zip.crypto.SeekableBlockCipher;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static de.truezip.driver.zip.io.WinZipAesEntryOutputStream.*;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.ArrayUtils;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.util.SuspensionPenalty;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -141,7 +141,7 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
             lastTry = SuspensionPenalty.enforce(lastTry);
 
             // Verify password.
-        } while (!ArrayHelper.equals(
+        } while (!ArrayUtils.equals(
                 keyParam.getKey(), 2 * keyStrengthBytes,
                 passwdVerifier, 0,
                 PWD_VERIFIER_BITS / 2));
@@ -179,7 +179,7 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         mac.init(sha1MacParam);
         final byte[] buf = computeMac(mac);
         assert buf.length == mac.getMacSize();
-        if (!ArrayHelper.equals(buf, 0, authenticationCode, 0, authenticationCode.length / 2))
+        if (!ArrayUtils.equals(buf, 0, authenticationCode, 0, authenticationCode.length / 2))
             throw new ZipAuthenticationException(entry.getName()
                     + " (authenticated WinZip AES entry content has been tampered with)");
     }

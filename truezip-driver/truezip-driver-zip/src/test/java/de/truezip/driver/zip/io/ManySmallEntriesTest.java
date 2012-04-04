@@ -8,7 +8,7 @@ import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import de.truezip.kernel.cio.ByteArrayIOBuffer;
 import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.IOEntry;
-import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.ArrayUtils;
 import de.truezip.kernel.util.Maps;
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,7 +76,7 @@ public final class ManySmallEntriesTest {
                         if (read < 0)
                             break;
                         assertTrue(read > 0);
-                        assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                        assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
                         off += read;
                     } while (true);
                     assertEquals(-1, read);

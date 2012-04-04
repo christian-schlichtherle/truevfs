@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.io;
 
-import static de.truezip.kernel.io.ByteBuffers.copy;
+import static de.truezip.kernel.io.Buffers.copy;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;

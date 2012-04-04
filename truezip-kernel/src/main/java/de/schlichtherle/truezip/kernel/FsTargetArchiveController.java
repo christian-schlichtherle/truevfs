@@ -633,12 +633,12 @@ extends FsFileSystemArchiveController<E> {
 
         @Override
         public InputSocket<E> getInputSocket(String name) {
-            throw new UnsupportedOperationException();
+            throw new AssertionError();
         }
 
         @Override
         public void close() throws IOException {
-            throw new UnsupportedOperationException();
+            throw new AssertionError();
         }
     } // DummyInputService
 

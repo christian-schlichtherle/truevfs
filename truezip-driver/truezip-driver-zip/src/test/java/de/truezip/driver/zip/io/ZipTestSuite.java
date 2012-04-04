@@ -7,7 +7,7 @@ package de.truezip.driver.zip.io;
 import static de.truezip.driver.zip.io.Constants.FORCE_ZIP64_EXT;
 import de.truezip.kernel.rof.DefaultReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.ArrayUtils;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
 import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
@@ -379,7 +379,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
                                 if (read < 0)
                                     break;
                                 assertTrue(read > 0);
-                                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
                                 off += read;
                             }
                             assertEquals(-1, read);
