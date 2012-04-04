@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.sbc;
 
-import static de.truezip.kernel.bb.ByteBuffers.copy;
+import static de.truezip.kernel.sbc.ByteBuffers.copy;
 import de.truezip.kernel.io.Streams;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
