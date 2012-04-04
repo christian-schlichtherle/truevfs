@@ -154,17 +154,126 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<AccessOption> options) {
-        return new Input(controller.getInputSocket(name, options));
+    public InputSocket<?> getInputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options) {
+        @NotThreadSafe
+        final class Input extends DecoratingInputSocket<Entry> {
+            Input() {
+                super(controller.getInputSocket(name, options));
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {
+                final FsTargetArchiveController<?>
+                        controller = FsContextController.this.controller;
+                final FsOperationContext context = controller.getContext();
+                controller.setContext(NONE);
+                try {
+                    return getBoundSocket().getLocalTarget();
+                } finally {
+                    controller.setContext(context);
+                }
+            }
+
+            @Override
+            public InputStream newStream() throws IOException {
+                final FsTargetArchiveController<?>
+                        controller = FsContextController.this.controller;
+                final FsOperationContext context = controller.getContext();
+                controller.setContext(NONE);
+                try {
+                    return getBoundSocket().newStream();
+                } finally {
+                    controller.setContext(context);
+                }
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                final FsTargetArchiveController<?>
+                        controller = FsContextController.this.controller;
+                final FsOperationContext context = controller.getContext();
+                controller.setContext(NONE);
+                try {
+                    return getBoundSocket().newChannel();
+                } finally {
+                    controller.setContext(context);
+                }
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                final FsTargetArchiveController<?>
+                        controller = FsContextController.this.controller;
+                final FsOperationContext context = controller.getContext();
+                controller.setContext(NONE);
+                try {
+                    return getBoundSocket().newReadOnlyFile();
+                } finally {
+                    controller.setContext(context);
+                }
+            }
+        } // Input
+
+        return new Input();
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<AccessOption> options,
-                                            @CheckForNull Entry template) {
-        return new Output(controller.getOutputSocket(name, options, template),
-                options);
+    public OutputSocket<?> getOutputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options,
+            final @CheckForNull Entry template) {
+        @NotThreadSafe
+        final class Output extends DecoratingOutputSocket<Entry> {
+            final FsOperationContext operation;
+
+            Output() {
+                super(controller.getOutputSocket(name, options, template));
+                this.operation = makeContext(options);
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {
+                final FsTargetArchiveController<?>
+                        controller = FsContextController.this.controller;
+                final FsOperationContext context = controller.getContext();
+                controller.setContext(operation);
+                try {
+                    return getBoundSocket().getLocalTarget();
+                } finally {
+                    controller.setContext(context);
+                }
+            }
+
+            @Override
+            public OutputStream newStream() throws IOException {
+                final FsTargetArchiveController<?>
+                        controller = FsContextController.this.controller;
+                final FsOperationContext context = controller.getContext();
+                controller.setContext(operation);
+                try {
+                    return getBoundSocket().newStream();
+                } finally {
+                    controller.setContext(context);
+                }
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                final FsTargetArchiveController<?>
+                        controller = FsContextController.this.controller;
+                final FsOperationContext context = controller.getContext();
+                controller.setContext(operation);
+                try {
+                    return getBoundSocket().newChannel();
+                } finally {
+                    controller.setContext(context);
+                }
+            }
+        } // Output
+
+        return new Output();
     }
 
     @Override
@@ -223,113 +332,4 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
             final BitField<AccessOption> options) {
         return new FsOperationContext(options);
     }
-
-    @NotThreadSafe
-    private final class Input extends DecoratingInputSocket<Entry> {
-        Input(InputSocket<?> input) {
-            super(input);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            final FsTargetArchiveController<?>
-                    controller = FsContextController.this.controller;
-            final FsOperationContext context = controller.getContext();
-            controller.setContext(NONE);
-            try {
-                return getBoundSocket().getLocalTarget();
-            } finally {
-                controller.setContext(context);
-            }
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            final FsTargetArchiveController<?>
-                    controller = FsContextController.this.controller;
-            final FsOperationContext context = controller.getContext();
-            controller.setContext(NONE);
-            try {
-                return getBoundSocket().newReadOnlyFile();
-            } finally {
-                controller.setContext(context);
-            }
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            final FsTargetArchiveController<?>
-                    controller = FsContextController.this.controller;
-            final FsOperationContext context = controller.getContext();
-            controller.setContext(NONE);
-            try {
-                return getBoundSocket().newChannel();
-            } finally {
-                controller.setContext(context);
-            }
-        }
-
-        @Override
-        public InputStream newStream() throws IOException {
-            final FsTargetArchiveController<?>
-                    controller = FsContextController.this.controller;
-            final FsOperationContext context = controller.getContext();
-            controller.setContext(NONE);
-            try {
-                return getBoundSocket().newStream();
-            } finally {
-                controller.setContext(context);
-            }
-        }
-    } // Input
-
-    @NotThreadSafe
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        final FsOperationContext operation;
-
-        Output( OutputSocket<?> output,
-                BitField<AccessOption> options) {
-            super(output);
-            this.operation = makeContext(options);
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            final FsTargetArchiveController<?>
-                    controller = FsContextController.this.controller;
-            final FsOperationContext context = controller.getContext();
-            controller.setContext(operation);
-            try {
-                return getBoundSocket().getLocalTarget();
-            } finally {
-                controller.setContext(context);
-            }
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            final FsTargetArchiveController<?>
-                    controller = FsContextController.this.controller;
-            final FsOperationContext context = controller.getContext();
-            controller.setContext(operation);
-            try {
-                return getBoundSocket().newChannel();
-            } finally {
-                controller.setContext(context);
-            }
-        }
-
-        @Override
-        public OutputStream newStream() throws IOException {
-            final FsTargetArchiveController<?>
-                    controller = FsContextController.this.controller;
-            final FsOperationContext context = controller.getContext();
-            controller.setContext(operation);
-            try {
-                return getBoundSocket().newStream();
-            } finally {
-                controller.setContext(context);
-            }
-        }
-    } // Output
 }
