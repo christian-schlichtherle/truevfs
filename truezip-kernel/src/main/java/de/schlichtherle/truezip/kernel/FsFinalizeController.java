@@ -11,10 +11,10 @@ import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -54,16 +54,58 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<AccessOption> options) {
-        return new Input(name, options);
+    public InputSocket<?> getInputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options) {
+        @NotThreadSafe
+        final class Input extends DecoratingInputSocket<Entry> {
+            Input() {
+                super(controller.getInputSocket(name, options));
+            }
+
+            @Override
+            public InputStream newStream() throws IOException {
+                return new FinalizeInputStream(getBoundSocket().newStream());
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                return new FinalizeSeekableByteChannel(getBoundSocket().newChannel());
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return new FinalizeReadOnlyFile(getBoundSocket().newReadOnlyFile());
+            }
+        } // Input
+
+        return new Input();
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<AccessOption> options,
-                                            @CheckForNull Entry template) {
-        return new Output(name, options, template);
+    public OutputSocket<?> getOutputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options,
+            final @CheckForNull Entry template) {
+        @NotThreadSafe
+        final class Output extends DecoratingOutputSocket<Entry> {
+            Output() {
+                super(controller.getOutputSocket(name, options, template));
+            }
+
+            @Override
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
+            public OutputStream newStream() throws IOException {
+                return new FinalizeOutputStream(getBoundSocket().newStream());
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                return new FinalizeSeekableByteChannel(getBoundSocket().newChannel());
+            }
+        } // Output
+
+        return new Output();
     }
 
     static void finalize(   final Closeable closeable,
@@ -84,54 +126,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
         }
     }
-
-    @NotThreadSafe
-    private final class Input extends DecoratingInputSocket<Entry> {
-        Input(  final FsEntryName name,
-                final BitField<AccessOption> options) {
-            super(controller.getInputSocket(name, options));
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return new FinalizeReadOnlyFile(
-                    getBoundSocket().newReadOnlyFile());
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            return new FinalizeSeekableByteChannel(
-                    getBoundSocket().newChannel());
-        }
-
-        @Override
-        public InputStream newStream() throws IOException {
-            return new FinalizeInputStream(
-                    getBoundSocket().newStream());
-        }
-    } // Input
-
-    @NotThreadSafe
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        Output( final FsEntryName name,
-                final BitField<AccessOption> options,
-                final @CheckForNull Entry template) {
-            super(controller.getOutputSocket(name, options, template));
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            return new FinalizeSeekableByteChannel(
-                    getBoundSocket().newChannel());
-        }
-
-        @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
-        public OutputStream newStream() throws IOException {
-            return new FinalizeOutputStream(
-                    getBoundSocket().newStream());
-        }
-    } // Output
 
     private static final class FinalizeReadOnlyFile
     extends DecoratingReadOnlyFile {

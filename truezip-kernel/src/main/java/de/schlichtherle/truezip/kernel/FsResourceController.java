@@ -58,16 +58,57 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<AccessOption> options) {
-        return new Input(name, options);
+    public InputSocket<?> getInputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options) {
+        @NotThreadSafe
+        final class Input extends DecoratingInputSocket<Entry> {
+            Input() {
+                super(controller.getInputSocket(name, options));
+            }
+
+            @Override
+            public InputStream newStream() throws IOException {
+                return new ResourceInputStream(getBoundSocket().newStream());
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                return new ResourceSeekableByteChannel(getBoundSocket().newChannel());
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return new ResourceReadOnlyFile(getBoundSocket().newReadOnlyFile());
+            }
+        } // Input
+
+        return new Input();
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<AccessOption> options,
-                                            @CheckForNull Entry template) {
-        return new Output(name, options, template);
+    public OutputSocket<?> getOutputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options,
+            final @CheckForNull Entry template) {
+        @NotThreadSafe
+        final class Output extends DecoratingOutputSocket<Entry> {
+            Output() {
+                super(controller.getOutputSocket(name, options, template));
+            }
+
+            @Override
+            public OutputStream newStream() throws IOException {
+                return new ResourceOutputStream(getBoundSocket().newStream());
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                return new ResourceSeekableByteChannel(getBoundSocket().newChannel());
+            }
+        } // Output
+
+        return new Output();
     }
 
     @Override
@@ -155,53 +196,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         if (null != acc)
             acc.closeAllResources(new IOExceptionHandler());
     }
-
-    @NotThreadSafe
-    private final class Input extends DecoratingInputSocket<Entry> {
-        Input(  final FsEntryName name,
-                final BitField<AccessOption> options) {
-            super(controller.getInputSocket(name, options));
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return new ResourceReadOnlyFile(
-                    getBoundSocket().newReadOnlyFile());
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            return new ResourceSeekableByteChannel(
-                    getBoundSocket().newChannel());
-        }
-
-        @Override
-        public InputStream newStream() throws IOException {
-            return new ResourceInputStream(
-                    getBoundSocket().newStream());
-        }
-    } // Input
-
-    @NotThreadSafe
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        Output( final FsEntryName name,
-                final BitField<AccessOption> options,
-                final @CheckForNull Entry template) {
-            super(controller.getOutputSocket(name, options, template));
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            return new ResourceSeekableByteChannel(
-                    getBoundSocket().newChannel());
-        }
-
-        @Override
-        public OutputStream newStream() throws IOException {
-            return new ResourceOutputStream(
-                    getBoundSocket().newStream());
-        }
-    } // Output
 
     private final class ResourceReadOnlyFile
     extends DecoratingReadOnlyFile {

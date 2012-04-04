@@ -311,12 +311,12 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
 
             @Override
             public SeekableByteChannel newChannel(){
-                throw new UnsupportedOperationException();
+                throw new AssertionError();
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() {
-                throw new UnsupportedOperationException();
+                throw new AssertionError();
             }
 
             @Override
@@ -371,30 +371,6 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                 // exception!
                 return getBoundSocket().getLocalTarget();
             }
-            @Override
-            public SeekableByteChannel newChannel() throws IOException {
-                preOutput();
-                return new Channel();
-            }
-
-            final class Channel extends DecoratingSeekableByteChannel {
-                @CreatesObligation
-                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-                Channel() throws IOException {
-                    // Note that the super class implementation MUST get
-                    // bypassed because the sbc MUST get kept even upon an
-                    // exception!
-                    //super(Nio2Output.super.newChannel());
-                    super(getBoundSocket().newChannel());
-                    register();
-                }
-
-                @Override
-                public void close() throws IOException {
-                    sbc.close();
-                    postOutput();
-                }
-            } // Channel
 
             @Override
             public OutputStream newStream() throws IOException {
@@ -420,6 +396,31 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
                     postOutput();
                 }
             } // Stream
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                preOutput();
+                return new Channel();
+            }
+
+            final class Channel extends DecoratingSeekableByteChannel {
+                @CreatesObligation
+                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+                Channel() throws IOException {
+                    // Note that the super class implementation MUST get
+                    // bypassed because the sbc MUST get kept even upon an
+                    // exception!
+                    //super(Nio2Output.super.newChannel());
+                    super(getBoundSocket().newChannel());
+                    register();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    sbc.close();
+                    postOutput();
+                }
+            } // Channel
 
             void preOutput() throws IOException {
                 mknod(options, template);
