@@ -4,10 +4,10 @@
  */
 package de.truezip.kernel.io;
 
+import static de.truezip.kernel.io.Channels.readByte;
+import static de.truezip.kernel.io.Channels.readFully;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import static de.truezip.kernel.io.SeekableByteChannels.readByte;
-import static de.truezip.kernel.io.SeekableByteChannels.readFully;
-import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.ArrayUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Math.max;
@@ -271,10 +271,10 @@ public abstract class SeekableByteChannelTestSuite {
                 break;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 readFully(tsbc, ByteBuffer.wrap(buf, 0, read));
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
             } else {
                 assertEquals(0, read);
                 assertEquals(0, tsbc.read(ByteBuffer.wrap(buf)));
@@ -303,10 +303,10 @@ public abstract class SeekableByteChannelTestSuite {
                 continue;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 readFully(tsbc, ByteBuffer.wrap(buf, 0, read));
-                assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
             } else {
                 assertEquals(0, read);
                 assertEquals(0, tsbc.read(ByteBuffer.wrap(buf)));

@@ -7,34 +7,35 @@ package de.truezip.kernel.io;
 import java.nio.ByteBuffer;
 
 /**
- * Utility methods for {@link ByteBuffer}s.
+ * Utility methods for {@link Buffer}s.
  * 
  * @author Christian Schlichtherle
  */
-final class ByteBuffers {
+final class Buffers {
 
     /** Can't touch this - hammer time! */
-    private ByteBuffers() { }
+    private Buffers() { }
 
     public static int copy(final ByteBuffer src, final ByteBuffer dst) {
-        final int available = src.remaining();
-        if (0 >= available)
-            return -1;
         int remaining = dst.remaining();
-        if (remaining > available)
-            remaining = available;
-        final int limit;
+        if (remaining <= 0)
+            return 0;
+        final int available = src.remaining();
+        if (available <= 0)
+            return -1;
+        final int readLimit;
         if (available > remaining) {
-            limit = src.limit();
+            readLimit = src.limit();
             src.limit(src.position() + remaining);
         } else {
-            limit = -1;
+            readLimit = -1;
+            remaining = available;
         }
         try {
             dst.put(src);
         } finally {
-            if (0 <= limit)
-                src.limit(limit);
+            if (readLimit >= 0)
+                src.limit(readLimit);
         }
         return remaining;
     }

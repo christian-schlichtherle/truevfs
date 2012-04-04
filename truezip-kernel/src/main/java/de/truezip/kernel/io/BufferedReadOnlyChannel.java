@@ -4,8 +4,7 @@
  */
 package de.truezip.kernel.io;
 
-import static de.truezip.kernel.io.ByteBuffers.copy;
-import de.truezip.kernel.io.Streams;
+import static de.truezip.kernel.io.Buffers.copy;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -95,7 +94,7 @@ public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
 
         // Setup.
         final int capacity = window.capacity();
-        int read = 0; // amount of read data copied to buf
+        int copied, total = 0; // amount of read data copied to buf
 
         {
             // Partial read of window data at the start.
@@ -104,36 +103,39 @@ public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
                 // The file pointer is not on a window boundary.
                 positionWindow();
                 window.position(p);
-                pos += read = copy(window, dst);
+                pos += total = copied = copy(window, dst);
+                assert copied > 0;
             }
         }
 
         {
             // Full read of window data in the middle.
-            while (read + capacity < remaining && pos + capacity <= size) {
+            while (total + capacity < remaining && pos + capacity <= size) {
                 // The file pointer is starting and ending on window boundaries.
                 positionWindow();
-                window.position(0);
-                copy(window, dst);
-                read += capacity;
-                pos += capacity;
+                window.rewind();
+                copied = copy(window, dst);
+                total += copied;
+                pos += copied;
+                assert copied == capacity;
             }
         }
 
         // Partial read of window data at the end.
-        if (read < remaining && pos < size) {
+        if (total < remaining && pos < size) {
             // The file pointer is not on a window boundary.
             positionWindow();
-            window.position(0);
-            final int n = copy(window, dst);
-            read += n;
-            pos += n;
+            window.rewind();
+            copied = copy(window, dst);
+            total += copied;
+            pos += copied;
+            assert copied > 0;
         }
 
         // Assert that at least one byte has been read if len isn't zero.
         // Note that EOF has been tested before.
-        assert 0 < read;
-        return read;
+        assert 0 < total;
+        return total;
     }
 
     @Override
@@ -162,7 +164,7 @@ public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
     @Override
     public long size() throws IOException {
         final long size = sbc.size();
-        if (size != this.size) {
+        if (this.size != size) {
             this.size = size;
             invalidateWindow();
         }

@@ -19,7 +19,7 @@ import static de.truezip.kernel.option.AccessOption.GROW;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
 import static de.truezip.kernel.option.SyncOptions.SYNC;
-import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.ArrayUtils;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
@@ -155,7 +155,7 @@ extends ConfiguredClientTestBase<D> {
         // Read back portion
         try (final InputStream in = newInputStream(file)) {
             byte[] buf = new byte[getDataLength()];
-            assertTrue(ArrayHelper.equals(getData(), 0, buf, 0, in.read(buf)));
+            assertTrue(ArrayUtils.equals(getData(), 0, buf, 0, in.read(buf)));
         }
         assertRm(file);
 
@@ -1242,7 +1242,7 @@ extends ConfiguredClientTestBase<D> {
                     if (0 > read)
                         break;
                     assertTrue(read > 0);
-                    assertTrue(ArrayHelper.equals(getData(), off, buf, 0, read));
+                    assertTrue(ArrayUtils.equals(getData(), off, buf, 0, read));
                     off += read;
                 }
                 assertEquals(-1, read);

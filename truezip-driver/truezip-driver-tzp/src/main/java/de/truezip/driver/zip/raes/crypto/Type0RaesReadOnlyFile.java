@@ -9,7 +9,7 @@ import de.truezip.driver.zip.crypto.SeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
 import static de.truezip.driver.zip.raes.crypto.Constants.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.ArrayHelper;
+import de.truezip.kernel.util.ArrayUtils;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.util.SuspensionPenalty;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -150,7 +150,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             klac.update(cipherKey, 0, cipherKey.length);
             buf = new byte[klac.getMacSize()];
             RaesOutputStream.klac(klac, length, buf);
-        } while (!ArrayHelper.equals(this.footer, 0, buf, 0, buf.length / 2));
+        } while (!ArrayUtils.equals(this.footer, 0, buf, 0, buf.length / 2));
 
         // Init parameters for authenticate().
         this.sha256MacParam = sha256MacParam;
@@ -182,7 +182,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         mac.init(sha256MacParam);
         final byte[] buf = computeMac(mac);
         assert buf.length == mac.getMacSize();
-        if (!ArrayHelper.equals(buf, 0, footer, footer.length / 2, footer.length / 2))
+        if (!ArrayUtils.equals(buf, 0, footer, footer.length / 2, footer.length / 2))
             throw new RaesAuthenticationException();
     }
 }
