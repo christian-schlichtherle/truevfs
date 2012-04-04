@@ -26,14 +26,4 @@ public final class CompositeManagerService extends FsManagerService {
     public FsManager get() {
         return manager;
     }
-
-    /**
-     * Returns 100.
-     * 
-     * @return 100.
-     */
-    @Override
-    public int getPriority() {
-        return 100;
-    }
 }

@@ -21,4 +21,10 @@ public final class FsFailSafeManagerService extends FsManagerService {
     public FsManager get() {
         return manager;
     }
+
+    /** @return -10 */
+    @Override
+    public int getPriority() {
+        return -10;
+    }
 }
