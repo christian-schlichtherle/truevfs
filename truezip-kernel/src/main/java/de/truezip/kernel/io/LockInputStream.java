@@ -88,17 +88,6 @@ public final class LockInputStream extends DecoratingInputStream {
 
     @Override
     @GuardedBy("lock")
-    public void close() throws IOException {
-        lock.lock();
-        try {
-            in.close();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    @GuardedBy("lock")
     public void mark(int readlimit) {
         lock.lock();
         try {
@@ -125,6 +114,17 @@ public final class LockInputStream extends DecoratingInputStream {
         lock.lock();
         try {
             return in.markSupported();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    @GuardedBy("lock")
+    public void close() throws IOException {
+        lock.lock();
+        try {
+            in.close();
         } finally {
             lock.unlock();
         }
