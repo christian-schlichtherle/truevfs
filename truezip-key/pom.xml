@@ -15,15 +15,22 @@
         <version>8-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-key-api</artifactId>
+    <artifactId>truezip-key</artifactId>
 
-    <name>TrueZIP Key API</name>
-    <description>Defines the secret key management API.</description>
+    <name>TrueZIP Key</name>
+    <description>
+Defines the secret key management API and provides a reference
+implementation of its SPI which is locatable on the class path.
+    </description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-kernel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>jemmy</artifactId>
         </dependency>
     </dependencies>
 

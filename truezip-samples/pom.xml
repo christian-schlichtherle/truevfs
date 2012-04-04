@@ -67,8 +67,7 @@
              entering wrong passwords. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-key-impl</artifactId>
-            <scope>compile</scope>
+            <artifactId>truezip-key</artifactId>
         </dependency>
 
         <!-- A TrueZIP application typically has a dependency on one or more

@@ -38,11 +38,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-key-api</artifactId>
+            <artifactId>truezip-key</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-key-api</artifactId>
+            <artifactId>truezip-key</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>

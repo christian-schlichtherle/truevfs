@@ -57,7 +57,7 @@
              entering wrong passwords. -->
         <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-key-impl</artifactId>
+            <artifactId>truezip-key</artifactId>
             <version>${truezip.version}</version>
         </dependency>
 
