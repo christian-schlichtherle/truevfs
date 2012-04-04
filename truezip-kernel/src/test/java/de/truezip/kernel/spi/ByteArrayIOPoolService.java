@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.spi;
 
-import de.truezip.kernel.spi.IOPoolService;
 import de.truezip.kernel.cio.ByteArrayIOBuffer;
 import de.truezip.kernel.cio.ByteArrayIOPool;
 import de.truezip.kernel.cio.IOPool;
@@ -13,7 +12,7 @@ import javax.annotation.concurrent.Immutable;
 /**
  * An immutable locatable container of a {@link ByteArrayIOPool byte array I/O buffer pool}.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class ByteArrayIOPoolService extends IOPoolService {
