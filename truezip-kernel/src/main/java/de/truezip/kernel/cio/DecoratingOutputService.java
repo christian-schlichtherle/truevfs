@@ -11,7 +11,7 @@ import javax.annotation.WillCloseWhenClosed;
 /**
  * An abstract decorator for an output service.
  *
- * @param  <E> the type of the entries served to the decorated output service.
+ * @param  <E> the type of the entries in the decorated output service.
  * @param  <O> the type of the decorated output service.
  * @see    DecoratingInputService
  * @author Christian Schlichtherle
@@ -22,8 +22,8 @@ extends DecoratingContainer<E, O>
 implements OutputService<E> {
 
     @CreatesObligation
-    protected DecoratingOutputService(final @WillCloseWhenClosed O service) {
-        super(service);
+    protected DecoratingOutputService(final @WillCloseWhenClosed O output) {
+        super(output);
     }
 
     @Override
