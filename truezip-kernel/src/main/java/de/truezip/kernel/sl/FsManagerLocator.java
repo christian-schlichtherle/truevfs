@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.ServiceConfigurationError;
 import static java.util.logging.Level.CONFIG;
+import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
@@ -64,16 +65,23 @@ public final class FsManagerLocator implements FsManagerProvider {
             FsManagerService
                     service = locator.getService(FsManagerService.class, null);
             if (null == service) {
-                FsManagerService oldService = null;
+                FsManagerService newService = null;
                 for (   final Iterator<FsManagerService>
                             i = locator.getServices(FsManagerService.class);
-                        i.hasNext();
-                        oldService = service) {
-                    service = i.next();
-                    logger.log(CONFIG, "located", service);
-                    if (null != oldService
-                            && oldService.getPriority() > service.getPriority())
-                        service = oldService;
+                        i.hasNext();) {
+                    newService = i.next();
+                    logger.log(CONFIG, "located", newService);
+                    if (null == service) {
+                        service = newService;
+                    } else {
+                        final int op = service.getPriority();
+                        final int np = newService.getPriority();
+                        if (op < np)
+                            service = newService;
+                        else if (op == np)
+                            logger.log(WARNING, "collision",
+                                    new Object[] { op, service, newService });
+                    }
                 }
             }
             if (null == service)

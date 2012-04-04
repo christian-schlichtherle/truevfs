@@ -4,7 +4,7 @@
  */
 /**
  * Provides singletons to locate various service providers on the class path.
- * Note that this module has absolutely no dependency on this package!
+ * Note that this module has no dependency on this package.
  * It's up to the other modules to inject these service locators into this
  * module if they want to.
  */
