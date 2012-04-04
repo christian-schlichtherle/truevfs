@@ -7,9 +7,9 @@ package de.schlichtherle.truezip.kernel;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.Pool;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -297,7 +297,7 @@ final class FsCache implements Flushable, Closeable {
 
     /** Used to proxy the backing store entries. */
     @Immutable
-    private static class ProxyEntry extends DecoratingEntry<Entry> {
+    private static final class ProxyEntry extends DecoratingEntry<Entry> {
         ProxyEntry(Entry entry) {
             super(entry);
         }
@@ -401,128 +401,126 @@ final class FsCache implements Flushable, Closeable {
             data.release();
         }
 
-        @Immutable
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
-                super(Buffer.this.data.getInputSocket());
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                class File extends DecoratingReadOnlyFile {
-                    boolean closed;
-
-                    File() throws IOException {
-                        super(getBoundSocket().newReadOnlyFile());
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        if (closed)
-                            return;
-                        rof.close();
-                        getInputBufferPool().release(Buffer.this);
-                        closed = true;
-                    }
-                } // File
-
-                return new File();
-            }
-
-            @Override
-            public SeekableByteChannel newChannel() throws IOException {
-                class Channel extends DecoratingSeekableByteChannel {
-                    boolean closed;
-
-                    Channel() throws IOException {
-                        super(getBoundSocket().newChannel());
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        if (closed)
-                            return;
-                        sbc.close();
-                        getInputBufferPool().release(Buffer.this);
-                        closed = true;
-                    }
-                } // Channel
-
-                return new Channel();
+                super(data.getInputSocket());
             }
 
             @Override
             public InputStream newStream() throws IOException {
-                class Stream extends DecoratingInputStream {
-                    boolean closed;
-
-                    Stream() throws IOException {
-                        super(getBoundSocket().newStream());
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        if (closed)
-                            return;
-                        in.close();
-                        getInputBufferPool().release(Buffer.this);
-                        closed = true;
-                    }
-                } // Stream
-
                 return new Stream();
             }
-        } // Input
 
-        @Immutable
-        final class Output extends DecoratingOutputSocket<Entry> {
-            Output() {
-                super(Buffer.this.data.getOutputSocket());
-            }
+            final class Stream extends DecoratingInputStream {
+                boolean closed;
+
+                Stream() throws IOException {
+                    super(getBoundSocket().newStream());
+                }
+
+                @Override
+                public void close() throws IOException {
+                    if (closed)
+                        return;
+                    in.close();
+                    getInputBufferPool().release(Buffer.this);
+                    closed = true;
+                }
+            } // Stream
 
             @Override
             public SeekableByteChannel newChannel() throws IOException {
-                class Channel extends DecoratingSeekableByteChannel {
-                    boolean closed;
-
-                    Channel() throws IOException {
-                        super(getBoundSocket().newChannel());
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        if (closed)
-                            return;
-                        sbc.close();
-                        getOutputBufferPool().release(Buffer.this);
-                        closed = true;
-                    }
-                } // Channel
-
                 return new Channel();
+            }
+
+            final class Channel extends DecoratingSeekableByteChannel {
+                boolean closed;
+
+                Channel() throws IOException {
+                    super(getBoundSocket().newChannel());
+                }
+
+                @Override
+                public void close() throws IOException {
+                    if (closed)
+                        return;
+                    sbc.close();
+                    getInputBufferPool().release(Buffer.this);
+                    closed = true;
+                }
+            } // Channel
+            
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return new File();
+            }
+
+            final class File extends DecoratingReadOnlyFile {
+                boolean closed;
+
+                File() throws IOException {
+                    super(getBoundSocket().newReadOnlyFile());
+                }
+
+                @Override
+                public void close() throws IOException {
+                    if (closed)
+                        return;
+                    rof.close();
+                    getInputBufferPool().release(Buffer.this);
+                    closed = true;
+                }
+            } // File
+        } // Input
+
+        final class Output extends DecoratingOutputSocket<Entry> {
+            Output() {
+                super(data.getOutputSocket());
             }
 
             @Override
             public OutputStream newStream() throws IOException {
-                class Stream extends DecoratingOutputStream {
-                    boolean closed;
-
-                    Stream() throws IOException {
-                        super(getBoundSocket().newStream());
-                    }
-
-                    @Override
-                    public void close() throws IOException {
-                        if (closed)
-                            return;
-                        out.close();
-                        getOutputBufferPool().release(Buffer.this);
-                        closed = true;
-                    }
-                } // Stream
-
                 return new Stream();
             }
+
+            final class Stream extends DecoratingOutputStream {
+                boolean closed;
+
+                Stream() throws IOException {
+                    super(getBoundSocket().newStream());
+                }
+
+                @Override
+                public void close() throws IOException {
+                    if (closed)
+                        return;
+                    out.close();
+                    getOutputBufferPool().release(Buffer.this);
+                    closed = true;
+                }
+            } // Stream
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                return new Channel();
+            }
+
+            final class Channel extends DecoratingSeekableByteChannel {
+                boolean closed;
+
+                Channel() throws IOException {
+                    super(getBoundSocket().newChannel());
+                }
+
+                @Override
+                public void close() throws IOException {
+                    if (closed)
+                        return;
+                    sbc.close();
+                    getOutputBufferPool().release(Buffer.this);
+                    closed = true;
+                }
+            } // Channel
         } // Output
     } // IOBuffer
 }
