@@ -49,7 +49,7 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param  delegate the file system driver provider to decorate.
+     * @param  provider the file system driver provider to decorate.
      * @param  extensions A list of file name extensions which shall identify
      *         prospective archive files.
      *         This must not be {@code null} and must not be empty.
@@ -58,10 +58,10 @@ public final class KeyManagement {
      *         RAES encrypted ZIP files with the given list of extensions.
      */
     public static TArchiveDetector newArchiveDetector1(
-            FsDriverProvider delegate,
+            FsDriverProvider provider,
             String extensions,
             char[] password) {
-        return new TArchiveDetector(delegate,
+        return new TArchiveDetector(provider,
                 extensions, new CustomZipRaesDriver(password));
     }
     
@@ -146,7 +146,7 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param  delegate the file system driver provider to decorate.
+     * @param  provider the file system driver provider to decorate.
      * @param  extensions A list of file name extensions which shall identify
      *         prospective archive files.
      *         This must not be {@code null} and must not be empty.
@@ -155,10 +155,10 @@ public final class KeyManagement {
      *         RAES encrypted ZIP files with the given list of extensions.
      */
     public static TArchiveDetector newArchiveDetector2(
-            FsDriverProvider delegate,
+            FsDriverProvider provider,
             String extensions,
             char[] password) {
-        return new TArchiveDetector(delegate,
+        return new TArchiveDetector(provider,
                     extensions, new CustomZipRaesDriver2(password));
     }
     

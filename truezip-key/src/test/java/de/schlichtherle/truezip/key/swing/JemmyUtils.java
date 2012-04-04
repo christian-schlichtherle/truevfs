@@ -149,7 +149,7 @@ public class JemmyUtils {
     private static final class AtomicButtonDriver
     extends LightSupportiveDriver
     implements ButtonDriver {
-        final ButtonDriver delegate = new ButtonMouseDriver();
+        final ButtonDriver driver = new ButtonMouseDriver();
 
         AtomicButtonDriver() {
             super(new String[] { ComponentOperator.class.getName() });
@@ -160,7 +160,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.press(op);
+                    driver.press(op);
                 }
             });
         }
@@ -170,7 +170,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.release(op);
+                    driver.release(op);
                 }
             });
         }
@@ -180,7 +180,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.push(op);
+                    driver.push(op);
                 }
             });
         }
@@ -195,7 +195,7 @@ public class JemmyUtils {
     private static final class AtomicTextDriver
     extends LightSupportiveDriver
     implements TextDriver {
-        final TextDriver delegate = new SwingTextKeyboardDriver();
+        final TextDriver driver = new SwingTextKeyboardDriver();
 
         public AtomicTextDriver() {
             super(new String[] { JTextComponentOperator.class.getName() });
@@ -208,7 +208,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.changeCaretPosition(op, position);
+                    driver.changeCaretPosition(op, position);
                 }
             });
         }
@@ -221,7 +221,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.selectText(op, startPosition, finalPosition);
+                    driver.selectText(op, startPosition, finalPosition);
                 }
             });
         }
@@ -231,7 +231,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.clearText(op);
+                    driver.clearText(op);
                 }
             });
         }
@@ -244,7 +244,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.typeText(op, text, caretPosition);
+                    driver.typeText(op, text, caretPosition);
                 }
             });
         }
@@ -256,7 +256,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.changeText(op, text);
+                    driver.changeText(op, text);
                 }
             });
         }
@@ -268,7 +268,7 @@ public class JemmyUtils {
             op.getQueueTool().invoke(new Runnable() {
                 @Override
                 public void run() {
-                    delegate.enterText(op, text);
+                    driver.enterText(op, text);
                 }
             });
         }

@@ -17,122 +17,121 @@ import javax.swing.filechooser.FileSystemView;
 public abstract class TDecoratingFileSystemView extends FileSystemView {
 
     /** The decorated file system view. */
-    protected final FileSystemView delegate;
+    protected final FileSystemView fsv;
 
     /**
      * Creates a new decorating file system view.
      *
-     * @param fileSystemView the file system view to decorate.
+     * @param fsv the file system view to decorate.
      */
-    protected TDecoratingFileSystemView(final FileSystemView fileSystemView) {
-        if (null == fileSystemView)
+    protected TDecoratingFileSystemView(final FileSystemView fsv) {
+        if (null == (this.fsv = fsv))
             throw new NullPointerException();
-        this.delegate = fileSystemView;
     }
 
     @Override
     public boolean isRoot(File f) {
-        return delegate.isRoot(f);
+        return fsv.isRoot(f);
     }
 
     @Override
     public Boolean isTraversable(File f) {
-        return delegate.isTraversable(f);
+        return fsv.isTraversable(f);
     }
 
     @Override
     public String getSystemDisplayName(File f) {
-        return delegate.getSystemDisplayName(f);
+        return fsv.getSystemDisplayName(f);
     }
 
     @Override
     public String getSystemTypeDescription(File f) {
-        return delegate.getSystemTypeDescription(f);
+        return fsv.getSystemTypeDescription(f);
     }
 
     @Override
     public Icon getSystemIcon(File f) {
-        return delegate.getSystemIcon(f);
+        return fsv.getSystemIcon(f);
     }
 
     @Override
     public boolean isParent(File folder, File file) {
-        return delegate.isParent(folder, file);
+        return fsv.isParent(folder, file);
     }
 
     @Override
     public File getChild(File parent, String fileName) {
-        return delegate.getChild(parent, fileName);
+        return fsv.getChild(parent, fileName);
     }
 
     @Override
     public boolean isFileSystem(File f) {
-        return delegate.isFileSystem(f);
+        return fsv.isFileSystem(f);
     }
 
     @Override
     public File createNewFolder(File containingDir) throws IOException {
-        return delegate.createNewFolder(containingDir);
+        return fsv.createNewFolder(containingDir);
     }
 
     @Override
     public boolean isHiddenFile(File f) {
-        return delegate.isHiddenFile(f);
+        return fsv.isHiddenFile(f);
     }
 
     @Override
     public boolean isFileSystemRoot(File dir) {
-        return delegate.isFileSystemRoot(dir);
+        return fsv.isFileSystemRoot(dir);
     }
 
     @Override
     public boolean isDrive(File dir) {
-        return delegate.isDrive(dir);
+        return fsv.isDrive(dir);
     }
 
     @Override
     public boolean isFloppyDrive(File dir) {
-        return delegate.isFloppyDrive(dir);
+        return fsv.isFloppyDrive(dir);
     }
 
     @Override
     public boolean isComputerNode(File dir) {
-        return delegate.isComputerNode(dir);
+        return fsv.isComputerNode(dir);
     }
 
     @Override
     public File[] getRoots() {
-        return delegate.getRoots();
+        return fsv.getRoots();
     }
 
     @Override
     public File getHomeDirectory() {
-        return delegate.getHomeDirectory();
+        return fsv.getHomeDirectory();
     }
 
     @Override
     public File getDefaultDirectory() {
-        return delegate.getDefaultDirectory();
+        return fsv.getDefaultDirectory();
     }
 
     @Override
     public File createFileObject(File dir, String filename) {
-        return delegate.createFileObject(dir, filename);
+        return fsv.createFileObject(dir, filename);
     }
 
     @Override
     public File createFileObject(String path) {
-        return delegate.createFileObject(path);
+        return fsv.createFileObject(path);
     }
 
     @Override
     public File[] getFiles(File dir, boolean useFileHiding) {
-        return delegate.getFiles(dir, useFileHiding);
+        return fsv.getFiles(dir, useFileHiding);
     }
 
     @Override
     public File getParentDirectory(File dir) {
-        return delegate.getParentDirectory(dir);
+        return fsv.getParentDirectory(dir);
     }
 
     /**
@@ -145,8 +144,8 @@ public abstract class TDecoratingFileSystemView extends FileSystemView {
      */
     @Override
     protected File createFileSystemRoot(File f) {
-        return (delegate instanceof TDecoratingFileSystemView)
-                ? ((TDecoratingFileSystemView) delegate).createFileSystemRoot(f)
+        return (fsv instanceof TDecoratingFileSystemView)
+                ? ((TDecoratingFileSystemView) fsv).createFileSystemRoot(f)
                 : super.createFileSystemRoot(f);
     }
 
@@ -156,8 +155,8 @@ public abstract class TDecoratingFileSystemView extends FileSystemView {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[fsv=%s]",
                 getClass().getName(),
-                delegate);
+                fsv);
     }
 }

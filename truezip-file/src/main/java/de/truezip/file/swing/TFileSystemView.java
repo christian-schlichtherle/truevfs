@@ -18,7 +18,7 @@ import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 
 /**
- * A custom file system view required to browse archive files like (virtual)
+ * A custom file system fsv required to browse archive files like (virtual)
  * directories with a {@link JFileChooser}.
  * This class is used by {@link TFileTreeCellRenderer}
  * to render files and directories in a {@link TFileTree}.
@@ -36,7 +36,7 @@ import javax.swing.filechooser.FileSystemView;
 // Other classes like BasicFileChooserUI also rely on the use of the
 // ShellFolder class, which they really shouldn't.
 // The use of the ShellFolder class is also the sole reason for the existence
-// of the file delegate property in de.truezip.kernel.io.TFile.
+// of the method {@link de.truezip.file.TFile#getFile()}.
 // For many methods in this class, we need to pass in the delegate to the
 // superclass implementation in order for the JFileChooser to work as expected.
 //
@@ -100,7 +100,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
 
     @Override
     public boolean isRoot(File file) {
-        return delegate.isRoot(unwrap(file));
+        return fsv.isRoot(unwrap(file));
     }
 
     @Override
@@ -108,7 +108,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
         final TFile tfile = wrap(file);
         return null != tfile
                 ? Boolean.valueOf(tfile.isDirectory())
-                : delegate.isTraversable(unwrap(file));
+                : fsv.isTraversable(unwrap(file));
     }
 
     @Override
@@ -116,7 +116,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
         final TFile tfile = wrap(file);
         if (tfile.isArchive() || tfile.isEntry())
             return tfile.getName();
-        return delegate.getSystemDisplayName(unwrap(file));
+        return fsv.getSystemDisplayName(unwrap(file));
     }
 
     @Override
@@ -125,7 +125,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
         final String typeDescription = TFileView.typeDescription(tfile);
         if (typeDescription != null)
             return typeDescription;
-        return delegate.getSystemTypeDescription(unwrap(file));
+        return fsv.getSystemTypeDescription(unwrap(file));
     }
 
     @Override
@@ -136,27 +136,27 @@ public class TFileSystemView extends TDecoratingFileSystemView {
             return icon;
         final File uFile = unwrap(file);
         return uFile.exists()
-            ? delegate.getSystemIcon(uFile)
+            ? fsv.getSystemIcon(uFile)
             : null;
     }
 
     @Override
     public boolean isParent(File folder, File file) {
-        return delegate.isParent(wrap(folder), wrap(file))
-            || delegate.isParent(unwrap(folder), unwrap(file));
+        return fsv.isParent(wrap(folder), wrap(file))
+            || fsv.isParent(unwrap(folder), unwrap(file));
     }
 
     @Override
     public File getChild(File parent, String child) {
         final TFile wParent = wrap(parent);
         if (wParent.isArchive() || wParent.isEntry())
-            return createFileObject(delegate.getChild(wParent, child));
-        return createFileObject(delegate.getChild(unwrap(parent), child));
+            return createFileObject(fsv.getChild(wParent, child));
+        return createFileObject(fsv.getChild(unwrap(parent), child));
     }
 
     @Override
     public boolean isFileSystem(File file) {
-        return delegate.isFileSystem(unwrap(file));
+        return fsv.isFileSystem(unwrap(file));
     }
 
     @Override
@@ -186,50 +186,50 @@ public class TFileSystemView extends TDecoratingFileSystemView {
 
             return folder;
         }
-        return createFileObject(delegate.createNewFolder(unwrap(parent)));
+        return createFileObject(fsv.createNewFolder(unwrap(parent)));
     }
 
     @Override
     public boolean isHiddenFile(File file) {
-        return delegate.isHiddenFile(unwrap(file));
+        return fsv.isHiddenFile(unwrap(file));
     }
 
     @Override
     public boolean isFileSystemRoot(File file) {
-        return delegate.isFileSystemRoot(unwrap(file));
+        return fsv.isFileSystemRoot(unwrap(file));
     }
 
     @Override
     public boolean isDrive(File file) {
-        return delegate.isDrive(unwrap(file));
+        return fsv.isDrive(unwrap(file));
     }
 
     @Override
     public boolean isFloppyDrive(File file) {
-        return delegate.isFloppyDrive(unwrap(file));
+        return fsv.isFloppyDrive(unwrap(file));
     }
 
     @Override
     public boolean isComputerNode(File file) {
-        return delegate.isComputerNode(unwrap(file));
+        return fsv.isComputerNode(unwrap(file));
     }
 
     /**
      * Creates a ZIP enabled file where necessary only,
-     * otherwise the file system view delegate is used to create the file.
+     * otherwise the file system fsv fsv is used to create the file.
      */
     @Override
     public File createFileObject(File dir, String str) {
-        return createFileObject(delegate.createFileObject(dir, str));
+        return createFileObject(fsv.createFileObject(dir, str));
     }
 
     /**
      * Creates a ZIP enabled file where necessary only,
-     * otherwise the file system view delegate is used to create the file.
+     * otherwise the file system fsv fsv is used to create the file.
      */
     @Override
     public File createFileObject(String str) {
-        return createFileObject(delegate.createFileObject(str));
+        return createFileObject(fsv.createFileObject(str));
     }
 
     /**
@@ -260,7 +260,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
             final File files[] = smartDir.listFiles(new Filter());
             return null == files ? new TFile[0] : files;
         } else {
-            final File files[] = delegate.getFiles(unwrap(dir), useFileHiding);
+            final File files[] = fsv.getFiles(unwrap(dir), useFileHiding);
             for (int i = files.length; --i >= 0; )
                 files[i] = createFileObject(files[i]);
             return files;
@@ -272,6 +272,6 @@ public class TFileSystemView extends TDecoratingFileSystemView {
         final TFile tfile = wrap(file);
         if (tfile.isEntry())
             return createFileObject(tfile.getParentFile());
-        return createFileObject(delegate.getParentDirectory(unwrap(file)));
+        return createFileObject(fsv.getParentDirectory(unwrap(file)));
     }
 }

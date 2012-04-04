@@ -58,7 +58,7 @@ implements OutputService<TarDriverEntry> {
     private final Map<String, TarDriverEntry>
             entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
-    private final OutputStream delegate;
+    private final OutputStream out;
     private final IOPool<?> pool;
     private boolean busy;
 
@@ -66,7 +66,7 @@ implements OutputService<TarDriverEntry> {
     public TarOutputService(final TarDriver driver,
                             final @WillCloseWhenClosed OutputStream out) {
         super(out);
-        this.delegate = out;
+        this.out = out;
         super.setLongFileMode(LONGFILE_GNU);
         this.pool = driver.getIOPool();
     }
@@ -139,7 +139,7 @@ implements OutputService<TarDriverEntry> {
         // been left in a consistent state if the decorated stream has
         // thrown an IOException upon the first call to its close() method.
         // See http://java.net/jira/browse/TRUEZIP-234
-        delegate.close();
+        out.close();
     }
 
     /**

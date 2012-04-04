@@ -41,8 +41,8 @@ public class InstrumentingIOPool<B extends IOBuffer<B>> implements IOPool<B> {
     extends DecoratingEntry<IOBuffer<B>>
     implements IOBuffer<B> {
 
-        protected InstrumentingBuffer(IOBuffer<B> delegate) {
-            super(delegate);
+        protected InstrumentingBuffer(IOBuffer<B> buffer) {
+            super(buffer);
         }
 
         @Override

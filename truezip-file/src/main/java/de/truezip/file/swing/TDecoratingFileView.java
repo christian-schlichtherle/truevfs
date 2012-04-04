@@ -17,7 +17,7 @@ import javax.swing.filechooser.FileView;
 public abstract class TDecoratingFileView extends FileView {
 
     /** The decorated file view. */
-    protected final FileView delegate;
+    protected final FileView fv;
 
     /**
      * Constructs a new decorating file view.
@@ -27,32 +27,32 @@ public abstract class TDecoratingFileView extends FileView {
     protected TDecoratingFileView(final FileView fileView) {
         if (null == fileView)
             throw new NullPointerException();
-        this.delegate = fileView;
+        this.fv = fileView;
     }
 
     @Override
     public @Nullable String getName(File f) {
-        return delegate.getName(f);
+        return fv.getName(f);
     }
 
     @Override
     public @Nullable String getDescription(File f) {
-        return delegate.getDescription(f);
+        return fv.getDescription(f);
     }
 
     @Override
     public @Nullable String getTypeDescription(File f) {
-        return delegate.getTypeDescription(f);
+        return fv.getTypeDescription(f);
     }
 
     @Override
     public @Nullable Icon getIcon(File f) {
-        return delegate.getIcon(f);
+        return fv.getIcon(f);
     }
 
     @Override
     public @Nullable Boolean isTraversable(File f) {
-        return delegate.isTraversable(f);
+        return fv.isTraversable(f);
     }
 
     /**
@@ -61,8 +61,8 @@ public abstract class TDecoratingFileView extends FileView {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
+        return String.format("%s[fv=%s]",
                 getClass().getName(),
-                delegate);
+                fv);
     }
 }

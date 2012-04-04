@@ -159,17 +159,17 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * Constructs a new {@code TArchiveDetector} by
-     * decorating the configuration of {@code delegate} with
+     * decorating the configuration of {@code provider} with
      * mappings for all canonicalized extensions in {@code extensions} to
      * {@code driver}.
      * 
-     * @param  delegate the file system driver provider to decorate.
+     * @param  provider the file system driver provider to decorate.
      * @param  extensions A list of file name extensions which shall identify
      *         prospective archive files.
      *         This must not be {@code null} and must not be empty.
      * @param  driver the file system driver to map for the extension list.
      *         {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *         file system scheme in {@code delegate} by removing it from the
+     *         file system scheme in {@code provider} by removing it from the
      *         resulting map for this detector.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
@@ -177,18 +177,18 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(FsDriverProvider delegate,
+    public TArchiveDetector(FsDriverProvider provider,
                             String extensions,
                             @CheckForNull FsDriver driver) {
-        this(delegate, new Object[][] {{ extensions, driver }});
+        this(provider, new Object[][] {{ extensions, driver }});
     }
 
     /**
      * Creates a new {@code TArchiveDetector} by
-     * decorating the configuration of {@code delegate} with
+     * decorating the configuration of {@code provider} with
      * mappings for all entries in {@code config}.
      * 
-     * @param  delegate the file system driver provider to decorate.
+     * @param  provider the file system driver provider to decorate.
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
@@ -201,7 +201,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         {@link String fully qualified name of a file system driver class},
      *         or {@code null}.
      *         {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *         file system scheme in {@code delegate} by removing it from the
+     *         file system scheme in {@code provider} by removing it from the
      *         resulting map for this detector.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
@@ -209,8 +209,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(FsDriverProvider delegate, Object[][] config) {
-        this(delegate, FsAbstractDriverProvider.newMap(config));
+    public TArchiveDetector(FsDriverProvider provider, Object[][] config) {
+        this(provider, FsAbstractDriverProvider.newMap(config));
     }
 
     /**

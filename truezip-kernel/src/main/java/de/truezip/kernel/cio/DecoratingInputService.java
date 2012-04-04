@@ -22,8 +22,8 @@ extends DecoratingContainer<E, I>
 implements InputService<E> {
 
     @CreatesObligation
-    protected DecoratingInputService(final @WillCloseWhenClosed I delegate) {
-        super(delegate);
+    protected DecoratingInputService(final @WillCloseWhenClosed I service) {
+        super(service);
     }
 
     @Override

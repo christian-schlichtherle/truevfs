@@ -22,8 +22,8 @@ extends DecoratingContainer<E, O>
 implements OutputService<E> {
 
     @CreatesObligation
-    protected DecoratingOutputService(final @WillCloseWhenClosed O delegate) {
-        super(delegate);
+    protected DecoratingOutputService(final @WillCloseWhenClosed O service) {
+        super(service);
     }
 
     @Override

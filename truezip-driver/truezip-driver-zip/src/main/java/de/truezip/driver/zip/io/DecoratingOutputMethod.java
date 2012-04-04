@@ -4,7 +4,6 @@
  */
 package de.truezip.driver.zip.io;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipException;
@@ -19,26 +18,26 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 abstract class DecoratingOutputMethod implements OutputMethod {
-    final OutputMethod delegate;
+    final OutputMethod method;
 
     DecoratingOutputMethod(final OutputMethod processor) {
         assert null != processor;
-        this.delegate = processor;
+        this.method = processor;
     }
 
     @Override
     public void init(ZipEntry entry) throws ZipException {
-        delegate.init(entry);
+        method.init(entry);
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public OutputStream start() throws IOException {
-        return delegate.start();
+        return method.start();
     }
 
     @Override
     public void finish() throws IOException {
-        delegate.finish();
+        method.finish();
     }
 }

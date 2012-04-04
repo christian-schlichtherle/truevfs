@@ -54,12 +54,12 @@ implements Cloneable {
             throw new AssertionError(ex);
         }
         final Map<Type, E> cloneMap = clone.map = new EnumMap<>(Type.class);
-        for (final Map.Entry<Type, E> entry : this.map.entrySet()) {
-            final FsArchiveEntry delegate = entry.getValue();
-            cloneMap.put(entry.getKey(),
-                        driver.newEntry(delegate.getName(),
-                                        delegate.getType(),
-                                        delegate));
+        for (final Map.Entry<Type, E> mapping : this.map.entrySet()) {
+            final FsArchiveEntry entry = mapping.getValue();
+            cloneMap.put(mapping.getKey(),
+                        driver.newEntry(entry.getName(),
+                                        entry.getType(),
+                                        entry));
         }
         final LinkedHashSet<String> members = this.members;
         if (null != members)
