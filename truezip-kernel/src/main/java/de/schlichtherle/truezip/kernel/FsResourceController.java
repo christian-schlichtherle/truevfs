@@ -18,7 +18,7 @@ import static de.truezip.kernel.option.SyncOption.FORCE_CLOSE_IO;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

@@ -5,7 +5,7 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.LockOutputStream;
-import de.truezip.kernel.sbc.LockSeekableByteChannel;
+import de.truezip.kernel.io.LockSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

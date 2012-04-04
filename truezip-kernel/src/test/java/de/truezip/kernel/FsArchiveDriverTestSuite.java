@@ -19,7 +19,7 @@ import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Throwables.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

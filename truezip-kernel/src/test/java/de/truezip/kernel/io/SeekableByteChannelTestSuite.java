@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.sbc;
+package de.truezip.kernel.io;
 
 import de.truezip.kernel.rof.ReadOnlyFile;
-import static de.truezip.kernel.sbc.SeekableByteChannels.readByte;
-import static de.truezip.kernel.sbc.SeekableByteChannels.readFully;
+import static de.truezip.kernel.io.SeekableByteChannels.readByte;
+import static de.truezip.kernel.io.SeekableByteChannels.readFully;
 import de.truezip.kernel.util.ArrayHelper;
 import java.io.IOException;
 import java.io.OutputStream;
