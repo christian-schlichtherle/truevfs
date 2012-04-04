@@ -72,10 +72,10 @@ TConfig.get().setArchiveDetector(
     Note that the <<<SafeZipRaesDriver>>> uses the
     {{{../truezip-key/apidocs/de/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
     to get a secret key manager.
-    The default implementation in the module 
-    {{{../truezip-key-impl/index.html}TrueZIP Key Implementation}}
-    will prompt the user for entering the secret keys, either on the console
-    (if the JVM is running headless) or with a Swing GUI.
+    The reference implementation of its service provider interface in the
+    module {{{../truezip-key/index.html}TrueZIP Key}} will prompt the user for
+    entering the secret keys, either with a Swing GUI or - if the JVM is
+    running headless - on the console.
     You can change this by following the instructions on the page about
     {{{../truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
 
