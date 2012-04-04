@@ -28,6 +28,7 @@ import static de.truezip.kernel.util.Maps.OVERHEAD_SIZE;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.nio.charset.CharsetEncoder;
 import java.nio.file.*;
 import java.util.*;
 import javax.annotation.CheckForNull;
@@ -53,6 +54,9 @@ implements Iterable<FsCovariantEntry<E>> {
     private final Splitter splitter = new Splitter();
     private final FsArchiveDriver<E> driver;
     private final EntryTable<E> master;
+
+    private final ThreadLocalCharsetEncoder
+            encoder = new ThreadLocalCharsetEncoder();
 
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
@@ -335,7 +339,9 @@ implements Iterable<FsCovariantEntry<E>> {
     throws CharConversionException {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        driver.checkEncodable(name);
+        if (!encoder.canEncode(name))
+            throw new CharConversionException(name +
+                    " (not encodable with " + driver.getCharset() + ")");
         return driver.newEntry(name, type, template, mknod);
     }
 
@@ -634,6 +640,22 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
+     * A thread local encoder for fast and convenient checking that a given
+     * entry name is encodable with the driver's character set.
+     */
+    private final class ThreadLocalCharsetEncoder
+    extends ThreadLocal<CharsetEncoder> {
+        @Override
+        protected CharsetEncoder initialValue() {
+            return driver.getCharset().newEncoder();
+        }
+
+        boolean canEncode(CharSequence cs) {
+            return get().canEncode(cs);
+        }
+    }
+
+    /**
      * @param <E> The type of the archive entries.
      */
     private static final class EntryTable<E extends FsArchiveEntry> {
@@ -674,7 +696,7 @@ implements Iterable<FsCovariantEntry<E>> {
         @Nullable FsCovariantEntry<E> remove(String path) {
             return map.remove(path);
         }
-    } // class EntryTable
+    } // EntryTable
 
     /** Splits a given path name into its parent path name and base name. */
     private static final class Splitter
@@ -688,5 +710,5 @@ implements Iterable<FsCovariantEntry<E>> {
             final String path = super.getParentPath();
             return null != path ? path : ROOT_PATH;
         }
-    } // class Splitter
+    } // Splitter
 }

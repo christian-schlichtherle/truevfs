@@ -346,36 +346,6 @@ extends FsDriver {
     }
 
     /**
-     * Ensures that the given entry name can get encoded by this driver's
-     * character set.
-     * 
-     * @param  name an entry name.
-     * @throws CharConversionException If the entry name contains characters
-     *         which cannot get encoded.
-     */
-    public final void checkEncodable(final String name)
-    throws CharConversionException {
-        if (!encoder.canEncode(name))
-            throw new CharConversionException(name +
-                    " (not encodable with " + getCharset() + ")");
-    }
-
-    private final ThreadLocalCharsetEncoder
-            encoder = new ThreadLocalCharsetEncoder();
-
-    private final class ThreadLocalCharsetEncoder
-    extends ThreadLocal<CharsetEncoder> {
-        @Override
-        protected CharsetEncoder initialValue() {
-            return getCharset().newEncoder();
-        }
-
-        boolean canEncode(CharSequence cs) {
-            return get().canEncode(cs);
-        }
-    }
-
-    /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
      */
