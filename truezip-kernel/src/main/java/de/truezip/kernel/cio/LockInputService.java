@@ -7,6 +7,7 @@ package de.truezip.kernel.cio;
 import de.truezip.kernel.io.LockInputStream;
 import de.truezip.kernel.rof.LockReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.sbc.LockSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * Decorates another input service to allow concurrent access which is
  * synchronized by a {@link Lock} object provided to its constructor.
  *
- * @param  <E> the type of the entries.
+ * @param  <E> the type of the entries in the decorated input service.
  * @see    LockOutputService
  * @author Christian Schlichtherle
  */
@@ -35,7 +36,7 @@ extends DecoratingInputService<E, InputService<E>> {
     protected final Lock lock;
 
     /**
-     * Constructs a new concurrent input service.
+     * Constructs a new lock input service.
      *
      * @param input the service to decorate.
      */
@@ -103,7 +104,7 @@ extends DecoratingInputService<E, InputService<E>> {
     public InputSocket<E> getInputSocket(final String name) {
         final class Input extends DecoratingInputSocket<E> {
             Input() {
-                super(LockInputService.super.getInputSocket(name));
+                super(container.getInputSocket(name));
             }
 
             @Override
@@ -119,24 +120,6 @@ extends DecoratingInputService<E, InputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                final ReadOnlyFile rof;
-                lock.lock();
-                try {
-                    rof = getBoundSocket().newReadOnlyFile();
-                } finally {
-                    lock.unlock();
-                }
-                return new LockReadOnlyFile(rof, lock);
-            }
-
-            @Override
-            public SeekableByteChannel newChannel() throws IOException {
-                throw new UnsupportedOperationException("TODO: Implement this!");
-            }
-
-            @Override
-            @GuardedBy("lock")
             public InputStream newStream() throws IOException {
                 final InputStream in;
                 lock.lock();
@@ -146,6 +129,32 @@ extends DecoratingInputService<E, InputService<E>> {
                     lock.unlock();
                 }
                 return new LockInputStream(in, lock);
+            }
+
+            @Override
+            @GuardedBy("lock")
+            public SeekableByteChannel newChannel() throws IOException {
+                final SeekableByteChannel sbc;
+                lock.lock();
+                try {
+                    sbc = getBoundSocket().newChannel();
+                } finally {
+                    lock.unlock();
+                }
+                return new LockSeekableByteChannel(sbc, lock);
+            }
+
+            @Override
+            @GuardedBy("lock")
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                final ReadOnlyFile rof;
+                lock.lock();
+                try {
+                    rof = getBoundSocket().newReadOnlyFile();
+                } finally {
+                    lock.unlock();
+                }
+                return new LockReadOnlyFile(rof, lock);
             }
         } // Input
 
