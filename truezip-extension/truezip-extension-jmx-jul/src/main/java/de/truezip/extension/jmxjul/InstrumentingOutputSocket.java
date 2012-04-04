@@ -20,9 +20,9 @@ extends DecoratingOutputSocket<E> {
     protected final InstrumentingDirector<?> director;
 
     protected InstrumentingOutputSocket(
-            final OutputSocket<? extends E> delegate,
+            final OutputSocket<? extends E> socket,
             final InstrumentingDirector<?> director) {
-        super(delegate);
+        super(socket);
         if (null == (this.director = director))
             throw new NullPointerException();
     }

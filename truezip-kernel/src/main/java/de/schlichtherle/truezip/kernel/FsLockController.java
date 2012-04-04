@@ -279,16 +279,118 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<AccessOption> options) {
-        return new Input(name, options);
+    public InputSocket<?> getInputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options) {
+        @NotThreadSafe
+        final class Input extends DecoratingInputSocket<Entry> {
+
+            Input() {
+                super(controller.getInputSocket(name, options));
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {
+                return writeLocked(new GetLocalTarget());
+            }
+
+            final class GetLocalTarget implements IOOperation<Entry> {
+                @Override
+                public Entry call() throws IOException {
+                    return getBoundSocket().getLocalTarget();
+                }
+            } // GetLocalTarget
+
+            @Override
+            public InputStream newStream() throws IOException {
+                return writeLocked(new NewStream());
+            }
+
+            final class NewStream implements IOOperation<InputStream> {
+                @Override
+                public InputStream call() throws IOException {
+                    return new LockInputStream(getBoundSocket().newStream());
+                }
+            } // NewStream
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                return writeLocked(new NewChannel());
+            }
+
+            final class NewChannel implements IOOperation<SeekableByteChannel> {
+                @Override
+                public SeekableByteChannel call() throws IOException {
+                    return new LockSeekableByteChannel(getBoundSocket().newChannel());
+                }
+            } // NewChannel
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                return writeLocked(new NewReadOnlyFile());
+            }
+
+            final class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
+                @Override
+                public ReadOnlyFile call() throws IOException {
+                    return new LockReadOnlyFile(getBoundSocket().newReadOnlyFile());
+                }
+            } // NewReadOnlyFile
+        } // Input
+
+        return new Input();
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<AccessOption> options,
-                                            @CheckForNull Entry template) {
-        return new Output(name, options, template);
+    public OutputSocket<?> getOutputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options,
+            final @CheckForNull Entry template) {
+        @NotThreadSafe
+        final class Output extends DecoratingOutputSocket<Entry> {
+
+            Output() {
+                super(controller.getOutputSocket(name, options, template));
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {
+                return writeLocked(new GetLocalTarget());
+            }
+
+            final class GetLocalTarget implements IOOperation<Entry> {
+                @Override
+                public Entry call() throws IOException {
+                    return getBoundSocket().getLocalTarget();
+                }
+            } // GetLocalTarget
+
+            @Override
+            public OutputStream newStream() throws IOException {
+                return writeLocked(new NewStream());
+            }
+
+            final class NewStream implements IOOperation<OutputStream> {
+                @Override
+                public OutputStream call() throws IOException {
+                    return new LockOutputStream(getBoundSocket().newStream());
+                }
+            } // NewStream
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                return writeLocked(new NewChannel());
+            }
+
+            final class NewChannel implements IOOperation<SeekableByteChannel> {
+                @Override
+                public SeekableByteChannel call() throws IOException {
+                    return new LockSeekableByteChannel(getBoundSocket().newChannel());
+                }
+            } // NewChannel
+        } // Output
+
+        return new Output();
     }
 
     @Override
@@ -378,112 +480,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     private interface IOOperation<T> {
         @Nullable T call() throws IOException;
     } // IOOperation
-
-    @NotThreadSafe
-    private final class Input extends DecoratingInputSocket<Entry> {
-        Input(  final FsEntryName name,
-                final BitField<AccessOption> options) {
-            super(controller.getInputSocket(name, options));
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            final class GetLocalTarget implements IOOperation<Entry> {
-                @Override
-                public Entry call() throws IOException {
-                    return getBoundSocket().getLocalTarget();
-                }
-            } // GetLocalTarget
-
-            return writeLocked(new GetLocalTarget());
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            final class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
-                @Override
-                public ReadOnlyFile call() throws IOException {
-                    return new LockReadOnlyFile(
-                            getBoundSocket().newReadOnlyFile());
-                }
-            } // NewReadOnlyFile
-
-            return writeLocked(new NewReadOnlyFile());
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            final class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
-                @Override
-                public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableByteChannel(
-                            getBoundSocket().newChannel());
-                }
-            } // NewSeekableByteChannel
-
-            return writeLocked(new NewSeekableByteChannel());
-        }
-
-        @Override
-        public InputStream newStream() throws IOException {
-            final class NewInputStream implements IOOperation<InputStream> {
-                @Override
-                public InputStream call() throws IOException {
-                    return new LockInputStream(
-                            getBoundSocket().newStream());
-                }
-            } // NewInputStream
-
-            return writeLocked(new NewInputStream());
-        }
-    } // Input
-
-    @NotThreadSafe
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        Output( final FsEntryName name,
-                final BitField<AccessOption> options,
-                final @CheckForNull Entry template) {
-            super(controller.getOutputSocket(name, options, template));
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            final class GetLocalTarget implements IOOperation<Entry> {
-                @Override
-                public Entry call() throws IOException {
-                    return getBoundSocket().getLocalTarget();
-                }
-            } // GetLocalTarget
-
-            return writeLocked(new GetLocalTarget());
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            final class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
-                @Override
-                public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableByteChannel(
-                            getBoundSocket().newChannel());
-                }
-            } // NewSeekableByteChannel
-
-            return writeLocked(new NewSeekableByteChannel());
-        }
-
-        @Override
-        public OutputStream newStream() throws IOException {
-            final class NewOutputStream implements IOOperation<OutputStream> {
-                @Override
-                public OutputStream call() throws IOException {
-                    return new LockOutputStream(
-                            getBoundSocket().newStream());
-                }
-            } // NewOutputStream
-
-            return writeLocked(new NewOutputStream());
-        }
-    } // Output
 
     private final class LockReadOnlyFile
     extends DecoratingReadOnlyFile {

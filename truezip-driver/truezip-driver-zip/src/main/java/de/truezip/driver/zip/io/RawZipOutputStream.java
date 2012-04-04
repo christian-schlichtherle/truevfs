@@ -101,13 +101,13 @@ implements Iterable<E> {
         if (null != appendee) {
             this.charset = appendee.getRawCharset();
             this.comment = appendee.getRawComment();
-            final Map<String, E> entries = new LinkedHashMap<String, E>(
+            final Map<String, E> entries = new LinkedHashMap<>(
                     initialCapacity(appendee.size() + param.getOverheadSize()));
             entries.putAll(appendee.getRawEntries());
             this.entries = entries;
         } else {
             this.charset = param.getCharset();
-            this.entries = new LinkedHashMap<String, E>(
+            this.entries = new LinkedHashMap<>(
                     initialCapacity(param.getOverheadSize()));
         }
         setMethod0(param.getMethod());
@@ -893,10 +893,10 @@ implements Iterable<E> {
             if (this.suppressCrc) {
                 final long crc = entry.getCrc();
                 entry.setRawCrc(0);
-                this.delegate.init(entry);
+                this.method.init(entry);
                 entry.setCrc(crc);
             } else {
-                this.delegate.init(entry);
+                this.method.init(entry);
             }
             entry.setRawMethod(WINZIP_AES);
             this.entry = entry;
@@ -907,7 +907,7 @@ implements Iterable<E> {
         public OutputStream start() throws IOException {
             // see DeflatedOutputMethod.finish().
             final ZipEntry entry = this.entry;
-            final OutputMethod delegate = this.delegate;
+            final OutputMethod method = this.method;
             final WinZipAesEntryParameters entryParam = this.entryParam;
             assert null != entryParam;
             assert null == this.out;
@@ -915,11 +915,11 @@ implements Iterable<E> {
                 final long crc = entry.getCrc();
                 entry.setRawCrc(0);
                 this.out = new WinZipAesEntryOutputStream(
-                        (LEDataOutputStream) delegate.start(), entryParam);
+                        (LEDataOutputStream) method.start(), entryParam);
                 entry.setCrc(crc);
             } else {
                 this.out = new WinZipAesEntryOutputStream(
-                        (LEDataOutputStream) delegate.start(), entryParam);
+                        (LEDataOutputStream) method.start(), entryParam);
             }
             return this.out;
         }
@@ -932,13 +932,13 @@ implements Iterable<E> {
             if (this.suppressCrc) {
                 final ZipEntry entry = this.entry;
                 entry.setRawCrc(0);
-                this.delegate.finish();
+                this.method.finish();
                 // Set to UNKNOWN in order to signal to
                 // Crc32CheckingOutputMethod that it should not check it and
                 // signal to writeCentralFileHeader() that it should write 0.
                 entry.setCrc(UNKNOWN);
             } else {
-                this.delegate.finish();
+                this.method.finish();
             }
         }
     } // WinZipAesOutputMethod
@@ -955,7 +955,7 @@ implements Iterable<E> {
         @Override
         public void init(final ZipEntry entry) throws ZipException  {
             entry.setCompressedSize(UNKNOWN);
-            this.delegate.init(entry);
+            this.method.init(entry);
             this.entry = entry;
         }
 
@@ -964,7 +964,7 @@ implements Iterable<E> {
         public OutputStream start() throws IOException {
             assert null == this.cout;
             assert null == this.dout;
-            OutputStream out = this.delegate.start();
+            OutputStream out = this.method.start();
             final long size = this.entry.getSize();
             final int blockSize = UNKNOWN != size
                     ? BZip2CompressorOutputStream.chooseBlockSize(size)
@@ -987,7 +987,7 @@ implements Iterable<E> {
             this.dout.flush(); // superfluous - should not buffer
             this.cout.finish();
             this.entry.setRawSize(this.dout.size());
-            this.delegate.finish();
+            this.method.finish();
         }
     } // BZip2OutputMethod
 
@@ -1002,7 +1002,7 @@ implements Iterable<E> {
         @Override
         public void init(final ZipEntry entry) throws ZipException  {
             entry.setCompressedSize(UNKNOWN);
-            this.delegate.init(entry);
+            this.method.init(entry);
             this.entry = entry;
         }
 
@@ -1011,7 +1011,7 @@ implements Iterable<E> {
         public OutputStream start() throws IOException {
             assert null == this.out;
             return this.out = new ZipDeflaterOutputStream(
-                    this.delegate.start(),
+                    this.method.start(),
                     RawZipOutputStream.this.getLevel(),
                     MAX_FLATER_BUF_LENGTH);
         }
@@ -1024,7 +1024,7 @@ implements Iterable<E> {
             //entry.setRawCompressedSize(deflater.getBytesWritten());
             entry.setRawSize(deflater.getBytesRead());
             deflater.end();
-            this.delegate.finish();
+            this.method.finish();
         }
     } // DeflaterOutputMethod
 
@@ -1039,7 +1039,7 @@ implements Iterable<E> {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             assert null == this.out;
-            return this.out = new Crc32OutputStream(this.delegate.start());
+            return this.out = new Crc32OutputStream(this.method.start());
         }
 
         @Override
@@ -1053,7 +1053,7 @@ implements Iterable<E> {
 
         @Override
         public void finish() throws IOException {
-            this.delegate.finish();
+            this.method.finish();
             final ZipEntry entry = RawZipOutputStream.this.entry;
             final long expectedCrc = entry.getCrc();
             if (UNKNOWN != expectedCrc) {
@@ -1074,7 +1074,7 @@ implements Iterable<E> {
             final ZipEntry entry = RawZipOutputStream.this.entry;
             final long crc = this.out.getChecksum().getValue();
             entry.setRawCrc(crc);
-            this.delegate.finish();
+            this.method.finish();
         }
     } // Crc32UpdatingOutputMethod
 }

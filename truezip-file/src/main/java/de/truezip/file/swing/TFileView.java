@@ -37,10 +37,10 @@ public class TFileView extends TDecoratingFileView {
     /**
      * Creates a new archive enabled file view.
      *
-     * @param fileView The nullable file view to decorate.
+     * @param fv The nullable file view to decorate.
      */
-    public TFileView(@CheckForNull FileView fileView) {
-        super(null != fileView ? fileView : new TNullFileView());
+    public TFileView(@CheckForNull FileView fv) {
+        super(null != fv ? fv : new TNullFileView());
     }
 
     @Override
@@ -48,7 +48,7 @@ public class TFileView extends TDecoratingFileView {
         String typeDescription = typeDescription(file);
         return typeDescription != null
                 ? typeDescription
-                : delegate.getTypeDescription(file);
+                : fv.getTypeDescription(file);
     }
 
     static @Nullable String typeDescription(File file) {
@@ -70,8 +70,8 @@ public class TFileView extends TDecoratingFileView {
 
     @Override
     public @Nullable Icon getIcon(File file) {
-        Icon icon = icon(file);
-        return null != icon ? icon : delegate.getIcon(file);
+        final Icon icon = icon(file);
+        return null != icon ? icon : fv.getIcon(file);
     }
 
     static @Nullable Icon icon(File file) {
@@ -110,6 +110,6 @@ public class TFileView extends TDecoratingFileView {
     public @Nullable Boolean isTraversable(File file) {
         return file instanceof TFile
                 ? Boolean.valueOf(((TFile) file).isDirectory())
-                : delegate.isTraversable(file);
+                : fv.isTraversable(file);
     }
 }

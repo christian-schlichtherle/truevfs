@@ -66,7 +66,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return new Output(name, options, template);
     }
 
-    static void finalize(   final Closeable delegate,
+    static void finalize(   final Closeable closeable,
                             final @CheckForNull IOException close) {
         if (OK == close) {
             logger.log(Level.FINEST, "closeCleared");
@@ -74,7 +74,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             logger.log(Level.FINER, "closeFailed", close);
         } else {
             try {
-                delegate.close();
+                closeable.close();
                 logger.log(Level.FINE, "finalizeCleared");
             } catch (final FsControllerException ex) {  // report and swallow
                 logger.log(Level.WARNING, "finalizeFailed",

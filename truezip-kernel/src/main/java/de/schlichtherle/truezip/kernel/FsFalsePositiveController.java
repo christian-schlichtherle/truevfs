@@ -257,13 +257,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @NotThreadSafe
         final class Input extends InputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
-            @Nullable InputSocket<? extends Entry> delegate;
+            @Nullable InputSocket<?> socket;
 
             InputSocket<?> getBoundDelegate(final FsController<?> controller,
                                             final FsEntryName name) {
                 return (lastController == controller
-                        ? delegate
-                        : (delegate = (lastController = controller)
+                        ? socket
+                        : (socket = (lastController = controller)
                             .getInputSocket(name, options)))
                         .bind(this);
             }
@@ -273,8 +273,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return call(new GetLocalTarget(), name);
             }
 
-            final class GetLocalTarget
-            implements IOOperation<Entry> {
+            final class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call(
                         final FsController<?> controller,
@@ -286,12 +285,44 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             } // GetLocalTarget
 
             @Override
+            public InputStream newStream() throws IOException {
+                return call(new NewStream(), name);
+            }
+
+            final class NewStream implements IOOperation<InputStream> {
+                @Override
+                public InputStream call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newStream();
+                }
+            } // NewStream
+
+            @Override
+            public SeekableByteChannel newChannel()
+            throws IOException {
+                return call(new NewChannel(), name);
+            }
+
+            final class NewChannel implements IOOperation<SeekableByteChannel> {
+                @Override
+                public SeekableByteChannel call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newChannel();
+                }
+            } // NewChannel
+
+            @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 return call(new NewReadOnlyFile(), name);
             }
 
-            final class NewReadOnlyFile
-            implements IOOperation<ReadOnlyFile> {
+            final class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call(
                         final FsController<?> controller,
@@ -301,41 +332,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .newReadOnlyFile();
                 }
             } // NewReadOnlyFile
-
-            @Override
-            public SeekableByteChannel newChannel()
-            throws IOException {
-                return call(new NewSeekableByteChannel(), name);
-            }
-
-            final class NewSeekableByteChannel
-            implements IOOperation<SeekableByteChannel> {
-                @Override
-                public SeekableByteChannel call(
-                        final FsController<?> controller,
-                        final FsEntryName name)
-                throws IOException {
-                    return getBoundDelegate(controller, name)
-                            .newChannel();
-                }
-            } // NewSeekableByteChannel
-
-            @Override
-            public InputStream newStream() throws IOException {
-                return call(new NewInputStream(), name);
-            }
-
-            final class NewInputStream
-            implements IOOperation<InputStream> {
-                @Override
-                public InputStream call(
-                        final FsController<?> controller,
-                        final FsEntryName name)
-                throws IOException {
-                    return getBoundDelegate(controller, name)
-                            .newStream();
-                }
-            } // NewInputStream
         } // Input
 
         return new Input();
@@ -350,13 +346,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @NotThreadSafe
         final class Output extends OutputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
-            @Nullable OutputSocket<? extends Entry> delegate;
+            @Nullable OutputSocket<?> socket;
 
             OutputSocket<?> getBoundDelegate(final FsController<?> controller,
                                              final FsEntryName name) {
                 return (lastController == controller
-                        ? delegate
-                        : (delegate = (lastController = controller)
+                        ? socket
+                        : (socket = (lastController = controller)
                             .getOutputSocket(name, options, template)))
                         .bind(this);
             }
@@ -366,8 +362,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return call(new GetLocalTarget(), name);
             }
 
-            final class GetLocalTarget
-            implements IOOperation<Entry> {
+            final class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call(
                         final FsController<?> controller,
@@ -379,30 +374,11 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             } // GetLocalTarget
 
             @Override
-            public SeekableByteChannel newChannel()
-            throws IOException {
-                return call(new NewSeekableByteChannel(), name);
-            }
-
-            final class NewSeekableByteChannel
-            implements IOOperation<SeekableByteChannel> {
-                @Override
-                public SeekableByteChannel call(
-                        final FsController<?> controller,
-                        final FsEntryName name)
-                throws IOException {
-                    return getBoundDelegate(controller, name)
-                            .newChannel();
-                }
-            } // NewSeekableByteChannel
-
-            @Override
             public OutputStream newStream() throws IOException {
-                return call(new NewOutputStream(), name);
+                return call(new NewStream(), name);
             }
 
-            final class NewOutputStream
-            implements IOOperation<OutputStream> {
+            final class NewStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call(
                         final FsController<?> controller,
@@ -411,7 +387,24 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                     return getBoundDelegate(controller, name)
                             .newStream();
                 }
-            } // NewOutputStream
+            } // NewStream
+
+            @Override
+            public SeekableByteChannel newChannel()
+            throws IOException {
+                return call(new NewChannel(), name);
+            }
+
+            final class NewChannel implements IOOperation<SeekableByteChannel> {
+                @Override
+                public SeekableByteChannel call(
+                        final FsController<?> controller,
+                        final FsEntryName name)
+                throws IOException {
+                    return getBoundDelegate(controller, name)
+                            .newChannel();
+                }
+            } // NewChannel
         } // Output
 
         return new Output();

@@ -316,46 +316,46 @@ public abstract class AbstractComboBoxBrowser<E> implements Serializable {
      * list model in the {@code JComboBox}.
      */
     private final class DecoratingComboBoxEditor implements ComboBoxEditor {
-        private final ComboBoxEditor delegate;
+        private final ComboBoxEditor editor;
 
-        DecoratingComboBoxEditor(ComboBoxEditor comboBoxEditor) {
-            assert null != comboBoxEditor;
-            this.delegate = comboBoxEditor;
+        DecoratingComboBoxEditor(ComboBoxEditor editor) {
+            assert null != editor;
+            this.editor = editor;
         }
 
         /** Returns the decorated combo box editor. */
         ComboBoxEditor getEditor() {
-            return delegate;
+            return editor;
         }
 
         @Override
         public Component getEditorComponent() {
-            return delegate.getEditorComponent();
+            return editor.getEditorComponent();
         }
 
         @Override
         public void setItem(final @CheckForNull Object item) {
-            updateEditor(delegate, item);
+            updateEditor(editor, item);
         }
 
         @Override
         public @CheckForNull Object getItem() {
-            return delegate.getItem();
+            return editor.getItem();
         }
 
         @Override
         public void selectAll() {
-            delegate.selectAll();
+            editor.selectAll();
         }
 
         @Override
         public void addActionListener(ActionListener actionListener) {
-            delegate.addActionListener(actionListener);
+            editor.addActionListener(actionListener);
         }
 
         @Override
         public void removeActionListener(ActionListener actionListener) {
-            delegate.removeActionListener(actionListener);
+            editor.removeActionListener(actionListener);
         }
     }
 }
