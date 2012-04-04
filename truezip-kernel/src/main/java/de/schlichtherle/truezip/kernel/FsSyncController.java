@@ -151,17 +151,115 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(   FsEntryName name,
-                                            BitField<AccessOption> options) {
-        return new Input(name, options);
+    public InputSocket<?> getInputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options) {
+        @NotThreadSafe
+        final class Input extends DecoratingInputSocket<Entry> {
+            Input() {
+                super(controller.getInputSocket(name, options));
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {
+                while (true) {
+                    try {
+                        return getBoundSocket().getLocalTarget();
+                    } catch (FsNeedsSyncException ex) {
+                        sync(ex);
+                    }
+                }
+            }
+
+            @Override
+            public InputStream newStream() throws IOException {
+                while (true) {
+                    try {
+                        return new SyncInputStream(
+                                getBoundSocket().newStream());
+                    } catch (FsNeedsSyncException ex) {
+                        sync(ex);
+                    }
+                }
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                while (true) {
+                    try {
+                        return new SyncSeekableByteChannel(
+                                getBoundSocket().newChannel());
+                    } catch (FsNeedsSyncException ex) {
+                        sync(ex);
+                    }
+                }
+            }
+
+            @Override
+            public ReadOnlyFile newReadOnlyFile() throws IOException {
+                while (true) {
+                    try {
+                        return new SyncReadOnlyFile(
+                                getBoundSocket().newReadOnlyFile());
+                    } catch (FsNeedsSyncException ex) {
+                        sync(ex);
+                    }
+                }
+            }
+        } // Input
+
+        return new Input();
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
-    public OutputSocket<?> getOutputSocket( FsEntryName name,
-                                            BitField<AccessOption> options,
-                                            @CheckForNull Entry template) {
-        return new Output(name, options, template);
+    public OutputSocket<?> getOutputSocket(
+            final FsEntryName name,
+            final BitField<AccessOption> options,
+            final @CheckForNull Entry template) {
+        @NotThreadSafe
+        final class Output extends DecoratingOutputSocket<Entry> {
+            Output() {
+                super(controller.getOutputSocket(name, options, template));
+            }
+
+            @Override
+            public Entry getLocalTarget() throws IOException {
+                while (true) {
+                    try {
+                        return getBoundSocket().getLocalTarget();
+                    } catch (FsNeedsSyncException ex) {
+                        sync(ex);
+                    }
+                }
+            }
+
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                while (true) {
+                    try {
+                        return new SyncSeekableByteChannel(
+                                getBoundSocket().newChannel());
+                    } catch (FsNeedsSyncException ex) {
+                        sync(ex);
+                    }
+                }
+            }
+
+            @Override
+            public OutputStream newStream() throws IOException {
+                while (true) {
+                    try {
+                        return new SyncOutputStream(
+                                getBoundSocket().newStream());
+                    } catch (FsNeedsSyncException ex) {
+                        sync(ex);
+                    }
+                }
+            }
+        } // Output
+
+        return new Output();
     }
 
     @Override
@@ -206,105 +304,6 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             }
         }
     }
-
-    @NotThreadSafe
-    private final class Input extends DecoratingInputSocket<Entry> {
-        Input(  final FsEntryName name,
-                final BitField<AccessOption> options) {
-            super(controller.getInputSocket(name, options));
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            while (true) {
-                try {
-                    return getBoundSocket().getLocalTarget();
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            while (true) {
-                try {
-                    return new SyncReadOnlyFile(
-                            getBoundSocket().newReadOnlyFile());
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            while (true) {
-                try {
-                    return new SyncSeekableByteChannel(
-                            getBoundSocket().newChannel());
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-
-        @Override
-        public InputStream newStream() throws IOException {
-            while (true) {
-                try {
-                    return new SyncInputStream(
-                            getBoundSocket().newStream());
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-    } // Input
-
-    @NotThreadSafe
-    private final class Output extends DecoratingOutputSocket<Entry> {
-        Output( final FsEntryName name,
-                final BitField<AccessOption> options,
-                final @CheckForNull Entry template) {
-            super(controller.getOutputSocket(name, options, template));
-        }
-
-        @Override
-        public Entry getLocalTarget() throws IOException {
-            while (true) {
-                try {
-                    return getBoundSocket().getLocalTarget();
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            while (true) {
-                try {
-                    return new SyncSeekableByteChannel(
-                            getBoundSocket().newChannel());
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-
-        @Override
-        public OutputStream newStream() throws IOException {
-            while (true) {
-                try {
-                    return new SyncOutputStream(
-                            getBoundSocket().newStream());
-                } catch (FsNeedsSyncException ex) {
-                    sync(ex);
-                }
-            }
-        }
-    } // Output
 
     private final class SyncReadOnlyFile
     extends DecoratingReadOnlyFile {

@@ -401,6 +401,7 @@ final class FsCache implements Flushable, Closeable {
             data.release();
         }
 
+        @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
                 super(data.getInputSocket());
@@ -473,6 +474,7 @@ final class FsCache implements Flushable, Closeable {
             } // File
         } // Input
 
+        @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {
             Output() {
                 super(data.getOutputSocket());
