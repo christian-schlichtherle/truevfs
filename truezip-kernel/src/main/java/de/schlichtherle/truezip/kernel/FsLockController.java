@@ -256,7 +256,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             public Boolean call() throws IOException {
                 return controller.setTime(name, times, options);
             }
-        } // class SetTime
+        } // SetTime
 
         return writeLocked(new SetTime());
     }
@@ -273,7 +273,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             public Boolean call() throws IOException {
                 return controller.setTime(name, types, value, options);
             }
-        } // class SetTime
+        } // SetTime
 
         return writeLocked(new SetTime());
     }
@@ -388,7 +388,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            class GetLocalTarget implements IOOperation<Entry> {
+            final class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
                     return getBoundSocket().getLocalTarget();
@@ -400,7 +400,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
+            final class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
                     return new LockReadOnlyFile(
@@ -413,7 +413,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public SeekableByteChannel newChannel() throws IOException {
-            class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
+            final class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
@@ -426,7 +426,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public InputStream newStream() throws IOException {
-            class NewInputStream implements IOOperation<InputStream> {
+            final class NewInputStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
                     return new LockInputStream(
@@ -448,7 +448,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            class GetLocalTarget implements IOOperation<Entry> {
+            final class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
                     return getBoundSocket().getLocalTarget();
@@ -460,7 +460,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public SeekableByteChannel newChannel() throws IOException {
-            class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
+            final class NewSeekableByteChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
@@ -473,7 +473,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public OutputStream newStream() throws IOException {
-            class NewOutputStream implements IOOperation<OutputStream> {
+            final class NewOutputStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
                     return new LockOutputStream(

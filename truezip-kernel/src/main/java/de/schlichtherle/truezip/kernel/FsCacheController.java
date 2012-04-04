@@ -104,7 +104,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             final FsEntryName name,
             final BitField<AccessOption> options) {
         /** This class requires ON-DEMAND LOOKUP of its in! */
-        class Input extends DelegatingInputSocket<Entry> {
+        final class Input extends DelegatingInputSocket<Entry> {
             @Override
             protected InputSocket<?> getSocket() {
                 assert isWriteLockedByCurrentThread();
@@ -128,7 +128,7 @@ extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsL
             final BitField<AccessOption> options,
             final @CheckForNull Entry template) {
         /** This class requires ON-DEMAND LOOKUP of its in! */
-        class Output extends DelegatingOutputSocket<Entry> {
+        final class Output extends DelegatingOutputSocket<Entry> {
             @Override
             protected OutputSocket<?> getSocket() {
                 assert isWriteLockedByCurrentThread();

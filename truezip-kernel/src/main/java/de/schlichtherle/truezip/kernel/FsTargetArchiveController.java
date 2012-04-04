@@ -318,7 +318,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     OutputSocket<? extends E> getOutputSocket(final E entry) {
-        class Output extends ClutchOutputSocket<E> {
+        final class Output extends ClutchOutputSocket<E> {
             @Override
             protected OutputSocket<? extends E> getLazyDelegate()
             throws IOException {
@@ -473,7 +473,7 @@ extends FsFileSystemArchiveController<E> {
     private <X extends IOException> void
     copy(final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        class Filter implements ExceptionHandler<IOException, X> {
+        final class Filter implements ExceptionHandler<IOException, X> {
             IOException warning;
 
             @Override
