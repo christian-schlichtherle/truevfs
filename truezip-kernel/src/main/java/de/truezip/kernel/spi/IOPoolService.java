@@ -14,7 +14,7 @@ import de.truezip.kernel.sl.IOPoolLocator;
  * <p>
  * Implementations must be thread-safe.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public abstract class IOPoolService implements IOPoolProvider {
 

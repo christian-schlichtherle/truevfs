@@ -29,16 +29,4 @@ public final class CompositeIOPoolService extends IOPoolService {
     public IOPool<?> get() {
         return pool;
     }
-
-    /**
-     * Returns 1 iff the JVM is running JSE 6 or 151 iff the JVM is running
-     * JSE 7.
-     * 
-     * @return 1 iff the JVM is running JSE 6 or 151 iff the JVM is running
-     *         JSE 7.
-     */
-    @Override
-    public int getPriority() {
-        return service.getPriority() * 3 / 2 + 1;
-    }
 }
