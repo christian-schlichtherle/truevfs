@@ -17,8 +17,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * A decorator which protects all access to its output stream
  * via a {@link Lock}.
  *
- * @see     LockInputStream
- * @author  Christian Schlichtherle
+ * @see    LockInputStream
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class LockOutputStream extends DecoratingOutputStream {
