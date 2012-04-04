@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.sbc;
+package de.truezip.kernel.io;
 
+import de.truezip.kernel.io.IntervalReadOnlyChannel;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;

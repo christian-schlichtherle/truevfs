@@ -5,7 +5,7 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.io.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;

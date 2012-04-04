@@ -2,9 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.sbc;
+package de.truezip.kernel.io;
 
-import static de.truezip.kernel.sbc.ByteBuffers.copy;
+import static de.truezip.kernel.io.ByteBuffers.copy;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;

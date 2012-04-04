@@ -8,7 +8,7 @@ import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import de.truezip.kernel.rof.ByteArrayReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.sbc.SeekableByteBufferChannel;
+import de.truezip.kernel.io.SeekableByteBufferChannel;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;

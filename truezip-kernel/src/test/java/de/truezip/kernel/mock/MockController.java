@@ -18,7 +18,7 @@ import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.io.ThrowingInputStream;
 import de.truezip.kernel.io.ThrowingOutputStream;
-import de.truezip.kernel.sbc.ThrowingSeekableByteChannel;
+import de.truezip.kernel.io.ThrowingSeekableByteChannel;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ThrowingReadOnlyFile;
 import de.truezip.kernel.util.BitField;

@@ -20,7 +20,7 @@ import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

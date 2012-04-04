@@ -11,7 +11,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * Provides constants and static utility methods for unsigned byte integer
  * values ({@value SIZE} bits).
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 final class UByte {

@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.sbc;
+package de.truezip.kernel.io;
 
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
