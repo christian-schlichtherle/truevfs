@@ -5,7 +5,7 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.DecoratingInputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;

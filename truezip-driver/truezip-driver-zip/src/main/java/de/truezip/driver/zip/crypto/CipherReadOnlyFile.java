@@ -244,8 +244,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         if (len == 0)
             return 0; // be fault-tolerant and compatible to RandomAccessFile
 
-        // Check state.
-        final SeekableBlockCipher cipher = cipher();
+        final SeekableBlockCipher cipher = cipher(); // check state.
         if (fp >= length)
             return -1;
 
@@ -323,6 +322,8 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      *         The block is not moved in this case.
      */
     private void positionBlock() throws IOException {
+        assert null != cipher;
+
         // Check block position.
         final long fp = this.fp;
         final int blockLen = block.length;

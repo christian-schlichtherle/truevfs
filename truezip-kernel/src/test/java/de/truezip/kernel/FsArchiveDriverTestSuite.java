@@ -14,7 +14,7 @@ import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.mock.MockController;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;

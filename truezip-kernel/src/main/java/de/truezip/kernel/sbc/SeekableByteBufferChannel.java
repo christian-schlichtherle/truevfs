@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.io;
+package de.truezip.kernel.sbc;
 
+import static de.truezip.kernel.bb.ByteBuffers.copy;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -58,26 +59,7 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
 
     @Override
     public final int read(final ByteBuffer dst) throws IOException {
-        final int available = buffer.remaining();
-        if (0 >= available)
-            return -1;
-        int remaining = dst.remaining();
-        if (remaining > available)
-            remaining = available;
-        final int limit;
-        if (available > remaining) {
-            limit = buffer.limit();
-            buffer.limit(buffer.position() + remaining);
-        } else {
-            limit = -1;
-        }
-        try {
-            dst.put(buffer);
-        } finally {
-            if (0 <= limit)
-                buffer.limit(limit);
-        }
-        return remaining;
+        return copy(buffer, dst);
     }
 
     @Override

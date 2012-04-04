@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsCovariantEntry;
 import de.truezip.kernel.FsArchiveEntry;
+import de.truezip.kernel.FsCovariantEntry;
 import de.truezip.kernel.util.Link;
 import java.io.IOException;
 

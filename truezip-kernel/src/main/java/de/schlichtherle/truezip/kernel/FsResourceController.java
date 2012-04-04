@@ -12,7 +12,7 @@ import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.FORCE_CLOSE_IO;
