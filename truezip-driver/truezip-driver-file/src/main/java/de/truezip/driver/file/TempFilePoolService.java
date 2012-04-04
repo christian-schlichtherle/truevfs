@@ -20,4 +20,10 @@ public final class TempFilePoolService extends IOPoolService {
     public IOPool<?> get() {
         return TempFilePool.INSTANCE;
     }
+
+    /** @return -10 */
+    @Override
+    public int getPriority() {
+        return -10;
+    }
 }

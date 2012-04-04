@@ -12,7 +12,7 @@ import de.truezip.kernel.spi.FsManagerService;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class CompositeManagerService extends FsManagerService {
