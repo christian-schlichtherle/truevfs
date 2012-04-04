@@ -5,6 +5,7 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.LockOutputStream;
+import de.truezip.kernel.sbc.LockSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * Decorates another output service to allow concurrent access which is
  * synchronized by a {@link Lock} object provided to its constructor.
  *
- * @param  <E> the type of the entries.
+ * @param  <E> the type of the entries in the decorated output service.
  * @see    LockInputService
  * @author Christian Schlichtherle
  */
@@ -33,7 +34,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     protected final Lock lock;
 
     /**
-     * Constructs a new concurrent output service.
+     * Constructs a new lock output service.
      * 
      * @param output the service to decorate.
      */
@@ -101,7 +102,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     public OutputSocket<E> getOutputSocket(final E entry) {
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(LockOutputService.super.getOutputSocket(entry));
+                super(container.getOutputSocket(entry));
             }
 
             @Override
@@ -116,11 +117,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
-                throw new UnsupportedOperationException("TODO: Implement this!");
-            }
-
-            @Override
             @GuardedBy("lock")
             public OutputStream newStream() throws IOException {
                 final OutputStream out;
@@ -131,6 +127,19 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     lock.unlock();
                 }
                 return new LockOutputStream(out, lock);
+            }
+
+            @Override
+            @GuardedBy("lock")
+            public SeekableByteChannel newChannel() throws IOException {
+                final SeekableByteChannel sbc;
+                lock.lock();
+                try {
+                    sbc = getBoundSocket().newChannel();
+                } finally {
+                    lock.unlock();
+                }
+                return new LockSeekableByteChannel(sbc, lock);
             }
         } // Output
 
