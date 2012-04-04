@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 import java.util.ServiceConfigurationError;
 import static java.util.logging.Level.CONFIG;
+import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
@@ -63,16 +64,23 @@ public final class IOPoolLocator implements IOPoolProvider {
                     IOPoolLocator.class.getClassLoader());
             IOPoolService service = locator.getService(IOPoolService.class, null);
             if (null == service) {
-                IOPoolService oldService = null;
+                IOPoolService newService = null;
                 for (   final Iterator<IOPoolService>
                             i = locator.getServices(IOPoolService.class);
-                        i.hasNext();
-                        oldService = service) {
-                    service = i.next();
-                    logger.log(CONFIG, "located", service);
-                    if (null != oldService
-                            && oldService.getPriority() > service.getPriority())
-                        service = oldService;
+                        i.hasNext();) {
+                    newService = i.next();
+                    logger.log(CONFIG, "located", newService);
+                    if (null == service) {
+                        service = newService;
+                    } else {
+                        final int op = service.getPriority();
+                        final int np = newService.getPriority();
+                        if (op < np)
+                            service = newService;
+                        else if (op == np)
+                            logger.log(WARNING, "collision",
+                                    new Object[] { op, service, newService });
+                    }
                 }
             }
             if (null == service)

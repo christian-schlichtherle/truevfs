@@ -63,9 +63,15 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
                     final KeyManager<?> newManager = entry.getValue();
                     if (null != type && null != newManager) {
                         final KeyManager<?> oldManager = sorted.put(type, newManager);
-                        if (null != oldManager
-                                && oldManager.getPriority() > newManager.getPriority())
-                            sorted.put(type, oldManager);
+                        if (null != oldManager) {
+                            final int op = oldManager.getPriority();
+                            final int np = newManager.getPriority();
+                            if (np < op)
+                                sorted.put(type, oldManager);
+                            else if (op == np)
+                                logger.log(WARNING, "collision",
+                                        new Object[] { op, type, oldManager, newManager });
+                        }
                     }
                 }
             }

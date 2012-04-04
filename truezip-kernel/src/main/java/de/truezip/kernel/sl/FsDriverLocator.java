@@ -64,9 +64,15 @@ public final class FsDriverLocator implements FsDriverProvider {
                     final FsDriver newDriver = entry.getValue();
                     if (null != scheme && null != newDriver) {
                         final FsDriver oldDriver = sorted.put(scheme, newDriver);
-                        if (null != oldDriver
-                                && oldDriver.getPriority() > newDriver.getPriority())
-                            sorted.put(scheme, oldDriver);
+                        if (null != oldDriver) {
+                            final int op = oldDriver.getPriority();
+                            final int np = newDriver.getPriority();
+                            if (np < op)
+                                sorted.put(scheme, oldDriver);
+                            else if (np == op)
+                                logger.log(WARNING, "collision",
+                                        new Object[] { op, scheme, oldDriver, newDriver });
+                        }
                     }
                 }
             }
