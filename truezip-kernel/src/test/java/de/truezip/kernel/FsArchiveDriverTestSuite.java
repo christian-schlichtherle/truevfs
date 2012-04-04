@@ -14,16 +14,13 @@ import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.mock.MockController;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
+import de.truezip.kernel.sbc.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ConcurrencyUtils;
-import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
-import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
 import static de.truezip.kernel.util.Throwables.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -35,8 +32,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
@@ -99,46 +94,17 @@ extends FsArchiveDriverTestBase<D> {
         assert null != getArchiveDriver().getCharset();
     }
 
-    @Test(expected = CharConversionException.class)
-    public void testUnencodableNameMustThrowCharConversionException()
-    throws CharConversionException {
+    @Test
+    public void testUnencodableCharacters() {
         final String name = getUnencodableName();
-        if (null == name)
-            throw new CharConversionException("Ignore me!");
-        getArchiveDriver().checkEncodable(name);
+        if (null != name)
+            assertFalse(getArchiveDriver().getCharset().newEncoder().canEncode(name));
     }
 
     @Test
     public void testAllUsAsciiCharactersMustBeEncodable()
     throws CharConversionException {
-        getArchiveDriver().checkEncodable(US_ASCII_CHARACTERS);
-    }
-
-    @Test
-    public void testAllUsAsciiCharactersMustBeEncodableWhenRunningMultithreaded()
-    throws Throwable {
-        final CountDownLatch start = new CountDownLatch(NUM_IO_THREADS);
-
-        final class CheckFactory implements ConcurrencyUtils.TaskFactory {
-            @Override
-            public Callable<?> newTask(int threadNum) {
-                return new Check();
-            }
-
-            final class Check implements Callable<Void> {
-                @Override
-                public Void call()
-                throws CharConversionException, InterruptedException {
-                    start.countDown();
-                    start.await();
-                    for (int i = 0; i < 100000; i++)
-                        getArchiveDriver().checkEncodable(US_ASCII_CHARACTERS);
-                    return null;
-                }
-            } // Check
-        } // CheckFactory
-
-        runConcurrent(NUM_IO_THREADS, new CheckFactory()).join();
+        getArchiveDriver().getCharset().newEncoder().canEncode(US_ASCII_CHARACTERS);
     }
 
     @Test
