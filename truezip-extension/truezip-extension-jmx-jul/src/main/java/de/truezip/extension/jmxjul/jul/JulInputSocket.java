@@ -30,7 +30,7 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public java.nio.channels.SeekableByteChannel newChannel() throws IOException {
-        return new JulInputByteChannel(getBoundSocket());
+        return new JulInputChannel(getBoundSocket());
     }
 
     @Override

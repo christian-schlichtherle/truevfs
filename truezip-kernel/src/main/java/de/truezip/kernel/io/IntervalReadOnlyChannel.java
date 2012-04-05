@@ -7,7 +7,6 @@ package de.truezip.kernel.io;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
@@ -21,7 +20,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class IntervalReadOnlyChannel extends DecoratingSeekableByteChannel {
+public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
 
     private final long start;
     private final long size;
@@ -163,11 +162,6 @@ public class IntervalReadOnlyChannel extends DecoratingSeekableByteChannel {
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
-        throw new NonWritableChannelException();
-    }
-
-    @Override
     public long position() throws IOException {
         sbc.position(); // check state.
         return pos;
@@ -192,11 +186,6 @@ public class IntervalReadOnlyChannel extends DecoratingSeekableByteChannel {
         if (sbc.size() < start + size)
             throw new IOException("Seekable Byte Channel has been changed!");
         return size;
-    }
-
-    @Override
-    public SeekableByteChannel truncate(long size) throws IOException {
-        throw new NonWritableChannelException();
     }
 
     /**

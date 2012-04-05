@@ -6,7 +6,7 @@ package de.truezip.extension.jmxjul.jul;
 
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOBuffer;
-import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -18,18 +18,18 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JulInputByteChannel extends DecoratingSeekableByteChannel {
+final class JulOutputChannel extends DecoratingSeekableByteChannel {
     private static final Logger
-            logger = Logger.getLogger(JulInputByteChannel.class.getName());
+            logger = Logger.getLogger(JulOutputChannel.class.getName());
 
-    private final InputSocket<?> socket;
+    private final OutputSocket<?> socket;
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    JulInputByteChannel(final InputSocket<?> socket) throws IOException {
+    JulOutputChannel(final OutputSocket<?> socket) throws IOException {
         super(socket.newChannel());
         this.socket = socket;
-        log("Random reading ");
+        log("Random writing ");
     }
 
     @Override
