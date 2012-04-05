@@ -37,10 +37,9 @@ public class FsModel {
 
     /**
      * Returns the mount point of the file system.
-     * <p>
      * The mount point may be used to construct error messages or to locate
      * and access file system meta data which is stored outside the file system,
-     * e.g. in-memory stored passwords for RAES encrypted ZIP files.
+     * e.g. passwords for RAES encrypted ZIP files.
      *
      * @return The mount point of the file system.
      */
@@ -63,10 +62,10 @@ public class FsModel {
      * Returns {@code true} if and only if some state associated with the
      * federated file system has been modified so that the
      * corresponding {@link FsController} must not get discarded until
-     * the next {@link FsController#sync sync}.
+     * the next call to {@link FsController#sync sync}.
      * <p>
-     * The implementation in the class {@link FsModel} always returns
-     * {@code false}.
+     * The implementation in the class {@link FsModel} always
+     * returns {@code false}.
      * 
      * @return {@code true} if and only if some state associated with the
      *         federated file system has been modified so that the
@@ -78,11 +77,11 @@ public class FsModel {
     }
 
     /**
-     * Sets the value of the property {@link #isTouched() touched}
-     * (optional operation).
+     * <b>Optional operation:</b> Sets the value of the property
+     * {@link #isTouched() touched}.
      * <p>
-     * The implementation in the class {@link FsModel} always throws an
-     * {@link UnsupportedOperationException}.
+     * The implementation in the class {@link FsModel} always
+     * throws an {@link UnsupportedOperationException}.
      *
      * @param  touched the new value of this property.
      * @throws UnsupportedOperationException At the discretion of the
@@ -96,7 +95,6 @@ public class FsModel {
     /**
      * Two file system models are considered equal if and only if they are
      * identical.
-     * This can't get overriden.
      * 
      * @param that the object to compare.
      */
@@ -108,7 +106,6 @@ public class FsModel {
 
     /**
      * Returns a hash code which is consistent with {@link #equals}.
-     * This can't get overriden.
      */
     @Override
     public final int hashCode() {
