@@ -35,7 +35,7 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public SeekableByteChannel newChannel() throws IOException {
-        return new JmxSeekableByteChannel(getBoundSocket().newChannel(), stats);
+        return new JmxSeekableChannel(getBoundSocket().newChannel(), stats);
     }
 
     @Override

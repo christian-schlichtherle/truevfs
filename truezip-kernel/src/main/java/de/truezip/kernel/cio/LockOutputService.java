@@ -5,7 +5,7 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.LockOutputStream;
-import de.truezip.kernel.io.LockSeekableByteChannel;
+import de.truezip.kernel.io.LockSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -139,7 +139,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 } finally {
                     lock.unlock();
                 }
-                return new LockSeekableByteChannel(sbc, lock);
+                return new LockSeekableChannel(sbc, lock);
             }
         } // Output
 

@@ -56,17 +56,17 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * byte channel may corrupt the input of this decorating seekable byte
      * channel!
      *
-     * @param  sbc the seekable byte channel to decorate.
+     * @param  channel the channel to decorate.
      * @param  size the size of the interval.
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public IntervalReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel sbc,
+            final @WillCloseWhenClosed SeekableByteChannel channel,
             final long size)
     throws IOException {
-        this(sbc, sbc.position(), size, true);
+        this(channel, channel.position(), size, true);
     }
 
     /**
@@ -78,7 +78,7 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * the file pointer in the decorated seekable byte channel before each read
      * operation!
      *
-     * @param  sbc the channel to decorate.
+     * @param  channel the channel to decorate.
      * @param  start the start of the interval.
      * @param  size the size of the interval.
      * @throws IOException on any I/O failure.
@@ -86,11 +86,11 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public IntervalReadOnlyChannel(
-            final @WillNotClose SeekableByteChannel sbc,
+            final @WillNotClose SeekableByteChannel channel,
             final long start,
             final long size)
     throws IOException {
-        this(sbc, start, size, false);
+        this(channel, start, size, false);
     }
     
     private IntervalReadOnlyChannel(
@@ -135,8 +135,8 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
         final int read;
         try {
             if (!exclusive)
-                sbc.position(start + pos);
-            read = sbc.read(dst);
+                channel.position(start + pos);
+            read = channel.read(dst);
         } finally {
             if (0 <= limit)
                 dst.limit(limit);
@@ -168,7 +168,7 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
     public SeekableByteChannel position(final long pos) throws IOException {
         if (0 > pos)
             throw new IllegalArgumentException();
-        sbc.position(start + pos);
+        channel.position(start + pos);
         this.pos = pos;
         return this;
     }
@@ -188,6 +188,6 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
     @Override
     public void close() throws IOException {
         if (exclusive)
-            sbc.close();
+            channel.close();
     }
 }

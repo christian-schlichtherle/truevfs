@@ -30,7 +30,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    DisconnectingOutputService
  * @author Christian Schlichtherle
  */
-// TODO: Consider renaming this to ClutchInputArchive in TrueZIP 8.
 @NotThreadSafe
 public class DisconnectingInputService<E extends Entry>
 extends DecoratingInputService<E, InputService<E>> {
@@ -52,31 +51,31 @@ extends DecoratingInputService<E, InputService<E>> {
         return closed;
     }
 
-    final void assertOpen() {
+    final void assertOpenService() {
         if (isClosed())
             throw new IllegalStateException(new InputClosedException());
     }
 
-    final void checkOpen() throws IOException {
+    final void checkOpenService() throws IOException {
         if (isClosed())
             throw new InputClosedException();
     }
 
     @Override
     public int size() {
-        assertOpen();
+        assertOpenService();
         return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
-        assertOpen();
+        assertOpenService();
         return container.iterator();
     }
 
     @Override
     public E getEntry(String name) {
-        assertOpen();
+        assertOpenService();
         return container.getEntry(name);
     }
 
@@ -108,20 +107,8 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         protected InputSocket<? extends E> getSocket() throws IOException {
-            checkOpen();
+            checkOpenService();
             return socket;
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return new DisconnectingReadOnlyFile(
-                    getBoundSocket().newReadOnlyFile());
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            return new DisconnectingSeekableByteChannel(
-                    getBoundSocket().newChannel());
         }
 
         @Override
@@ -129,95 +116,19 @@ extends DecoratingInputService<E, InputService<E>> {
             return new DisconnectingInputStream(
                     getBoundSocket().newStream());
         }
+
+        @Override
+        public SeekableByteChannel newChannel() throws IOException {
+            return new DisconnectingSeekableChannel(
+                    getBoundSocket().newChannel());
+        }
+
+        @Override
+        public ReadOnlyFile newReadOnlyFile() throws IOException {
+            return new DisconnectingReadOnlyFile(
+                    getBoundSocket().newReadOnlyFile());
+        }
     } // Input
-
-    private final class DisconnectingReadOnlyFile
-    extends DecoratingReadOnlyFile {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public long length() throws IOException {
-            checkOpen();
-            return rof.length();
-        }
-
-        @Override
-        public long getFilePointer() throws IOException {
-            checkOpen();
-            return rof.getFilePointer();
-        }
-
-        @Override
-        public void seek(long pos) throws IOException {
-            checkOpen();
-            rof.seek(pos);
-        }
-
-        @Override
-        public int read() throws IOException {
-            checkOpen();
-            return rof.read();
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            checkOpen();
-            return rof.read(b, off, len);
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (!closed)
-                rof.close();
-        }
-    } // DisconnectingReadOnlyFile
-
-    private final class DisconnectingSeekableByteChannel
-    extends DecoratingReadOnlyChannel {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
-        }
-
-        @Override
-        public int read(ByteBuffer dst) throws IOException {
-            checkOpen();
-            return sbc.read(dst);
-        }
-
-        @Override
-        public long position() throws IOException {
-            checkOpen();
-            return sbc.position();
-        }
-
-        @Override
-        public SeekableByteChannel position(long newPosition) throws IOException {
-            checkOpen();
-            sbc.position(newPosition);
-            return this;
-        }
-
-        @Override
-        public long size() throws IOException {
-            checkOpen();
-            return sbc.size();
-        }
-
-        @Override
-        public boolean isOpen() {
-            return !closed && sbc.isOpen();
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (!closed)
-                sbc.close();
-        }
-    } // DisconnectingSeekableByteChannel
 
     private final class DisconnectingInputStream
     extends DecoratingInputStream {
@@ -228,25 +139,25 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         public int read() throws IOException {
-            checkOpen();
+            checkOpenService();
             return in.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            checkOpen();
+            checkOpenService();
             return in.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
-            checkOpen();
+            checkOpenService();
             return in.skip(n);
         }
 
         @Override
         public int available() throws IOException {
-            checkOpen();
+            checkOpenService();
             return in.available();
         }
 
@@ -258,7 +169,7 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         public void reset() throws IOException {
-            checkOpen();
+            checkOpenService();
             in.reset();
         }
 
@@ -268,4 +179,92 @@ extends DecoratingInputService<E, InputService<E>> {
                 in.close();
         }
     } // DisconnectingInputStream
+
+    private final class DisconnectingSeekableChannel
+    extends DecoratingReadOnlyChannel {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DisconnectingSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public boolean isOpen() {
+            return !closed && channel.isOpen();
+        }
+
+        @Override
+        public int read(ByteBuffer dst) throws IOException {
+            checkOpenService();
+            return channel.read(dst);
+        }
+
+        @Override
+        public long position() throws IOException {
+            checkOpenService();
+            return channel.position();
+        }
+
+        @Override
+        public SeekableByteChannel position(long newPosition) throws IOException {
+            checkOpenService();
+            channel.position(newPosition);
+            return this;
+        }
+
+        @Override
+        public long size() throws IOException {
+            checkOpenService();
+            return channel.size();
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (!closed)
+                channel.close();
+        }
+    } // DisconnectingSeekableChannel
+
+    private final class DisconnectingReadOnlyFile
+    extends DecoratingReadOnlyFile {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DisconnectingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
+            super(rof);
+        }
+
+        @Override
+        public long length() throws IOException {
+            checkOpenService();
+            return rof.length();
+        }
+
+        @Override
+        public long getFilePointer() throws IOException {
+            checkOpenService();
+            return rof.getFilePointer();
+        }
+
+        @Override
+        public void seek(long pos) throws IOException {
+            checkOpenService();
+            rof.seek(pos);
+        }
+
+        @Override
+        public int read() throws IOException {
+            checkOpenService();
+            return rof.read();
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            checkOpenService();
+            return rof.read(b, off, len);
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (!closed)
+                rof.close();
+        }
+    } // DisconnectingReadOnlyFile
 }

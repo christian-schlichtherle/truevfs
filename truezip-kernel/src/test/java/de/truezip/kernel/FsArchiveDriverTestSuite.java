@@ -19,7 +19,7 @@ import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Throwables.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -527,7 +527,7 @@ extends FsArchiveDriverTestBase<D> {
                 @Override
                 public SeekableByteChannel newChannel()
                 throws IOException {
-                    return new TestSeekableByteChannel(
+                    return new TestSeekableChannel(
                             getBoundSocket().newChannel());
                 }
 
@@ -558,7 +558,7 @@ extends FsArchiveDriverTestBase<D> {
                 @Override
                 public SeekableByteChannel newChannel()
                 throws IOException {
-                    return new TestSeekableByteChannel(
+                    return new TestSeekableChannel(
                             getBoundSocket().newChannel());
                 }
 
@@ -592,19 +592,19 @@ extends FsArchiveDriverTestBase<D> {
         }
     } // TestReadOnlyfile
 
-    private final class TestSeekableByteChannel
-    extends DecoratingSeekableByteChannel
+    private final class TestSeekableChannel
+    extends DecoratingSeekableChannel
     implements TestCloseable {
-        TestSeekableByteChannel(SeekableByteChannel sbc) {
+        TestSeekableChannel(SeekableByteChannel sbc) {
             super(sbc);
         }
 
         @Override
         public void close() throws IOException {
             checkAllExceptions(this);
-            sbc.close();
+            channel.close();
         }
-    } // TestSeekableByteChannel
+    } // TestSeekableChannel
 
     private final class TestInputStream
     extends DecoratingInputStream

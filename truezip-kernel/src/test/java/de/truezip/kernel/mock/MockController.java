@@ -11,7 +11,7 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.ThrowingInputStream;
 import de.truezip.kernel.io.ThrowingOutputStream;
-import de.truezip.kernel.io.ThrowingSeekableByteChannel;
+import de.truezip.kernel.io.ThrowingSeekableChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.rof.ReadOnlyFile;
@@ -184,7 +184,7 @@ public class MockController extends FsModelController<FsModel> {
             @Override
             public SeekableByteChannel newChannel()
             throws IOException {
-                return new ThrowingSeekableByteChannel(
+                return new ThrowingSeekableChannel(
                         getBoundSocket().newChannel(),
                         config.getThrowControl());
             }
@@ -226,7 +226,7 @@ public class MockController extends FsModelController<FsModel> {
             @Override
             public SeekableByteChannel newChannel()
             throws IOException {
-                return new ThrowingSeekableByteChannel(
+                return new ThrowingSeekableChannel(
                         getBoundSocket().newChannel(),
                         config.getThrowControl());
             }

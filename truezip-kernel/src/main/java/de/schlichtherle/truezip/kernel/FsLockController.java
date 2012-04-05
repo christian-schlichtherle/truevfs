@@ -11,7 +11,7 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
@@ -320,7 +320,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
             final class NewChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableByteChannel(getBoundSocket().newChannel());
+                    return new LockSeekableChannel(getBoundSocket().newChannel());
                 }
             } // NewChannel
 
@@ -384,7 +384,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
             final class NewChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableByteChannel(getBoundSocket().newChannel());
+                    return new LockSeekableChannel(getBoundSocket().newChannel());
                 }
             } // NewChannel
         } // Output
@@ -494,19 +494,19 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
         }
     } // LockReadOnlyFile
 
-    private final class LockSeekableByteChannel
-    extends DecoratingSeekableByteChannel {
+    private final class LockSeekableChannel
+    extends DecoratingSeekableChannel {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        LockSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
         @Override
         public void close() throws IOException {
-            close(sbc);
+            close(channel);
         }
-    } // LockSeekableByteChannel
+    } // LockSeekableChannel
 
     private final class LockInputStream
     extends DecoratingInputStream {

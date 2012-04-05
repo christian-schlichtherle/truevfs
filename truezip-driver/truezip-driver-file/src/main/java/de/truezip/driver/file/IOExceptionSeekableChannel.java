@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.file;
 
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,8 +20,8 @@ import javax.annotation.WillCloseWhenClosed;
  *
  * @author Christian Schlichtherle
  */
-abstract class IOExceptionSeekableByteChannel
-extends DecoratingSeekableByteChannel {
+abstract class IOExceptionSeekableChannel
+extends DecoratingSeekableChannel {
 
     /** The nullable last I/O exception. */
     @CheckForNull IOException exception;
@@ -33,7 +33,7 @@ extends DecoratingSeekableByteChannel {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    IOExceptionSeekableByteChannel(
+    IOExceptionSeekableChannel(
             @Nullable @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);
     }
@@ -41,7 +41,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public int read(ByteBuffer dst) throws IOException {
         try {
-            return sbc.read(dst);
+            return channel.read(dst);
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -50,7 +50,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public int write(ByteBuffer src) throws IOException {
         try {
-            return sbc.write(src);
+            return channel.write(src);
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -59,7 +59,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public long position() throws IOException {
         try {
-            return sbc.position();
+            return channel.position();
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -68,7 +68,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
         try {
-            sbc.position(newPosition);
+            channel.position(newPosition);
             return this;
         } catch (IOException ex) {
             throw exception = ex;
@@ -78,7 +78,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public long size() throws IOException {
         try {
-            return sbc.size();
+            return channel.size();
         } catch (IOException ex) {
             throw exception = ex;
         }
@@ -87,7 +87,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
         try {
-            sbc.truncate(size);
+            channel.truncate(size);
             return this;
         } catch (IOException ex) {
             throw exception = ex;
@@ -97,7 +97,7 @@ extends DecoratingSeekableByteChannel {
     @Override
     public void close() throws IOException {
         try {
-            sbc.close();
+            channel.close();
         } catch (IOException ex) {
             throw exception = ex;
         }

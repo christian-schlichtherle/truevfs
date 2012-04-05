@@ -7,7 +7,7 @@ package de.truezip.extension.jmxjul.jul;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -18,7 +18,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JulOutputChannel extends DecoratingSeekableByteChannel {
+final class JulOutputChannel extends DecoratingSeekableChannel {
     private static final Logger
             logger = Logger.getLogger(JulOutputChannel.class.getName());
 
@@ -35,7 +35,7 @@ final class JulOutputChannel extends DecoratingSeekableByteChannel {
     @Override
     public void close() throws IOException {
         log("Closing ");
-        sbc.close();
+        channel.close();
     }
 
     private void log(String message) {

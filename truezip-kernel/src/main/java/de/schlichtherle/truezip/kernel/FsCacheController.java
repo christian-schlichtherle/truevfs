@@ -20,7 +20,7 @@ import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -293,7 +293,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
         }
 
         /**
-         * This class requires LAZY INITIALIZATION of its sbc and
+         * This class requires LAZY INITIALIZATION of its channel and
          * automatic decoupling on exceptions!
          */
         @NotThreadSafe
@@ -341,7 +341,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
         } // Input
 
         /**
-         * This class requires LAZY INITIALIZATION of its sbc, but NO
+         * This class requires LAZY INITIALIZATION of its channel, but NO
          * automatic decoupling on exceptions!
          */
         @NotThreadSafe
@@ -367,7 +367,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
             @Override
             public Entry getLocalTarget() throws IOException {
                 // Note that the super class implementation MUST get
-                // bypassed because the sbc MUST get kept even upon an
+                // bypassed because the channel MUST get kept even upon an
                 // exception!
                 return getBoundSocket().getLocalTarget();
             }
@@ -383,7 +383,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
                     // Note that the super class implementation MUST get
-                    // bypassed because the sbc MUST get kept even upon an
+                    // bypassed because the channel MUST get kept even upon an
                     // exception!
                     //super(Output.super.newStream());
                     super(getBoundSocket().newStream());
@@ -403,12 +403,12 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                 return new Channel();
             }
 
-            final class Channel extends DecoratingSeekableByteChannel {
+            final class Channel extends DecoratingSeekableChannel {
                 @CreatesObligation
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Channel() throws IOException {
                     // Note that the super class implementation MUST get
-                    // bypassed because the sbc MUST get kept even upon an
+                    // bypassed because the channel MUST get kept even upon an
                     // exception!
                     //super(Nio2Output.super.newChannel());
                     super(getBoundSocket().newChannel());
@@ -417,7 +417,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
 
                 @Override
                 public void close() throws IOException {
-                    sbc.close();
+                    channel.close();
                     postOutput();
                 }
             } // Channel

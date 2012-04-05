@@ -35,7 +35,7 @@ final class JulInputChannel extends DecoratingReadOnlyChannel {
     @Override
     public void close() throws IOException {
         log("Closing ");
-        sbc.close();
+        channel.close();
     }
 
     private void log(String message) {

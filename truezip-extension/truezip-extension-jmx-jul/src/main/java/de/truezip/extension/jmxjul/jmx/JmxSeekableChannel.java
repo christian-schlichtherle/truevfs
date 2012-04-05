@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -16,12 +16,12 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class JmxSeekableByteChannel extends DecoratingSeekableByteChannel {
+final class JmxSeekableChannel extends DecoratingSeekableChannel {
     private final JmxIOStatistics stats;
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    JmxSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc, JmxIOStatistics stats) {
+    JmxSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc, JmxIOStatistics stats) {
         super(sbc);
         assert null != stats;
         this.stats = stats;
@@ -29,7 +29,7 @@ final class JmxSeekableByteChannel extends DecoratingSeekableByteChannel {
 
     @Override
     public int read(ByteBuffer buf) throws IOException {
-        int ret = sbc.read(buf);
+        int ret = channel.read(buf);
         if (0 < ret)
             stats.incBytesRead(ret);
         return ret;
@@ -37,7 +37,7 @@ final class JmxSeekableByteChannel extends DecoratingSeekableByteChannel {
 
     @Override
     public int write(ByteBuffer buf) throws IOException {
-        int ret = sbc.write(buf);
+        int ret = channel.write(buf);
         stats.incBytesWritten(ret);
         return ret;
     }
