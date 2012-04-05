@@ -6,7 +6,6 @@ package de.truezip.kernel.io;
 
 import static de.truezip.kernel.io.Channels.readByte;
 import static de.truezip.kernel.io.Channels.readFully;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.ArrayUtils;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,15 +24,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Performs an integration test for an implementation of {@link ReadOnlyFile}.
+ * Performs an integration test of a {@link SeekableByteChannel} with read-only
+ * access.
  * Some tests use Las Vegas algorithms, so the run time may vary.
  *
  * @author Christian Schlichtherle
  */
-public abstract class SeekableByteChannelTestSuite {
+public abstract class ReadOnlyChannelTestSuite {
 
     private static final Logger
-            logger = Logger.getLogger(SeekableByteChannelTestSuite.class.getName());
+            logger = Logger.getLogger(ReadOnlyChannelTestSuite.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -205,13 +205,13 @@ public abstract class SeekableByteChannelTestSuite {
     throws IOException {
         assertEquals(0, sbc.position());
 
-        assertRandomReadByte(sbc, 0);
+        assertReadAtPosition(sbc, 0);
 
         final int size = (int) sbc.size();
         for (int i = size; --i >= 0; ) {
             final int tooSmall = rnd.nextInt() | Integer.MIN_VALUE;
             try {
-                assertRandomReadByte(sbc, tooSmall);
+                assertReadAtPosition(sbc, tooSmall);
                 fail();
             } catch (final IllegalArgumentException ex) {
             }
@@ -220,28 +220,25 @@ public abstract class SeekableByteChannelTestSuite {
             // IOException, depending on the implementation.
             // In any case, we want to validate that it yields no side effects.
             final int tooLarge = max(size + 1, rnd.nextInt() & Integer.MAX_VALUE);
-            try {
-                assertRandomReadByte(sbc, tooLarge);
-            } catch (final IOException mayHappen) {
-            }
+            assertReadAtPosition(sbc, tooLarge);
 
             final int justRight = rnd.nextInt(size);
-            assertRandomReadByte(sbc, justRight);
+            assertReadAtPosition(sbc, justRight);
         }
     }
 
-    private void assertRandomReadByte(
+    private void assertReadAtPosition(
             final SeekableByteChannel sbc,
-            final int off)
+            final int pos)
     throws IOException {
-        sbc.position(off);
-        assertEquals(off, sbc.position());
-        if (off < sbc.size()) {
-            assertEquals(data[off] & 0xff, readByte(sbc));
-            assertEquals(off + 1, sbc.position());
+        sbc.position(pos);
+        assertEquals(pos, sbc.position());
+        if (pos < sbc.size()) {
+            assertEquals(data[pos] & 0xff, readByte(sbc));
+            assertEquals(pos + 1, sbc.position());
         } else {
             assertEquals(-1, readByte(sbc));
-            assertEquals(off, sbc.position());
+            assertEquals(pos, sbc.position());
         }
     }
     
@@ -254,35 +251,35 @@ public abstract class SeekableByteChannelTestSuite {
     private void assertBackwardReadBytes(final SeekableByteChannel rof)
     throws IOException {
         final int size = (int) rof.size();
-        for (int off = size; --off >= 0; )
-            assertRandomReadByte(rof, off);
+        for (int pos = size; --pos >= 0; )
+            assertReadAtPosition(rof, pos);
     }
 
     @Test
     public void testForwardReadChunks() throws IOException {
         // Las Vegas algorithm.
         final int size = (int) rsbc.size();
-        int off = 0;
+        int pos = 0;
         int read;
         while (true) {
             final byte[] buf = new byte[rnd.nextInt(size / 100)];
             read = rsbc.read(ByteBuffer.wrap(buf));
-            if (read < 0)
+            if (0 > read)
                 break;
-            if (buf.length > 0) {
-                assertTrue(read > 0);
-                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
+            if (0 < buf.length) {
+                assertTrue(0 < read);
+                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 readFully(tsbc, ByteBuffer.wrap(buf, 0, read));
-                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
             } else {
                 assertEquals(0, read);
                 assertEquals(0, tsbc.read(ByteBuffer.wrap(buf)));
             }
-            off += read;
+            pos += read;
         }
 
-        assertEquals(off, size);
+        assertEquals(pos, size);
         assertEquals(-1, read);
         assertEquals(-1, readByte(tsbc));
         assertEquals(0, rsbc.read(ByteBuffer.allocate(0)));
@@ -293,20 +290,20 @@ public abstract class SeekableByteChannelTestSuite {
     public void testRandomReadChunks() throws IOException {
         final int size = (int) rsbc.size();
         for (int i = 100; --i >= 0; ) {
-            int off = rnd.nextInt(size);
-            assertRandomReadByte(rsbc, off);
-            assertRandomReadByte(tsbc, off);
-            off++;
+            int pos = rnd.nextInt(size);
+            assertReadAtPosition(rsbc, pos);
+            assertReadAtPosition(tsbc, pos);
+            pos++;
             final byte[] buf = new byte[rnd.nextInt(size / 100)];
             int read = rsbc.read(ByteBuffer.wrap(buf));
             if (read < 0)
                 continue;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
                 readFully(tsbc, ByteBuffer.wrap(buf, 0, read));
-                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
+                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
             } else {
                 assertEquals(0, read);
                 assertEquals(0, tsbc.read(ByteBuffer.wrap(buf)));

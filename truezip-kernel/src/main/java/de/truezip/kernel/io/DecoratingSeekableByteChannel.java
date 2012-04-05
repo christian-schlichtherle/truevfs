@@ -9,6 +9,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -44,6 +45,18 @@ implements SeekableByteChannel {
     @Override
     public boolean isOpen() {
         return sbc.isOpen();
+    }
+
+    /**
+     * Throws a {@link ClosedChannelException} iff {@link #isOpen()} returns
+     * {@code false}.
+     * 
+     * @throws ClosedChannelException iff {@link #isOpen()} returns
+     *         {@code false}.
+     */
+    protected final void checkOpen() throws ClosedChannelException {
+        if (!isOpen())
+            throw new ClosedChannelException();
     }
 
     @Override
