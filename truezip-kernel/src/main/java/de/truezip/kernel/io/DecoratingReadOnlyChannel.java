@@ -19,12 +19,12 @@ import javax.annotation.WillCloseWhenClosed;
  * @author Christian Schlichtherle
  */
 public abstract class DecoratingReadOnlyChannel
-extends DecoratingSeekableByteChannel {
+extends DecoratingSeekableChannel {
 
     @CreatesObligation
     protected DecoratingReadOnlyChannel(
-            @CheckForNull @WillCloseWhenClosed SeekableByteChannel sbc) {
-        super(sbc);
+            @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
+        super(channel);
     }
 
     /** @throws NonWritableChannelException always. */

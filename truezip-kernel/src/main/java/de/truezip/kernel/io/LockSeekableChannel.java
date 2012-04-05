@@ -21,8 +21,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class LockSeekableByteChannel
-extends DecoratingSeekableByteChannel {
+public class LockSeekableChannel
+extends DecoratingSeekableChannel {
 
     /** The lock on which this object synchronizes. */
     protected final Lock lock;
@@ -30,15 +30,15 @@ extends DecoratingSeekableByteChannel {
     /**
      * Constructs a new lock seekable byte channel.
      *
-     * @param sbc the seekable byte channel to decorate.
+     * @param channel the seekable byte channel to decorate.
      * @param lock the lock to use.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public LockSeekableByteChannel(
-            final @Nullable @WillCloseWhenClosed SeekableByteChannel sbc,
+    public LockSeekableChannel(
+            final @Nullable @WillCloseWhenClosed SeekableByteChannel channel,
             final Lock lock) {
-        super(sbc);
+        super(channel);
         if (null == (this.lock = lock))
             throw new NullPointerException();
     }
@@ -48,7 +48,7 @@ extends DecoratingSeekableByteChannel {
     public boolean isOpen() {
         lock.lock();
         try {
-            return sbc.isOpen();
+            return channel.isOpen();
         } finally {
             lock.unlock();
         }
@@ -59,7 +59,7 @@ extends DecoratingSeekableByteChannel {
     public int read(ByteBuffer dst) throws IOException {
         lock.lock();
         try {
-            return sbc.read(dst);
+            return channel.read(dst);
         } finally {
             lock.unlock();
         }
@@ -70,7 +70,7 @@ extends DecoratingSeekableByteChannel {
     public int write(ByteBuffer src) throws IOException {
         lock.lock();
         try {
-            return sbc.write(src);
+            return channel.write(src);
         } finally {
             lock.unlock();
         }
@@ -81,7 +81,7 @@ extends DecoratingSeekableByteChannel {
     public long position() throws IOException {
         lock.lock();
         try {
-            return sbc.position();
+            return channel.position();
         } finally {
             lock.unlock();
         }
@@ -92,7 +92,7 @@ extends DecoratingSeekableByteChannel {
     public SeekableByteChannel position(long pos) throws IOException {
         lock.lock();
         try { 
-            sbc.position(pos);
+            channel.position(pos);
         } finally {
             lock.unlock();
         }
@@ -104,7 +104,7 @@ extends DecoratingSeekableByteChannel {
     public long size() throws IOException {
         lock.lock();
         try {
-            return sbc.size();
+            return channel.size();
         } finally {
             lock.unlock();
         }
@@ -115,7 +115,7 @@ extends DecoratingSeekableByteChannel {
     public SeekableByteChannel truncate(long size) throws IOException {
         lock.lock();
         try {
-            sbc.truncate(size);
+            channel.truncate(size);
         } finally {
             lock.unlock();
         }
@@ -127,7 +127,7 @@ extends DecoratingSeekableByteChannel {
     public void close() throws IOException {
         lock.lock();
         try {
-            sbc.close();
+            channel.close();
         } finally {
             lock.unlock();
         }

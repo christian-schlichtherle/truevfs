@@ -5,7 +5,7 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.io.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -28,7 +28,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    DisconnectingInputService
  * @author Christian Schlichtherle
  */
-// TODO: Consider renaming this to ClutchOutputArchive in TrueZIP 8.
 @NotThreadSafe
 public class DisconnectingOutputService<E extends Entry>
 extends DecoratingOutputService<E, OutputService<E>> {
@@ -50,31 +49,31 @@ extends DecoratingOutputService<E, OutputService<E>> {
         return closed;
     }
 
-    final void assertOpen() {
+    final void assertOpenService() {
         if (isClosed())
             throw new IllegalStateException(new OutputClosedException());
     }
 
-    final void checkOpen() throws IOException {
+    final void checkOpenService() throws IOException {
         if (isClosed())
             throw new OutputClosedException();
     }
 
     @Override
     public int size() {
-        assertOpen();
+        assertOpenService();
         return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
-        assertOpen();
+        assertOpenService();
         return container.iterator();
     }
 
     @Override
     public E getEntry(String name) {
-        assertOpen();
+        assertOpenService();
         return container.getEntry(name);
     }
 
@@ -106,14 +105,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         protected OutputSocket<? extends E> getSocket() throws IOException {
-            checkOpen();
+            checkOpenService();
             return socket;
-        }
-
-        @Override
-        public SeekableByteChannel newChannel() throws IOException {
-            return new DisconnectingSeekableByteChannel(
-                    getBoundSocket().newChannel());
         }
 
         @Override
@@ -121,64 +114,13 @@ extends DecoratingOutputService<E, OutputService<E>> {
             return new DisconnectingOutputStream(
                     getBoundSocket().newStream());
         }
+
+        @Override
+        public SeekableByteChannel newChannel() throws IOException {
+            return new DisconnectingSeekableChannel(
+                    getBoundSocket().newChannel());
+        }
     } // Output
-
-    private final class DisconnectingSeekableByteChannel
-    extends DecoratingSeekableByteChannel {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
-        }
-
-        @Override
-        public int read(ByteBuffer dst) throws IOException {
-            checkOpen();
-            return sbc.read(dst);
-        }
-
-        @Override
-        public int write(ByteBuffer src) throws IOException {
-            checkOpen();
-            return sbc.write(src);
-        }
-
-        @Override
-        public long position() throws IOException {
-            checkOpen();
-            return sbc.position();
-        }
-
-        @Override
-        public SeekableByteChannel position(long newPosition) throws IOException {
-            checkOpen();
-            sbc.position(newPosition);
-            return this;
-        }
-
-        @Override
-        public long size() throws IOException {
-            checkOpen();
-            return sbc.size();
-        }
-
-        @Override
-        public SeekableByteChannel truncate(long size) throws IOException {
-            checkOpen();
-            sbc.truncate(size);
-            return this;
-        }
-
-        @Override
-        public boolean isOpen() {
-            return !closed && sbc.isOpen();
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (!closed)
-                sbc.close();
-        }
-    } // DisconnectingSeekableByteChannel
 
     private final class DisconnectingOutputStream
     extends DecoratingOutputStream {
@@ -189,19 +131,19 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         public void write(int b) throws IOException {
-            checkOpen();
+            checkOpenService();
             out.write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            checkOpen();
+            checkOpenService();
             out.write(b, off, len);
         }
 
         @Override
         public void flush() throws IOException {
-            checkOpen();
+            checkOpenService();
             out.flush();
         }
 
@@ -211,4 +153,61 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 out.close();
         }
     } // DisconnectingOutputStream
+
+    private final class DisconnectingSeekableChannel
+    extends DecoratingSeekableChannel {
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        DisconnectingSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+            super(channel);
+        }
+
+        @Override
+        public boolean isOpen() {
+            return !closed && channel.isOpen();
+        }
+
+        @Override
+        public int read(ByteBuffer dst) throws IOException {
+            checkOpenService();
+            return channel.read(dst);
+        }
+
+        @Override
+        public int write(ByteBuffer src) throws IOException {
+            checkOpenService();
+            return channel.write(src);
+        }
+
+        @Override
+        public long position() throws IOException {
+            checkOpenService();
+            return channel.position();
+        }
+
+        @Override
+        public SeekableByteChannel position(long newPosition) throws IOException {
+            checkOpenService();
+            channel.position(newPosition);
+            return this;
+        }
+
+        @Override
+        public long size() throws IOException {
+            checkOpenService();
+            return channel.size();
+        }
+
+        @Override
+        public SeekableByteChannel truncate(long size) throws IOException {
+            checkOpenService();
+            channel.truncate(size);
+            return this;
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (!closed)
+                channel.close();
+        }
+    } // DisconnectingSeekableChannel
 }

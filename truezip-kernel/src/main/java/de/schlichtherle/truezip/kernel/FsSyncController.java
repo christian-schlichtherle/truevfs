@@ -16,7 +16,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -187,7 +187,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             public SeekableByteChannel newChannel() throws IOException {
                 while (true) {
                     try {
-                        return new SyncSeekableByteChannel(
+                        return new SyncSeekableChannel(
                                 getBoundSocket().newChannel());
                     } catch (FsNeedsSyncException ex) {
                         sync(ex);
@@ -238,7 +238,7 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             public SeekableByteChannel newChannel() throws IOException {
                 while (true) {
                     try {
-                        return new SyncSeekableByteChannel(
+                        return new SyncSeekableChannel(
                                 getBoundSocket().newChannel());
                     } catch (FsNeedsSyncException ex) {
                         sync(ex);
@@ -319,19 +319,19 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
     } // SyncReadOnlyFile
 
-    private final class SyncSeekableByteChannel
-    extends DecoratingSeekableByteChannel {
+    private final class SyncSeekableChannel
+    extends DecoratingSeekableChannel {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        SyncSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+        SyncSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
         @Override
         public void close() throws IOException {
-            close(sbc);
+            close(channel);
         }
-    } // SyncSeekableByteChannel
+    } // SyncSeekableChannel
 
     private final class SyncInputStream
     extends DecoratingInputStream {

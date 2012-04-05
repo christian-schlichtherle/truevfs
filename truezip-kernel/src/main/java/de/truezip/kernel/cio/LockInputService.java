@@ -7,7 +7,7 @@ package de.truezip.kernel.cio;
 import de.truezip.kernel.io.LockInputStream;
 import de.truezip.kernel.rof.LockReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.LockSeekableByteChannel;
+import de.truezip.kernel.io.LockSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -141,7 +141,7 @@ extends DecoratingInputService<E, InputService<E>> {
                 } finally {
                     lock.unlock();
                 }
-                return new LockSeekableByteChannel(sbc, lock);
+                return new LockSeekableChannel(sbc, lock);
             }
 
             @Override

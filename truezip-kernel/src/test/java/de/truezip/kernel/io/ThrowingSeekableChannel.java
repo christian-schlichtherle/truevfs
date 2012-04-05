@@ -21,20 +21,20 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-public final class ThrowingSeekableByteChannel extends DecoratingSeekableByteChannel {
+public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
 
     private final ThrowControl control;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
-    public ThrowingSeekableByteChannel(
+    public ThrowingSeekableChannel(
             @WillCloseWhenClosed SeekableByteChannel sbc) {
         this(sbc, null);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
-    public ThrowingSeekableByteChannel(
+    public ThrowingSeekableChannel(
             final @WillCloseWhenClosed SeekableByteChannel sbc,
             final @CheckForNull ThrowControl control) {
         super(sbc);
@@ -58,50 +58,50 @@ public final class ThrowingSeekableByteChannel extends DecoratingSeekableByteCha
     @Override
     public boolean isOpen() {
         checkUndeclaredExceptions();
-        return sbc.isOpen();
+        return channel.isOpen();
     }
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
         checkAllExceptions();
-        return sbc.read(dst);
+        return channel.read(dst);
     }
 
     @Override
     public int write(ByteBuffer src) throws IOException {
         checkAllExceptions();
-        return sbc.write(src);
+        return channel.write(src);
     }
 
     @Override
     public long position() throws IOException {
         checkAllExceptions();
-        return sbc.position();
+        return channel.position();
     }
 
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
         checkAllExceptions();
-        sbc.position(newPosition);
+        channel.position(newPosition);
         return this;
     }
 
     @Override
     public long size() throws IOException {
         checkAllExceptions();
-        return sbc.size();
+        return channel.size();
     }
 
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
         checkAllExceptions();
-        sbc.truncate(size);
+        channel.truncate(size);
         return this;
     }
 
     @Override
     public void close() throws IOException {
         checkAllExceptions();
-        sbc.close();
+        channel.close();
     }
 }

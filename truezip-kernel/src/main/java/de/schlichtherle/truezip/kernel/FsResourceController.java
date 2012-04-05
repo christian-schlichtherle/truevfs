@@ -12,7 +12,7 @@ import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.FORCE_CLOSE_IO;
@@ -74,7 +74,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
             @Override
             public SeekableByteChannel newChannel() throws IOException {
-                return new ResourceSeekableByteChannel(getBoundSocket().newChannel());
+                return new ResourceSeekableChannel(getBoundSocket().newChannel());
             }
 
             @Override
@@ -105,7 +105,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
             @Override
             public SeekableByteChannel newChannel() throws IOException {
-                return new ResourceSeekableByteChannel(getBoundSocket().newChannel());
+                return new ResourceSeekableChannel(getBoundSocket().newChannel());
             }
         } // Output
 
@@ -214,11 +214,11 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
         }
     } // ResourceReadOnlyFile
 
-    private final class ResourceSeekableByteChannel
-    extends DecoratingSeekableByteChannel {
+    private final class ResourceSeekableChannel
+    extends DecoratingSeekableChannel {
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        ResourceSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+        ResourceSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
             getAccountant().startAccountingFor(this);
         }
@@ -226,9 +226,9 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
         @Override
         public void close() throws IOException {
             getAccountant().stopAccountingFor(this);
-            sbc.close();
+            channel.close();
         }
-    } // ResourceSeekableByteChannel
+    } // ResourceSeekableChannel
 
     private final class ResourceInputStream
     extends DecoratingInputStream {

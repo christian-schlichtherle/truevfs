@@ -30,21 +30,21 @@ import javax.annotation.WillCloseWhenClosed;
  * @author Christian Schlichtherle
  */
 @CleanupObligation
-public abstract class DecoratingSeekableByteChannel
+public abstract class DecoratingSeekableChannel
 implements SeekableByteChannel {
 
     /** The nullable decorated seekable byte channel. */
-    protected @Nullable SeekableByteChannel sbc;
+    protected @Nullable SeekableByteChannel channel;
 
     @CreatesObligation
-    protected DecoratingSeekableByteChannel(
+    protected DecoratingSeekableChannel(
             final @CheckForNull @WillCloseWhenClosed SeekableByteChannel sbc) {
-        this.sbc = sbc;
+        this.channel = sbc;
     }
 
     @Override
     public boolean isOpen() {
-        return sbc.isOpen();
+        return channel.isOpen();
     }
 
     /**
@@ -61,40 +61,40 @@ implements SeekableByteChannel {
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        return sbc.read(dst);
+        return channel.read(dst);
     }
 
     @Override
     public int write(ByteBuffer src) throws IOException {
-        return sbc.write(src);
+        return channel.write(src);
     }
 
     @Override
     public long position() throws IOException {
-        return sbc.position();
+        return channel.position();
     }
 
     @Override
     public SeekableByteChannel position(long newPosition) throws IOException {
-        sbc.position(newPosition);
+        channel.position(newPosition);
         return this;
     }
 
     @Override
     public long size() throws IOException {
-        return sbc.size();
+        return channel.size();
     }
 
     @Override
     public SeekableByteChannel truncate(long size) throws IOException {
-        sbc.truncate(size);
+        channel.truncate(size);
         return this;
     }
 
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        sbc.close();
+        channel.close();
     }
 
     /**
@@ -105,6 +105,6 @@ implements SeekableByteChannel {
     public String toString() {
         return String.format("%s[sbc=%s]",
                 getClass().getName(),
-                sbc);
+                channel);
     }
 }

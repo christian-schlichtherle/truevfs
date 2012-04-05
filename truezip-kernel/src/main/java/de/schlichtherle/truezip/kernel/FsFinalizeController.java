@@ -11,7 +11,7 @@ import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
@@ -70,7 +70,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public SeekableByteChannel newChannel() throws IOException {
-                return new FinalizeSeekableByteChannel(getBoundSocket().newChannel());
+                return new FinalizeSeekableChannel(getBoundSocket().newChannel());
             }
 
             @Override
@@ -102,7 +102,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public SeekableByteChannel newChannel() throws IOException {
-                return new FinalizeSeekableByteChannel(getBoundSocket().newChannel());
+                return new FinalizeSeekableChannel(getBoundSocket().newChannel());
             }
         } // Output
 
@@ -166,20 +166,20 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
     } // FinalizeReadOnlyFile
 
-    private static final class FinalizeSeekableByteChannel
-    extends DecoratingSeekableByteChannel {
+    private static final class FinalizeSeekableChannel
+    extends DecoratingSeekableChannel {
         volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        FinalizeSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+        FinalizeSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
         @Override
         public void close() throws IOException {
             try {
-                sbc.close();
+                channel.close();
             } catch (final FsControllerException ex) {
                 assert ex instanceof FsNeedsLockRetryException : ex;
                 // This is a non-local control flow exception.
@@ -197,12 +197,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         @SuppressWarnings("FinalizeDeclaration")
         protected void finalize() throws Throwable {
             try {
-                finalize(sbc, close);
+                finalize(channel, close);
             } finally {
                 super.finalize();
             }
         }
-    } // FinalizeSeekableByteChannel
+    } // FinalizeSeekableChannel
 
     private static final class FinalizeInputStream
     extends DecoratingInputStream {

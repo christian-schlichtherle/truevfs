@@ -46,36 +46,36 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     /**
      * Constructs a new buffered read-only channel.
      *
-     * @param  sbc the channel to decorate.
+     * @param  channel the channel to decorate.
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel sbc)
+            final @WillCloseWhenClosed SeekableByteChannel channel)
     throws IOException {
-        this(sbc, BUFFER_CAPACITY);
+        this(channel, BUFFER_CAPACITY);
     }
 
     /**
      * Constructs a new buffered input channel.
      *
-     * @param  sbc the seekable byte channel to decorate.
+     * @param  channel the channel to decorate.
      * @param  capacity the size of the byte buffer.
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel sbc,
+            final @WillCloseWhenClosed SeekableByteChannel channel,
             final int capacity)
     throws IOException {
-        super(sbc);
+        super(channel);
         buffer = ByteBuffer.allocate(capacity);
         assert capacity == buffer.capacity();
         assert capacity == buffer.limit();
         reset();
-        pos = sbc.position();
+        pos = channel.position();
     }
 
     @Override
@@ -155,7 +155,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     public long size() throws IOException {
         checkOpen();
         final long size = this.size;
-        return 0 <= size ? size : (this.size = sbc.size());
+        return 0 <= size ? size : (this.size = channel.size());
     }
 
     /**
@@ -201,7 +201,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             // Move buffer.
             bufferPos = (pos / limit) * limit; // round down to multiple of buffer limit
             if (bufferPos != nextWindowPos)
-                sbc.position(bufferPos);
+                channel.position(bufferPos);
 
             // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
@@ -210,7 +210,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             buffer.rewind();
             int n = 0;
             do {
-                int read = sbc.read(buffer);
+                int read = channel.read(buffer);
                 if (0 > read) {
                     size = bufferPos + n;
                     break;

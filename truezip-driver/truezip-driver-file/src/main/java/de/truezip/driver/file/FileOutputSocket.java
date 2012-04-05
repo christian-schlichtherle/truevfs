@@ -178,7 +178,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     public SeekableByteChannel newChannel() throws IOException {
         final FileEntry temp = begin();
 
-        final class Channel extends IOExceptionSeekableByteChannel {
+        final class Channel extends IOExceptionSeekableChannel {
             boolean closed;
 
             Channel() throws IOException {

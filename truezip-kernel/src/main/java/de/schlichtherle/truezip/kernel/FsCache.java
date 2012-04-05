@@ -10,7 +10,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.Pool;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -446,7 +446,7 @@ final class FsCache implements Flushable, Closeable {
                 public void close() throws IOException {
                     if (closed)
                         return;
-                    sbc.close();
+                    channel.close();
                     getInputBufferPool().release(Buffer.this);
                     closed = true;
                 }
@@ -508,7 +508,7 @@ final class FsCache implements Flushable, Closeable {
                 return new Channel();
             }
 
-            final class Channel extends DecoratingSeekableByteChannel {
+            final class Channel extends DecoratingSeekableChannel {
                 boolean closed;
 
                 Channel() throws IOException {
@@ -519,7 +519,7 @@ final class FsCache implements Flushable, Closeable {
                 public void close() throws IOException {
                     if (closed)
                         return;
-                    sbc.close();
+                    channel.close();
                     getOutputBufferPool().release(Buffer.this);
                     closed = true;
                 }
