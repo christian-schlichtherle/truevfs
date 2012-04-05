@@ -27,11 +27,13 @@ extends DecoratingSeekableByteChannel {
         super(sbc);
     }
 
+    /** @throws NonWritableChannelException always. */
     @Override
     public final int write(ByteBuffer src) throws NonWritableChannelException {
         throw new NonWritableChannelException();
     }
 
+    /** @throws NonWritableChannelException always. */
     @Override
     public final SeekableByteChannel truncate(long size)
     throws NonWritableChannelException {
