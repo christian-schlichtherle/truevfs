@@ -260,38 +260,20 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
     }
 
     @Override
-    public int hashCode() {
-        int h = 17;
-        for (int p = position(), l = limit(); p < l;)
-            h = 31 * h + get(p++);
-        return h;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other)
-            return true;
-        if (!(other instanceof ByteBuffer))
-            return false;
-        final ByteBuffer that = (ByteBuffer) other;
-        if (this.remaining() != that.remaining())
-            return false;
-        int p = this.position();
-        for (int i = this.limit() - 1, j = that.limit() - 1; i >= p; i--, j--)
-            if (this.get(i) != that.get(j))
-                return false;
-        return true;
-    }
-
-    @Override
     public int compareTo(PowerBuffer that) {
-        int n = this.position() + Math.min(this.remaining(), that.remaining());
-        for (int i = this.position(), j = that.position(); i < n; i++, j++) {
-            int cmp = Byte.compare(this.get(i), that.get(j));
-            if (cmp != 0)
-                return cmp;
-        }
-        return this.remaining() - that.remaining();
+        return this.bb.compareTo(that.bb);
+    }
+
+    @Override
+    public int hashCode() {
+        return bb.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+        return this == that
+                || that instanceof PowerBuffer
+                    && this.bb.equals(((PowerBuffer) that).bb);
     }
 
     public final ByteOrder order() {
