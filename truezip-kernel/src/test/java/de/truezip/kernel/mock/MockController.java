@@ -4,21 +4,16 @@
  */
 package de.truezip.kernel.mock;
 
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
+import de.truezip.kernel.*;
+import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.io.ThrowingInputStream;
 import de.truezip.kernel.io.ThrowingOutputStream;
 import de.truezip.kernel.io.ThrowingSeekableByteChannel;
+import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ThrowingReadOnlyFile;
 import de.truezip.kernel.util.BitField;
@@ -39,12 +34,12 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class MockController extends FsController<FsModel> {
+public class MockController extends FsModelController<FsModel> {
 
     private final @Nullable FsController<?> parent;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final ConcurrentMap<FsEntryName, IOEntry<?>>
-            map = new ConcurrentHashMap<FsEntryName, IOEntry<?>>();
+            map = new ConcurrentHashMap<>();
     private final TestConfig config;
     private volatile @CheckForNull ThrowControl control;
 

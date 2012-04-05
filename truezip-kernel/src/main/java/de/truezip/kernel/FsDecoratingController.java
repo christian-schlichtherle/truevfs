@@ -16,6 +16,7 @@ import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -31,17 +32,16 @@ public abstract class FsDecoratingController<
         C extends FsController<? extends M>>
 extends FsController<M> {
 
-    /** The decorated file system controller. */
-    protected final C controller;
+    /** The nullable decorated file system controller. */
+    protected @Nullable C controller;
 
-    /**
-     * Constructs a new decorating file system controller.
-     *
-     * @param controller the decorated file system controller.
-     */
     protected FsDecoratingController(final C controller) {
-        super(controller.getModel());
         this.controller = controller;
+    }
+
+    @Override
+    public M getModel() {
+        return controller.getModel();
     }
 
     @Override

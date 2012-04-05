@@ -11,12 +11,12 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.kernel.util.Threads;
@@ -284,7 +284,6 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
             final BitField<AccessOption> options) {
         @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
-
             Input() {
                 super(controller.getInputSocket(name, options));
             }
@@ -342,13 +341,13 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
             final BitField<AccessOption> options,
             final @CheckForNull Entry template) {
         @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {
-
             Output() {
                 super(controller.getOutputSocket(name, options, template));
             }
