@@ -11,7 +11,7 @@ import java.nio.ByteBuffer;
  * 
  * @author Christian Schlichtherle
  */
-final class Buffers {
+public final class Buffers {
 
     /** Can't touch this - hammer time! */
     private Buffers() { }

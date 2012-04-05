@@ -8,22 +8,22 @@
  * Note that some decorator classes for
  * {@linkplain java.nio.channels.SeekableByteChannel seekable byte channels}
  * implement their own virtual
- * {@linkplain java.nio.channels.SeekableByteChannel#position() file pointer}.
+ * {@linkplain java.nio.channels.SeekableByteChannel#position() position}.
  * If you would like to use a decorated seekable byte channel again after you
  * have finished using such a decorating seekable byte channel, then you need
- * to synchronize their file pointers using the following idiom:
+ * to synchronize their positions using the following idiom:
  * <pre>
  *     SeekableByteChannel sbc = ...
  *     try {
  *         SeekableInputChannel bic = new BufferedInputChannel(sbc);
  *         try {
- *             // Do any file input on bic here...
+ *             // Do any input on bic here...
  *             bic.seek(1);
  *         } finally {
- *             // Synchronize the file pointers.
+ *             // Synchronize the positions.
  *             sbc.position(bic.position());
  *         }
- *         // This assertion would fail if we hadn't done the file pointer
+ *         // This assertion would fail if we hadn't done the position
  *         // synchronization!
  *         assert sbc.position() == 1;
  *     } finally {

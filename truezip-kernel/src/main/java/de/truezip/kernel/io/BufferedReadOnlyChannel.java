@@ -15,21 +15,18 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Provides buffered random read-only access to its decorated seekable byte
  * channel.
- * Note that this class implements its own virtual file pointer.
+ * Note that this channel implements its own virtual position.
  *
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
 
-    /** The default capacity of the byte buffer for the channel data. */
-    private static final int BUFFER_CAPACITY = Streams.BUFFER_SIZE;
-
     /** The size of this channel. */
     private long size;
 
     /**
-     * The virtual file pointer for this channel.
+     * The virtual position of this channel.
      * This is relative to the start of this channel.
      */
     private long pos;
@@ -54,26 +51,26 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     public BufferedReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel)
     throws IOException {
-        this(channel, BUFFER_CAPACITY);
+        this(channel, Streams.BUFFER_SIZE);
     }
 
     /**
      * Constructs a new buffered input channel.
      *
      * @param  channel the channel to decorate.
-     * @param  capacity the size of the byte buffer.
+     * @param  bufferSize the size of the byte buffer.
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
-            final int capacity)
+            final int bufferSize)
     throws IOException {
         super(channel);
-        buffer = ByteBuffer.allocate(capacity);
-        assert capacity == buffer.capacity();
-        assert capacity == buffer.limit();
+        buffer = ByteBuffer.allocate(bufferSize);
+        assert bufferSize == buffer.limit();
+        assert bufferSize == buffer.capacity();
         reset();
         pos = channel.position();
     }
@@ -81,7 +78,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     @Override
     public int read(final ByteBuffer dst) throws IOException {
         // Check no-op first for compatibility with FileChannel.
-        int remaining = dst.remaining();
+        final int remaining = dst.remaining();
         if (0 >= remaining)
             return 0;
 
@@ -91,47 +88,49 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             return -1;
 
         // Setup.
-        final int limit = buffer.limit();
-        int copied, total = 0; // amount of read data copied to buf
+        final int bufferSize = buffer.limit();
+        int total = 0; // amount of read data copied to dst
 
         {
             // Partial read of buffer data at the start.
-            final int p = (int) (pos % limit);
+            final int p = (int) (pos % bufferSize);
             if (p != 0) {
-                // The file pointer is not on a buffer boundary.
+                // The virtual position is not on a buffer boundary.
                 positionBuffer();
                 buffer.position(p);
-                pos += total = copied = copy(buffer, dst);
-                assert copied > 0;
+                total = copy(buffer, dst);
+                assert total > 0;
+                pos += total;
             }
         }
 
         {
             // Full read of buffer data in the middle.
-            while (total + limit < remaining && pos + limit <= size) {
-                // The file pointer is starting and ending on buffer boundaries.
+            while (total + bufferSize < remaining && pos + bufferSize <= size) {
+                // The virtual position is starting and ending on buffer
+                // boundaries.
                 positionBuffer();
                 buffer.rewind();
-                copied = copy(buffer, dst);
+                final int copied = copy(buffer, dst);
+                assert copied == bufferSize;
                 total += copied;
                 pos += copied;
-                assert copied == limit;
             }
         }
 
         // Partial read of buffer data at the end.
         if (total < remaining && pos < size) {
-            // The file pointer is not on a buffer boundary.
+            // The virtual position is starting on a buffer boundary.
             positionBuffer();
             buffer.rewind();
-            copied = copy(buffer, dst);
+            final int copied = copy(buffer, dst);
             total += copied;
             pos += copied;
             assert copied > 0;
         }
 
-        // Assert that at least one byte has been read if len isn't zero.
-        // Note that EOF has been tested before.
+        // Assert that at least one byte has been read.
+        // Note that EOF has been checked before.
         assert 0 < total;
         return total;
     }
@@ -181,26 +180,24 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     }
 
     /**
-     * Positions the buffer so that it holds the data referenced by the virtual
-     * file pointer.
+     * Positions the buffer so that it holds the data
+     * referenced by the virtual file pointer.
      *
      * @throws IOException on any I/O failure.
      *         The buffer gets invalidated in this case.
      */
-    private void positionBuffer()
-    throws IOException {
-        // Check position of buffer.
+    private void positionBuffer() throws IOException {
+        // Check position.
         final long pos = this.pos;
-        final int limit = buffer.limit();
-        final long nextWindowPos = bufferPos + limit;
-        if (bufferPos <= pos && pos < nextWindowPos)
+        final int bufferSize = buffer.limit();
+        final long nextBufferPos = bufferPos + bufferSize;
+        if (bufferPos <= pos && pos < nextBufferPos)
             return;
 
-        // The buffer needs to move.
         try {
-            // Move buffer.
-            bufferPos = (pos / limit) * limit; // round down to multiple of buffer limit
-            if (bufferPos != nextWindowPos)
+            // Move position.
+            bufferPos = pos / bufferSize * bufferSize; // round down to multiple of buffer size
+            if (bufferPos != nextBufferPos)
                 channel.position(bufferPos);
 
             // Fill buffer until end of file or buffer.
@@ -216,7 +213,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
                     break;
                 }
                 n += read;
-            } while (n < limit);
+            } while (n < bufferSize);
         } catch (final IOException ex) {
             invalidateBuffer();
             throw ex;

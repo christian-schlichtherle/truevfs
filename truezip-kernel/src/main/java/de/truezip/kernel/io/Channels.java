@@ -38,11 +38,10 @@ final class Channels {
      * Marks the given buffer, reads all its remaining bytes from the given
      * channel and resets the buffer.
      * If an {@link IOException} occurs or the end-of-file is reached before
-     * the buffer has been entirely filled, then the buffer does not get reset
-     * and the {@code IOException} or an {@link EOFException} gets thrown
-     * respectively.
+     * the buffer has been entirely filled, then it does not get reset and the
+     * {@code IOException} or an {@link EOFException} gets thrown respectively.
      * 
-     * @param  channel the readable byte channel.
+     * @param  channel the channel.
      * @param  buffer the byte buffer to fill with data from the channel.
      * @throws EOFException on end-of-file.
      * @throws IOException on any I/O failure.
@@ -68,7 +67,7 @@ final class Channels {
      * If an {@link IOException} occurs, then the buffer does not get reset
      * and the {@code IOException} gets thrown.
      * 
-     * @param  channel the writable byte channel.
+     * @param  channel the channel.
      * @param  buffer the byte buffer with the data to flush to the channel.
      * @throws IOException on any I/O failure.
      */

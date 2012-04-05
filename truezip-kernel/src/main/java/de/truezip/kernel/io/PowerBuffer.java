@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.*;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import javax.annotation.Nullable;
 
 /**
  * A drop-in replacement which adapts a {@link ByteBuffer} to provide
@@ -19,6 +18,10 @@ import javax.annotation.Nullable;
 public final class PowerBuffer implements Comparable<PowerBuffer> {
 
     private final ByteBuffer bb;
+
+    //
+    // Construction.
+    //
 
     private PowerBuffer(final ByteBuffer bb) {
         this.bb = bb;
@@ -50,36 +53,66 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
     // PowerBuffer specials.
     //
 
+    /**
+     * Returns the adapted byte buffer.
+     * 
+     * @return The adapted byte buffer.
+     */
+    public ByteBuffer buffer() {
+        return bb;
+    }
+
+    /**
+     * Sets the byte order to little endian.
+     * 
+     * @return {@code this}.
+     */
     public PowerBuffer littleEndian() {
         bb.order(ByteOrder.LITTLE_ENDIAN);
         return this;
     }
 
+    /**
+     * Sets the byte order to big endian.
+     * 
+     * @return {@code this}.
+     */
     public PowerBuffer bigEndian() {
         bb.order(ByteOrder.BIG_ENDIAN);
         return this;
     }
 
-    public PowerBuffer load(ReadableByteChannel rbc) throws IOException {
-        Channels.readFully(rbc, bb);
-        return this;
-    }
-
-    public PowerBuffer save(WritableByteChannel wbc) throws IOException {
-        Channels.writeFully(wbc, bb);
+    /**
+     * Marks this buffer, reads all remaining bytes from the given channel and
+     * resets this buffer.
+     * If an {@link IOException} occurs or the end-of-file is reached before
+     * this buffer has been entirely filled, then it does not get reset and the
+     * {@code IOException} or an {@link EOFException} gets thrown respectively.
+     * 
+     * @param  channel the channel.
+     * @return {@code this}.
+     * @throws EOFException on end-of-file.
+     * @throws IOException on any I/O failure.
+     */
+    public PowerBuffer load(ReadableByteChannel channel) throws IOException {
+        Channels.readFully(channel, bb);
         return this;
     }
 
     /**
-     * Returns a {@linkplain ByteBuffer#duplicate() duplicate} of the
-     * underlying byte buffer.
+     * Marks this buffer, writes all remaining bytes to the given channel and
+     * resets this buffer.
+     * If an {@link IOException} occurs, then this buffer does not get reset
+     * and the {@code IOException} gets thrown.
      * 
-     * @return A {@linkplain ByteBuffer#duplicate() duplicate} of the
-     *         underlying byte buffer.
+     * @param  channel the channel.
+     * @return {@code this}.
+     * @throws IOException on any I/O failure.
      */
-    /*public ByteBuffer asByteBuffer() {
-        return bb.duplicate();
-    }*/
+    public PowerBuffer save(WritableByteChannel channel) throws IOException {
+        Channels.writeFully(channel, bb);
+        return this;
+    }
 
     /**
      * Returns an unsigned byte, cast to an integer.
