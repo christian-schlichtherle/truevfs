@@ -20,7 +20,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 final class FsResetController
-extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
+extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
     /**
      * Constructs a new file system unlink controller.

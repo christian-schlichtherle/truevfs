@@ -76,7 +76,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 final class FsCacheController
-extends FsLockModelDecoratingController<FsSyncDecoratingController<? extends FsLockModel, ?>> {
+extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsLockModel, ?>> {
 
     private static final Logger logger = Logger.getLogger(
             FsCacheController.class.getName(),

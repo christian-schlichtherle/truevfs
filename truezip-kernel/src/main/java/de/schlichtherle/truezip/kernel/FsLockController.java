@@ -47,7 +47,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @Immutable
 final class FsLockController
-extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
+extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
     private static final ThreadLocal<ThreadUtil>
             threadUtil = new ThreadLocal<ThreadUtil>() {
