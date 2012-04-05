@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
+import de.truezip.driver.zip.crypto.CtrBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.*;
 import de.truezip.kernel.io.LEDataOutputStream;
 import de.truezip.kernel.io.Sink;
@@ -62,7 +62,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     Type0RaesOutputStream(final Sink sink, final Type0RaesParameters param)
     throws IOException{
         super(new BufferedBlockCipher(
-                new SICSeekableBlockCipher( // or new SICBlockCipher(
+                new CtrBlockCipher( // or new SICBlockCipher(
                     new AESFastEngine())));
 
         assert null != sink;

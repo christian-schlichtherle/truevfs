@@ -4,7 +4,6 @@
  */
 package de.truezip.driver.zip.crypto;
 
-import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
 import java.security.SecureRandom;
 import java.util.Random;
 import org.bouncycastle.crypto.BlockCipher;
@@ -19,16 +18,16 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-public class SICSeekableBlockCipherTest {
+public class CtrBlockCipherTest {
 
     @Test
     public void compareModes() {
         BlockCipher engine = new AESEngine();
         int blockSize = engine.getBlockSize();
         BlockCipher ref = new SICBlockCipher(engine); // reference implementation
-        BlockCipher uut = new SICSeekableBlockCipher(engine); // unit under test
+        BlockCipher uut = new CtrBlockCipher(engine); // unit under test
         PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
         byte[] salt = new byte[blockSize]; // used as salt and cipher input
         new SecureRandom().nextBytes(salt);
