@@ -219,6 +219,7 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
         return new Input();
     }
 
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive
     @Override
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,

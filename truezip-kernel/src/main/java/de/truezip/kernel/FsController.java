@@ -5,7 +5,6 @@
 package de.truezip.kernel;
 
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
@@ -101,37 +100,12 @@ import javax.annotation.Nullable;
  */
 public abstract class FsController<M extends FsModel> {
 
-    private final M model;
-
-    /**
-     * Constructs a new file system controller for the given model.
-     * 
-     * @param model the file system model.
-     */
-    protected FsController(final M model) {
-        if (null == (this.model = model))
-            throw new NullPointerException();
-    }
-
     /**
      * Returns the file system model.
      * 
      * @return The file system model.
      */
-    public final M getModel() {
-        return model;
-    }
-
-    /**
-     * Returns the mount point of this (federated virtual) file system as
-     * defined by the {@linkplain #getModel() model}.
-     * 
-     * @return The mount point of this (federated virtual) file system as
-     *         defined by the {@linkplain #getModel() model}.
-     */
-    public final FsMountPoint getMountPoint() {
-        return model.getMountPoint();
-    }
+    public abstract M getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
@@ -371,7 +345,7 @@ public abstract class FsController<M extends FsModel> {
      *
      * @param  options the synchronization options.
      * @throws FsSyncException if committing the changes fails because of any
-     *         I/O related failure.
+     *         I/O failure.
      * @throws IOException on any other (not necessarily I/O related) failure.
      */
     public final void
@@ -415,8 +389,8 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param that the object to compare.
      */
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public final boolean equals(@CheckForNull Object that) {
         return this == that;
     }

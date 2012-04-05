@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsModelController;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.concurrent.Immutable;
@@ -19,24 +19,16 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 abstract class FsLockModelController
-extends FsController<FsLockModel>  {
+extends FsModelController<FsLockModel>  {
 
     /**
-     * Constructs a new file system controller for the given
-     * concurrent file system model.
+     * Constructs a new file system controller for the given file system lock
+     * model.
      * 
-     * @param model the concurrent file system model.
+     * @param model the file system lock model.
      */
     FsLockModelController(FsLockModel model) {
         super(model);
-    }
-
-    final boolean isTouched() {
-        return getModel().isTouched();
-    }
-
-    final void setTouched(boolean touched) {
-        getModel().setTouched(touched);
     }
 
     ReadLock readLock() {

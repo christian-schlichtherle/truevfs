@@ -125,7 +125,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     private FsPath getPath() {
         final FsPath path = this.path;
-        return null != path ? path : (this.path = getMountPoint().getPath());
+        return null != path ? path : (this.path = getModel().getMountPoint().getPath());
     }
 
     @Override

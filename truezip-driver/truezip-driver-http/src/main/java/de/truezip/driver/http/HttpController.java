@@ -4,6 +4,12 @@
  */
 package de.truezip.driver.http;
 
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsModel;
+import de.truezip.kernel.FsModelController;
+import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
@@ -11,11 +17,6 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.util.BitField;
@@ -31,7 +32,7 @@ import org.apache.http.HttpResponse;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public class HttpController extends FsController<FsModel>  {
+public class HttpController extends FsModelController<FsModel>  {
 
     private final HttpDriver driver;
 

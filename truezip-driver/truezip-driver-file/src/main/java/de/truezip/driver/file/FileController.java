@@ -6,6 +6,7 @@ package de.truezip.driver.file;
 
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.FsModelController;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry;
@@ -42,7 +43,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class FileController extends FsController<FsModel>  {
+final class FileController extends FsModelController<FsModel>  {
 
     private final Path target;
 

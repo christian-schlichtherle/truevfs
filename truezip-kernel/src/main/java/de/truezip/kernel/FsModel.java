@@ -100,7 +100,7 @@ public class FsModel {
      */
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object that) {
+    public final boolean equals(@CheckForNull Object that) {
         return this == that;
     }
 

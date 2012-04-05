@@ -11,10 +11,10 @@ import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -83,6 +83,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
             final BitField<AccessOption> options,
