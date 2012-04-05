@@ -6,6 +6,7 @@ package de.truezip.kernel.cio;
 
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 
 /**
@@ -22,7 +23,8 @@ extends DecoratingContainer<E, O>
 implements OutputService<E> {
 
     @CreatesObligation
-    protected DecoratingOutputService(final @WillCloseWhenClosed O output) {
+    protected DecoratingOutputService(
+            @CheckForNull @WillCloseWhenClosed O output) {
         super(output);
     }
 

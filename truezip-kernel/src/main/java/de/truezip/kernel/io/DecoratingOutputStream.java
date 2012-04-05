@@ -10,6 +10,7 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 
@@ -28,14 +29,9 @@ public abstract class DecoratingOutputStream extends OutputStream {
     /** The nullable decorated output stream. */
     protected @Nullable OutputStream out;
 
-    /**
-     * Constructs a new decorating output stream.
-     *
-     * @param out the nullable output stream to decorate.
-     */
     @CreatesObligation
     protected DecoratingOutputStream(
-            final @Nullable @WillCloseWhenClosed OutputStream out) {
+            final @CheckForNull @WillCloseWhenClosed OutputStream out) {
         this.out = out;
     }
 
