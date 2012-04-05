@@ -6,6 +6,7 @@ package de.truezip.kernel.cio;
 
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 
 /**
@@ -22,7 +23,8 @@ extends DecoratingContainer<E, I>
 implements InputService<E> {
 
     @CreatesObligation
-    protected DecoratingInputService(final @WillCloseWhenClosed I input) {
+    protected DecoratingInputService(
+            @CheckForNull @WillCloseWhenClosed I input) {
         super(input);
     }
 

@@ -6,12 +6,13 @@ package de.truezip.kernel.cio;
 
 import java.util.Iterator;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 
 /**
  * An abstract decorator for an entry container.
  *
- * @param  <E> the type of the entries in the container.
- * @param  <C> the type of the entry container.
+ * @param  <E> the type of the entries in the decorated container.
+ * @param  <C> the type of the decorated entry container.
  * @author Christian Schlichtherle
  */
 public abstract class DecoratingContainer<
@@ -19,17 +20,11 @@ public abstract class DecoratingContainer<
         C extends Container<E>>
 implements Container<E> {
 
-    /** The decorated entry container. */
-    protected final C container;
+    /** The nullable decorated entry container. */
+    protected @Nullable C container;
 
-    /**
-     * Constructs a new filter entry container.
-     *
-     * @param container the entry container to decorate.
-     */
-    protected DecoratingContainer(final C container) {
-        if (null == (this.container = container))
-            throw new NullPointerException();
+    protected DecoratingContainer(final @CheckForNull C container) {
+        this.container = container;
     }
 
     @Override

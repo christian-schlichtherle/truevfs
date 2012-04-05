@@ -10,6 +10,7 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 
@@ -34,14 +35,9 @@ implements SeekableByteChannel {
     /** The nullable decorated seekable byte channel. */
     protected @Nullable SeekableByteChannel sbc;
 
-    /**
-     * Constructs a new decorating seekable byte channel.
-     *
-     * @param sbc the nullable seekable byte channel to decorate.
-     */
     @CreatesObligation
     protected DecoratingSeekableByteChannel(
-            final @Nullable @WillCloseWhenClosed SeekableByteChannel sbc) {
+            final @CheckForNull @WillCloseWhenClosed SeekableByteChannel sbc) {
         this.sbc = sbc;
     }
 

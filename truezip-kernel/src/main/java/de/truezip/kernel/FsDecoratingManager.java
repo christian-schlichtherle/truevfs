@@ -6,6 +6,8 @@ package de.truezip.kernel;
 
 import de.truezip.kernel.addr.FsMountPoint;
 import java.util.Iterator;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -18,17 +20,16 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class FsDecoratingManager<M extends FsManager>
 extends FsManager {
 
-    /** The decorated file system manager. */
-    protected final M manager;
+    /** The nullable decorated file system manager. */
+    protected @Nullable M manager;
 
     /**
      * Constructs a new decorating file system manager.
      *
      * @param manager the file system manager to decorate.
      */
-    protected FsDecoratingManager(final M manager) {
-        if (null == (this.manager = manager))
-            throw new NullPointerException();
+    protected FsDecoratingManager(final @CheckForNull M manager) {
+        this.manager = manager;
     }
 
     @Override

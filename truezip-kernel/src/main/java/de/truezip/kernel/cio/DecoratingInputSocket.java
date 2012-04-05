@@ -5,6 +5,7 @@
 package de.truezip.kernel.cio;
 
 import java.io.IOException;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -23,7 +24,7 @@ extends DelegatingInputSocket<E> {
     protected @Nullable InputSocket<? extends E> socket;
 
     protected DecoratingInputSocket(
-            final @Nullable InputSocket<? extends E> socket) {
+            final @CheckForNull InputSocket<? extends E> socket) {
         this.socket = socket;
     }
 
