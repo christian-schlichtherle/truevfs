@@ -18,10 +18,10 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * Like the {@link SICBlockCipher} class, the block counter is incremented
  * <em>after</em> updating the cipher input in <em>big endian</em> order.
  *
- * @author  The Legion of the Bouncy Castle (majority of the code)
- * @author  Christian Schlichtherle (optimizations and extension to support seeking)
+ * @author The Legion of the Bouncy Castle (majority of the code)
+ * @author Christian Schlichtherle (optimizations and extension to support seeking)
  */
-public class SICSeekableBlockCipher implements SeekableBlockCipher {
+public class CtrBlockCipher implements SeekableBlockCipher {
 
     protected final BlockCipher cipher;
     protected final int blockSize;
@@ -35,7 +35,7 @@ public class SICSeekableBlockCipher implements SeekableBlockCipher {
      *
      * @param cipher The underlying block cipher to use.
      */
-    public SICSeekableBlockCipher(final BlockCipher cipher) {
+    public CtrBlockCipher(final BlockCipher cipher) {
         this.cipher = cipher;
         this.blockSize = cipher.getBlockSize();
         this.IV = new byte[blockSize];

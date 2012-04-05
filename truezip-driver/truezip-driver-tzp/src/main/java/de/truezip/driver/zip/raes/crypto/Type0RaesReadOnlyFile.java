@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.truezip.driver.zip.crypto.SICSeekableBlockCipher;
+import de.truezip.driver.zip.crypto.CtrBlockCipher;
 import de.truezip.driver.zip.crypto.SeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
 import static de.truezip.driver.zip.raes.crypto.Constants.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT;
@@ -157,7 +157,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
 
         // Init cipher.
         final SeekableBlockCipher
-                cipher = new SICSeekableBlockCipher(new AESFastEngine());
+                cipher = new CtrBlockCipher(new AESFastEngine());
         cipher.init(false, aesCtrParam);
         init(cipher, start, length);
 
