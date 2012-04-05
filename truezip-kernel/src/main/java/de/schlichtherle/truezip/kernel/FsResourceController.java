@@ -38,7 +38,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 final class FsResourceController
-extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
+extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
     private @CheckForNull FsResourceAccountant accountant;
 
