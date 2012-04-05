@@ -5,8 +5,8 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.DecoratingInputStream;
+import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.InputClosedException;
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -176,7 +176,7 @@ extends DecoratingInputService<E, InputService<E>> {
     } // DisconnectingReadOnlyFile
 
     private final class DisconnectingSeekableByteChannel
-    extends DecoratingSeekableByteChannel {
+    extends DecoratingReadOnlyChannel {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         DisconnectingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
@@ -186,12 +186,6 @@ extends DecoratingInputService<E, InputService<E>> {
         public int read(ByteBuffer dst) throws IOException {
             checkOpen();
             return sbc.read(dst);
-        }
-
-        @Override
-        public int write(ByteBuffer src) throws IOException {
-            checkOpen();
-            return sbc.write(src);
         }
 
         @Override
@@ -211,13 +205,6 @@ extends DecoratingInputService<E, InputService<E>> {
         public long size() throws IOException {
             checkOpen();
             return sbc.size();
-        }
-
-        @Override
-        public SeekableByteChannel truncate(long size) throws IOException {
-            checkOpen();
-            sbc.truncate(size);
-            return this;
         }
 
         @Override

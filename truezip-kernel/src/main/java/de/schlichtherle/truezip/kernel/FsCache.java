@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.kernel;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.rof.DecoratingReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.io.DecoratingSeekableByteChannel;
@@ -434,7 +435,7 @@ final class FsCache implements Flushable, Closeable {
                 return new Channel();
             }
 
-            final class Channel extends DecoratingSeekableByteChannel {
+            final class Channel extends DecoratingReadOnlyChannel {
                 boolean closed;
 
                 Channel() throws IOException {
