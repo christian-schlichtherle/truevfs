@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import de.truezip.kernel.io.BufferedReadOnlyChannel;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
@@ -13,7 +12,7 @@ import java.nio.file.Path;
 /**
  * @author Christian Schlichtherle
  */
-public final class BufferedReadOnlyChannelIT extends SeekableByteChannelTestSuite {
+public final class BufferedReadOnlyChannelIT extends ReadOnlyChannelTestSuite {
 
     @Override
     protected SeekableByteChannel newChannel(Path path) throws IOException {

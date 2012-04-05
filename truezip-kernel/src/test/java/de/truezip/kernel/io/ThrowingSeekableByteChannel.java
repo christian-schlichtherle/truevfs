@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import de.truezip.kernel.io.DecoratingSeekableByteChannel;
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.ThrowControl;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;

@@ -8,7 +8,6 @@ import static de.truezip.kernel.io.Buffers.copy;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -21,10 +20,10 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
+public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
 
-    /** The default size of the window byte buffer to the channel data. */
-    public static final int WINDOW_LEN = Streams.BUFFER_SIZE;
+    /** The default capacity of the byte buffer for the channel data. */
+    private static final int BUFFER_CAPACITY = Streams.BUFFER_SIZE;
 
     /** The size of this channel. */
     private long size;
@@ -36,18 +35,18 @@ public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
     private long pos;
 
     /**
-     * The position in this channel where the window byte buffer starts.
-     * This is always a multiple of the window byte buffer size.
+     * The position in the decorated channel where the buffer starts.
+     * This is always a multiple of the buffer size.
      */
-    private long windowPos;
+    private long bufferPos;
 
-    /** The window byte buffer to the channel data. */
-    private final ByteBuffer window;
+    /** The buffer to the data of the decorated channel. */
+    private final ByteBuffer buffer;
 
     /**
-     * Constructs a new buffered input channel.
+     * Constructs a new buffered read-only channel.
      *
-     * @param  sbc the seekable byte channel to decorate.
+     * @param  sbc the channel to decorate.
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
@@ -55,78 +54,77 @@ public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
     public BufferedReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel sbc)
     throws IOException {
-        this(sbc, WINDOW_LEN);
+        this(sbc, BUFFER_CAPACITY);
     }
 
     /**
      * Constructs a new buffered input channel.
      *
      * @param  sbc the seekable byte channel to decorate.
-     * @param  windowLen the size of the buffer window in bytes.
+     * @param  capacity the size of the byte buffer.
      * @throws IOException on any I/O failure.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel sbc,
-            final int windowLen)
+            final int capacity)
     throws IOException {
         super(sbc);
-        this.pos = this.sbc.position();
-        this.window = ByteBuffer.allocate(windowLen);
-        invalidateWindow();
-        assert 0 < this.window.capacity();
+        buffer = ByteBuffer.allocate(capacity);
+        assert capacity == buffer.capacity();
+        assert capacity == buffer.limit();
+        reset();
+        pos = sbc.position();
     }
 
     @Override
-    public int read(final ByteBuffer dst)
-    throws IOException {
-        final int remaining = dst.remaining();
-        if (0 >= remaining) {
-            // Be fault-tolerant and compatible to FileChannel, even if
-            // the decorated read only file has been closed before.
+    public int read(final ByteBuffer dst) throws IOException {
+        // Check no-op first for compatibility with FileChannel.
+        int remaining = dst.remaining();
+        if (0 >= remaining)
             return 0;
-        }
 
-        final long size = size(); // check state
-        if (pos >= size)
+        // Check is open and not at EOF.
+        final long size = size();
+        if (pos >= size) // do NOT cache pos!
             return -1;
 
         // Setup.
-        final int capacity = window.capacity();
+        final int limit = buffer.limit();
         int copied, total = 0; // amount of read data copied to buf
 
         {
-            // Partial read of window data at the start.
-            final int p = (int) (pos % capacity);
+            // Partial read of buffer data at the start.
+            final int p = (int) (pos % limit);
             if (p != 0) {
-                // The file pointer is not on a window boundary.
-                positionWindow();
-                window.position(p);
-                pos += total = copied = copy(window, dst);
+                // The file pointer is not on a buffer boundary.
+                positionBuffer();
+                buffer.position(p);
+                pos += total = copied = copy(buffer, dst);
                 assert copied > 0;
             }
         }
 
         {
-            // Full read of window data in the middle.
-            while (total + capacity < remaining && pos + capacity <= size) {
-                // The file pointer is starting and ending on window boundaries.
-                positionWindow();
-                window.rewind();
-                copied = copy(window, dst);
+            // Full read of buffer data in the middle.
+            while (total + limit < remaining && pos + limit <= size) {
+                // The file pointer is starting and ending on buffer boundaries.
+                positionBuffer();
+                buffer.rewind();
+                copied = copy(buffer, dst);
                 total += copied;
                 pos += copied;
-                assert copied == capacity;
+                assert copied == limit;
             }
         }
 
-        // Partial read of window data at the end.
+        // Partial read of buffer data at the end.
         if (total < remaining && pos < size) {
-            // The file pointer is not on a window boundary.
-            positionWindow();
-            window.rewind();
-            copied = copy(window, dst);
+            // The file pointer is not on a buffer boundary.
+            positionBuffer();
+            buffer.rewind();
+            copied = copy(buffer, dst);
             total += copied;
             pos += copied;
             assert copied > 0;
@@ -139,13 +137,8 @@ public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
-        throw new NonWritableChannelException();
-    }
-
-    @Override
     public long position() throws IOException {
-        sbc.position(); // check state
+        checkOpen();
         return pos;
     }
 
@@ -153,76 +146,79 @@ public class BufferedReadOnlyChannel extends DecoratingSeekableByteChannel {
     public SeekableByteChannel position(final long pos) throws IOException {
         if (0 > pos)
             throw new IllegalArgumentException();
-        final long size = size();
-        if (pos > size)
-            throw new IOException("Position (" + pos
-                    + ") is larger than channel size (" + size + ")!");
+        checkOpen();
         this.pos = pos;
         return this;
     }
 
     @Override
     public long size() throws IOException {
-        final long size = sbc.size();
-        if (this.size != size) {
-            this.size = size;
-            invalidateWindow();
-        }
-        return size;
+        checkOpen();
+        final long size = this.size;
+        return 0 <= size ? size : (this.size = sbc.size());
     }
-
-    @Override
-    public SeekableByteChannel truncate(long size) throws IOException {
-        throw new NonWritableChannelException();
-    }
-
-    //
-    // Window byte buffer operations.
-    //
 
     /**
-     * Forces a reload of the window byte buffer on the next call to
-     * {@link #positionWindow()}.
+     * Notifies this channel of concurrent changes in its decorated channel.
+     * Calling this method triggers a reload of the buffer on the next read
+     * access.
+     * 
+     * @return {@code this}
      */
-    private void invalidateWindow() {
-        windowPos = Long.MIN_VALUE;
+    public BufferedReadOnlyChannel sync() {
+        reset();
+        return this;
+    }
+
+    private void reset() {
+        size = -1;
+        invalidateBuffer();
+    }
+
+    /** Triggers a reload of the buffer on the next read access. */
+    private void invalidateBuffer() {
+        bufferPos = Long.MIN_VALUE;
     }
 
     /**
-     * Positions the window byte buffer so that the block referenced by the
-     * virtual file pointer is loaded.
+     * Positions the buffer so that it holds the data referenced by the virtual
+     * file pointer.
      *
      * @throws IOException on any I/O failure.
-     *         The window byte buffer gets invalidated in this case.
+     *         The buffer gets invalidated in this case.
      */
-    private void positionWindow()
+    private void positionBuffer()
     throws IOException {
-        // Check position of window byte buffer.
+        // Check position of buffer.
         final long pos = this.pos;
-        final int capacity = window.capacity();
-        final long nextWindowOff = windowPos + capacity;
-        if (windowPos <= pos && pos < nextWindowOff)
+        final int limit = buffer.limit();
+        final long nextWindowPos = bufferPos + limit;
+        if (bufferPos <= pos && pos < nextWindowPos)
             return;
-        // The window byte buffer needs to move.
+
+        // The buffer needs to move.
         try {
-            // Move window byte buffer.
-            windowPos = (pos / capacity) * capacity; // round down to multiple of window capacity
-            if (windowPos != nextWindowOff)
-                sbc.position(windowPos);
-            // Fill window byte buffer until end of file or buffer.
+            // Move buffer.
+            bufferPos = (pos / limit) * limit; // round down to multiple of buffer limit
+            if (bufferPos != nextWindowPos)
+                sbc.position(bufferPos);
+
+            // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
             // depend on this as it would be a violation of the contract for a
-            // SeekableByteBuffer.
-            window.rewind();
+            // SeekableByteChannel.
+            buffer.rewind();
             int n = 0;
             do {
-                int read = sbc.read(window);
-                if (0 > read)
+                int read = sbc.read(buffer);
+                if (0 > read) {
+                    size = bufferPos + n;
                     break;
+                }
                 n += read;
-            } while (n < capacity);
+            } while (n < limit);
         } catch (final IOException ex) {
-            windowPos = -capacity - 1; // force position() at next positionWindow()
+            invalidateBuffer();
             throw ex;
         }
     }

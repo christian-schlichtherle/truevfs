@@ -5,9 +5,7 @@
 package de.truezip.kernel.io;
 
 import java.io.EOFException;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
@@ -18,7 +16,7 @@ import java.nio.channels.WritableByteChannel;
  * 
  * @author Christian Schlichtherle
  */
-public final class Channels {
+final class Channels {
 
     /** Can't touch this - hammer time! */
     private Channels() { }

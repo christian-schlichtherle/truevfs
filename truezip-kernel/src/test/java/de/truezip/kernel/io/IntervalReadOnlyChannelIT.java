@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import de.truezip.kernel.io.IntervalReadOnlyChannel;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -19,7 +18,7 @@ import org.junit.Before;
  * @author Christian Schlichtherle
  */
 public final class IntervalReadOnlyChannelIT
-extends SeekableByteChannelTestSuite {
+extends ReadOnlyChannelTestSuite {
 
     private static final Logger
             logger = Logger.getLogger(IntervalReadOnlyChannelIT.class.getName());

@@ -4,12 +4,12 @@
  */
 package de.truezip.kernel.io;
 
-import java.net.URI;
+import de.truezip.kernel.io.Paths.Splitter;
+import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import java.io.File;
-import org.junit.Test;
-
-import static de.truezip.kernel.io.Paths.*;
+import java.net.URI;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
