@@ -9,7 +9,7 @@ import de.truezip.kernel.FsModel;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 final class JmxModel extends InstrumentingModel {
