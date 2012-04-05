@@ -222,7 +222,7 @@ extends FsLockModelController {
     public final OutputSocket<?> getOutputSocket(
             FsEntryName name,
             BitField<AccessOption> options,
-            Entry template) {
+            @CheckForNull Entry template) {
         return new Output(name, options, template);
     }
 
@@ -267,6 +267,7 @@ extends FsLockModelController {
         }
 
         @Override
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE") // false positive
         public OutputStream newStream() throws IOException {
             mknod = null;
             final FsArchiveFileSystemOperation<E> mknod = mknod();
