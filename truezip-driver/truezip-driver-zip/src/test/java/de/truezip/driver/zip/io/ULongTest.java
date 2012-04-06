@@ -4,10 +4,8 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.io.ULong;
+import static org.junit.Assert.fail;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * A simple round trip test of the static utility methods for unsigned long
