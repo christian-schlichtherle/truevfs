@@ -182,9 +182,8 @@ extends DecoratingReadOnlyChannel {
             return -1;
 
         // Setup.
-        final SeekableBlockCipher cipher = this.cipher;
         final int blockSize = block.limit();
-        int total = 0; // amount of decrypted data copied to dst
+        int total = 0; // amount of data copied to dst
 
         {
             // Partial read of block data at the start.
@@ -199,31 +198,24 @@ extends DecoratingReadOnlyChannel {
             }
         }
 
-        {
+        if (dst.hasArray()) {
             // Full read of block data in the middle.
-            final boolean useArray = dst.hasArray();
+            final SeekableBlockCipher cipher = this.cipher;
             long blockCounter = pos / blockSize;
             while (total + blockSize < remaining && pos + blockSize < size) {
                 // The virtual position is starting on a block boundary.
+                positionBuffer();
                 cipher.setBlockCounter(blockCounter++);
-                if (useArray) {
-                    positionBuffer();
-                    final int copied = cipher.processBlock(buffer.array(), (int) (pos - bufferPos), dst.array(), dst.arrayOffset() + total);
-                    assert copied == blockSize;
-                    dst.position(dst.position() + copied);
-                } else {
-                    positionBlock();
-                    buffer.rewind();
-                    final int copied = copy(buffer, dst);
-                    assert copied == blockSize;
-                }
+                final int copied = cipher.processBlock(buffer.array(), (int) (pos - bufferPos), dst.array(), dst.arrayOffset() + total);
+                assert copied == blockSize;
+                dst.position(dst.position() + copied);
                 total += blockSize;
                 pos += blockSize;
             }
         }
 
-        // Partial read of block data at the end.
-        if (total < remaining && pos < size) {
+        // Read of remaining block data.
+        while (total < remaining && pos < size) {
             // The virtual position is starting on a block boundary.
             positionBlock();
             block.rewind();
@@ -272,17 +264,17 @@ extends DecoratingReadOnlyChannel {
 
         // Check position.
         final long pos = this.pos;
-        final int blockLen = block.capacity();
+        final int blockSize = block.limit();
         if (blockPos <= pos) {
-            final long nextBlockOff = blockPos + blockLen;
+            final long nextBlockOff = blockPos + blockSize;
             if (pos < nextBlockOff)
                 return;
         }
 
         // Move position.
         positionBuffer();
-        final long blockCounter = pos / blockLen;
-        blockPos = blockCounter * blockLen;
+        final long blockCounter = pos / blockSize;
+        blockPos = blockCounter * blockSize;
 
         // Decrypt block from buffer.
         cipher.setBlockCounter(blockCounter);

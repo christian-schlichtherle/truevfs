@@ -101,21 +101,8 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             }
         }
 
-        {
-            // Full read of buffer data in the middle.
-            while (total + bufferSize < remaining && pos + bufferSize < size) {
-                // The virtual position is starting on a buffer boundary.
-                positionBuffer();
-                buffer.rewind();
-                final int copied = copy(buffer, dst);
-                assert copied == bufferSize;
-                total += copied;
-                pos += copied;
-            }
-        }
-
-        // Partial read of buffer data at the end.
-        if (total < remaining && pos < size) {
+        // Read of remaining buffer data.
+        while (total < remaining && pos < size) {
             // The virtual position is starting on a buffer boundary.
             positionBuffer();
             buffer.rewind();
