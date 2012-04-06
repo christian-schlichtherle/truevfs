@@ -19,7 +19,7 @@ public abstract class AbstractSource implements Source {
      * <p>
      * The implementation in the class {@link AbstractSource} calls
      * {@link #newChannel()} and wraps the result in a
-     * {@link SeekableByteChannelInputStream} adapter.
+     * {@link SeekableChannelInputStream} adapter.
      * Note that this may intentionally violate the contract for this method
      * because {@link #newChannel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
@@ -27,7 +27,7 @@ public abstract class AbstractSource implements Source {
      */
     @Override
     public InputStream newStream() throws IOException {
-        return new SeekableByteChannelInputStream(newChannel());
+        return new SeekableChannelInputStream(newChannel());
     }
 
     /**

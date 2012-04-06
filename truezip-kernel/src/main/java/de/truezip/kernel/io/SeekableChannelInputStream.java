@@ -26,7 +26,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-public class SeekableByteChannelInputStream extends InputStream {
+public class SeekableChannelInputStream extends InputStream {
 
     private final ByteBuffer single = ByteBuffer.allocate(1);
 
@@ -51,7 +51,7 @@ public class SeekableByteChannelInputStream extends InputStream {
      *        of this class can be used.
      */
     @CreatesObligation
-    public SeekableByteChannelInputStream(
+    public SeekableChannelInputStream(
             final @CheckForNull @WillCloseWhenClosed SeekableByteChannel sbc) {
         this.sbc = sbc;
     }
@@ -102,7 +102,7 @@ public class SeekableByteChannelInputStream extends InputStream {
         try {
             mark = sbc.position();
         } catch (IOException ex) {
-            Logger  .getLogger(SeekableByteChannelInputStream.class.getName())
+            Logger  .getLogger(SeekableChannelInputStream.class.getName())
                     .log(Level.WARNING, ex.getLocalizedMessage(), ex);
             mark = -2;
         }
