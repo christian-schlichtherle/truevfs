@@ -35,7 +35,7 @@ public class SeekableChannelInputStream extends InputStream {
      * All methods in this class throw a {@link NullPointerException} if this
      * hasn't been initialized.
      */
-    protected @Nullable SeekableByteChannel sbc;
+    protected @Nullable SeekableByteChannel channel;
 
     /**
      * The position of the last mark.
@@ -46,20 +46,20 @@ public class SeekableChannelInputStream extends InputStream {
     /**
      * Adapts the given {@code SeekableByteChannel}.
      *
-     * @param sbc The underlying {@code SeekableByteChannel}. May be
+     * @param channel The underlying {@code SeekableByteChannel}. May be
      *        {@code null}, but must be initialized before any method
      *        of this class can be used.
      */
     @CreatesObligation
     public SeekableChannelInputStream(
-            final @CheckForNull @WillCloseWhenClosed SeekableByteChannel sbc) {
-        this.sbc = sbc;
+            final @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
+        this.channel = channel;
     }
 
     @Override
     public int read() throws IOException {
         single.rewind();
-        return 1 == sbc.read(single) ? single.get(0) & 0xff : -1;
+        return 1 == channel.read(single) ? single.get(0) & 0xff : -1;
     }
 
     @Override
@@ -69,38 +69,38 @@ public class SeekableChannelInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        return sbc.read(ByteBuffer.wrap(b, off, len));
+        return channel.read(ByteBuffer.wrap(b, off, len));
     }
 
     @Override
     public long skip(long n) throws IOException {
         if (n <= 0)
             return 0;
-        final long fp = sbc.position(); // should fail when closed
-        final long len = sbc.size();
+        final long fp = channel.position(); // should fail when closed
+        final long len = channel.size();
         final long rem = len - fp;
         if (n > rem)
             n = (int) rem;
-        sbc.position(fp + n);
+        channel.position(fp + n);
         return n;
     }
 
     @Override
     public int available() throws IOException {
-        final long rem = sbc.size() - sbc.position();
+        final long rem = channel.size() - channel.position();
         return rem > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) rem;
     }
 
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        sbc.close();
+        channel.close();
     }
 
     @Override
     public void mark(final int readlimit) {
         try {
-            mark = sbc.position();
+            mark = channel.position();
         } catch (IOException ex) {
             Logger  .getLogger(SeekableChannelInputStream.class.getName())
                     .log(Level.WARNING, ex.getLocalizedMessage(), ex);
@@ -114,13 +114,13 @@ public class SeekableChannelInputStream extends InputStream {
             throw new IOException(mark == -1
                     ? "no mark set"
                     : "mark()/reset() not supported by underlying file");
-        sbc.position(mark);
+        channel.position(mark);
     }
 
     @Override
     public boolean markSupported() {
         try {
-            sbc.position(sbc.position());
+            channel.position(channel.position());
             return true;
         } catch (IOException failure) {
             return false;
