@@ -132,14 +132,14 @@ extends DecoratingOutputService<E, OutputService<E>> {
             @Override
             @GuardedBy("lock")
             public SeekableByteChannel newChannel() throws IOException {
-                final SeekableByteChannel sbc;
+                final SeekableByteChannel channel;
                 lock.lock();
                 try {
-                    sbc = getBoundSocket().newChannel();
+                    channel = getBoundSocket().newChannel();
                 } finally {
                     lock.unlock();
                 }
-                return new LockSeekableChannel(sbc, lock);
+                return new LockSeekableChannel(channel, lock);
             }
         } // Output
 
