@@ -6,21 +6,21 @@ package de.truezip.driver.zip.io;
 
 import static de.truezip.driver.zip.io.Constants.*;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
-import static de.truezip.driver.zip.io.LittleEndian.*;
 import static de.truezip.driver.zip.io.WinZipAesEntryExtraField.VV_AE_2;
 import static de.truezip.driver.zip.io.WinZipAesUtils.overhead;
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
-import de.truezip.kernel.rof.BufferedReadOnlyFile;
-import de.truezip.kernel.rof.IntervalReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFileInputStream;
+import de.truezip.kernel.io.BufferedReadOnlyChannel;
+import de.truezip.kernel.io.IntervalReadOnlyChannel;
+import de.truezip.kernel.io.PowerBuffer;
+import de.truezip.kernel.io.SeekableChannelInputStream;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.Pool;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
@@ -59,8 +59,8 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class RawZipFile<E extends ZipEntry>
-implements Iterable<E>, Closeable {
+public abstract class RawReadOnlyChannel<E extends ZipEntry>
+implements Closeable, Iterable<E> {
 
     private static final int LFH_FILE_NAME_LENGTH_OFF =
             /* Local File Header signature     */ 4 +
@@ -81,10 +81,10 @@ implements Iterable<E>, Closeable {
      */
     public static final Charset DEFAULT_CHARSET = Constants.DEFAULT_CHARSET;
 
-    /** The nullable data source. */
-    private @CheckForNull ReadOnlyFile rof;
+    /** The nullable seekable byte channel. */
+    private @CheckForNull SeekableByteChannel channel;
 
-    /** The total number of bytes in the ZIP file. */
+    /** The total number of bytes in the ZIP channel. */
     private long length;
 
     /** The number of bytes in the preamble of this ZIP file. */
@@ -114,7 +114,7 @@ implements Iterable<E>, Closeable {
      * Reads the given {@code zip} file in order to provide random access
      * to its entries.
      *
-     * @param  zip the ZIP file to be read.
+     * @param  zip the ZIP file to be load.
      * @param  param the parameters for reading the ZIP file.
      * @throws ZipException if the file is not compatible to the ZIP
      *         File Format Specification.
@@ -122,55 +122,53 @@ implements Iterable<E>, Closeable {
      * @see    #recoverLostEntries()
      */
     @CreatesObligation
-    protected RawZipFile(
-            @WillCloseWhenClosed ReadOnlyFile zip,
+    protected RawReadOnlyChannel(
+            @WillCloseWhenClosed SeekableByteChannel zip,
             ZipFileParameters<E> param)
     throws IOException {
-        this(new SingleReadOnlyFilePool(zip), param);
+        this(new SingleReadOnlyChannelPool(zip), param);
     }
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    RawZipFile(
-            final Pool<ReadOnlyFile, IOException> source,
+    RawReadOnlyChannel(
+            final Pool<SeekableByteChannel, IOException> source,
             final ZipFileParameters<E> param)
     throws IOException {
-        if (null == param)
+        if (null == (this.param = param))
             throw new NullPointerException();
-        final ReadOnlyFile rof = source.allocate();
+        final SeekableByteChannel channel = this.channel = source.allocate();
         try {
-            this.rof = rof;
-            this.length = rof.length();
-            this.param = param;
-            this.charset = param.getCharset();
-            final ReadOnlyFile
-                    brof = new SafeBufferedReadOnlyFile(rof, this.length);
+            length = channel.size();
+            charset = param.getCharset();
+            final SeekableByteChannel
+                    bchannel = new SafeBufferedReadOnlyChannel(channel, length);
             if (!param.getPreambled())
-                assertZipFileSignature(brof);
-            final int numEntries = findCentralDirectory(brof, param.getPostambled());
-            mountCentralDirectory(brof, numEntries);
-            if (this.preamble + this.postamble >= this.length) {
+                assertZipFileSignature(bchannel);
+            final int numEntries = findCentralDirectory(bchannel, param.getPostambled());
+            mountCentralDirectory(bchannel, numEntries);
+            if (preamble + postamble >= length) {
                 assert 0 == numEntries;
                 if (param.getPreambled()) // otherwise already checked
-                    assertZipFileSignature(brof);
+                    assertZipFileSignature(bchannel);
             }
-            // Do NOT close brof - would close rof as well!
-        } catch (IOException ex) {
-            source.release(rof);
+            assert null != channel;
+            assert null != charset;
+            assert null != entries;
+            assert null != mapper;
+            // Do NOT close bchannel - would close channel as well!
+        } catch (final Throwable ex) {
+            source.release(channel);
             throw ex;
         }
-        assert null != this.rof;
-        //assert null != this.param; // make FindBugs happy
-        assert null != this.charset;
-        assert null != this.entries;
-        assert null != this.mapper;
     }
 
-    private void assertZipFileSignature(final ReadOnlyFile rof)
+    private void assertZipFileSignature(final SeekableByteChannel channel)
     throws IOException {
-        final byte[] sig = new byte[4];
-        rof.seek(this.preamble);
-        rof.readFully(sig);
-        final long signature = readUInt(sig, 0);
+        final long signature = PowerBuffer
+                .allocate(4)
+                .littleEndian()
+                .load(channel.position(preamble))
+                .getUInt();
         // Constraint: A ZIP file must start with a Local File Header
         // or a (ZIP64) End Of Central Directory Record iff it's emtpy.
         if (LFH_SIG != signature
@@ -201,144 +199,138 @@ implements Iterable<E>, Closeable {
      * @throws IOException On any other I/O error.
      */
     private int findCentralDirectory(
-            final ReadOnlyFile rof,
+            final SeekableByteChannel channel,
             final boolean postambled)
     throws IOException {
-        final byte[] sig = new byte[4];
-        final long max = this.length - EOCDR_MIN_LEN;
+        // Search for End of central directory record.
+        final PowerBuffer eocdr = PowerBuffer
+                .allocate(EOCDR_MIN_LEN)
+                .littleEndian();
+        final long max = length - EOCDR_MIN_LEN;
         final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
-        for (long eocdrOff = max; eocdrOff >= min; eocdrOff--) {
-            rof.seek(eocdrOff);
-            rof.readFully(sig);
-            if (EOCDR_SIG != readUInt(sig, 0))
+        for (long eocdrPos = max; eocdrPos >= min; eocdrPos--) {
+            eocdr.rewind().limit(4).load(channel.position(eocdrPos));
+            // end of central dir signature    4 bytes  (0x06054b50)
+            if (EOCDR_SIG != eocdr.getUInt())
                 continue;
-            long diskNo;        // number of this disk
-            long cdDiskNo;      // number of the disk with the start of the central directory
-            long cdEntriesDisk; // total number of entries in the central directory on this disk
-            long cdEntries;     // total number of entries in the central directory
-            long cdSize;        // size of the central directory
-            long cdOffset;      // offset of start of central directory with respect to the starting disk number
-            int commentLen;     // .ZIP file comment length
-            // Process EOCDR.
-            final byte[] eocdr = new byte[EOCDR_MIN_LEN - sig.length];
-            rof.readFully(eocdr);
-            int off = 0;
-            diskNo = readUShort(eocdr, off);
-            off += 2;
-            cdDiskNo = readUShort(eocdr, off);
-            off += 2;
-            cdEntriesDisk = readUShort(eocdr, off);
-            off += 2;
-            cdEntries = readUShort(eocdr, off);
-            off += 2;
+
+            // Process End of central directory record.
+            eocdr.limit(EOCDR_MIN_LEN).load(channel);
+            // number of this disk             2 bytes
+            long diskNo = eocdr.getUShort();
+            // number of the disk with the
+            // start of the central directory  2 bytes
+            long cdDiskNo = eocdr.getUShort();
+            // total number of entries in the
+            // central directory on this disk  2 bytes
+            long cdEntriesDisk = eocdr.getUShort();
+            // total number of entries in
+            // the central directory           2 bytes
+            long cdEntries = eocdr.getUShort();
             if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
                 throw new ZipException(
                         "ZIP file spanning/splitting is not supported!");
-            cdSize = readUInt(eocdr, off);
-            off += 4;
-            cdOffset = readUInt(eocdr, off);
-            off += 4;
-            commentLen = readUShort(eocdr, off);
-            //off += 2;
-            if (0 < commentLen) {
-                final byte[] comment = new byte[commentLen];
-                rof.readFully(comment);
-                this.comment = comment;
+            // size of the central directory   4 bytes
+            long cdSize = eocdr.getUInt();
+            // offset of start of central
+            // directory with respect to
+            // the starting disk number        4 bytes
+            long cdPos = eocdr.getUInt();
+            // .ZIP file comment length        2 bytes
+            int commentLen = eocdr.getUShort();
+            // .ZIP file comment       (variable size)
+            if (0 < commentLen)
+                comment = PowerBuffer
+                        .allocate(commentLen)
+                        .load(channel)
+                        .array();
+            preamble = eocdrPos;
+            postamble = length - channel.position();
+
+            // Check for ZIP64 end of central directory locator.
+            final long eocdlPos = eocdrPos - ZIP64_EOCDL_LEN;
+            final PowerBuffer zip64eocdl = PowerBuffer
+                .allocate(ZIP64_EOCDL_LEN)
+                .littleEndian();
+            // zip64 end of central dir locator 
+            // signature                       4 bytes  (0x07064b50)
+            if (0 > eocdlPos || ZIP64_EOCDL_SIG != zip64eocdl
+                    .load(channel.position(eocdlPos))
+                    .getUInt()) {
+                // Seek and check first CFH, probably requiring an offset mapper.
+                long offset = eocdrPos - cdSize;
+                channel.position(offset);
+                offset -= cdPos;
+                if (0 != offset)
+                    mapper = new OffsetPositionMapper(offset);
+                return (int) cdEntries;
             }
-            this.preamble = eocdrOff;
-            this.postamble = this.length - rof.getFilePointer();
-            // Check for ZIP64 End Of Central Directory Locator.
-            try {
-                // Read Zip64 End Of Central Directory Locator.
-                rof.seek(eocdrOff - ZIP64_EOCDL_LEN);
-                final byte[] zip64eocdl = new byte[ZIP64_EOCDL_LEN];
-                rof.readFully(zip64eocdl);
-                if (ZIP64_EOCDL_SIG != readUInt(zip64eocdl, 0))
-                    throw new IOException( // MUST be IOException, not ZipException - see catch clauses!
-                            "No ZIP64 End Of Central Directory Locator signature found!");
-                final long zip64eocdrDisk;      // number of the disk with the start of the zip64 end of central directory record
-                final long zip64eocdrOff;    // relative offset of the zip64 end of central directory record
-                final long totalDisks;          // total number of disks
-                off = 4; // reuse
-                zip64eocdrDisk = readUInt(zip64eocdl, off);
-                off += 4;
-                zip64eocdrOff = readLong(zip64eocdl, off);
-                off += 8;
-                totalDisks = readUInt(zip64eocdl, off);
-                //off += 4;
-                if (0 != zip64eocdrDisk || 1 != totalDisks)
-                    throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                            "ZIP file spanning/splitting is not supported!");
-                // Read Zip64 End Of Central Directory Record.
-                final byte[] zip64eocdr = new byte[ZIP64_EOCDR_MIN_LEN];
-                rof.seek(zip64eocdrOff);
-                rof.readFully(zip64eocdr);
-                off = 0; // reuse
-                // zip64 end of central dir 
-                // signature                       4 bytes  (0x06064b50)
-                if (ZIP64_EOCDR_SIG != readUInt(zip64eocdr, off))
-                    throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                            "No ZIP64 End Of Central Directory Record signature found!");
-                off += 4;
-                // size of zip64 end of central
-                // directory record                8 bytes
-                off += 8;
-                // version made by                 2 bytes
-                off += 2;
-                // version needed to extract       2 bytes
-                off += 2;
-                // number of this disk             4 bytes
-                diskNo = readUInt(zip64eocdr, off);
-                off += 4;
-                // number of the disk with the 
-                // start of the central directory  4 bytes
-                cdDiskNo = readUInt(zip64eocdr, off);
-                off += 4;
-                // total number of entries in the
-                // central directory on this disk  8 bytes
-                cdEntriesDisk = readLong(zip64eocdr, off);
-                off += 8;
-                // total number of entries in the
-                // central directory               8 bytes
-                cdEntries = readLong(zip64eocdr, off);
-                off += 8;
-                if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
-                    throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                            "ZIP file spanning/splitting is not supported!");
-                if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
-                    throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
-                            "Total Number Of Entries In The Central Directory out of range!");
-                // size of the central directory   8 bytes
-                cdSize = readLong(zip64eocdr, off);
-                off += 8;
-                // offset of start of central
-                // directory with respect to
-                // the starting disk number        8 bytes
-                cdOffset = readLong(zip64eocdr, off);
-                //off += 8;
-                rof.seek(cdOffset);
-                // zip64 extensible data sector    (variable size)
-                this.preamble = zip64eocdrOff;
-            } catch (ZipException ex) {
-                throw ex;
-            } catch (IOException ex) {
-                // Seek and check first CFH, probably using an offset mapper.
-                long start = eocdrOff - cdSize;
-                rof.seek(start);
-                start -= cdOffset;
-                if (0 != start)
-                    this.mapper = new OffsetPositionMapper(start);
-            }
+
+            // number of the disk with the
+            // start of the zip64 end of 
+            // central directory               4 bytes
+            final long zip64eocdrDisk = zip64eocdl.getUInt();
+            // relative offset of the zip64
+            // end of central directory record 8 bytes
+            final long zip64eocdrPos = zip64eocdl.getLong();
+            // total number of disks           4 bytes
+            final long totalDisks = zip64eocdl.getUInt();
+            if (0 != zip64eocdrDisk || 1 != totalDisks)
+                throw new ZipException(
+                        "ZIP file spanning/splitting is not supported!");
+
+            // Read Zip64 end of central directory record.
+            final PowerBuffer zip64eocdr = PowerBuffer
+                    .allocate(ZIP64_EOCDR_MIN_LEN)
+                    .littleEndian()
+                    .load(channel.position(zip64eocdrPos));
+            // zip64 end of central dir 
+            // signature                       4 bytes  (0x06064b50)
+            if (ZIP64_EOCDR_SIG != zip64eocdr.getUInt())
+                throw new ZipException(
+                        "No ZIP64 End Of Central Directory Record signature found!");
+            // size of zip64 end of central
+            // directory record                8 bytes
+            // version made by                 2 bytes
+            // version needed to extract       2 bytes
+            zip64eocdr.skip(8 + 2 + 2);
+            // number of this disk             4 bytes
+            diskNo = zip64eocdr.getUInt();
+            // number of the disk with the 
+            // start of the central directory  4 bytes
+            cdDiskNo = zip64eocdr.getUInt();
+            // total number of entries in the
+            // central directory on this disk  8 bytes
+            cdEntriesDisk = zip64eocdr.getLong();
+            // total number of entries in the
+            // central directory               8 bytes
+            cdEntries = zip64eocdr.getLong();
+            if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
+                throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
+                        "ZIP file spanning/splitting is not supported!");
+            if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
+                throw new ZipException( // MUST be ZipException, not IOException - see catch clauses!
+                        "Total Number Of Entries In The Central Directory out of range!");
+            // size of the central directory   8 bytes
+            cdSize = zip64eocdr.getLong();
+            // offset of start of central
+            // directory with respect to
+            // the starting disk number        8 bytes
+            cdPos = zip64eocdr.getLong();
+            channel.position(cdPos);
+            // zip64 extensible data sector    (variable size)
+            preamble = zip64eocdrPos;
             return (int) cdEntries;
         }
+
         // Start recovering file entries from min.
-        this.preamble = min;
-        this.postamble = this.length - min;
+        preamble = min;
+        postamble = length - min;
         return 0;
     }
 
     /**
-     * Reads the central directory from the given read only file file and
+     * Reads the central directory from the given seekable byte channel and
      * populates the internal tables with ZipEntry instances.
      * <p>
      * The ZipEntrys will know all data that can be obtained from
@@ -358,89 +350,79 @@ implements Iterable<E>, Closeable {
      *
      * @throws ZipException If the file is not compatible to the ZIP File
      *         Format Specification.
-     * @throws IOException On any other I/O related issue.
+     * @throws IOException on any I/O failure.
      */
-    private void mountCentralDirectory(final ReadOnlyFile rof, int numEntries)
+    private void mountCentralDirectory(
+            final SeekableByteChannel channel,
+            int numEntries)
     throws IOException {
+        final PowerBuffer cfh = PowerBuffer
+                .allocate(CFH_MIN_LEN)
+                .littleEndian();
         final Map<String, E> entries = new LinkedHashMap<>(
                 Math.max(initialCapacity(numEntries), 16));
-        final byte[] cfh = new byte[CFH_MIN_LEN];
         for (; ; numEntries--) {
-            rof.readFully(cfh, 0, 4);
+            cfh.rewind().limit(4).load(channel);
             // central file header signature   4 bytes  (0x02014b50)
-            if (CFH_SIG != readUInt(cfh, 0))
+            if (CFH_SIG != cfh.getUInt())
                 break;
-            rof.readFully(cfh, 4, CFH_MIN_LEN - 4);
-            final int gpbf = readUShort(cfh, 8);
-            final int nameLen = readUShort(cfh, 28);
-            final byte[] name = new byte[nameLen];
-            rof.readFully(name);
+            cfh.limit(CFH_MIN_LEN).load(channel);
+            final int gpbf = cfh.position(8).getUShort();
+            final int nameLen = cfh.position(28).getUShort();
+            final PowerBuffer name = PowerBuffer.allocate(nameLen).load(channel);
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
             if (utf8)
                 this.charset = UTF8;
-            final E entry = this.param.newEntry(decode(name));
+            final E entry = param.newEntry(decode(name.array()));
             try {
-                int off = 0;
                 // central file header signature   4 bytes  (0x02014b50)
-                off += 4;
+                cfh.position(4);
                 // version made by                 2 bytes
-                entry.setRawPlatform(readUShort(cfh, off) >> 8);
-                off += 2;
+                entry.setRawPlatform(cfh.getUShort() >> 8);
                 // version needed to extract       2 bytes
-                off += 2;
                 // general purpose bit flag        2 bytes
+                cfh.skip(2 + 2);
                 entry.setGeneralPurposeBitFlags(gpbf);
-                off += 2; // General Purpose Bit Flags
                 // compression method              2 bytes
-                entry.setRawMethod(readUShort(cfh, off));
-                off += 2;
+                entry.setRawMethod(cfh.getUShort());
                 // last mod file time              2 bytes
                 // last mod file date              2 bytes
-                entry.setRawTime(readUInt(cfh, off));
-                off += 4;
+                entry.setRawTime(cfh.getUInt());
                 // crc-32                          4 bytes
-                entry.setRawCrc(readUInt(cfh, off));
-                off += 4;
+                entry.setRawCrc(cfh.getUInt());
                 // compressed size                 4 bytes
-                entry.setRawCompressedSize(readUInt(cfh, off));
-                off += 4;
+                entry.setRawCompressedSize(cfh.getUInt());
                 // uncompressed size               4 bytes
-                entry.setRawSize(readUInt(cfh, off));
-                off += 4;
+                entry.setRawSize(cfh.getUInt());
                 // file name length                2 bytes
-                off += 2;
+                cfh.skip(2);
                 // extra field length              2 bytes
-                final int extraLen = readUShort(cfh, off);
-                off += 2;
+                final int extraLen = cfh.getUShort();
                 // file comment length             2 bytes
-                final int commentLen = readUShort(cfh, off);
-                off += 2;
+                final int commentLen = cfh.getUShort();
                 // disk number start               2 bytes
-                off += 2;
                 // internal file attributes        2 bytes
+                cfh.skip(2 + 2);
                 //entry.setEncodedInternalAttributes(readUShort(cfh, off));
-                off += 2;
                 // external file attributes        4 bytes
-                entry.setRawExternalAttributes(readUInt(cfh, off));
-                off += 4;
+                entry.setRawExternalAttributes(cfh.getUInt());
                 // relative offset of local header 4 bytes
-                long lfhOff = readUInt(cfh, off);
+                long lfhOff = cfh.getUInt();
                 entry.setRawOffset(lfhOff); // must be unmapped!
-                //off += 4;
                 // extra field (variable size)
-                if (0 < extraLen) {
-                    final byte[] extra = new byte[extraLen];
-                    rof.readFully(extra);
-                    entry.setRawExtraFields(extra);
-                }
+                if (0 < extraLen)
+                    entry.setRawExtraFields(PowerBuffer
+                            .allocate(extraLen)
+                            .load(channel)
+                            .array());
                 // file comment (variable size)
-                if (0 < commentLen) {
-                    final byte[] comment = new byte[commentLen];
-                    rof.readFully(comment);
-                    entry.setRawComment(decode(comment));
-                }
-                // Re-read virtual offset after ZIP64 Extended Information
+                if (0 < commentLen)
+                    entry.setRawComment(decode(PowerBuffer
+                            .allocate(commentLen)
+                            .load(channel)
+                            .array()));
+                // Re-load virtual offset after ZIP64 Extended Information
                 // Extra Field may have been parsed, map it to the real
                 // offset and conditionally update the preamble size from it.
                 lfhOff = this.mapper.map(entry.getOffset());
@@ -505,71 +487,66 @@ implements Iterable<E>, Closeable {
      * {@link #getPostambleLength()} and {@link #getPostambleInputStream()}.
      * 
      * @throws ZipException if an invalid entry is found.
-     * @throws IOException if any other I/O error occurs.
+     * @throws IOException on any I/O failure.
      */
     public void recoverLostEntries() throws IOException {
         assertOpen();
-        assert null != this.rof; // makes FindBugs happy
-        final ReadOnlyFile
-                rof = new SafeBufferedReadOnlyFile(this.rof, this.length);
-        while (0 < this.postamble) {
-            long fp = this.length - this.postamble;
-            rof.seek(fp);
-            final byte[] lfh = new byte[LFH_MIN_LEN];
-            rof.readFully(lfh, 0, 4);
-            final long sig = readUInt(lfh, 0);
+        assert null != channel; // make FindBugs happy!
+        final long length = this.length;
+        final SeekableByteChannel
+                channel = new SafeBufferedReadOnlyChannel(this.channel, length);
+        while (0 < postamble) {
+            long pos = length - postamble;
+            final PowerBuffer lfh = PowerBuffer
+                    .allocate(LFH_MIN_LEN)
+                    .littleEndian()
+                    .limit(4)
+                    .load(channel.position(pos));
+            final long sig = lfh.getUInt();
             if (LFH_SIG != sig)
                 throw new ZipException("Expected Local File Header signature 0x"
                         + Long.toHexString(LFH_SIG)
                         + ", but is 0x"
                         + Long.toHexString(sig)
                         + "!");
-            rof.readFully(lfh, 4, LFH_MIN_LEN - 4);
-            final int gpbf = readUShort(lfh, 6);
-            final int nameLen = readUShort(lfh, 26);
-            final byte[] name = new byte[nameLen];
-            rof.readFully(name);
+            lfh.limit(LFH_MIN_LEN).load(channel);
+            final int gpbf = lfh.position(6).getUShort();
+            final int nameLen = lfh.position(26).getUShort();
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
             if (utf8)
-                this.charset = UTF8;
-            final E entry = this.param.newEntry(decode(name));
-            int off = 0;
+                charset = UTF8;
+            final E entry = param.newEntry(decode(PowerBuffer
+                    .allocate(nameLen)
+                    .load(channel)
+                    .array()));
             // local file header signature     4 bytes  (0x04034b50)
-            off += 4;
             // version needed to extract       2 bytes
-            off += 2;
             // general purpose bit flag        2 bytes
             entry.setGeneralPurposeBitFlags(gpbf);
-            off += 2; // General Purpose Bit Flags
+            lfh.position(8);
             // compression method              2 bytes
-            entry.setRawMethod(readUShort(lfh, off));
-            off += 2;
+            entry.setRawMethod(lfh.getUShort());
             // last mod file time              2 bytes
             // last mod file date              2 bytes
-            entry.setRawTime(readUInt(lfh, off));
-            off += 4;
+            entry.setRawTime(lfh.getUInt());
             // crc-32                          4 bytes
-            entry.setRawCrc(readUInt(lfh, off));
-            off += 4;
+            entry.setRawCrc(lfh.getUInt());
             // compressed size                 4 bytes
-            entry.setRawCompressedSize(readUInt(lfh, off));
-            off += 4;
+            entry.setRawCompressedSize(lfh.getUInt());
             // uncompressed size               4 bytes
-            entry.setRawSize(readUInt(lfh, off));
-            off += 4;
+            entry.setRawSize(lfh.getUInt());
             // file name length                2 bytes
-            off += 2;
+            lfh.skip(2);
             // extra field length              2 bytes
-            final int extraLen = readUShort(lfh, off);
-            //off += 2;
-            entry.setRawOffset(this.mapper.unmap(fp));
+            final int extraLen = lfh.getUShort();
+            entry.setRawOffset(mapper.unmap(pos));
             // extra field (variable size)
-            if (0 < extraLen) {
-                final byte[] extra = new byte[extraLen];
-                rof.readFully(extra);
-                entry.setRawExtraFields(extra);
-            }
+            if (0 < extraLen)
+                entry.setRawExtraFields(PowerBuffer
+                        .allocate(extraLen)
+                        .load(channel)
+                        .array());
 
             // Process entry contents.
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
@@ -580,9 +557,9 @@ implements Iterable<E>, Closeable {
                 // uncompressed size are unknown.
                 // Once we have done this, we compare our findings to
                 // the Data Descriptor which comes next.
-                final long start = fp = rof.getFilePointer();
-                ReadOnlyFile erof = new IntervalReadOnlyFile(rof,
-                        fp, this.length - fp);
+                final long start = pos = channel.position();
+                SeekableByteChannel esbc = new IntervalReadOnlyChannel(channel,
+                        pos, length - pos);
                 WinZipAesEntryExtraField field = null;
                 int method = entry.getMethod();
                 if (entry.isEncrypted()) {
@@ -591,7 +568,7 @@ implements Iterable<E>, Closeable {
                                 + " (encrypted compression method "
                                 + method
                                 + " is not supported)");
-                    erof = new WinZipAesEntryReadOnlyFile(erof,
+                    esbc = new WinZipAesEntryReadOnlyChannel(esbc,
                             new WinZipAesEntryParameters(
                                 parameters(
                                     WinZipAesParameters.class,
@@ -607,12 +584,12 @@ implements Iterable<E>, Closeable {
                 switch (method) {
                     case DEFLATED:
                         in = new ZipInflaterInputStream(
-                                new DummyByteInputStream(erof),
+                                new DummyByteSeekableChannelInputStream(esbc),
                                 bufSize);
                         break;
                     case BZIP2:
                         din = new CountingInputStream(
-                                new ReadOnlyFileInputStream(erof));
+                                new SeekableChannelInputStream(esbc));
                         in = new BZip2CompressorInputStream(din);
                         break;
                     default:
@@ -633,45 +610,45 @@ implements Iterable<E>, Closeable {
                             Inflater inf = ((ZipInflaterInputStream) in)
                                     .getInflater();
                             assert inf.finished(); // JDK6: R/W 1210/2057; JDK 7: R/W 1193/2057
-                            fp += inf.getBytesRead();
+                            pos += inf.getBytesRead();
                             break;
                         case BZIP2:
-                            fp += din.getBytesRead();
+                            pos += din.getBytesRead();
                             break;
                         default:
                             throw new AssertionError();
                     }
                 }
                 if (null != field)
-                    fp += overhead(field.getKeyStrength());
-                entry.setRawCompressedSize(fp - start);
+                    pos += overhead(field.getKeyStrength());
+                entry.setRawCompressedSize(pos - start);
 
                 // We have reconstituted all meta data for the entry now.
                 // Next comes the Data Descriptor.
                 // Let's parse and check it.
-                final byte[] dd = new byte[
-                        entry.isZip64ExtensionsRequired()
-                        ? 4 + 8 + 8
-                        : 4 + 4 + 4];
-                rof.seek(fp);
-                rof.readFully(dd, 0, 4);
-                long crc = readUInt(dd, 0);
+                final PowerBuffer dd = PowerBuffer
+                        .allocate(entry.isZip64ExtensionsRequired()
+                            ? 4 + 8 + 8
+                            : 4 + 4 + 4)
+                        .littleEndian()
+                        .limit(4)
+                        .load(channel.position(pos));
+                long crc = dd.getUInt();
                 // Note the Data Descriptor's Signature is optional:
                 // All newer apps should write it (and so does TrueZIP),
                 // but older apps might not.
                 if (DD_SIG == crc)
-                    rof.readFully(dd);
-                else
-                    rof.readFully(dd, 4, dd.length - 4);
-                crc = readUInt(dd, 0);
+                    dd.rewind();
+                dd.limit(dd.capacity()).load(channel);
+                crc = dd.getUInt();
                 final long csize;
                 final long size;
                 if (entry.isZip64ExtensionsRequired()) {
-                    csize = readLong(dd, 4);
-                    size = readLong(dd, 12);
+                    csize = dd.getLong();
+                    size  = dd.getLong();
                 } else {
-                    csize = readUInt(dd, 4);
-                    size = readUInt(dd, 8);
+                    csize = dd.getUInt();
+                    size  = dd.getUInt();
                 }
                 if (entry.getCrc() != crc)
                     throw new CRC32Exception(entry.getName(),
@@ -686,21 +663,21 @@ implements Iterable<E>, Closeable {
                 // This is the easy one.
                 // The entry is not using a Data Descriptor, so we can
                 // use the properties parsed from the Local File Header.
-                fp += entry.getCompressedSize();
-                rof.seek(fp - 1);
-                if (fp > this.length || -1 == rof.read())
+                pos += entry.getCompressedSize();
+                channel.position(pos - 1);
+                if (pos > length || channel.position() >= channel.size())
                     throw new ZipException(entry.getName()
                             + " (truncated ZIP entry)");
             }
 
             // Entry is almost recovered. Update the postamble length.
-            this.postamble = this.length - rof.getFilePointer();
+            postamble = length - channel.position();
 
             // Map the entry using the name that has been determined
             // by the ZipEntryFactory.
             // Note that this name may differ from what has been found
             // in the ZIP file!
-            this.entries.put(entry.getName(), entry);
+            entries.put(entry.getName(), entry);
         }
     }
 
@@ -708,8 +685,8 @@ implements Iterable<E>, Closeable {
         return entries;
     }
 
-    private String decode(byte[] bytes) {
-        return new String(bytes, charset);
+    private String decode(byte[] buffer) {
+        return new String(buffer, charset);
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
@@ -802,14 +779,14 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns an {@link InputStream} to read the preamble of this ZIP file.
+     * Returns an {@link InputStream} to load the preamble of this ZIP file.
      * <p>
      * Note that the returned stream is a <i>lightweight</i> stream,
-     * i.e. there is no external resource such as a {@link ReadOnlyFile}
+     * i.e. there is no external resource such as a {@link SeekableByteChannel}
      * allocated for it. Instead, all streams returned by this method share
-     * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
+     * the underlying {@code SeekableByteChannel} of this {@code ZipFile}.
      * This allows to close this object (and hence the underlying
-     * {@code ReadOnlyFile}) without cooperation of the returned
+     * {@code SeekableByteChannel}) without cooperation of the returned
      * streams, which is important if the client application wants to work on
      * the underlying file again (e.g. update or delete it).
      *
@@ -818,8 +795,8 @@ implements Iterable<E>, Closeable {
     @CreatesObligation
     public InputStream getPreambleInputStream() throws IOException {
         assertOpen();
-        return new ReadOnlyFileInputStream(
-                new EntryReadOnlyFile(0, preamble));
+        return new SeekableChannelInputStream(
+                new EntryReadOnlyChannel(0, preamble));
     }
 
     /**
@@ -833,14 +810,14 @@ implements Iterable<E>, Closeable {
     }
 
     /**
-     * Returns an {@link InputStream} to read the postamble of this ZIP file.
+     * Returns an {@link InputStream} to load the postamble of this ZIP file.
      * <p>
      * Note that the returned stream is a <i>lightweight</i> stream,
-     * i.e. there is no external resource such as a {@link ReadOnlyFile}
+     * i.e. there is no external resource such as a {@link SeekableByteChannel}
      * allocated for it. Instead, all streams returned by this method share
-     * the underlying {@code ReadOnlyFile} of this {@code ZipFile}.
+     * the underlying {@code SeekableByteChannel} of this {@code ZipFile}.
      * This allows to close this object (and hence the underlying
-     * {@code ReadOnlyFile}) without cooperation of the returned
+     * {@code SeekableByteChannel}) without cooperation of the returned
      * streams, which is important if the client application wants to work on
      * the underlying file again (e.g. update or delete it).
      *
@@ -849,8 +826,8 @@ implements Iterable<E>, Closeable {
     @CreatesObligation
     public InputStream getPostambleInputStream() throws IOException {
         assertOpen();
-        return new ReadOnlyFileInputStream(
-                new EntryReadOnlyFile(length - postamble, postamble));
+        return new SeekableChannelInputStream(
+                new EntryReadOnlyChannel(length - postamble, postamble));
     }
 
     final PositionMapper getOffsetMapper() {
@@ -951,13 +928,13 @@ implements Iterable<E>, Closeable {
      *         This should be set to {@code false} if and only if the
      *         application is going to copy entries from an input ZIP file to
      *         an output ZIP file.
-     * @return A stream to read the entry data from or {@code null} if the
+     * @return A stream to load the entry data from or {@code null} if the
      *         entry does not exist.
      * @throws ZipAuthenticationException If the entry is encrypted and
      *         checking the MAC fails.
      * @throws ZipException If this file is not compatible to the ZIP File
      *         Format Specification.
-     * @throws IOException If the entry cannot get read from this ZipFile.
+     * @throws IOException If the entry cannot get load from this ZipFile.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -970,17 +947,19 @@ implements Iterable<E>, Closeable {
         if (name == null)
             throw new NullPointerException();
         final ZipEntry entry = entries.get(name);
-        if (entry == null)
+        if (null == entry)
             return null;
-        long fp = entry.getOffset();
-        assert UNKNOWN != fp;
-        fp = mapper.map(fp);
-        final ReadOnlyFile rof = this.rof;
-        assert null != rof;
-        rof.seek(fp);
-        final byte[] lfh = new byte[LFH_MIN_LEN];
-        rof.readFully(lfh);
-        final long sig = readUInt(lfh, 0);
+        long pos = entry.getOffset();
+        assert UNKNOWN != pos;
+        pos = mapper.map(pos);
+        final SeekableByteChannel c = this.channel;
+        assert null != c;
+        c.position(pos);
+        final PowerBuffer lfh = PowerBuffer
+                .allocate(LFH_MIN_LEN)
+                .littleEndian()
+                .load(c);
+        final long sig = lfh.getUInt();
         if (LFH_SIG != sig)
             throw new ZipException(name
                     + " (expected Local File Header signature 0x"
@@ -988,14 +967,14 @@ implements Iterable<E>, Closeable {
                     + ", but is 0x"
                     + Long.toHexString(sig)
                     + ")");
-        fp += LFH_MIN_LEN
-                + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF) // file name length
-                + readUShort(lfh, LFH_FILE_NAME_LENGTH_OFF + 2); // extra field length
-        ReadOnlyFile erof = new EntryReadOnlyFile(
-                fp, entry.getCompressedSize());
+        pos += LFH_MIN_LEN
+                + lfh.position(LFH_FILE_NAME_LENGTH_OFF).getUShort() // file name length
+                + lfh.position(LFH_FILE_NAME_LENGTH_OFF + 2).getUShort(); // extra field length
+        SeekableByteChannel ec = new EntryReadOnlyChannel(
+                pos, entry.getCompressedSize());
         if (!process) {
             assert UNKNOWN != entry.getCrc();
-            return new ReadOnlyFileInputStream(erof);
+            return new SeekableChannelInputStream(ec);
         }
         if (null == check)
             check = entry.isEncrypted();
@@ -1006,16 +985,16 @@ implements Iterable<E>, Closeable {
                         + " (encrypted compression method "
                         + method
                         + " is not supported)");
-            final WinZipAesEntryReadOnlyFile
-                    eerof = new WinZipAesEntryReadOnlyFile(erof,
+            final WinZipAesEntryReadOnlyChannel
+                    eec = new WinZipAesEntryReadOnlyChannel(ec,
                             new WinZipAesEntryParameters(
                                 parameters(
                                     WinZipAesParameters.class,
                                     getCryptoParameters()),
                                 entry));
-            erof = eerof;
+            ec = eec;
             if (check) {
-                eerof.authenticate();
+                eec.authenticate();
                 // Disable redundant CRC-32 check.
                 check = false;
             }
@@ -1032,15 +1011,16 @@ implements Iterable<E>, Closeable {
                 // Note the Data Descriptor's Signature is optional:
                 // All newer apps should write it (and so does TrueZIP),
                 // but older apps might not.
-                final byte[] dd = new byte[8];
-                rof.seek(fp + entry.getCompressedSize());
-                rof.readFully(dd);
-                localCrc = readUInt(dd, 0);
+                final PowerBuffer dd = PowerBuffer
+                        .allocate(8)
+                        .littleEndian()
+                        .load(c.position(pos + entry.getCompressedSize()));
+                localCrc = dd.getUInt();
                 if (DD_SIG == localCrc)
-                    localCrc = readUInt(dd, 4);
+                    localCrc = dd.getUInt();
             } else {
                 // The CRC-32 in the Local File Header.
-                localCrc = readUInt(lfh, 14);
+                localCrc = lfh.position(14).getUInt();
             }
             if (entry.getCrc() != localCrc)
                 throw new CRC32Exception(name, entry.getCrc(), localCrc);
@@ -1049,15 +1029,15 @@ implements Iterable<E>, Closeable {
         InputStream in;
         switch (method) {
             case STORED:
-                in = new ReadOnlyFileInputStream(erof);
+                in = new SeekableChannelInputStream(ec);
                 break;
             case DEFLATED:
-                in = new ZipInflaterInputStream(new DummyByteInputStream(erof),
+                in = new ZipInflaterInputStream(new DummyByteSeekableChannelInputStream(ec),
                         bufSize);
                 break;
             case BZIP2:
                 in = new BZip2CompressorInputStream(
-                        new ReadOnlyFileInputStream(erof));
+                        new SeekableChannelInputStream(ec));
                 break;
             default:
                 throw new ZipException(name
@@ -1081,7 +1061,7 @@ implements Iterable<E>, Closeable {
 
     /** Asserts that this ZIP file is still open for reading its entries. */
     final void assertOpen() throws ZipException {
-        if (null == this.rof)
+        if (null == this.channel)
             throw new ZipException("ZIP file closed!");
     }
 
@@ -1093,66 +1073,65 @@ implements Iterable<E>, Closeable {
      */
     @Override
     public void close() throws IOException {
-        final ReadOnlyFile rof = this.rof;
-        if (null == rof)
-            return;
-        rof.close();
-        this.rof = null;
+        try (SeekableByteChannel sbc = this.channel) {
+            if (null == sbc)
+                return;
+        }
+        this.channel = null;
     }
 
     /**
-     * An interval read only file which accounts for itself until it gets
+     * An interval load only channel which accounts for itself until it gets
      * closed.
-     * Note that when an object of this class gets closed, the decorated read
-     * only file, i.e. the raw zip file does NOT get closed!
+     * Note that when an object of this class gets closed, the decorated load
+     * only channel, i.e. the raw load only channel does NOT get closed!
      */
-    private final class EntryReadOnlyFile extends IntervalReadOnlyFile {
-        private boolean closed;
+    private final class EntryReadOnlyChannel extends IntervalReadOnlyChannel {
+        boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        EntryReadOnlyFile(final long start, final long length)
+        EntryReadOnlyChannel(final long start, final long length)
         throws IOException {
-            super(RawZipFile.this.rof, start, length);
-            assert null != RawZipFile.this.rof;
-            RawZipFile.this.open++;
+            super(RawReadOnlyChannel.this.channel, start, length);
+            assert null != RawReadOnlyChannel.this.channel;
+            RawReadOnlyChannel.this.open++;
         }
 
         @Override
         public void close() throws IOException {
             if (this.closed)
                 return;
-            // Never close the raw ZIP file!
+            // Never close the channel!
             //super.close();
             this.closed = true;
-            RawZipFile.this.open--;
+            RawReadOnlyChannel.this.open--;
         }
     } // EntryReadOnlyFile
 
     /**
-     * A buffered read only file which is safe for use with a concurrently
+     * A buffered load only file which is safe for use with a concurrently
      * growing file, e.g. when another thread is appending to it.
      */
-    private static final class SafeBufferedReadOnlyFile
-    extends BufferedReadOnlyFile {
-
-        final long length;
+    private static final class SafeBufferedReadOnlyChannel
+    extends BufferedReadOnlyChannel {
+        final long size;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        public SafeBufferedReadOnlyFile(
-                final @WillCloseWhenClosed ReadOnlyFile rof,
-                final long length)
+        public SafeBufferedReadOnlyChannel(
+                final @WillCloseWhenClosed SeekableByteChannel channel,
+                final long size)
         throws IOException {
-            super(rof);
-            assert length <= rof.length();
-            this.length = length;
+            super(channel);
+            assert size <= channel.size();
+            this.size = size;
         }
 
         @Override
-        public long length() throws IOException {
-            assertOpen();
-            return length;
+        public long size() throws IOException {
+            channel.size(); // check state
+            return size;
         }
-    } // SafeBufferedReadOnlyFile
+    } // SafeBufferedReadOnlyChannel
 }

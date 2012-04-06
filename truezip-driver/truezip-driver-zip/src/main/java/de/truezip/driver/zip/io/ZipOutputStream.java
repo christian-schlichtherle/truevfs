@@ -61,7 +61,7 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out) {
-        super(out, null, DEFAULT_PARAM);
+        super(out, (RawZipFile<ZipEntry>) null, DEFAULT_PARAM);
     }
 
     /**
@@ -74,7 +74,7 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset) {
-        super(out, null, new DefaultZipOutputStreamParameters(charset));
+        super(out, (RawZipFile<ZipEntry>) null, new DefaultZipOutputStreamParameters(charset));
     }
 
     /**
@@ -91,6 +91,14 @@ public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out, ZipFile appendee) {
+        super(out, appendee, DEFAULT_PARAM);
+        if (null == appendee)
+            throw new NullPointerException();
+    }
+
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public ZipOutputStream(@WillCloseWhenClosed OutputStream out, ZipReadOnlyChannel appendee) {
         super(out, appendee, DEFAULT_PARAM);
         if (null == appendee)
             throw new NullPointerException();

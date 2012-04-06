@@ -128,6 +128,44 @@ implements Iterable<E> {
                     : new LEDataOutputStream(out);
     }
 
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    protected RawZipOutputStream(
+            final @WillCloseWhenClosed OutputStream out,
+            final @CheckForNull @WillNotClose RawReadOnlyChannel<E> appendee,
+            final ZipOutputStreamParameters param) {
+        super(newLEDataOutputStream(out, appendee));
+        this.dos = (LEDataOutputStream) this.out;
+        if (null != appendee) {
+            this.charset = appendee.getRawCharset();
+            this.comment = appendee.getRawComment();
+            final Map<String, E> entries = new LinkedHashMap<>(
+                    initialCapacity(appendee.size() + param.getOverheadSize()));
+            entries.putAll(appendee.getRawEntries());
+            this.entries = entries;
+        } else {
+            this.charset = param.getCharset();
+            this.entries = new LinkedHashMap<>(
+                    initialCapacity(param.getOverheadSize()));
+        }
+        setMethod0(param.getMethod());
+        setLevel0(param.getLevel());
+    }
+
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    private static LEDataOutputStream newLEDataOutputStream(
+            final @WillCloseWhenClosed OutputStream out,
+            final @CheckForNull @WillNotClose RawReadOnlyChannel<?> appendee) {
+        if (null == out)
+            throw new NullPointerException();
+        return null != appendee
+                ? new AppendingLEDataOutputStream(out, appendee)
+                : out instanceof LEDataOutputStream
+                    ? (LEDataOutputStream) out
+                    : new LEDataOutputStream(out);
+    }
+
     private byte[] encode(String string) {
         return string.getBytes(charset);
     }
@@ -689,6 +727,16 @@ implements Iterable<E> {
         AppendingLEDataOutputStream(
                 final @WillCloseWhenClosed OutputStream out,
                 final @WillNotClose RawZipFile<?> appendee) {
+            super(out);
+            assert null != out;
+            super.written = appendee.getOffsetMapper().unmap(appendee.length());
+        }
+
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        AppendingLEDataOutputStream(
+                final @WillCloseWhenClosed OutputStream out,
+                final @WillNotClose RawReadOnlyChannel<?> appendee) {
             super(out);
             assert null != out;
             super.written = appendee.getOffsetMapper().unmap(appendee.length());
