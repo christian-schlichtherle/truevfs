@@ -14,7 +14,7 @@ import java.util.zip.ZipException;
 import static org.junit.Assert.assertSame;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class WinZipAesIT extends ZipTestSuite {
 
@@ -114,12 +114,12 @@ public final class WinZipAesIT extends ZipTestSuite {
     implements WinZipAesParameters {
         @Override
         public byte[] getWritePassword(String name) throws ZipKeyException {
-            return "secret".getBytes();
+            return "top secret".getBytes();
         }
 
         @Override
         public byte[] getReadPassword(String name, boolean invalid) throws ZipKeyException {
-            return "secret".getBytes();
+            return "top secret".getBytes();
         }
 
         @Override
