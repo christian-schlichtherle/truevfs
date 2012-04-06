@@ -31,7 +31,7 @@ public class CtrBlockCipherTest {
         PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
         byte[] salt = new byte[blockSize]; // used as salt and cipher input
         new SecureRandom().nextBytes(salt);
-        gen.init("secret".getBytes(), salt, 1);
+        gen.init("top secret".getBytes(), salt, 1);
         ParametersWithIV
                 param = (ParametersWithIV) gen.generateDerivedParameters(
                     blockSize * 8,
