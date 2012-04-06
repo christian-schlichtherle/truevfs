@@ -112,34 +112,34 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
         return new ZipOutputStream(out, appendee);
     }
 
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(String name)
+    protected ZipReadOnlyChannel newZipFile(String name)
     throws IOException {
         return new ZipReadOnlyChannel(name);
     }
 
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(
+    protected ZipReadOnlyChannel newZipFile(
             String name, Charset charset)
     throws IOException {
         return new ZipReadOnlyChannel(name, charset);
     }
 
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(File file)
+    protected ZipReadOnlyChannel newZipFile(File file)
     throws IOException {
         return new ZipReadOnlyChannel(file);
     }
 
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(
+    protected ZipReadOnlyChannel newZipFile(
             File file, Charset charset)
     throws IOException {
         return new ZipReadOnlyChannel(file, charset);
     }
 
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(SeekableByteChannel channel)
+    protected ZipReadOnlyChannel newZipFile(SeekableByteChannel channel)
     throws IOException {
         return new ZipReadOnlyChannel(channel);
     }
 
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(
+    protected ZipReadOnlyChannel newZipFile(
             SeekableByteChannel channel, Charset charset)
     throws IOException {
         return new ZipReadOnlyChannel(channel, charset);
@@ -181,103 +181,103 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
             }
 
             try {
-                newZipReadOnlyChannel((String) null);
+                newZipFile((String) null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((String) null, null);
+                newZipFile((String) null, null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((String) null, Charset.forName("UTF-8"));
+                newZipFile((String) null, Charset.forName("UTF-8"));
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(file.getPath(), null);
+                newZipFile(file.getPath(), null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((File) null);
+                newZipFile((File) null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((File) null, null);
+                newZipFile((File) null, null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((File) null, Charset.forName("UTF-8"));
+                newZipFile((File) null, Charset.forName("UTF-8"));
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(file, null);
+                newZipFile(file, null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((SeekableByteChannel) null);
+                newZipFile((SeekableByteChannel) null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((SeekableByteChannel) null, null);
+                newZipFile((SeekableByteChannel) null, null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel((SeekableByteChannel) null, Charset.forName("UTF-8"));
+                newZipFile((SeekableByteChannel) null, Charset.forName("UTF-8"));
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(channel, null);
+                newZipFile(channel, null);
                 fail();
             } catch (NullPointerException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(file.getPath());
+                newZipFile(file.getPath());
                 fail();
             } catch (IOException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(file);
+                newZipFile(file);
                 fail();
             } catch (IOException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(channel);
+                newZipFile(channel);
                 fail();
             } catch (IOException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(file, Charset.forName("UTF-8"));
+                newZipFile(file, Charset.forName("UTF-8"));
                 fail();
             } catch (IOException ex) {
             }
 
             try {
-                newZipReadOnlyChannel(channel, Charset.forName("UTF-8"));
+                newZipFile(channel, Charset.forName("UTF-8"));
                 fail();
             } catch (IOException ex) {
             }
@@ -290,7 +290,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
         // Create empty ZIP file.
         newZipOutputStream(new FileOutputStream(file)).close();
 
-        try (final ZipReadOnlyChannel zipIn = newZipReadOnlyChannel(file)) {
+        try (final ZipReadOnlyChannel zipIn = newZipFile(file)) {
             assertEquals(0, zipIn.getPreambleLength());
             try (final InputStream in = zipIn.getPreambleInputStream()) {
                 assertEquals(-1, in.read());
@@ -304,7 +304,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
             zipOut.putNextEntry(newEntry("foo"));
         }
 
-        try (final ZipReadOnlyChannel zipIn = newZipReadOnlyChannel(file)) {
+        try (final ZipReadOnlyChannel zipIn = newZipFile(file)) {
             zipIn.getInputStream("foo").close();
             assertNull(zipIn.getInputStream("bar"));
         }
@@ -318,7 +318,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
                 zipOut.write(data[i]);
         }
 
-        try (   final ZipReadOnlyChannel zipIn = newZipReadOnlyChannel(file);
+        try (   final ZipReadOnlyChannel zipIn = newZipFile(file);
                 final InputStream in = zipIn.getInputStream("file")) {
             for (int c, i = 0; 0 <= (c = in.read()); i++)
                 assertEquals(data[i] & 0xff, c);
@@ -343,7 +343,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
     throws Exception {
         createTestZipFile(nEntries);
 
-        try (final ZipReadOnlyChannel zin = newZipReadOnlyChannel(file)) {
+        try (final ZipReadOnlyChannel zin = newZipFile(file)) {
             final class CheckAllEntriesFactory implements TaskFactory {
                 @Override
                 public Callable<?> newTask(int threadNum) {
@@ -405,7 +405,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
             }
         }
 
-        try (final ZipReadOnlyChannel zin = newZipReadOnlyChannel(file)) {
+        try (final ZipReadOnlyChannel zin = newZipFile(file)) {
             // Check that zipIn correctly enumerates all entries.
             for (ZipEntry entry : zin) {
                 assertEquals(data.length, entry.getSize());
@@ -424,7 +424,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
             zipOut.write(data);
         }
 
-        try (final ZipReadOnlyChannel zipIn = newZipReadOnlyChannel(file)) {
+        try (final ZipReadOnlyChannel zipIn = newZipFile(file)) {
             InputStream in = zipIn.getCheckedInputStream(name);
             in.close();
 
@@ -535,7 +535,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
         append(0, 20, data1);
         append(10, 20, data2);
 
-        try (final ZipReadOnlyChannel zipIn = newZipReadOnlyChannel(file)) {
+        try (final ZipReadOnlyChannel zipIn = newZipFile(file)) {
             assertEquals(30, zipIn.size());
             // Check that zipIn correctly enumerates all entries.
             final byte[] buf = new byte[data1.length];
@@ -567,7 +567,7 @@ public abstract class Zip2TestSuite implements ZipEntryFactory<ZipEntry> {
     throws IOException {
         final ZipOutputStream out;
         if (file.exists()) {
-            final ZipReadOnlyChannel in = newZipReadOnlyChannel(file);
+            final ZipReadOnlyChannel in = newZipFile(file);
             in.close();
             out = newZipOutputStream(new FileOutputStream(file, true), in);
         } else {

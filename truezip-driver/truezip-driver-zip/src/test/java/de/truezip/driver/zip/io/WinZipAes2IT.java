@@ -53,7 +53,7 @@ public final class WinZipAes2IT extends Zip2TestSuite {
     }
 
     @Override
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(String name)
+    protected ZipReadOnlyChannel newZipFile(String name)
     throws IOException {
         final ZipReadOnlyChannel r = new ZipReadOnlyChannel(name);
         r.setCryptoParameters(new WinZipAesCryptoParameters());
@@ -61,7 +61,7 @@ public final class WinZipAes2IT extends Zip2TestSuite {
     }
 
     @Override
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(
+    protected ZipReadOnlyChannel newZipFile(
             String name, Charset charset)
     throws IOException {
         final ZipReadOnlyChannel r = new ZipReadOnlyChannel(name, charset);
@@ -70,7 +70,7 @@ public final class WinZipAes2IT extends Zip2TestSuite {
     }
 
     @Override
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(File file)
+    protected ZipReadOnlyChannel newZipFile(File file)
     throws IOException {
         final ZipReadOnlyChannel r = new ZipReadOnlyChannel(file);
         r.setCryptoParameters(new WinZipAesCryptoParameters());
@@ -78,7 +78,7 @@ public final class WinZipAes2IT extends Zip2TestSuite {
     }
 
     @Override
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(
+    protected ZipReadOnlyChannel newZipFile(
             File file, Charset charset)
     throws IOException {
         final ZipReadOnlyChannel r = new ZipReadOnlyChannel(file, charset);
@@ -87,7 +87,7 @@ public final class WinZipAes2IT extends Zip2TestSuite {
     }
 
     @Override
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(SeekableByteChannel file)
+    protected ZipReadOnlyChannel newZipFile(SeekableByteChannel file)
     throws IOException {
         final ZipReadOnlyChannel r = new ZipReadOnlyChannel(file);
         r.setCryptoParameters(new WinZipAesCryptoParameters());
@@ -95,7 +95,7 @@ public final class WinZipAes2IT extends Zip2TestSuite {
     }
 
     @Override
-    protected ZipReadOnlyChannel newZipReadOnlyChannel(
+    protected ZipReadOnlyChannel newZipFile(
             SeekableByteChannel file, Charset charset)
     throws IOException {
         final ZipReadOnlyChannel r = new ZipReadOnlyChannel(file, charset);
