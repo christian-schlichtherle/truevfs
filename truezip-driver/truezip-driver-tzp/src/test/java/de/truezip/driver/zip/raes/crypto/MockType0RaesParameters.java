@@ -5,7 +5,6 @@
 package de.truezip.driver.zip.raes.crypto;
 
 import de.truezip.key.param.AesKeyStrength;
-import de.truezip.driver.zip.raes.crypto.Type0RaesParameters;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,7 +19,7 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
 
     private static final Logger
             logger = Logger.getLogger(MockType0RaesParameters.class.getName());
-    private static final String PASSWD = "secret";
+    private static final String PASSWD = "top secret";
     private static final AesKeyStrength[] keyStrengths = AesKeyStrength.values();
 
     private final Random rnd = new Random();
