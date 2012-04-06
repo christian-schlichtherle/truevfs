@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 import javax.annotation.WillCloseWhenClosed;
@@ -22,7 +23,7 @@ import javax.annotation.WillCloseWhenClosed;
 final class ZipInflaterInputStream extends InflaterInputStream {
 
     @CreatesObligation
-    ZipInflaterInputStream(@WillCloseWhenClosed DummyByteInputStream in, int size) {
+    ZipInflaterInputStream(@WillCloseWhenClosed InputStream in, int size) {
         super(in, new Inflater(true), size);
     }
 
