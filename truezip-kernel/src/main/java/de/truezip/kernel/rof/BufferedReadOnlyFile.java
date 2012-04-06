@@ -222,8 +222,9 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     @Override
     public int read(final byte[] buf, final int off, final int len)
     throws IOException {
-        if (len == 0)
-            return 0; // be fault-tolerant and compatible to RandomAccessFile
+        // Check no-op first for compatibility with RandomAccessFile.
+        if (0 >= len)
+            return 0;
 
         // Check state.
         assertOpen();
@@ -243,7 +244,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
             // Partial read of window data at the start.
             final int o = (int) (fp % windowLen);
             if (o != 0) {
-                // The file pointer is not on a window boundary.
+                // The virtual file pointer is NOT starting on a block boundary.
                 positionWindow();
                 read = Math.min(len, windowLen - o);
                 read = (int) Math.min(read, length - fp);
@@ -254,8 +255,8 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
         {
             // Full read of window data in the middle.
-            while (read + windowLen < len && fp + windowLen <= length) {
-                // The file pointer is starting and ending on window boundaries.
+            while (read + windowLen < len && fp + windowLen < length) {
+                // The virtual file pointer is starting on a block boundary.
                 positionWindow();
                 System.arraycopy(window, 0, buf, off + read, windowLen);
                 read += windowLen;
@@ -265,7 +266,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Partial read of window data at the end.
         if (read < len && fp < length) {
-            // The file pointer is not on a window boundary.
+            // The virtual file pointer is starting on a block boundary.
             positionWindow();
             final int n = (int) Math.min(len - read, length - fp);
             System.arraycopy(window, 0, buf, off + read, n);
