@@ -355,7 +355,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         try {
             // Move window in the encrypted file.
             final int blockLen = block.length;
-            windowOff = fp / blockLen * blockLen; // round down to multiple of block size
+            windowOff = fp / windowLen * windowLen; // round down to multiple of window size
             if (windowOff != nextWindowOff)
                 rof.seek(windowOff + start);
 
@@ -366,13 +366,13 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             int n = 0;
             do {
                 int read = rof.read(window, n, windowLen - n);
-                if (read < 0)
+                if (0 > read)
                     break;
                 n += read;
             } while (n < windowLen);
-        } catch (IOException ioe) {
+        } catch (final Throwable ex) {
             windowOff = -windowLen - 1; // force seek() at next positionWindow()
-            throw ioe;
+            throw ex;
         }
     }
 }

@@ -311,8 +311,7 @@ extends DecoratingReadOnlyChannel {
 
         try {
             // Move position.
-            final int blockSize = block.limit();
-            bufferPos = pos / blockSize * blockSize; // round down to multiple of block size
+            bufferPos = pos / bufferSize * bufferSize; // round down to multiple of buffer size
             if (bufferPos != nextBufferPos)
                 channel.position(bufferPos);
 

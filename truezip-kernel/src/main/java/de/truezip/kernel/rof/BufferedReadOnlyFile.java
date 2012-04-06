@@ -328,13 +328,13 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
             int n = 0;
             do {
                 int read = rof.read(window, n, windowLen - n);
-                if (read < 0)
+                if (0 > read)
                     break;
                 n += read;
             } while (n < windowLen);
-        } catch (IOException ioe) {
+        } catch (final Throwable ex) {
             windowOff = -windowLen - 1; // force seek() at next positionWindow()
-            throw ioe;
+            throw ex;
         }
     }
 
