@@ -7,7 +7,7 @@ package de.truezip.driver.zip.io;
 import static de.truezip.driver.zip.io.ZipEntry.DEFLATED;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class DeflatedZipIT extends ZipTestSuite {
     @Override

@@ -7,7 +7,7 @@ package de.truezip.driver.zip.io;
 import static de.truezip.driver.zip.io.ZipEntry.BZIP2;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class BZip2ZipIT extends ZipTestSuite {
     @Override
