@@ -72,7 +72,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
         panel.setError("This is a test error message!");
         assertFalse(isBlank(error.getText()));
         final JTextFieldOperator tf = new JTextFieldOperator(frame);
-        tf.setText("secret");
+        tf.setText("top secret");
         //tf.getQueueTool().waitEmpty(WAIT_EMPTY);
         assertTrue(isBlank(error.getText()));
 

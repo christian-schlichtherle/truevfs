@@ -35,7 +35,7 @@ public final class ReadKeyPanelIT extends KeyPanelTestSuite<ReadKeyPanel> {
         assertEquals(0, param.getPassword().length);
         assertTrue(isBlank(error.getText()));
 
-        final String passwd = "secret";
+        final String passwd = "top secret";
         new JPasswordFieldOperator(frame).setText(passwd);
         assertTrue(updateParam(param));
         assertEquals(passwd, new String(param.getPassword()));
