@@ -25,10 +25,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     /** The size of this channel. */
     private long size;
 
-    /**
-     * The virtual position of this channel.
-     * This is relative to the start of this channel.
-     */
+    /** The virtual position of this channel. */
     private long pos;
 
     /**
@@ -95,7 +92,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             // Partial read of buffer data at the start.
             final int p = (int) (pos % bufferSize);
             if (p != 0) {
-                // The virtual position is not on a buffer boundary.
+                // The virtual position is NOT starting on a buffer boundary.
                 positionBuffer();
                 buffer.position(p);
                 total = copy(buffer, dst);
@@ -106,9 +103,8 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
 
         {
             // Full read of buffer data in the middle.
-            while (total + bufferSize < remaining && pos + bufferSize <= size) {
-                // The virtual position is starting and ending on buffer
-                // boundaries.
+            while (total + bufferSize < remaining && pos + bufferSize < size) {
+                // The virtual position is starting on a buffer boundary.
                 positionBuffer();
                 buffer.rewind();
                 final int copied = copy(buffer, dst);
@@ -214,7 +210,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
                 }
                 n += read;
             } while (n < bufferSize);
-        } catch (final IOException ex) {
+        } catch (final Throwable ex) {
             invalidateBuffer();
             throw ex;
         }
