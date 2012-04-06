@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.cio;
 
+import de.truezip.kernel.io.SeekableChannelInputStream;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.rof.ReadOnlyFileInputStream;
@@ -96,16 +97,16 @@ extends IOSocket<E, Entry> implements Source {
      * Implementations must support calling this method multiple times.
      * <p>
      * The implementation in the class {@link InputSocket} calls
-     * {@link #newReadOnlyFile()} and wraps the result in a
-     * {@link ReadOnlyFileInputStream} adapter.
+     * {@link #newChannel()} and wraps the result in a
+     * {@link SeekableChannelInputStream} adapter.
      * Note that this may intentionally violate the contract for this method
-     * because {@link #newReadOnlyFile()} may throw an
+     * because {@link #newChannel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
      * so override appropriately.
      */
     @Override
     public InputStream newStream() throws IOException {
-        return new ReadOnlyFileInputStream(newReadOnlyFile());
+        return new SeekableChannelInputStream(newChannel());
     }
 
     /**
