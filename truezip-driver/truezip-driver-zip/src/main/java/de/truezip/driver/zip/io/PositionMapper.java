@@ -5,16 +5,16 @@
 package de.truezip.driver.zip.io;
 
 /**
- * Maps a given offset to a file pointer position.
+ * Maps a given position.
  *
  * @author Christian Schlichtherle
  */
-class OffsetMapper {
-    long map(long offset) {
-        return offset;
+class PositionMapper {
+    long map(long position) {
+        return position;
     }
 
-    long unmap(long offset) {
-        return offset;
+    long unmap(long position) {
+        return position;
     }
 }
