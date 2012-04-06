@@ -64,17 +64,14 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         if (null == field)
             throw new ZipCryptoException(entry.getName() + " (missing extra field for WinZip AES entry)");
 
-        // Init key strength.
+        // Get key strength.
         final AesKeyStrength keyStrength = field.getKeyStrength();
         final int keyStrengthBits = keyStrength.getBits();
         final int keyStrengthBytes = keyStrength.getBytes();
 
-        // Init read only file.
-        rof.seek(0);
-        final long fileLength = rof.length();
-
         // Load salt.
         final byte[] salt = new byte[keyStrengthBytes / 2];
+        rof.seek(0);
         rof.readFully(salt);
         
         // Load password verification value.
@@ -86,10 +83,10 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         this.authenticationCode = new byte[mac.getMacSize() / 2];
 
         // Init start, end and length of encrypted data.
-        final long start = salt.length + passwdVerifier.length;
-        final long end = fileLength - this.authenticationCode.length;
+        final long start = rof.getFilePointer();
+        final long end = rof.length() - this.authenticationCode.length;
         final long length = end - start;
-        if (length < 0) {
+        if (0 > length) {
             // Wrap an EOFException so that RawZipFile can identify this issue.
             throw new ZipCryptoException(entry.getName()
                     + " (false positive WinZip AES entry is too short)",
@@ -123,9 +120,8 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
             // Yes, the password verifier is only a 16 bit value.
             // So we must use the MAC for password verification, too.
             assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
-            keyParam =
-                    (KeyParameter) gen.generateDerivedParameters(
-                        2 * keyStrengthBits + PWD_VERIFIER_BITS);
+            keyParam = (KeyParameter) gen.generateDerivedParameters(
+                    2 * keyStrengthBits + PWD_VERIFIER_BITS);
             paranoidWipe(passwd);
 
             // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
@@ -144,7 +140,7 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         } while (!ArrayUtils.equals(
                 keyParam.getKey(), 2 * keyStrengthBytes,
                 passwdVerifier, 0,
-                PWD_VERIFIER_BITS / 2));
+                PWD_VERIFIER_BITS / 8));
 
         // Init parameters and entry for authenticate().
         this.sha1MacParam = sha1MacParam;
@@ -179,7 +175,7 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         mac.init(sha1MacParam);
         final byte[] buf = computeMac(mac);
         assert buf.length == mac.getMacSize();
-        if (!ArrayUtils.equals(buf, 0, authenticationCode, 0, authenticationCode.length / 2))
+        if (!ArrayUtils.equals(buf, 0, authenticationCode, 0, authenticationCode.length))
             throw new ZipAuthenticationException(entry.getName()
                     + " (authenticated WinZip AES entry content has been tampered with)");
     }
