@@ -769,7 +769,7 @@ public class ZipEntry implements Cloneable {
                 .format("%s[name=%s", getClass().getName(), getName());
         long value;
         if (UNKNOWN != (value = getGeneralPurposeBitFlags()))
-            f.format(", time=0x%04X", value);
+            f.format(", gpbf=0x%04X", value);
         if (UNKNOWN != (value = getMethod()))
             f.format(", method=%d", value);
         if (UNKNOWN != (value = getTime()))
@@ -781,7 +781,7 @@ public class ZipEntry implements Cloneable {
         if (UNKNOWN != (value = getSize()))
             f.format(", size=%d", value);
         if (UNKNOWN != (value = getExternalAttributes()))
-            f.format(", crc=0x%08X", value);
+            f.format(", ea=0x%08X", value);
         {
             final String comment = getComment();
             if (null != comment)
