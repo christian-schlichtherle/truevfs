@@ -4,7 +4,6 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.io.ZipEntry;
 import static de.truezip.driver.zip.io.ZipEntry.DEFLATED;
 
 /**

@@ -4,13 +4,8 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.key.param.AesKeyStrength;
 import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.driver.zip.io.WinZipAesParameters;
-import de.truezip.driver.zip.io.ZipEntry;
-import de.truezip.driver.zip.io.ZipFile;
-import de.truezip.driver.zip.io.ZipKeyException;
-import de.truezip.driver.zip.io.ZipOutputStream;
+import de.truezip.key.param.AesKeyStrength;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
