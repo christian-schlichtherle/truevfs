@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.crypto;
 
+import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -48,15 +49,6 @@ import org.bouncycastle.crypto.Mac;
 //
 @NotThreadSafe
 public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
-
-    /**
-     * The maximum buffer length of the window to the encrypted file.
-     * This value has been adjusted to provide optimum performance at minimal
-     * size on a Windows XP computer - results may vary.
-     * Note that the <em>actual</em> size of the window is a multiple of the
-     * cipher's block size and may be smaller than the maximum window size.
-     */
-    private static final int MAX_WINDOW_LEN = 1024;
 
     /** Returns the smaller parameter. */
     private static long min(long a, long b) {
@@ -173,7 +165,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         final int blockLen = cipher.getBlockSize();
         this.block = new byte[blockLen];
         this.windowOff = Long.MIN_VALUE; // invalidate window
-        this.window = new byte[(MAX_WINDOW_LEN / blockLen) * blockLen]; // round down to multiple of block size
+        this.window = new byte[(Streams.BUFFER_SIZE / blockLen) * blockLen]; // round down to multiple of block size
 
         assert this.fp == 0;
         assert this.block.length > 0;
@@ -249,8 +241,9 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     @Override
     public int read(final byte[] buf, final int off, final int len)
     throws IOException {
-        if (len == 0)
-            return 0; // be fault-tolerant and compatible to RandomAccessFile
+        // Check no-op first for compatibility with RandomAccessFile.
+        if (0 >= len)
+            return 0;
 
         // Check state.
         assertOpen();
@@ -269,10 +262,10 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         int read = 0; // amount of decrypted data copied to buf
 
         {
-            // Partial read of decrypted data block at the start.
+            // Partial read of block data at the start.
             final int o = (int) (fp % blockLen);
             if (o != 0) {
-                // The file pointer is not on a block boundary.
+                // The virtual file pointer is NOT starting on a block boundary.
                 positionBlock();
                 read = (int) min(len, blockLen - o);
                 read = (int) min(read, length - fp);
@@ -282,10 +275,10 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         }
 
         {
-            // Full read of decrypted data blocks in the middle.
+            // Full read of block data in the middle.
             long blockCounter = fp / blockLen;
-            while (read + blockLen < len && fp + blockLen <= length) {
-                // The file pointer is starting and ending on block boundaries.
+            while (read + blockLen < len && fp + blockLen < length) {
+                // The virtual file pointer is starting on a block boundary.
                 positionWindow();
                 cipher.setBlockCounter(blockCounter++);
                 cipher.processBlock(window, (int) (fp - windowOff), buf, off + read);
@@ -294,9 +287,9 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             }
         }
 
-        // Partial read of decrypted data block at the end.
+        // Partial read of block data at the end.
         if (read < len && fp < length) {
-            // The file pointer is not on a block boundary.
+            // The virtual file pointer is starting on a block boundary.
             positionBlock();
             final int n = (int) min(len - read, length - fp);
             System.arraycopy(block, 0, buf, off + read, n);
