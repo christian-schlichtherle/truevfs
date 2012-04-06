@@ -204,10 +204,8 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             int n = 0;
             do {
                 int read = channel.read(buffer);
-                if (0 > read) {
-                    size = bufferPos + n;
+                if (0 > read)
                     break;
-                }
                 n += read;
             } while (n < bufferSize);
         } catch (final Throwable ex) {
