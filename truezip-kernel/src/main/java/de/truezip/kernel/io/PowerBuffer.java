@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.io;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.*;
 import java.nio.channels.ReadableByteChannel;
@@ -130,30 +131,57 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
     }
 
     /**
-     * Returns an unsigned byte, cast to an integer.
+     * Reads an unsigned byte from the current position.
      * 
-     * @return An unsigned byte, cast to an integer.
+     * @return The unsigned byte, cast to an integer.
      */
     public int getUByte() {
         return bb.get() & 0xff;
     }
 
     /**
-     * Returns an unsigned short, cast to an integer.
+     * Reads an unsigned byte from the given position.
      * 
-     * @return an unsigned short, cast to an integer.
+     * @return The unsigned byte, cast to an integer.
+     */
+    public int getUByte(int index) {
+        return bb.get(index) & 0xff;
+    }
+
+    /**
+     * Reads an unsigned short from the current position.
+     * 
+     * @return The unsigned short, cast to an integer.
      */
     public int getUShort() {
         return bb.getShort() & 0xffff;
     }
 
     /**
-     * Returns an unsigned int, cast to a long.
+     * Reads an unsigned short from the given position.
      * 
-     * @return An unsigned int, cast to a long.
+     * @return The unsigned short, cast to an integer.
+     */
+    public int getUShort(int index) {
+        return bb.getShort(index) & 0xffff;
+    }
+
+    /**
+     * Reads an unsigned int from the current position.
+     * 
+     * @return The unsigned int, cast to a long.
      */
     public long getUInt() {
         return bb.getInt() & 0xffff_ffffL;
+    }
+
+    /**
+     * Reads an unsigned int from the given position.
+     * 
+     * @return The unsigned int, cast to a long.
+     */
+    public long getUInt(int index) {
+        return bb.getInt(index) & 0xffff_ffffL;
     }
 
     //
