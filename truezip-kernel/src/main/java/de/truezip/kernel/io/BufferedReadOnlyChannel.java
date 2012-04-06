@@ -86,7 +86,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
 
         // Setup.
         final int bufferSize = buffer.limit();
-        int total = 0; // amount of read data copied to dst
+        int total = 0; // amount of data copied dst
 
         {
             // Partial read of buffer data at the start.
@@ -120,9 +120,9 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             positionBuffer();
             buffer.rewind();
             final int copied = copy(buffer, dst);
+            assert copied > 0;
             total += copied;
             pos += copied;
-            assert copied > 0;
         }
 
         // Assert that at least one byte has been read.
@@ -201,13 +201,13 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             // depend on this as it would be a violation of the contract for a
             // SeekableByteChannel.
             buffer.rewind();
-            int n = 0;
+            int total = 0;
             do {
                 int read = channel.read(buffer);
                 if (0 > read)
                     break;
-                n += read;
-            } while (n < bufferSize);
+                total += read;
+            } while (total < bufferSize);
         } catch (final Throwable ex) {
             invalidateBuffer();
             throw ex;
