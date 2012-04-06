@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.io;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 
 /**
@@ -23,19 +24,19 @@ public final class Buffers {
         final int available = src.remaining();
         if (available <= 0)
             return -1;
-        final int readLimit;
+        final int srcLimit;
         if (available > remaining) {
-            readLimit = src.limit();
+            srcLimit = src.limit();
             src.limit(src.position() + remaining);
         } else {
-            readLimit = -1;
+            srcLimit = -1;
             remaining = available;
         }
         try {
             dst.put(src);
         } finally {
-            if (readLimit >= 0)
-                src.limit(readLimit);
+            if (srcLimit >= 0)
+                src.limit(srcLimit);
         }
         return remaining;
     }
