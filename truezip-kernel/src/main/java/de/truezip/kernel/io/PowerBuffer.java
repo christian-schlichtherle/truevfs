@@ -115,6 +115,21 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
     }
 
     /**
+     * Skips the given number of bytes.
+     * This is a relative move operation to the buffer's position.
+     * 
+     * @param  skip the number of bytes to move forwards.
+     *         May be negative to move backwards, too.
+     * @return {@code this}.
+     * @throws IllegalArgumentException if attempting to move outside the
+     *         buffer bounds.
+     */
+    public PowerBuffer skip(int skip) {
+        bb.position(bb.position() + skip);
+        return this;
+    }
+
+    /**
      * Returns an unsigned byte, cast to an integer.
      * 
      * @return An unsigned byte, cast to an integer.
