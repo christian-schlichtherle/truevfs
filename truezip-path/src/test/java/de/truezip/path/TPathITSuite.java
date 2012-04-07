@@ -19,7 +19,6 @@ import static de.truezip.kernel.option.AccessOption.GROW;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
 import static de.truezip.kernel.option.SyncOptions.SYNC;
-import de.truezip.kernel.util.ArrayUtils;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
@@ -27,6 +26,7 @@ import de.truezip.kernel.util.ConcurrencyUtils.TaskJoiner;
 import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
 import static java.io.File.separatorChar;
 import java.io.*;
+import java.nio.ByteBuffer;
 import static java.nio.file.Files.*;
 import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
@@ -155,7 +155,9 @@ extends ConfiguredClientTestBase<D> {
         // Read back portion
         try (final InputStream in = newInputStream(file)) {
             byte[] buf = new byte[getDataLength()];
-            assertTrue(ArrayUtils.equals(getData(), 0, buf, 0, in.read(buf)));
+            final int read = in.read(buf);
+            assertEquals(   ByteBuffer.wrap(getData(), 0, read),
+                            ByteBuffer.wrap(buf, 0, read));
         }
         assertRm(file);
 
@@ -1242,7 +1244,8 @@ extends ConfiguredClientTestBase<D> {
                     if (0 > read)
                         break;
                     assertTrue(read > 0);
-                    assertTrue(ArrayUtils.equals(getData(), off, buf, 0, read));
+                    assertEquals(   ByteBuffer.wrap(getData(), off, read),
+                                    ByteBuffer.wrap(buf, 0, read));
                     off += read;
                 }
                 assertEquals(-1, read);
