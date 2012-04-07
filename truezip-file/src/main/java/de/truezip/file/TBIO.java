@@ -124,7 +124,7 @@ final class TBIO {
      * @param  dstDetector the object used to detect any archive files in the
      *         destination path.
      * @throws IOException if the source path contains the destination path
-     *         or any I/O failure.
+     *         or any I/O error.
      */
     static void
     cp_r(   final boolean preserve,

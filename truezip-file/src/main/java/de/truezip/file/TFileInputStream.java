@@ -72,7 +72,7 @@ public final class TFileInputStream extends DecoratingInputStream {
      *
      * @param  path the path of the plain old file or entry in an archive file
      *         to read.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -86,7 +86,7 @@ public final class TFileInputStream extends DecoratingInputStream {
      * in an archive file.
      *
      * @param  file the plain old file or entry in an archive file to read.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")

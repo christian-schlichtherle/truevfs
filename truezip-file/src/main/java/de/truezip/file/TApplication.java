@@ -39,6 +39,7 @@ public abstract class TApplication<E extends Exception> {
      * system, even if {@link #work} throws an exception.
      * 
      * @param  args an array of arguments for this application.
+     * @return The exit status of this application.
      * @throws E At the discretion of the {@link #work} method.
      * @throws FsSyncException At the discretion of the {@link #sync} method.
      */

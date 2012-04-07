@@ -1956,7 +1956,7 @@ public final class TFile extends File {
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
      *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O failure.
+     *         due to an I/O error.
      */
     @Override
     public @Nullable String[] list() {
@@ -1988,7 +1988,7 @@ public final class TFile extends File {
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
      *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O failure.
+     *         due to an I/O error.
      */
     @Override
     public @Nullable String[] list(final @CheckForNull FilenameFilter filter) {
@@ -2037,7 +2037,7 @@ public final class TFile extends File {
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
      *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O failure.
+     *         due to an I/O error.
      */
     public @Nullable TFile[] listFiles(TArchiveDetector detector) {
         return listFiles((FilenameFilter) null, detector);
@@ -2069,7 +2069,7 @@ public final class TFile extends File {
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
      *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O failure.
+     *         due to an I/O error.
      */
     public @Nullable TFile[] listFiles(
             final @CheckForNull FilenameFilter filter,
@@ -2141,7 +2141,7 @@ public final class TFile extends File {
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
      *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O failure.
+     *         due to an I/O error.
      */
     public @Nullable TFile[] listFiles(
             final @CheckForNull FileFilter filter,
