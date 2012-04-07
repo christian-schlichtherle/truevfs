@@ -94,13 +94,13 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
     }
     
     private IntervalReadOnlyChannel(
-            final SeekableByteChannel sbc,
+            final SeekableByteChannel channel,
             final long start,
             final long size,
             final boolean exclusive)
     throws IOException {
-        super(sbc);
-        if (start < 0 || size < 0 || sbc.size() < start + size)
+        super(channel);
+        if (start < 0 || size < 0 || channel.size() < start + size)
             throw new IllegalArgumentException();
         this.start = start;
         this.size = size;
