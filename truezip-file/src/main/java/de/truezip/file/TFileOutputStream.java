@@ -5,8 +5,8 @@
 package de.truezip.file;
 
 import de.truezip.kernel.cio.OutputSocket;
-import static de.truezip.kernel.option.AccessOption.APPEND;
 import de.truezip.kernel.io.DecoratingOutputStream;
+import static de.truezip.kernel.option.AccessOption.APPEND;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
@@ -74,7 +74,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *
      * @param  path the path of the plain old file or entry in an archive file
      *         to write.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -93,7 +93,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         to write.
      * @param  append if the data shall get appended to the file rather than
      *         replacing it.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -107,7 +107,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * in an archive file.
      *
      * @param  file the plain old file or entry in an archive file to write.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -123,7 +123,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @param  file the plain old file or entry in an archive file to write.
      * @param  append if the data shall get appended to the file rather than
      *         replacing it.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")

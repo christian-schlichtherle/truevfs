@@ -52,7 +52,8 @@ public final class TVFS {
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public static void umount() throws FsSyncException {
+    public static void umount()
+    throws FsSyncWarningException, FsSyncException {
         sync(UMOUNT);
     }
 
@@ -75,7 +76,8 @@ public final class TVFS {
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public static void umount(TFile tree) throws FsSyncException {
+    public static void umount(TFile tree)
+    throws FsSyncWarningException, FsSyncException {
         sync(tree, UMOUNT);
     }
 
@@ -98,7 +100,8 @@ public final class TVFS {
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public static void umount(FsMountPoint tree) throws FsSyncException {
+    public static void umount(FsMountPoint tree)
+    throws FsSyncWarningException, FsSyncException {
         sync(tree, UMOUNT);
     }
 
@@ -144,7 +147,7 @@ public final class TVFS {
      * @throws FsSyncException if any error conditions apply.
      */
     public static void sync(SyncOption... options)
-    throws FsSyncException {
+    throws FsSyncWarningException, FsSyncException {
         sync(SyncOptions.of(options));
     }
 
@@ -166,7 +169,7 @@ public final class TVFS {
      */
     @SuppressWarnings("deprecation")
     public static void sync(BitField<SyncOption> options)
-    throws FsSyncException {
+    throws FsSyncWarningException, FsSyncException {
         TConfig.get().getFsManager().sync(options);
     }
 
@@ -189,7 +192,7 @@ public final class TVFS {
      * @throws FsSyncException if any error conditions apply.
      */
     public static void sync(TFile tree, SyncOption... options)
-    throws FsSyncException {
+    throws FsSyncWarningException, FsSyncException {
         sync(tree, SyncOptions.of(options));
     }
 
@@ -212,7 +215,7 @@ public final class TVFS {
      * @throws FsSyncException if any error conditions apply.
      */
     public static void sync(TFile tree, BitField<SyncOption> options)
-    throws FsSyncException {
+    throws FsSyncWarningException, FsSyncException {
         sync(mountPoint(tree), options);
     }
 
@@ -235,7 +238,7 @@ public final class TVFS {
      * @throws FsSyncException if any error conditions apply.
      */
     public static void sync(FsMountPoint tree, SyncOption... options)
-    throws FsSyncException {
+    throws FsSyncWarningException, FsSyncException {
         sync(tree, SyncOptions.of(options));
     }
 
@@ -259,7 +262,7 @@ public final class TVFS {
      */
     @SuppressWarnings("deprecation")
     public static void sync(FsMountPoint tree, BitField<SyncOption> options)
-    throws FsSyncException {
+    throws FsSyncWarningException, FsSyncException {
         new FsFilteringManager(TConfig.get().getFsManager(), tree)
                 .sync(options);
     }

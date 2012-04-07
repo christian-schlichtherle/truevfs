@@ -113,8 +113,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         final Map<FsScheme, FsDriver> outDrivers;
         if (null != extensions) {
             inExtensions = new ExtensionSet(extensions);
-            outDrivers = new HashMap<FsScheme, FsDriver>(
-                    initialCapacity(inDrivers.size()));
+            outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
         } else {
             inExtensions = null;
             outDrivers = inDrivers;
@@ -234,8 +233,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
                             final Map<FsScheme, FsDriver> config) {
         final Map<FsScheme, FsDriver> inDrivers = provider.get();
         final Map<FsScheme, FsDriver> 
-                outDrivers = new HashMap<FsScheme, FsDriver>(
-                        initialCapacity(inDrivers.size()));
+                outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
         final ExtensionSet outExtensions = new ExtensionSet();
         for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
             final FsDriver driver = entry.getValue();

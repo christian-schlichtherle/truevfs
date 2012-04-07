@@ -16,7 +16,6 @@ import de.truezip.kernel.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.Closeable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -251,7 +250,7 @@ public final class TConfig extends Resource<RuntimeException> {
             NOT_ACCESS_PREFERENCES_MASK = ACCESS_PREFERENCES_MASK.not();
 
     private static final InheritableThreadLocalStack<TConfig>
-            configs = new InheritableThreadLocalStack<TConfig>();
+            configs = new InheritableThreadLocalStack<>();
 
     private static final TConfig GLOBAL = new TConfig();
 

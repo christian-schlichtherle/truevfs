@@ -32,7 +32,7 @@ public final class TFileTreeModel implements TreeModel {
      * Used to cache the contents of directories.
      * Maps {@link TFile} -&gt; {@link TFile}[] instances.
      */
-    private final Map<TFile, TFile[]> cache = new HashMap<TFile, TFile[]>();
+    private final Map<TFile, TFile[]> cache = new HashMap<>();
 
     private final @CheckForNull TFile root;
 
@@ -195,7 +195,7 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the current selection may get lost.
      *
      * @return Whether or not the file has been newly created.
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public boolean createNewFile(final TFile node)
     throws IOException {
@@ -212,7 +212,7 @@ public final class TFileTreeModel implements TreeModel {
      *
      * @param  recursive whether or not any missing ancestor directories shall
      *         get created if required.
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void mkdir(final TFile node, final boolean recursive)
     throws IOException {
@@ -226,7 +226,7 @@ public final class TFileTreeModel implements TreeModel {
      * Note that the given stream is <em>always</em> closed and
      * that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp(final @WillClose InputStream in, final TFile node)
     throws IOException {
@@ -239,7 +239,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp(final TFile oldNode, final TFile node) throws IOException {
         TFile.cp(oldNode, node);
@@ -251,7 +251,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp_r(final TFile oldNode, final TFile node) throws IOException {
         try {
@@ -267,7 +267,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp_p(final TFile oldNode, final TFile node) throws IOException {
         TFile.cp_p(oldNode, node);
@@ -280,7 +280,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp_rp(final TFile oldNode, final TFile node) throws IOException {
         try {
@@ -295,7 +295,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void mv(TFile oldNode, TFile node) throws IOException {
         oldNode.mv(node);
@@ -308,7 +308,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void rm(TFile node) throws IOException {
         TFile.rm(node);
@@ -320,7 +320,7 @@ public final class TFileTreeModel implements TreeModel {
      * and updates the tree accordingly.
      * Note that the current selection may get lost.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void rm_r(TFile node) throws IOException {
         TFile.rm_r(node);

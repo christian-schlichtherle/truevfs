@@ -6,8 +6,10 @@ package de.truezip.file;
 
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import javax.annotation.concurrent.Immutable;
@@ -31,7 +33,7 @@ public final class TFileReader extends InputStreamReader {
      * characters.
      * 
      * @param  file a file to read.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings({
@@ -46,7 +48,7 @@ public final class TFileReader extends InputStreamReader {
      * 
      * @param  file a file to read.
      * @param  charset a character set for decoding bytes to characters.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -60,7 +62,7 @@ public final class TFileReader extends InputStreamReader {
      * 
      * @param  file a file to read.
      * @param  decoder a decoder for decoding bytes to characters.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")

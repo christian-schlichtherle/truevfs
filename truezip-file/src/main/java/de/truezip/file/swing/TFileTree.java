@@ -6,8 +6,6 @@ package de.truezip.file.swing;
 
 import de.truezip.file.TFile;
 import de.truezip.file.TFileComparator;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +14,8 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.WillClose;
 import javax.swing.CellEditor;
 import javax.swing.JTree;
@@ -380,7 +380,7 @@ public final class TFileTree extends JTree {
      * If you would like to create a new file with initial content, please
      * check {@link #cp(InputStream, TFile)}.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public boolean createNewFile(final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -399,7 +399,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the newly created directory
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void mkdir(final TFile node, final boolean recursive)
     throws IOException {
@@ -417,7 +417,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp(final @WillClose InputStream in, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -434,7 +434,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -451,7 +451,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp_r(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -468,7 +468,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the copied node
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp_p(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -485,7 +485,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the recursively copied node
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void cp_rp(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -502,7 +502,7 @@ public final class TFileTree extends JTree {
      * restores the expanded paths, selects {@code node} and scrolls to
      * it if necessary.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void mv(final TFile oldNode, final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -542,7 +542,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the successor to the deleted node
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void rm(final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();
@@ -560,7 +560,7 @@ public final class TFileTree extends JTree {
      * and scrolls the tree so that the successor to the deleted node
      * is selected and visible.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public void rm_r(final TFile node) throws IOException {
         final TFileTreeModel ftm = getModel();

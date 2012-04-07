@@ -6,8 +6,10 @@ package de.truezip.file;
 
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import javax.annotation.concurrent.Immutable;
@@ -32,7 +34,7 @@ public final class TFileWriter extends OutputStreamWriter {
      * to bytes.
      * 
      * @param  file a file to write.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings({
@@ -50,7 +52,7 @@ public final class TFileWriter extends OutputStreamWriter {
      * @param  file a file to write.
      * @param  append iff {@code true}, then this writer appends the data to the
      *         given file.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings({
@@ -67,7 +69,7 @@ public final class TFileWriter extends OutputStreamWriter {
      * @param  append iff {@code true}, then this writer appends the data to the
      *         given file.
      * @param  charset a character set for encoding characters to bytes.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -83,7 +85,7 @@ public final class TFileWriter extends OutputStreamWriter {
      * @param  append iff {@code true}, then this writer appends the data to the
      *         given file.
      * @param  encoder an encoder for encoding characters to bytes.
-     * @throws FileNotFoundException on any I/O failure.
+     * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
