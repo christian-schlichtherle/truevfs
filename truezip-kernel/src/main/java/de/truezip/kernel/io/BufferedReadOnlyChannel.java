@@ -26,7 +26,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     private long size;
 
     /** The virtual position of this channel. */
-    private long pos;
+    private long pos = -1;
 
     /**
      * The position in the decorated channel where the buffer starts.
@@ -46,13 +46,12 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel channel)
-    throws IOException {
+            final @WillCloseWhenClosed SeekableByteChannel channel) {
         this(channel, Streams.BUFFER_SIZE);
     }
 
     /**
-     * Constructs a new buffered input channel.
+     * Constructs a new buffered read-only channel.
      *
      * @param  channel the channel to decorate.
      * @param  bufferSize the size of the byte buffer.
@@ -62,14 +61,12 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
-            final int bufferSize)
-    throws IOException {
+            final int bufferSize) {
         super(channel);
         buffer = ByteBuffer.allocate(bufferSize);
         assert bufferSize == buffer.limit();
         assert bufferSize == buffer.capacity();
         reset();
-        pos = channel.position();
     }
 
     @Override
@@ -81,7 +78,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
 
         // Check is open and not at EOF.
         final long size = size();
-        if (pos >= size) // do NOT cache pos!
+        if (position() >= size) // init pos and do NOT cache!
             return -1;
 
         // Setup.
@@ -121,7 +118,8 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     @Override
     public long position() throws IOException {
         checkOpen();
-        return pos;
+        final long pos = this.pos;
+        return 0 <= pos ? pos : (this.pos = channel.position());
     }
 
     @Override
@@ -172,6 +170,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     private void positionBuffer() throws IOException {
         // Check position.
         final long pos = this.pos;
+        assert 0 <= pos;
         final int bufferSize = buffer.limit();
         final long nextBufferPos = bufferPos + bufferSize;
         if (bufferPos <= pos && pos < nextBufferPos)
