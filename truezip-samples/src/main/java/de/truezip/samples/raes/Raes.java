@@ -6,18 +6,19 @@ package de.truezip.samples.raes;
 
 import de.truezip.driver.zip.raes.KeyManagerRaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
 import de.truezip.driver.zip.raes.crypto.RaesSink;
 import de.truezip.file.*;
 import de.truezip.kernel.io.AbstractSink;
+import de.truezip.kernel.io.SeekableChannelInputStream;
 import de.truezip.kernel.io.Sink;
-import de.truezip.kernel.rof.DefaultReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFileInputStream;
 import de.truezip.key.sl.KeyManagerLocator;
+import de.truezip.path.TPath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import static java.nio.file.Files.*;
 import javax.annotation.WillClose;
 
 /**
@@ -42,10 +43,10 @@ public final class Raes {
      * are not recognized as archive files.
      */
     public static void encrypt(
-            final String plainFilePath,
-            final String raesFilePath)
+            final String plainPath,
+            final String cipherPath)
     throws IOException {
-        encrypt(plainFilePath, raesFilePath, TConfig.get().getArchiveDetector());
+        encrypt(plainPath, cipherPath, TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -56,35 +57,38 @@ public final class Raes {
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void encrypt(
-            final String plainFilePath,
-            final String raesFilePath,
+            final String plainPath,
+            final String cipherPath,
             final TArchiveDetector detector)
     throws IOException {
-        final TFile plainFile = new TFile(plainFilePath, detector).toNonArchiveFile();
-        final TFile raesFile = new TFile(raesFilePath, detector).toNonArchiveFile();
-        final Sink sink = new RaesSink(
-                new AbstractSink() {
-                    @Override
-                    public OutputStream newStream() throws IOException {
-                        return new TFileOutputStream(raesFile);
-                    }
-                },
-                new KeyManagerRaesParameters(
-                    KeyManagerLocator.SINGLETON,
-                    raesFile/*.getCanonicalFile()*/.toURI()));
-        final @WillClose InputStream in = new TFileInputStream(plainFile);
-        final @WillClose OutputStream out;
-        try {
-            out = sink.newStream();
-        } catch (final IOException ex) {
+        try (final TConfig config = TConfig.push()) {
+            config.setArchiveDetector(detector);
+            final TPath plainFile = new TPath(plainPath).toNonArchivePath();
+            final TPath cipherFile = new TPath(cipherPath).toNonArchivePath();
+            final Sink sink = new RaesSink(
+                    new AbstractSink() {
+                        @Override
+                        public OutputStream newStream() throws IOException {
+                            return newOutputStream(cipherFile);
+                        }
+                    },
+                    new KeyManagerRaesParameters(
+                        KeyManagerLocator.SINGLETON,
+                        cipherFile/*.getCanonicalFile()*/.toUri()));
+            final @WillClose InputStream in = newInputStream(plainFile);
+            final @WillClose OutputStream out;
             try {
-                in.close();
-            } catch (final IOException ex2) {
-                ex.addSuppressed(ex2);
+                out = sink.newStream();
+            } catch (final IOException ex) {
+                try {
+                    in.close();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
+                throw ex;
             }
-            throw ex;
+            TFile.cp(in, out);
         }
-        TFile.cp(in, out);
     }
 
     /**
@@ -94,11 +98,11 @@ public final class Raes {
      * are not recognized as archive files.
      */
     public static void decrypt(
-            final String raesFilePath,
-            final String plainFilePath,
+            final String cipherPath,
+            final String plainPath,
             final boolean strongAuthentication)
     throws IOException {
-        decrypt(raesFilePath, plainFilePath, strongAuthentication,
+        decrypt(cipherPath, plainPath, strongAuthentication,
                 TConfig.get().getArchiveDetector());
     }
 
@@ -116,34 +120,37 @@ public final class Raes {
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void decrypt(
-            final String raesFilePath,
-            final String plainFilePath,
+            final String cipherPath,
+            final String plainPath,
             final boolean authenticate,
             final TArchiveDetector detector)
     throws IOException {
-        final TFile raesFile = new TFile(raesFilePath, detector).toNonArchiveFile();
-        final TFile plainFile = new TFile(plainFilePath, detector).toNonArchiveFile();
-        final RaesParameters param = new KeyManagerRaesParameters(
-                KeyManagerLocator.SINGLETON,
-                raesFile/*.getCanonicalFile()*/.toURI());
-        try (final ReadOnlyFile rof = new DefaultReadOnlyFile(raesFile)) {
-            final RaesReadOnlyFile rrof
-                    = RaesReadOnlyFile.getInstance(rof, param);
-            if (authenticate)
-                rrof.authenticate();
-            final @WillClose InputStream in = new ReadOnlyFileInputStream(rrof);
-            @WillClose OutputStream out = null;
-            try {
-                out = new TFileOutputStream(plainFile);
-            } catch (final IOException ex) {
+        try (final TConfig config = TConfig.push()) {
+            config.setArchiveDetector(detector);
+            final TPath cipherFile = new TPath(cipherPath).toNonArchivePath();
+            final TPath plainFile = new TPath(plainPath).toNonArchivePath();
+            final RaesParameters param = new KeyManagerRaesParameters(
+                    KeyManagerLocator.SINGLETON,
+                    cipherFile/*.getCanonicalFile()*/.toUri());
+            try (final SeekableByteChannel channel = newByteChannel(cipherFile)) {
+                final RaesReadOnlyChannel rchannel
+                        = RaesReadOnlyChannel.getInstance(channel, param);
+                if (authenticate)
+                    rchannel.authenticate();
+                final @WillClose InputStream in = new SeekableChannelInputStream(rchannel);
+                @WillClose OutputStream out = null;
                 try {
-                    in.close();
-                } catch (final IOException ex2) {
-                    ex.addSuppressed(ex2);
+                    out = newOutputStream(plainFile);
+                } catch (final Throwable ex) {
+                    try {
+                        in.close();
+                    } catch (final Throwable ex2) {
+                        ex.addSuppressed(ex2);
+                    }
+                    throw ex;
                 }
-                throw ex;
+                TFile.cp(in, out);
             }
-            TFile.cp(in, out);
         }
     }
 }
