@@ -50,8 +50,8 @@ final class Channels {
             final ReadableByteChannel channel,
             final ByteBuffer buffer)
     throws IOException {
-        buffer.mark();
         int remaining = buffer.remaining();
+        buffer.mark();
         do {
             int read = channel.read(buffer);
             if (0 > read)
@@ -75,8 +75,8 @@ final class Channels {
             final WritableByteChannel channel,
             final ByteBuffer buffer)
     throws IOException {
-        buffer.mark();
         int remaining = buffer.remaining();
+        buffer.mark();
         do {
             remaining -= channel.write(buffer);
         } while (0 < remaining);
