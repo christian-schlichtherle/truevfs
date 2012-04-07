@@ -121,7 +121,7 @@ public abstract class FsController<M extends FsModel> {
      * Returns {@code true} if and only if the file system is read-only.
      * 
      * @return {@code true} if and only if the file system is read-only.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public abstract boolean isReadOnly()
     throws IOException;
@@ -135,7 +135,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @return A file system entry or {@code null} if no file system entry
      *         exists for the given name.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public abstract @Nullable FsEntry getEntry(FsEntryName name)
     throws IOException;
@@ -145,7 +145,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not readable.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     // TODO: Consider using a Boolean return value in order to use null to
     // indicate that this property is not supported
@@ -157,7 +157,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not writable.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     // TODO: Consider using a Boolean return value in order to use null to
     // indicate that this property is not supported
@@ -172,7 +172,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the name of the file system entry.
      * @return {@code false} if the named file system entry is not executable.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     // TODO: Consider using a Boolean return value in order to use null to
     // indicate that this property is not supported
@@ -187,7 +187,7 @@ public abstract class FsController<M extends FsModel> {
      * controller implementations because they do not support it.
      * 
      * @param  name the name of the file system entry.
-     * @throws IOException on any I/O failure or if this operation is not
+     * @throws IOException on any I/O error or if this operation is not
      *         supported.
      */
     public abstract void setReadOnly(FsEntryName name)
@@ -206,7 +206,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  options the file system output options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code times} succeeded.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
      */
@@ -239,7 +239,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  options the file system output options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code types} succeeded.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public abstract boolean setTime(
             FsEntryName name,
@@ -292,7 +292,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.
-     * @throws IOException on any I/O failure, including but not limited to
+     * @throws IOException on any I/O error, including but not limited to
      *         these reasons:
      *         <ul>
      *         <li>The file system is read only.
@@ -320,7 +320,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the file system entry name.
      * @param  options output options for this operation.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public abstract void
     unlink(FsEntryName name, BitField<AccessOption> options)
@@ -345,12 +345,12 @@ public abstract class FsController<M extends FsModel> {
      *
      * @param  options the synchronization options.
      * @throws FsSyncException if committing the changes fails because of any
-     *         I/O failure.
-     * @throws IOException on any other (not necessarily I/O related) failure.
+     *         I/O error.
+     * @throws IOException on any other (not necessarily I/O related) error.
      */
     public final void
     sync(final BitField<SyncOption> options)
-    throws IOException {
+    throws FsSyncException, IOException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
@@ -381,7 +381,7 @@ public abstract class FsController<M extends FsModel> {
     public abstract <X extends IOException> void
     sync(   BitField<SyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException;
+    throws X, IOException;
 
     /**
      * Two file system controllers are considered equal if and only if they
