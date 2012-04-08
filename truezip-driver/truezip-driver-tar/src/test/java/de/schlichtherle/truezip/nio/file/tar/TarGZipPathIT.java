@@ -9,7 +9,7 @@ import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
 /**
  * @author  Christian Schlichtherle
  */
-public final class TarGZipPathIT extends TarPathTestSuite<TarGZipDriver> {
+public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
 
     @Override
     protected String getSuffixList() {

@@ -5,12 +5,12 @@
 package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import de.schlichtherle.truezip.nio.file.TPathITSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class ZipPathIT extends TPathTestSuite<ZipDriver> {
+public final class ZipPathIT extends TPathITSuite<ZipDriver> {
 
     @Override
     protected String getSuffixList() {

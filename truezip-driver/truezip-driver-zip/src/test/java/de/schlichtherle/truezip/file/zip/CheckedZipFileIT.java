@@ -4,13 +4,13 @@
  */
 package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.file.TFileITSuite;
 import de.schlichtherle.truezip.fs.archive.zip.CheckedZipDriver;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class CheckedZipFileIT extends TFileTestSuite<CheckedZipDriver> {
+public final class CheckedZipFileIT extends TFileITSuite<CheckedZipDriver> {
 
     @Override
     protected String getSuffixList() {

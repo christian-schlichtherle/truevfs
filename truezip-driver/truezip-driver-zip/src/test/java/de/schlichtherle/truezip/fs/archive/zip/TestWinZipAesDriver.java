@@ -15,6 +15,7 @@ import de.schlichtherle.truezip.socket.IOPoolProvider;
 public final class TestWinZipAesDriver extends ZipDriver {
 
     private final KeyManagerProvider provider;
+    private final MockView<AesPbeParameters> view;
 
     public TestWinZipAesDriver(IOPoolProvider ioPoolProvider) {
         this(ioPoolProvider, newView());
@@ -25,6 +26,7 @@ public final class TestWinZipAesDriver extends ZipDriver {
             final MockView<AesPbeParameters> view) {
         super(ioPoolProvider);
         this.provider = new PromptingKeyManagerService(view);
+        this.view = view;
     }
 
     private static MockView<AesPbeParameters> newView() {
@@ -35,8 +37,17 @@ public final class TestWinZipAesDriver extends ZipDriver {
         return view;
     }
 
+    public MockView<AesPbeParameters> getView() {
+        return view;
+    }
+
     @Override
     protected KeyManagerProvider getKeyManagerProvider() {
         return provider;
+    }
+
+    @Override
+    public KeyProviderSyncStrategy getKeyProviderSyncStrategy() {
+        return KeyProviderSyncStrategy.RESET_UNCONDITIONALLY;
     }
 }

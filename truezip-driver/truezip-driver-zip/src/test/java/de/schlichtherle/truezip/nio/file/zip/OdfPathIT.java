@@ -5,12 +5,12 @@
 package de.schlichtherle.truezip.nio.file.zip;
 
 import de.schlichtherle.truezip.fs.archive.zip.OdfDriver;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import de.schlichtherle.truezip.nio.file.TPathITSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class OdfPathIT extends TPathTestSuite<OdfDriver> {
+public final class OdfPathIT extends TPathITSuite<OdfDriver> {
 
     @Override
     protected String getSuffixList() {
