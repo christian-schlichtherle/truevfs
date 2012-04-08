@@ -250,8 +250,8 @@ public final class Streams {
                 else if (ex instanceof IOException)
                     throw new InputException((IOException) ex);
                 else if (ex instanceof RuntimeException)
-                    throw (RuntimeException) wrap(ex).fillInStackTrace();
-                throw (Error) wrap(ex).fillInStackTrace();
+                    throw (RuntimeException) wrap(ex);
+                throw (Error) wrap(ex);
             }
         } finally {
             if (interrupted)
