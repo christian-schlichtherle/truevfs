@@ -168,9 +168,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         thread.locking = false;
                         lock.unlock();
                     }
-                } catch (final IOException ex) {
-                    if (!(ex instanceof FsNeedsLockRetryException))
-                        throw ex;
+                } catch (FsNeedsLockRetryException ex) {
                     thread.pause();
                 }
             }
