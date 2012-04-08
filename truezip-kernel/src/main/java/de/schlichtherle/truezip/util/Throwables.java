@@ -36,8 +36,8 @@ public class Throwables {
                         .getConstructor(String.class)
                         .newInstance(t.toString())
                         .initCause(t);
-        } catch (final Exception ex) {
-            //t.addSuppressed(ex);
+        } catch (final Throwable ex) {
+            //t.addSuppressed(ex); // JSE 7 might not be available at runtime!
             return t;
         }
     }
