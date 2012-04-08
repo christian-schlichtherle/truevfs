@@ -4,11 +4,11 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.cio.Entry;
-import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.*;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.ROOT;
+import de.truezip.kernel.cio.Entry;
+import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.util.BitField;
@@ -89,7 +89,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             while (entry instanceof FsCovariantEntry<?>)
                 entry = ((FsCovariantEntry<?>) entry).getEntry();
             final FsCovariantEntry<FsArchiveEntry>
-                    special = new FsCovariantEntry<FsArchiveEntry>(ROOT_PATH);
+                    special = new FsCovariantEntry<>(ROOT_PATH);
             special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
             return special;
         }
@@ -107,7 +107,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             // like a false positive and routing this operation to the parent
             // file system.
             // This prevents the application from inadvertently deleting an
-            // encrypted ZIP file just because e.g. the user has cancelled key
+            // encrypted ZIP file just because the user has cancelled key
             // prompting.
             final IOException keyEx = findKeyException(ex);
             throw null != keyEx ? keyEx : ex;
