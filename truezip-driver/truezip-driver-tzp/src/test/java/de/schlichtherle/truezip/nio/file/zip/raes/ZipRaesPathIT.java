@@ -10,7 +10,7 @@ import de.schlichtherle.truezip.key.MockView;
 import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
 import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
 import de.schlichtherle.truezip.nio.file.TPath;
-import de.schlichtherle.truezip.nio.file.TPathTestSuite;
+import de.schlichtherle.truezip.nio.file.TPathITSuite;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
@@ -19,7 +19,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class ZipRaesPathIT extends TPathTestSuite<TestZipRaesDriver> {
+public final class ZipRaesPathIT extends TPathITSuite<TestZipRaesDriver> {
 
     private MockView<AesCipherParameters> view;
 

@@ -4,13 +4,23 @@
  */
 package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.file.TFileTestSuite;
+import de.schlichtherle.truezip.file.TConfig;
+import de.schlichtherle.truezip.file.TFile;
+import de.schlichtherle.truezip.file.TFileITSuite;
+import static de.schlichtherle.truezip.fs.FsOutputOption.ENCRYPT;
 import de.schlichtherle.truezip.fs.archive.zip.TestWinZipAesDriver;
+import de.schlichtherle.truezip.key.MockView.Action;
+import static de.schlichtherle.truezip.key.MockView.Action.CANCEL;
+import static de.schlichtherle.truezip.key.MockView.Action.ENTER;
+import java.io.IOException;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
+public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
+
     @Override
     protected String getSuffixList() {
         return "zip";
@@ -19,5 +29,73 @@ public final class WinZipAesFileIT extends TFileTestSuite<TestWinZipAesDriver> {
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
         return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
+    }
+
+    @Override
+    public void setUp() throws IOException {
+        super.setUp();
+        final TConfig config = TConfig.get();
+        config.setOutputPreferences(config.getOutputPreferences().set(ENCRYPT));
+    }
+
+    private void setAction(Action action) {
+        getArchiveDriver().getView().setAction(action);
+    }
+
+    @Test
+    public void testCancelling() throws IOException {
+        setAction(CANCEL);
+
+        final TFile archive = getArchive();
+        assertFalse(archive.toNonArchiveFile().exists());
+
+        final TFile entry1 = new TFile(archive, "entry1");
+        assertTrue(entry1.mkdirs());
+        entry1.rm();
+        assertTrue(entry1.createNewFile());
+        entry1.rm();
+
+        final TFile entry2 = new TFile(archive, "entry2");
+        assertTrue(entry2.mkdirs());
+        entry2.rm();
+        assertTrue(entry2.createNewFile());
+        entry2.rm();
+    }
+
+    @Test
+    public void testFileStatus() throws IOException {
+        final TFile archive = getArchive();
+        final TFile inner = new TFile(archive, "inner" + getSuffix());
+
+        assertTrue(archive.mkdir());
+        assertTrue(inner.mkdir());
+
+        umount();
+        setAction(CANCEL);
+        assertTrue(archive.exists());
+        assertTrue(archive.isDirectory());
+        assertFalse(archive.isFile());
+
+        umount();
+        setAction(ENTER);
+        assertTrue(archive.exists());
+        assertTrue(archive.isDirectory());
+        assertFalse(archive.isFile());
+
+        setAction(CANCEL);
+        assertTrue(inner.exists());
+        assertFalse(inner.isDirectory());
+        assertFalse(inner.isFile());
+
+        umount();
+        try {
+            archive.rm_r();
+            fail();
+        } catch (IOException expected) {
+        }
+
+        umount();
+        setAction(ENTER);
+        archive.rm_r();
     }
 }
