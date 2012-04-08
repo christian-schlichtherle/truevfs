@@ -20,8 +20,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Adapts a {@link SeekableByteChannel} to the {@code InputStream} interface.
- * The stream supports marking.
+ * This stream supports marking.
  * 
+ * @see    SeekableChannelOutputStream
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -43,13 +44,6 @@ public class SeekableChannelInputStream extends InputStream {
      */
     private long mark = -1;
 
-    /**
-     * Adapts the given {@code SeekableByteChannel}.
-     *
-     * @param channel The underlying {@code SeekableByteChannel}. May be
-     *        {@code null}, but must be initialized before any method
-     *        of this class can be used.
-     */
     @CreatesObligation
     public SeekableChannelInputStream(
             final @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
@@ -76,19 +70,19 @@ public class SeekableChannelInputStream extends InputStream {
     public long skip(long n) throws IOException {
         if (n <= 0)
             return 0;
-        final long fp = channel.position(); // should fail when closed
-        final long len = channel.size();
-        final long rem = len - fp;
+        final long pos = channel.position(); // should fail when closed
+        final long size = channel.size();
+        final long rem = size - pos;
         if (n > rem)
             n = (int) rem;
-        channel.position(fp + n);
+        channel.position(pos + n);
         return n;
     }
 
     @Override
     public int available() throws IOException {
-        final long rem = channel.size() - channel.position();
-        return rem > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) rem;
+        final long avl = channel.size() - channel.position();
+        return avl > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) avl;
     }
 
     @Override
@@ -110,10 +104,10 @@ public class SeekableChannelInputStream extends InputStream {
 
     @Override
     public void reset() throws IOException {
-        if (mark < 0)
-            throw new IOException(mark == -1
+        if (0 > mark)
+            throw new IOException(-1 == mark
                     ? "no mark set"
-                    : "mark()/reset() not supported by underlying file");
+                    : "mark()/reset() not supported by underlying channel");
         channel.position(mark);
     }
 
