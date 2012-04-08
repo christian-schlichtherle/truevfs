@@ -17,6 +17,7 @@ import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.net.URI;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -68,11 +69,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         try {
             return delegate.getEntry(name);
-        } catch (final FsFalsePositiveException ex) {
-            if (!(getKeyExceptionType().isInstance(ex.getCause())))
+        } catch (final IOException ex) {
+            if (!name.isRoot() || null == findKeyException(ex))
                 throw ex;
-            if (!name.isRoot())
-                return null;
             Entry entry = getParent().getEntry(
                     getModel()
                         .getMountPoint()
@@ -100,21 +99,29 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         try {
             delegate.unlink(name, options);
-        } catch (final FsFalsePositiveException ex) {
-            // If the false positive exception is caused by a key exception,
-            // then throw this cause instead in order to avoid delegating
-            // this operation to the parent file system.
+        } catch (final IOException ex) {
+            // If the exception is caused by a key exception, then throw this
+            // cause instead in order to avoid treating the target archive file
+            // like a false positive and routing this operation to the parent
+            // file system.
             // This prevents the application from inadvertently deleting an
-            // encrypted ZIP file just because e.g. the user has cancelled key
+            // encrypted ZIP file just because the user has cancelled key
             // prompting.
-            final IOException cause = ex.getCause();
-            if (null != cause && getKeyExceptionType().isInstance(cause))
-                throw cause;
-            throw ex;
+            final IOException keyEx = findKeyException(ex);
+            throw null != keyEx ? keyEx : ex;
         }
         if (name.isRoot())
             getKeyManager().removeKeyProvider(
                     driver.resourceUri(getModel(), name.toString()));
+    }
+
+    private @CheckForNull IOException findKeyException(Throwable ex) {
+        final Class<? extends IOException> clazz = getKeyExceptionType();
+        do {
+            if (clazz.isInstance(ex))
+                return clazz.cast(ex);
+        } while (null != (ex = ex.getCause()));
+        return null;
     }
 
     @Override
