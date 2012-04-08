@@ -14,6 +14,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import static de.schlichtherle.truezip.fs.FsOutputOption.CACHE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
@@ -119,11 +120,11 @@ extends FsFileSystemArchiveController<E> {
         return true;
     }
 
-    @Nullable InputArchive<E> getCheckedInputArchive()
+    @Nullable InputArchive<E> getInputArchive()
     throws FsNeedsSyncException {
         final InputArchive<E> ia = inputArchive;
         if (null != ia && ia.isClosed())
-            throw FsNeedsSyncException.get(parent.getModel(), name, READ);
+            throw FsNeedsSyncException.get(getModel(), ROOT, READ);
         return ia;
     }
 
@@ -134,11 +135,11 @@ extends FsFileSystemArchiveController<E> {
             setTouched(true);
     }
 
-    @Nullable OutputArchive<E> getCheckedOutputArchive()
+    @Nullable OutputArchive<E> getOutputArchive()
     throws FsNeedsSyncException {
         final OutputArchive<E> oa = outputArchive;
         if (null != oa && oa.isClosed())
-            throw FsNeedsSyncException.get(parent.getModel(), name, WRITE);
+            throw FsNeedsSyncException.get(getModel(), ROOT, WRITE);
         return oa;
     }
 
@@ -257,7 +258,7 @@ extends FsFileSystemArchiveController<E> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     OutputArchive<E> makeOutputArchive() throws IOException {
-        OutputArchive<E> oa = getCheckedOutputArchive();
+        OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
             return oa;
         final BitField<FsOutputOption> options = getContext()
@@ -266,7 +267,7 @@ extends FsFileSystemArchiveController<E> {
                 .set(CACHE);
         final OutputSocket<?> os = driver.getOutputSocket(
                 parent, name, options, null);
-        final InputArchive<E> ia = getCheckedInputArchive();
+        final InputArchive<E> ia = getInputArchive();
         try {
             oa = new OutputArchive<E>(driver.newOutputShop(
                     getModel(), os, null == ia ? null : ia.getArchive()));
@@ -284,7 +285,7 @@ extends FsFileSystemArchiveController<E> {
             @Override
             protected InputSocket<? extends E> getLazyDelegate()
             throws IOException {
-                return getCheckedInputArchive().getInputSocket(name);
+                return getInputArchive().getInputSocket(name);
             }
 
             @Override
@@ -395,7 +396,7 @@ extends FsFileSystemArchiveController<E> {
                     return;
             } else if (WRITE == intention) {
                 if (driver.getRedundantContentSupport()) {
-                    getCheckedOutputArchive();
+                    getOutputArchive();
                     return;
                 }
             }
@@ -420,7 +421,7 @@ extends FsFileSystemArchiveController<E> {
 
         // Check if the entry is already written to the output archive.
         {
-            final OutputArchive<E> oa = getCheckedOutputArchive();
+            final OutputArchive<E> oa = getOutputArchive();
             if (null != oa) {
                 aen = fse.getEntry().getName();
                 if (null != oa.getEntry(aen))
@@ -437,7 +438,7 @@ extends FsFileSystemArchiveController<E> {
         // Check if the entry is present in the input archive.
         final E iae; // input archive entry
         {
-            final InputArchive<E> ia = getCheckedInputArchive();
+            final InputArchive<E> ia = getInputArchive();
             if (null != ia) {
                 if (null == aen)
                     aen = fse.getEntry().getName();
