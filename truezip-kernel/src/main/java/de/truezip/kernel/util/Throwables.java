@@ -35,7 +35,7 @@ public class Throwables {
                         .getConstructor(String.class)
                         .newInstance(t.toString())
                         .initCause(t);
-        } catch (final Exception ex) {
+        } catch (final Throwable ex) {
             t.addSuppressed(ex);
             return t;
         }
