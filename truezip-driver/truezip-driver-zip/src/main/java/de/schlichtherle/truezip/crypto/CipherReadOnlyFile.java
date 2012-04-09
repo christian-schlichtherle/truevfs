@@ -66,7 +66,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * The current offset in the encrypted file where the buffer window starts.
      * This is always a multiple of the block size.
      */
-    private long bufferPos = INVALID;
+    private long bufferStart = INVALID;
 
     /**
      * The buffer for the encrypted file data.
@@ -84,7 +84,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * has been decrypted to the block.
      * This is always a multiple of the block size.
      */
-    private long blockPos = INVALID;
+    private long blockStart = INVALID;
 
     /** The buffer for the decrypted file data. */
     private byte[] block;
@@ -170,13 +170,13 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         final long safedFp = getFilePointer();
         try {
             final long length = this.length;
-            final int windowLen = buffer.length;
+            final int bufferSize = buffer.length;
             for (pos = 0; pos < length; ) {
                 positionBuffer();
-                final int windowLimit = (int) min(windowLen, length - bufferPos);
-                assert 0 < windowLimit;
-                mac.update(buffer, 0, windowLimit);
-                pos += windowLimit;
+                final int bufferLimit = (int) min(bufferSize, length - bufferStart);
+                assert 0 < bufferLimit;
+                mac.update(buffer, 0, bufferLimit);
+                pos += bufferLimit;
             }
             final byte[] buf = new byte[mac.getMacSize()];
             final int bufLength = mac.doFinal(buf, 0);
@@ -224,33 +224,33 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Partial read of block data at the start.
         positionBlock();
-        if (pos != blockPos) {
+        if (pos != blockStart) {
             assert pos % blockSize != 0;
-            final int blockOff = (int) (pos - blockPos);
-            total = min(remaining, blockSize - blockOff);
-            total = (int) min(total, length - pos);
-            assert total > 0;
-            System.arraycopy(block, blockOff, dst, offset, total);
-            pos += total;
+            final int blockPos = (int) (pos - blockStart);
+            int blockLimit = min(remaining, blockSize - blockPos);
+            blockLimit = (int) min(blockLimit, length - pos);
+            assert blockLimit > 0;
+            System.arraycopy(block, blockPos, dst, offset, blockLimit);
+            total += blockLimit;
+            pos += blockLimit;
         }
 
         if (total < remaining && pos < length) {
             // Full read of block data in the middle.
-            assert pos % blockSize == 0;
             final SeekableBlockCipher cipher = this.cipher;
             final byte[] buffer = this.buffer;
             long blockCounter = pos / blockSize;
             while (total + blockSize <= remaining && pos + blockSize <= length) {
-                // The virtual file pointer is starting on a block boundary.
+                assert pos % blockSize == 0;
                 positionBuffer();
                 cipher.setBlockCounter(blockCounter++);
-                final int bufferOff = (int) (pos - bufferPos);
-                final int processed = cipher.processBlock(
-                        buffer, bufferOff,
+                final int bufferPos = (int) (pos - bufferStart);
+                final int blockLimit = cipher.processBlock(
+                        buffer, bufferPos,
                         dst, offset + total);
-                assert processed == blockSize;
-                total += processed;
-                pos += processed;
+                assert blockLimit == blockSize;
+                total += blockLimit;
+                pos += blockLimit;
             }
         }
 
@@ -258,13 +258,13 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
             // Partial read of block data at the end.
             assert pos % blockSize == 0;
             positionBlock();
-            final int blockOff = (int) (pos - blockPos);
-            int processed = min(remaining - total, blockSize - blockOff);
-            processed = (int) min(processed, length - pos);
-            assert processed > 0;
-            System.arraycopy(block, blockOff, dst, offset + total, processed);
-            total += processed;
-            pos += processed;
+            final int blockPos = (int) (pos - blockStart);
+            int blockLimit = min(remaining - total, blockSize - blockPos);
+            blockLimit = (int) min(blockLimit, length - pos);
+            assert blockLimit > 0;
+            System.arraycopy(block, blockPos, dst, offset + total, blockLimit);
+            total += blockLimit;
+            pos += blockLimit;
         }
 
         return total;
@@ -315,29 +315,29 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      */
     private void positionBlock() throws IOException {
         final byte[] block = this.block;
-        final SeekableBlockCipher cipher = this.cipher;
-        assert null != cipher;
+        final int blockSize = block.length;
 
         // Check position.
         final long pos = this.pos;
-        long blockPos = this.blockPos;
-        final int blockSize = block.length;
-        if (blockPos <= pos) {
-            final long nextBlockPos = blockPos + blockSize;
+        long blockStart = this.blockStart;
+        if (blockStart <= pos) {
+            final long nextBlockPos = blockStart + blockSize;
             if (pos < nextBlockPos)
                 return;
         }
 
         // Move position.
+        final SeekableBlockCipher cipher = this.cipher;
+        assert null != cipher;
         positionBuffer();
         final long blockCounter = pos / blockSize;
         cipher.setBlockCounter(blockCounter);
-        this.blockPos = blockPos = blockCounter * blockSize;
+        this.blockStart = blockStart = blockCounter * blockSize;
 
         // Decrypt block from window.
-        final int bufferOff = (int) (blockPos - bufferPos);
+        final int bufferPos = (int) (blockStart - bufferStart);
         final int processed = cipher.processBlock(
-                buffer, bufferOff,
+                buffer, bufferPos,
                 block, 0);
         assert processed == blockSize;
     }
@@ -356,9 +356,9 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
         // Check position.
         final long pos = this.pos;
-        long bufferPos = this.bufferPos;
-        final long nextBufferPos = bufferPos + bufferSize;
-        if (bufferPos <= pos && pos < nextBufferPos)
+        long bufferStart = this.bufferStart;
+        final long nextBufferStart = bufferStart + bufferSize;
+        if (bufferStart <= pos && pos < nextBufferStart)
             return;
 
         try {
@@ -366,9 +366,9 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
             // Move position.
             // Round down to multiple of buffer size.
-            this.bufferPos = bufferPos = pos / bufferSize * bufferSize;
-            if (bufferPos != nextBufferPos)
-                delegate.seek(start + bufferPos);
+            this.bufferStart = bufferStart = pos / bufferSize * bufferSize;
+            if (bufferStart != nextBufferStart)
+                delegate.seek(start + bufferStart);
 
             // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
@@ -382,7 +382,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
                 total += read;
             } while (total < bufferSize);
         } catch (final IOException ex) {
-            this.bufferPos = INVALID;
+            this.bufferStart = INVALID;
             throw ex;
         }
     }
