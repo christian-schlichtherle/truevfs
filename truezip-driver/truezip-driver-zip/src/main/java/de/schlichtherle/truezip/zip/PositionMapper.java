@@ -9,7 +9,7 @@ package de.schlichtherle.truezip.zip;
  *
  * @author Christian Schlichtherle
  */
-class OffsetMapper {
+class PositionMapper {
     long map(long offset) {
         return offset;
     }

@@ -9,10 +9,10 @@ package de.schlichtherle.truezip.zip;
  *
  * @author  Christian Schlichtherle
  */
-final class IrregularOffsetMapper extends OffsetMapper {
+final class OffsetPositionMapper extends PositionMapper {
     final long start;
 
-    IrregularOffsetMapper(final long start) {
+    OffsetPositionMapper(final long start) {
         this.start = start;
     }
 

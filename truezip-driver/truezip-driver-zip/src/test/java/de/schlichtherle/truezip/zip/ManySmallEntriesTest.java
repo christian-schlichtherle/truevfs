@@ -43,7 +43,7 @@ public final class ManySmallEntriesTest {
         final HashSet<String> set = new HashSet<String>(
                 Maps.initialCapacity(NUM_ENTRIES));
 
-        final ZipOutputStream zipOut = new ZipOutputStream(
+        final ZipOutputStream zos = new ZipOutputStream(
                 buffer.getOutputSocket().newOutputStream());
         for (int i = FIRST_ENTRY; i <= LAST_ENTRY; i++) {
             final String name = Integer.toString(i);
@@ -55,42 +55,46 @@ public final class ManySmallEntriesTest {
             entry.setCrc(DATA_CRC);
             entry.setMethod(STORED);
 
-            zipOut.putNextEntry(entry);
-            zipOut.write(data);
+            zos.putNextEntry(entry);
+            zos.write(data);
             assertTrue(set.add(name));
         }
-        zipOut.close();
+        zos.close();
         assertEquals(ZIP_SIZE, buffer.getSize(Size.STORAGE));
 
-        final ZipFile zipIn = new ZipFile(
+        final ZipFile zf = new ZipFile(
                 buffer.getInputSocket().newReadOnlyFile());
         try {
             final byte[] buf = new byte[data.length];
-            for (Enumeration<? extends ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
+            for (   final Enumeration<? extends ZipEntry> e = zf.entries();
+                    e.hasMoreElements(); ) {
                 final ZipEntry entry = e.nextElement();
 
                 assertEquals(data.length, entry.getSize());
 
-                InputStream in = zipIn.getCheckedInputStream(entry);
-                int off = 0;
-                int read;
-                do {
-                    read = in.read(buf);
-                    if (read < 0)
-                        break;
-                    assertTrue(read > 0);
-                    assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
-                    off += read;
-                } while (true);
-                assertEquals(-1, read);
-                assertEquals(off, data.length);
-                assertEquals(0, in.read(new byte[0]));
-                in.close();
+                final InputStream in = zf.getCheckedInputStream(entry);
+                try {
+                    int off = 0;
+                    int read;
+                    do {
+                        read = in.read(buf);
+                        if (read < 0)
+                            break;
+                        assertTrue(read > 0);
+                        assertTrue(ArrayHelper.equals(data, off, buf, 0, read));
+                        off += read;
+                    } while (true);
+                    assertEquals(-1, read);
+                    assertEquals(off, data.length);
+                    assertEquals(0, in.read(new byte[0]));
+                } finally {
+                    in.close();
+                }
 
                 assertTrue(set.remove(entry.getName()));
             }
         } finally {
-            zipIn.close();
+            zf.close();
         }
 
         assertTrue(set.isEmpty());

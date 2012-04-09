@@ -23,10 +23,10 @@ import org.junit.Test;
  *
  * @author Christian Schlichtherle
  */
-public abstract class ReadOnlyFileTestSuite {
+public abstract class ReadOnlyFileITSuite {
 
     private static final Logger
-            logger = Logger.getLogger(ReadOnlyFileTestSuite.class.getName());
+            logger = Logger.getLogger(ReadOnlyFileITSuite.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -224,7 +224,7 @@ public abstract class ReadOnlyFileTestSuite {
             // IOException, depending on the implementation.
             // In any case, we want to validate that it shows no after effects.
             final int tooLarge = Math.max(
-                    length + 1, rnd.nextInt() & Integer.MAX_VALUE);
+                    length, rnd.nextInt() & Integer.MAX_VALUE);
             try {
                 assertRandomReadByte(rof, tooLarge);
             } catch (IOException mayHappen) {

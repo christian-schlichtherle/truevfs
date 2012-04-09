@@ -145,7 +145,7 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
 
         // Init parameters and entry for authenticate().
         this.sha1MacParam = sha1MacParam;
-        this.entry = param.getEntry();
+        this.entry = entry;
 
         // Init cipher.
         final SeekableBlockCipher cipher = new WinZipAesCipher();
@@ -175,7 +175,6 @@ final class WinZipAesEntryReadOnlyFile extends CipherReadOnlyFile {
         final Mac mac = new HMac(new SHA1Digest());
         mac.init(sha1MacParam);
         final byte[] buf = computeMac(mac);
-        assert buf.length == mac.getMacSize();
         if (!ArrayHelper.equals(buf, 0, authenticationCode, 0, authenticationCode.length))
             throw new ZipAuthenticationException(entry.getName()
                     + " (authenticated WinZip AES entry content has been tampered with)");

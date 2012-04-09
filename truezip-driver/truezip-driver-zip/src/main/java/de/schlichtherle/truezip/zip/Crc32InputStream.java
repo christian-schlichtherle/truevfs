@@ -16,12 +16,12 @@ import java.util.zip.CheckedInputStream;
  *
  * @author Christian Schlichtherle
  */
-final class Crc32CheckingInputStream extends CheckedInputStream {
+final class Crc32InputStream extends CheckedInputStream {
     private final ZipEntry entry;
     private final int size;
     boolean closed;
 
-    Crc32CheckingInputStream(
+    Crc32InputStream(
             final InputStream in,
             final ZipEntry entry,
             final int size) {

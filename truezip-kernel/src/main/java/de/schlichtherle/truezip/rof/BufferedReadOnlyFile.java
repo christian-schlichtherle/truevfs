@@ -40,10 +40,12 @@ import javax.annotation.concurrent.NotThreadSafe;
  *     }
  * </pre>
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
+
+    private static final long INVALID = Long.MIN_VALUE;
 
     /** The default buffer length of the window to the file. */
     public static final int WINDOW_LEN = Streams.BUFFER_SIZE;
@@ -66,29 +68,24 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         return a < b ? b : a;
     }
 
-    private long length;
+    /** The virtual file pointer. */
+    private long pos;
 
     /**
-     * The virtual file pointer in the file data.
-     * This is relative to the start of the file.
+     * The position in the decorated file data where the buffer starts.
+     * This is always a multiple of the buffer size.
      */
-    private long fp;
+    private long bufferStart = INVALID;
 
-    /**
-     * The current offset in the read only file where the buffer window starts.
-     * This is always a multiple of the buffer window size.
-     */
-    private long windowOff;
-
-    /** The buffer window to the file data. */
-    private final byte[] window;
+    /** The buffer for the file data. */
+    private final byte[] buffer;
 
     /**
      * Constructs a new buffered read only file.
      *
      * @param  file The file to read.
      * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws IOException On any other I/O related issue.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -99,26 +96,26 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     /**
      * Constructs a new buffered read only file.
      *
-     * @param  file The file to read.
-     * @param  windowLen The size of the buffer window in bytes.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws IOException On any other I/O related issue.
+     * @param  file the file to read.
+     * @param  bufferSize the size of the buffer window in bytes.
+     * @throws FileNotFoundException if the file cannot get opened for reading.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyFile(
             final File file,
-            final int windowLen)
+            final int bufferSize)
     throws IOException {
-        this(null, file, windowLen);
+        this(null, file, bufferSize);
     }
 
     /**
      * Constructs a new buffered read only file.
      *
-     * @param rof The read only file to read.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws IOException On any other I/O related issue.
+     * @param rof the read only file to read.
+     * @throws FileNotFoundException if the file cannot get opened for reading.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -130,18 +127,18 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     /**
      * Constructs a new buffered read only file.
      *
-     * @param rof The read only file to read.
-     * @param windowLen The size of the buffer window in bytes.
-     * @throws FileNotFoundException If the file cannot get opened for reading.
-     * @throws IOException On any other I/O related issue.
+     * @param rof the read only file to read.
+     * @param bufferSize the size of the buffer window in bytes.
+     * @throws FileNotFoundException if the file cannot get opened for reading.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyFile(
             final @WillCloseWhenClosed ReadOnlyFile rof,
-            final int windowLen)
+            final int bufferSize)
     throws IOException {
-        this(rof, null, windowLen);
+        this(rof, null, bufferSize);
     }
 
     @CreatesObligation
@@ -149,15 +146,10 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     private BufferedReadOnlyFile(
             final @CheckForNull @WillCloseWhenClosed ReadOnlyFile rof,
             final @CheckForNull File file,
-            final int windowLen)
+            final int bufferSize)
     throws IOException {
-        super(check(rof, file, windowLen));
-
-        this.fp = delegate.getFilePointer();
-        this.window = new byte[windowLen];
-        invalidateWindow();
-
-        assert 0 < this.window.length;
+        super(check(rof, file, bufferSize));
+        buffer = new byte[bufferSize];
     }
 
     /** Check constructor parameters (fail fast). */
@@ -187,115 +179,73 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
     }
 
     @Override
-    public long length() throws IOException {
-        // Check state.
-        assertOpen();
-
-        final long length = delegate.length();
-        if (length != this.length) {
-            this.length = length;
-            invalidateWindow();
-        }
-        return length;
-    }
-
-    @Override
-    public long getFilePointer()
-    throws IOException {
-        // Check state.
-        assertOpen();
-
-        return fp;
-    }
-
-    @Override
-    public void seek(final long fp)
-    throws IOException {
-        // Check state.
-        assertOpen();
-
-        if (fp < 0)
-            throw new IOException("File pointer must not be negative!");
-        final long length = length();
-        if (fp > length)
-            throw new IOException("File pointer (" + fp
-                    + ") is larger than file length (" + length + ")!");
-
-        this.fp = fp;
-    }
-
-    @Override
     public int read()
     throws IOException {
         // Check state.
         assertOpen();
-        if (fp >= length())
+        if (pos >= delegate.length())
             return -1;
 
         // Position window and return its data.
-        positionWindow();
-        return window[(int) (fp++ % window.length)] & 0xff;
+        positionBuffer();
+        return buffer[(int) (pos++ % buffer.length)] & 0xff;
     }
 
     @Override
-    public int read(final byte[] buf, final int off, final int len)
+    public int read(final byte[] dst, final int offset, final int remaining)
     throws IOException {
         // Check no-op first for compatibility with RandomAccessFile.
-        if (0 >= len)
+        if (remaining <= 0)
             return 0;
 
-        // Check state.
-        assertOpen();
+        // Check is open and not at EOF.
         final long length = length();
-        if (fp >= length)
+        if (getFilePointer() >= length) // ensure pos is initialized, but do NOT cache!
             return -1;
 
         // Check parameters.
-        if (0 > (off | len | buf.length - off - len))
+        if (0 > (offset | remaining | dst.length - offset - remaining))
 	    throw new IndexOutOfBoundsException();
 
-        // Setup.
-        final int windowLen = window.length;
-        int read = 0; // amount of read data copied to buf
-
-        {
-            // Partial read of window data at the start.
-            final int o = (int) (fp % windowLen);
-            if (o != 0) {
-                // The virtual file pointer is NOT starting on a block boundary.
-                positionWindow();
-                read = Math.min(len, windowLen - o);
-                read = (int) Math.min(read, length - fp);
-                System.arraycopy(window, o, buf, off, read);
-                fp += read;
-            }
+        // Read of buffer data.
+        int total = 0; // amount of data copied to buf
+        final int bufferSize = buffer.length;
+        while (total < remaining && pos < length) {
+            positionBuffer();
+            final int bufferPos = (int) (pos - bufferStart);
+            int processed = Math.min(remaining - total, bufferSize - bufferPos);
+            processed = (int) Math.min(processed, length - pos);
+            assert processed > 0;
+            System.arraycopy(buffer, bufferPos, dst, offset + total, processed);
+            total += processed;
+            pos += processed;
         }
 
-        {
-            // Full read of window data in the middle.
-            while (read + windowLen < len && fp + windowLen < length) {
-                // The virtual file pointer is starting on a block boundary.
-                positionWindow();
-                System.arraycopy(window, 0, buf, off + read, windowLen);
-                read += windowLen;
-                fp += windowLen;
-            }
-        }
+        return total;
+    }
 
-        // Partial read of window data at the end.
-        if (read < len && fp < length) {
-            // The virtual file pointer is starting on a block boundary.
-            positionWindow();
-            final int n = (int) Math.min(len - read, length - fp);
-            System.arraycopy(window, 0, buf, off + read, n);
-            read += n;
-            fp += n;
-        }
+    @Override
+    public long getFilePointer() throws IOException {
+        assertOpen();
+        return pos;
+    }
 
-        // Assert that at least one byte has been read if len isn't zero.
-        // Note that EOF has been tested before.
-        assert read > 0;
-        return read;
+    @Override
+    public void seek(final long pos) throws IOException {
+        assertOpen();
+        if (pos < 0)
+            throw new IOException("File pointer must not be negative!");
+        final long length = delegate.length();
+        if (pos > length)
+            throw new IOException("File pointer (" + pos
+                    + ") is larger than file length (" + length + ")!");
+        this.pos = pos;
+    }
+
+    @Override
+    public long length() throws IOException {
+        assertOpen();
+        return delegate.length();
     }
 
     /**
@@ -313,54 +263,47 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         delegate = null;
     }
 
-    //
-    // Buffer window operations.
-    //
-
     /**
      * Positions the window so that the block containing the current virtual
      * file pointer in the encrypted file is entirely contained in it.
      *
-     * @throws IOException On any I/O related issue.
-     *         The window is invalidated in this case.
+     * @throws IOException on any I/O error.
+     *         The buffer gets invalidated in this case.
      */
-    private void positionWindow()
-    throws IOException {
-        // Check window position.
-        final long fp = this.fp;
-        final int windowLen = window.length;
-        final long nextWindowOff = windowOff + windowLen;
-        if (windowOff <= fp && fp < nextWindowOff)
+    private void positionBuffer() throws IOException {
+        final byte[] buffer = this.buffer;
+        final int bufferSize = buffer.length;
+
+        // Check position.
+        final long pos = this.pos;
+        long bufferStart = this.bufferStart;
+        final long nextBufferStart = bufferStart + bufferSize;
+        if (bufferStart <= pos && pos < nextBufferStart)
             return;
 
         try {
-            // Move window in the buffered file.
-            windowOff = (fp / windowLen) * windowLen; // round down to multiple of window size
-            if (windowOff != nextWindowOff)
-                delegate.seek(windowOff);
+            final ReadOnlyFile delegate = this.delegate;
 
-            // Fill window until end of file or buffer.
+            // Move position.
+            // Round down to multiple of buffer size.
+            this.bufferStart = bufferStart = pos / bufferSize * bufferSize;
+            if (bufferStart != nextBufferStart)
+                delegate.seek(bufferStart);
+
+            // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
             // depend on this as it would be a violation of ReadOnlyFile's
             // contract.
-            int n = 0;
+            int total = 0;
             do {
-                int read = delegate.read(window, n, windowLen - n);
+                int read = delegate.read(buffer, total, bufferSize - total);
                 if (read < 0)
                     break;
-                n += read;
-            } while (n < windowLen);
-        } catch (IOException ioe) {
-            windowOff = -windowLen - 1; // force seek() at next positionWindow()
-            throw ioe;
+                total += read;
+            } while (total < bufferSize);
+        } catch (final IOException ex) {
+            this.bufferStart = INVALID;
+            throw ex;
         }
-    }
-
-    /**
-     * Forces the window to be reloaded on the next call to
-     * {@link #positionWindow()}.
-     */
-    private void invalidateWindow() {
-        windowOff = Long.MIN_VALUE;
     }
 }
