@@ -12,7 +12,7 @@ import java.io.InputStream;
  * 
  * @author Christian Schlichtherle
  */
-public class InputExceptionSource extends AbstractSource {
+public final class InputExceptionSource extends AbstractSource {
 
     private final Source source;
 
