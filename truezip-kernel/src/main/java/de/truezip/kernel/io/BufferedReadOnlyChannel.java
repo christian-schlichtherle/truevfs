@@ -4,9 +4,9 @@
  */
 package de.truezip.kernel.io;
 
-import static de.truezip.kernel.io.Buffers.copy;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import static java.lang.Math.min;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
@@ -34,7 +34,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
     private long bufferStart = INVALID;
 
     /** The buffer for the channel data. */
-    private final ByteBuffer buffer;
+    private final byte[] buffer;
 
     /**
      * Constructs a new buffered read-only channel.
@@ -60,7 +60,7 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
             final @WillCloseWhenClosed SeekableByteChannel channel,
             final int bufferSize) {
         super(channel);
-        buffer = ByteBuffer.allocate(bufferSize);
+        buffer = new byte[bufferSize];
     }
 
     @Override
@@ -77,12 +77,16 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
 
         // Read of buffer data.
         int total = 0; // amount of data copied dst
+        final int bufferSize = buffer.length;
         while (total < remaining && pos < size) {
             positionBuffer();
-            final int processed = copy(buffer, dst);
-            assert processed > 0;
-            total += processed;
-            pos += processed;
+            final int bufferPos = (int) (pos - bufferStart);
+            int bufferLimit = min(remaining - total, bufferSize - bufferPos);
+            bufferLimit = (int) min(bufferLimit, size - pos);
+            assert bufferLimit > 0;
+            dst.put(buffer, bufferPos, bufferLimit);
+            total += bufferLimit;
+            pos += bufferLimit;
         }
 
         return total;
@@ -123,43 +127,37 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
      *         The buffer gets invalidated in this case.
      */
     private void positionBuffer() throws IOException {
-        final ByteBuffer buffer = this.buffer;
-        final int bufferSize = buffer.capacity();
+        final int bufferSize = buffer.length;
 
         // Check position.
         final long pos = this.pos;
         long bufferStart = this.bufferStart;
-        long bufferPos = pos - bufferStart;
         final long nextBufferStart = bufferStart + bufferSize;
-        if (0 <= bufferPos && pos < nextBufferStart) {
-            buffer.position((int) bufferPos);
+        if (bufferStart <= pos && pos < nextBufferStart)
             return;
-        }
 
         try {
             final SeekableByteChannel channel = this.channel;
 
             // Move position.
-            // Round down to multiple of buffer size
+            // Round down to multiple of buffer size.
             this.bufferStart = bufferStart = pos / bufferSize * bufferSize;
-            bufferPos = pos - bufferStart;
             if (bufferStart != nextBufferStart)
                 channel.position(bufferStart);
 
             // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
-            // depend on this as it would be a violation of the contract for a
-            // SeekableByteChannel.
-            buffer.clear();
+            // depend on this as it would be a violation of ReadOnlyFile's
+            // contract.
             int total = 0;
+            final ByteBuffer buffer = ByteBuffer.wrap(this.buffer);
             do {
-                final int read = channel.read(buffer);
+                int read = channel.read(buffer);
                 if (read < 0)
                     break;
                 total += read;
             } while (total < bufferSize);
-            buffer.flip().position((int) bufferPos);
-        } catch (final Throwable ex) {
+        } catch (final IOException ex) {
             this.bufferStart = INVALID;
             throw ex;
         }

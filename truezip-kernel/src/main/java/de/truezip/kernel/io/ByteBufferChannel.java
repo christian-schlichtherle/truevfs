@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import static de.truezip.kernel.io.Buffers.copy;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -60,6 +59,30 @@ public class ByteBufferChannel implements SeekableByteChannel {
     @Override
     public final int read(final ByteBuffer dst) throws IOException {
         return copy(buffer, dst);
+    }
+
+    private static int copy(final ByteBuffer src, final ByteBuffer dst) {
+        int remaining = dst.remaining();
+        if (remaining <= 0)
+            return 0;
+        final int available = src.remaining();
+        if (available <= 0)
+            return -1;
+        final int srcLimit;
+        if (available > remaining) {
+            srcLimit = src.limit();
+            src.limit(src.position() + remaining);
+        } else {
+            srcLimit = -1;
+            remaining = available;
+        }
+        try {
+            dst.put(src);
+        } finally {
+            if (srcLimit >= 0)
+                src.limit(srcLimit);
+        }
+        return remaining;
     }
 
     @Override
