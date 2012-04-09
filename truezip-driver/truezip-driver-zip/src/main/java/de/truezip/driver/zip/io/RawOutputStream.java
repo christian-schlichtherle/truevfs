@@ -12,7 +12,7 @@ import static de.truezip.driver.zip.io.WinZipAesUtils.overhead;
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.LEDataOutputStream;
+import de.truezip.kernel.io.LittleEndianOutputStream;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -48,7 +48,7 @@ public abstract class RawOutputStream<E extends ZipEntry>
 extends DecoratingOutputStream
 implements Iterable<E> {
 
-    private final LEDataOutputStream dos;
+    private final LittleEndianOutputStream leos;
 
     /** The charset to use for entry names and comments. */
     private final Charset charset;
@@ -96,8 +96,8 @@ implements Iterable<E> {
             final @WillCloseWhenClosed OutputStream out,
             final @CheckForNull @WillNotClose RawFile<E> appendee,
             final ZipOutputStreamParameters param) {
-        super(newLEDataOutputStream(out, appendee));
-        this.dos = (LEDataOutputStream) this.out;
+        super(newLittleEndianOutputStream(out, appendee));
+        this.leos = (LittleEndianOutputStream) this.out;
         if (null != appendee) {
             this.charset = appendee.getRawCharset();
             this.comment = appendee.getRawComment();
@@ -116,16 +116,14 @@ implements Iterable<E> {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    private static LEDataOutputStream newLEDataOutputStream(
+    private static LittleEndianOutputStream newLittleEndianOutputStream(
             final @WillCloseWhenClosed OutputStream out,
             final @CheckForNull @WillNotClose RawFile<?> appendee) {
         if (null == out)
             throw new NullPointerException();
         return null != appendee
-                ? new AppendingLEDataOutputStream(out, appendee)
-                : out instanceof LEDataOutputStream
-                    ? (LEDataOutputStream) out
-                    : new LEDataOutputStream(out);
+                ? new AppendingLittleEndianOutputStream(out, appendee)
+                : new LittleEndianOutputStream(out);
     }
 
     private byte[] encode(String string) {
@@ -292,7 +290,7 @@ implements Iterable<E> {
      * to the underlying stream.
      */
     public long length() {
-        return this.dos.size();
+        return leos.size();
     }
 
     /**
@@ -462,7 +460,7 @@ implements Iterable<E> {
             return;
         this.processor.finish();
         this.out.flush();
-        this.out = this.dos;
+        this.out = this.leos;
         this.processor = null;
         this.entry = null;
     }
@@ -489,8 +487,8 @@ implements Iterable<E> {
         if (this.finished)
             return;
         closeEntry();
-        final LEDataOutputStream dos = this.dos;
-        this.cdOffset = dos.size();
+        final LittleEndianOutputStream leos = this.leos;
+        this.cdOffset = leos.size();
         final Iterator<E> i = this.entries.values().iterator();
         while (i.hasNext())
             if (!writeCentralFileHeader(i.next()))
@@ -520,49 +518,49 @@ implements Iterable<E> {
             // E.g. this may happen with the GROW output option preference.
             return false;
         }
-        final LEDataOutputStream dos = this.dos;
+        final LittleEndianOutputStream leos = this.leos;
         // central file header signature   4 bytes  (0x02014b50)
-        dos.writeInt(CFH_SIG);
+        leos.writeInt(CFH_SIG);
         // version made by                 2 bytes
-        dos.writeShort((entry.getRawPlatform() << 8) | 63);
+        leos.writeShort((entry.getRawPlatform() << 8) | 63);
         // version needed to extract       2 bytes
-        dos.writeShort(entry.getRawVersionNeededToExtract());
+        leos.writeShort(entry.getRawVersionNeededToExtract());
         // general purpose bit flag        2 bytes
-        dos.writeShort(entry.getGeneralPurposeBitFlags());
+        leos.writeShort(entry.getGeneralPurposeBitFlags());
         // compression method              2 bytes
-        dos.writeShort(entry.getRawMethod());
+        leos.writeShort(entry.getRawMethod());
         // last mod file time              2 bytes
         // last mod file date              2 bytes
-        dos.writeInt((int) entry.getRawTime());
+        leos.writeInt((int) entry.getRawTime());
         // crc-32                          4 bytes
-        dos.writeInt((int) entry.getRawCrc());
+        leos.writeInt((int) entry.getRawCrc());
         // compressed size                 4 bytes
-        dos.writeInt((int) entry.getRawCompressedSize());
+        leos.writeInt((int) entry.getRawCompressedSize());
         // uncompressed size               4 bytes
-        dos.writeInt((int) entry.getRawSize());
+        leos.writeInt((int) entry.getRawSize());
         // file name length                2 bytes
         final byte[] name = encode(entry.getName());
-        dos.writeShort(name.length);
+        leos.writeShort(name.length);
         // extra field length              2 bytes
         final byte[] extra = entry.getRawExtraFields();
-        dos.writeShort(extra.length);
+        leos.writeShort(extra.length);
         // file comment length             2 bytes
         final byte[] comment = getCommentEncoded(entry);
-        dos.writeShort(comment.length);
+        leos.writeShort(comment.length);
         // disk number start               2 bytes
-        dos.writeShort(0);
+        leos.writeShort(0);
         // internal file attributes        2 bytes
-        dos.writeShort(0);
+        leos.writeShort(0);
         // external file attributes        4 bytes
-        dos.writeInt((int) entry.getRawExternalAttributes());
+        leos.writeInt((int) entry.getRawExternalAttributes());
         // relative offset of local header 4 bytes
-        dos.writeInt((int) entry.getRawOffset());
+        leos.writeInt((int) entry.getRawOffset());
         // file name (variable size)
-        dos.write(name);
+        leos.write(name);
         // extra field (variable size)
-        dos.write(extra);
+        leos.write(extra);
         // file comment (variable size)
-        dos.write(comment);
+        leos.write(comment);
 
         return true;
     }
@@ -577,10 +575,10 @@ implements Iterable<E> {
      * @throws IOException On any I/O error.
      */
     private void writeEndOfCentralDirectory() throws IOException {
-        final LEDataOutputStream dos = this.dos;
+        final LittleEndianOutputStream leos = this.leos;
         final long cdEntries = entries.size();
         final long cdOffset = this.cdOffset;
-        final long cdSize = dos.size() - cdOffset;
+        final long cdSize = leos.size() - cdOffset;
         final boolean cdEntriesZip64 = cdEntries > UShort.MAX_VALUE || FORCE_ZIP64_EXT;
         final boolean cdSizeZip64    = cdSize    > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
         final boolean cdOffsetZip64  = cdOffset  > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
@@ -593,73 +591,73 @@ implements Iterable<E> {
                 || cdOffsetZip64;
         if (zip64) {
             final long zip64eocdOffset // relative offset of the zip64 end of central directory record
-                    = dos.size();
+                    = leos.size();
             // zip64 end of central dir 
             // signature                       4 bytes  (0x06064b50)
-            dos.writeInt(ZIP64_EOCDR_SIG);
+            leos.writeInt(ZIP64_EOCDR_SIG);
             // size of zip64 end of central
             // directory record                8 bytes
-            dos.writeLong(ZIP64_EOCDR_MIN_LEN - 12);
+            leos.writeLong(ZIP64_EOCDR_MIN_LEN - 12);
             // version made by                 2 bytes
-            dos.writeShort(63);
+            leos.writeShort(63);
             // version needed to extract       2 bytes
-            dos.writeShort(46); // due to potential use of BZIP2 compression
+            leos.writeShort(46); // due to potential use of BZIP2 compression
             // number of this disk             4 bytes
-            dos.writeInt(0);
+            leos.writeInt(0);
             // number of the disk with the 
             // start of the central directory  4 bytes
-            dos.writeInt(0);
+            leos.writeInt(0);
             // total number of entries in the
             // central directory on this disk  8 bytes
-            dos.writeLong(cdEntries);
+            leos.writeLong(cdEntries);
             // total number of entries in the
             // central directory               8 bytes
-            dos.writeLong(cdEntries);
+            leos.writeLong(cdEntries);
             // size of the central directory   8 bytes
-            dos.writeLong(cdSize);
+            leos.writeLong(cdSize);
             // offset of start of central
             // directory with respect to
             // the starting disk number        8 bytes
-            dos.writeLong(cdOffset);
+            leos.writeLong(cdOffset);
             // zip64 extensible data sector    (variable size)
             //
             // zip64 end of central dir locator 
             // signature                       4 bytes  (0x07064b50)
-            dos.writeInt(ZIP64_EOCDL_SIG);
+            leos.writeInt(ZIP64_EOCDL_SIG);
             // number of the disk with the
             // start of the zip64 end of 
             // central directory               4 bytes
-            dos.writeInt(0);
+            leos.writeInt(0);
             // relative offset of the zip64
             // end of central directory record 8 bytes
-            dos.writeLong(zip64eocdOffset);
+            leos.writeLong(zip64eocdOffset);
             // total number of disks           4 bytes
-            dos.writeInt(1);
+            leos.writeInt(1);
         }
         // end of central dir signature    4 bytes  (0x06054b50)
-        dos.writeInt(EOCDR_SIG);
+        leos.writeInt(EOCDR_SIG);
         // number of this disk             2 bytes
-        dos.writeShort(0);
+        leos.writeShort(0);
         // number of the disk with the
         // start of the central directory  2 bytes
-        dos.writeShort(0);
+        leos.writeShort(0);
         // total number of entries in the
         // central directory on this disk  2 bytes
-        dos.writeShort(cdEntries16);
+        leos.writeShort(cdEntries16);
         // total number of entries in
         // the central directory           2 bytes
-        dos.writeShort(cdEntries16);
+        leos.writeShort(cdEntries16);
         // size of the central directory   4 bytes
-        dos.writeInt((int) cdSize32);
+        leos.writeInt((int) cdSize32);
         // offset of start of central
         // directory with respect to
         // the starting disk number        4 bytes
-        dos.writeInt((int) cdOffset32);
+        leos.writeInt((int) cdOffset32);
         // .ZIP file comment length        2 bytes
         final byte[] comment = getRawComment();
-        dos.writeShort(comment.length);
+        leos.writeShort(comment.length);
         // .ZIP file comment       (variable size)
-        dos.write(comment);
+        leos.write(comment);
     }
 
     private byte[] getRawComment() {
@@ -682,11 +680,11 @@ implements Iterable<E> {
     }
 
     /** Adjusts the number of written bytes in the offset for appending mode. */
-    private static final class AppendingLEDataOutputStream
-    extends LEDataOutputStream {
+    private static final class AppendingLittleEndianOutputStream
+    extends LittleEndianOutputStream {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        AppendingLEDataOutputStream(
+        AppendingLittleEndianOutputStream(
                 final @WillCloseWhenClosed OutputStream out,
                 final @WillNotClose RawFile<?> appendee) {
             super(out);
@@ -742,8 +740,8 @@ implements Iterable<E> {
          */
         @Override
         public OutputStream start() throws IOException {
-            final LEDataOutputStream dos = RawOutputStream.this.dos;
-            final long offset = dos.size();
+            final LittleEndianOutputStream leos = RawOutputStream.this.leos;
+            final long offset = leos.size();
             final ZipEntry entry = this.entry;
             final boolean encrypted = entry.isEncrypted();
             final boolean dd = entry.isDataDescriptorRequired();
@@ -756,44 +754,44 @@ implements Iterable<E> {
             // Start changes.
             RawOutputStream.this.finished = false;
             // local file header signature     4 bytes  (0x04034b50)
-            dos.writeInt(LFH_SIG);
+            leos.writeInt(LFH_SIG);
             // version needed to extract       2 bytes
-            dos.writeShort(entry.getRawVersionNeededToExtract());
+            leos.writeShort(entry.getRawVersionNeededToExtract());
             // general purpose bit flag        2 bytes
-            dos.writeShort(general);
+            leos.writeShort(general);
             // compression method              2 bytes
-            dos.writeShort(entry.getRawMethod());
+            leos.writeShort(entry.getRawMethod());
             // last mod file time              2 bytes
             // last mod file date              2 bytes
-            dos.writeInt((int) entry.getRawTime());
+            leos.writeInt((int) entry.getRawTime());
             // crc-32                          4 bytes
             // compressed size                 4 bytes
             // uncompressed size               4 bytes
             if (dd) {
-                dos.writeInt(0);
-                dos.writeInt(0);
-                dos.writeInt(0);
+                leos.writeInt(0);
+                leos.writeInt(0);
+                leos.writeInt(0);
             } else {
-                dos.writeInt((int) entry.getRawCrc());
-                dos.writeInt((int) entry.getRawCompressedSize());
-                dos.writeInt((int) entry.getRawSize());
+                leos.writeInt((int) entry.getRawCrc());
+                leos.writeInt((int) entry.getRawCompressedSize());
+                leos.writeInt((int) entry.getRawSize());
             }
             // file name length                2 bytes
             final byte[] name = encode(entry.getName());
-            dos.writeShort(name.length);
+            leos.writeShort(name.length);
             // extra field length              2 bytes
             final byte[] extra = entry.getRawExtraFields();
-            dos.writeShort(extra.length);
+            leos.writeShort(extra.length);
             // file name (variable size)
-            dos.write(name);
+            leos.write(name);
             // extra field (variable size)
-            dos.write(extra);
+            leos.write(extra);
             // Commit changes.
             entry.setGeneralPurposeBitFlags(general);
             entry.setRawOffset(offset);
             // Update data start.
-            this.dataStart = dos.size();
-            return dos;
+            this.dataStart = leos.size();
+            return leos;
         }
 
         /**
@@ -802,25 +800,25 @@ implements Iterable<E> {
          */
         @Override
         public void finish() throws IOException {
-            final LEDataOutputStream dos = RawOutputStream.this.dos;
-            final long csize = dos.size() - this.dataStart;
+            final LittleEndianOutputStream leos = RawOutputStream.this.leos;
+            final long csize = leos.size() - this.dataStart;
             final ZipEntry entry = this.entry;
             assert UNKNOWN != entry.getCrc();
             assert UNKNOWN != entry.getSize();
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
                 entry.setRawCompressedSize(csize);
                 // data descriptor signature       4 bytes  (0x08074b50)
-                dos.writeInt(DD_SIG);
+                leos.writeInt(DD_SIG);
                 // crc-32                          4 bytes
-                dos.writeInt((int) entry.getRawCrc());
+                leos.writeInt((int) entry.getRawCrc());
                 // compressed size                 4 or 8 bytes
                 // uncompressed size               4 or 8 bytes
                 if (entry.isZip64ExtensionsRequired()) {
-                    dos.writeLong(csize);
-                    dos.writeLong(entry.getSize());
+                    leos.writeLong(csize);
+                    leos.writeLong(entry.getSize());
                 } else {
-                    dos.writeInt((int) entry.getRawCompressedSize());
-                    dos.writeInt((int) entry.getRawSize());
+                    leos.writeInt((int) entry.getRawCompressedSize());
+                    leos.writeInt((int) entry.getRawSize());
                 }
             } else if (entry.getCompressedSize() != csize) {
                 throw new ZipException(entry.getName()
@@ -915,11 +913,11 @@ implements Iterable<E> {
                 final long crc = entry.getCrc();
                 entry.setRawCrc(0);
                 this.out = new WinZipAesEntryOutputStream(
-                        (LEDataOutputStream) method.start(), entryParam);
+                        (LittleEndianOutputStream) method.start(), entryParam);
                 entry.setCrc(crc);
             } else {
                 this.out = new WinZipAesEntryOutputStream(
-                        (LEDataOutputStream) method.start(), entryParam);
+                        (LittleEndianOutputStream) method.start(), entryParam);
             }
             return this.out;
         }
@@ -945,7 +943,7 @@ implements Iterable<E> {
 
     private final class BZip2OutputMethod extends DecoratingOutputMethod {
         @Nullable BZip2CompressorOutputStream cout;
-        @Nullable LEDataOutputStream dout;
+        @Nullable LittleEndianOutputStream dout;
         @Nullable ZipEntry entry;
 
         BZip2OutputMethod(OutputMethod processor) {
@@ -970,7 +968,7 @@ implements Iterable<E> {
                     ? BZip2CompressorOutputStream.chooseBlockSize(size)
                     : getBZip2BlockSize();
             out = this.cout = new BZip2CompressorOutputStream(out, blockSize);
-            return this.dout = new LEDataOutputStream(out);
+            return this.dout = new LittleEndianOutputStream(out);
         }
 
         int getBZip2BlockSize() {

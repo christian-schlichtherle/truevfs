@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -18,23 +19,23 @@ import javax.annotation.concurrent.NotThreadSafe;
  * but writes data in Little Endian format to its underlying stream.
  * A noteable difference to {@code DataOutputStream} is that the
  * {@link #size()} method and the {@link #written} field are respectively
- * return {@code long} values and wrap to {@link Long#MAX_VALUE}.
+ * return {@code long} values.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class LEDataOutputStream
+public class LittleEndianOutputStream
 extends DecoratingOutputStream
 implements DataOutput {
-
-    /** This buffer is used for writing data. */
-    private final byte[] buf = new byte[8];
 
     /**
      * The number of bytes written to the data output stream so far.
      * If this counter overflows, it will be wrapped to Long.MAX_VALUE.
      */
     protected long written;
+
+    /** This buffer is used for writing data. */
+    private final byte[] buf = new byte[8];
 
     /**
      * Creates a new data output stream to write data to the specified
@@ -45,7 +46,8 @@ implements DataOutput {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public LEDataOutputStream(@WillCloseWhenClosed OutputStream out) {
+    public LittleEndianOutputStream(
+            @CheckForNull @WillCloseWhenClosed OutputStream out) {
         super(out);
     }
 
@@ -125,20 +127,6 @@ implements DataOutput {
     }
 
     /**
-     * Writes a {@code char} value to the underlying output stream
-     * as a 2-byte value, low byte first.
-     * If no exception is thrown, the counter {@code written} is
-     * incremented by two.
-     *
-     * @param c The {@code char} value to be written.
-     * @throws IOException If an I/O error occurs.
-     */
-    @Override
-    public final void writeChar(int c) throws IOException {
-        writeShort(c);
-    }
-
-    /**
      * Writes the integer value {@code s} to the underlying output stream
      * as two bytes, low byte first.
      * If no exception is thrown, the counter {@code written} is
@@ -154,6 +142,20 @@ implements DataOutput {
         buf[1] = (byte) s;
         out.write(buf, 0, 2);
         inc(2);
+    }
+
+    /**
+     * Writes a {@code char} value to the underlying output stream
+     * as a 2-byte value, low byte first.
+     * If no exception is thrown, the counter {@code written} is
+     * incremented by two.
+     *
+     * @param c The {@code char} value to be written.
+     * @throws IOException If an I/O error occurs.
+     */
+    @Override
+    public final void writeChar(int c) throws IOException {
+        writeShort(c);
     }
 
     /**
@@ -274,7 +276,7 @@ implements DataOutput {
     public final void writeChars(String s) throws IOException {
         final int len = s.length();
         for (int i = 0 ; i < len ; i++)
-            writeShort(s.charAt(i));
+            writeChar(s.charAt(i));
     }
 
     /**
