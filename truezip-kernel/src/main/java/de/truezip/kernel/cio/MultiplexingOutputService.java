@@ -235,7 +235,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             super(buffer.getOutputSocket().newStream());
             this.output = output;
             this.local = output.getLocalTarget();
-            final Entry remote = output.getRemoteTarget();
+            final Entry peer = output.getPeerTarget();
             class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() {
                     super(buffer.getInputSocket());
@@ -243,7 +243,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
                 @Override
                 public Entry getLocalTarget() {
-                    return null != remote ? remote : buffer;
+                    return null != peer ? peer : buffer;
                 }
             }
             this.buffer = buffer;

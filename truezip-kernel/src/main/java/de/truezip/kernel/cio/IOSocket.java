@@ -28,22 +28,22 @@ import javax.annotation.concurrent.ThreadSafe;
  * However, this operation may fail with an {@link IOException} at the
  * discretion of the implementation.
  * <p>
- * A socket may have an optional <i>remote target</i> which can get resolved
- * anytime by calling the abstract method {@link #getRemoteTarget()}.
- * If this method returns {@code null}, then the socket does not have a remote
+ * A socket may have an optional <i>peer target</i> which can get resolved
+ * anytime by calling the abstract method {@link #getPeerTarget()}.
+ * If this method returns {@code null}, then the socket does not have a peer
  * target.
  * Again, this operation may fail with an {@code IOException}.
  * <p>
  * I/O sockets are designed to {@linkplain #copy copy} the contents of their
  * I/O targets fast and easily by using multithreading.
- * In addition, a socket may negotiate with its remote target in order to
+ * In addition, a socket may negotiate with its peer target in order to
  * agree upon the necessary processing when copying the entry data.
  * For example, this could get used by an implementation in order to avoid
  * redundant decompression and recompression when copying compressed entry data.
  *
  * @param  <LT> the type of the {@link #getLocalTarget() local target}
  *         for I/O operations.
- * @param  <PT> the type of the {@link #getRemoteTarget() remote target}
+ * @param  <PT> the type of the {@link #getPeerTarget() peer target}
  *         for I/O operations.
  * @author Christian Schlichtherle
  */
@@ -75,14 +75,14 @@ public abstract class IOSocket<LT, PT> {
     public abstract LT getLocalTarget() throws IOException;
 
     /**
-     * Resolves the <i>remote target</i> for I/O operations.
+     * Resolves the <i>peer target</i> for I/O operations.
      * <p>
      * The same considerations as for {@link #getLocalTarget} apply here, too.
      *
-     * @return The remote target for I/O operations.
+     * @return The peer target for I/O operations.
      * @throws IOException On any I/O error. 
      */
-    public abstract @CheckForNull PT getRemoteTarget() throws IOException;
+    public abstract @CheckForNull PT getPeerTarget() throws IOException;
 
     /**
      * Copies an input stream {@link InputSocket#newStream created}
@@ -111,7 +111,7 @@ public abstract class IOSocket<LT, PT> {
     }
 
     /**
-     * Returns a string representing a connection of the local and remote
+     * Returns a string representing a connection of the local and peer
      * targets.
      */
     @Override
@@ -124,11 +124,11 @@ public abstract class IOSocket<LT, PT> {
         }
         Object pt;
         try {
-            pt = getRemoteTarget();
+            pt = getPeerTarget();
         } catch (final IOException ex) {
             pt = ex;
         }
-        return String.format("%s[localTarget=%s, remoteTarget=%s]",
+        return String.format("%s[localTarget=%s, peerTarget=%s]",
                 getClass().getName(), lt, pt);
     }
 

@@ -142,7 +142,7 @@ implements OutputService<ZipDriverEntry> {
             throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(entry.getName());
-                final Entry remote;
+                final Entry peer;
                 final long size;
                 boolean process = true;
                 if (entry.isDirectory()) {
@@ -151,15 +151,15 @@ implements OutputService<ZipDriverEntry> {
                     entry.setCompressedSize(0);
                     entry.setSize(0);
                     return new EntryOutputStream(entry, true);
-                } else if (null != (remote = getRemoteTarget())
-                        && UNKNOWN != (size = remote.getSize(DATA))) {
+                } else if (null != (peer = getPeerTarget())
+                        && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);
-                    if (remote instanceof ZipDriverEntry) {
+                    if (peer instanceof ZipDriverEntry) {
                         // Set up entry attributes for Raw Data Copying (RDC).
                         // A preset method in the entry takes priority.
                         // The ZIP.RAES drivers use this feature to enforce
                         // deflation for enhanced authentication security.
-                        final ZipDriverEntry zpt = (ZipDriverEntry) remote;
+                        final ZipDriverEntry zpt = (ZipDriverEntry) peer;
                         process = driver.process(ZipOutputService.this, entry, zpt);
                         if (!process) {
                             entry.setPlatform(zpt.getPlatform());
@@ -180,7 +180,7 @@ implements OutputService<ZipDriverEntry> {
                     } else if (UNKNOWN == entry.getSize()
                             || UNKNOWN == entry.getCompressedSize()
                             || UNKNOWN == entry.getCrc()) {
-                        assert process : "The CRC-32, compressed size and size properties should be set in the remote target!";
+                        assert process : "The CRC-32, compressed size and size properties should be set in the peer target!";
                         return new BufferedEntryOutputStream(
                                 getPool().allocate(), entry, process);
                     }
