@@ -97,7 +97,15 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
      */
     public PowerBuffer load(ReadableByteChannel channel)
     throws EOFException, IOException {
-        Channels.readFully(channel, bb);
+        int remaining = bb.remaining();
+        bb.mark();
+        do {
+            int read = channel.read(bb);
+            if (0 > read)
+                throw new EOFException();
+            remaining -= read;
+        } while (0 < remaining);
+        bb.reset();
         return this;
     }
 
@@ -112,7 +120,12 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
      * @throws IOException on any I/O error.
      */
     public PowerBuffer save(WritableByteChannel channel) throws IOException {
-        Channels.writeFully(channel, bb);
+        int remaining = bb.remaining();
+        bb.mark();
+        do {
+            remaining -= channel.write(bb);
+        } while (0 < remaining);
+        bb.reset();
         return this;
     }
 
