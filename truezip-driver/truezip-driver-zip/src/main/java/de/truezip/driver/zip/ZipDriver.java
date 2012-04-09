@@ -23,7 +23,6 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
