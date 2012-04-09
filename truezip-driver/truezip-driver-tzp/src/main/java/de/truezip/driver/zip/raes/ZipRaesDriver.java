@@ -16,11 +16,16 @@ import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
+import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.OutputService;
+import de.truezip.kernel.io.AbstractSource;
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
@@ -100,7 +105,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected final boolean check(ZipInputService input, ZipDriverEntry entry) {
         // Optimization: If the cipher text alias the encrypted ZIP file is
         // smaller than the authentication trigger, then its entire cipher text
-        // has already been authenticated by {@link ZipRaesDriver#newInputService}.
+        // has already been authenticated by {@link ZipRaesDriver#newZipInputService}.
         // Hence, checking the CRC-32 value of the entry is redundant.
         return input.length() > getAuthenticationTrigger();
     }
@@ -135,26 +140,31 @@ public abstract class ZipRaesDriver extends JarDriver {
      * implementation.
      */
     @Override
-    protected final InputService<ZipDriverEntry> newInputService(
+    protected final ZipInputService newZipInputService(
             final FsModel model,
-            final InputSocket<?> input)
+            final Source source)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        final RaesReadOnlyChannel channel = RaesReadOnlyChannel.create(
-                raesParameters(model), input);
-        try {
-            if (channel.size() <= getAuthenticationTrigger())
-                channel.authenticate();
-            return newInputService(model, channel);
-        } catch (final Throwable ex) {
-            try {
-                channel.close();
-            } catch (final Throwable ex2) {
-                ex.addSuppressed(ex2);
+        final class RaesSource extends AbstractSource {
+            @Override
+            public SeekableByteChannel newChannel() throws IOException {
+                final RaesReadOnlyChannel channel = RaesReadOnlyChannel
+                        .create(raesParameters(model), source);
+                try {
+                    if (channel.size() <= getAuthenticationTrigger())
+                        channel.authenticate();
+                } catch (final Throwable ex) {
+                    try {
+                        channel.close();
+                    } catch (final Throwable ex2) {
+                        ex.addSuppressed(ex2);
+                    }
+                    throw ex;
+                }
+                return channel;
             }
-            throw ex;
-        }
+        } // RaesSource
+
+        return new ZipInputService(this, model, new RaesSource());
     }
 
     @Override

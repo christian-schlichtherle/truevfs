@@ -11,6 +11,7 @@ import de.truezip.kernel.io.PowerBuffer;
 import de.truezip.kernel.io.Source;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
@@ -71,13 +72,14 @@ public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @throws RaesParametersException If no RAES parameter can be found which
      *         match the type of RAES file in the given channel.
      * @throws RaesException If the file is not RAES compatible.
+     * @throws EOFException on premature end-of-file.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public static RaesReadOnlyChannel create(
             final RaesParameters param,
             final Source source)
-    throws RaesParametersException, RaesException, IOException {
+    throws RaesParametersException, RaesException, EOFException, IOException {
         final SeekableByteChannel channel = source.newChannel();
         try {
             return create(param, channel);
@@ -106,14 +108,15 @@ public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @return A new RAES read-only channel.
      * @throws RaesParametersException If no RAES parameter can be found which
      *         match the type of RAES file in the given channel.
-     * @throws RaesException If the file is not RAES compatible.
+     * @throws RaesException If the source data is not RAES compatible.
+     * @throws EOFException on premature end-of-file.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     private static RaesReadOnlyChannel create(
             final RaesParameters param,
             final @WillCloseWhenClosed SeekableByteChannel channel)
-    throws RaesParametersException, RaesException, IOException {
+    throws RaesParametersException, RaesException, EOFException, IOException {
         final PowerBuffer header = PowerBuffer
                 .allocate(HEADER_MIN_LEN)
                 .littleEndian()

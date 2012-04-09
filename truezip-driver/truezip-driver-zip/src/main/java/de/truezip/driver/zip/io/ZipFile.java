@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.zip.io;
 
+import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.LockInputStream;
-import de.truezip.kernel.util.Pool;
-import java.io.File;
+import de.truezip.kernel.io.OneTimeSource;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -111,8 +111,8 @@ public class ZipFile extends RawFile<ZipEntry> {
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new DefaultReadOnlyChannelPool(path),
-                new DefaultZipFileParameters(charset, preambled, postambled));
+        super(  new DefaultZipFileParameters(charset, preambled, postambled),
+                new ZipSource(path));
         this.name = path;
     }
 
@@ -172,8 +172,8 @@ public class ZipFile extends RawFile<ZipEntry> {
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new DefaultReadOnlyChannelPool(file),
-                new DefaultZipFileParameters(charset, preambled, postambled));
+        super(  new DefaultZipFileParameters(charset, preambled, postambled),
+                new ZipSource(file));
         this.name = file.toString();
     }
 
@@ -233,7 +233,8 @@ public class ZipFile extends RawFile<ZipEntry> {
             boolean preambled,
             boolean postambled)
     throws IOException {
-        super(channel, new DefaultZipFileParameters(charset, preambled, postambled));
+        super(  new DefaultZipFileParameters(charset, preambled, postambled),
+                new OneTimeSource(channel));
         this.name = channel.toString();
     }
 
@@ -251,7 +252,7 @@ public class ZipFile extends RawFile<ZipEntry> {
     /**
      * Returns the {@link Object#toString() string representation} of whatever
      * input source object was used to construct this ZIP file.
-     * For {@link String} and {@link File} objects, this is a path name.
+     * For {@link String} and {@link Path} objects, this is a path name.
      */
     public String getName() {
         return name;
@@ -401,26 +402,20 @@ public class ZipFile extends RawFile<ZipEntry> {
      * A pool which allocates {@link SeekableByteChannel} objects for the
      * file provided to its constructor.
      */
-    private static final class DefaultReadOnlyChannelPool
-    implements Pool<SeekableByteChannel, IOException> {
+    private static final class ZipSource extends AbstractSource {
         final Path file;
 
-        DefaultReadOnlyChannelPool(String name) {
+        ZipSource(String name) {
             this(Paths.get(name));
         }
 
-        DefaultReadOnlyChannelPool(final Path file) {
+        ZipSource(final Path file) {
             this.file = file;
         }
 
         @Override
-        public SeekableByteChannel allocate() throws IOException {
+        public SeekableByteChannel newChannel() throws IOException {
             return newByteChannel(file);
         }
-
-        @Override
-        public void release(SeekableByteChannel channel) throws IOException {
-            channel.close();
-        }
-    } // DefaultReadOnlyChannelPool
+    } // ZipSource
 }

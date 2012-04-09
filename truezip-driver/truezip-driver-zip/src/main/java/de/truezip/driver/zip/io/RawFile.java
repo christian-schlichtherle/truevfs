@@ -12,7 +12,6 @@ import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
 import de.truezip.kernel.io.*;
 import static de.truezip.kernel.util.Maps.initialCapacity;
-import de.truezip.kernel.util.Pool;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.EOFException;
@@ -112,28 +111,21 @@ implements Closeable, Iterable<E> {
      * Reads the given {@code zip} file in order to provide random access
      * to its entries.
      *
-     * @param  zip the ZIP file to be load.
      * @param  param the parameters for reading the ZIP file.
-     * @throws ZipException if the channel data is not compatible to the ZIP
+     * @param  source the source for reading the ZIP file from.
+     * @throws ZipException if the source data is not compatible to the ZIP
      *         File Format Specification.
-     * @throws IOException on any other I/O related issue.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
     @CreatesObligation
     protected RawFile(
-            @WillCloseWhenClosed SeekableByteChannel zip,
-            ZipFileParameters<E> param)
-    throws ZipException, IOException {
-        this(new SingleReadOnlyChannelPool(zip), param);
-    }
-
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    RawFile(final Pool<SeekableByteChannel, IOException> source,
-            final ZipFileParameters<E> param)
-    throws IOException {
-        if (null == (this.param = param))
-            throw new NullPointerException();
-        final SeekableByteChannel channel = this.channel = source.allocate();
+            final ZipFileParameters<E> param,
+            final Source source)
+    throws ZipException, EOFException, IOException {
+        this.param = param;
+        final SeekableByteChannel channel = this.channel = source.newChannel();
         try {
             length = channel.size();
             charset = param.getCharset();
@@ -154,7 +146,11 @@ implements Closeable, Iterable<E> {
             assert null != mapper;
             // Do NOT close bchannel - would close channel as well!
         } catch (final Throwable ex) {
-            source.release(channel);
+            try {
+                channel.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }

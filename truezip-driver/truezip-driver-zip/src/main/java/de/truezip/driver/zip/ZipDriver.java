@@ -13,6 +13,7 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import de.truezip.key.KeyManagerProvider;
@@ -348,51 +349,31 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         return new ZipKeyController<>(controller, this);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link ZipDriver} acquires a read only
-     * file from the given socket and forwards the call to
-     * {@link #newInputService(de.truezip.kernel.FsModel, java.nio.channels.SeekableByteChannel)}.
-     */
     @Override
-    protected InputService<ZipDriverEntry> newInputService(
+    protected final ZipInputService newInputService(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final SeekableByteChannel channel = input.newChannel();
+        final ZipInputService zis = newZipInputService(model, input);
         try {
-            return newInputService(model, channel);
-        } catch (final Throwable ex) {
-            try {
-                channel.close();
-            } catch (final Throwable ex2) {
-                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
-    @CreatesObligation
-    protected InputService<ZipDriverEntry> newInputService(
-            final FsModel model,
-            final @WillCloseWhenClosed SeekableByteChannel channel)
-    throws IOException {
-        assert null != model;
-        final ZipInputService input = new ZipInputService(this, model, channel);
-        try {
-            input.recoverLostEntries();
+            zis.recoverLostEntries();
         } catch (final IOException ex) {
             logger.log(Level.WARNING, "junkInTheTrunk.warning", new Object[] {
                 mountPointUri(model),
-                input.getPostambleLength(),
+                zis.getPostambleLength(),
             });
             logger.log(Level.FINE, "junkInTheTrunk.fine", ex);
         }
-        return input;
+        return zis;
+    }
+
+    @CreatesObligation
+    protected ZipInputService newZipInputService(FsModel model, Source source)
+    throws IOException {
+        assert null != model;
+        return new ZipInputService(this, model, source);
     }
 
     @Override

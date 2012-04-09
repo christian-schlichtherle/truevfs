@@ -4,8 +4,8 @@
  */
 package de.truezip.driver.zip.io;
 
-import javax.annotation.CheckForNull;
 import java.util.zip.ZipException;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
