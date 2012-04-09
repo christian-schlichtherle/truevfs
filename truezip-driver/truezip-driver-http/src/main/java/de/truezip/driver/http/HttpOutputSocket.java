@@ -6,7 +6,7 @@ package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,7 +26,7 @@ public class HttpOutputSocket extends OutputSocket<HttpEntry> {
     private final HttpEntry entry;
 
     HttpOutputSocket(   final               HttpEntry                entry,
-                        final               BitField<AccessOption> options,
+                        final               BitField<FsAccessOption> options,
                         final @CheckForNull Entry                    template) {
         assert null != entry;
         assert null != options;

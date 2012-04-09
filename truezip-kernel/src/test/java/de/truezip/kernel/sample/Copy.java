@@ -4,16 +4,12 @@
  */
 package de.truezip.kernel.sample;
 
+import de.truezip.kernel.*;
+import de.truezip.kernel.addr.FsPath;
+import de.truezip.kernel.addr.FsUriModifier;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsCompositeDriver;
-import de.truezip.kernel.FsManager;
-import de.truezip.kernel.FsSimpleCompositeDriver;
-import de.truezip.kernel.addr.FsPath;
-import de.truezip.kernel.addr.FsUriModifier;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOptions;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
@@ -78,7 +74,7 @@ public final class Copy {
             InputSocket<?> srcSocket = manager
                     .getController(     srcPath.getMountPoint(), driver)
                     .getInputSocket(    srcPath.getEntryName(),
-                                        BitField.noneOf(AccessOption.class));
+                                        BitField.noneOf(FsAccessOption.class));
             // Resolve the destination socket. Again, we need an absolute URI.
             URI dstUri = URI.create(dst);
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
@@ -86,15 +82,15 @@ public final class Copy {
             OutputSocket<?> dstSocket = manager
                     .getController(     dstPath.getMountPoint(), driver)
                     .getOutputSocket(   dstPath.getEntryName(),
-                                        BitField.of(AccessOption.CREATE_PARENTS,
-                                                    AccessOption.EXCLUSIVE),
+                                        BitField.of(FsAccessOption.CREATE_PARENTS,
+                                                    FsAccessOption.EXCLUSIVE),
                                         srcSocket.getLocalTarget());
             IOSocket.copy(srcSocket, dstSocket); // copy the data
         } finally {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(SyncOptions.UMOUNT);
+            manager.sync(FsSyncOptions.UMOUNT);
         }
     }
 // END SNIPPET: copy

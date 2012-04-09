@@ -23,13 +23,13 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.OutputClosedException;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.CACHE;
-import static de.truezip.kernel.option.AccessOption.GROW;
-import static de.truezip.kernel.option.AccessOptions.ACCESS_PREFERENCES_MASK;
-import de.truezip.kernel.option.SyncOption;
-import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
-import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.CACHE;
+import static de.truezip.kernel.FsAccessOption.GROW;
+import static de.truezip.kernel.FsAccessOptions.ACCESS_PREFERENCES_MASK;
+import de.truezip.kernel.FsSyncOption;
+import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -58,8 +58,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class FsTargetArchiveController<E extends FsArchiveEntry>
 extends FsFileSystemArchiveController<E> {
 
-    private static final BitField<AccessOption>
-            MOUNT_INPUT_OPTIONS = BitField.of(AccessOption.CACHE);
+    private static final BitField<FsAccessOption>
+            MOUNT_INPUT_OPTIONS = BitField.of(FsAccessOption.CACHE);
 
     private final FsArchiveDriver<E> driver;
     
@@ -241,7 +241,7 @@ extends FsFileSystemArchiveController<E> {
         OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
             return oa;
-        final BitField<AccessOption> options = getContext()
+        final BitField<FsAccessOption> options = getContext()
                 .getOutputOptions()
                 .and(ACCESS_PREFERENCES_MASK)
                 .set(CACHE);
@@ -424,7 +424,7 @@ extends FsFileSystemArchiveController<E> {
 
     @Override
     public <X extends IOException> void
-    sync(   final BitField<SyncOption> options,
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControlFlowIOException, X {
         assert isWriteLockedByCurrentThread();
@@ -436,7 +436,7 @@ extends FsFileSystemArchiveController<E> {
     }
 
     private <X extends IOException> void
-    sync0(  final BitField<SyncOption> options,
+    sync0(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControlFlowIOException, X {
         if (!options.get(ABORT_CHANGES))

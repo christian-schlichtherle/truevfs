@@ -8,7 +8,7 @@ import de.truezip.driver.zip.TestWinZipAesDriver;
 import de.truezip.file.TConfig;
 import de.truezip.file.TFile;
 import de.truezip.file.TFileITSuite;
-import static de.truezip.kernel.option.AccessOption.ENCRYPT;
+import static de.truezip.kernel.FsAccessOption.ENCRYPT;
 import de.truezip.key.MockView.Action;
 import static de.truezip.key.MockView.Action.CANCEL;
 import static de.truezip.key.MockView.Action.ENTER;

@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.option;
+package de.truezip.kernel;
 
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsResourceOpenException;
@@ -23,7 +23,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum SyncOption {
+public enum FsSyncOption {
 
     /**
      * Suppose there are any open I/O resources (streams, channels etc.) for

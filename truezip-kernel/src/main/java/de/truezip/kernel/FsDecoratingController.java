@@ -10,8 +10,6 @@ import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -84,7 +82,7 @@ extends FsController<M> {
     public boolean setTime(
             FsEntryName name,
             Map<Access, Long> times,
-            BitField<AccessOption> options)
+            BitField<FsAccessOption> options)
     throws IOException {
         return controller.setTime(name, times, options);
     }
@@ -94,7 +92,7 @@ extends FsController<M> {
             FsEntryName name,
             BitField<Access> types,
             long value,
-            BitField<AccessOption> options)
+            BitField<FsAccessOption> options)
     throws IOException {
         return controller.setTime(name, types, value, options);
     }
@@ -102,14 +100,14 @@ extends FsController<M> {
     @Override
     public InputSocket<?>
     getInputSocket( FsEntryName name,
-                    BitField<AccessOption> options) {
+                    BitField<FsAccessOption> options) {
         return controller.getInputSocket(name, options);
     }
 
     @Override
     public OutputSocket<?>
     getOutputSocket(    FsEntryName name,
-                        BitField<AccessOption> options,
+                        BitField<FsAccessOption> options,
                         Entry template) {
         return controller.getOutputSocket(name, options, template);
     }
@@ -118,21 +116,21 @@ extends FsController<M> {
     public void
     mknod(  FsEntryName name,
             Type type,
-            BitField<AccessOption> options,
+            BitField<FsAccessOption> options,
             Entry template)
     throws IOException {
         controller.mknod(name, type, options, template);
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<AccessOption> options)
+    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
     throws IOException {
         controller.unlink(name, options);
     }
 
     @Override
     public <X extends IOException> void
-    sync(   BitField<SyncOption> options,
+    sync(   BitField<FsSyncOption> options,
             ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         controller.sync(options, handler);

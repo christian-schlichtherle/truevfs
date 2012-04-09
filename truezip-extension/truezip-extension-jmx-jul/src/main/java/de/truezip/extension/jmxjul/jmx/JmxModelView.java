@@ -10,8 +10,8 @@ import static de.truezip.kernel.cio.Entry.Size.STORAGE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.*;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.SyncOption;
-import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
+import de.truezip.kernel.FsSyncOption;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
@@ -31,7 +31,7 @@ implements JmxModelViewMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
-    private static final BitField<SyncOption>
+    private static final BitField<FsSyncOption>
             SYNC_OPTIONS = BitField.of(CLEAR_CACHE);
     private static final FsCompositeDriver
             DRIVER = new FsSimpleCompositeDriver(FsDriverLocator.SINGLETON);

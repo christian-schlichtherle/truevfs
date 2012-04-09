@@ -17,9 +17,9 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.InputExceptionSource;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.APPEND;
-import static de.truezip.kernel.option.AccessOption.CREATE_PARENTS;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.APPEND;
+import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -159,7 +159,7 @@ extends FsLockModelController {
     @Override
     public final boolean setTime(   FsEntryName name,
                                     Map<Access, Long> times,
-                                    BitField<AccessOption> options)
+                                    BitField<FsAccessOption> options)
     throws IOException {
         checkSync(name, null);
         return autoMount().setTime(name, times);
@@ -169,7 +169,7 @@ extends FsLockModelController {
     public final boolean setTime(   FsEntryName name,
                                     BitField<Access> types,
                                     long value,
-                                    BitField<AccessOption> options)
+                                    BitField<FsAccessOption> options)
     throws IOException {
         checkSync(name, null);
         return autoMount().setTime(name, types, value);
@@ -178,7 +178,7 @@ extends FsLockModelController {
     @Override
     public final InputSocket<?> getInputSocket(
             FsEntryName name,
-            BitField<AccessOption> options) {
+            BitField<FsAccessOption> options) {
         return new Input(name);
     }
 
@@ -221,7 +221,7 @@ extends FsLockModelController {
     @Override
     public final OutputSocket<?> getOutputSocket(
             FsEntryName name,
-            BitField<AccessOption> options,
+            BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return new Output(name, options, template);
     }
@@ -229,12 +229,12 @@ extends FsLockModelController {
     @NotThreadSafe
     private final class Output extends OutputSocket<FsArchiveEntry> {
         final FsEntryName name;
-        final BitField<AccessOption> options;
+        final BitField<FsAccessOption> options;
         final @CheckForNull Entry template;
         @CheckForNull FsArchiveFileSystemOperation<E> mknod;
 
         Output( final FsEntryName name,
-                final BitField<AccessOption> options,
+                final BitField<FsAccessOption> options,
                 final @CheckForNull Entry template) {
             if (null == (this.name = name))
                 throw new NullPointerException();
@@ -332,7 +332,7 @@ extends FsLockModelController {
     public final void mknod(
             final FsEntryName name,
             final Type type,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final Entry template)
     throws IOException {
         if (name.isRoot()) { // TODO: Is this case differentiation required?
@@ -356,7 +356,7 @@ extends FsLockModelController {
 
     @Override
     public void unlink( final FsEntryName name,
-                        final BitField<AccessOption> options)
+                        final BitField<FsAccessOption> options)
     throws IOException {
         checkSync(name, null);
         final FsArchiveFileSystem<E> fs = autoMount();

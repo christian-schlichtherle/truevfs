@@ -16,8 +16,8 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.*;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import de.truezip.key.KeyManagerProvider;
@@ -126,7 +126,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * Returns the ZIP crypto parameters for the given file system model
      * and character set or {@code null} if not available.
      * To enable the use of this method when writing an archive entry with the
-     * client APIs, you must use {@link AccessOption#ENCRYPT}.
+     * client APIs, you must use {@link FsAccessOption#ENCRYPT}.
      * <p>
      * The implementation in the class {@link ZipDriver} returns
      * {@code new KeyManagerZipCryptoParameters(getKeyManagerProvider(), mountPointUri(model), charset)}.
@@ -358,7 +358,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             String name,
             final Type type,
             final Entry template,
-            final BitField<AccessOption> mknod) {
+            final BitField<FsAccessOption> mknod) {
         name = normalize(name, type);
         final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {
@@ -460,9 +460,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * This implementation modifies {@code options} in the following way before
      * it forwards the call to {@code controller}:
      * <ol>
-     * <li>{@link AccessOption#STORE} is set.
-     * <li>If {@link AccessOption#GROW} is set, {@link AccessOption#APPEND}
-     *     gets set too, and {@link AccessOption#CACHE} gets cleared.
+     * <li>{@link FsAccessOption#STORE} is set.
+     * <li>If {@link FsAccessOption#GROW} is set, {@link FsAccessOption#APPEND}
+     *     gets set too, and {@link FsAccessOption#CACHE} gets cleared.
      * </ol>
      * <p>
      * The resulting output socket is then wrapped in a private nested class
@@ -476,9 +476,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     public OptionOutputSocket getOutputSocket(
             final FsController<?> controller,
             final FsEntryName name,
-            BitField<AccessOption> options,
+            BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
-        // Leave AccessOption.COMPRESS untouched - the driver shall be given
+        // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);
         if (options.get(GROW))
@@ -489,7 +489,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * This implementation first checks if {@link AccessOption#GROW} is set
+     * This implementation first checks if {@link FsAccessOption#GROW} is set
      * for the given {@code output} socket.
      * If this is the case and the given {@code source} is not {@code null},
      * then it's marked for appending to it.
@@ -518,7 +518,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             final OptionOutputSocket output,
             final @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
-        final BitField<AccessOption> options = output.getOptions();
+        final BitField<FsAccessOption> options = output.getOptions();
         if (null != source)
             source.setAppendee(options.get(GROW));
         return newOutputService(model, output, source);

@@ -2,30 +2,30 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.option;
+package de.truezip.kernel;
 
-import static de.truezip.kernel.option.AccessOption.*;
+import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * Provides common bit fields of access options for I/O operations.
  * 
- * @see    AccessOption
+ * @see    FsAccessOption
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class AccessOptions {
+public final class FsAccessOptions {
 
     /** A bit field with no access options set. */
-    public static final BitField<AccessOption>
-            NONE = BitField.noneOf(AccessOption.class);
+    public static final BitField<FsAccessOption>
+            NONE = BitField.noneOf(FsAccessOption.class);
 
     /**
      * The mask of access preferences, which is
-     * <code>{@link BitField}.of({@link AccessOption#CACHE}, {@link AccessOption#CREATE_PARENTS}, {@link AccessOption#STORE}, {@link AccessOption#COMPRESS}, {@link AccessOption#GROW}, {@link AccessOption#ENCRYPT})</code>.
+     * <code>{@link BitField}.of({@link FsAccessOption#CACHE}, {@link FsAccessOption#CREATE_PARENTS}, {@link FsAccessOption#STORE}, {@link FsAccessOption#COMPRESS}, {@link FsAccessOption#GROW}, {@link FsAccessOption#ENCRYPT})</code>.
      */
-    public static final BitField<AccessOption> ACCESS_PREFERENCES_MASK
+    public static final BitField<FsAccessOption> ACCESS_PREFERENCES_MASK
             = BitField.of(CACHE, CREATE_PARENTS, STORE, COMPRESS, GROW, ENCRYPT);
 
     /**
@@ -34,10 +34,10 @@ public final class AccessOptions {
      * @param  options an array of output options.
      * @return A bit field of output options.
      */
-    public static BitField<AccessOption> of(AccessOption... options) {
+    public static BitField<FsAccessOption> of(FsAccessOption... options) {
         return 0 == options.length ? NONE : BitField.of(options[0], options);
     }
 
     /* Can't touch this - hammer time! */
-    private AccessOptions() { }
+    private FsAccessOptions() { }
 }

@@ -4,9 +4,9 @@
  */
 package de.truezip.file;
 
+import static de.truezip.kernel.FsAccessOption.APPEND;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import static de.truezip.kernel.option.AccessOption.APPEND;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;

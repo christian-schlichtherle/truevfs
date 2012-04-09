@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.option;
+package de.truezip.kernel;
 
 import de.truezip.kernel.FsController;
 import java.io.IOException;
@@ -21,7 +21,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum AccessOption {
+public enum FsAccessOption {
 
     /**
      * Whether or not the entry data shall get cached for subsequent access.

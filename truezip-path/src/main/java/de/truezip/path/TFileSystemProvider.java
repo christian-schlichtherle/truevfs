@@ -6,6 +6,8 @@ package de.truezip.path;
 
 import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
 import de.truezip.kernel.FsEntry;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
 import de.truezip.kernel.addr.FsMountPoint;
@@ -15,8 +17,6 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
 import java.net.URI;
@@ -306,7 +306,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (isSameFile0(src, dst))
             throw new IOException(dst + " (source and destination are the same file)");
         boolean preserve = false;
-        BitField<AccessOption> o = dst.getAccessPreferences().set(EXCLUSIVE);
+        BitField<FsAccessOption> o = dst.getAccessPreferences().set(EXCLUSIVE);
         for (final CopyOption option : options) {
             if (!(option instanceof StandardCopyOption))
                 throw new UnsupportedOperationException(option.toString());

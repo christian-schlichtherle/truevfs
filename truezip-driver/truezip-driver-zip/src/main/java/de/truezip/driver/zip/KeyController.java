@@ -9,8 +9,8 @@ import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.ROOT;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOption;
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.key.KeyManager;
@@ -97,7 +97,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public final void unlink(   final FsEntryName name,
-                                final BitField<AccessOption> options)
+                                final BitField<FsAccessOption> options)
     throws IOException {
         try {
             controller.unlink(name, options);
@@ -135,7 +135,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public final <X extends IOException> void
-    sync(   final BitField<SyncOption> options,
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         controller.sync(options, handler);

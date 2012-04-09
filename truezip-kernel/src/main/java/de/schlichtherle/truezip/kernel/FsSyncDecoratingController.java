@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.*;
-import static de.truezip.kernel.option.SyncOptions.SYNC;
+import static de.truezip.kernel.FsSyncOptions.SYNC;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 

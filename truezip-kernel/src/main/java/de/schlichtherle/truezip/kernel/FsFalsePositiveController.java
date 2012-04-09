@@ -14,8 +14,8 @@ import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOption;
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -217,7 +217,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            final BitField<AccessOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
@@ -236,7 +236,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final FsEntryName name,
             final BitField<Access> types,
             final long value,
-            final BitField<AccessOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
@@ -253,7 +253,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options) {
+            final BitField<FsAccessOption> options) {
         @NotThreadSafe
         final class Input extends InputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
@@ -325,7 +325,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
         @NotThreadSafe
         final class Output extends OutputSocket<Entry> {
@@ -399,7 +399,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public void mknod(
             final FsEntryName name,
             final Type type,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final @CheckForNull Entry template)
     throws IOException {
         final class Mknod implements IOOperation<Void> {
@@ -418,7 +418,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     public void unlink(
             final FsEntryName name,
-            final BitField<AccessOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final class Unlink implements IOOperation<Void> {
             @Override
@@ -458,7 +458,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public <X extends IOException> void
-    sync(   final BitField<SyncOption> options,
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         try {

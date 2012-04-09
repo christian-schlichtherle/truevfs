@@ -17,8 +17,8 @@ import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.*;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
@@ -142,7 +142,7 @@ public abstract class ZipRaesDriver extends JarDriver {
             final String path,
             final Type type,
             final Entry template,
-            final BitField<AccessOption> mknod) {
+            final BitField<FsAccessOption> mknod) {
         final ZipDriverEntry entry
                 = super.newEntry(path, type, template, mknod.set(COMPRESS));
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
@@ -192,17 +192,17 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Sets {@link AccessOption#STORE} in {@code options} before
+     * Sets {@link FsAccessOption#STORE} in {@code options} before
      * forwarding the call to {@code controller}.
      */
     @Override
     public final OptionOutputSocket
     getOutputSocket(final FsController<?> controller,
                     final FsEntryName name,
-                    BitField<AccessOption> options,
+                    BitField<FsAccessOption> options,
                     final @CheckForNull Entry template) {
         options = options.clear(GROW);
-        // Leave AccessOption.COMPRESS untouched - the controller shall have the
+        // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
         // opportunity to apply its own preferences to sort out such a conflict.
         return new OptionOutputSocket(
                 controller.getOutputSocket(name, options.set(STORE), template),

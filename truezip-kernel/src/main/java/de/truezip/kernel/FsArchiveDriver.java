@@ -11,14 +11,10 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.CharConversionException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
@@ -198,7 +194,7 @@ extends FsDriver {
      */
     public InputSocket<?> getInputSocket(   FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<AccessOption> options) {
+                                            BitField<FsAccessOption> options) {
         return controller.getInputSocket(name, options);
     }
 
@@ -252,7 +248,7 @@ extends FsDriver {
      */
     public OutputSocket<?> getOutputSocket( FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<AccessOption> options,
+                                            BitField<FsAccessOption> options,
                                             @CheckForNull Entry template) {
         return controller.getOutputSocket(name, options, template);
     }
@@ -288,7 +284,7 @@ extends FsDriver {
 
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.truezip.kernel.cio.Entry.Type, de.truezip.kernel.cio.Entry, de.truezip.kernel.util.BitField)
-     * newEntry(name, type, template, AccessOptions.NONE)}.
+     * newEntry(name, type, template, FsAccessOptions.NONE)}.
      * 
      * @param  name an entry name.
      * @param  type an entry type.
@@ -298,7 +294,7 @@ extends FsDriver {
      * @return A new entry for the given name.
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template) {
-        return newEntry(name, type, template, AccessOptions.NONE);
+        return newEntry(name, type, template, FsAccessOptions.NONE);
     }
 
     /**
@@ -327,7 +323,7 @@ extends FsDriver {
             String name,
             Type type,
             @CheckForNull Entry template,
-            BitField<AccessOption> mknod);
+            BitField<FsAccessOption> mknod);
 
     /**
      * Normalizes the given entry name so that it forms a valid entry name for
