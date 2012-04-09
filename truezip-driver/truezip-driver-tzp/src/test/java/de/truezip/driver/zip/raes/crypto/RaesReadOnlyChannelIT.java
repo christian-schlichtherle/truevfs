@@ -5,6 +5,7 @@
 package de.truezip.driver.zip.raes.crypto;
 
 import de.truezip.kernel.io.AbstractSink;
+import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.ReadOnlyChannelITSuite;
 import de.truezip.kernel.io.Streams;
 import java.io.IOException;
@@ -37,14 +38,14 @@ public final class RaesReadOnlyChannelIT extends ReadOnlyChannelITSuite {
         try (final InputStream in = newInputStream(plainFile)) {
             cipherFile = createTempFile(TEMP_FILE_PREFIX, null);
             try {
-                final RaesOutputStream out = new RaesSink(
+                final RaesOutputStream out = RaesOutputStream.create(
+                        newRaesParameters(),
                         new AbstractSink() {
                             @Override
                             public OutputStream newStream() throws IOException {
                                 return newOutputStream(cipherFile);
                             }
-                        },
-                        newRaesParameters()).newStream();
+                        });
                 Streams.copy(in, out);
                 logger.log(Level.FINEST,
                         "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PKCS#12v1",
@@ -56,7 +57,14 @@ public final class RaesReadOnlyChannelIT extends ReadOnlyChannelITSuite {
                 deleteIfExists(cipherFile);
                 throw ex;
             }
-            return RaesReadOnlyChannel.getInstance(cipherFile, newRaesParameters());
+            return RaesReadOnlyChannel.create(
+                    newRaesParameters(),
+                    new AbstractSource() {
+                        @Override
+                        public SeekableByteChannel newChannel() throws IOException {
+                            return newByteChannel(cipherFile);
+                        }
+                    });
         }
     }
 

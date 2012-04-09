@@ -5,13 +5,14 @@
 package de.truezip.samples.raes;
 
 import de.truezip.driver.zip.raes.KeyManagerRaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesParameters;
+import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import de.truezip.driver.zip.raes.crypto.RaesSink;
-import de.truezip.file.*;
+import de.truezip.file.TArchiveDetector;
+import de.truezip.file.TConfig;
 import de.truezip.kernel.io.AbstractSink;
+import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.ChannelInputStream;
-import de.truezip.kernel.io.Sink;
+import de.truezip.kernel.io.Streams;
 import de.truezip.key.sl.KeyManagerLocator;
 import de.truezip.path.TPath;
 import java.io.IOException;
@@ -27,7 +28,7 @@ import javax.annotation.WillClose;
  * This class cannot get instantiated outside its package.
  * <p>
  * Note that this class is not intended to access RAES encrypted ZIP files -
- * use the {@link TFile} class for this task instead.
+ * use the TrueZIP client API modules for this task instead.
  *
  * @author Christian Schlichtherle
  */
@@ -65,29 +66,28 @@ public final class Raes {
             config.setArchiveDetector(detector);
             final TPath plainFile = new TPath(plainPath).toNonArchivePath();
             final TPath cipherFile = new TPath(cipherPath).toNonArchivePath();
-            final Sink sink = new RaesSink(
-                    new AbstractSink() {
-                        @Override
-                        public OutputStream newStream() throws IOException {
-                            return newOutputStream(cipherFile);
-                        }
-                    },
-                    new KeyManagerRaesParameters(
-                        KeyManagerLocator.SINGLETON,
-                        cipherFile/*.getCanonicalFile()*/.toUri()));
             final @WillClose InputStream in = newInputStream(plainFile);
             final @WillClose OutputStream out;
             try {
-                out = sink.newStream();
-            } catch (final IOException ex) {
+                out = RaesOutputStream.create(
+                        new KeyManagerRaesParameters(
+                            KeyManagerLocator.SINGLETON,
+                            cipherFile/*.getCanonicalFile()*/.toUri()),
+                        new AbstractSink() {
+                            @Override
+                            public OutputStream newStream() throws IOException {
+                                return newOutputStream(cipherFile);
+                            }
+                        });
+            } catch (final Throwable ex) {
                 try {
                     in.close();
-                } catch (final IOException ex2) {
+                } catch (final Throwable ex2) {
                     ex.addSuppressed(ex2);
                 }
                 throw ex;
             }
-            TFile.cp(in, out);
+            Streams.copy(in, out);
         }
     }
 
@@ -129,28 +129,31 @@ public final class Raes {
             config.setArchiveDetector(detector);
             final TPath cipherFile = new TPath(cipherPath).toNonArchivePath();
             final TPath plainFile = new TPath(plainPath).toNonArchivePath();
-            final RaesParameters param = new KeyManagerRaesParameters(
+            final RaesReadOnlyChannel sbc = RaesReadOnlyChannel.create(
+                    new KeyManagerRaesParameters(
                     KeyManagerLocator.SINGLETON,
-                    cipherFile/*.getCanonicalFile()*/.toUri());
-            try (final SeekableByteChannel channel = newByteChannel(cipherFile)) {
-                final RaesReadOnlyChannel rchannel
-                        = RaesReadOnlyChannel.getInstance(channel, param);
+                    cipherFile/*.getCanonicalFile()*/.toUri()),
+                    new AbstractSource() {
+                        @Override
+                        public SeekableByteChannel newChannel() throws IOException {
+                            return newByteChannel(cipherFile);
+                        }
+                    });
+            final @WillClose InputStream in = new ChannelInputStream(sbc);
+            @WillClose OutputStream out = null;
+            try {
                 if (authenticate)
-                    rchannel.authenticate();
-                final @WillClose InputStream in = new ChannelInputStream(rchannel);
-                @WillClose OutputStream out = null;
+                    sbc.authenticate();
+                out = newOutputStream(plainFile);
+            } catch (final Throwable ex) {
                 try {
-                    out = newOutputStream(plainFile);
-                } catch (final Throwable ex) {
-                    try {
-                        in.close();
-                    } catch (final Throwable ex2) {
-                        ex.addSuppressed(ex2);
-                    }
-                    throw ex;
+                    in.close();
+                } catch (final Throwable ex2) {
+                    ex.addSuppressed(ex2);
                 }
-                TFile.cp(in, out);
+                throw ex;
             }
+            Streams.copy(in, out);
         }
     }
 }

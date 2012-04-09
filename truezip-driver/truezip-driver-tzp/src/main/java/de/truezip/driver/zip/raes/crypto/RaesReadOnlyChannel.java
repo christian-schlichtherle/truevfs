@@ -4,18 +4,16 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import static de.truezip.driver.zip.raes.crypto.Constants.LEAD_IN_LENGTH;
+import static de.truezip.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
 import static de.truezip.driver.zip.raes.crypto.Constants.SIGNATURE;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.PowerBuffer;
+import de.truezip.kernel.io.Source;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
-import static java.nio.file.Files.newByteChannel;
-import java.nio.file.Path;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -53,82 +51,81 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
 
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    RaesReadOnlyChannel(
-            @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
-        super(channel);
+    RaesReadOnlyChannel() {
+        super(null);
     }
 
     /**
-     * Returns a new {@code RaesReadOnlyChannel}.
+     * Creates a new RAES read-only channel.
      *
-     * @param  path the file to open for reading the cipher text data.
-     * @param  param the {@link RaesParameters} required to access the
-     *         RAES type actually found in the file.
-     *         If the run time class of this parameter does not match the
-     *         required parameter interface according to the RAES type found
-     *         in the file, but is an instance of the
-     *         {@link RaesParametersProvider} interface, it is used to find
-     *         the required RAES parameters.
-     *         This is applied recursively.
-     * @return A new {@code RaesReadOnlyChannel}.
-     * @throws RaesParametersException If {@code param} is not suitable for the
-     *         given type of RAES file.
+     * @param  param the {@link RaesParameters} required to access the RAES
+     *         type actually found in the file.
+     *         If the class of this parameter does not match the required
+     *         parameter interface according to the RAES type found in the
+     *         file, but is an instance of the {@link RaesParametersProvider}
+     *         interface, then it gets queried to find the required RAES
+     *         parameters.
+     *         This algorithm gets recursively applied.
+     * @param  source the source for reading the RAES file from.
+     * @return A new RAES read-only channel.
+     * @throws RaesParametersException If no RAES parameter can be found which
+     *         match the type of RAES file in the given channel.
      * @throws RaesException If the file is not RAES compatible.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public static RaesReadOnlyChannel getInstance(
-            final Path path,
-            final @Nullable RaesParameters param)
-    throws IOException {
-        if (null == param)
-            throw new NullPointerException();
-        final SeekableByteChannel channel = newByteChannel(path);
+    public static RaesReadOnlyChannel create(
+            final RaesParameters param,
+            final Source source)
+    throws RaesParametersException, RaesException, IOException {
+        final SeekableByteChannel channel = source.newChannel();
         try {
-            return getInstance(channel, param);
+            return create(param, channel);
         } catch (final Throwable ex) {
-            channel.close();
+            try {
+                channel.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
 
     /**
-     * Returns a new {@code RaesReadOnlyChannel}.
+     * Creates a new RAES read-only channel.
      *
-     * @param  channel the channel to read the cipher data from.
      * @param  param the {@link RaesParameters} required to access the RAES
      *         type actually found in the file.
-     *         If the run time class of this parameter does not match the
-     *         required parameter interface according to the RAES type found
-     *         in the file, but is an instance of the
-     *         {@link RaesParametersProvider} interface, it's queried to find
-     *         the required RAES parameters.
-     *         This algorithm is recursively applied.
-     * @return A new {@code RaesReadOnlyChannel}.
-     * @throws RaesParametersException If {@code param} is not suitable for the
-     *         given type of RAES file.
+     *         If the class of this parameter does not match the required
+     *         parameter interface according to the RAES type found in the
+     *         file, but is an instance of the {@link RaesParametersProvider}
+     *         interface, then it gets queried to find the required RAES
+     *         parameters.
+     *         This algorithm gets recursively applied.
+     * @param  channel the channel for reading the RAES file from.
+     * @return A new RAES read-only channel.
+     * @throws RaesParametersException If no RAES parameter can be found which
+     *         match the type of RAES file in the given channel.
      * @throws RaesException If the file is not RAES compatible.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public static RaesReadOnlyChannel getInstance(
-            final @WillCloseWhenClosed SeekableByteChannel channel,
-            @CheckForNull RaesParameters param)
-    throws IOException {
-        // Load header data.
-        final PowerBuffer leadIn = PowerBuffer
-                .allocate(LEAD_IN_LENGTH)
+    private static RaesReadOnlyChannel create(
+            final RaesParameters param,
+            final @WillCloseWhenClosed SeekableByteChannel channel)
+    throws RaesParametersException, RaesException, IOException {
+        final PowerBuffer header = PowerBuffer
+                .allocate(HEADER_MIN_LEN)
                 .littleEndian()
                 .load(channel.position(0));
-        if (SIGNATURE != leadIn.getUInt())
+        if (SIGNATURE != header.getUInt())
             throw new RaesException("No RAES signature!");
-        final int type = leadIn.getUByte();
+        final int type = header.getUByte();
         switch (type) {
             case 0:
-                return new Type0RaesReadOnlyChannel(channel,
-                        parameters(Type0RaesParameters.class, param));
+                return new Type0RaesReadOnlyChannel(
+                        parameters(Type0RaesParameters.class, param),
+                        channel);
             default:
                 throw new RaesException("Unknown RAES type: " + type);
         }
@@ -154,6 +151,9 @@ public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
     /**
      * Returns the key strength which is actually used to decrypt the data
      * of the RAES file.
+     * 
+     * @return The key strength which is actually used to decrypt the data
+     *         of the RAES file.
      */
     public abstract AesKeyStrength getKeyStrength();
 
@@ -171,5 +171,6 @@ public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
      *         the MAC declared in the RAES file.
      * @throws IOException On any I/O related issue.
      */
-    public abstract void authenticate() throws IOException;
+    public abstract void authenticate()
+    throws RaesAuthenticationException, IOException;
 }

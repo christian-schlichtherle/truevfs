@@ -8,14 +8,17 @@ import de.truezip.driver.zip.io.ZipFile;
 import de.truezip.driver.zip.io.ZipOutputStream;
 import de.truezip.driver.zip.io.ZipTestSuite;
 import de.truezip.driver.zip.raes.crypto.MockType0RaesParameters;
+import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import de.truezip.driver.zip.raes.crypto.RaesSink;
-import de.truezip.kernel.io.AbstractSink;
+import de.truezip.kernel.io.AbstractSource;
+import de.truezip.kernel.io.OneTimeSink;
+import de.truezip.kernel.io.OneTimeSource;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
+import static java.nio.file.Files.newByteChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -35,12 +38,16 @@ public final class RaesZipIT extends ZipTestSuite {
     @Override
     protected ZipOutputStream newZipOutputStream(final OutputStream out)
     throws IOException {
-        final OutputStream ros = new RaesSink(new InvalidSink(out),
-                raesParameters).newStream();
+        final OutputStream ros = RaesOutputStream
+                .create(raesParameters, new OneTimeSink(out));
         try {
             return new ZipOutputStream(ros);
-        } catch (RuntimeException ex) {
-            ros.close();
+        } catch (final Throwable ex) {
+            try {
+                ros.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -49,44 +56,49 @@ public final class RaesZipIT extends ZipTestSuite {
     protected ZipOutputStream newZipOutputStream(
             final OutputStream out, final Charset cs)
     throws IOException {
-        final OutputStream ros = new RaesSink(new InvalidSink(out),
-                raesParameters).newStream();
+        final OutputStream ros = RaesOutputStream
+                .create(raesParameters, new OneTimeSink(out));
         try {
             return new ZipOutputStream(ros, cs);
-        } catch (RuntimeException ex) {
-            ros.close();
+        } catch (final Throwable ex) {
+            try {
+                ros.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
-
-    private static final class InvalidSink extends AbstractSink {
-        private final OutputStream out;
-
-        InvalidSink(final OutputStream out) {
-            this.out = out;
-        }
-
-        @Override
-        public OutputStream newStream() throws IOException {
-            return out; // TODO: Upon the second call, this is an invalid stream!
-        }
-    } // InvalidSink
 
     @Override
     protected ZipFile newZipFile(final String name)
     throws IOException {
-        final RaesReadOnlyChannel channel
-                = RaesReadOnlyChannel.getInstance(Paths.get(name), raesParameters);
+        final RaesReadOnlyChannel rroc = newRaesReadOnlyChannel(Paths.get(name));
         try {
-            if (channel.size() < AUTHENTICATION_TRIGGER) // heuristic
-                channel.authenticate();
-            return new ZipFile(channel);
-        } catch (final RuntimeException | IOException ex) {
-            channel.close();
+            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
+                rroc.authenticate();
+            return new ZipFile(rroc);
+        } catch (final Throwable ex) {
+            try {
+                rroc.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
 
+    private RaesReadOnlyChannel newRaesReadOnlyChannel(final Path file)
+    throws IOException {
+        return RaesReadOnlyChannel.create(
+                raesParameters,
+                new AbstractSource() {
+                    @Override
+                    public SeekableByteChannel newChannel() throws IOException {
+                        return newByteChannel(file);
+                    }
+                });
+    }
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     protected ZipFile newZipFile(final String name, final Charset cs)
@@ -94,14 +106,17 @@ public final class RaesZipIT extends ZipTestSuite {
         if (null == cs)
             throw new NullPointerException();
         new String(new byte[0], cs); // may throw UnsupportedEncodingExceoption!
-        final RaesReadOnlyChannel channel
-                = RaesReadOnlyChannel.getInstance(Paths.get(name), raesParameters);
+        final RaesReadOnlyChannel rroc = newRaesReadOnlyChannel(Paths.get(name));
         try {
-            if (channel.size() < AUTHENTICATION_TRIGGER) // heuristic
-                channel.authenticate();
-            return new ZipFile(channel, cs);
-        } catch (final RuntimeException | IOException ex) {
-            channel.close();
+            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
+                rroc.authenticate();
+            return new ZipFile(rroc, cs);
+        } catch (final Throwable ex) {
+            try {
+                rroc.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -109,14 +124,17 @@ public final class RaesZipIT extends ZipTestSuite {
     @Override
     protected ZipFile newZipFile(final Path file)
     throws IOException {
-        final RaesReadOnlyChannel channel
-                = RaesReadOnlyChannel.getInstance(file, raesParameters);
+        final RaesReadOnlyChannel rroc = newRaesReadOnlyChannel(file);
         try {
-            if (channel.size() < AUTHENTICATION_TRIGGER) // heuristic
-                channel.authenticate();
-            return new ZipFile(channel);
-        } catch (final RuntimeException | IOException ex) {
-            channel.close();
+            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
+                rroc.authenticate();
+            return new ZipFile(rroc);
+        } catch (final Throwable ex) {
+            try {
+                rroc.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -129,48 +147,59 @@ public final class RaesZipIT extends ZipTestSuite {
         if (null == charset)
             throw new NullPointerException();
         new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
-        final RaesReadOnlyChannel channel
-                = RaesReadOnlyChannel.getInstance(file, raesParameters);
+        final RaesReadOnlyChannel rroc = newRaesReadOnlyChannel(file);
         try {
-            if (channel.size() < AUTHENTICATION_TRIGGER) // heuristic
-                channel.authenticate();
-            return new ZipFile(channel, charset);
-        } catch (final RuntimeException | IOException ex) {
-            channel.close();
+            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
+                rroc.authenticate();
+            return new ZipFile(rroc, charset);
+        } catch (final Throwable ex) {
+            try {
+                rroc.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
 
     @Override
-    protected ZipFile newZipFile(final SeekableByteChannel channel)
+    protected ZipFile newZipFile(final SeekableByteChannel sbc)
     throws IOException {
-        final RaesReadOnlyChannel rrof
-                = RaesReadOnlyChannel.getInstance(channel, raesParameters);
+        final RaesReadOnlyChannel rroc = RaesReadOnlyChannel.create(
+                raesParameters, new OneTimeSource(sbc));
         try {
-            if (rrof.size() < AUTHENTICATION_TRIGGER) // heuristic
-                rrof.authenticate();
-            return new ZipFile(rrof);
-        } catch (final RuntimeException | IOException ex) {
-            rrof.close();
+            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
+                rroc.authenticate();
+            return new ZipFile(rroc);
+        } catch (final Throwable ex) {
+            try {
+                rroc.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
 
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile newZipFile(final SeekableByteChannel channel, final Charset cs)
+    protected ZipFile newZipFile(final SeekableByteChannel sbc, final Charset cs)
     throws IOException {
         if (null == cs)
             throw new NullPointerException();
         new String(new byte[0], cs); // may throw UnsupportedEncodingExceoption!
-        final RaesReadOnlyChannel rrof
-                = RaesReadOnlyChannel.getInstance(channel, raesParameters);
+        final RaesReadOnlyChannel rroc = RaesReadOnlyChannel.create(
+                raesParameters, new OneTimeSource(sbc));
         try {
-            if (rrof.size() < AUTHENTICATION_TRIGGER) // heuristic
-                rrof.authenticate();
-            return new ZipFile(rrof, cs);
-        } catch (final RuntimeException | IOException ex) {
-            rrof.close();
+            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
+                rroc.authenticate();
+            return new ZipFile(rroc, cs);
+        } catch (final Throwable ex) {
+            try {
+                rroc.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
