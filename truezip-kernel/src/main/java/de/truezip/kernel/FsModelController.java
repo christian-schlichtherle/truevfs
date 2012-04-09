@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsMountPoint;
-
 /**
  * An abstract file system controller which implements the {@link #getModel()}
  * method.

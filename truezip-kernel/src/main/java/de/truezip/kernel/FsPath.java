@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.addr;
+package de.truezip.kernel;
 
-import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
-import static de.truezip.kernel.addr.FsUriModifier.NULL;
-import static de.truezip.kernel.addr.FsUriModifier.PostFix.PATH;
+import static de.truezip.kernel.FsUriModifier.CANONICALIZE;
+import static de.truezip.kernel.FsUriModifier.NULL;
+import static de.truezip.kernel.FsUriModifier.PostFix.PATH;
 import de.truezip.kernel.util.QuotedUriSyntaxException;
 import de.truezip.kernel.util.UriBuilder;
 import java.io.*;

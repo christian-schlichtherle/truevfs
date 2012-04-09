@@ -5,8 +5,8 @@
 package de.truezip.file;
 
 import static de.truezip.file.TArchiveDetector.NULL;
-import static de.truezip.kernel.addr.FsEntryName.ROOT;
-import de.truezip.kernel.addr.FsPath;
+import static de.truezip.kernel.FsEntryName.ROOT;
+import de.truezip.kernel.FsPath;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

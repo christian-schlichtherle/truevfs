@@ -6,8 +6,8 @@ package de.truezip.file;
 
 import static de.truezip.kernel.FsSyncOptions.UMOUNT;
 import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsMountPoint;
-import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
+import de.truezip.kernel.FsMountPoint;
+import static de.truezip.kernel.FsUriModifier.CANONICALIZE;
 import de.truezip.kernel.util.BitField;
 import java.net.URI;
 import java.net.URISyntaxException;

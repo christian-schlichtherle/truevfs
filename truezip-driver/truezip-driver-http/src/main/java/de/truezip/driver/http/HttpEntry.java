@@ -10,7 +10,7 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.FsReadOnlyFileSystemException;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.FsAccessOptions;
 import de.truezip.kernel.util.BitField;

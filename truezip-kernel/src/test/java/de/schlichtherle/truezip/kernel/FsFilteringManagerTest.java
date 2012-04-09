@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.FsManagerTestSuite;
-import de.truezip.kernel.addr.FsMountPoint;
+import de.truezip.kernel.FsMountPoint;
 import de.truezip.kernel.*;
 import de.truezip.kernel.mock.MockDriverService;
 import de.truezip.kernel.util.Link.Type;

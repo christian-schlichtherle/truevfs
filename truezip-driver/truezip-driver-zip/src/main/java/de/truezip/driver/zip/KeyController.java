@@ -5,8 +5,8 @@
 package de.truezip.driver.zip;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsEntryName;
-import static de.truezip.kernel.addr.FsEntryName.ROOT;
+import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsEntryName.ROOT;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.FsAccessOption;

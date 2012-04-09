@@ -5,8 +5,8 @@
 package de.truezip.path;
 
 import de.truezip.file.MockArchiveDriverTestBase;
-import de.truezip.kernel.addr.FsMountPoint;
-import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
+import de.truezip.kernel.FsMountPoint;
+import static de.truezip.kernel.FsUriModifier.CANONICALIZE;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;

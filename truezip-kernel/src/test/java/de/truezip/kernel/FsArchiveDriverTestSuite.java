@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.addr.FsMountPoint;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Size.STORAGE;

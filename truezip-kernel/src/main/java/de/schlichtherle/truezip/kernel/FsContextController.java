@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.kernel;
 import de.truezip.kernel.FsDecoratingController;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;

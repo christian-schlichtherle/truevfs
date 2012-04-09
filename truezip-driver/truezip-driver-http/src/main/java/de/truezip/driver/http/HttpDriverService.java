@@ -5,7 +5,7 @@
 package de.truezip.driver.http;
 
 import de.truezip.kernel.FsDriver;
-import de.truezip.kernel.addr.FsScheme;
+import de.truezip.kernel.FsScheme;
 import de.truezip.kernel.spi.FsDriverService;
 import de.truezip.kernel.sl.IOPoolLocator;
 import java.util.Map;

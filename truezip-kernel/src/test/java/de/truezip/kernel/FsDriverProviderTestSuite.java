@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.util.ExtensionSet;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;

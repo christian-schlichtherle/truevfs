@@ -14,7 +14,7 @@ import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
 import de.truezip.driver.zip.raes.crypto.RaesSink;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsAccessOption;

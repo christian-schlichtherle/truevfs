@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsScheme;
 import de.truezip.kernel.util.Maps;
 import de.truezip.kernel.util.ServiceLocator;
 import de.truezip.kernel.util.ExtensionSet;

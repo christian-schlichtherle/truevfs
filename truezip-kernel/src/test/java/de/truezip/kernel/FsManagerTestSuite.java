@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.FsCompositeDriver;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsManager;

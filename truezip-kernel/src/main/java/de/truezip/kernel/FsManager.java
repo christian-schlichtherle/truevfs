@@ -5,7 +5,6 @@
 package de.truezip.kernel;
 
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
-import de.truezip.kernel.addr.FsMountPoint;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;

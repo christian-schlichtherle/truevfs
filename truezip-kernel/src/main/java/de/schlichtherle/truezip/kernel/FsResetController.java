@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.FsController;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsSyncOptions.RESET;
 import de.truezip.kernel.util.BitField;

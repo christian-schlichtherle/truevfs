@@ -8,7 +8,7 @@ import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.addr.FsMountPoint;
+import de.truezip.kernel.FsMountPoint;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.util.BitField;

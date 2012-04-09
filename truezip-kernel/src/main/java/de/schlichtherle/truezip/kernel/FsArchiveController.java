@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.kernel;
 import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.kernel.FsCovariantEntry;
 import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
