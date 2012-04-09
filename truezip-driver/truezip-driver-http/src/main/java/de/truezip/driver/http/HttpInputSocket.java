@@ -42,18 +42,18 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
     }
 
     @Override
-    public InputStream newStream() throws IOException {
+    public InputStream stream() throws IOException {
         return entry.getInputStream();
     }
 
     @Override
-    public SeekableByteChannel newChannel() throws IOException {
+    public SeekableByteChannel channel() throws IOException {
         final IOBuffer<?> temp;
         final InputStream in = entry.getInputStream();
         try {
             temp = entry.getPool().allocate();
             try {
-                try (final OutputStream out = temp.getOutputSocket().newStream()) {
+                try (final OutputStream out = temp.getOutputSocket().stream()) {
                     Streams.cat(in, out);
                 }
             } catch (final Throwable ex) {
@@ -74,7 +74,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
             @CreatesObligation
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             TempReadOnlyChannel() throws IOException {
-                super(temp.getInputSocket().newChannel()); // bind(*) is considered redundant for IOPool.IOBuffer
+                super(temp.getInputSocket().channel()); // bind(*) is considered redundant for IOPool.IOBuffer
             }
 
             @Override

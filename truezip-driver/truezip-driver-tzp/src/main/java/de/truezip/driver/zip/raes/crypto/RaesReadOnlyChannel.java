@@ -80,7 +80,7 @@ public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
             final RaesParameters param,
             final Source source)
     throws RaesParametersException, RaesException, EOFException, IOException {
-        final SeekableByteChannel channel = source.newChannel();
+        final SeekableByteChannel channel = source.channel();
         try {
             return create(param, channel);
         } catch (final Throwable ex) {

@@ -46,12 +46,12 @@ extends InputSocket<E> {
     }
 
     @Override
-    public InputStream newStream() throws IOException {
-        return getBoundSocket().newStream();
+    public InputStream stream() throws IOException {
+        return getBoundSocket().stream();
     }
 
     @Override
-    public SeekableByteChannel newChannel() throws IOException {
-        return getBoundSocket().newChannel();
+    public SeekableByteChannel channel() throws IOException {
+        return getBoundSocket().channel();
     }
 }

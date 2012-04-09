@@ -17,16 +17,16 @@ public abstract class AbstractSink implements Sink {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link AbstractSink} calls
-     * {@link #newChannel()} and wraps the result in a
+     * {@link #channel()} and wraps the result in a
      * {@link ChannelOutputStream} adapter.
      * Note that this may intentionally violate the contract for this method
-     * because {@link #newChannel()} may throw an
+     * because {@link #channel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
      * so override appropriately.
      */
     @Override
-    public OutputStream newStream() throws IOException {
-        return new ChannelOutputStream(newChannel());
+    public OutputStream stream() throws IOException {
+        return new ChannelOutputStream(channel());
     }
 
     /**
@@ -37,7 +37,7 @@ public abstract class AbstractSink implements Sink {
      *         this type.
      */
     @Override
-    public SeekableByteChannel newChannel() throws IOException {
+    public SeekableByteChannel channel() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

@@ -176,26 +176,26 @@ extends FsDecoratingController<LockModel, TargetArchiveController<?>> {
             }
 
             @Override
-            public InputStream newStream() throws IOException {
+            public InputStream stream() throws IOException {
                 final TargetArchiveController<?>
                         controller = ContextController.this.controller;
                 final OperationContext context = controller.getContext();
                 controller.setContext(NONE);
                 try {
-                    return getBoundSocket().newStream();
+                    return getBoundSocket().stream();
                 } finally {
                     controller.setContext(context);
                 }
             }
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 final TargetArchiveController<?>
                         controller = ContextController.this.controller;
                 final OperationContext context = controller.getContext();
                 controller.setContext(NONE);
                 try {
-                    return getBoundSocket().newChannel();
+                    return getBoundSocket().channel();
                 } finally {
                     controller.setContext(context);
                 }
@@ -234,26 +234,26 @@ extends FsDecoratingController<LockModel, TargetArchiveController<?>> {
             }
 
             @Override
-            public OutputStream newStream() throws IOException {
+            public OutputStream stream() throws IOException {
                 final TargetArchiveController<?>
                         controller = ContextController.this.controller;
                 final OperationContext context = controller.getContext();
                 controller.setContext(operation);
                 try {
-                    return getBoundSocket().newStream();
+                    return getBoundSocket().stream();
                 } finally {
                     controller.setContext(context);
                 }
             }
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 final TargetArchiveController<?>
                         controller = ContextController.this.controller;
                 final OperationContext context = controller.getContext();
                 controller.setContext(operation);
                 try {
-                    return getBoundSocket().newChannel();
+                    return getBoundSocket().channel();
                 } finally {
                     controller.setContext(context);
                 }

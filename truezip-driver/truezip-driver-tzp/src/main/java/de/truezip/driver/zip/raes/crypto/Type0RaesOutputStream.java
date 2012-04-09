@@ -119,7 +119,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         klac.update(cipherKey, 0, cipherKey.length);
 
         // Init chain of output streams as Encrypt-then-MAC.
-        final OutputStream out = sink.newStream();
+        final OutputStream out = sink.stream();
         try {
             final LittleEndianOutputStream leos =
                     this.leos = new LittleEndianOutputStream(out);

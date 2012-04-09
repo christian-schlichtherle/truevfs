@@ -19,26 +19,26 @@ import java.nio.channels.SeekableByteChannel;
 public interface Sink {
 
     /**
-     * Returns a new output stream for writing bytes.
+     * Returns an output stream for writing bytes.
      * The returned output stream should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
      *
-     * @return A new output stream.
+     * @return An output stream for writing bytes.
      * @throws IOException on any I/O error.
      * @throws IllegalStateException if this method has already been called
      *         and a new output stream cannot get created.
      */
     @CreatesObligation
-    OutputStream newStream() throws IOException;
+    OutputStream stream() throws IOException;
 
     /**
-     * <b>Optional operation:</b> Returns a new seekable byte channel for
-     * writing bytes in random order.
+     * <b>Optional operation:</b> Returns a seekable byte channel for
+     * writing bytes.
      * If this method is supported, then the returned seekable byte channel
      * should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
      *
-     * @return A new seekable byte channel.
+     * @return A seekable byte channel for writing bytes.
      * @throws IOException on any I/O error.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
@@ -46,5 +46,5 @@ public interface Sink {
      *         and a new seekable byte channel cannot get created.
      */
     @CreatesObligation
-    SeekableByteChannel newChannel() throws IOException;
+    SeekableByteChannel channel() throws IOException;
 }

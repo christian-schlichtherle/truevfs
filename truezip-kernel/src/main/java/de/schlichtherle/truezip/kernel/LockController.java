@@ -297,26 +297,26 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             } // GetLocalTarget
 
             @Override
-            public InputStream newStream() throws IOException {
+            public InputStream stream() throws IOException {
                 return writeLocked(new NewStream());
             }
 
             final class NewStream implements IOOperation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
-                    return new LockInputStream(getBoundSocket().newStream());
+                    return new LockInputStream(getBoundSocket().stream());
                 }
             } // NewStream
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 return writeLocked(new NewChannel());
             }
 
             final class NewChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableChannel(getBoundSocket().newChannel());
+                    return new LockSeekableChannel(getBoundSocket().channel());
                 }
             } // NewChannel
         } // Input
@@ -349,26 +349,26 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             } // GetLocalTarget
 
             @Override
-            public OutputStream newStream() throws IOException {
+            public OutputStream stream() throws IOException {
                 return writeLocked(new NewStream());
             }
 
             final class NewStream implements IOOperation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
-                    return new LockOutputStream(getBoundSocket().newStream());
+                    return new LockOutputStream(getBoundSocket().stream());
                 }
             } // NewStream
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 return writeLocked(new NewChannel());
             }
 
             final class NewChannel implements IOOperation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
-                    return new LockSeekableChannel(getBoundSocket().newChannel());
+                    return new LockSeekableChannel(getBoundSocket().channel());
                 }
             } // NewChannel
         } // Output

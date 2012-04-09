@@ -23,12 +23,12 @@ extends InstrumentingInputSocket<E> {
     }
 
     @Override
-    public InputStream newStream() throws IOException {
+    public InputStream stream() throws IOException {
         return new JulInputStream(getBoundSocket());
     }
 
     @Override
-    public java.nio.channels.SeekableByteChannel newChannel() throws IOException {
+    public java.nio.channels.SeekableByteChannel channel() throws IOException {
         return new JulInputChannel(getBoundSocket());
     }
 }

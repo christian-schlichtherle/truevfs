@@ -27,7 +27,7 @@ final class JulInputChannel extends DecoratingReadOnlyChannel {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     JulInputChannel(final InputSocket<?> socket) throws IOException {
-        super(socket.newChannel());
+        super(socket.channel());
         this.socket = socket;
         log("Random reading ");
     }

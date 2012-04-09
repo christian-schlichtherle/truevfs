@@ -107,7 +107,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final OutputStream out = output.newStream();
+        final OutputStream out = output.stream();
         try {
             return new MultiplexingOutputService<>(
                     newTarOutputService(model, out, (TarInputService) source),

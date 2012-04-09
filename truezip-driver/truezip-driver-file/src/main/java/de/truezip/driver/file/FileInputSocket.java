@@ -34,12 +34,12 @@ final class FileInputSocket extends InputSocket<FileEntry> {
     }
 
     @Override
-    public InputStream newStream() throws IOException {
+    public InputStream stream() throws IOException {
         return newInputStream(entry.getPath());
     }
 
     @Override
-    public SeekableByteChannel newChannel() throws IOException {
+    public SeekableByteChannel channel() throws IOException {
         return newByteChannel(entry.getPath());
     }
 }

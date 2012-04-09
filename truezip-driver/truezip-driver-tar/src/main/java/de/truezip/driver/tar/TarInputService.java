@@ -70,7 +70,7 @@ implements InputService<TarDriverEntry> {
             final Source source)
     throws IOException {
         final IOPool<?> pool = driver.getIOPool();
-        try (final InputStream in = source.newStream()) {
+        try (final InputStream in = source.stream()) {
             final TarArchiveInputStream tin = newValidatedTarInputStream(in);
             TarArchiveEntry tinEntry;
             while (null != (tinEntry = tin.getNextTarEntry())) {
@@ -83,7 +83,7 @@ implements InputService<TarDriverEntry> {
                     final IOBuffer<?> temp = pool.allocate();
                     entry.setTemp(temp);
                     try {
-                        try (final OutputStream out = temp.getOutputSocket().newStream()) {
+                        try (final OutputStream out = temp.getOutputSocket().stream()) {
                             Streams.cat(tin, out);
                         }
                     } catch (final Throwable ex) {
@@ -209,14 +209,14 @@ implements InputService<TarDriverEntry> {
             }
 
             @Override
-            public InputStream newStream()
+            public InputStream stream()
             throws IOException {
-                return getInputSocket().newStream();
+                return getInputSocket().stream();
             }
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
-                return getInputSocket().newChannel();
+            public SeekableByteChannel channel() throws IOException {
+                return getInputSocket().channel();
             }
 
             InputSocket<? extends IOEntry<?>> getInputSocket()

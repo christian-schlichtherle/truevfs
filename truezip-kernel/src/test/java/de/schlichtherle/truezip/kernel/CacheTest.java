@@ -297,7 +297,7 @@ public final class CacheTest {
         }
 
         @Override
-        public InputStream newStream() throws IOException {
+        public InputStream stream() throws IOException {
             return new BrokenInputStream();
         }
 
@@ -326,7 +326,7 @@ public final class CacheTest {
         }
 
         @Override
-        public OutputStream newStream() throws IOException {
+        public OutputStream stream() throws IOException {
             return new BrokenOutputStream();
         }
 

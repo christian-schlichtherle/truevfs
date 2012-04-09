@@ -170,11 +170,11 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public InputStream newStream() throws IOException {
+            public InputStream stream() throws IOException {
                 while (true) {
                     try {
                         return new SyncInputStream(
-                                getBoundSocket().newStream());
+                                getBoundSocket().stream());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -182,11 +182,11 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 while (true) {
                     try {
                         return new SyncSeekableChannel(
-                                getBoundSocket().newChannel());
+                                getBoundSocket().channel());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -221,11 +221,11 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 while (true) {
                     try {
                         return new SyncSeekableChannel(
-                                getBoundSocket().newChannel());
+                                getBoundSocket().channel());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -233,11 +233,11 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public OutputStream newStream() throws IOException {
+            public OutputStream stream() throws IOException {
                 while (true) {
                     try {
                         return new SyncOutputStream(
-                                getBoundSocket().newStream());
+                                getBoundSocket().stream());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }

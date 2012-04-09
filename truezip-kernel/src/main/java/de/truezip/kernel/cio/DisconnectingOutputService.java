@@ -110,15 +110,15 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
-        public OutputStream newStream() throws IOException {
+        public OutputStream stream() throws IOException {
             return new DisconnectingOutputStream(
-                    getBoundSocket().newStream());
+                    getBoundSocket().stream());
         }
 
         @Override
-        public SeekableByteChannel newChannel() throws IOException {
+        public SeekableByteChannel channel() throws IOException {
             return new DisconnectingSeekableChannel(
-                    getBoundSocket().newChannel());
+                    getBoundSocket().channel());
         }
     } // Output
 

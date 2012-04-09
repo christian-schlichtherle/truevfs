@@ -75,7 +75,7 @@ public final class Raes {
                             cipherFile/*.getCanonicalFile()*/.toUri()),
                         new AbstractSink() {
                             @Override
-                            public OutputStream newStream() throws IOException {
+                            public OutputStream stream() throws IOException {
                                 return newOutputStream(cipherFile);
                             }
                         });
@@ -135,7 +135,7 @@ public final class Raes {
                     cipherFile/*.getCanonicalFile()*/.toUri()),
                     new AbstractSource() {
                         @Override
-                        public SeekableByteChannel newChannel() throws IOException {
+                        public SeekableByteChannel channel() throws IOException {
                             return newByteChannel(cipherFile);
                         }
                     });

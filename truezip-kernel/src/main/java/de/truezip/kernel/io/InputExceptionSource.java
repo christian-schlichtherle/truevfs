@@ -22,9 +22,9 @@ public final class InputExceptionSource extends AbstractSource {
     }
 
     @Override
-    public InputStream newStream() throws IOException {
+    public InputStream stream() throws IOException {
         try {
-            return new InputExceptionStream(source.newStream());
+            return new InputExceptionStream(source.stream());
         } catch (IOException ex) {
             throw new InputException(ex);
         }

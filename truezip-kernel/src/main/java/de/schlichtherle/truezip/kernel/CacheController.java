@@ -310,7 +310,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             }
 
             @Override
-            public InputStream newStream() throws IOException {
+            public InputStream stream() throws IOException {
                 return new Stream();
             }
 
@@ -318,7 +318,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 @CreatesObligation
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
-                    super(Input.super.newStream());
+                    super(Input.super.stream());
                     assert getModel().isTouched();
                 }
 
@@ -330,7 +330,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             } // Stream
 
             @Override
-            public SeekableByteChannel newChannel(){
+            public SeekableByteChannel channel(){
                 throw new AssertionError();
             }
         } // Input
@@ -368,7 +368,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             }
 
             @Override
-            public OutputStream newStream() throws IOException {
+            public OutputStream stream() throws IOException {
                 preOutput();
                 return new Stream();
             }
@@ -380,8 +380,8 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                     // Note that the super class implementation MUST get
                     // bypassed because the channel MUST get kept even upon an
                     // exception!
-                    //super(Output.super.newStream());
-                    super(getBoundSocket().newStream());
+                    //super(Output.super.stream());
+                    super(getBoundSocket().stream());
                     register();
                 }
 
@@ -393,7 +393,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             } // Stream
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 preOutput();
                 return new Channel();
             }
@@ -405,8 +405,8 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                     // Note that the super class implementation MUST get
                     // bypassed because the channel MUST get kept even upon an
                     // exception!
-                    //super(Nio2Output.super.newChannel());
-                    super(getBoundSocket().newChannel());
+                    //super(Nio2Output.super.channel());
+                    super(getBoundSocket().channel());
                     register();
                 }
 

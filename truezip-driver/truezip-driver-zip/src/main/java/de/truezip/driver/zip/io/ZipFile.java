@@ -414,7 +414,7 @@ public class ZipFile extends RawFile<ZipEntry> {
         }
 
         @Override
-        public SeekableByteChannel newChannel() throws IOException {
+        public SeekableByteChannel channel() throws IOException {
             return newByteChannel(file);
         }
     } // ZipSource

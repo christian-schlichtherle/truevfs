@@ -103,11 +103,11 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public OutputStream newStream() throws IOException {
+            public OutputStream stream() throws IOException {
                 final OutputStream out;
                 lock.lock();
                 try {
-                    out = getBoundSocket().newStream();
+                    out = getBoundSocket().stream();
                 } finally {
                     lock.unlock();
                 }
@@ -116,11 +116,11 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 final SeekableByteChannel channel;
                 lock.lock();
                 try {
-                    channel = getBoundSocket().newChannel();
+                    channel = getBoundSocket().channel();
                 } finally {
                     lock.unlock();
                 }
