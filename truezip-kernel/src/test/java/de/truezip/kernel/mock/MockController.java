@@ -5,7 +5,7 @@
 package de.truezip.kernel.mock;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;

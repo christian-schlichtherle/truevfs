@@ -9,7 +9,7 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Size.STORAGE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsSyncOption;
 import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.sl.FsDriverLocator;

@@ -4,9 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.FsModel;
 import java.net.URI;
 import javax.annotation.CheckForNull;

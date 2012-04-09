@@ -5,13 +5,13 @@
 package de.truezip.path;
 
 import de.truezip.file.TArchiveDetector;
-import de.truezip.kernel.addr.FsEntryName;
-import static de.truezip.kernel.addr.FsEntryName.*;
-import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.addr.FsPath;
-import de.truezip.kernel.addr.FsScheme;
-import static de.truezip.kernel.addr.FsUriModifier.CANONICALIZE;
-import static de.truezip.kernel.addr.FsUriModifier.NULL;
+import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsEntryName.*;
+import de.truezip.kernel.FsMountPoint;
+import de.truezip.kernel.FsPath;
+import de.truezip.kernel.FsScheme;
+import static de.truezip.kernel.FsUriModifier.CANONICALIZE;
+import static de.truezip.kernel.FsUriModifier.NULL;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.io.Paths.Splitter;
 import de.truezip.kernel.util.QuotedUriSyntaxException;

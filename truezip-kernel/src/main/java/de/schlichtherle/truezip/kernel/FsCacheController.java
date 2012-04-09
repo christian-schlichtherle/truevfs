@@ -9,7 +9,7 @@ import static de.schlichtherle.truezip.kernel.FsCache.Strategy.WRITE_BACK;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;

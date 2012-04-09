@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.kernel;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.kernel.FsReadOnlyFileSystemException;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Container;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;

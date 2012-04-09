@@ -8,7 +8,7 @@ import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;

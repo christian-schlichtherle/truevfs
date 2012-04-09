@@ -6,7 +6,7 @@ package de.truezip.kernel.sl;
 
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsDriverProvider;
-import de.truezip.kernel.addr.FsScheme;
+import de.truezip.kernel.FsScheme;
 import de.truezip.kernel.spi.FsDriverService;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.ServiceLocator;

@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsScheme;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 

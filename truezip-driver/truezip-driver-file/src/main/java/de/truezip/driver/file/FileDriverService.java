@@ -5,7 +5,7 @@
 package de.truezip.driver.file;
 
 import de.truezip.kernel.FsDriver;
-import de.truezip.kernel.addr.FsScheme;
+import de.truezip.kernel.FsScheme;
 import de.truezip.kernel.spi.FsDriverService;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;

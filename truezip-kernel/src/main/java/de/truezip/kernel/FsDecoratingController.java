@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;

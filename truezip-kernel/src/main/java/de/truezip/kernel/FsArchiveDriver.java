@@ -4,9 +4,8 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsEntryName;
-import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
-import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
+import static de.truezip.kernel.FsEntryName.SEPARATOR;
+import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;

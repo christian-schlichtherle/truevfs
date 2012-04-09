@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.addr.FsEntryName;
-import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
-import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsEntryName.SEPARATOR;
+import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.Streams;
 import static de.truezip.kernel.util.Maps.initialCapacity;

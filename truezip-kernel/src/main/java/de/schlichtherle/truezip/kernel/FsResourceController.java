@@ -9,7 +9,7 @@ import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncWarningException;
-import de.truezip.kernel.addr.FsEntryName;
+import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;

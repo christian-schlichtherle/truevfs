@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.addr.FsMountPoint;
 import java.util.Iterator;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;

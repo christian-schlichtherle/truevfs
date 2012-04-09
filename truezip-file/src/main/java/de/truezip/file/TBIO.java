@@ -6,7 +6,7 @@ package de.truezip.file;
 
 import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
-import de.truezip.kernel.addr.FsPath;
+import de.truezip.kernel.FsPath;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;

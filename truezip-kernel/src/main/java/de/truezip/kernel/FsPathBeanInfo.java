@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.addr;
+package de.truezip.kernel;
 
 import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.beans.*;
@@ -13,15 +13,15 @@ import javax.annotation.concurrent.Immutable;
  * Provides a persistence delegate to support
  * {@link XMLEncoder}/{@link XMLDecoder}.
  *
- * @see    FsMountPoint
+ * @see    FsPath
  * @author Christian Schlichtherle
  */
 @Immutable
 @DefaultAnnotation(Nullable.class)
-public final class FsMountPointBeanInfo extends SimpleBeanInfo {
+public final class FsPathBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
-    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.truezip.kernel.addr.FsMountPoint.class , null ); // NOI18N
+    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( de.truezip.kernel.FsPath.class , null ); // NOI18N
 
     private static BeanDescriptor getBdescriptor(){
         return beanDescriptor;
@@ -32,13 +32,13 @@ public final class FsMountPointBeanInfo extends SimpleBeanInfo {
         final PersistenceDelegate pd = new PersistenceDelegate() {
             @Override
             protected Expression instantiate(Object oldInstance, Encoder out) {
-                final FsMountPoint mountPoint = (FsMountPoint) oldInstance;
+                final FsPath path = (FsPath) oldInstance;
                 return new Expression(
-                    mountPoint,
-                    mountPoint.getClass(),
+                    path,
+                    path.getClass(),
                     "new", // NOI18N
                     new Object[] {
-                        mountPoint.toUri(),
+                        path.toUri(),
                     });
             }
         };

@@ -8,7 +8,7 @@ import de.truezip.kernel.FsAbstractCompositeDriver;
 import de.truezip.kernel.FsAbstractDriverProvider;
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsDriverProvider;
-import de.truezip.kernel.addr.FsScheme;
+import de.truezip.kernel.FsScheme;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.util.ExtensionSet;
 import static de.truezip.kernel.util.Maps.initialCapacity;

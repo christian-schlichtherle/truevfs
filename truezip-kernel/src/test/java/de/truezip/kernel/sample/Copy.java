@@ -5,8 +5,8 @@
 package de.truezip.kernel.sample;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsPath;
-import de.truezip.kernel.addr.FsUriModifier;
+import de.truezip.kernel.FsPath;
+import de.truezip.kernel.FsUriModifier;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;

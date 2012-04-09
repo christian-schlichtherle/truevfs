@@ -6,7 +6,7 @@ package de.truezip.file;
 
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsDriver;
-import de.truezip.kernel.addr.FsScheme;
+import de.truezip.kernel.FsScheme;
 import de.truezip.kernel.mock.MockArchiveDriver;
 import de.truezip.kernel.util.ExtensionSet;
 import java.io.File;

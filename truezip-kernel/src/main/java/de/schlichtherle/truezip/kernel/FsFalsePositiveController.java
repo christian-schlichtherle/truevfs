@@ -6,9 +6,9 @@ package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.*;
-import de.truezip.kernel.addr.FsEntryName;
-import static de.truezip.kernel.addr.FsEntryName.ROOT;
-import de.truezip.kernel.addr.FsPath;
+import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsEntryName.ROOT;
+import de.truezip.kernel.FsPath;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
