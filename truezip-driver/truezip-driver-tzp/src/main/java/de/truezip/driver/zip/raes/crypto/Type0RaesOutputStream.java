@@ -4,12 +4,14 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
+import de.truezip.driver.zip.crypto.CipherOutputStream;
 import de.truezip.driver.zip.crypto.CtrBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.*;
 import de.truezip.kernel.io.LEDataOutputStream;
 import de.truezip.kernel.io.Sink;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
@@ -37,6 +39,8 @@ final class Type0RaesOutputStream extends RaesOutputStream {
      */
     final static int ITERATION_COUNT = 2005; // The RAES epoch :-)
 
+    private boolean finished;
+
     /** The key strength. */
     private final AesKeyStrength keyStrength;
 
@@ -59,9 +63,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     Type0RaesOutputStream(final Sink sink, final Type0RaesParameters param)
     throws IOException{
-        super(new BufferedBlockCipher(
-                new CtrBlockCipher( // or new SICBlockCipher(
-                    new AESFastEngine())));
+        super(null);
 
         assert null != sink;
         assert null != param;
@@ -97,6 +99,9 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         Arrays.fill(pwdBytes, (byte) 0);
 
         // Init cipher.
+        final BufferedBlockCipher cipher = new BufferedBlockCipher(
+                new CtrBlockCipher( // or new SICBlockCipher(
+                    new AESFastEngine()));
         cipher.init(true, aesCtrParam);
 
         // Init MAC.
@@ -121,7 +126,8 @@ final class Type0RaesOutputStream extends RaesOutputStream {
                     this.dos = out instanceof LEDataOutputStream
                         ? (LEDataOutputStream) out
                         : new LEDataOutputStream(out);
-            this.out = new MacOutputStream(dos, mac);
+            this.out = new CipherOutputStream(cipher,
+                    new MacOutputStream(dos, mac));
 
             // Write data envelope header.
             dos.writeInt(SIGNATURE);
@@ -148,10 +154,13 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         return keyStrength;
     }
 
-    @Override
-    protected void finish() throws IOException {
+    private void finish() throws IOException {
+        if (finished)
+            return;
+        finished = true;
+
         // Flush partial block to out, if any.
-        super.finish();
+        ((CipherOutputStream) out).finish();
 
         final long trailer = dos.size();
 
@@ -175,5 +184,12 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         dos.write(buf, 0, buf.length / 2);
 
         assert dos.size() - trailer == buf.length;
+    }
+
+    @Override
+    @DischargesObligation
+    public void close() throws IOException {
+        finish();
+        out.close();
     }
 }

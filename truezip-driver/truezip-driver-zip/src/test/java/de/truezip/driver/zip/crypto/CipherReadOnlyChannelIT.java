@@ -19,8 +19,7 @@ public class CipherReadOnlyChannelIT extends ReadOnlyChannelITSuite {
     @Override
     protected SeekableByteChannel newChannel(Path path) throws IOException {
         return new CipherReadOnlyChannel(
-                Files.newByteChannel(path),
-                new SeekableNullEngine());
+                new SeekableNullEngine(), Files.newByteChannel(path));
     }
 
     private static final class SeekableNullEngine

@@ -160,9 +160,8 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
         final SeekableBlockCipher
                 cipher = new CtrBlockCipher(new AESFastEngine());
         cipher.init(false, aesCtrParam);
-        this.channel = new CipherReadOnlyChannel(
-                new IntervalReadOnlyChannel(channel.position(start), size),
-                cipher);
+        this.channel = new CipherReadOnlyChannel(cipher,
+                new IntervalReadOnlyChannel(channel.position(start), size));
 
         // Commit key strength.
         param.setKeyStrength(keyStrength);

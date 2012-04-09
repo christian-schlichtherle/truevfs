@@ -4,12 +4,15 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import de.truezip.driver.zip.crypto.CipherOutputStream;
+import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.key.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 
 /**
@@ -20,11 +23,12 @@ import org.bouncycastle.crypto.Mac;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class RaesOutputStream extends CipherOutputStream {
+public abstract class RaesOutputStream extends DecoratingOutputStream {
 
     @CreatesObligation
-    RaesOutputStream(BufferedBlockCipher cipher) {
-        super(null, cipher);
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    RaesOutputStream(@CheckForNull @WillCloseWhenClosed OutputStream out) {
+        super(out);
     }
 
     /**
