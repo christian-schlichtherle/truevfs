@@ -4,12 +4,15 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.FsModel;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.OutputService;
-import java.io.FileNotFoundException;
+import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -49,14 +52,13 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    protected final OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final OptionOutputSocket output,
-            final ZipInputService source)
+    public final OutputService<ZipDriverEntry> newOutputService(
+            FsModel model,
+            @CheckForNull @WillNotClose InputService<ZipDriverEntry> source,
+            FsController<?> parent,
+            FsEntryName entry,
+            BitField<FsAccessOption> options)
     throws IOException {
-        assert null != model;
-        assert null != output;
-        throw new FileNotFoundException(
-                "driver class does not support creating or modifying SFX archives");
+        throw new FsReadOnlyFileSystemException();
     }
 }

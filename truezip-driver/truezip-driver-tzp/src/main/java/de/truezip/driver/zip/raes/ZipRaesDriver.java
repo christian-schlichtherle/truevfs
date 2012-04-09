@@ -12,18 +12,20 @@ import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
 import de.truezip.driver.zip.raes.crypto.RaesSink;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsEntryName;
-import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOption.*;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsEntryName;
+import de.truezip.kernel.FsModel;
+import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -168,9 +170,9 @@ public abstract class ZipRaesDriver extends JarDriver {
      * implementation.
      */
     @Override
-    public final InputService<ZipDriverEntry>
-    newInputService(final FsModel model,
-                    final InputSocket<?> input)
+    protected final InputService<ZipDriverEntry> newInputService(
+            final FsModel model,
+            final InputSocket<?> input)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
@@ -191,35 +193,21 @@ public abstract class ZipRaesDriver extends JarDriver {
         }
     }
 
-    /**
-     * Sets {@link FsAccessOption#STORE} in {@code options} before
-     * forwarding the call to {@code controller}.
-     */
-    @Override
-    public final OptionOutputSocket
-    getOutputSocket(final FsController<?> controller,
-                    final FsEntryName name,
-                    BitField<FsAccessOption> options,
-                    final @CheckForNull Entry template) {
-        options = options.clear(GROW);
-        // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
-        // opportunity to apply its own preferences to sort out such a conflict.
-        return new OptionOutputSocket(
-                controller.getOutputSocket(name, options.set(STORE), template),
-                options); // use modified options!
-    }
-
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputService<ZipDriverEntry>
-    newOutputService(   final FsModel model,
-                        final OptionOutputSocket output,
-                        final ZipInputService source)
+    protected final OutputService<ZipDriverEntry> newOutputService(
+            final FsModel model,
+            final @CheckForNull @WillNotClose ZipInputService source,
+            final OptionOutputSocket output)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
+        if (null != source)
+            source.setAppendee(output.getOptions().get(GROW));
         final RaesOutputStream ros = new RaesSink(output, raesParameters(model))
                 .newStream();
         try {
-            return newOutputService(model, ros, source);
+            return newOutputService(model, source, ros);
         } catch (final Throwable ex) {
             try {
                 ros.close();
@@ -228,5 +216,23 @@ public abstract class ZipRaesDriver extends JarDriver {
             }
             throw ex;
         }
+    }
+
+    /**
+     * Sets {@link FsAccessOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    protected final OptionOutputSocket
+    getOutputSocket(
+            final FsController<?> controller,
+            final FsEntryName name,
+            BitField<FsAccessOption> options) {
+        options = options.clear(GROW);
+        // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
+        // opportunity to apply its own preferences to sort out such a conflict.
+        return new OptionOutputSocket(
+                controller.getOutputSocket(name, options.set(STORE), null),
+                options); // use modified options!
     }
 }

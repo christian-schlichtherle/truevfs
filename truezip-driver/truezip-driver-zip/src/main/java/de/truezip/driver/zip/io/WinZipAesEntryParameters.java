@@ -18,7 +18,7 @@ final class WinZipAesEntryParameters {
     private final WinZipAesParameters param;
     private final ZipEntry entry;
 
-    public WinZipAesEntryParameters(
+    WinZipAesEntryParameters(
             final WinZipAesParameters param,
             final ZipEntry entry) {
         assert null != param;

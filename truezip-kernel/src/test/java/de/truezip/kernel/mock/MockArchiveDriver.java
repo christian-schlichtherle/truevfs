@@ -4,11 +4,7 @@
  */
 package de.truezip.kernel.mock;
 
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsArchiveDriver;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.FsMountPoint;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.util.BitField;
@@ -19,6 +15,7 @@ import java.nio.charset.Charset;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -42,7 +39,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
         if (null == config)
             config = TestConfig.get();
         this.config = config;
-        this.containers = new ConcurrentHashMap<FsMountPoint, MockArchive>(
+        this.containers = new ConcurrentHashMap<>(
                 Maps.initialCapacity(config.getNumEntries()));
     }
 
@@ -56,7 +53,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    public InputService<MockArchiveDriverEntry> newInputService(
+    protected InputService<MockArchiveDriverEntry> newInputService(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
@@ -70,10 +67,10 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    public OutputService<MockArchiveDriverEntry> newOutputService(
+    protected OutputService<MockArchiveDriverEntry> newOutputService(
             FsModel model,
-            OutputSocket<?> output,
-            InputService<MockArchiveDriverEntry> source)
+            @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> source,
+            OutputSocket<?> output)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         output.getLocalTarget(); // don't care for the result

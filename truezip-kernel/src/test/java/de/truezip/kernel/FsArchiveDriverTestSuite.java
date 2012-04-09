@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel;
 
+import static de.truezip.kernel.FsAccessOptions.NONE;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Size.STORAGE;
@@ -45,7 +46,7 @@ extends FsArchiveDriverTestBase<D> {
             logger = Logger.getLogger(FsArchiveDriverTestSuite.class.getName());
 
     private static final FsEntryName
-            name = FsEntryName.create(URI.create("archive"));
+            entry = FsEntryName.create(URI.create("archive"));
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -68,7 +69,7 @@ extends FsArchiveDriverTestBase<D> {
         config.setDataSize(getMaxArchiveLength());
         config.setIOPoolProvider(null); // reset
         model = newArchiveModel();
-        parent = newController(model.getParent());
+        parent = newParentController(model.getParent());
         assert !UTF8.equals(getArchiveDriver().getCharset())
                 || null == getUnencodableName() : "Bad test setup!";
     }
@@ -118,50 +119,44 @@ extends FsArchiveDriverTestBase<D> {
             logger.log(Level.WARNING, "{0} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
     }
 
-    @Test
-    public void testGetInputSocketMustForwardTheCallToTheGivenController() {
-        final Throwable expected = new RuntimeException();
-        trigger(MockController.class, expected);
-        try {
-            getArchiveInputSocket();
-            fail();
-        } catch (final RuntimeException got) {
-            if (!contains(got, expected))
-                throw got;
-        }
-    }
-
-    @Test
-    public void testGetOutputSocketMustForwardTheCallToTheGivenController() {
-        final Throwable expected = new RuntimeException();
-        trigger(MockController.class, expected);
-        try {
-            getArchiveOutputSocket();
-            fail();
-        } catch (final RuntimeException got) {
-            if (!contains(got, expected))
-                throw got;
-        }
-    }
-
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newInputService(null, getArchiveInputSocket());
+        getArchiveDriver().newInputService(null, parent, entry, NONE);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewInputServiceMustNotTolerateNullInputSocket() throws IOException {
-        getArchiveDriver().newInputService(model, null);
+    public void testNewInputServiceMustNotTolerateNullParentController() throws IOException {
+        getArchiveDriver().newInputService(model, null, entry, NONE);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNewInputServiceMustNotTolerateNullEntryName() throws IOException {
+        getArchiveDriver().newInputService(model, parent, null, NONE);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNewInputServiceMustNotTolerateNullOptions() throws IOException {
+        getArchiveDriver().newInputService(model, parent, entry, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newOutputService(null, getArchiveOutputSocket(), null);
+        getArchiveDriver().newOutputService(null, null, parent, entry, NONE);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewOutputServiceMustNotTolerateNullInputSocket() throws IOException {
-        getArchiveDriver().newOutputService(model, null, null);
+    public void testNewOutputServiceMustNotTolerateNullParentController() throws IOException {
+        getArchiveDriver().newOutputService(model, null, null, entry, NONE);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNewOutputServiceMustNotTolerateNullEntryName() throws IOException {
+        getArchiveDriver().newOutputService(model, null, parent, null, NONE);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNewOutputServiceMustNotTolerateNullOptions() throws IOException {
+        getArchiveDriver().newOutputService(model, null, parent, entry, null);
     }
 
     @Test
@@ -172,7 +167,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void output() throws IOException {
         final OutputService<E> os = getArchiveDriver()
-                .newOutputService(model, getArchiveOutputSocket(), null);
+                .newOutputService(model, null, parent, entry, NONE);
         try {
             final Closeable[] streams = new Closeable[getNumEntries()];
             try {
@@ -232,14 +227,9 @@ extends FsArchiveDriverTestBase<D> {
         return out;
     }
 
-    private OutputSocket<?> getArchiveOutputSocket() {
-        return getArchiveDriver().getOutputSocket(parent, name,
-                FsAccessOptions.NONE, null);
-    }
-
     private void input() throws IOException {
         final InputService<E> is = getArchiveDriver()
-                .newInputService(model, getArchiveInputSocket());
+                .newInputService(model, parent, entry, NONE);
         try {
             check(is);
             final Closeable[] streams = new Closeable[getNumEntries()];
@@ -323,11 +313,6 @@ extends FsArchiveDriverTestBase<D> {
         }
     }
 
-    private InputSocket<?> getArchiveInputSocket() {
-        return getArchiveDriver().getInputSocket(parent, name,
-                FsAccessOptions.NONE);
-    }
-
     private static void close(final Closeable[] resources) throws IOException {
         IOException failure = null;
         for (final Closeable resource : resources) {
@@ -399,17 +384,17 @@ extends FsArchiveDriverTestBase<D> {
         return Integer.toString(i);
     }
 
-    private MockController newController(final FsModel model) {
+    private MockController newParentController(final FsModel model) {
         final FsModel pm = model.getParent();
-        final FsController<?> pc = null == pm ? null : newController(pm);
-        return new TestController(model, pc);
+        final FsController<?> pc = null == pm ? null : newParentController(pm);
+        return new ParentController(model, pc);
     }
 
     private FsModel newArchiveModel() {
         final FsModel parent = newNonArchiveModel();
         return newModel(
                 FsMountPoint.create(URI.create(
-                    "scheme:" + parent.getMountPoint() + name + "!/")),
+                    "scheme:" + parent.getMountPoint() + entry + "!/")),
                 parent);
     }
 
@@ -451,8 +436,8 @@ extends FsArchiveDriverTestBase<D> {
         return getTestConfig().getNumEntries();
     }
 
-    private final class TestController extends MockController {
-        TestController( FsModel model,
+    private final class ParentController extends MockController {
+        ParentController( FsModel model,
                         @CheckForNull FsController<?> parent) {
             super(model, parent, getTestConfig());
         }
@@ -461,12 +446,14 @@ extends FsArchiveDriverTestBase<D> {
         public InputSocket<?> getInputSocket(
                 final FsEntryName name,
                 final BitField<FsAccessOption> options) {
-            assert null != name;
-            assert null != options;
+            if (null == name)
+                throw new NullPointerException();
+            if (null == options)
+                throw new NullPointerException();
 
             final class Input extends DecoratingInputSocket<Entry> {
                 Input() {
-                    super(TestController.super.getInputSocket(name, options));
+                    super(ParentController.super.getInputSocket(name, options));
                 }
 
                 @Override
@@ -492,12 +479,14 @@ extends FsArchiveDriverTestBase<D> {
                 final FsEntryName name,
                 final BitField<FsAccessOption> options,
                 final Entry template) {
-            assert null != name;
-            assert null != options;
+            if (null == name)
+                throw new NullPointerException();
+            if (null == options)
+                throw new NullPointerException();
 
             final class Output extends DecoratingOutputSocket<Entry> {
                 Output() {
-                    super(TestController.super.getOutputSocket(name, options, template));
+                    super(ParentController.super.getOutputSocket(name, options, template));
                 }
 
                 @Override

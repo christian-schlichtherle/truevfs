@@ -4,10 +4,10 @@
  */
 package de.truezip.kernel.mock;
 
-import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.FsArchiveEntries;
 import de.truezip.kernel.FsArchiveEntry;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.IOPool;
 import java.io.IOException;
 import java.util.EnumMap;
@@ -21,9 +21,9 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
     private final String name;
     private final Type type;
     private final EnumMap<Size, Long>
-            sizes = new EnumMap<Size, Long>(Size.class);
+            sizes = new EnumMap<>(Size.class);
     private final EnumMap<Access, Long>
-            times = new EnumMap<Access, Long>(Access.class);
+            times = new EnumMap<>(Access.class);
     private @CheckForNull IOBuffer<?> buffer;
 
     public MockArchiveDriverEntry(  final String name,

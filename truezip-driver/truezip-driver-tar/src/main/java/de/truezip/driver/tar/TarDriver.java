@@ -4,17 +4,12 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.FsArchiveDriver;
-import de.truezip.kernel.FsControlFlowIOException;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsAccessOption.COMPRESS;
+import de.truezip.kernel.*;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.COMPRESS;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -80,59 +75,6 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     /**
-     * Clears {@link FsAccessOption#CACHE} in {@code options} before
-     * forwarding the call to {@code controller}.
-     */
-    @Override
-    public InputSocket<?> getInputSocket(   FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsAccessOption> options) {
-        return controller.getInputSocket(
-                name,
-                options.clear(FsAccessOption.CACHE));
-    }
-
-    /**
-     * Sets {@link FsAccessOption#COMPRESS} in {@code options} before
-     * forwarding the call to {@code controller}.
-     */
-    @Override
-    public OutputSocket<?> getOutputSocket( FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsAccessOption> options,
-                                            @CheckForNull Entry template) {
-        return controller.getOutputSocket(name, options.set(COMPRESS), template);
-    }
-
-    @Override
-    public TarDriverEntry newEntry(
-            String name,
-            final Type type,
-            final Entry template,
-            final BitField<FsAccessOption> mknod) {
-        name = normalize(name, type);
-        final TarDriverEntry entry;
-        if (template instanceof TarArchiveEntry) {
-            entry = newEntry(name, (TarArchiveEntry) template);
-        } else {
-            entry = newEntry(name);
-            if (null != template) {
-                entry.setModTime(template.getTime(WRITE));
-                entry.setSize(template.getSize(DATA));
-            }
-        }
-        return entry;
-    }
-
-    public TarDriverEntry newEntry(String name) {
-        return new TarDriverEntry(name);
-    }
-
-    public TarDriverEntry newEntry(String name, TarArchiveEntry template) {
-        return new TarDriverEntry(name, template);
-    }
-
-    /**
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link TarDriver} acquires an input
@@ -141,7 +83,9 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      */
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public TarInputService newInputService(FsModel model, InputSocket<?> input)
+    protected TarInputService newInputService(
+            final FsModel model,
+            final InputSocket<?> input)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
@@ -184,10 +128,10 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * {@link MultiplexingOutputService}.
      */
     @Override
-    public OutputService<TarDriverEntry> newOutputService(
+    protected OutputService<TarDriverEntry> newOutputService(
             final FsModel model,
-            final OutputSocket<?> output,
-            final InputService<TarDriverEntry> source)
+            final @CheckForNull @WillNotClose InputService<TarDriverEntry> source,
+            final OutputSocket<?> output)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
@@ -215,5 +159,59 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     throws IOException {
         assert null != model;
         return new TarOutputService(this, out);
+    }
+
+    /**
+     * Clears {@link FsAccessOption#CACHE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    protected InputSocket<?> getInputSocket(
+            FsController<?> controller,
+            FsEntryName name,
+            BitField<FsAccessOption> options) {
+        return controller.getInputSocket(
+                name,
+                options.clear(FsAccessOption.CACHE));
+    }
+
+    /**
+     * Sets {@link FsAccessOption#COMPRESS} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    protected OutputSocket<?> getOutputSocket(
+            FsController<?> controller,
+            FsEntryName name,
+            BitField<FsAccessOption> options) {
+        return controller.getOutputSocket(name, options.set(COMPRESS), null);
+    }
+
+    @Override
+    public TarDriverEntry newEntry(
+            String name,
+            final Type type,
+            final Entry template,
+            final BitField<FsAccessOption> mknod) {
+        name = normalize(name, type);
+        final TarDriverEntry entry;
+        if (template instanceof TarArchiveEntry) {
+            entry = newEntry(name, (TarArchiveEntry) template);
+        } else {
+            entry = newEntry(name);
+            if (null != template) {
+                entry.setModTime(template.getTime(WRITE));
+                entry.setSize(template.getSize(DATA));
+            }
+        }
+        return entry;
+    }
+
+    public TarDriverEntry newEntry(String name) {
+        return new TarDriverEntry(name);
+    }
+
+    public TarDriverEntry newEntry(String name, TarArchiveEntry template) {
+        return new TarDriverEntry(name, template);
     }
 }

@@ -6,18 +6,13 @@ package de.truezip.driver.zip;
 
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import de.truezip.driver.zip.io.*;
-import de.truezip.kernel.FsArchiveDriver;
-import de.truezip.kernel.FsControlFlowIOException;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsAccessOption.*;
+import de.truezip.kernel.*;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import de.truezip.key.KeyManagerProvider;
@@ -353,6 +348,141 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         return new ZipKeyController<>(controller, this);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver} acquires a read only
+     * file from the given socket and forwards the call to
+     * {@link #newInputService(de.truezip.kernel.FsModel, java.nio.channels.SeekableByteChannel)}.
+     */
+    @Override
+    protected InputService<ZipDriverEntry> newInputService(
+            final FsModel model,
+            final InputSocket<?> input)
+    throws IOException {
+        if (null == model)
+            throw new NullPointerException();
+        final SeekableByteChannel channel = input.newChannel();
+        try {
+            return newInputService(model, channel);
+        } catch (final Throwable ex) {
+            try {
+                channel.close();
+            } catch (final Throwable ex2) {
+                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
+    }
+
+    @CreatesObligation
+    protected InputService<ZipDriverEntry> newInputService(
+            final FsModel model,
+            final @WillCloseWhenClosed SeekableByteChannel channel)
+    throws IOException {
+        assert null != model;
+        final ZipInputService input = new ZipInputService(this, model, channel);
+        try {
+            input.recoverLostEntries();
+        } catch (final IOException ex) {
+            logger.log(Level.WARNING, "junkInTheTrunk.warning", new Object[] {
+                mountPointUri(model),
+                input.getPostambleLength(),
+            });
+            logger.log(Level.FINE, "junkInTheTrunk.fine", ex);
+        }
+        return input;
+    }
+
+    @Override
+    public OutputService<ZipDriverEntry> newOutputService(
+            FsModel model,
+            @CheckForNull @WillNotClose InputService<ZipDriverEntry> source,
+            FsController<?> parent,
+            FsEntryName entry,
+            BitField<FsAccessOption> options)
+    throws IOException {
+        return newOutputService(model, (ZipInputService) source,
+                getOutputSocket(parent, entry, options));
+    }
+
+    @Override
+    protected final OutputService<ZipDriverEntry> newOutputService(
+            final FsModel model,
+            final @CheckForNull @WillNotClose InputService<ZipDriverEntry> source,
+            final OutputSocket<?> output)
+    throws IOException {
+        throw new UnsupportedOperationException();
+    }
+
+    protected OutputService<ZipDriverEntry> newOutputService(
+            final FsModel model,
+            final @CheckForNull @WillNotClose ZipInputService source,
+            final OptionOutputSocket output)
+    throws IOException {
+        if (null == model)
+            throw new NullPointerException();
+        if (null != source)
+            source.setAppendee(output.getOptions().get(GROW));
+        final OutputStream out = output.newStream();
+        try {
+            return newOutputService(model, source, out);
+        } catch (final Throwable ex) {
+            try {
+                out.close();
+            } catch (final Throwable ex2) {
+                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
+    }
+
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    protected OutputService<ZipDriverEntry> newOutputService(
+            final FsModel model,
+            final @CheckForNull @WillNotClose ZipInputService source,
+            final @WillCloseWhenClosed OutputStream out)
+    throws IOException {
+        return new MultiplexingOutputService<>(
+                new ZipOutputService(this, model, source, out),
+                getIOPool());
+    }
+
+    /**
+     * This implementation modifies {@code options} in the following way before
+     * it forwards the call to {@code controller}:
+     * <ol>
+     * <li>{@link FsAccessOption#STORE} is set.
+     * <li>If {@link FsAccessOption#GROW} is set, then
+     *     {@link FsAccessOption#APPEND} gets set, too, and
+     *     {@link FsAccessOption#CACHE} gets cleared.
+     * </ol>
+     * <p>
+     * The resulting output socket is then wrapped in a private nested class
+     * for an upcast in {@link #newOutputService}.
+     * Thus, when overriding this method, {@link #newOutputService} should get
+     * overridden, too.
+     * Otherwise, a class cast exception will get thrown in
+     * {@link #newOutputService}.
+     */
+    @Override
+    protected OptionOutputSocket getOutputSocket(
+            final FsController<?> controller,
+            final FsEntryName name,
+            BitField<FsAccessOption> options) {
+        // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
+        // opportunity to apply its own preferences to sort out such a conflict.
+        options = options.set(STORE);
+        if (options.get(GROW))
+            options = options.set(APPEND).clear(CACHE);
+        return new OptionOutputSocket(
+                controller.getOutputSocket(name, options, null),
+                options);
+    }
+
     @Override
     public ZipDriverEntry newEntry(
             String name,
@@ -407,153 +537,5 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      */
     public ZipDriverEntry newEntry(String name, ZipEntry template) {
         return new ZipDriverEntry(name, template);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link ZipDriver} acquires a read only
-     * file from the given socket and forwards the call to
-     * {@link #newInputService}.
-     */
-    @Override
-    public InputService<ZipDriverEntry> newInputService(
-            final FsModel model,
-            final InputSocket<?> input)
-    throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        final SeekableByteChannel channel = input.newChannel();
-        try {
-            return newInputService(model, channel);
-        } catch (final Throwable ex) {
-            try {
-                channel.close();
-            } catch (final Throwable ex2) {
-                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
-    @CreatesObligation
-    protected InputService<ZipDriverEntry> newInputService(
-            FsModel model,
-            @WillCloseWhenClosed SeekableByteChannel channel)
-    throws IOException {
-        assert null != model;
-        final ZipInputService input = new ZipInputService(this, model, channel);
-        try {
-            input.recoverLostEntries();
-        } catch (final IOException ex) {
-            logger.log(Level.WARNING, "junkInTheTrunk.warning", new Object[] {
-                mountPointUri(model),
-                input.getPostambleLength(),
-            });
-            logger.log(Level.FINE, "junkInTheTrunk.fine", ex);
-        }
-        return input;
-    }
-
-    /**
-     * This implementation modifies {@code options} in the following way before
-     * it forwards the call to {@code controller}:
-     * <ol>
-     * <li>{@link FsAccessOption#STORE} is set.
-     * <li>If {@link FsAccessOption#GROW} is set, {@link FsAccessOption#APPEND}
-     *     gets set too, and {@link FsAccessOption#CACHE} gets cleared.
-     * </ol>
-     * <p>
-     * The resulting output socket is then wrapped in a private nested class
-     * for an upcast in {@link #newOutputService}.
-     * Thus, when overriding this method, {@link #newOutputService} should get
-     * overridden, too.
-     * Otherwise, a class cast exception will get thrown in
-     * {@link #newOutputService}.
-     */
-    @Override
-    public OptionOutputSocket getOutputSocket(
-            final FsController<?> controller,
-            final FsEntryName name,
-            BitField<FsAccessOption> options,
-            final @CheckForNull Entry template) {
-        // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
-        // opportunity to apply its own preferences to sort out such a conflict.
-        options = options.set(STORE);
-        if (options.get(GROW))
-            options = options.set(APPEND).clear(CACHE);
-        return new OptionOutputSocket(
-                controller.getOutputSocket(name, options, template),
-                options);
-    }
-
-    /**
-     * This implementation first checks if {@link FsAccessOption#GROW} is set
-     * for the given {@code output} socket.
-     * If this is the case and the given {@code source} is not {@code null},
-     * then it's marked for appending to it.
-     * Then, an output stream is acquired from the given {@code output} socket
-     * and the parameters are forwarded to {@link #newOutputService(FsModel, OptionOutputSocket, ZipInputService)}
-     * and the result gets wrapped in a new {@link MultiplexingOutputService}
-     * which uses the current {@link #getIOPool}.
-     */
-    @Override
-    public final OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final OutputSocket<?> output,
-            final InputService<ZipDriverEntry> source)
-    throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        return newOutputService0(
-                model,
-                (OptionOutputSocket) output,
-                (ZipInputService) source);
-    }
-
-    @CreatesObligation
-    private OutputService<ZipDriverEntry> newOutputService0(
-            final FsModel model,
-            final OptionOutputSocket output,
-            final @CheckForNull @WillNotClose ZipInputService source)
-    throws IOException {
-        final BitField<FsAccessOption> options = output.getOptions();
-        if (null != source)
-            source.setAppendee(options.get(GROW));
-        return newOutputService(model, output, source);
-    }
-
-    @CreatesObligation
-    protected OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final OptionOutputSocket output,
-            final @CheckForNull @WillNotClose ZipInputService source)
-    throws IOException {
-        assert null != model;
-        final OutputStream out = output.newStream();
-        try {
-            return newOutputService(model, out, source);
-        } catch (final Throwable ex) {
-            try {
-                out.close();
-            } catch (final Throwable ex2) {
-                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputService<ZipDriverEntry> newOutputService(
-            FsModel model,
-            @WillCloseWhenClosed OutputStream out,
-            @CheckForNull @WillNotClose ZipInputService source)
-    throws IOException {
-        return new MultiplexingOutputService<>(
-                new ZipOutputService(this, model, out, source),
-                getIOPool());
     }
 }

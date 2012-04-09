@@ -74,7 +74,7 @@ implements InputService<ZipDriverEntry> {
      * @return {@code true} if and only if the target archive file gets entries
      *         appended to it.
      */
-    boolean isAppendee() {
+    public boolean isAppendee() {
         return appendee;
     }
 
@@ -85,7 +85,7 @@ implements InputService<ZipDriverEntry> {
      * @param appendee {@code true} if and only if the target archive file gets
      *        entries appended to it.
      */
-    void setAppendee(boolean appendee) {
+    public void setAppendee(boolean appendee) {
         this.appendee = appendee;
     }
 
