@@ -14,10 +14,10 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOption;
-import static de.truezip.kernel.option.SyncOption.FORCE_CLOSE_IO;
-import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsSyncOption;
+import static de.truezip.kernel.FsSyncOption.FORCE_CLOSE_IO;
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -59,7 +59,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     @Override
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options) {
+            final BitField<FsAccessOption> options) {
         @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
@@ -84,7 +84,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
         @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {
@@ -108,7 +108,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
     @Override
     public <X extends IOException> void
-    sync(   final BitField<SyncOption> options,
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         assert isWriteLockedByCurrentThread();
@@ -134,7 +134,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    waitIdle(   final BitField<SyncOption> options,
+    waitIdle(   final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // HC SUNT DRACONES!

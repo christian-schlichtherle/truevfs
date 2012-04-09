@@ -4,14 +4,14 @@
  */
 package de.truezip.file;
 
+import static de.truezip.kernel.FsAccessOption.GROW;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
+import static de.truezip.kernel.FsSyncOptions.SYNC;
 import de.truezip.kernel.*;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.OutputClosedException;
-import static de.truezip.kernel.option.AccessOption.GROW;
-import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
-import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
-import static de.truezip.kernel.option.SyncOptions.SYNC;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;

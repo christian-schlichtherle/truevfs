@@ -13,8 +13,8 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.COMPRESS;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.COMPRESS;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -80,26 +80,26 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     /**
-     * Clears {@link AccessOption#CACHE} in {@code options} before
+     * Clears {@link FsAccessOption#CACHE} in {@code options} before
      * forwarding the call to {@code controller}.
      */
     @Override
     public InputSocket<?> getInputSocket(   FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<AccessOption> options) {
+                                            BitField<FsAccessOption> options) {
         return controller.getInputSocket(
                 name,
-                options.clear(AccessOption.CACHE));
+                options.clear(FsAccessOption.CACHE));
     }
 
     /**
-     * Sets {@link AccessOption#COMPRESS} in {@code options} before
+     * Sets {@link FsAccessOption#COMPRESS} in {@code options} before
      * forwarding the call to {@code controller}.
      */
     @Override
     public OutputSocket<?> getOutputSocket( FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<AccessOption> options,
+                                            BitField<FsAccessOption> options,
                                             @CheckForNull Entry template) {
         return controller.getOutputSocket(name, options.set(COMPRESS), template);
     }
@@ -109,7 +109,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             String name,
             final Type type,
             final Entry template,
-            final BitField<AccessOption> mknod) {
+            final BitField<FsAccessOption> mknod) {
         name = normalize(name, type);
         final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {

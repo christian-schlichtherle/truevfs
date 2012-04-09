@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.*;
 import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.option.SyncOption;
-import de.truezip.kernel.option.SyncOptions;
+import de.truezip.kernel.FsSyncOption;
+import de.truezip.kernel.FsSyncOptions;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -84,7 +84,7 @@ final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
      */
     @Override
     public <X extends IOException> void
-    sync(   final BitField<SyncOption> options,
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         if (null != this.shutdownHook) {
@@ -113,7 +113,7 @@ final class FsFailSafeManager extends FsDecoratingManager<FsManager> {
         @SuppressWarnings("CallToThreadDumpStack")
         public void run() {
             try {
-                manager.sync(SyncOptions.UMOUNT);
+                manager.sync(FsSyncOptions.UMOUNT);
             } catch (final IOException ex) {
                 // Logging doesn't work in a shutdown hook!
                 ex.printStackTrace();

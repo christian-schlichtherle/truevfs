@@ -11,8 +11,8 @@ import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.STORE;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.STORE;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,13 +67,13 @@ public class TarGZipDriver extends TarDriver {
     }
 
     /**
-     * Sets {@link AccessOption#STORE} in {@code options} before
+     * Sets {@link FsAccessOption#STORE} in {@code options} before
      * forwarding the call to {@code controller}.
      */
     @Override
     public OutputSocket<?> getOutputSocket( FsController<?> controller,
                                             FsEntryName name,
-                                            BitField<AccessOption> options,
+                                            BitField<FsAccessOption> options,
                                             @CheckForNull Entry template) {
         return controller.getOutputSocket(name, options.set(STORE), template);
     }

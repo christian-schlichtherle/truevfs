@@ -14,8 +14,8 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOption;
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -96,7 +96,7 @@ public class HttpController extends FsModelController<FsModel>  {
             FsEntryName name,
             BitField<Access> types,
             long value,
-            BitField<AccessOption> options)
+            BitField<FsAccessOption> options)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
@@ -104,14 +104,14 @@ public class HttpController extends FsModelController<FsModel>  {
     @Override
     public InputSocket<?> getInputSocket(
             FsEntryName name,
-            BitField<AccessOption> options) {
+            BitField<FsAccessOption> options) {
         return newEntry(name).newInputSocket(options);
     }
 
     @Override
     public OutputSocket<?> getOutputSocket(
             FsEntryName name,
-            BitField<AccessOption> options,
+            BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return newEntry(name).newOutputSocket(options, template);
     }
@@ -119,21 +119,21 @@ public class HttpController extends FsModelController<FsModel>  {
     @Override
     public void mknod(  final FsEntryName name,
                         final Type type,
-                        final BitField<AccessOption> options,
+                        final BitField<FsAccessOption> options,
                         final @CheckForNull Entry template)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<AccessOption> options)
+    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
     public <X extends IOException>
-    void sync(  BitField<SyncOption> options,
+    void sync(  BitField<FsSyncOption> options,
                 ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
     }

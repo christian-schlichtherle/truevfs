@@ -8,17 +8,17 @@ import de.truezip.file.ConfiguredClientTestBase;
 import de.truezip.file.TConfig;
 import de.truezip.file.TFileITSuite;
 import de.truezip.file.TVFS;
+import static de.truezip.kernel.FsAccessOption.GROW;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
+import static de.truezip.kernel.FsSyncOptions.SYNC;
 import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.io.Streams;
-import static de.truezip.kernel.option.AccessOption.GROW;
-import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
-import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
-import static de.truezip.kernel.option.SyncOptions.SYNC;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
@@ -458,10 +458,10 @@ extends ConfiguredClientTestBase<D> {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
 
-        createFile(file1); // uses AccessOption.CACHE!
+        createFile(file1); // uses FsAccessOption.CACHE!
         umount();
         final InputStream in1 = newInputStream(file1);
-        createFile(file2); // uses AccessOption.CACHE!
+        createFile(file2); // uses FsAccessOption.CACHE!
         try {
             copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
 

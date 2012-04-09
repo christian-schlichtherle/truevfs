@@ -12,9 +12,9 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.SyncOption;
-import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsSyncOption;
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.kernel.util.Threads;
@@ -55,7 +55,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
                 }
             };
 
-    private static final BitField<SyncOption>
+    private static final BitField<FsSyncOption>
             NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not();
 
     private final ReadLock readLock;
@@ -245,7 +245,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     public boolean setTime(
             final FsEntryName name,
             final Map<Access, Long> times,
-            final BitField<AccessOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
@@ -262,7 +262,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
             final FsEntryName name,
             final BitField<Access> types,
             final long value,
-            final BitField<AccessOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
@@ -277,7 +277,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     @Override
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options) {
+            final BitField<FsAccessOption> options) {
         @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
@@ -328,7 +328,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
         @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {
@@ -381,7 +381,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     public void
     mknod(  final FsEntryName name,
             final Type type,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final Entry template)
     throws IOException {
         final class Mknod implements IOOperation<Void> {
@@ -398,7 +398,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
     @Override
     public void unlink(
             final FsEntryName name,
-            final BitField<AccessOption> options)
+            final BitField<FsAccessOption> options)
     throws IOException {
         final class Unlink implements IOOperation<Void> {
             @Override
@@ -413,11 +413,11 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
     @Override
     public <X extends IOException> void
-    sync(   final BitField<SyncOption> options,
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         // MUST not initialize within IOOperation => would always be true!
-        final BitField<SyncOption> sync = threadUtil.get().locking
+        final BitField<FsSyncOption> sync = threadUtil.get().locking
                 ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
                 : options;
 

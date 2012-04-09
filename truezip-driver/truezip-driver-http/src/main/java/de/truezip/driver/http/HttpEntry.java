@@ -11,8 +11,8 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.FsReadOnlyFileSystemException;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.AccessOptions;
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsAccessOptions;
 import de.truezip.kernel.util.BitField;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -151,20 +151,20 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
 
     @Override
     public InputSocket<HttpEntry> getInputSocket() {
-        return newInputSocket(AccessOptions.NONE);
+        return newInputSocket(FsAccessOptions.NONE);
     }
 
-    protected InputSocket<HttpEntry> newInputSocket(BitField<AccessOption> options) {
+    protected InputSocket<HttpEntry> newInputSocket(BitField<FsAccessOption> options) {
         return new HttpInputSocket(this, options);
     }
 
     @Override
     public OutputSocket<HttpEntry> getOutputSocket() {
-        return newOutputSocket(AccessOptions.NONE, null);
+        return newOutputSocket(FsAccessOptions.NONE, null);
     }
 
     protected OutputSocket<HttpEntry> newOutputSocket(
-            BitField<AccessOption> options,
+            BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return new HttpOutputSocket(this, options, template);
     }

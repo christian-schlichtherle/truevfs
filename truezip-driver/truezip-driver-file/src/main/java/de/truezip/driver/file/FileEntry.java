@@ -11,8 +11,8 @@ import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.AccessOptions;
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsAccessOptions;
 import de.truezip.kernel.util.BitField;
 import static java.io.File.separatorChar;
 import java.io.IOException;
@@ -182,11 +182,11 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
 
     @Override
     public final OutputSocket<FileEntry> getOutputSocket() {
-        return new FileOutputSocket(this, AccessOptions.NONE, null);
+        return new FileOutputSocket(this, FsAccessOptions.NONE, null);
     }
 
     final OutputSocket<FileEntry> getOutputSocket(
-            BitField<AccessOption> options,
+            BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return new FileOutputSocket(this, options, template);
     }

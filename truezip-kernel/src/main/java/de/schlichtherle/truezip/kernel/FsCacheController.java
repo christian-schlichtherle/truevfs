@@ -15,11 +15,11 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
-import de.truezip.kernel.option.SyncOption;
-import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
-import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import de.truezip.kernel.FsSyncOption;
+import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -45,9 +45,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <li>Caching and buffering for an entry needs to get activated by using the
  *     method
  *     {@link #getInputSocket input socket} with the input option
- *     {@link AccessOption#CACHE} or the method
+ *     {@link FsAccessOption#CACHE} or the method
  *     {@link #getOutputSocket output socket} with the output option
- *     {@link AccessOption#CACHE}.
+ *     {@link FsAccessOption#CACHE}.
  * <li>Unless a write operation succeeds, upon each read operation the entry
  *     data gets copied from the backing store for buffering purposes only.
  * <li>Upon a successful write operation, the entry data gets cached for
@@ -102,7 +102,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
     @Override
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options) {
+            final BitField<FsAccessOption> options) {
         /** This class requires ON-DEMAND LOOKUP of its in! */
         final class Input extends DelegatingInputSocket<Entry> {
             @Override
@@ -110,7 +110,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
-                    if (!options.get(AccessOption.CACHE))
+                    if (!options.get(FsAccessOption.CACHE))
                         return controller.getInputSocket(name, options);
                     cache = new EntryCache(name);
                 }
@@ -125,7 +125,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive!
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
         /** This class requires ON-DEMAND LOOKUP of its in! */
         final class Output extends DelegatingOutputSocket<Entry> {
@@ -134,7 +134,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
-                    if (!options.get(AccessOption.CACHE))
+                    if (!options.get(FsAccessOption.CACHE))
                         return controller.getOutputSocket(name, options, template);
                     cache = new EntryCache(name);
                 }
@@ -148,7 +148,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
     @Override
     public void mknod(  final FsEntryName name,
                         final Type type,
-                        final BitField<AccessOption> options,
+                        final BitField<FsAccessOption> options,
                         final @CheckForNull Entry template)
     throws IOException {
         assert isWriteLockedByCurrentThread();
@@ -160,7 +160,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
 
     @Override
     public void unlink( final FsEntryName name,
-                        final BitField<AccessOption> options)
+                        final BitField<FsAccessOption> options)
     throws IOException {
         assert isWriteLockedByCurrentThread();
         controller.unlink(name, options);
@@ -171,7 +171,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
 
     @Override
     public <X extends IOException> void sync(
-            final BitField<SyncOption> options,
+            final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         FsNeedsSyncException preSyncEx;
@@ -213,14 +213,14 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                 logger.log(Level.FINE, "recovering", invalidState);
                 preSyncEx = invalidState; // trigger another iteration
             }
-            // TODO: Consume SyncOption.CLEAR_CACHE and clear a flag in
+            // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in
             // the model instead.
             controller.sync(options/*.clear(CLEAR_CACHE)*/, handler);
         } while (null != preSyncEx);
     }
 
     private <X extends IOException> void
-    preSync(final BitField<SyncOption> options,
+    preSync(final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControlFlowIOException, X {
         assert isWriteLockedByCurrentThread();
@@ -270,11 +270,11 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
             this.cache = WRITE_BACK.newCache(FsCacheController.this.pool);
         }
 
-        InputSocket<?> getInputSocket(BitField<AccessOption> options) {
+        InputSocket<?> getInputSocket(BitField<FsAccessOption> options) {
             return cache.configure(new Input(options)).getInputSocket();
         }
 
-        OutputSocket<?> getOutputSocket(BitField<AccessOption> options,
+        OutputSocket<?> getOutputSocket(BitField<FsAccessOption> options,
                                         @CheckForNull Entry template) {
             return new Output(options, template);
         }
@@ -298,10 +298,10 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
          */
         @NotThreadSafe
         final class Input extends ClutchInputSocket<Entry> {
-            final BitField<AccessOption> options;
+            final BitField<FsAccessOption> options;
 
-            Input(final BitField<AccessOption> options) {
-                this.options = options.clear(AccessOption.CACHE); // consume
+            Input(final BitField<FsAccessOption> options) {
+                this.options = options.clear(FsAccessOption.CACHE); // consume
             }
 
             @Override
@@ -341,12 +341,12 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
          */
         @NotThreadSafe
         final class Output extends ClutchOutputSocket<Entry> {
-            final BitField<AccessOption> options;
+            final BitField<FsAccessOption> options;
             final @CheckForNull Entry template;
 
-            Output( final BitField<AccessOption> options,
+            Output( final BitField<FsAccessOption> options,
                     final @CheckForNull Entry template) {
-                this.options = options.clear(AccessOption.CACHE); // consume
+                this.options = options.clear(FsAccessOption.CACHE); // consume
                 this.template = template;
             }
 
@@ -427,7 +427,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                 register();
             }
 
-            void mknod( final BitField<AccessOption> options,
+            void mknod( final BitField<FsAccessOption> options,
                         final @CheckForNull Entry template)
             throws IOException {
                 while (true) {

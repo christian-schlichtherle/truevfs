@@ -4,6 +4,9 @@
  */
 package de.truezip.file;
 
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import static de.truezip.kernel.FsAccessOption.GROW;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.addr.FsEntryName;
@@ -21,9 +24,6 @@ import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.io.Paths;
 import de.truezip.kernel.io.Paths.Splitter;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
-import static de.truezip.kernel.option.AccessOption.GROW;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.UriBuilder;
 import java.io.*;
@@ -3324,7 +3324,7 @@ public final class TFile extends File {
      * then this operation does nothing and returns immediately.
      * <p>
      * This operation is intended to compact archive files which have been
-     * frequently updated with {@link AccessOption#GROW} or similar means.
+     * frequently updated with {@link FsAccessOption#GROW} or similar means.
      * If this output option preference is set and an archive file is updated
      * frequently, then over time a lot of redundant artifacts such as archive
      * entry contents and meta data, including central directories may be
@@ -3359,7 +3359,7 @@ public final class TFile extends File {
      * 
      * @return this
      * @throws IOException On any I/O error.
-     * @see    AccessOption#GROW
+     * @see    FsAccessOption#GROW
      */
     public TFile compact() throws IOException {
         if (isTopLevelArchive()) // see http://java.net/jira/browse/TRUEZIP-205
@@ -3376,7 +3376,7 @@ public final class TFile extends File {
         final File dir = getParent(grown);
         final String extension = getExtension(grown);
         try (final TConfig config = TConfig.push()) {
-            // Switch off AccessOption.GROW.
+            // Switch off FsAccessOption.GROW.
             config.setAccessPreferences(
                     config.getAccessPreferences().clear(GROW));
 

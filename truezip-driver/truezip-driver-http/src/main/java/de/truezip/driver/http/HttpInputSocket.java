@@ -9,7 +9,7 @@ import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
     private final HttpEntry entry;
 
     HttpInputSocket(final HttpEntry                entry, 
-                    final BitField<AccessOption> options) {
+                    final BitField<FsAccessOption> options) {
         assert null != entry;
         assert null != options;
         this.entry = entry;

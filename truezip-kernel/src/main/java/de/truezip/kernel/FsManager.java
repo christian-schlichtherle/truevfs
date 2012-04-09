@@ -4,9 +4,8 @@
  */
 package de.truezip.kernel;
 
+import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
 import de.truezip.kernel.addr.FsMountPoint;
-import de.truezip.kernel.option.SyncOption;
-import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -97,11 +96,11 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * @param  options a bit field of synchronization options.
      * @throws FsSyncException if committing the changes fails for any reason.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@link SyncOption#ABORT_CHANGES}
+     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
      *         is set.
      */
     public final void
-    sync(final BitField<SyncOption> options) throws FsSyncException {
+    sync(final BitField<FsSyncOption> options) throws FsSyncException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
@@ -127,11 +126,11 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * @throws X at the discretion of the exception {@code handler}
      *         upon the occurence of any {@code IOException}.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@link SyncOption#ABORT_CHANGES}
+     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
      *         is set.
      */
     public <X extends IOException> void
-    sync(   final BitField<SyncOption> options,
+    sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         if (options.get(ABORT_CHANGES))

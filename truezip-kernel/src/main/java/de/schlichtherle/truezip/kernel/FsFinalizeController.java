@@ -13,7 +13,7 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
-import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -55,7 +55,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     public InputSocket<?> getInputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options) {
+            final BitField<FsAccessOption> options) {
         @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
@@ -80,7 +80,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive
     public OutputSocket<?> getOutputSocket(
             final FsEntryName name,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
         @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {

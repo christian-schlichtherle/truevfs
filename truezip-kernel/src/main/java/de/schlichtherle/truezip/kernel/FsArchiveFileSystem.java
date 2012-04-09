@@ -15,10 +15,10 @@ import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.*;
-import de.truezip.kernel.option.AccessOption;
-import static de.truezip.kernel.option.AccessOption.CREATE_PARENTS;
-import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
-import de.truezip.kernel.option.AccessOptions;
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
+import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import de.truezip.kernel.FsAccessOptions;
 import de.truezip.kernel.io.Paths.Normalizer;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import static de.truezip.kernel.io.Paths.isRoot;
@@ -82,7 +82,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private FsArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.driver = driver;
-        final E root = newEntry(ROOT_PATH, DIRECTORY, AccessOptions.NONE, null);
+        final E root = newEntry(ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -157,7 +157,7 @@ implements Iterable<FsCovariantEntry<E>> {
         // Setup root file system entry, potentially replacing its previous
         // mapping from the input archive.
         master.add(ROOT_PATH, newEntry(
-                ROOT_PATH, DIRECTORY, AccessOptions.NONE, rootTemplate));
+                ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, rootTemplate));
         this.master = master;
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this must be done
@@ -191,7 +191,7 @@ implements Iterable<FsCovariantEntry<E>> {
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
             parent = master.add(parentPath, newEntry(
-                    parentPath, DIRECTORY, AccessOptions.NONE, null));
+                    parentPath, DIRECTORY, FsAccessOptions.NONE, null));
         parent.add(memberName);
         fix(parentPath);
     }
@@ -311,7 +311,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private E newEntry(
             final String name,
             final Type type,
-            final BitField<AccessOption> mknod,
+            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
@@ -334,7 +334,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private E newCheckedEntry(
             final String name,
             final Type type,
-            final BitField<AccessOption> mknod,
+            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template)
     throws CharConversionException {
         assert null != type;
@@ -374,7 +374,7 @@ implements Iterable<FsCovariantEntry<E>> {
     FsArchiveFileSystemOperation<E> mknod(
             final FsEntryName name,
             final Entry.Type type,
-            final BitField<AccessOption> options,
+            final BitField<FsAccessOption> options,
             @CheckForNull Entry template)
     throws IOException {
         if (null == type)
@@ -417,16 +417,16 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     private final class PathLink implements FsArchiveFileSystemOperation<E> {
         final boolean createParents;
-        final BitField<AccessOption> options;
+        final BitField<FsAccessOption> options;
         final SegmentLink<E>[] links;
         long time = UNKNOWN;
 
         PathLink(   final String path,
                     final Entry.Type type,
-                    final BitField<AccessOption> options,
+                    final BitField<FsAccessOption> options,
                     @CheckForNull final Entry template)
         throws IOException {
-            // Consume AccessOption.CREATE_PARENTS.
+            // Consume FsAccessOption.CREATE_PARENTS.
             this.createParents = options.get(CREATE_PARENTS);
             this.options = options.clear(CREATE_PARENTS);
             links = newSegmentLinks(1, path, type, template);

@@ -4,9 +4,9 @@
  */
 package de.truezip.file;
 
+import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.mock.MockArchiveDriver;
-import static de.truezip.kernel.option.AccessOption.*;
 import de.truezip.kernel.util.BitField;
 import java.util.NoSuchElementException;
 import static org.hamcrest.CoreMatchers.is;

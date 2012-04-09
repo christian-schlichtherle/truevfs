@@ -12,17 +12,16 @@ import static de.truezip.kernel.cio.Entry.Size.STORAGE;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.*;
+import de.truezip.kernel.io.DecoratingInputStream;
+import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.DecoratingSeekableChannel;
+import de.truezip.kernel.io.PowerBuffer;
 import de.truezip.kernel.mock.MockController;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Throwables.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -237,7 +236,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private OutputSocket<?> getArchiveOutputSocket() {
         return getArchiveDriver().getOutputSocket(parent, name,
-                AccessOptions.NONE, null);
+                FsAccessOptions.NONE, null);
     }
 
     private void input() throws IOException {
@@ -328,7 +327,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private InputSocket<?> getArchiveInputSocket() {
         return getArchiveDriver().getInputSocket(parent, name,
-                AccessOptions.NONE);
+                FsAccessOptions.NONE);
     }
 
     private static void close(final Closeable[] resources) throws IOException {
@@ -463,7 +462,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public InputSocket<?> getInputSocket(
                 final FsEntryName name,
-                final BitField<AccessOption> options) {
+                final BitField<FsAccessOption> options) {
             assert null != name;
             assert null != options;
 
@@ -493,7 +492,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public OutputSocket<?> getOutputSocket(
                 final FsEntryName name,
-                final BitField<AccessOption> options,
+                final BitField<FsAccessOption> options,
                 final Entry template) {
             assert null != name;
             assert null != options;

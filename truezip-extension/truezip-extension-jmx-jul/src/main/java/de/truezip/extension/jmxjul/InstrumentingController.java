@@ -11,7 +11,7 @@ import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsDecoratingController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
-import de.truezip.kernel.option.AccessOption;
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
@@ -35,12 +35,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(FsEntryName name, BitField<AccessOption> options) {
+    public InputSocket<?> getInputSocket(FsEntryName name, BitField<FsAccessOption> options) {
         return director.instrument(controller.getInputSocket(name, options), this);
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(FsEntryName name, BitField<AccessOption> options, Entry template) {
+    public OutputSocket<?> getOutputSocket(FsEntryName name, BitField<FsAccessOption> options, Entry template) {
         return director.instrument(controller.getOutputSocket(name, options, template), this);
     }
 }
