@@ -65,22 +65,22 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
     /**
      * Constructs a new cipher read-only channel.
      *
-     * @param channel a seekable byte channel.
-     * @param cipher a seekable block cipher.
+     * @param cipher the seekable block cipher.
+     * @param channel the seekable byte channel.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public CipherReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel channel,
-            final SeekableBlockCipher cipher) {
-        this(channel, cipher, Streams.BUFFER_SIZE);
+            final SeekableBlockCipher cipher,
+            final @WillCloseWhenClosed SeekableByteChannel channel) {
+        this(cipher, channel, Streams.BUFFER_SIZE);
     }
 
     /**
      * Constructs a new cipher read-only channel.
      *
-     * @param channel a seekable byte channel.
-     * @param cipher a seekable block cipher.
+     * @param cipher the seekable block cipher.
+     * @param channel the seekable byte channel.
      * @param bufferSize the size of the byte buffer.
      *        The value gets adjusted to be at least as large as the cipher's
      *        block size.
@@ -88,8 +88,8 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public CipherReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel channel,
             final SeekableBlockCipher cipher,
+            final @WillCloseWhenClosed SeekableByteChannel channel,
             int bufferSize) {
         super(channel);
         if (null == channel)

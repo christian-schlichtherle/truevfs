@@ -8,9 +8,6 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -35,38 +32,34 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class CipherOutputStream extends DecoratingOutputStream {
+public final class CipherOutputStream extends DecoratingOutputStream {
 
-    /** The buffered block cipher used for preprocessing the output. */
-    protected @Nullable BufferedBlockCipher cipher;
+    /** The buffered block cipher used for processing the output. */
+    private BufferedBlockCipher cipher;
 
     /**
-     * The cipher output buffer used for preprocessing the output
+     * The cipher output buffer used for processing the output
      * to the decorated stream.
      * This buffer is autosized to the largest buffer written to this stream.
      */
-    private byte[] cipherOut = new byte[0];
+    private byte[] buffer = new byte[0];
 
     /**
      * Creates a new cipher output stream.
-     * Please note that unlike {@code javax.crypto.CipherOutputStream},
-     * the cipher does not need to be initialized before calling this
-     * constructor.
-     * However, the cipher must be initialized before anything is actually
-     * written to this stream or before this stream is closed.
      *
-     * @param out The output stream to write the encrypted or decrypted data to.
-     *        Maybe {@code null} for subsequent initialization by a sub-class.
-     * @param cipher The cipher to use for encryption or decryption.
-     *        Maybe {@code null} for subsequent initialization by a sub-class.
+     * @param cipher the block cipher.
+     * @param out the output stream.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public CipherOutputStream(
-            final @CheckForNull @WillCloseWhenClosed OutputStream out,
-            final @CheckForNull BufferedBlockCipher cipher) {
+            final BufferedBlockCipher cipher,
+            final @WillCloseWhenClosed OutputStream out) {
         super(out);
-        this.cipher = cipher;
+        if (null == out)
+            throw new NullPointerException();
+        if (null == (this.cipher = cipher))
+            throw new NullPointerException();
     }
 
     /**
@@ -94,9 +87,9 @@ public class CipherOutputStream extends DecoratingOutputStream {
     throws IOException {
         final BufferedBlockCipher cipher = cipher();
         int cipherLen = cipher.getUpdateOutputSize(1);
-        byte[] cipherOut = this.cipherOut;
+        byte[] cipherOut = this.buffer;
         if (cipherLen > cipherOut.length)
-            this.cipherOut = cipherOut = new byte[cipherLen];
+            this.buffer = cipherOut = new byte[cipherLen];
         cipherLen = cipher.processByte((byte) b, cipherOut, 0);
         if (cipherLen > 0)
             out.write(cipherOut, 0, cipherLen);
@@ -117,9 +110,9 @@ public class CipherOutputStream extends DecoratingOutputStream {
     throws IOException {
         final BufferedBlockCipher cipher = cipher();
         int cipherLen = cipher.getUpdateOutputSize(len);
-        byte[] cipherOut = this.cipherOut;
+        byte[] cipherOut = this.buffer;
         if (cipherLen > cipherOut.length)
-            this.cipherOut = cipherOut = new byte[cipherLen];
+            this.buffer = cipherOut = new byte[cipherLen];
         cipherLen = cipher.processBytes(buf, off, len, cipherOut, 0);
         out.write(cipherOut, 0, cipherLen);
     }
@@ -127,23 +120,24 @@ public class CipherOutputStream extends DecoratingOutputStream {
     /**
      * Finishes and voids this cipher output stream.
      * Calling this method causes all remaining buffered bytes to get written
-     * and padding to get added if necessary.
-     * <p>
-     * Note that after a call to this method only {@link #close()} may get
-     * called on this cipher output stream
-     * The result of calling any other method (including this one) is undefined!
+     * and padded if necessary.
+     * Afterwards, this stream will behave as if it had been closed, although
+     * the decorated stream may still be open.
      *
-     * @throws IOException If out or cipher aren't properly initialized,
-     *         the stream has been closed, an I/O error occured the cipher
-     *         text is invalid, i.e. required padding information is missing.
+     * @throws IOException If {@code out} or {@code cipher} aren't properly
+     *         initialized, an I/O error occurs or the cipher
+     *         text is invalid because some required padding is missing.
      */
-    @OverridingMethodsMustInvokeSuper
-    protected void finish() throws IOException {
-        final BufferedBlockCipher cipher = cipher();
+    public void finish() throws IOException {
+        final BufferedBlockCipher cipher = this.cipher;
+        if (null == cipher)
+            return;
+        this.cipher = null;
+
         int cipherLen = cipher.getOutputSize(0);
-        byte[] cipherOut = this.cipherOut;
+        byte[] cipherOut = this.buffer;
         if (cipherLen > cipherOut.length)
-            this.cipherOut = cipherOut = new byte[cipherLen];
+            this.buffer = cipherOut = new byte[cipherLen];
         try {
             cipherLen = cipher.doFinal(cipherOut, 0);
         } catch (InvalidCipherTextException ex) {
@@ -152,21 +146,9 @@ public class CipherOutputStream extends DecoratingOutputStream {
         out.write(cipherOut, 0, cipherLen);
     }
 
-    /**
-     * Closes this output stream and releases any resources associated with it.
-     * Upon the first call to this method, {@link #finish()} gets called and
-     * {@link #cipher} gets set to {@code null} upon success.
-     * Next, the {@link #out} gets unconditionally
-     * {@linkplain #close() closed}.
-     *
-     * @throws IOException On any I/O error.
-     */
     @Override
     public void close() throws IOException {
-        if (null != cipher) {
-            finish();
-            cipher = null;
-        }
+        finish();
         out.close();
     }
 }

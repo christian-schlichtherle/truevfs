@@ -5,6 +5,7 @@
 package de.truezip.driver.zip.io;
 
 import de.truezip.driver.zip.crypto.CipherOutputStream;
+import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.LEDataOutputStream;
 import de.truezip.key.param.KeyStrength;
 import java.io.IOException;
@@ -32,7 +33,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesEntryOutputStream extends CipherOutputStream {
+final class WinZipAesEntryOutputStream extends DecoratingOutputStream {
 
     /**
      * The iteration count for the derived keys of the cipher, KLAC and MAC.
@@ -59,11 +60,11 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
     private LEDataOutputStream dos;
 
     WinZipAesEntryOutputStream(
-            final LEDataOutputStream out,
+            final LEDataOutputStream dos,
             final WinZipAesEntryParameters param)
     throws IOException {
-        super(out, new BufferedBlockCipher(new WinZipAesCipher()));
-        assert null != out;
+        super(dos);
+        assert null != dos;
         assert null != param;
         this.param = param;
 
@@ -103,7 +104,9 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 keyStrengthBytes,
                 keyStrengthBytes);
 
-        // Init cipher.
+        // Init cipher and stream.
+        final BufferedBlockCipher
+                cipher = new BufferedBlockCipher(new WinZipAesCipher());
         cipher.init(true, aesCtrParam);
 
         // Init MAC.
@@ -111,8 +114,9 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         mac.init(sha1HMacParam);
 
         // Reinit chain of output streams as Encrypt-then-MAC.
-        final LEDataOutputStream dos = this.dos = (LEDataOutputStream) this.out;
-        this.out = new MacOutputStream(dos, mac);
+        this.dos = dos;
+        this.out = new CipherOutputStream(cipher,
+                new MacOutputStream(dos, mac));
 
         // Write header.
         dos.write(salt);
@@ -127,10 +131,9 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 PWD_VERIFIER_BITS / 8);
     }
 
-    @Override
-    protected void finish() throws IOException {
+    void finish() throws IOException {
         // Flush partial block to out, if any.
-        super.finish();
+        ((CipherOutputStream) out).finish();
 
         // Calculate and write MAC to footer.
         final Mac mac = this.mac;

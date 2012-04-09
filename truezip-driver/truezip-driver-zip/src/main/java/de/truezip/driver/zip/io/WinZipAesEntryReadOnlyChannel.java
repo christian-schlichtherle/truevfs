@@ -156,9 +156,8 @@ final class WinZipAesEntryReadOnlyChannel extends DecoratingReadOnlyChannel {
         // Init cipher and channel.
         final SeekableBlockCipher cipher = new WinZipAesCipher();
         cipher.init(false, aesCtrParam);
-        this.channel = new CipherReadOnlyChannel(
-                new IntervalReadOnlyChannel(channel.position(start), size),
-                cipher);
+        this.channel = new CipherReadOnlyChannel(cipher,
+                new IntervalReadOnlyChannel(channel.position(start), size));
 
         // Commit key strength.
         param.setKeyStrength(keyStrength);
