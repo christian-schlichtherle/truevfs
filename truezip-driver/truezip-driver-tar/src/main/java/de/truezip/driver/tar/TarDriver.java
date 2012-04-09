@@ -10,6 +10,7 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -18,7 +19,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillClose;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -74,49 +74,22 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
         return ioPool;
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link TarDriver} acquires an input
-     * stream from the given socket and forwards the call to
-     * {@link #newTarInputService}.
-     */
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected TarInputService newInputService(
+    protected final TarInputService newInputService(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        TarInputService is = null;
-        final @WillClose InputStream in = input.newStream();
-        try {
-            return is = newTarInputService(model, in);
-        } finally {
-            try {
-                in.close();
-            } catch (final Throwable ex) {
-                if (null != is) {
-                    try {
-                        is.close();
-                    } catch (final Throwable ex2) {
-                        assert !(ex2 instanceof FsControlFlowIOException) : ex;
-                        ex.addSuppressed(ex2);
-                    }
-                }
-                throw ex;
-            }
-        }
+        return newTarInputService(model, input);
     }
 
     @CreatesObligation
-    protected TarInputService newTarInputService(
-            FsModel model,
-            @WillCloseWhenClosed InputStream in)
+    protected TarInputService newTarInputService(FsModel model, Source source)
     throws IOException {
         assert null != model;
-        return new TarInputService(this, in);
+        return new TarInputService(this, model, source);
     }
 
     /**

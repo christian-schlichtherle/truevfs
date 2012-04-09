@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.tar;
 
+import de.truezip.kernel.FsArchiveEntries;
+import de.truezip.kernel.FsArchiveEntry;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Size.STORAGE;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
-import de.truezip.kernel.FsArchiveEntries;
-import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.util.Releasable;
 import java.io.IOException;

@@ -11,6 +11,8 @@ import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.io.AbstractSource;
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
@@ -63,11 +65,28 @@ public class TarBZip2Driver extends TarDriver {
 
     @Override
     protected TarInputService newTarInputService(
-            final FsModel model, final InputStream in)
+            final FsModel model,
+            final Source source)
     throws IOException {
-        return super.newTarInputService(model,
-                new BZip2CompressorInputStream(
-                    new BufferedInputStream(in, getBufferSize())));
+        final class BZip2Source extends AbstractSource {
+            @Override
+            public InputStream newStream() throws IOException {
+                final InputStream in = source.newStream();
+                try {
+                    return new BZip2CompressorInputStream(
+                            new BufferedInputStream(in, getBufferSize()));
+                } catch(final Throwable ex) {
+                    try {
+                        in.close();
+                    } catch (final Throwable ex2) {
+                        ex.addSuppressed(ex2);
+                    }
+                    throw ex;
+                }
+            }
+        } // BZip2Source
+
+        return new TarInputService(this, model, new BZip2Source());
     }
 
     @Override
