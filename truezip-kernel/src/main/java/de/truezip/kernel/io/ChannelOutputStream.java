@@ -20,7 +20,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Adapts a {@link WritableByteChannel} to the {@code OutputStream} interface.
  *
- * @see    SeekableChannelInputStream
+ * @see    ChannelInputStream
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -44,8 +44,7 @@ public class ChannelOutputStream extends OutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        single.put(0, (byte) b);
-        single.rewind();
+        single.put(0, (byte) b).clear();
         if (1 != channel.write(single))
             throw new IOException("write error");
     }
