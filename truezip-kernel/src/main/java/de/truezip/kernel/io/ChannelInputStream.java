@@ -22,7 +22,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Adapts a {@link SeekableByteChannel} to the {@code InputStream} interface.
  * This stream supports marking.
  * 
- * @see    SeekableChannelOutputStream
+ * @see    ChannelOutputStream
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
