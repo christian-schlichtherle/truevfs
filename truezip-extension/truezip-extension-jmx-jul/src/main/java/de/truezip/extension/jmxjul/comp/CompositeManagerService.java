@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul.comp;
 
-import de.schlichtherle.truezip.kernel.FsFailSafeManagerService;
+import de.schlichtherle.truezip.kernel.FailSafeManagerService;
 import de.truezip.extension.jmxjul.jmx.JmxDirector;
 import de.truezip.extension.jmxjul.jul.JulDirector;
 import de.truezip.kernel.FsManager;
@@ -20,7 +20,7 @@ public final class CompositeManagerService extends FsManagerService {
     private final FsManager manager =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    new FsFailSafeManagerService().get()));
+                    new FailSafeManagerService().get()));
 
     @Override
     public FsManager get() {
