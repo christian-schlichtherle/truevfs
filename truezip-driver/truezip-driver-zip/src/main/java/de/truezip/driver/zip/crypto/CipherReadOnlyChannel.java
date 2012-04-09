@@ -82,8 +82,8 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @param cipher the seekable block cipher.
      * @param channel the seekable byte channel.
      * @param bufferSize the size of the byte buffer.
-     *        The value gets adjusted to be at least as large as the cipher's
-     *        block size.
+     *        The value gets rounded down to a multiple of the cipher's
+     *        blocksize or the cipher's blocksize, whatever is larger.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
