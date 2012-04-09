@@ -29,7 +29,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class DisconnectingOutputService<E extends Entry>
+public final class DisconnectingOutputService<E extends Entry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     private boolean closed;
