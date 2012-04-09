@@ -5,18 +5,16 @@
 package de.truezip.driver.zip.raes.crypto;
 
 import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.Sink;
 import de.truezip.key.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 
 /**
- * An {@link OutputStream} to produce a file with data ecnrypted according
+ * An {@link OutputStream} which produces a file with data ecnrypted according
  * to the Random Access Encryption Specification (RAES).
  *
  * @see    RaesReadOnlyChannel
@@ -25,10 +23,8 @@ import org.bouncycastle.crypto.Mac;
 @NotThreadSafe
 public abstract class RaesOutputStream extends DecoratingOutputStream {
 
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    RaesOutputStream(@CheckForNull @WillCloseWhenClosed OutputStream out) {
-        super(out);
+    RaesOutputStream() {
+        super(null);
     }
 
     /**
@@ -55,5 +51,43 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
         }
         final int bufLength = klac.doFinal(buf, 0);
         assert bufLength == buf.length;
+    }
+
+    /**
+     * Creates a new RAES output stream.
+     * 
+     * @param  param The {@link RaesParameters} used to determine and configure
+     *         the type of RAES file created.
+     *         If the class of this parameter matches multiple parameter
+     *         interfaces, it is at the discretion of this implementation which
+     *         one is picked and hence which type of RAES file gets created.
+     *         Provide an implementation of the
+     *         {@link RaesParametersProvider} interface for more control.
+     *         Instances of this interface are queried to find RAES parameters
+     *         which match a known RAES type.
+     *         This algorithm gets recursively applied.
+     * @param  sink the sink for writing the RAES file to.
+     * @return A new RAES output stream.
+     * @throws RaesParametersException if the RAES parameters type is unknown.
+     * @throws IOException on any I/O error.
+     */
+    @CreatesObligation
+    public static RaesOutputStream create(
+            RaesParameters param,
+            final Sink sink)
+    throws RaesParametersException, IOException {
+        while (null != param) {
+            // HC SUNT DRACONES!
+            if (param instanceof Type0RaesParameters) {
+                return new Type0RaesOutputStream((Type0RaesParameters) param,
+                        sink);
+            } else if (param instanceof RaesParametersProvider) {
+                param = ((RaesParametersProvider) param)
+                        .get(RaesParameters.class);
+            } else {
+                break;
+            }
+        }
+        throw new RaesParametersException("Unknown RAES parameter type: " + param.getClass());
     }
 }

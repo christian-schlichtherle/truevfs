@@ -8,7 +8,7 @@ import de.truezip.driver.zip.crypto.CipherReadOnlyChannel;
 import de.truezip.driver.zip.crypto.CtrBlockCipher;
 import de.truezip.driver.zip.crypto.SeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
-import static de.truezip.driver.zip.raes.crypto.Constants.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT;
+import static de.truezip.driver.zip.raes.crypto.Constants.TYPE_0_HEADER_LEN_WO_SALT;
 import de.truezip.kernel.io.IntervalReadOnlyChannel;
 import de.truezip.kernel.io.PowerBuffer;
 import de.truezip.key.param.AesKeyStrength;
@@ -53,15 +53,15 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     Type0RaesReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel channel,
-            final Type0RaesParameters param)
+            final Type0RaesParameters param,
+            final @WillCloseWhenClosed SeekableByteChannel channel)
     throws IOException {
-        super(channel);
         assert null != param;
+        assert null != channel;
 
         // Load header data.
         final PowerBuffer header = PowerBuffer
-                .allocate(ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT)
+                .allocate(TYPE_0_HEADER_LEN_WO_SALT)
                 .littleEndian()
                 .load(channel.position(0));
         final int type = header.position(4).getUByte();

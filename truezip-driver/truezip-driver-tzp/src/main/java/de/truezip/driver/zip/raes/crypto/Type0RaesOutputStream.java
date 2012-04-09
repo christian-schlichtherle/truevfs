@@ -60,13 +60,12 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     private long start;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    Type0RaesOutputStream(final Sink sink, final Type0RaesParameters param)
-    throws IOException{
-        super(null);
-
-        assert null != sink;
+    Type0RaesOutputStream(
+            final Type0RaesParameters param,
+            final Sink sink)
+    throws IOException {
         assert null != param;
+        assert null != sink;
 
         // Init key strength.
         final AesKeyStrength keyStrength = param.getKeyStrength();
@@ -129,14 +128,14 @@ final class Type0RaesOutputStream extends RaesOutputStream {
 
             // Write data envelope header.
             leos.writeInt(SIGNATURE);
-            leos.writeByte(ENVELOPE_TYPE_0);
+            leos.writeByte(TYPE_0);
             leos.writeByte(keyStrengthOrdinal);
             leos.writeShort(ITERATION_COUNT);
             leos.write(salt);
 
             // Init start.
             this.start = leos.size();
-            assert ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length == start;
+            assert TYPE_0_HEADER_LEN_WO_SALT + salt.length == start;
         } catch (final Throwable ex) {
             try {
                 out.close();

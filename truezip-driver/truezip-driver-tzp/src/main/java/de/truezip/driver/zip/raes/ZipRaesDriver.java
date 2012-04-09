@@ -11,7 +11,6 @@ import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import de.truezip.driver.zip.raes.crypto.RaesSink;
 import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.FsController;
@@ -22,8 +21,6 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
@@ -126,6 +123,84 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in {@link ZipRaesDriver} calls
+     * {@link #raesParameters}, with which it initializes a new
+     * {@link RaesReadOnlyChannel}.
+     * Next, if the gross file length of the archive is smaller than or equal
+     * to the authentication trigger, the MAC authentication on the cipher
+     * text is performed.
+     * Finally, the {@link RaesReadOnlyChannel} is passed on to the super class
+     * implementation.
+     */
+    @Override
+    protected final InputService<ZipDriverEntry> newInputService(
+            final FsModel model,
+            final InputSocket<?> input)
+    throws IOException {
+        if (null == model)
+            throw new NullPointerException();
+        final RaesReadOnlyChannel channel = RaesReadOnlyChannel.create(
+                raesParameters(model), input);
+        try {
+            if (channel.size() <= getAuthenticationTrigger())
+                channel.authenticate();
+            return newInputService(model, channel);
+        } catch (final Throwable ex) {
+            try {
+                channel.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
+    }
+
+    @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    protected final OutputService<ZipDriverEntry> newOutputService(
+            final FsModel model,
+            final @CheckForNull @WillNotClose ZipInputService source,
+            final OptionOutputSocket output)
+    throws IOException {
+        if (null == model)
+            throw new NullPointerException();
+        if (null != source)
+            source.setAppendee(output.getOptions().get(GROW));
+        final RaesOutputStream ros = RaesOutputStream
+                .create(raesParameters(model), output);
+        try {
+            return newOutputService(model, source, ros);
+        } catch (final Throwable ex) {
+            try {
+                ros.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
+    }
+
+    /**
+     * Sets {@link FsAccessOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    protected final OptionOutputSocket
+    getOutputSocket(
+            final FsController<?> controller,
+            final FsEntryName name,
+            BitField<FsAccessOption> options) {
+        options = options.clear(GROW);
+        // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
+        // opportunity to apply its own preferences to sort out such a conflict.
+        return new OptionOutputSocket(
+                controller.getOutputSocket(name, options.set(STORE), null),
+                options); // use modified options!
+    }
+
+    /**
      * Returns a new {@link ZipDriverEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
@@ -155,84 +230,5 @@ public abstract class ZipRaesDriver extends JarDriver {
         // provided by the RAES wrapper file format.
         entry.clearEncryption();
         return entry;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in {@link ZipRaesDriver} calls
-     * {@link #raesParameters}, with which it initializes a new
-     * {@link RaesReadOnlyChannel}.
-     * Next, if the gross file length of the archive is smaller than or equal
-     * to the authentication trigger, the MAC authentication on the cipher
-     * text is performed.
-     * Finally, the {@link RaesReadOnlyChannel} is passed on to the super class
-     * implementation.
-     */
-    @Override
-    protected final InputService<ZipDriverEntry> newInputService(
-            final FsModel model,
-            final InputSocket<?> input)
-    throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        final SeekableByteChannel channel = input.newChannel();
-        try {
-            final RaesReadOnlyChannel rchannel = RaesReadOnlyChannel.getInstance(
-                    channel, raesParameters(model));
-            if (rchannel.size() <= getAuthenticationTrigger()) // compare rchannel, not channel!
-                rchannel.authenticate();
-            return newInputService(model, rchannel);
-        } catch (final Throwable ex) {
-            try {
-                channel.close();
-            } catch (final Throwable ex2) {
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
-    @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected final OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final @CheckForNull @WillNotClose ZipInputService source,
-            final OptionOutputSocket output)
-    throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        if (null != source)
-            source.setAppendee(output.getOptions().get(GROW));
-        final RaesOutputStream ros = new RaesSink(output, raesParameters(model))
-                .newStream();
-        try {
-            return newOutputService(model, source, ros);
-        } catch (final Throwable ex) {
-            try {
-                ros.close();
-            } catch (final Throwable ex2) {
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
-    /**
-     * Sets {@link FsAccessOption#STORE} in {@code options} before
-     * forwarding the call to {@code controller}.
-     */
-    @Override
-    protected final OptionOutputSocket
-    getOutputSocket(
-            final FsController<?> controller,
-            final FsEntryName name,
-            BitField<FsAccessOption> options) {
-        options = options.clear(GROW);
-        // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
-        // opportunity to apply its own preferences to sort out such a conflict.
-        return new OptionOutputSocket(
-                controller.getOutputSocket(name, options.set(STORE), null),
-                options); // use modified options!
     }
 }

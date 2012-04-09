@@ -20,7 +20,7 @@ interface Constants {
      */
     int SIGNATURE = 'R' | (('A' | (('E' | ('S' << 8)) << 8)) << 8);
 
-    int LEAD_IN_LENGTH =
+    int HEADER_MIN_LEN =
             4 + // SIGNATURE
             1;  // Envelope type
 
@@ -28,24 +28,17 @@ interface Constants {
      * The data envelope type used for password based encryption
      * with the same salt length as the cipher key length.
      */
-    byte ENVELOPE_TYPE_0 = 0;
+    byte TYPE_0 = 0;
 
     /** The length of the header before the salt and the encrypted data. */
-    int ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT =
-            LEAD_IN_LENGTH +
+    int TYPE_0_HEADER_LEN_WO_SALT =
+            HEADER_MIN_LEN +
             1 + // Cipher and MAC key strength.
             2;  // Iteration count
                 // The salt which's length is the cipher key length.
                 // The ciphered data which has the same length as the plain data.
                 // The KLAC (first half of 256 bit SHA output = 128 bits).
                 // The  MAC (first half of 256 bit SHA output = 128 bits).
-
-    /**
-     * The data envelope type reserved for certificate based encryption and
-     * authentication.
-     * This type is not yet specified, but reserved for future use.
-     */
-    byte ENVELOPE_TYPE_1 = 1;
 
     /**
      * The block size of the Advanced Encryption Specification (AES) Algorithm
