@@ -4,13 +4,12 @@
  */
 package de.truezip.kernel.io;
 
-import static de.truezip.kernel.io.Channels.readByte;
-import static de.truezip.kernel.io.Channels.readFully;
 import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Math.max;
 import java.nio.ByteBuffer;
 import java.nio.channels.NonWritableChannelException;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
@@ -194,6 +193,19 @@ public abstract class ReadOnlyChannelITSuite {
         assertEquals(-1, readByte(channel));
     }
 
+    /**
+     * Reads a single byte from the given seekable byte channel.
+     * 
+     * @param channel the readable byte channel.
+     * @return the read byte or -1 on end-of-file.
+     * @throws IOException on any I/O error.
+     */
+    private static int readByte(final ReadableByteChannel channel)
+    throws IOException {
+        final ByteBuffer buf = ByteBuffer.allocate(1);
+        return 1 != channel.read(buf) ? -1 : buf.get(0) & 0xff;
+    }
+
     @Test
     public void testRandomReadBytes() throws IOException {
         assertRandomReadBytes(rchannel);
@@ -270,7 +282,7 @@ public abstract class ReadOnlyChannelITSuite {
                 assertEquals(   ByteBuffer.wrap(data, pos, read),
                                 ByteBuffer.wrap(buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
-                readFully(tchannel, ByteBuffer.wrap(buf, 0, read));
+                PowerBuffer.wrap(buf, 0, read).load(tchannel);
                 assertEquals(   ByteBuffer.wrap(data, pos, read),
                                 ByteBuffer.wrap(buf, 0, read));
             } else {
@@ -304,7 +316,7 @@ public abstract class ReadOnlyChannelITSuite {
                 assertEquals(   ByteBuffer.wrap(data, pos, read),
                                 ByteBuffer.wrap(buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
-                readFully(tchannel, ByteBuffer.wrap(buf, 0, read));
+                PowerBuffer.wrap(buf, 0, read).load(tchannel);
                 assertEquals(   ByteBuffer.wrap(data, pos, read),
                                 ByteBuffer.wrap(buf, 0, read));
             } else {
