@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * @author  Christian Schlichtherle
  */
-public final class MemoryMappedReadOnlyFileIT extends ReadOnlyFileTestSuite {
+public final class MemoryMappedReadOnlyFileIT extends ReadOnlyFileITSuite {
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {
         return new MemoryMappedReadOnlyFile(file);

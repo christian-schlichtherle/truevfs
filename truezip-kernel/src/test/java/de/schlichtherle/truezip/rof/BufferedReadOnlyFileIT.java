@@ -10,7 +10,7 @@ import java.io.IOException;
 /**
  * @author  Christian Schlichtherle
  */
-public final class BufferedReadOnlyFileIT extends ReadOnlyFileTestSuite {
+public final class BufferedReadOnlyFileIT extends ReadOnlyFileITSuite {
 
     @Override
     protected ReadOnlyFile newReadOnlyFile(File file) throws IOException {

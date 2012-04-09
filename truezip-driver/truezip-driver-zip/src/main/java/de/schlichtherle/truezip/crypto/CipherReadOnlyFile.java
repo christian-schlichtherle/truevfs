@@ -9,6 +9,7 @@ import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import static java.lang.Math.min;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -50,15 +51,7 @@ import org.bouncycastle.crypto.Mac;
 @NotThreadSafe
 public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
-    /** Returns the smaller parameter. */
-    private static long min(long a, long b) {
-        return a < b ? a : b;
-    }
-
-    /** Returns the greater parameter. */
-    /*private static final long max(long a, long b) {
-        return a < b ? b : a;
-    }*/
+    private static final long INVALID = Long.MIN_VALUE;
 
     /** Start offset of the encrypted data. */
     private long start;
@@ -66,25 +59,22 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     /** The length of the encrypted data. */
     private long length;
 
-    /**
-     * The virtual file pointer in the encrypted data.
-     * This is relative to the start.
-     */
-    private long fp;
+    /** The virtual file pointer in the encrypted data. */
+    private long pos;
 
     /**
      * The current offset in the encrypted file where the buffer window starts.
      * This is always a multiple of the block size.
      */
-    private long windowOff;
+    private long bufferPos = INVALID;
 
     /**
-     * The buffer window to the encrypted file.
+     * The buffer for the encrypted file data.
      * Note that this buffer contains encrypted data only.
      * The actual size of the window is a multiple of the cipher's block size
      * and may be slightly smaller than {@link #MAX_WINDOW_LEN}.
      */
-    private byte[] window;
+    private byte[] buffer;
 
     /** The seekable block cipher which allows random access. */
     private @Nullable SeekableBlockCipher cipher;
@@ -94,12 +84,9 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * has been decrypted to the block.
      * This is always a multiple of the block size.
      */
-    private long blockOff;
+    private long blockPos = INVALID;
 
-    /**
-     * The block buffer to use for decryption of partial blocks.
-     * Note that this buffer contains decrypted data only.
-     */
+    /** The buffer for the decrypted file data. */
     private byte[] block;
 
     /**
@@ -119,22 +106,12 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
     }
 
     /**
-     * Asserts that this cipher output stream is in open state, which requires
-     * that {@link #cipher} is not {@code null}.
-     *
-     * @throws IOException If the preconditions do not hold.
-     */
-    private void assertOpen() throws IOException {
-        if (null == cipher)
-            throw new IOException("cipher read only file is not in open state");
-    }
-
-    /**
      * Initializes this cipher read only file - must be called before first
      * read access!
      *
-     * @param  start The start offset of the encrypted data in this file.
-     * @param  length The length of the encrypted data in this file.
+     * @param  cipher the seekable block cipher.
+     * @param  start the start offset of the encrypted data in this file.
+     * @param  length the length of the encrypted data in this file.
      * @throws IOException If this read only file has already been closed.
      *         This exception is <em>not</em> recoverable.
      * @throws IllegalStateException if {@link #delegate} is {@code null} or
@@ -161,146 +138,159 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
         if (0 > (this.length = length))
             throw new IllegalArgumentException();
 
-        this.blockOff = length;
-        final int blockLen = cipher.getBlockSize();
-        this.block = new byte[blockLen];
-        this.windowOff = Long.MIN_VALUE; // invalidate window
-        this.window = new byte[(Streams.BUFFER_SIZE / blockLen) * blockLen]; // round down to multiple of block size
+        final int blockSize = cipher.getBlockSize();
+        this.block = new byte[blockSize];
+        this.buffer = new byte[(Streams.BUFFER_SIZE / blockSize) * blockSize]; // round down to multiple of block size
 
-        assert this.fp == 0;
-        assert this.block.length > 0;
-        assert this.window.length > 0;
-        assert this.window.length % this.block.length == 0;
+        assert this.buffer.length % blockSize == 0;
+    }
+
+    /**
+     * Asserts that this cipher output stream is in open state, which requires
+     * that {@link #cipher} is not {@code null}.
+     *
+     * @throws IOException If the preconditions do not hold.
+     */
+    private void checkOpen() throws IOException {
+        if (null == cipher)
+            throw new IOException("cipher read only file is not in open state");
     }
 
     /**
      * Returns the authentication code of the encrypted data in this cipher
-     * read only file using the given Message Authentication Code (MAC) object.
+     * read-only file using the given Message Authentication Code (MAC) object.
      * It is safe to call this method multiple times to detect if the file
      * has been tampered with meanwhile.
      *
-     * @param mac A properly initialized MAC object.
-     *
-     * @throws IOException On any I/O related issue.
+     * @param  mac a properly initialized MAC object.
+     * @return A byte array with the authentication code.
+     * @throws IOException on any I/O error.
      */
     protected byte[] computeMac(final Mac mac) throws IOException {
-        final int windowLen = window.length;
-        final byte[] buf = new byte[mac.getMacSize()];
         final long safedFp = getFilePointer();
         try {
-            for (fp = 0; fp < length; fp += windowLen) {
-                positionWindow();
-                final long remaining = length - windowOff;
-                mac.update(window, 0, (int) min(windowLen, remaining));
+            final long length = this.length;
+            final int windowLen = buffer.length;
+            for (pos = 0; pos < length; ) {
+                positionBuffer();
+                final int windowLimit = (int) min(windowLen, length - bufferPos);
+                assert 0 < windowLimit;
+                mac.update(buffer, 0, windowLimit);
+                pos += windowLimit;
             }
-            final int bufLen = mac.doFinal(buf, 0);
-            assert bufLen == buf.length;
+            final byte[] buf = new byte[mac.getMacSize()];
+            final int bufLength = mac.doFinal(buf, 0);
+            assert bufLength == buf.length;
+            return buf;
         } finally {
             seek(safedFp);
         }
-        return buf;
-    }
-
-    @Override
-    public long length() throws IOException {
-        assertOpen();
-        return length;
-    }
-
-    @Override
-    public long getFilePointer() throws IOException {
-        assertOpen();
-        return fp;
-    }
-
-    @Override
-    public void seek(final long fp) throws IOException {
-        assertOpen();
-
-        if (fp < 0)
-            throw new IOException("file pointer must not be negative");
-        if (fp > length)
-            throw new IOException("file pointer (" + fp
-                    + ") is larger than file length (" + length + ")");
-
-        this.fp = fp;
     }
 
     @Override
     public int read() throws IOException {
         // Check state.
-        assertOpen();
-        if (fp >= length)
+        checkOpen();
+        if (pos >= length)
             return -1;
 
         // Position block and return its decrypted data.
         positionBlock();
-        return block[(int) (fp++ % block.length)] & 0xff;
+        return block[(int) (pos++ % block.length)] & 0xff;
     }
 
     @Override
-    public int read(final byte[] buf, final int off, final int len)
+    public int read(final byte[] dst, final int offset, final int remaining)
     throws IOException {
         // Check no-op first for compatibility with RandomAccessFile.
-        if (0 >= len)
+        if (remaining <= 0)
             return 0;
 
-        // Check state.
-        assertOpen();
-        if (fp >= length)
+        // Check is open and not at EOF.
+        final long length = this.length;
+        if (getFilePointer() >= length) // ensure pos is initialized, but do NOT cache!
             return -1;
 
         // Check parameters.
         {
-            final int offPlusLen = off + len;
-            if ((off | len | offPlusLen | buf.length - offPlusLen) < 0)
+            final int or = offset + remaining;
+            if ((offset | remaining | or | dst.length - or) < 0)
                 throw new IndexOutOfBoundsException();
         }
 
         // Setup.
-        final int blockLen = block.length;
-        int read = 0; // amount of decrypted data copied to buf
+        int total = 0; // amount of data copied to buf
+        final int blockSize = block.length;
 
-        {
-            // Partial read of block data at the start.
-            final int o = (int) (fp % blockLen);
-            if (o != 0) {
-                // The virtual file pointer is NOT starting on a block boundary.
-                positionBlock();
-                read = (int) min(len, blockLen - o);
-                read = (int) min(read, length - fp);
-                System.arraycopy(block, o, buf, off, read);
-                fp += read;
-            }
+        // Partial read of block data at the start.
+        positionBlock();
+        if (pos != blockPos) {
+            assert pos % blockSize != 0;
+            final int blockOff = (int) (pos - blockPos);
+            total = min(remaining, blockSize - blockOff);
+            total = (int) min(total, length - pos);
+            assert total > 0;
+            System.arraycopy(block, blockOff, dst, offset, total);
+            pos += total;
         }
 
-        {
+        if (total < remaining && pos < length) {
             // Full read of block data in the middle.
-            long blockCounter = fp / blockLen;
-            while (read + blockLen < len && fp + blockLen < length) {
+            assert pos % blockSize == 0;
+            final SeekableBlockCipher cipher = this.cipher;
+            final byte[] buffer = this.buffer;
+            long blockCounter = pos / blockSize;
+            while (total + blockSize <= remaining && pos + blockSize <= length) {
                 // The virtual file pointer is starting on a block boundary.
-                positionWindow();
+                positionBuffer();
                 cipher.setBlockCounter(blockCounter++);
-                cipher.processBlock(window, (int) (fp - windowOff), buf, off + read);
-                read += blockLen;
-                fp += blockLen;
+                final int bufferOff = (int) (pos - bufferPos);
+                final int processed = cipher.processBlock(
+                        buffer, bufferOff,
+                        dst, offset + total);
+                assert processed == blockSize;
+                total += processed;
+                pos += processed;
             }
         }
 
-        // Partial read of block data at the end.
-        if (read < len && fp < length) {
-            // The virtual file pointer is starting on a block boundary.
+        if (total < remaining && pos < length) {
+            // Partial read of block data at the end.
+            assert pos % blockSize == 0;
             positionBlock();
-            final int n = (int) min(len - read, length - fp);
-            System.arraycopy(block, 0, buf, off + read, n);
-            read += n;
-            fp += n;
+            final int blockOff = (int) (pos - blockPos);
+            int processed = min(remaining - total, blockSize - blockOff);
+            processed = (int) min(processed, length - pos);
+            assert processed > 0;
+            System.arraycopy(block, blockOff, dst, offset + total, processed);
+            total += processed;
+            pos += processed;
         }
 
-        // Assert that at least one byte has been read if len isn't zero.
-        // Note that EOF has been tested before.
-        assert read > 0;
-        return read;
+        return total;
+    }
+
+    @Override
+    public long getFilePointer() throws IOException {
+        checkOpen();
+        return pos;
+    }
+
+    @Override
+    public void seek(final long pos) throws IOException {
+        checkOpen();
+        if (pos < 0)
+            throw new IOException("file pointer must not be negative");
+        if (pos > length)
+            throw new IOException("file pointer (" + pos
+                    + ") is larger than file length (" + length + ")");
+        this.pos = pos;
+    }
+
+    @Override
+    public long length() throws IOException {
+        checkOpen();
+        return length;
     }
 
     /**
@@ -320,27 +310,36 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * Positions the block with the decrypted data for partial reading so that
      * it contains the current virtual file pointer in the encrypted file.
      *
-     * @throws IOException On any I/O related issue.
+     * @throws IOException on any I/O error.
      *         The block is not moved in this case.
      */
     private void positionBlock() throws IOException {
-        // Check block position.
-        final long fp = this.fp;
-        final int blockLen = block.length;
-        if (blockOff <= fp) {
-            final long nextBlockOff = blockOff + blockLen;
-            if (fp < nextBlockOff)
+        final byte[] block = this.block;
+        final SeekableBlockCipher cipher = this.cipher;
+        assert null != cipher;
+
+        // Check position.
+        final long pos = this.pos;
+        long blockPos = this.blockPos;
+        final int blockSize = block.length;
+        if (blockPos <= pos) {
+            final long nextBlockPos = blockPos + blockSize;
+            if (pos < nextBlockPos)
                 return;
         }
 
-        // Move block.
-        positionWindow();
-        final long blockCounter = fp / blockLen;
-        blockOff = blockCounter * blockLen;
+        // Move position.
+        positionBuffer();
+        final long blockCounter = pos / blockSize;
+        cipher.setBlockCounter(blockCounter);
+        this.blockPos = blockPos = blockCounter * blockSize;
 
         // Decrypt block from window.
-        cipher.setBlockCounter(blockCounter);
-        cipher.processBlock(window, (int) (blockOff - windowOff), block, 0);
+        final int bufferOff = (int) (blockPos - bufferPos);
+        final int processed = cipher.processBlock(
+                buffer, bufferOff,
+                block, 0);
+        assert processed == blockSize;
     }
 
     /**
@@ -348,38 +347,43 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
      * the current virtual file pointer in the encrypted file is entirely
      * contained in it.
      *
-     * @throws IOException On any I/O related issue.
-     *         The window is invalidated in this case.
+     * @throws IOException on any I/O error.
+     *         The buffer gets invalidated in this case.
      */
-    private void positionWindow() throws IOException {
-        // Check window position.
-        final long fp = this.fp;
-        final int windowLen = window.length;
-        final long nextWindowOff = windowOff + windowLen;
-        if (windowOff <= fp && fp < nextWindowOff)
+    private void positionBuffer() throws IOException {
+        final byte[] buffer = this.buffer;
+        final int bufferSize = buffer.length;
+
+        // Check position.
+        final long pos = this.pos;
+        long bufferPos = this.bufferPos;
+        final long nextBufferPos = bufferPos + bufferSize;
+        if (bufferPos <= pos && pos < nextBufferPos)
             return;
 
         try {
-            // Move window in the encrypted file.
-            final int blockLen = block.length;
-            windowOff = fp / blockLen * blockLen; // round down to multiple of block size
-            if (windowOff != nextWindowOff)
-                delegate.seek(windowOff + start);
+            final ReadOnlyFile delegate = this.delegate;
 
-            // Fill window until end of file or buffer.
+            // Move position.
+            // Round down to multiple of buffer size.
+            this.bufferPos = bufferPos = pos / bufferSize * bufferSize;
+            if (bufferPos != nextBufferPos)
+                delegate.seek(start + bufferPos);
+
+            // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
             // depend on this as it would be a violation of ReadOnlyFile's
             // contract.
-            int n = 0;
+            int total = 0;
             do {
-                int read = delegate.read(window, n, windowLen - n);
+                int read = delegate.read(buffer, total, bufferSize - total);
                 if (read < 0)
                     break;
-                n += read;
-            } while (n < windowLen);
-        } catch (IOException ioe) {
-            windowOff = -windowLen - 1; // force seek() at next positionWindow()
-            throw ioe;
+                total += read;
+            } while (total < bufferSize);
+        } catch (final IOException ex) {
+            this.bufferPos = INVALID;
+            throw ex;
         }
     }
 }

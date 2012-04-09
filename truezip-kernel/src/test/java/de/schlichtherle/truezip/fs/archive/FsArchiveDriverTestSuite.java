@@ -312,24 +312,24 @@ extends FsArchiveDriverTestBase<D> {
 
         {
             final byte[] buf = new byte[getDataLength()];
-            SeekableByteChannel sbc;
+            SeekableByteChannel channel;
             try {
-                sbc = input.newSeekableByteChannel();
+                channel = input.newSeekableByteChannel();
             } catch (UnsupportedOperationException ex) {
-                sbc = null;
+                channel = null;
                 logger.log(Level.FINE,
                         input.getClass()
                             + " does not support newSeekableByteChannel().",
                         ex);
             }
-            if (null != sbc) {
+            if (null != channel) {
                 try {
-                    readFully(sbc, ByteBuffer.wrap(buf));
-                    assertEquals(-1, sbc.read(ByteBuffer.wrap(buf)));
+                    readFully(channel, ByteBuffer.wrap(buf));
+                    assertEquals(-1, channel.read(ByteBuffer.wrap(buf)));
                 } finally {
-                    sbc.close();
+                    channel.close();
                 }
-                sbc.close(); // expect no issues
+                channel.close(); // expect no issues
                 assertTrue(Arrays.equals(getData(), buf));
             }
         }
@@ -337,9 +337,10 @@ extends FsArchiveDriverTestBase<D> {
         {
             final byte[] buf = new byte[getDataLength()];
             boolean failure = true;
-            final InputStream in = input.newInputStream();
+            final DataInputStream
+                    in = new DataInputStream(input.newInputStream());
             try {
-                readFully(in, buf);
+                in.readFully(buf);
                 assertTrue(Arrays.equals(getData(), buf));
                 assertEquals(-1, in.read());
                 failure = false;
@@ -425,11 +426,6 @@ extends FsArchiveDriverTestBase<D> {
 
     private static String name(int i) {
         return Integer.toString(i);
-    }
-
-    private static void readFully(InputStream in, byte[] b)
-    throws IOException {
-        new DataInputStream(in).readFully(b);
     }
 
     private static void readFully(  final ReadableByteChannel rbc,
@@ -588,8 +584,8 @@ extends FsArchiveDriverTestBase<D> {
     private final class TestSeekableByteChannel
     extends DecoratingSeekableByteChannel
     implements TestCloseable {
-        TestSeekableByteChannel(SeekableByteChannel sbc) {
-            super(sbc);
+        TestSeekableByteChannel(SeekableByteChannel channel) {
+            super(channel);
         }
 
         @Override

@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.crypto.raes;
 
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
-import de.schlichtherle.truezip.rof.ReadOnlyFileTestSuite;
+import de.schlichtherle.truezip.rof.ReadOnlyFileITSuite;
 import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * @author  Christian Schlichtherle
  */
-public final class RaesIT extends ReadOnlyFileTestSuite {
+public final class RaesIT extends ReadOnlyFileITSuite {
 
     private static final Logger logger = Logger.getLogger(
             RaesIT.class.getName());
