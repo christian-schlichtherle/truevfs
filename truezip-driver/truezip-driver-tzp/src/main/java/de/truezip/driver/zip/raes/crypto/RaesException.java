@@ -5,12 +5,11 @@
 package de.truezip.driver.zip.raes.crypto;
 
 import java.io.IOException;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Thrown if there is an issue when reading or writing a RAES file which is
- * specific to the RAES file format.
+ * Indicates that there is an issue when reading or writing a RAES file which
+ * is specific to the RAES file format.
  *
  * @author Christian Schlichtherle
  */
@@ -31,7 +30,7 @@ public class RaesException extends IOException {
      *
      * @param msg the detail message.
      */
-    public RaesException(@CheckForNull String msg) {
+    public RaesException(String msg) {
         super(msg);
     }
 
@@ -42,7 +41,7 @@ public class RaesException extends IOException {
      * @param msg the detail message.
      * @param cause the cause for this exception to be thrown.
      */
-    public RaesException(@CheckForNull String msg, @CheckForNull Throwable cause) {
+    public RaesException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
@@ -52,7 +51,7 @@ public class RaesException extends IOException {
      *
      * @param cause the cause for this exception to get thrown.
      */
-    public RaesException(@CheckForNull Throwable cause) {
+    public RaesException(Throwable cause) {
         super(cause);
     }
 }

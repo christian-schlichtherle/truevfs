@@ -10,12 +10,11 @@ import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.SeekableByteChannel;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -35,17 +34,22 @@ implements InputService<ZipDriverEntry> {
     private ZipCryptoParameters param;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipInputService(
             final ZipDriver driver,
             final FsModel model,
-            final @WillCloseWhenClosed SeekableByteChannel channel)
+            final Source source)
     throws IOException {
-        super(channel, driver);
-        if (null == model)
-            throw new NullPointerException();
+        super(driver, source);
         this.driver = driver;
-        this.model = model;
+        if (null == (this.model = model)) {
+            final NullPointerException ex = new NullPointerException();
+            try {
+                super.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
     }
 
     /**

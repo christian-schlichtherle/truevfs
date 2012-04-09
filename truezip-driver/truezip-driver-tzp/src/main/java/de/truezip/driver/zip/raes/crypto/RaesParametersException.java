@@ -23,7 +23,7 @@ public class RaesParametersException extends RaesException {
      *
      * @param msg the detail message.
      */
-    public RaesParametersException(@CheckForNull String msg) {
+    public RaesParametersException(String msg) {
         super(msg);
     }
 
@@ -33,7 +33,7 @@ public class RaesParametersException extends RaesException {
      *
      * @param cause the cause for this exception to get thrown.
      */
-    public RaesParametersException(@CheckForNull Throwable cause) {
+    public RaesParametersException(Throwable cause) {
         super(cause);
     }
 }
