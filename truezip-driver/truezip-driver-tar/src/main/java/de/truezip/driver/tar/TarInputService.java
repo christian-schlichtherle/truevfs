@@ -7,15 +7,17 @@ package de.truezip.driver.tar;
 import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.io.Streams;
 import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import java.util.*;
 import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -60,21 +62,16 @@ implements InputService<TarDriverEntry> {
     /**
      * Extracts the entire TAR input stream into a temporary directory in order
      * to allow subsequent random access to its entries.
-     *
-     * @param in The input stream from which this input archive file should be
-     *        initialized. This stream is not used by any of the methods in
-     *        this class after the constructor has terminated and is
-     *        <em>never</em> closed!
-     *        So it is safe and recommended to close it upon termination
-     *        of this constructor.
      */
     @CreatesObligation
-    public TarInputService( final TarDriver driver,
-                            final @WillNotClose InputStream in)
+    public TarInputService(
+            final TarDriver driver,
+            final FsModel model,
+            final Source source)
     throws IOException {
-        final TarArchiveInputStream tin = newValidatedTarInputStream(in);
         final IOPool<?> pool = driver.getIOPool();
-        try {
+        try (final InputStream in = source.newStream()) {
+            final TarArchiveInputStream tin = newValidatedTarInputStream(in);
             TarArchiveEntry tinEntry;
             while (null != (tinEntry = tin.getNextTarEntry())) {
                 final String name = getName(tinEntry);
@@ -89,15 +86,23 @@ implements InputService<TarDriverEntry> {
                         try (final OutputStream out = temp.getOutputSocket().newStream()) {
                             Streams.cat(tin, out);
                         }
-                    } catch (IOException ex) {
-                        temp.release();
+                    } catch (final Throwable ex) {
+                        try {
+                            temp.release();
+                        } catch (final Throwable ex2) {
+                            ex.addSuppressed(ex2);
+                        }
                         throw ex;
                     }
                 }
                 entries.put(name, entry);
             }
-        } catch (IOException ex) {
-            close0();
+        } catch (final Throwable ex) {
+            try {
+                close0();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -122,8 +127,8 @@ implements InputService<TarDriverEntry> {
      * This method is required because the {@code TarArchiveInputStream}
      * unfortunately does not do any validation!
      */
-    private static TarArchiveInputStream newValidatedTarInputStream(
-            final InputStream in)
+    private static TarArchiveInputStream
+    newValidatedTarInputStream(final InputStream in)
     throws IOException {
         final byte[] buf = new byte[DEFAULT_RCDSIZE];
         final InputStream vin = readAhead(in, buf);
@@ -133,15 +138,16 @@ implements InputService<TarDriverEntry> {
             final long expected;
             try {
                 expected = TarUtils.parseOctal(buf, CHECKSUM_OFFSET, 8);
-            } catch (IllegalArgumentException ex) {
-                throw new IOException("Illegal initial record in TAR file!", ex);
+            } catch (final Throwable ex) {
+                throw new TarException("Illegal initial record in TAR file!", ex);
             }
             for (int i = 0; i < 8; i++)
                 buf[CHECKSUM_OFFSET + i] = ' ';
             final long actual = TarUtils.computeCheckSum(buf);
             if (expected != actual)
-                throw new IOException(
-                        "Illegal initial record in TAR file: Expected / actual checksum := " + expected + " / " + actual + "!");
+                throw new TarException(
+                        "Illegal initial record in TAR file: Expected / actual checksum := "
+                        + expected + " / " + actual + "!");
         }
         return new TarArchiveInputStream(vin, DEFAULT_BLKSIZE, DEFAULT_RCDSIZE);
     }
@@ -156,25 +162,20 @@ implements InputService<TarDriverEntry> {
      * @return A stream which holds all the data {@code in} did.
      * @throws IOException If {@code buf} couldn't get filled entirely.
      */
-    static InputStream readAhead(final InputStream in, final byte[] buf)
+    private static InputStream readAhead(final InputStream in, final byte[] buf)
     throws IOException {
         if (in.markSupported()) {
             in.mark(buf.length);
-            readFully(in, buf);
+            new DataInputStream(in).readFully(buf);
             in.reset();
             return in;
         } else {
-            final PushbackInputStream pin
-                    = new PushbackInputStream(in, buf.length);
-            readFully(pin, buf);
+            final PushbackInputStream
+                    pin = new PushbackInputStream(in, buf.length);
+            new DataInputStream(pin).readFully(buf);
             pin.unread(buf);
             return pin;
         }
-    }
-
-    private static void readFully(final InputStream in, final byte[] buf)
-    throws IOException {
-        new DataInputStream(in).readFully(buf);
     }
 
     @Override
@@ -233,10 +234,18 @@ implements InputService<TarDriverEntry> {
     }
 
     private void close0() throws IOException {
+        final SuppressedExceptionBuilder<IOException>
+                builder = new SuppressedExceptionBuilder<>();
         Collection<TarDriverEntry> values = entries.values();
         for (final Iterator<TarDriverEntry> i = values.iterator();
                 i.hasNext();
-                i.remove())
-            i.next().release();
+                i.remove()) {
+            try {
+                i.next().release();
+            } catch (final IOException ex) {
+                builder.warn(ex);
+            }
+        }
+        builder.check();
     }
 }
