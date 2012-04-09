@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.kernel.FsFailSafeManagerService;
+import de.schlichtherle.truezip.kernel.FailSafeManagerService;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsArchiveDriverTestBase;
 import de.truezip.kernel.FsMountPoint;
@@ -62,7 +62,7 @@ extends FsArchiveDriverTestBase<D> {
         // issues in case this invariant is not met.
         // See http://truezip.java.net/truezip-file/usage.html#Third_Party_Access
         if (ISOLATE_FS_MANAGER)
-            config.setManager(new FsFailSafeManagerService().get());
+            config.setManager(new FailSafeManagerService().get());
         config.setLenient(true);
         config.setArchiveDetector(detector);
     }
