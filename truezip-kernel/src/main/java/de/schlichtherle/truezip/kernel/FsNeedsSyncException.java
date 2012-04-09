@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.schlichtherle.truezip.kernel.FsControllerException;
+import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.FsModel;
@@ -23,7 +23,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-final class FsNeedsSyncException extends FsControllerException {
+final class FsNeedsSyncException extends FsControlFlowIOException {
 
     private static final @Nullable FsNeedsSyncException
             SINGLETON = TRACEABLE ? null : new FsNeedsSyncException();

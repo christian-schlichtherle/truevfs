@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.*;
 import de.truezip.kernel.addr.FsEntryName;
 import static de.truezip.kernel.addr.FsEntryName.ROOT;
@@ -15,7 +16,6 @@ import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -39,8 +39,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * controller of the parent file system in order to continue the operation.
  * If this fails with another exception, then the {@link IOException} which is
  * associated as the cause of the initial exception gets rethrown unless the
- * other exception is an {@link FsControllerException}.
- * In this case the {@link FsControllerException} gets rethrown as is in order
+ * other exception is an {@link FsControlFlowIOException}.
+ * In this case the {@link FsControlFlowIOException} gets rethrown as is in order
  * to enable the caller to resolve it.
  * <p>
  * This algorithm effectively achieves the following objectives:
@@ -54,7 +54,7 @@ import javax.annotation.concurrent.ThreadSafe;
  *     place in order to provide the caller with a good indication of what went
  *     wrong in the first place.
  * <li>Exceptions which are thrown by the TrueZIP Kernel itself identify
- *     themselves by the type {@link FsControllerException}.
+ *     themselves by the type {@link FsControlFlowIOException}.
  *     They are excempt from this masquerade in order to support resolving them
  *     by a more competent caller.
  * </ol>
@@ -316,22 +316,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                             .newChannel();
                 }
             } // NewChannel
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return call(new NewReadOnlyFile(), name);
-            }
-
-            final class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
-                @Override
-                public ReadOnlyFile call(
-                        final FsController<?> controller,
-                        final FsEntryName name)
-                throws IOException {
-                    return getBoundDelegate(controller, name)
-                            .newReadOnlyFile();
-                }
-            } // NewReadOnlyFile
         } // Input
 
         return new Input();
@@ -519,7 +503,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         throws IOException {
             try {
                 return operation.call(getParent(), resolveParent(name));
-            } catch (final FsControllerException ex) {
+            } catch (final FsControlFlowIOException ex) {
                 assert !(ex instanceof FsFalsePositiveException);
                 throw ex;
             } catch (final IOException ignored) {

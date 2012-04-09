@@ -67,11 +67,10 @@
  *         executable code.
  *     </ol>
  * <li>{@link de.truezip.driver.zip.io.ZipFile} supports reading archive
- *     data from the random access read only interface
- *     {@link de.truezip.kernel.rof.ReadOnlyFile}, which allows to read
- *     archive data from composite data sources like e.g. RAES encrypted ZIP
- *     files directly without the need to decrypt them to a temporary file
- *     first.
+ *     data from a {@link java.nio.channel.SeekableByteChannel}, which allows
+ *     to read archive data from composite data sources like e.g. RAES
+ *     encrypted ZIP files directly without the need to decrypt them to a
+ *     temporary file first.
  * </ul>
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)

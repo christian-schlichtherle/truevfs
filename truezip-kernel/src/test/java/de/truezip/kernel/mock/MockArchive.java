@@ -10,7 +10,6 @@ import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.ThrowControl;
 import de.truezip.kernel.util.Maps;
@@ -132,19 +131,14 @@ implements Container<MockArchiveDriverEntry> {
                 }
 
                 @Override
+                public InputStream newStream() throws IOException {
+                    return getBufferInputSocket().newStream();
+                }
+
+                @Override
                 public SeekableByteChannel newChannel()
                 throws IOException {
                     return getBufferInputSocket().newChannel();
-                }
-
-                @Override
-                public ReadOnlyFile newReadOnlyFile() throws IOException {
-                    return getBufferInputSocket().newReadOnlyFile();
-                }
-
-                @Override
-                public InputStream newStream() throws IOException {
-                    return getBufferInputSocket().newStream();
                 }
 
                 InputSocket<? extends IOEntry<?>>

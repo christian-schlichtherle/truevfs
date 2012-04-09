@@ -8,9 +8,9 @@ import de.truezip.driver.zip.crypto.CipherReadOnlyChannel;
 import de.truezip.driver.zip.crypto.SeekableBlockCipher;
 import static de.truezip.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static de.truezip.driver.zip.io.WinZipAesEntryOutputStream.*;
+import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.IntervalReadOnlyChannel;
 import de.truezip.kernel.io.PowerBuffer;
-import de.truezip.kernel.util.ArrayUtils;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.util.SuspensionPenalty;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -18,6 +18,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Arrays;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
@@ -30,6 +31,8 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Decrypts ZIP entry contents according the WinZip AES specification.
+ * <p>
+ * Note that this channel implements its own virtual position.
  * 
  * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2 (WinZip Computing, S.L.)</a>
  * @see     <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers (WinZip Computing, S.L.)</a>
@@ -39,9 +42,9 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesEntryReadOnlyChannel extends CipherReadOnlyChannel {
+final class WinZipAesEntryReadOnlyChannel extends DecoratingReadOnlyChannel {
 
-    private final PowerBuffer authenticationCode;
+    private final ByteBuffer authenticationCode;
 
     /**
      * The key parameter required to init the SHA-1 Message Authentication
@@ -73,24 +76,26 @@ final class WinZipAesEntryReadOnlyChannel extends CipherReadOnlyChannel {
         final int keyStrengthBytes = keyStrength.getBytes();
 
         // Load salt.
-        final PowerBuffer salt = PowerBuffer
+        final ByteBuffer salt = PowerBuffer
                 .allocate(keyStrengthBytes / 2)
-                .load(channel.position(0));
+                .load(channel.position(0))
+                .buffer();
         
         // Load password verification value.
-        final PowerBuffer passwdVerifier = PowerBuffer
+        final ByteBuffer passwdVerifier = PowerBuffer
                 .allocate(PWD_VERIFIER_BITS / 8)
-                .load(channel);
+                .load(channel)
+                .buffer();
 
         // Init MAC and authentication code.
         final Mac mac = new HMac(new SHA1Digest());
-        this.authenticationCode = PowerBuffer.allocate(mac.getMacSize() / 2);
+        final PowerBuffer footer = PowerBuffer.allocate(mac.getMacSize() / 2);
 
-        // Init start, end and length of encrypted data.
+        // Init start, end and size of encrypted data.
         final long start = channel.position();
-        final long end = channel.size() - this.authenticationCode.limit();
+        final long end = channel.size() - footer.limit();
         final long size = end - start;
-        if (size < 0) {
+        if (0 > size) {
             // Wrap an EOFException so that RawReadOnlyChannel can identify this issue.
             throw new ZipCryptoException(entry.getName()
                     + " (false positive WinZip AES entry is too short)",
@@ -98,13 +103,14 @@ final class WinZipAesEntryReadOnlyChannel extends CipherReadOnlyChannel {
         }
 
         // Load authentication code.
-        this.authenticationCode.load(channel.position(end));
-        if (channel.position() < channel.size()) {
+        footer.load(channel.position(end));
+        if (channel.position() != channel.size()) {
             // This should never happen unless someone is writing to the
             // end of the file concurrently!
             throw new ZipCryptoException(
                     "Expected end of file after WinZip AES authentication code!");
         }
+        authenticationCode = footer.buffer();
 
         // Derive cipher and MAC parameters.
         final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
@@ -125,7 +131,7 @@ final class WinZipAesEntryReadOnlyChannel extends CipherReadOnlyChannel {
             assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
             keyParam = (KeyParameter) gen.generateDerivedParameters(
                     2 * keyStrengthBits + PWD_VERIFIER_BITS);
-            paranoidWipe(passwd);
+            Arrays.fill(passwd, (byte) 0);
 
             // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
             final byte[] ctrIv = new byte[AES_BLOCK_SIZE_BITS / 8];
@@ -140,29 +146,22 @@ final class WinZipAesEntryReadOnlyChannel extends CipherReadOnlyChannel {
             lastTry = SuspensionPenalty.enforce(lastTry);
 
             // Verify password.
-        } while (!ArrayUtils.equals(
-                keyParam.getKey(), 2 * keyStrengthBytes,
-                passwdVerifier.array(), 0,
-                PWD_VERIFIER_BITS / 8));
+        } while (!passwdVerifier.equals(ByteBuffer.wrap(
+                keyParam.getKey()).position(2 * keyStrengthBytes)));
 
         // Init parameters and entry for authenticate().
         this.sha1MacParam = sha1MacParam;
-        this.entry = param.getEntry();
+        this.entry = entry;
 
-        // Init channel interval and cipher.
-        this.channel = new IntervalReadOnlyChannel(channel.position(start), size);
+        // Init cipher and channel.
         final SeekableBlockCipher cipher = new WinZipAesCipher();
         cipher.init(false, aesCtrParam);
-        init(cipher);
+        this.channel = new CipherReadOnlyChannel(
+                new IntervalReadOnlyChannel(channel.position(start), size),
+                cipher);
 
         // Commit key strength.
         param.setKeyStrength(keyStrength);
-    }
-
-    /** Wipe the given array. */
-    private void paranoidWipe(final byte[] pwd) {
-        for (int i = pwd.length; --i >= 0; )
-            pwd[i] = 0;
     }
 
     /**
@@ -177,9 +176,8 @@ final class WinZipAesEntryReadOnlyChannel extends CipherReadOnlyChannel {
     void authenticate() throws IOException {
         final Mac mac = new HMac(new SHA1Digest());
         mac.init(sha1MacParam);
-        final ByteBuffer buf = computeMac(mac);
-        assert buf.limit() == mac.getMacSize();
-        if (!ArrayUtils.equals(buf.array(), 0, authenticationCode.array(), 0, authenticationCode.limit()))
+        final byte[] buf = ((CipherReadOnlyChannel) channel).mac(mac);
+        if (!authenticationCode.equals(ByteBuffer.wrap(buf, 0, buf.length / 2)))
             throw new ZipAuthenticationException(entry.getName()
                     + " (authenticated WinZip AES entry content has been tampered with)");
     }

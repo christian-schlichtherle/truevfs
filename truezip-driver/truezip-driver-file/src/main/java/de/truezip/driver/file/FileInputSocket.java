@@ -5,12 +5,11 @@
 package de.truezip.driver.file;
 
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.rof.DefaultReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
+import static java.nio.file.Files.newByteChannel;
+import static java.nio.file.Files.newInputStream;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -35,18 +34,12 @@ final class FileInputSocket extends InputSocket<FileEntry> {
     }
 
     @Override
-    public SeekableByteChannel newChannel() throws IOException {
-        return Files.newByteChannel(entry.getPath());
-    }
-
-    @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
-        // TODO: Write SeekableByteChannel adapter.
-        return new DefaultReadOnlyFile(entry.getPath().toFile());
-    }
-
-    @Override
     public InputStream newStream() throws IOException {
-        return Files.newInputStream(entry.getPath());
+        return newInputStream(entry.getPath());
+    }
+
+    @Override
+    public SeekableByteChannel newChannel() throws IOException {
+        return newByteChannel(entry.getPath());
     }
 }

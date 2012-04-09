@@ -17,8 +17,7 @@ import org.junit.Before;
 /**
  * @author Christian Schlichtherle
  */
-public final class IntervalReadOnlyChannelIT
-extends ReadOnlyChannelTestSuite {
+public class IntervalReadOnlyChannelIT extends ReadOnlyChannelITSuite {
 
     private static final Logger
             logger = Logger.getLogger(IntervalReadOnlyChannelIT.class.getName());

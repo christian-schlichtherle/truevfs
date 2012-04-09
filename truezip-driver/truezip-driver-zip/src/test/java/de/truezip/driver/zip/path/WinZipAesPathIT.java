@@ -21,6 +21,7 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
+
     @Override
     protected String getExtensionList() {
         return "zip";

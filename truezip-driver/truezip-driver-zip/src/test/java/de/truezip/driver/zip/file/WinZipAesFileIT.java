@@ -93,7 +93,7 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
             fail();
         } catch (IOException expected) {
         }
-            
+
         umount();
         setAction(ENTER);
         archive.rm_r();

@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.cio;
 
-import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -25,7 +24,7 @@ extends InputSocket<E> {
      * Returns the delegate socket.
      * 
      * @return The delegate socket.
-     * @throws IOException on any I/O failure. 
+     * @throws IOException on any I/O error. 
      */
     protected abstract InputSocket<? extends E> getSocket()
     throws IOException;
@@ -34,7 +33,7 @@ extends InputSocket<E> {
      * Binds the delegate socket to this socket and returns it.
      *
      * @return The bound delegate socket.
-     * @throws IOException on any I/O failure. 
+     * @throws IOException on any I/O error. 
      */
     protected final InputSocket<? extends E> getBoundSocket()
     throws IOException {
@@ -47,17 +46,12 @@ extends InputSocket<E> {
     }
 
     @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return getBoundSocket().newReadOnlyFile();
+    public InputStream newStream() throws IOException {
+        return getBoundSocket().newStream();
     }
 
     @Override
     public SeekableByteChannel newChannel() throws IOException {
         return getBoundSocket().newChannel();
-    }
-
-    @Override
-    public InputStream newStream() throws IOException {
-        return getBoundSocket().newStream();
     }
 }

@@ -14,7 +14,6 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
 import de.truezip.kernel.option.SyncOption;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -197,19 +196,6 @@ extends FsDecoratingController<FsLockModel, FsTargetArchiveController<?>> {
                 controller.setContext(NONE);
                 try {
                     return getBoundSocket().newChannel();
-                } finally {
-                    controller.setContext(context);
-                }
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                final FsTargetArchiveController<?>
-                        controller = FsContextController.this.controller;
-                final FsOperationContext context = controller.getContext();
-                controller.setContext(NONE);
-                try {
-                    return getBoundSocket().newReadOnlyFile();
                 } finally {
                     controller.setContext(context);
                 }

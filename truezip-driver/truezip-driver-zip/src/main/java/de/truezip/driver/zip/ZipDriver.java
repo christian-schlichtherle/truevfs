@@ -7,6 +7,7 @@ package de.truezip.driver.zip;
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import de.truezip.driver.zip.io.*;
 import de.truezip.kernel.FsArchiveDriver;
+import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
@@ -17,7 +18,6 @@ import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.*;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import de.truezip.key.KeyManagerProvider;
@@ -27,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -349,7 +350,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
-        return new ZipKeyController<M>(controller, this);
+        return new ZipKeyController<>(controller, this);
     }
 
     @Override
@@ -422,13 +423,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final ReadOnlyFile rof = input.newReadOnlyFile();
+        final SeekableByteChannel channel = input.newChannel();
         try {
-            return newInputService(model, rof);
+            return newInputService(model, channel);
         } catch (final Throwable ex) {
             try {
-                rof.close();
+                channel.close();
             } catch (final Throwable ex2) {
+                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -438,10 +440,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @CreatesObligation
     protected InputService<ZipDriverEntry> newInputService(
             FsModel model,
-            @WillCloseWhenClosed ReadOnlyFile rof)
+            @WillCloseWhenClosed SeekableByteChannel channel)
     throws IOException {
         assert null != model;
-        final ZipInputService input = new ZipInputService(this, model, rof);
+        final ZipInputService input = new ZipInputService(this, model, channel);
         try {
             input.recoverLostEntries();
         } catch (final IOException ex) {
@@ -493,7 +495,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * then it's marked for appending to it.
      * Then, an output stream is acquired from the given {@code output} socket
      * and the parameters are forwarded to {@link #newOutputService(FsModel, OptionOutputSocket, ZipInputService)}
-     * and the result gets wrapped in a new {@link MultiplexedOutputService}
+     * and the result gets wrapped in a new {@link MultiplexingOutputService}
      * which uses the current {@link #getIOPool}.
      */
     @Override
@@ -532,10 +534,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final OutputStream out = output.newStream();
         try {
             return newOutputService(model, out, source);
-        } catch (final IOException ex) {
+        } catch (final Throwable ex) {
             try {
                 out.close();
-            } catch (final IOException ex2) {
+            } catch (final Throwable ex2) {
+                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -549,7 +552,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             @WillCloseWhenClosed OutputStream out,
             @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
-        return new MultiplexedOutputService<>(
+        return new MultiplexingOutputService<>(
                 new ZipOutputService(this, model, out, source),
                 getIOPool());
     }

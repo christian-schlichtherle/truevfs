@@ -6,23 +6,23 @@ package de.truezip.driver.http;
 
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An input socket for HTTP(S) entries.
  * 
- * @see     HttpOutputSocket
- * @author  Christian Schlichtherle
+ * @see    HttpOutputSocket
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class HttpInputSocket extends InputSocket<HttpEntry> {
@@ -42,7 +42,12 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
     }
 
     @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
+    public InputStream newStream() throws IOException {
+        return entry.getInputStream();
+    }
+
+    @Override
+    public SeekableByteChannel newChannel() throws IOException {
         final IOBuffer<?> temp;
         final InputStream in = entry.getInputStream();
         try {
@@ -51,7 +56,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
                 try (final OutputStream out = temp.getOutputSocket().newStream()) {
                     Streams.cat(in, out);
                 }
-            } catch (final IOException ex) {
+            } catch (final Throwable ex) {
                 temp.release();
                 throw ex;
             }
@@ -63,30 +68,25 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
             }
         }
 
-        final class TempReadOnlyFile extends DecoratingReadOnlyFile {
+        final class TempReadOnlyChannel extends DecoratingReadOnlyChannel {
             boolean closed;
 
             @CreatesObligation
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-            TempReadOnlyFile() throws IOException {
-                super(temp.getInputSocket().newReadOnlyFile()); // bind(*) is considered redundant for IOPool.IOBuffer
+            TempReadOnlyChannel() throws IOException {
+                super(temp.getInputSocket().newChannel()); // bind(*) is considered redundant for IOPool.IOBuffer
             }
 
             @Override
             public void close() throws IOException {
                 if (closed)
                     return;
-                rof.close();
+                channel.close();
                 closed = true;
                 temp.release();
             }
-        } // TempReadOnlyFile
+        } // TempReadOnlyChannel
 
-        return new TempReadOnlyFile();
-    }
-
-    @Override
-    public InputStream newStream() throws IOException {
-        return entry.getInputStream();
+        return new TempReadOnlyChannel();
     }
 }

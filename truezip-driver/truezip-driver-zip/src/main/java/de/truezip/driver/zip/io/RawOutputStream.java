@@ -40,11 +40,11 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * - its API may change at will without prior notification!
  *
  * @param  <E> the type of the ZIP entries.
- * @see    RawZipFile
+ * @see    RawFile
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class RawZipOutputStream<E extends ZipEntry>
+public abstract class RawOutputStream<E extends ZipEntry>
 extends DecoratingOutputStream
 implements Iterable<E> {
 
@@ -92,9 +92,9 @@ implements Iterable<E> {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected RawZipOutputStream(
+    protected RawOutputStream(
             final @WillCloseWhenClosed OutputStream out,
-            final @CheckForNull @WillNotClose RawZipFile<E> appendee,
+            final @CheckForNull @WillNotClose RawFile<E> appendee,
             final ZipOutputStreamParameters param) {
         super(newLEDataOutputStream(out, appendee));
         this.dos = (LEDataOutputStream) this.out;
@@ -118,45 +118,7 @@ implements Iterable<E> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private static LEDataOutputStream newLEDataOutputStream(
             final @WillCloseWhenClosed OutputStream out,
-            final @CheckForNull @WillNotClose RawZipFile<?> appendee) {
-        if (null == out)
-            throw new NullPointerException();
-        return null != appendee
-                ? new AppendingLEDataOutputStream(out, appendee)
-                : out instanceof LEDataOutputStream
-                    ? (LEDataOutputStream) out
-                    : new LEDataOutputStream(out);
-    }
-
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected RawZipOutputStream(
-            final @WillCloseWhenClosed OutputStream out,
-            final @CheckForNull @WillNotClose RawReadOnlyChannel<E> appendee,
-            final ZipOutputStreamParameters param) {
-        super(newLEDataOutputStream(out, appendee));
-        this.dos = (LEDataOutputStream) this.out;
-        if (null != appendee) {
-            this.charset = appendee.getRawCharset();
-            this.comment = appendee.getRawComment();
-            final Map<String, E> entries = new LinkedHashMap<>(
-                    initialCapacity(appendee.size() + param.getOverheadSize()));
-            entries.putAll(appendee.getRawEntries());
-            this.entries = entries;
-        } else {
-            this.charset = param.getCharset();
-            this.entries = new LinkedHashMap<>(
-                    initialCapacity(param.getOverheadSize()));
-        }
-        setMethod0(param.getMethod());
-        setLevel0(param.getLevel());
-    }
-
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    private static LEDataOutputStream newLEDataOutputStream(
-            final @WillCloseWhenClosed OutputStream out,
-            final @CheckForNull @WillNotClose RawReadOnlyChannel<?> appendee) {
+            final @CheckForNull @WillNotClose RawFile<?> appendee) {
         if (null == out)
             throw new NullPointerException();
         return null != appendee
@@ -335,7 +297,7 @@ implements Iterable<E> {
 
     /**
      * Returns {@code true} if and only if this
-     * {@code RawZipOutputStream} is currently writing a ZIP entry.
+     * {@code RawOutputStream} is currently writing a ZIP entry.
      */
     public boolean isBusy() {
         return null != this.entry;
@@ -726,17 +688,7 @@ implements Iterable<E> {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         AppendingLEDataOutputStream(
                 final @WillCloseWhenClosed OutputStream out,
-                final @WillNotClose RawZipFile<?> appendee) {
-            super(out);
-            assert null != out;
-            super.written = appendee.getOffsetMapper().unmap(appendee.length());
-        }
-
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        AppendingLEDataOutputStream(
-                final @WillCloseWhenClosed OutputStream out,
-                final @WillNotClose RawReadOnlyChannel<?> appendee) {
+                final @WillNotClose RawFile<?> appendee) {
             super(out);
             assert null != out;
             super.written = appendee.getOffsetMapper().unmap(appendee.length());
@@ -762,10 +714,10 @@ implements Iterable<E> {
                                 + encode(entry.getRawComment()).length;
                 if (UShort.MAX_VALUE < size)
                     throw new ZipException(entry.getName()
-                            + " (the total size "
+                            + " (the total size of "
                             + size
-                            + " for the name, extra fields and comment exceeds the maximum size "
-                            + UShort.MAX_VALUE + ")");
+                            + " bytes for the name, extra fields and comment exceeds the maximum size of "
+                            + UShort.MAX_VALUE + " bytes)");
             }
             if (STORED == entry.getMethod() || !this.process) {
                 if (UNKNOWN == entry.getCrc())
@@ -790,7 +742,7 @@ implements Iterable<E> {
          */
         @Override
         public OutputStream start() throws IOException {
-            final LEDataOutputStream dos = RawZipOutputStream.this.dos;
+            final LEDataOutputStream dos = RawOutputStream.this.dos;
             final long offset = dos.size();
             final ZipEntry entry = this.entry;
             final boolean encrypted = entry.isEncrypted();
@@ -802,7 +754,7 @@ implements Iterable<E> {
                               | (dd        ? GPBF_DATA_DESCRIPTOR : 0)
                               | (utf8      ? GPBF_UTF8 : 0);
             // Start changes.
-            RawZipOutputStream.this.finished = false;
+            RawOutputStream.this.finished = false;
             // local file header signature     4 bytes  (0x04034b50)
             dos.writeInt(LFH_SIG);
             // version needed to extract       2 bytes
@@ -850,7 +802,7 @@ implements Iterable<E> {
          */
         @Override
         public void finish() throws IOException {
-            final LEDataOutputStream dos = RawZipOutputStream.this.dos;
+            final LEDataOutputStream dos = RawOutputStream.this.dos;
             final long csize = dos.size() - this.dataStart;
             final ZipEntry entry = this.entry;
             assert UNKNOWN != entry.getCrc();
@@ -872,11 +824,11 @@ implements Iterable<E> {
                 }
             } else if (entry.getCompressedSize() != csize) {
                 throw new ZipException(entry.getName()
-                        + " (expected compressed entry size "
+                        + " (expected compressed entry size of "
                         + entry.getCompressedSize()
-                        + ", but is actually "
+                        + " bytes, but is actually "
                         + csize
-                        + ")");
+                        + " bytes)");
             }
         }
     } // RawOutputMethod
@@ -1022,7 +974,7 @@ implements Iterable<E> {
         }
 
         int getBZip2BlockSize() {
-            final int level = RawZipOutputStream.this.getLevel();
+            final int level = RawOutputStream.this.getLevel();
             if (BZip2CompressorOutputStream.MIN_BLOCKSIZE <= level
                     && level <= BZip2CompressorOutputStream.MAX_BLOCKSIZE)
                 return level;
@@ -1060,7 +1012,7 @@ implements Iterable<E> {
             assert null == this.out;
             return this.out = new ZipDeflaterOutputStream(
                     this.method.start(),
-                    RawZipOutputStream.this.getLevel(),
+                    RawOutputStream.this.getLevel(),
                     MAX_FLATER_BUF_LENGTH);
         }
 
@@ -1102,12 +1054,12 @@ implements Iterable<E> {
         @Override
         public void finish() throws IOException {
             this.method.finish();
-            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final ZipEntry entry = RawOutputStream.this.entry;
             final long expectedCrc = entry.getCrc();
             if (UNKNOWN != expectedCrc) {
                 final long actualCrc = this.out.getChecksum().getValue();
                 if (expectedCrc != actualCrc)
-                    throw new CRC32Exception(entry.getName(), expectedCrc, actualCrc);
+                    throw new Crc32Exception(entry.getName(), expectedCrc, actualCrc);
             }
         }
     } // Crc32CheckingOutputMethod
@@ -1119,7 +1071,7 @@ implements Iterable<E> {
 
         @Override
         public void finish() throws IOException {
-            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final ZipEntry entry = RawOutputStream.this.entry;
             final long crc = this.out.getChecksum().getValue();
             entry.setRawCrc(crc);
             this.method.finish();

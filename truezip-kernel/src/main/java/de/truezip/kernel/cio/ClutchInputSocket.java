@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.cio;
 
-import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -36,7 +35,7 @@ extends DecoratingInputSocket<E> {
      * Returns the socket socket for lazy initialization.
      * 
      * @return the socket socket for lazy initialization.
-     * @throws IOException on any I/O failure. 
+     * @throws IOException on any I/O error. 
      */
     protected abstract InputSocket<? extends E> getLazyDelegate()
     throws IOException;
@@ -52,9 +51,9 @@ extends DecoratingInputSocket<E> {
     }
 
     @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
+    public InputStream newStream() throws IOException {
         try {
-            return getBoundSocket().newReadOnlyFile();
+            return getBoundSocket().newStream();
         } catch (final Throwable ex) {
             reset();
             throw ex;
@@ -66,16 +65,6 @@ extends DecoratingInputSocket<E> {
     throws IOException {
         try {
             return getBoundSocket().newChannel();
-        } catch (final Throwable ex) {
-            reset();
-            throw ex;
-        }
-    }
-
-    @Override
-    public InputStream newStream() throws IOException {
-        try {
-            return getBoundSocket().newStream();
         } catch (final Throwable ex) {
             reset();
             throw ex;

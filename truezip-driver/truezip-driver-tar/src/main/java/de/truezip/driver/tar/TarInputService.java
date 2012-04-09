@@ -9,7 +9,6 @@ import static de.truezip.kernel.addr.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.addr.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -197,7 +196,7 @@ implements InputService<TarDriverEntry> {
     public InputSocket<TarDriverEntry> getInputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
-        class Input extends InputSocket<TarDriverEntry> {
+        final class Input extends InputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry getLocalTarget() throws IOException {
                 final TarDriverEntry entry = getEntry(name);
@@ -209,19 +208,14 @@ implements InputService<TarDriverEntry> {
             }
 
             @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return getInputSocket().newReadOnlyFile();
+            public InputStream newStream()
+            throws IOException {
+                return getInputSocket().newStream();
             }
 
             @Override
             public SeekableByteChannel newChannel() throws IOException {
                 return getInputSocket().newChannel();
-            }
-
-            @Override
-            public InputStream newStream()
-            throws IOException {
-                return getInputSocket().newStream();
             }
 
             InputSocket<? extends IOEntry<?>> getInputSocket()

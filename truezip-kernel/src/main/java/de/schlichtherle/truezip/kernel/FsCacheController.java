@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsControlFlowIOException;
 import static de.schlichtherle.truezip.kernel.FsCache.Strategy.WRITE_BACK;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
@@ -19,7 +20,6 @@ import static de.truezip.kernel.option.AccessOption.EXCLUSIVE;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.option.SyncOption.CLEAR_CACHE;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -222,7 +222,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
     private <X extends IOException> void
     preSync(final BitField<SyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws FsControllerException, X {
+    throws FsControlFlowIOException, X {
         assert isWriteLockedByCurrentThread();
         if (0 >= caches.size())
             return;
@@ -236,7 +236,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                 if (flush) {
                     try {
                         cache.flush();
-                    } catch (final FsControllerException ex) {
+                    } catch (final FsControlFlowIOException ex) {
                         clear = false;
                         throw ex;
                     } catch (final IOException ex) {
@@ -248,7 +248,7 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                     i.remove();
                     try {
                         cache.clear();
-                    } catch (final FsControllerException ex) {
+                    } catch (final FsControlFlowIOException ex) {
                         assert false;
                         throw ex;
                     } catch (final IOException ex) {
@@ -310,16 +310,6 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
             }
 
             @Override
-            public SeekableByteChannel newChannel(){
-                throw new AssertionError();
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() {
-                throw new AssertionError();
-            }
-
-            @Override
             public InputStream newStream() throws IOException {
                 return new Stream();
             }
@@ -338,6 +328,11 @@ extends FsDecoratingLockModelController<FsSyncDecoratingController<? extends FsL
                     register();
                 }
             } // Stream
+
+            @Override
+            public SeekableByteChannel newChannel(){
+                throw new AssertionError();
+            }
         } // Input
 
         /**

@@ -92,10 +92,11 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
      * 
      * @param  channel the channel.
      * @return {@code this}.
-     * @throws EOFException on end-of-file.
-     * @throws IOException on any I/O failure.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      */
-    public PowerBuffer load(ReadableByteChannel channel) throws IOException {
+    public PowerBuffer load(ReadableByteChannel channel)
+    throws EOFException, IOException {
         Channels.readFully(channel, bb);
         return this;
     }
@@ -108,7 +109,7 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
      * 
      * @param  channel the channel.
      * @return {@code this}.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public PowerBuffer save(WritableByteChannel channel) throws IOException {
         Channels.writeFully(channel, bb);
@@ -271,8 +272,8 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
         return new PowerBuffer(bb.duplicate());
     }
 
-    public ByteBuffer asReadOnlyBuffer() {
-        return bb.asReadOnlyBuffer();
+    public PowerBuffer asReadOnlyBuffer() {
+        return new PowerBuffer(bb.asReadOnlyBuffer());
     }
 
     public byte get() {

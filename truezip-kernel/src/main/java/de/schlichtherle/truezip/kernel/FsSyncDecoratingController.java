@@ -42,7 +42,7 @@ extends FsDecoratingController<M, C> {
             ied.warn(fuse);     // charge fuse
             sync(SYNC, ied);    // charge load
             ied.check();        // pull trigger
-            throw new AssertionError("Expected an instance of the " + FsSyncException.class);
+            throw new AssertionError("Expected to throw an instance of the " + FsSyncException.class);
         } catch (final FsSyncWarningException damage) {
             if (damage != fuse) // check for dud
                 throw damage;

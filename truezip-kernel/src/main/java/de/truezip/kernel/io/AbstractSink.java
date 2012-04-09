@@ -18,7 +18,7 @@ public abstract class AbstractSink implements Sink {
      * <p>
      * The implementation in the class {@link AbstractSink} calls
      * {@link #newChannel()} and wraps the result in a
-     * {@link SeekableByteChannelOutputStream} adapter.
+     * {@link ChannelOutputStream} adapter.
      * Note that this may intentionally violate the contract for this method
      * because {@link #newChannel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
@@ -26,7 +26,7 @@ public abstract class AbstractSink implements Sink {
      */
     @Override
     public OutputStream newStream() throws IOException {
-        return new SeekableByteChannelOutputStream(newChannel());
+        return new ChannelOutputStream(newChannel());
     }
 
     /**

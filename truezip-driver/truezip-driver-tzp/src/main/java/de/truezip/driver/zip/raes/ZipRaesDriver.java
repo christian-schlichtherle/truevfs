@@ -10,7 +10,7 @@ import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
-import de.truezip.driver.zip.raes.crypto.RaesReadOnlyFile;
+import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
 import de.truezip.driver.zip.raes.crypto.RaesSink;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
@@ -19,11 +19,10 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.option.AccessOption;
 import static de.truezip.kernel.option.AccessOption.*;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
-import java.io.CharConversionException;
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
@@ -161,12 +160,12 @@ public abstract class ZipRaesDriver extends JarDriver {
      * <p>
      * The implementation in {@link ZipRaesDriver} calls
      * {@link #raesParameters}, with which it initializes a new
-     * {@link RaesReadOnlyFile}.
+     * {@link RaesReadOnlyChannel}.
      * Next, if the gross file length of the archive is smaller than or equal
      * to the authentication trigger, the MAC authentication on the cipher
      * text is performed.
-     * Finally, the {@link RaesReadOnlyFile} is passed on to the super
-     * class implementation.
+     * Finally, the {@link RaesReadOnlyChannel} is passed on to the super class
+     * implementation.
      */
     @Override
     public final InputService<ZipDriverEntry>
@@ -175,16 +174,16 @@ public abstract class ZipRaesDriver extends JarDriver {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final ReadOnlyFile rof = input.newReadOnlyFile();
+        final SeekableByteChannel channel = input.newChannel();
         try {
-            final RaesReadOnlyFile rrof = RaesReadOnlyFile.getInstance(
-                    rof, raesParameters(model));
-            if (rrof.length() <= getAuthenticationTrigger()) // compare rrof, not rof!
-                rrof.authenticate();
-            return newInputService(model, rrof);
+            final RaesReadOnlyChannel rchannel = RaesReadOnlyChannel.getInstance(
+                    channel, raesParameters(model));
+            if (rchannel.size() <= getAuthenticationTrigger()) // compare rchannel, not channel!
+                rchannel.authenticate();
+            return newInputService(model, rchannel);
         } catch (final Throwable ex) {
             try {
-                rof.close();
+                channel.close();
             } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }

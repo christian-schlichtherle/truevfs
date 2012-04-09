@@ -12,7 +12,7 @@ import java.nio.file.Path;
 /**
  * @author Christian Schlichtherle
  */
-public final class BufferedReadOnlyChannelIT extends ReadOnlyChannelTestSuite {
+public class BufferedReadOnlyChannelIT extends ReadOnlyChannelITSuite {
 
     @Override
     protected SeekableByteChannel newChannel(Path path) throws IOException {

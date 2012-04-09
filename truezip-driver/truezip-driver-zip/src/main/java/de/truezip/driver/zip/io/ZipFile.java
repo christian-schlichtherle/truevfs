@@ -5,14 +5,16 @@
 package de.truezip.driver.zip.io;
 
 import de.truezip.kernel.io.LockInputStream;
-import de.truezip.kernel.rof.DefaultReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.Pool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
+import static java.nio.file.Files.newByteChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
@@ -43,7 +45,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class ZipFile extends RawZipFile<ZipEntry> {
+public class ZipFile extends RawFile<ZipEntry> {
 
     /** The lock on which this object synchronizes. */
     protected final Lock lock = new ReentrantLock();
@@ -109,31 +111,31 @@ public class ZipFile extends RawZipFile<ZipEntry> {
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new DefaultReadOnlyFilePool(path),
+        super(  new DefaultReadOnlyChannelPool(path),
                 new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = path;
     }
 
     /**
-     * Equivalent to {@link #ZipFile(File, Charset, boolean, boolean)
+     * Equivalent to {@link #ZipFile(Path, Charset, boolean, boolean)
      * ZipFile(file, DEFAULT_CHARSET, true, false)}
      */
-    public ZipFile(File file)
+    public ZipFile(Path file)
     throws IOException {
         this(file, DEFAULT_CHARSET, true, false);
     }
 
     /**
-     * Equivalent to {@link #ZipFile(File, Charset, boolean, boolean)
+     * Equivalent to {@link #ZipFile(Path, Charset, boolean, boolean)
      * ZipFile(file, charset, true, false)}
      */
-    public ZipFile(File file, Charset charset)
+    public ZipFile(Path file, Charset charset)
     throws IOException {
         this(file, charset, true, false);
     }
 
     /**
-     * Opens the given {@link File} for reading its entries.
+     * Opens the given {@code file} for reading its entries.
      *
      * @param file the file.
      * @param charset the charset to use for decoding entry names and ZIP file
@@ -165,38 +167,38 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @see    #recoverLostEntries()
      */
     public ZipFile(
-            final File file,
+            final Path file,
             final Charset charset,
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new DefaultReadOnlyFilePool(file),
+        super(  new DefaultReadOnlyChannelPool(file),
                 new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = file.toString();
     }
 
     /**
-     * Equivalent to {@link #ZipFile(ReadOnlyFile, Charset, boolean, boolean)
+     * Equivalent to {@link #ZipFile(SeekableByteChannel, Charset, boolean, boolean)
      * ZipFile(rof, DEFAULT_CHARSET, true, false)}
      */
-    public ZipFile(ReadOnlyFile rof)
+    public ZipFile(SeekableByteChannel channel)
     throws IOException {
-        this(rof, DEFAULT_CHARSET, true, false);
+        this(channel, DEFAULT_CHARSET, true, false);
     }
 
     /**
-     * Equivalent to {@link #ZipFile(ReadOnlyFile, Charset, boolean, boolean)
+     * Equivalent to {@link #ZipFile(SeekableByteChannel, Charset, boolean, boolean)
      * ZipFile(rof, charset, true, false)}
      */
-    public ZipFile(ReadOnlyFile rof, Charset charset)
+    public ZipFile(SeekableByteChannel channel, Charset charset)
     throws IOException {
-        this(rof, charset, true, false);
+        this(channel, charset, true, false);
     }
 
     /**
-     * Opens the given {@link ReadOnlyFile} for reading its entries.
+     * Opens the given {@link SeekableByteChannel} for reading its entries.
      *
-     * @param rof the random access read only file.
+     * @param channel the channel to read.
      * @param charset the charset to use for decoding entry names and ZIP file
      *        comment.
      * @param preambled if this is {@code true}, then the ZIP file may have a
@@ -226,13 +228,13 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * @see    #recoverLostEntries()
      */
     public ZipFile(
-            ReadOnlyFile rof,
+            SeekableByteChannel channel,
             Charset charset,
             boolean preambled,
             boolean postambled)
     throws IOException {
-        super(rof, new DefaultZipFileParameters(charset, preambled, postambled));
-        this.name = rof.toString();
+        super(channel, new DefaultZipFileParameters(charset, preambled, postambled));
+        this.name = channel.toString();
     }
 
     /**
@@ -241,8 +243,9 @@ public class ZipFile extends RawZipFile<ZipEntry> {
      * Note that this method is <em>not</em> thread-safe!
      */
     @Override
-    public void recoverLostEntries() throws IOException {
+    public ZipFile recoverLostEntries() throws IOException {
         super.recoverLostEntries();
+        return this;
     }
 
     /**
@@ -395,29 +398,29 @@ public class ZipFile extends RawZipFile<ZipEntry> {
     }
 
     /**
-     * A pool which allocates {@link DefaultReadOnlyFile} objects for the
+     * A pool which allocates {@link SeekableByteChannel} objects for the
      * file provided to its constructor.
      */
-    private static final class DefaultReadOnlyFilePool
-    implements Pool<ReadOnlyFile, IOException> {
-        final File file;
+    private static final class DefaultReadOnlyChannelPool
+    implements Pool<SeekableByteChannel, IOException> {
+        final Path file;
 
-        DefaultReadOnlyFilePool(String name) {
-            this(new File(name));
+        DefaultReadOnlyChannelPool(String name) {
+            this(Paths.get(name));
         }
 
-        DefaultReadOnlyFilePool(final File file) {
+        DefaultReadOnlyChannelPool(final Path file) {
             this.file = file;
         }
 
         @Override
-        public ReadOnlyFile allocate() throws IOException {
-            return new DefaultReadOnlyFile(file);
+        public SeekableByteChannel allocate() throws IOException {
+            return newByteChannel(file);
         }
 
         @Override
-        public void release(ReadOnlyFile rof) throws IOException {
-            rof.close();
+        public void release(SeekableByteChannel channel) throws IOException {
+            channel.close();
         }
-    } // DefaultReadOnlyFilePool
+    } // DefaultReadOnlyChannelPool
 }

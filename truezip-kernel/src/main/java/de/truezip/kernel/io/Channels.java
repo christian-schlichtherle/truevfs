@@ -16,7 +16,7 @@ import java.nio.channels.WritableByteChannel;
  * 
  * @author Christian Schlichtherle
  */
-final class Channels {
+public final class Channels {
 
     /** Can't touch this - hammer time! */
     private Channels() { }
@@ -26,7 +26,7 @@ final class Channels {
      * 
      * @param channel the readable byte channel.
      * @return the read byte or -1 on end-of-file.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public static int readByte(final ReadableByteChannel channel)
     throws IOException {
@@ -43,13 +43,13 @@ final class Channels {
      * 
      * @param  channel the channel.
      * @param  buffer the byte buffer to fill with data from the channel.
-     * @throws EOFException on end-of-file.
-     * @throws IOException on any I/O failure.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      */
     public static void readFully(
             final ReadableByteChannel channel,
             final ByteBuffer buffer)
-    throws IOException {
+    throws EOFException, IOException {
         int remaining = buffer.remaining();
         buffer.mark();
         do {
@@ -69,7 +69,7 @@ final class Channels {
      * 
      * @param  channel the channel.
      * @param  buffer the byte buffer with the data to flush to the channel.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     public static void writeFully(
             final WritableByteChannel channel,

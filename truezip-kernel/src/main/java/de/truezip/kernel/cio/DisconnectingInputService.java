@@ -7,8 +7,6 @@ package de.truezip.kernel.cio;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.InputClosedException;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -92,7 +90,7 @@ extends DecoratingInputService<E, InputService<E>> {
      * an {@link InputClosedException}, even if the call to this method fails
      * with an {@link IOException}.
      * 
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     @Override
     public void close() throws IOException {
@@ -121,12 +119,6 @@ extends DecoratingInputService<E, InputService<E>> {
         public SeekableByteChannel newChannel() throws IOException {
             return new DisconnectingSeekableChannel(
                     getBoundSocket().newChannel());
-        }
-
-        @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return new DisconnectingReadOnlyFile(
-                    getBoundSocket().newReadOnlyFile());
         }
     } // Input
 
@@ -223,48 +215,4 @@ extends DecoratingInputService<E, InputService<E>> {
                 channel.close();
         }
     } // DisconnectingSeekableChannel
-
-    private final class DisconnectingReadOnlyFile
-    extends DecoratingReadOnlyFile {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public long length() throws IOException {
-            checkOpenService();
-            return rof.length();
-        }
-
-        @Override
-        public long getFilePointer() throws IOException {
-            checkOpenService();
-            return rof.getFilePointer();
-        }
-
-        @Override
-        public void seek(long pos) throws IOException {
-            checkOpenService();
-            rof.seek(pos);
-        }
-
-        @Override
-        public int read() throws IOException {
-            checkOpenService();
-            return rof.read();
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            checkOpenService();
-            return rof.read(b, off, len);
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (!closed)
-                rof.close();
-        }
-    } // DisconnectingReadOnlyFile
 }

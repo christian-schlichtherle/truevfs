@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.cio;
 
-import de.truezip.kernel.io.SeekableByteChannelOutputStream;
+import de.truezip.kernel.io.ChannelOutputStream;
 import de.truezip.kernel.io.Sink;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,7 +39,7 @@ extends IOSocket<E, Entry> implements Sink {
      * The remote target is {@code null} if and only if this socket is not
      * {@link #connect}ed to another socket.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException On any I/O error.
      */
     // See https://java.net/jira/browse/TRUEZIP-203
     @Override
@@ -96,7 +96,7 @@ extends IOSocket<E, Entry> implements Sink {
      * <p>
      * The implementation in the class {@link OutputSocket} calls
      * {@link #newChannel()} and wraps the result in a
-     * {@link SeekableByteChannelOutputStream} adapter.
+     * {@link ChannelOutputStream} adapter.
      * Note that this may intentionally violate the contract for this method
      * because {@link #newChannel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
@@ -104,7 +104,7 @@ extends IOSocket<E, Entry> implements Sink {
      */
     @Override
     public OutputStream newStream() throws IOException {
-        return new SeekableByteChannelOutputStream(newChannel());
+        return new ChannelOutputStream(newChannel());
     }
 
     /**

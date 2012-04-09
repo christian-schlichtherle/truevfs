@@ -4,10 +4,8 @@
  */
 package de.truezip.kernel.cio;
 
-import de.truezip.kernel.io.SeekableChannelInputStream;
+import de.truezip.kernel.io.ChannelInputStream;
 import de.truezip.kernel.io.Source;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -41,7 +39,7 @@ extends IOSocket<E, Entry> implements Source {
      * The remote target is {@code null} if and only if this socket is not
      * {@link #connect}ed to another socket.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException On any I/O error.
      */
     // See https://java.net/jira/browse/TRUEZIP-203
     @Override
@@ -98,7 +96,7 @@ extends IOSocket<E, Entry> implements Source {
      * <p>
      * The implementation in the class {@link InputSocket} calls
      * {@link #newChannel()} and wraps the result in a
-     * {@link SeekableChannelInputStream} adapter.
+     * {@link ChannelInputStream} adapter.
      * Note that this may intentionally violate the contract for this method
      * because {@link #newChannel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
@@ -106,7 +104,7 @@ extends IOSocket<E, Entry> implements Source {
      */
     @Override
     public InputStream newStream() throws IOException {
-        return new SeekableChannelInputStream(newChannel());
+        return new ChannelInputStream(newChannel());
     }
 
     /**
@@ -120,20 +118,6 @@ extends IOSocket<E, Entry> implements Source {
      */
     @Override
     public SeekableByteChannel newChannel() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Implementations must support calling this method multiple times.
-     *
-     * @throws UnsupportedOperationException the implementation in the class
-     *         {@link InputSocket} <em>always</em> throws an exception of
-     *         this type.
-     */
-    @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

@@ -6,9 +6,7 @@ package de.truezip.kernel.cio;
 
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
-import de.truezip.kernel.rof.ByteArrayReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.SeekableByteBufferChannel;
+import de.truezip.kernel.io.ByteBufferChannel;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -196,21 +194,15 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
         }
 
         @Override
-        public ReadOnlyFile newReadOnlyFile() throws IOException {
+        public InputStream newStream() throws IOException {
             count();
-            return new DataReadOnlyFile();
+            return new DataInputStream();
         }
 
         @Override
         public SeekableByteChannel newChannel() throws IOException {
             count();
             return new DataInputChannel();
-        }
-
-        @Override
-        public InputStream newStream() throws IOException {
-            count();
-            return new DataInputStream();
         }
     } // Input
 
@@ -237,24 +229,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
         }
     } // Output
 
-    private final class DataReadOnlyFile extends ByteArrayReadOnlyFile {
-        boolean closed;
-
-        DataReadOnlyFile() {
-            super(data);
-        }
-
-        @Override
-        public void close() throws IOException {
-            if (closed)
-                return;
-            super.close();
-            times.put(READ, System.currentTimeMillis());
-            closed = true;
-        }
-    } // DataReadOnlyFile
-
-    private final class DataInputChannel extends SeekableByteBufferChannel {
+    private final class DataInputChannel extends ByteBufferChannel {
         boolean closed;
 
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -272,7 +247,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
         }
     } // DataInputChannel
 
-    private final class DataOutputChannel extends SeekableByteBufferChannel {
+    private final class DataOutputChannel extends ByteBufferChannel {
         boolean closed;
 
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")

@@ -5,6 +5,7 @@
 package de.truezip.driver.tar;
 
 import de.truezip.kernel.FsArchiveDriver;
+import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.addr.FsEntryName;
@@ -156,6 +157,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
                     try {
                         is.close();
                     } catch (final Throwable ex2) {
+                        assert !(ex2 instanceof FsControlFlowIOException) : ex;
                         ex.addSuppressed(ex2);
                     }
                 }
@@ -179,7 +181,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * The implementation in the class {@link TarDriver} acquires an output
      * stream from the given socket, forwards the call to
      * {@link #newTarOutputService} and wraps the result in a new
-     * {@link MultiplexedOutputService}.
+     * {@link MultiplexingOutputService}.
      */
     @Override
     public OutputService<TarDriverEntry> newOutputService(
@@ -191,13 +193,14 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             throw new NullPointerException();
         final OutputStream out = output.newStream();
         try {
-            return new MultiplexedOutputService<>(
+            return new MultiplexingOutputService<>(
                     newTarOutputService(model, out, (TarInputService) source),
                     getIOPool());
         } catch (final Throwable ex) {
             try {
                 out.close();
             } catch (final Throwable ex2) {
+                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
                 ex.addSuppressed(ex2);
             }
             throw ex;

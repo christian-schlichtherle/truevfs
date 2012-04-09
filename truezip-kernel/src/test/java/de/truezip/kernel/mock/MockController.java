@@ -14,8 +14,6 @@ import de.truezip.kernel.io.ThrowingOutputStream;
 import de.truezip.kernel.io.ThrowingSeekableChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.rof.ThrowingReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.FileNotFoundException;
@@ -171,14 +169,6 @@ public class MockController extends FsModelController<FsModel> {
                 if (null == buffer)
                     throw new FileNotFoundException(name.toString());
                 return buffer.getInputSocket();
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile()
-            throws IOException {
-                return new ThrowingReadOnlyFile(
-                        getBoundSocket().newReadOnlyFile(),
-                        config.getThrowControl());
             }
 
             @Override

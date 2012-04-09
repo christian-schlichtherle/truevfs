@@ -8,19 +8,18 @@ import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import de.truezip.kernel.cio.ByteArrayIOBuffer;
 import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.IOEntry;
-import de.truezip.kernel.util.ArrayUtils;
-import de.truezip.kernel.util.Maps;
+import static de.truezip.kernel.util.Maps.initialCapacity;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashSet;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * Tests compression of data.
+ * Tests round trip compression of more than 2^16-1 entries
  *
  * @author Christian Schlichtherle
  */
@@ -40,9 +39,9 @@ public final class ManySmallEntriesTest {
     public void testManySmallEntries() throws IOException {
         final IOEntry<?> buffer = new ByteArrayIOBuffer("zip", ZIP_SIZE);
         final byte[] data = DATA_STRING.getBytes(DATA_CHARSET);
-        final HashSet<String> set = new HashSet<>(Maps.initialCapacity(NUM_ENTRIES));
+        final HashSet<String> set = new HashSet<>(initialCapacity(NUM_ENTRIES));
 
-        try (final ZipOutputStream zipOut = new ZipOutputStream(
+        try (final ZipOutputStream zos = new ZipOutputStream(
                buffer.getOutputSocket().newStream())) {
             for (int i = FIRST_ENTRY; i <= LAST_ENTRY; i++) {
                 final String name = Integer.toString(i);
@@ -54,21 +53,22 @@ public final class ManySmallEntriesTest {
                 entry.setCrc(DATA_CRC);
                 entry.setMethod(STORED);
 
-                zipOut.putNextEntry(entry);
-                zipOut.write(data);
+                zos.putNextEntry(entry);
+                zos.write(data);
                 assertTrue(set.add(name));
             }
         }
         assertEquals(ZIP_SIZE, buffer.getSize(Size.STORAGE));
 
-        try (final ZipFile zipIn = new ZipFile(buffer.getInputSocket().newReadOnlyFile())) {
+        try (final ZipFile zf = new ZipFile(buffer.getInputSocket().newChannel())) {
             final byte[] buf = new byte[data.length];
-            for (final Enumeration<? extends ZipEntry> e = zipIn.entries(); e.hasMoreElements(); ) {
+            for (   final Enumeration<? extends ZipEntry> e = zf.entries();
+                    e.hasMoreElements(); ) {
                 final ZipEntry entry = e.nextElement();
 
                 assertEquals(data.length, entry.getSize());
 
-                try (final InputStream in = zipIn.getCheckedInputStream(entry)) {
+                try (final InputStream in = zf.getCheckedInputStream(entry)) {
                     int off = 0;
                     int read;
                     do {
@@ -76,7 +76,8 @@ public final class ManySmallEntriesTest {
                         if (read < 0)
                             break;
                         assertTrue(read > 0);
-                        assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
+                        assertEquals(   ByteBuffer.wrap(data, off, read),
+                                        ByteBuffer.wrap(buf, 0, read));
                         off += read;
                     } while (true);
                     assertEquals(-1, read);

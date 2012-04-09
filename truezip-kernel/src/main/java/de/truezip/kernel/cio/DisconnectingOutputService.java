@@ -90,7 +90,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * an {@link OutputClosedException}, even if the call to this method fails
      * with an {@link IOException}.
      * 
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     @Override
     public void close() throws IOException {

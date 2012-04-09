@@ -6,8 +6,6 @@ package de.truezip.kernel.cio;
 
 import de.truezip.kernel.io.LockInputStream;
 import de.truezip.kernel.io.LockSeekableChannel;
-import de.truezip.kernel.rof.LockReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,19 +140,6 @@ extends DecoratingInputService<E, InputService<E>> {
                     lock.unlock();
                 }
                 return new LockSeekableChannel(channel, lock);
-            }
-
-            @Override
-            @GuardedBy("lock")
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                final ReadOnlyFile rof;
-                lock.lock();
-                try {
-                    rof = getBoundSocket().newReadOnlyFile();
-                } finally {
-                    lock.unlock();
-                }
-                return new LockReadOnlyFile(rof, lock);
             }
         } // Input
 

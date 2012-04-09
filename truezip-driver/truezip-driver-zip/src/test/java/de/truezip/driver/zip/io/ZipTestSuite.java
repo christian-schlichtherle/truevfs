@@ -5,15 +5,18 @@
 package de.truezip.driver.zip.io;
 
 import static de.truezip.driver.zip.io.Constants.FORCE_ZIP64_EXT;
-import de.truezip.kernel.rof.DefaultReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.ArrayUtils;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
 import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
 import de.truezip.kernel.util.Maps;
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
+import static java.nio.file.Files.*;
+import java.nio.file.Path;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.WRITE;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
@@ -50,7 +53,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     }
 
     /** The temporary file to use as a ZIP file. */
-    private File file;
+    private Path file;
     private byte[] data;
 
     /**
@@ -59,16 +62,16 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      * It must also finally call this superclass implementation to create
      * the temporary file to be used as a ZIP file.
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException On any I/O error.
      */
     @Before
     public void setUp() throws IOException {
-        file = File.createTempFile(TEMP_FILE_PREFIX, null);
-        assertTrue(file.delete());
+        file = createTempFile(TEMP_FILE_PREFIX, null);
+        delete(file);
         data = DATA.clone();
     }
 
-    protected final File getZip() {
+    protected final Path getFile() {
         return file;
     }
 
@@ -79,8 +82,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     @After
     public void tearDown() {
         try {
-            if (file.exists() && !file.delete())
-                throw new IOException(file + " (could not delete)");
+            deleteIfExists(file);
         } catch (final IOException ex) {
             logger.log(Level.FINEST,
                     "Failed to clean up test file (this may be just an aftermath):",
@@ -113,221 +115,214 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
     protected ZipFile newZipFile(String name)
     throws IOException {
-        return new ZipFile(name);
+        return new ZipFile(name).recoverLostEntries();
     }
 
     protected ZipFile newZipFile(
             String name, Charset charset)
     throws IOException {
-        return new ZipFile(name, charset);
+        return new ZipFile(name, charset).recoverLostEntries();
     }
 
-    protected ZipFile newZipFile(File file)
+    protected ZipFile newZipFile(Path file)
     throws IOException {
-        return new ZipFile(file);
-    }
-
-    protected ZipFile newZipFile(
-            File file, Charset charset)
-    throws IOException {
-        return new ZipFile(file, charset);
-    }
-
-    protected ZipFile newZipFile(ReadOnlyFile file)
-    throws IOException {
-        return new ZipFile(file);
+        return new ZipFile(file).recoverLostEntries();
     }
 
     protected ZipFile newZipFile(
-            ReadOnlyFile file, Charset charset)
+            Path file, Charset charset)
     throws IOException {
-        return new ZipFile(file, charset);
+        return new ZipFile(file, charset).recoverLostEntries();
+    }
+
+    protected ZipFile newZipFile(SeekableByteChannel channel)
+    throws IOException {
+        return new ZipFile(channel).recoverLostEntries();
+    }
+
+    protected ZipFile newZipFile(
+            SeekableByteChannel channel, Charset charset)
+    throws IOException {
+        return new ZipFile(channel, charset).recoverLostEntries();
     }
 
     @Test
     public final void testConstructors() throws Exception {
-        try (final OutputStream os = new FileOutputStream(file)) {
-            os.write(data);
+        write(file, data);
+
+        try (final SeekableByteChannel channel = newByteChannel(file)) {
+            try {
+                newZipOutputStream(null, (Charset) null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipOutputStream(null, (ZipFile) null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipOutputStream(new ByteArrayOutputStream(), (Charset) null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipOutputStream(new ByteArrayOutputStream(), (ZipFile) null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipOutputStream(null, Charset.forName("UTF-8"));
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((String) null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((String) null, null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((String) null, Charset.forName("UTF-8"));
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile(file, null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((Path) null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((Path) null, null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((Path) null, Charset.forName("UTF-8"));
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile(file, null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((SeekableByteChannel) null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((SeekableByteChannel) null, null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile((SeekableByteChannel) null, Charset.forName("UTF-8"));
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile(channel, null);
+                fail();
+            } catch (NullPointerException ex) {
+            }
+
+            try {
+                newZipFile(file);
+                fail();
+            } catch (IOException ex) {
+            }
+
+            try {
+                newZipFile(file);
+                fail();
+            } catch (IOException ex) {
+            }
+
+            try {
+                newZipFile(channel);
+                fail();
+            } catch (IOException ex) {
+            }
+
+            try {
+                newZipFile(file, Charset.forName("UTF-8"));
+                fail();
+            } catch (IOException ex) {
+            }
+
+            try {
+                newZipFile(channel, Charset.forName("UTF-8"));
+                fail();
+            } catch (IOException ex) {
+            }
         }
-
-        final ReadOnlyFile rof = new DefaultReadOnlyFile(file);
-
-        try {
-            newZipOutputStream(null, (Charset) null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipOutputStream(null, (ZipFile) null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipOutputStream(new ByteArrayOutputStream(), (Charset) null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipOutputStream(new ByteArrayOutputStream(), (ZipFile) null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipOutputStream(null, Charset.forName("UTF-8"));
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((String) null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((String) null, null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((String) null, Charset.forName("UTF-8"));
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile(file.getPath(), null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((File) null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((File) null, null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((File) null, Charset.forName("UTF-8"));
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile(file, null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((ReadOnlyFile) null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((ReadOnlyFile) null, null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile((ReadOnlyFile) null, Charset.forName("UTF-8"));
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile(rof, null);
-            fail();
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            newZipFile(file.getPath());
-            fail();
-        } catch (IOException ex) {
-        }
-
-        try {
-            newZipFile(file);
-            fail();
-        } catch (IOException ex) {
-        }
-
-        try {
-            newZipFile(rof);
-            fail();
-        } catch (IOException ex) {
-        }
-
-        try {
-            newZipFile(file, Charset.forName("UTF-8"));
-            fail();
-        } catch (IOException ex) {
-        }
-
-        try {
-            newZipFile(rof, Charset.forName("UTF-8"));
-            fail();
-        } catch (IOException ex) {
-        }
-
-        rof.close();
-        assertTrue(file.delete());
+        delete(file);
     }
 
     @Test
     public final void testPreambleOfEmptyZipFile() throws IOException {
         // Create empty ZIP file.
-        newZipOutputStream(new FileOutputStream(file)).close();
+        newZipOutputStream(newOutputStream(file)).close();
 
-        try (final ZipFile zipIn = newZipFile(file)) {
-            assertEquals(0, zipIn.getPreambleLength());
-            final InputStream in = zipIn.getPreambleInputStream();
-            try {
+        try (final ZipFile zf = newZipFile(file)) {
+            assertEquals(0, zf.getPreambleLength());
+            try (final InputStream in = zf.getPreambleInputStream()) {
                 assertEquals(-1, in.read());
-            } finally {
-                in.close();
             }
         }
     }
 
     @Test
     public final void testGetInputStream() throws IOException {
-        try (final ZipOutputStream zipOut = newZipOutputStream(new FileOutputStream(file))) {
-            zipOut.putNextEntry(newEntry("foo"));
+        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+            zos.putNextEntry(newEntry("foo"));
         }
 
-        try (final ZipFile zipIn = newZipFile(file)) {
-            zipIn.getInputStream("foo").close();
-            assertNull(zipIn.getInputStream("bar"));
+        try (final ZipFile zf = newZipFile(file)) {
+            zf.getInputStream("foo").close();
+            assertNull(zf.getInputStream("bar"));
         }
     }
 
     @Test
     public final void testWriteAndReadSingleBytes() throws IOException {
-        try (final ZipOutputStream zipOut = newZipOutputStream(new FileOutputStream(file))) {
-            zipOut.putNextEntry(newEntry("file"));
+        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+            zos.putNextEntry(newEntry("file"));
             for (int i = 0; i < data.length; i++)
-                zipOut.write(data[i]);
+                zos.write(data[i]);
         }
 
-        try (   final ZipFile zipIn = newZipFile(file);
-                final InputStream in = zipIn.getInputStream("file")) {
-            for (int i = 0, c; (c = in.read()) != -1; i++)
-                assertEquals(data[i] & 0xFF, c);
+        try (   final ZipFile zf = newZipFile(file);
+                final InputStream in = zf.getInputStream("file")) {
+            for (int c, i = 0; 0 <= (c = in.read()); i++)
+                assertEquals(data[i] & 0xff, c);
         }
     }
 
@@ -349,55 +344,49 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     throws Exception {
         createTestZipFile(nEntries);
 
-        final ZipFile zin = newZipFile(file);
-
-        class CheckAllEntriesFactory implements TaskFactory {
-            @Override
-            public Callable<?> newTask(int threadNum) {
-                return new CheckAllEntries();
-            }
-
-            class CheckAllEntries implements Callable<Void> {
+        try (final ZipFile zf = newZipFile(file)) {
+            final class CheckAllEntriesFactory implements TaskFactory {
                 @Override
-                public Void call() throws IOException {
-                    // Retrieve list of entries and shuffle their order.
-                    @SuppressWarnings("unchecked")
-                    final List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) zin.entries());
-                    assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
-                    Collections.shuffle(entries, rnd);
-
-                    // Now read in the entries in the shuffled order.
-                    final byte[] buf = new byte[data.length];
-                    for (final ZipEntry entry : entries) {
-                        // Read full entry and check the contents.
-                        final InputStream in = zin.getInputStream(entry.getName());
-                        try {
-                            int off = 0;
-                            int read;
-                            while (true) {
-                                read = in.read(buf);
-                                if (read < 0)
-                                    break;
-                                assertTrue(read > 0);
-                                assertTrue(ArrayUtils.equals(data, off, buf, 0, read));
-                                off += read;
-                            }
-                            assertEquals(-1, read);
-                            assertEquals(off, data.length);
-                            assertTrue(0 >= in.read(new byte[0]));
-                        } finally {
-                            in.close();
-                        }
-                    }
-                    return null;
+                public Callable<?> newTask(int threadNum) {
+                    return new CheckAllEntries();
                 }
-            } // CheckAllEntries
-        } // CheckAllEntriesFactory
 
-        try {
+                final class CheckAllEntries implements Callable<Void> {
+                    @Override
+                    public Void call() throws IOException {
+                        // Retrieve list of entries and shuffle their order.
+                        @SuppressWarnings("unchecked")
+                        final List<ZipEntry> entries = Collections.list((Enumeration<ZipEntry>) zf.entries());
+                        assert entries.size() == nEntries; // this would be a programming error in the test class itself - not the class under test!
+                        Collections.shuffle(entries, rnd);
+
+                        // Now read in the entries in the shuffled order.
+                        final byte[] buf = new byte[data.length];
+                        for (final ZipEntry entry : entries) {
+                            // Read full entry and check the contents.
+                            try (final InputStream in = zf.getInputStream(entry.getName())) {
+                                int off = 0;
+                                int read;
+                                while (true) {
+                                    read = in.read(buf);
+                                    if (read < 0)
+                                        break;
+                                    assertTrue(read > 0);
+                                    assertEquals(   ByteBuffer.wrap(data, off, read),
+                                                    ByteBuffer.wrap(buf, 0, read));
+                                    off += read;
+                                }
+                                assertEquals(-1, read);
+                                assertEquals(off, data.length);
+                                assertTrue(0 >= in.read(new byte[0]));
+                            }
+                        }
+                        return null;
+                    }
+                } // CheckAllEntries
+            } // CheckAllEntriesFactory
+
             runConcurrent(nThreads, new CheckAllEntriesFactory()).join();
-        } finally {
-            zin.close();
         }
     }
 
@@ -409,18 +398,18 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         final HashSet<String>
                 set = new HashSet<>(Maps.initialCapacity(nEntries));
 
-        try (final ZipOutputStream zout = newZipOutputStream(new FileOutputStream(file))) {
+        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
             for (int i = 0; i < nEntries; i++) {
                 String name = i + ".txt";
-                zout.putNextEntry(newEntry(name));
-                zout.write(data);
+                zos.putNextEntry(newEntry(name));
+                zos.write(data);
                 assertTrue(set.add(name));
             }
         }
 
-        try (final ZipFile zin = newZipFile(file)) {
-            // Check that zipIn correctly enumerates all entries.
-            for (ZipEntry entry : zin) {
+        try (final ZipFile zf = newZipFile(file)) {
+            // Check that zf correctly enumerates all entries.
+            for (ZipEntry entry : zf) {
                 assertEquals(data.length, entry.getSize());
                 assertTrue(set.remove(entry.getName()));
             }
@@ -432,17 +421,17 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     public final void testGoodGetCheckedInputStream() throws IOException {
         // Create test ZIP file.
         final String name = "entry";
-        try (final ZipOutputStream zipOut = newZipOutputStream(new FileOutputStream(file))) {
-            zipOut.putNextEntry(newEntry(name));
-            zipOut.write(data);
+        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+            zos.putNextEntry(newEntry(name));
+            zos.write(data);
         }
 
-        try (final ZipFile zipIn = newZipFile(file)) {
-            InputStream in = zipIn.getCheckedInputStream(name);
+        try (final ZipFile zf = newZipFile(file)) {
+            InputStream in = zf.getCheckedInputStream(name);
             in.close();
 
             // Open checked input stream and read fully, using multiple methods.
-            in = zipIn.getCheckedInputStream(name);
+            in = zf.getCheckedInputStream(name);
             final int n = data.length / 4;
             in.skip(n);
             in.read(new byte[n]);
@@ -461,7 +450,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      * with RAES encrypted ZIP files) and may easily break if the
      * ZipOutputStream class changes its implementation!
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException On any I/O error.
      */
     @Test
     public void testBadGetCheckedInputStream() throws IOException {
@@ -471,10 +460,9 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         for (int i = 0; i < 4; i++) {
             // Create test ZIP file.
             final String name = "entry";
-            try (final ZipOutputStream zipOut = newZipOutputStream(
-                   new FileOutputStream(file))) {
-                zipOut.putNextEntry(newEntry(name));
-                zipOut.write(data);
+            try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+                zos.putNextEntry(newEntry(name));
+                zos.write(data);
             }
 
             final boolean tweakDD = (i & 1) != 0;
@@ -482,38 +470,37 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
             // Modify ZIP file to contain an incorrect CRC32 value in the
             // Central File Header.
-            final byte[] crc = new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF };
-            try (final RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+            final ByteBuffer crc = ByteBuffer.wrap(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF });
+            try (final SeekableByteChannel channel = newByteChannel(file, WRITE)) {
                 if (tweakDD) {
-                    raf.seek(raf.length() - 57 - 28); // CRC-32 position in Data Descriptor
-                    raf.write(crc);
+                    channel.position(channel.size() - 57 - 28); // CRC-32 position in Data Descriptor
+                    channel.write(crc);
                 }
                 if (tweakCFH) {
-                    raf.seek(raf.length() - 57); // CRC-32 position in Central File Header
-                    raf.write(crc);
+                    channel.position(channel.size() - 57); // CRC-32 position in Central File Header
+                    channel.write(crc);
                 }
             }
 
-            try (final ZipFile zipIn = new ZipFile(file)) {
+            try (final ZipFile zf = new ZipFile(file)) {
                 try {
-                    InputStream in = zipIn.getCheckedInputStream(name);
-                    if (tweakDD ^ tweakCFH)
-                        fail("Expected CRC32Exception!");
-
                     // Open checked input stream and join immediately.
-                    in.close();
+                    try (final InputStream in = zf.getCheckedInputStream(name)) {
+                        if (tweakDD ^ tweakCFH)
+                            fail("Expected CRC32Exception!");
+                    }
                     if (tweakDD & tweakCFH)
                         fail("Expected CRC32Exception!");
-                } catch (CRC32Exception ex) {
+                } catch (Crc32Exception ex) {
                     assertTrue(tweakDD | tweakCFH);
                 }
 
                 try {
-                    try (final InputStream in = zipIn.getCheckedInputStream(name)) {
+                    // Open checked input stream and read fully, using multiple methods.
+                    try (final InputStream in = zf.getCheckedInputStream(name)) {
                         if (tweakDD ^ tweakCFH)
                             fail("Expected CRC32Exception!");
 
-                        // Open checked input stream and read fully, using multiple methods.
                         final int n = data.length / 4;
                         in.skip(n);
                         in.read(new byte[n]);
@@ -521,10 +508,9 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
                         while (in.read() != -1) { // read until EOF
                         }
                     }
-
                     if (tweakDD & tweakCFH)
                         fail("Expected CRC32Exception!");
-                } catch (CRC32Exception ex) {
+                } catch (Crc32Exception ex) {
                     assertTrue(tweakDD | tweakCFH);
                 }
             }
@@ -537,7 +523,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      * Note that this may work with plain ZIP files only (e.g. not
      * with RAES encrypted ZIP files).
      * 
-     * @throws IOException On any I/O failure.
+     * @throws IOException On any I/O error.
      */
     @Test
     public void testAppending() throws IOException {
@@ -550,17 +536,15 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         append(0, 20, data1);
         append(10, 20, data2);
 
-        final ZipFile zipIn = newZipFile(file);
-        assertEquals(30, zipIn.size());
-        try {
-            // Check that zipIn correctly enumerates all entries.
+        try (final ZipFile zf = newZipFile(file)) {
+            assertEquals(30, zf.size());
+            // Check that zf correctly enumerates all entries.
             final byte[] buf = new byte[data1.length];
             for (int i = 0; i < 30; i++) {
                 final String name = i + ".txt";
-                final ZipEntry entry = zipIn.getEntry(name);
+                final ZipEntry entry = zf.getEntry(name);
                 assertEquals(data1.length, entry.getSize());
-                final InputStream in = zipIn.getInputStream(name);
-                try {
+                try (final InputStream in = zf.getInputStream(name)) {
                     int off = 0;
                     int read;
                     do {
@@ -572,12 +556,8 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
                     } while (off < buf.length);
                     assertEquals(-1, in.read());
                     assertTrue(Arrays.equals(i < 10 ? data1 : data2, buf));
-                } finally {
-                    in.close();
                 }
             }
-        } finally {
-            zipIn.close();
         }
     }
 
@@ -586,22 +566,22 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
             final int len,
             final byte[] data)
     throws IOException {
-        final ZipOutputStream out;
-        if (file.exists()) {
-            final ZipFile in = newZipFile(file);
-            in.close();
-            out = newZipOutputStream(new FileOutputStream(file, true), in);
+        final ZipOutputStream zos;
+        if (exists(file)) {
+            final ZipFile zf = newZipFile(file);
+            zf.close();
+            zos = newZipOutputStream(newOutputStream(file, APPEND), zf);
         } else {
-            out = newZipOutputStream(new FileOutputStream(file));
+            zos = newZipOutputStream(newOutputStream(file));
         }
         try {
             for (int i = 0; i < len; i++) {
                 final String name = off + i + ".txt";
-                out.putNextEntry(newEntry(name));
-                out.write(data);
+                zos.putNextEntry(newEntry(name));
+                zos.write(data);
             }
         } finally {
-            out.close();
+            zos.close();
         }
     }
 }
