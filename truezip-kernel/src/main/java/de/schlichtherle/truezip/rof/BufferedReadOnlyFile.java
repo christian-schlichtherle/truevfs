@@ -208,7 +208,7 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
 	    throw new IndexOutOfBoundsException();
 
         // Read of buffer data.
-        int total = 0; // amount of data copied to buf
+        int total = 0; // amount of data copied to dst
         final int bufferSize = buffer.length;
         while (total < remaining && pos < length) {
             positionBuffer();
