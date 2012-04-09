@@ -151,10 +151,10 @@ extends FsDriver {
      * {@code model.getParent().equals(parent.getModel())} is {@code true}.
      */
     @Override
-    public final FsController<?>
-    newController(  FsManager manager,
-                    FsModel model,
-                    @Nonnull FsController<?> parent) {
+    public final FsController<?> newController(
+            FsManager manager,
+            FsModel model,
+            @Nonnull FsController<?> parent) {
         assert parent.getModel().equals(model.getParent());
         return manager.newController(this, model, parent);
     }
@@ -177,10 +177,128 @@ extends FsDriver {
     }
 
     /**
+     * This method gets called by an archive controller in order to create a
+     * new input service for its target archive file.
+     * <p>
+     * The implementation in {@link FsArchiveDriver} simply forwards the call
+     * to {@link #getInputSocket}
+     * and {@link #newInputService(FsModel, InputSocket)}.
+     * 
+     * @param  model the file system model for the target archive file.
+     * @param  parent the controller for the parent file system with the target
+     *         archive file.
+     * @param  entry the entry name of the target archive file in the parent
+     *         file system.
+     * @param  options the options to use when accessing the target archive
+     *         file.
+     * @return A new input service for reading the target archive file.
+     *         Note that this service does <em>not</em> need to be thread-safe!
+     * @throws IOException on any I/O error.
+     *         If the file system entry for the given model exists in the
+     *         parent file system and is <em>not</em> a {@link Type#SPECIAL}
+     *         type, then this exception is deemed to indicate a
+     *         <em>persistent false positive</em> archive file and gets cached
+     *         until the file system controller for the given model is
+     *         {@linkplain FsController#sync(BitField, de.truezip.kernel.util.ExceptionHandler) synced}
+     *         again.
+     *         Otherwise, this exception is deemed to indicate a
+     *         <em>transient false positive</em> archive file and does not
+     *         get cached.
+     */
+    @CreatesObligation
+    public InputService<E> newInputService(
+            FsModel model,
+            FsController<?> parent,
+            FsEntryName entry,
+            BitField<FsAccessOption> options)
+    throws IOException {
+        return newInputService(model,
+                getInputSocket(parent, entry, options));
+    }
+
+    /**
+     * Creates a new input service for reading the archive entries for the
+     * given {@code model} from the given {@code input} socket's target.
+     * 
+     * @param  model the file system model.
+     * @param  input the input socket for reading the contents of the
+     *         archive file from its target.
+     * @return A new input service.
+     *         Note that this service does <em>not</em> need to be thread-safe!
+     * @throws IOException on any I/O error.
+     * @see    #newInputService(FsModel, FsController, FsEntryName, BitField) 
+     */
+    @CreatesObligation
+    protected abstract InputService<E> newInputService(
+            FsModel model,
+            InputSocket<?> input)
+    throws IOException;
+
+    /**
+     * This method gets called by an archive controller in order to create a
+     * new output service for its target archive file.
+     * <p>
+     * The implementation in {@link FsArchiveDriver} simply forwards the call
+     * to {@link #getOutputSocket}
+     * and {@link #newOutputService(FsModel, InputService, OutputSocket)}.
+     * 
+     * @param  model the file system model for the target archive file.
+     * @param  source the nullable {@link InputService} for the target archive
+     *         file.
+     *         If not {@code null}, then the target archive file is going to
+     *         get updated.
+     *         This parameter is guaranteed to be the product of this driver's
+     *         factory method
+     *         {@link #newInputService(FsModel, FsController, FsEntryName, BitField)}.
+     * @param  parent the controller for the parent file system with the target
+     *         archive file.
+     * @param  entry the entry name of the target archive file in the parent
+     *         file system.
+     * @param  options the options to use when accessing the target archive
+     *         file.
+     *         These may get modified as required by overridding this method
+     *         or {@link #getInputSocket}. 
+     * @return A new output service for writing the target archive file.
+     *         Note that this service does <em>not</em> need to be thread-safe!
+     * @throws IOException on any I/O error.
+     */
+    @CreatesObligation
+    public OutputService<E> newOutputService(
+            FsModel model,
+            @CheckForNull @WillNotClose InputService<E> source,
+            FsController<?> parent,
+            FsEntryName entry,
+            BitField<FsAccessOption> options)
+    throws IOException {
+        return newOutputService(model, source,
+                getOutputSocket(parent, entry, options));
+    }
+
+    /**
+     * Creates a new output service for writing archive entries for the
+     * given {@code model} to the given {@code output} socket's target.
+     * 
+     * @param  model the file system model.
+     * @param  source the nullable {@link InputService}.
+     * @param  output the output socket for writing the contents of the
+     *         archive file to its target.
+     * @return A new output service for writing the target archive file.
+     *         Note that this service does <em>not</em> need to be thread-safe!
+     * @throws IOException on any I/O error.
+     * @see    #newOutputService(FsModel, InputService, FsController, FsEntryName, BitField) 
+     */
+    @CreatesObligation
+    protected abstract OutputService<E> newOutputService(
+            FsModel model,
+            @CheckForNull @WillNotClose InputService<E> source,
+            OutputSocket<?> output)
+    throws IOException;
+
+    /**
      * Called to prepare reading an archive file artifact of this driver from
      * {@code name} in {@code controller} using {@code options}.
      * <p>
-     * This method may get overridden in order to modify the given options
+     * This method is overridable to enable modifying the given options
      * before forwarding the call to the given controller.
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
@@ -190,50 +308,21 @@ extends FsDriver {
      * @param  name the entry name.
      * @param  options the options to use.
      * @return An input socket for reading an artifact of this driver.
+     * @see    #newInputService(FsModel, FsController, FsEntryName, BitField) 
      */
-    public InputSocket<?> getInputSocket(   FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsAccessOption> options) {
+    protected InputSocket<?> getInputSocket(
+            FsController<?> controller,
+            FsEntryName name,
+            BitField<FsAccessOption> options) {
         return controller.getInputSocket(name, options);
     }
-
-    /**
-     * Creates a new input service for reading the archive entries for the
-     * given {@code model} from the given {@code input} socket's target.
-     * <p>
-     * Note that the returned input service does <em>not</em> need to be
-     * thread-safe.
-     * 
-     * @param  model the file system model.
-     * @param  input the input socket for reading the contents of the
-     *         archive file from its target.
-     *         This is guaranteed to be the product of this driver's
-     *         {@link #getInputSocket} method.
-     * @return A new input service.
-     * @throws IOException on any I/O error.
-     *         If the file system entry for the given model exists in the
-     *         parent file system and is <em>not</em> a {@link Type#SPECIAL}
-     *         type, then this exception is deemed to indicate a
-     *         <em>persistent false positive</em> archive file and gets cached
-     *         until the file system controller for the given model is
-     *         {@linkplain FsController#sync(de.truezip.kernel.util.BitField, de.truezip.kernel.util.ExceptionHandler) synced}
-     *         again.
-     *         Otherwise, this exception is deemed to indicate a
-     *         <em>transient false positive</em> archive file and does not
-     *         get cached.
-     */
-    @CreatesObligation
-    public abstract InputService<E>
-    newInputService(FsModel model,
-                    InputSocket<?> input)
-    throws IOException;
 
     /**
      * Called to prepare writing an archive file artifact of this driver to
      * the entry {@code name} in {@code controller} using {@code options} and
      * the nullable {@code template}.
      * <p>
-     * This method may get overridden in order to modify the given options
+     * This method is overridable to enable modifying the given options
      * before forwarding the call to the given controller.
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
@@ -242,44 +331,15 @@ extends FsDriver {
      *         driver.
      * @param  name the entry name.
      * @param  options the options to use.
-     * @param  template the template to use.
      * @return An output socket for writing an artifact of this driver.
+     * @see    #newOutputService(FsModel, InputService, FsController, FsEntryName, BitField) 
      */
-    public OutputSocket<?> getOutputSocket( FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsAccessOption> options,
-                                            @CheckForNull Entry template) {
-        return controller.getOutputSocket(name, options, template);
+    protected OutputSocket<?> getOutputSocket(
+            FsController<?> controller,
+            FsEntryName name,
+            BitField<FsAccessOption> options) {
+        return controller.getOutputSocket(name, options, null);
     }
-
-    /**
-     * Creates a new output service for writing archive entries for the
-     * given {@code model} to the given {@code output} socket's target.
-     * <p>
-     * Note that the returned output service does <em>not</em> need to be
-     * thread-safe.
-     * 
-     * @param  model the file system model.
-     * @param  output the output socket for writing the contents of the
-     *         archive file to its target.
-     *         This is guaranteed to be the product of this driver's
-     *         {@link #getOutputSocket} method.
-     * @param  source the {@link InputService} if {@code archive} is going to
-     *         get updated.
-     *         If not {@code null}, this is guaranteed to be the product
-     *         of this driver's {@link #newInputService} factory method.
-     *         This feature could get used to copy some meta data which is
-     *         specific to the type of archive this driver supports,
-     *         e.g. the comment of a ZIP file.
-     * @return A new output service.
-     * @throws IOException on any I/O error.
-     */
-    @CreatesObligation
-    public abstract OutputService<E>
-    newOutputService(   FsModel model,
-                        OutputSocket<?> output,
-                        @CheckForNull @WillNotClose InputService<E> source)
-    throws IOException;
 
     /**
      * Equivalent to {@link #newEntry(java.lang.String, de.truezip.kernel.cio.Entry.Type, de.truezip.kernel.cio.Entry, de.truezip.kernel.util.BitField)

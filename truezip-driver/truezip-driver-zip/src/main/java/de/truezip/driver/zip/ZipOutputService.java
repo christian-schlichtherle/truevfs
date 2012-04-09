@@ -50,10 +50,11 @@ implements OutputService<ZipDriverEntry> {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ZipOutputService(final ZipDriver driver,
-                            final FsModel model,
-                            final @WillCloseWhenClosed OutputStream out,
-                            final @CheckForNull @WillNotClose ZipInputService source)
+    public ZipOutputService(
+            final ZipDriver driver,
+            final FsModel model,
+            final @CheckForNull @WillNotClose ZipInputService source,
+            final @WillCloseWhenClosed OutputStream out)
     throws IOException {
         super(  out,
                 null != source && source.isAppendee() ? source : null,

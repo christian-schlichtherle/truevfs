@@ -12,6 +12,8 @@ import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputService;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -54,11 +56,11 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      * written entries.
      */
     @Override
-    protected OutputService<ZipDriverEntry> newOutputService(
+    protected final OutputService<ZipDriverEntry> newOutputService(
             FsModel model,
-            OutputStream out,
-            ZipInputService source)
+            @CheckForNull @WillNotClose ZipInputService source,
+            OutputStream out)
     throws IOException {
-        return new ZipOutputService(this, model, out, source);
+        return new ZipOutputService(this, model, source, out);
     }
 }

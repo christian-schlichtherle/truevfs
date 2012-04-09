@@ -4,18 +4,16 @@
  */
 package de.truezip.driver.tar;
 
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.STORE;
 import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
 import de.truezip.kernel.FsEntryName;
-import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.STORE;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
@@ -63,18 +61,6 @@ public class TarBZip2Driver extends TarDriver {
         return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
     }
 
-    /**
-     * Sets {@link FsAccessOption#STORE} in {@code options} before
-     * forwarding the call to {@code controller}.
-     */
-    @Override
-    public OutputSocket<?> getOutputSocket( FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsAccessOption> options,
-                                            @CheckForNull Entry template) {
-        return controller.getOutputSocket(name, options.set(STORE), template);
-    }
-
     @Override
     protected TarInputService newTarInputService(
             final FsModel model, final InputStream in)
@@ -95,6 +81,18 @@ public class TarBZip2Driver extends TarDriver {
                     new BufferedOutputStream(out, getBufferSize()),
                     getLevel()),
                 source);
+    }
+
+    /**
+     * Sets {@link FsAccessOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    protected OutputSocket<?> getOutputSocket(
+            FsController<?> controller,
+            FsEntryName name,
+            BitField<FsAccessOption> options) {
+        return controller.getOutputSocket(name, options.set(STORE), null);
     }
 
     private static final class BZip2CompressorOutputStream

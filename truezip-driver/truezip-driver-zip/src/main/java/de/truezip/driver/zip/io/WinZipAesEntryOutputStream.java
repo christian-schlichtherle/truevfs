@@ -60,8 +60,8 @@ final class WinZipAesEntryOutputStream extends DecoratingOutputStream {
     private LittleEndianOutputStream leos;
 
     WinZipAesEntryOutputStream(
-            final LittleEndianOutputStream leos,
-            final WinZipAesEntryParameters param)
+            final WinZipAesEntryParameters param,
+            final LittleEndianOutputStream leos)
     throws IOException {
         super(leos);
         assert null != leos;

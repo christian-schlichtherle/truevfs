@@ -4,22 +4,20 @@
  */
 package de.truezip.driver.tar;
 
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.STORE;
 import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
 import de.truezip.kernel.FsEntryName;
-import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.STORE;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -66,18 +64,6 @@ public class TarGZipDriver extends TarDriver {
         return Deflater.BEST_COMPRESSION;
     }
 
-    /**
-     * Sets {@link FsAccessOption#STORE} in {@code options} before
-     * forwarding the call to {@code controller}.
-     */
-    @Override
-    public OutputSocket<?> getOutputSocket( FsController<?> controller,
-                                            FsEntryName name,
-                                            BitField<FsAccessOption> options,
-                                            @CheckForNull Entry template) {
-        return controller.getOutputSocket(name, options.set(STORE), template);
-    }
-
     @Override
     protected TarInputService newTarInputService(FsModel model, InputStream in)
     throws IOException {
@@ -94,6 +80,18 @@ public class TarGZipDriver extends TarDriver {
         return super.newTarOutputService(model,
                 new GZIPOutputStream(out, getBufferSize(), getLevel()),
                 source);
+    }
+
+    /**
+     * Sets {@link FsAccessOption#STORE} in {@code options} before
+     * forwarding the call to {@code controller}.
+     */
+    @Override
+    protected OutputSocket<?> getOutputSocket(
+            FsController<?> controller,
+            FsEntryName name,
+            BitField<FsAccessOption> options) {
+        return controller.getOutputSocket(name, options.set(STORE), null);
     }
 
     /** Extends its super class to set the deflater level. */

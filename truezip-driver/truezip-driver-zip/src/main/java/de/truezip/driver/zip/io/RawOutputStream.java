@@ -912,12 +912,12 @@ implements Iterable<E> {
             if (suppressCrc) {
                 final long crc = entry.getCrc();
                 entry.setRawCrc(0);
-                this.out = new WinZipAesEntryOutputStream(
-                        (LittleEndianOutputStream) method.start(), entryParam);
+                this.out = new WinZipAesEntryOutputStream(entryParam,
+                        (LittleEndianOutputStream) method.start());
                 entry.setCrc(crc);
             } else {
-                this.out = new WinZipAesEntryOutputStream(
-                        (LittleEndianOutputStream) method.start(), entryParam);
+                this.out = new WinZipAesEntryOutputStream(entryParam,
+                        (LittleEndianOutputStream) method.start());
             }
             return this.out;
         }

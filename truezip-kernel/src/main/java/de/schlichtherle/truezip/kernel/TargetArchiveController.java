@@ -4,12 +4,15 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsControlFlowIOException;
 import static de.schlichtherle.truezip.kernel.ArchiveFileSystem.newEmptyFileSystem;
 import static de.schlichtherle.truezip.kernel.ArchiveFileSystem.newPopulatedFileSystem;
-import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsAccessOption.CACHE;
+import static de.truezip.kernel.FsAccessOption.GROW;
+import static de.truezip.kernel.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import static de.truezip.kernel.FsEntryName.ROOT;
+import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
+import de.truezip.kernel.*;
 import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
@@ -23,13 +26,6 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.OutputClosedException;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.CACHE;
-import static de.truezip.kernel.FsAccessOption.GROW;
-import static de.truezip.kernel.FsAccessOptions.ACCESS_PREFERENCES_MASK;
-import de.truezip.kernel.FsSyncOption;
-import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
-import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -59,7 +55,7 @@ final class TargetArchiveController<E extends FsArchiveEntry>
 extends FileSystemArchiveController<E> {
 
     private static final BitField<FsAccessOption>
-            MOUNT_INPUT_OPTIONS = BitField.of(FsAccessOption.CACHE);
+            MOUNT_OPTIONS = BitField.of(FsAccessOption.CACHE);
 
     private final FsArchiveDriver<E> driver;
     
@@ -201,11 +197,16 @@ extends FileSystemArchiveController<E> {
                 // could be a FileController and on Windows this property changes
                 // to TRUE once a file is opened for reading!
                 final boolean ro = !parent.isWritable(name);
-                final InputSocket<?> is = driver.getInputSocket(
-                        parent, name, MOUNT_INPUT_OPTIONS);
-                final InputArchive<E> ia = new InputArchive<>(
-                        driver.newInputService(getModel(), is));
-                fs = newPopulatedFileSystem(driver, ia.getArchive(), pe, ro);
+                final FsModel m = getModel();
+                final InputService<E> is;
+                try {
+                    is = driver.newInputService(m, parent, name, MOUNT_OPTIONS);
+                } catch (final FsControlFlowIOException ex) {
+                    assert ex instanceof NeedsLockRetryException;
+                    throw ex;
+                }
+                final InputArchive<E> ia = new InputArchive<>(is);
+                fs = newPopulatedFileSystem(driver, is, pe, ro);
                 setInputArchive(ia);
             } catch (final FsControlFlowIOException ex) {
                 assert ex instanceof NeedsLockRetryException;
@@ -241,20 +242,21 @@ extends FileSystemArchiveController<E> {
         OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
             return oa;
+        final InputArchive<E> ia = getInputArchive();
+        final InputService<E> is = null == ia ? null : ia.getDriverProduct();
+        final FsModel m = getModel();
         final BitField<FsAccessOption> options = getContext()
                 .getOutputOptions()
                 .and(ACCESS_PREFERENCES_MASK)
                 .set(CACHE);
-        final OutputSocket<?> os = driver.getOutputSocket(
-                parent, name, options, null);
-        final InputArchive<E> ia = getInputArchive();
+        final OutputService<E> os;
         try {
-            oa = new OutputArchive<>(driver.newOutputService(
-                    getModel(), os, null == ia ? null : ia.getArchive()));
+            os = driver.newOutputService(m, is, parent, name, options);
         } catch (final FsControlFlowIOException ex) {
             assert ex instanceof NeedsLockRetryException;
             throw ex;
         }
+        oa = new OutputArchive<>(os);
         setOutputArchive(oa);
         return oa;
     }
@@ -655,7 +657,7 @@ extends FileSystemArchiveController<E> {
          * Publishes the product of the archive driver this input archive is
          * decorating.
          */
-        InputService<E> getArchive() {
+        InputService<E> getDriverProduct() {
             assert !isClosed();
             return archive;
         }
