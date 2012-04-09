@@ -4,6 +4,7 @@
  */
 package de.truezip.driver.tar;
 
+import static de.truezip.kernel.FsAccessOption.CACHE;
 import static de.truezip.kernel.FsAccessOption.COMPRESS;
 import de.truezip.kernel.*;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
@@ -14,11 +15,9 @@ import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
-import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -143,9 +142,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.getInputSocket(
-                name,
-                options.clear(FsAccessOption.CACHE));
+        return controller.getInputSocket(name, options.clear(CACHE));
     }
 
     /**
