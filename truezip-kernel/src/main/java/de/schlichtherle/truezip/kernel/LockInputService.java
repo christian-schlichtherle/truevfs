@@ -103,11 +103,11 @@ extends DecoratingInputService<E, InputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public InputStream newStream() throws IOException {
+            public InputStream stream() throws IOException {
                 final InputStream in;
                 lock.lock();
                 try {
-                    in = getBoundSocket().newStream();
+                    in = getBoundSocket().stream();
                 } finally {
                     lock.unlock();
                 }
@@ -116,11 +116,11 @@ extends DecoratingInputService<E, InputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 final SeekableByteChannel channel;
                 lock.lock();
                 try {
-                    channel = getBoundSocket().newChannel();
+                    channel = getBoundSocket().channel();
                 } finally {
                     lock.unlock();
                 }

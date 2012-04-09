@@ -92,32 +92,31 @@ extends IOSocket<E, Entry> implements Source {
     /**
      * {@inheritDoc}
      * <p>
-     * Implementations must support calling this method multiple times.
-     * <p>
      * The implementation in the class {@link InputSocket} calls
-     * {@link #newChannel()} and wraps the result in a
+     * {@link #channel()} and wraps the result in a
      * {@link ChannelInputStream} adapter.
      * Note that this may intentionally violate the contract for this method
-     * because {@link #newChannel()} may throw an
+     * because {@link #channel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
      * so override appropriately.
+     * 
+     * @return A new input stream for reading bytes upon each call.
      */
     @Override
-    public InputStream newStream() throws IOException {
-        return new ChannelInputStream(newChannel());
+    public InputStream stream() throws IOException {
+        return new ChannelInputStream(channel());
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Implementations must support calling this method multiple times.
      * 
+     * @return A new seekable byte channel for reading bytes upon each call.
      * @throws UnsupportedOperationException the implementation in the class
      *         {@link InputSocket} <em>always</em> throws an exception of
      *         this type.
      */
     @Override
-    public SeekableByteChannel newChannel() throws IOException {
+    public SeekableByteChannel channel() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

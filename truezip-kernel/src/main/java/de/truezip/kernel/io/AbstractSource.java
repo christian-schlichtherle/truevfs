@@ -17,16 +17,16 @@ public abstract class AbstractSource implements Source {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link AbstractSource} calls
-     * {@link #newChannel()} and wraps the result in a
+     * {@link #channel()} and wraps the result in a
      * {@link ChannelInputStream} adapter.
      * Note that this may intentionally violate the contract for this method
-     * because {@link #newChannel()} may throw an
+     * because {@link #channel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
      * so override appropriately.
      */
     @Override
-    public InputStream newStream() throws IOException {
-        return new ChannelInputStream(newChannel());
+    public InputStream stream() throws IOException {
+        return new ChannelInputStream(channel());
     }
 
     /**
@@ -37,7 +37,7 @@ public abstract class AbstractSource implements Source {
      *         this type.
      */
     @Override
-    public SeekableByteChannel newChannel() throws IOException {
+    public SeekableByteChannel channel() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

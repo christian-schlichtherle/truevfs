@@ -110,15 +110,15 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
-        public InputStream newStream() throws IOException {
+        public InputStream stream() throws IOException {
             return new DisconnectingInputStream(
-                    getBoundSocket().newStream());
+                    getBoundSocket().stream());
         }
 
         @Override
-        public SeekableByteChannel newChannel() throws IOException {
+        public SeekableByteChannel channel() throws IOException {
             return new DisconnectingSeekableChannel(
-                    getBoundSocket().newChannel());
+                    getBoundSocket().channel());
         }
     } // Input
 

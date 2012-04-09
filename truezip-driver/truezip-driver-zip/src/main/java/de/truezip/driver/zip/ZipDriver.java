@@ -405,7 +405,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             throw new NullPointerException();
         if (null != source)
             source.setAppendee(output.getOptions().get(GROW));
-        final OutputStream out = output.newStream();
+        final OutputStream out = output.stream();
         try {
             return newOutputService(model, source, out);
         } catch (final Throwable ex) {

@@ -19,26 +19,26 @@ import java.nio.channels.SeekableByteChannel;
 public interface Source {
 
     /**
-     * Returns a new input stream for reading bytes.
+     * Returns an input stream for reading bytes.
      * The returned input stream should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
      *
-     * @return A new input stream.
+     * @return An input stream for reading bytes.
      * @throws IOException on any I/O error.
      * @throws IllegalStateException if this method has already been called
      *         and a new input stream cannot get created.
      */
     @CreatesObligation
-    InputStream newStream() throws IOException;    
+    InputStream stream() throws IOException;    
 
     /**
-     * <b>Optional operation:</b> Returns a new seekable byte channel for
-     * reading bytes in random order.
+     * <b>Optional operation:</b> Returns a seekable byte channel for
+     * reading bytes.
      * If this operation is supported, then the returned seekable byte channel
      * should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
      *
-     * @return A new seekable byte channel.
+     * @return A seekable byte channel for reading bytes.
      * @throws IOException on any I/O error.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
@@ -46,5 +46,5 @@ public interface Source {
      *         and a new seekable byte channel cannot get created.
      */
     @CreatesObligation
-    SeekableByteChannel newChannel() throws IOException;
+    SeekableByteChannel channel() throws IOException;
 }

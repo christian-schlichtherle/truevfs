@@ -170,18 +170,18 @@ public class MockController extends FsModelController<FsModel> {
             }
 
             @Override
-            public SeekableByteChannel newChannel()
+            public SeekableByteChannel channel()
             throws IOException {
                 return new ThrowingSeekableChannel(
-                        getBoundSocket().newChannel(),
+                        getBoundSocket().channel(),
                         config.getThrowControl());
             }
 
             @Override
-            public InputStream newStream()
+            public InputStream stream()
             throws IOException {
                 return new ThrowingInputStream(
-                        getBoundSocket().newStream(),
+                        getBoundSocket().stream(),
                         config.getThrowControl());
             }
         } // Input
@@ -212,18 +212,18 @@ public class MockController extends FsModelController<FsModel> {
             }
 
             @Override
-            public SeekableByteChannel newChannel()
+            public SeekableByteChannel channel()
             throws IOException {
                 return new ThrowingSeekableChannel(
-                        getBoundSocket().newChannel(),
+                        getBoundSocket().channel(),
                         config.getThrowControl());
             }
 
             @Override
-            public OutputStream newStream()
+            public OutputStream stream()
             throws IOException {
                 return new ThrowingOutputStream(
-                        getBoundSocket().newStream(),
+                        getBoundSocket().stream(),
                         config.getThrowControl());
             }
         } // Output

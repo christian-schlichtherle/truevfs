@@ -125,7 +125,7 @@ implements Closeable, Iterable<E> {
             final Source source)
     throws ZipException, EOFException, IOException {
         this.param = param;
-        final SeekableByteChannel channel = this.channel = source.newChannel();
+        final SeekableByteChannel channel = this.channel = source.channel();
         try {
             length = channel.size();
             charset = param.getCharset();

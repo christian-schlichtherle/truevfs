@@ -70,8 +70,8 @@ public class TarBZip2Driver extends TarDriver {
     throws IOException {
         final class BZip2Source extends AbstractSource {
             @Override
-            public InputStream newStream() throws IOException {
-                final InputStream in = source.newStream();
+            public InputStream stream() throws IOException {
+                final InputStream in = source.stream();
                 try {
                     return new BZip2CompressorInputStream(
                             new BufferedInputStream(in, getBufferSize()));

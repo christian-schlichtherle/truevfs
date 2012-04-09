@@ -73,8 +73,8 @@ public class TarGZipDriver extends TarDriver {
     throws IOException {
         final class GZipSource extends AbstractSource {
             @Override
-            public InputStream newStream() throws IOException {
-                final InputStream in = source.newStream();
+            public InputStream stream() throws IOException {
+                final InputStream in = source.stream();
                 try {
                     return new GZIPInputStream(in, getBufferSize());
                 } catch(final Throwable ex) {

@@ -140,7 +140,7 @@ public final class TFileOutputStream extends DecoratingOutputStream {
                 TConfig.get().getAccessPreferences().set(APPEND, append),
                 null);
         try {
-            return output.newStream();
+            return output.stream();
         } catch (FileNotFoundException ex) {
             throw ex;
         } catch (IOException ex) {

@@ -268,14 +268,14 @@ extends LockModelController {
 
         @Override
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE") // false positive
-        public OutputStream newStream() throws IOException {
+        public OutputStream stream() throws IOException {
             mknod = null;
             final ArchiveFileSystemOperation<E> mknod = mknod();
             final E ae = mknod.getTarget().getEntry();
             InputStream in = null;
             if (options.get(APPEND)) {
                 try {
-                    in = new InputExceptionSource(new Input(name)).newStream();
+                    in = new InputExceptionSource(new Input(name)).stream();
                 } catch (IOException ex) {
                     // When appending, there is no need for the entry to exist,
                     // so we can safely ignore this - fall through!
@@ -285,7 +285,7 @@ extends LockModelController {
                 final OutputSocket<? extends E> os = getOutputSocket(ae);
                 if (null == in2) // do NOT bind when appending!
                     os.bind(this);
-                final OutputStream out = os.newStream();
+                final OutputStream out = os.stream();
                 try {
                     mknod.commit();
                     if (null != in2)

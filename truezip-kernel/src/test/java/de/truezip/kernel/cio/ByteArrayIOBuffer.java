@@ -194,13 +194,13 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
         }
 
         @Override
-        public InputStream newStream() throws IOException {
+        public InputStream stream() throws IOException {
             count();
             return new DataInputStream();
         }
 
         @Override
-        public SeekableByteChannel newChannel() throws IOException {
+        public SeekableByteChannel channel() throws IOException {
             count();
             return new DataInputChannel();
         }
@@ -217,13 +217,13 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
         }
 
         @Override
-        public SeekableByteChannel newChannel() throws IOException {
+        public SeekableByteChannel channel() throws IOException {
             count();
             return new DataOutputChannel();
         }
 
         @Override
-        public OutputStream newStream() throws IOException {
+        public OutputStream stream() throws IOException {
             count();
             return new DataOutputStream();
         }

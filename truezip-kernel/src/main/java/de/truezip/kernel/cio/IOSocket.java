@@ -85,9 +85,9 @@ public abstract class IOSocket<LT, PT> {
     public abstract @CheckForNull PT getPeerTarget() throws IOException;
 
     /**
-     * Copies an input stream {@link InputSocket#newStream created}
+     * Copies an input stream {@link InputSocket#stream created}
      * by the given {@code input} socket to an output stream
-     * {@link OutputSocket#newStream created} by the given {@code output}
+     * {@link OutputSocket#stream created} by the given {@code output}
      * socket.
      * <p>
      * This is a high performance implementation which uses a pooled background

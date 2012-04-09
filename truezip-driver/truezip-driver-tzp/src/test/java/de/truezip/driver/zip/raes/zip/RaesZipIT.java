@@ -94,7 +94,7 @@ public final class RaesZipIT extends ZipTestSuite {
                 raesParameters,
                 new AbstractSource() {
                     @Override
-                    public SeekableByteChannel newChannel() throws IOException {
+                    public SeekableByteChannel channel() throws IOException {
                         return newByteChannel(file);
                     }
                 });

@@ -146,7 +146,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     throws IOException {
         final class RaesSource extends AbstractSource {
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 final RaesReadOnlyChannel channel = RaesReadOnlyChannel
                         .create(raesParameters(model), source);
                 try {

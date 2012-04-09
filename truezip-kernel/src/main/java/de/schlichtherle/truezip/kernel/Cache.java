@@ -407,7 +407,7 @@ final class Cache implements Flushable, Closeable {
             }
 
             @Override
-            public InputStream newStream() throws IOException {
+            public InputStream stream() throws IOException {
                 return new Stream();
             }
 
@@ -415,7 +415,7 @@ final class Cache implements Flushable, Closeable {
                 boolean closed;
 
                 Stream() throws IOException {
-                    super(getBoundSocket().newStream());
+                    super(getBoundSocket().stream());
                 }
 
                 @Override
@@ -429,7 +429,7 @@ final class Cache implements Flushable, Closeable {
             } // Stream
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 return new Channel();
             }
 
@@ -437,7 +437,7 @@ final class Cache implements Flushable, Closeable {
                 boolean closed;
 
                 Channel() throws IOException {
-                    super(getBoundSocket().newChannel());
+                    super(getBoundSocket().channel());
                 }
 
                 @Override
@@ -458,7 +458,7 @@ final class Cache implements Flushable, Closeable {
             }
 
             @Override
-            public OutputStream newStream() throws IOException {
+            public OutputStream stream() throws IOException {
                 return new Stream();
             }
 
@@ -466,7 +466,7 @@ final class Cache implements Flushable, Closeable {
                 boolean closed;
 
                 Stream() throws IOException {
-                    super(getBoundSocket().newStream());
+                    super(getBoundSocket().stream());
                 }
 
                 @Override
@@ -480,7 +480,7 @@ final class Cache implements Flushable, Closeable {
             } // Stream
 
             @Override
-            public SeekableByteChannel newChannel() throws IOException {
+            public SeekableByteChannel channel() throws IOException {
                 return new Channel();
             }
 
@@ -488,7 +488,7 @@ final class Cache implements Flushable, Closeable {
                 boolean closed;
 
                 Channel() throws IOException {
-                    super(getBoundSocket().newChannel());
+                    super(getBoundSocket().channel());
                 }
 
                 @Override

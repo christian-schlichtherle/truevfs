@@ -42,7 +42,7 @@ public final class ManySmallEntriesTest {
         final HashSet<String> set = new HashSet<>(initialCapacity(NUM_ENTRIES));
 
         try (final ZipOutputStream zos = new ZipOutputStream(
-               buffer.getOutputSocket().newStream())) {
+               buffer.getOutputSocket().stream())) {
             for (int i = FIRST_ENTRY; i <= LAST_ENTRY; i++) {
                 final String name = Integer.toString(i);
                 final ZipEntry entry = new ZipEntry(name);
@@ -60,7 +60,7 @@ public final class ManySmallEntriesTest {
         }
         assertEquals(ZIP_SIZE, buffer.getSize(Size.STORAGE));
 
-        try (final ZipFile zf = new ZipFile(buffer.getInputSocket().newChannel())) {
+        try (final ZipFile zf = new ZipFile(buffer.getInputSocket().channel())) {
             final byte[] buf = new byte[data.length];
             for (   final Enumeration<? extends ZipEntry> e = zf.entries();
                     e.hasMoreElements(); ) {
