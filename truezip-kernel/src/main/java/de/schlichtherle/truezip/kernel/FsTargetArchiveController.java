@@ -633,7 +633,7 @@ extends FsFileSystemArchiveController<E> {
     } // DummyInputService
 
     private static final class InputArchive<E extends FsArchiveEntry>
-    extends LockInputService<E> {
+    extends FsLockInputService<E> {
         final InputService<E> archive;
 
         @CreatesObligation
@@ -662,7 +662,7 @@ extends FsFileSystemArchiveController<E> {
     } // InputArchive
 
     private static final class OutputArchive<E extends FsArchiveEntry>
-    extends LockOutputService<E> {
+    extends FsLockOutputService<E> {
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         OutputArchive(final @WillCloseWhenClosed OutputService<E> output) {
