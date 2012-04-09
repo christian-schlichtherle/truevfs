@@ -213,12 +213,12 @@ public class BufferedReadOnlyFile extends DecoratingReadOnlyFile {
         while (total < remaining && pos < length) {
             positionBuffer();
             final int bufferPos = (int) (pos - bufferStart);
-            int processed = Math.min(remaining - total, bufferSize - bufferPos);
-            processed = (int) Math.min(processed, length - pos);
-            assert processed > 0;
-            System.arraycopy(buffer, bufferPos, dst, offset + total, processed);
-            total += processed;
-            pos += processed;
+            int bufferLimit = Math.min(remaining - total, bufferSize - bufferPos);
+            bufferLimit = (int) Math.min(bufferLimit, length - pos);
+            assert bufferLimit > 0;
+            System.arraycopy(buffer, bufferPos, dst, offset + total, bufferLimit);
+            total += bufferLimit;
+            pos += bufferLimit;
         }
 
         return total;
