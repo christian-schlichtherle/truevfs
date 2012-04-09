@@ -6,7 +6,7 @@ package de.truezip.driver.zip.io;
 
 import de.truezip.driver.zip.crypto.CipherOutputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.LEDataOutputStream;
+import de.truezip.kernel.io.LittleEndianOutputStream;
 import de.truezip.key.param.KeyStrength;
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -57,14 +57,14 @@ final class WinZipAesEntryOutputStream extends DecoratingOutputStream {
      * The low level data output stream.
      * Used for writing the header and footer.
      **/
-    private LEDataOutputStream dos;
+    private LittleEndianOutputStream leos;
 
     WinZipAesEntryOutputStream(
-            final LEDataOutputStream dos,
+            final LittleEndianOutputStream leos,
             final WinZipAesEntryParameters param)
     throws IOException {
-        super(dos);
-        assert null != dos;
+        super(leos);
+        assert null != leos;
         assert null != param;
         this.param = param;
 
@@ -114,18 +114,18 @@ final class WinZipAesEntryOutputStream extends DecoratingOutputStream {
         mac.init(sha1HMacParam);
 
         // Reinit chain of output streams as Encrypt-then-MAC.
-        this.dos = dos;
+        this.leos = leos;
         this.out = new CipherOutputStream(cipher,
-                new MacOutputStream(dos, mac));
+                new MacOutputStream(leos, mac));
 
         // Write header.
-        dos.write(salt);
+        leos.write(salt);
         writePasswordVerifier(keyParam);
     }
 
     private void writePasswordVerifier(KeyParameter keyParam)
     throws IOException {
-        this.dos.write(
+        this.leos.write(
                 keyParam.getKey(),
                 2 * param.getKeyStrength().getBytes(),
                 PWD_VERIFIER_BITS / 8);
@@ -140,6 +140,6 @@ final class WinZipAesEntryOutputStream extends DecoratingOutputStream {
         final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
         final int bufLength = mac.doFinal(buf, 0);
         assert bufLength == buf.length;
-        this.dos.write(buf, 0, bufLength / 2);
+        this.leos.write(buf, 0, bufLength / 2);
     }
 }

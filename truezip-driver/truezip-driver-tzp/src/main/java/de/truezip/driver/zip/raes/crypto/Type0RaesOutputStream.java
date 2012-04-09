@@ -7,7 +7,7 @@ package de.truezip.driver.zip.raes.crypto;
 import de.truezip.driver.zip.crypto.CipherOutputStream;
 import de.truezip.driver.zip.crypto.CtrBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.*;
-import de.truezip.kernel.io.LEDataOutputStream;
+import de.truezip.kernel.io.LittleEndianOutputStream;
 import de.truezip.kernel.io.Sink;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -54,7 +54,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
      * The low level data output stream.
      * Used for writing the header and footer.
      **/
-    private LEDataOutputStream dos;
+    private LittleEndianOutputStream leos;
 
     /** The offset where the encrypted application data starts. */
     private long start;
@@ -122,22 +122,20 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         // Init chain of output streams as Encrypt-then-MAC.
         final OutputStream out = sink.newStream();
         try {
-            final LEDataOutputStream dos =
-                    this.dos = out instanceof LEDataOutputStream
-                        ? (LEDataOutputStream) out
-                        : new LEDataOutputStream(out);
+            final LittleEndianOutputStream leos =
+                    this.leos = new LittleEndianOutputStream(out);
             this.out = new CipherOutputStream(cipher,
-                    new MacOutputStream(dos, mac));
+                    new MacOutputStream(leos, mac));
 
             // Write data envelope header.
-            dos.writeInt(SIGNATURE);
-            dos.writeByte(ENVELOPE_TYPE_0);
-            dos.writeByte(keyStrengthOrdinal);
-            dos.writeShort(ITERATION_COUNT);
-            dos.write(salt);
+            leos.writeInt(SIGNATURE);
+            leos.writeByte(ENVELOPE_TYPE_0);
+            leos.writeByte(keyStrengthOrdinal);
+            leos.writeShort(ITERATION_COUNT);
+            leos.write(salt);
 
             // Init start.
-            this.start = dos.size();
+            this.start = leos.size();
             assert ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT + salt.length == start;
         } catch (final Throwable ex) {
             try {
@@ -162,7 +160,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         // Flush partial block to out, if any.
         ((CipherOutputStream) out).finish();
 
-        final long trailer = dos.size();
+        final long trailer = leos.size();
 
         final Mac mac = this.mac;
         assert mac.getMacSize() == klac.getMacSize();
@@ -174,16 +172,16 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         // authentication code for security reasons.
         final long length = trailer - start; // message length
         klac(klac, length, buf);
-        dos.write(buf, 0, buf.length / 2);
+        leos.write(buf, 0, buf.length / 2);
 
         // Calculate and write MAC to data envelope footer.
         // Again, we will only use the first half of the
         // authentication code for security reasons.
         bufLength = mac.doFinal(buf, 0);
         assert bufLength == buf.length;
-        dos.write(buf, 0, buf.length / 2);
+        leos.write(buf, 0, buf.length / 2);
 
-        assert dos.size() - trailer == buf.length;
+        assert leos.size() - trailer == buf.length;
     }
 
     @Override
