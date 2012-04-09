@@ -17,8 +17,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * An output socket for HTTP(S) entries.
  * Right now, this is only a dummy.
  * 
- * @see     HttpInputSocket
- * @author  Christian Schlichtherle
+ * @see    HttpInputSocket
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class HttpOutputSocket extends OutputSocket<HttpEntry> {

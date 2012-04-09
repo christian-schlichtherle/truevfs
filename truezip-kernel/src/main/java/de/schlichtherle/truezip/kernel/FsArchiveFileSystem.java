@@ -365,7 +365,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  template if not {@code null}, then the archive file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      * @return A new archive file system operation on a chain of one or more
      *         archive file system entries for the given path name which will
      *         be linked into this archive file system upon a call to its
@@ -544,7 +544,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * directory entries (including the file system root) must be empty.
      *
      * @param  name the archive file system entry name.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     void unlink(final FsEntryName name)
     throws IOException {

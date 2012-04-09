@@ -11,17 +11,17 @@ import java.util.zip.CheckedInputStream;
 
 /**
  * Compares the CRC computed from the content to the CRC in the ZIP entry
- * and throws a CRC32Exception if it detects a mismatch in its method
+ * and throws a Crc32Exception if it detects a mismatch in its method
  * {@link #close()}.
  *
  * @author Christian Schlichtherle
  */
-final class Crc32CheckingInputStream extends CheckedInputStream {
+final class Crc32InputStream extends CheckedInputStream {
     private final ZipEntry entry;
     private final int size;
     boolean closed;
 
-    Crc32CheckingInputStream(
+    Crc32InputStream(
             final InputStream in,
             final ZipEntry entry,
             final int size) {
@@ -59,6 +59,6 @@ final class Crc32CheckingInputStream extends CheckedInputStream {
         final long expected = entry.getCrc();
         final long computed = getChecksum().getValue();
         if (expected != computed)
-            throw new CRC32Exception(entry.getName(), expected, computed);
+            throw new Crc32Exception(entry.getName(), expected, computed);
     }
 }

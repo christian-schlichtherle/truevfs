@@ -31,7 +31,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  *     information about the ciphered data (e.g. a MAC).
  * </ul>
  *
- * @see    CipherReadOnlyFile
+ * @see    CipherReadOnlyChannel
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -159,7 +159,7 @@ public class CipherOutputStream extends DecoratingOutputStream {
      * Next, the {@link #out} gets unconditionally
      * {@linkplain #close() closed}.
      *
-     * @throws IOException On any I/O failure.
+     * @throws IOException On any I/O error.
      */
     @Override
     public void close() throws IOException {

@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.schlichtherle.truezip.kernel.FsControllerException;
+import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsModel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-final class FsNeedsLockRetryException extends FsControllerException {
+final class FsNeedsLockRetryException extends FsControlFlowIOException {
 
     private static final @Nullable FsNeedsLockRetryException
             SINGLETON = TRACEABLE ? null : new FsNeedsLockRetryException();

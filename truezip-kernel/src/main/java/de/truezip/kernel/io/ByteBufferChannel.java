@@ -21,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-public class SeekableByteBufferChannel implements SeekableByteChannel {
+public class ByteBufferChannel implements SeekableByteChannel {
 
     private ByteBuffer buffer;
 
@@ -38,7 +38,7 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
      *         resizing it.
      */
     @CreatesObligation
-    public SeekableByteBufferChannel(final ByteBuffer buffer) {
+    public ByteBufferChannel(final ByteBuffer buffer) {
         if (!buffer.isReadOnly() && !buffer.hasArray())
             throw new IllegalArgumentException();
         this.buffer = buffer.duplicate();
@@ -100,7 +100,7 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
     }
 
     @Override
-    public final SeekableByteBufferChannel position(long newPosition)
+    public final ByteBufferChannel position(long newPosition)
     throws IOException {
         ensureLimit(newPosition);
         buffer.position((int) newPosition);
@@ -113,7 +113,7 @@ public class SeekableByteBufferChannel implements SeekableByteChannel {
     }
 
     @Override
-    public final SeekableByteBufferChannel truncate(final long newSize)
+    public final ByteBufferChannel truncate(final long newSize)
     throws IOException {
         if (buffer.limit() > newSize)
             buffer.limit((int) newSize);

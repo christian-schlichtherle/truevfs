@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -19,7 +18,7 @@ public abstract class AbstractSource implements Source {
      * <p>
      * The implementation in the class {@link AbstractSource} calls
      * {@link #newChannel()} and wraps the result in a
-     * {@link SeekableChannelInputStream} adapter.
+     * {@link ChannelInputStream} adapter.
      * Note that this may intentionally violate the contract for this method
      * because {@link #newChannel()} may throw an
      * {@link UnsupportedOperationException} while this method may not,
@@ -27,7 +26,7 @@ public abstract class AbstractSource implements Source {
      */
     @Override
     public InputStream newStream() throws IOException {
-        return new SeekableChannelInputStream(newChannel());
+        return new ChannelInputStream(newChannel());
     }
 
     /**
@@ -39,18 +38,6 @@ public abstract class AbstractSource implements Source {
      */
     @Override
     public SeekableByteChannel newChannel() throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws UnsupportedOperationException the implementation in the class
-     *         {@link AbstractSource} <em>always</em> throws an exception of
-     *         this type.
-     */
-    @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
         throw new UnsupportedOperationException();
     }
 }

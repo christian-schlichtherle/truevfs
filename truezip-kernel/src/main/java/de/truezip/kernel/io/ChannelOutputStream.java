@@ -11,19 +11,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Adapts a {@link SeekableByteChannel} to the {@code OutputStream} interface.
+ * Adapts a {@link WritableByteChannel} to the {@code OutputStream} interface.
  *
+ * @see    SeekableChannelInputStream
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 @CleanupObligation
-public class SeekableByteChannelOutputStream extends OutputStream {
+public class ChannelOutputStream extends OutputStream {
 
     private final ByteBuffer single = ByteBuffer.allocate(1);
 
@@ -32,19 +34,19 @@ public class SeekableByteChannelOutputStream extends OutputStream {
      * All methods in this class throw a {@link NullPointerException} if this
      * hasn't been initialized.
      */
-    protected @Nullable SeekableByteChannel sbc;
+    protected @Nullable WritableByteChannel channel;
 
     @CreatesObligation
-    public SeekableByteChannelOutputStream(
-            final @CheckForNull @WillCloseWhenClosed SeekableByteChannel sbc) {
-        this.sbc = sbc;
+    public ChannelOutputStream(
+            final @CheckForNull @WillCloseWhenClosed WritableByteChannel sbc) {
+        this.channel = sbc;
     }
 
     @Override
     public void write(int b) throws IOException {
         single.put(0, (byte) b);
         single.rewind();
-        if (1 != sbc.write(single))
+        if (1 != channel.write(single))
             throw new IOException("write error");
     }
 
@@ -55,7 +57,7 @@ public class SeekableByteChannelOutputStream extends OutputStream {
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        if (len != sbc.write(ByteBuffer.wrap(b, off, len)))
+        if (len != channel.write(ByteBuffer.wrap(b, off, len)))
             throw new IOException("write error");
     }
 
@@ -66,6 +68,6 @@ public class SeekableByteChannelOutputStream extends OutputStream {
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        sbc.close();
+        channel.close();
     }
 }

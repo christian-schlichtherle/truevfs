@@ -4,17 +4,21 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
+import de.truezip.driver.zip.crypto.CipherReadOnlyChannel;
 import de.truezip.driver.zip.crypto.CtrBlockCipher;
 import de.truezip.driver.zip.crypto.SeekableBlockCipher;
 import static de.truezip.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
 import static de.truezip.driver.zip.raes.crypto.Constants.ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.util.ArrayUtils;
+import de.truezip.kernel.io.IntervalReadOnlyChannel;
+import de.truezip.kernel.io.PowerBuffer;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.util.SuspensionPenalty;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Arrays;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
@@ -30,13 +34,15 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 /**
  * Reads a type 0 RAES file.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
+final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
 
     /** The key strength. */
     private final AesKeyStrength keyStrength;
+
+    private final ByteBuffer authenticationCode;
 
     /**
      * The key parameter required to init the SHA-256 Message Authentication
@@ -44,36 +50,30 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
      */
     private final KeyParameter sha256MacParam;
 
-    /**
-     * The footer of the data envelope containing the authentication codes.
-     */
-    private final byte[] footer;
-
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    Type0RaesReadOnlyFile(
-            final @WillCloseWhenClosed ReadOnlyFile rof,
+    Type0RaesReadOnlyChannel(
+            final @WillCloseWhenClosed SeekableByteChannel channel,
             final Type0RaesParameters param)
     throws IOException {
-        super(rof);
-
+        super(channel);
         assert null != param;
 
-        // Init read only file.
-        rof.seek(0);
-        final long fileLength = rof.length();
-
         // Load header data.
-        final byte[] header = new byte[ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT];
-        rof.readFully(header);
+        final PowerBuffer header = PowerBuffer
+                .allocate(ENVELOPE_TYPE_0_HEADER_LEN_WO_SALT)
+                .littleEndian()
+                .load(channel.position(0));
+        final int type = header.position(4).getUByte();
+        assert 0 == type;
 
         // Check key size and iteration count
-        final int keyStrengthOrdinal = readUByte(header, 5);
+        final int keyStrengthOrdinal = header.getUByte();
         final AesKeyStrength keyStrength;
         try {
             keyStrength = AesKeyStrength.values()[keyStrengthOrdinal];
             assert keyStrength.ordinal() == keyStrengthOrdinal;
-        } catch (ArrayIndexOutOfBoundsException ex) {
+        } catch (final ArrayIndexOutOfBoundsException ex) {
             throw new RaesException(
                     "Unknown index for cipher key strength: "
                     + keyStrengthOrdinal);
@@ -82,7 +82,7 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
         final int keyStrengthBits = keyStrength.getBits();
         this.keyStrength = keyStrength;
 
-        final int iCount = readUShort(header, 6);
+        final int iCount = header.getUShort();
         if (1024 > iCount)
             throw new RaesException(
                     "Iteration count must be 1024 or greater, but is "
@@ -90,32 +90,34 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
                     + "!");
 
         // Load salt.
-        final byte[] salt = new byte[keyStrengthBytes];
-        rof.readFully(salt);
+        final PowerBuffer salt = PowerBuffer
+                .allocate(keyStrengthBytes)
+                .load(channel);
 
         // Init KLAC and footer.
         final Mac klac = new HMac(new SHA256Digest());
-        this.footer = new byte[klac.getMacSize()];
+        final PowerBuffer footer = PowerBuffer.allocate(klac.getMacSize());
 
-        // Init start, end and length of encrypted data.
-        final long start = header.length + salt.length;
-        final long end = fileLength - this.footer.length;
-        final long length = end - start;
-        if (length < 0) {
+        // Init start, end and size of encrypted data.
+        final long start = channel.position();
+        final long end = channel.size() - footer.limit();
+        final long size = end - start;
+        if (0 > size) {
             // Wrap an EOFException so that a caller can identify this issue.
             throw new RaesException("False positive Type 0 RAES file is too short!",
                     new EOFException());
         }
 
-        // Load footer data.
-        rof.seek(end);
-        rof.readFully(this.footer);
-        if (-1 != rof.read()) {
+        // Load authentication code.
+        footer.load(channel.position(end)).position(footer.limit() / 2);
+        if (channel.position() != channel.size()) {
             // This should never happen unless someone is writing to the
             // end of the file concurrently!
             throw new RaesException(
                     "Expected end of file after data envelope trailer!");
         }
+        authenticationCode = footer.slice().buffer();
+        final ByteBuffer passwdVerifier = footer.flip().buffer();
 
         // Derive cipher and MAC parameters.
         final PBEParametersGenerator
@@ -128,15 +130,14 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             final char[] passwd = param.getReadPassword(0 != lastTry);
             assert null != passwd;
             final byte[] pass = PKCS12PasswordToBytes(passwd);
-            for (int i = passwd.length; --i >= 0; ) // nullify password parameter
-                passwd[i] = 0;
+            Arrays.fill(passwd, (char) 0);
 
-            gen.init(pass, salt, iCount);
+            gen.init(pass, salt.array(), iCount);
             aesCtrParam = (ParametersWithIV) gen.generateDerivedParameters(
                     keyStrengthBits, AES_BLOCK_SIZE_BITS);
             sha256MacParam = (KeyParameter) gen.generateDerivedMacParameters(
                     keyStrengthBits);
-            paranoidWipe(pass);
+            Arrays.fill(pass, (byte) 0);
 
             lastTry = SuspensionPenalty.enforce(lastTry);
 
@@ -149,26 +150,22 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
             final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters()).getKey();
             klac.update(cipherKey, 0, cipherKey.length);
             buf = new byte[klac.getMacSize()];
-            RaesOutputStream.klac(klac, length, buf);
-        } while (!ArrayUtils.equals(this.footer, 0, buf, 0, buf.length / 2));
+            RaesOutputStream.klac(klac, size, buf);
+        } while (!passwdVerifier.equals(ByteBuffer.wrap(buf, 0, buf.length / 2)));
 
         // Init parameters for authenticate().
         this.sha256MacParam = sha256MacParam;
 
-        // Init cipher.
+        // Init cipher and channel.
         final SeekableBlockCipher
                 cipher = new CtrBlockCipher(new AESFastEngine());
         cipher.init(false, aesCtrParam);
-        init(cipher, start, length);
+        this.channel = new CipherReadOnlyChannel(
+                new IntervalReadOnlyChannel(channel.position(start), size),
+                cipher);
 
-        // Commit key strength to parameters.
+        // Commit key strength.
         param.setKeyStrength(keyStrength);
-    }
-
-    /** Wipe the given array. */
-    private void paranoidWipe(final byte[] pwd) {
-        for (int i = pwd.length; --i >= 0; )
-            pwd[i] = 0;
     }
 
     @Override
@@ -180,9 +177,9 @@ final class Type0RaesReadOnlyFile extends RaesReadOnlyFile {
     public void authenticate() throws IOException {
         final Mac mac = new HMac(new SHA256Digest());
         mac.init(sha256MacParam);
-        final byte[] buf = computeMac(mac);
+        final byte[] buf = ((CipherReadOnlyChannel) channel).mac(mac);
         assert buf.length == mac.getMacSize();
-        if (!ArrayUtils.equals(buf, 0, footer, footer.length / 2, footer.length / 2))
+        if (!authenticationCode.equals(ByteBuffer.wrap(buf, 0, buf.length / 2)))
             throw new RaesAuthenticationException();
     }
 }

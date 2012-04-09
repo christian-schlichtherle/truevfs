@@ -10,7 +10,7 @@ import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
 import de.truezip.driver.zip.raes.crypto.RaesSink;
 import de.truezip.file.*;
 import de.truezip.kernel.io.AbstractSink;
-import de.truezip.kernel.io.SeekableChannelInputStream;
+import de.truezip.kernel.io.ChannelInputStream;
 import de.truezip.kernel.io.Sink;
 import de.truezip.key.sl.KeyManagerLocator;
 import de.truezip.path.TPath;
@@ -137,7 +137,7 @@ public final class Raes {
                         = RaesReadOnlyChannel.getInstance(channel, param);
                 if (authenticate)
                     rchannel.authenticate();
-                final @WillClose InputStream in = new SeekableChannelInputStream(rchannel);
+                final @WillClose InputStream in = new ChannelInputStream(rchannel);
                 @WillClose OutputStream out = null;
                 try {
                     out = newOutputStream(plainFile);

@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsDecoratingController;
 import de.truezip.kernel.FsModel;
@@ -13,8 +14,6 @@ import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -72,11 +71,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             public SeekableByteChannel newChannel() throws IOException {
                 return new FinalizeSeekableChannel(getBoundSocket().newChannel());
             }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return new FinalizeReadOnlyFile(getBoundSocket().newReadOnlyFile());
-            }
         } // Input
 
         return new Input();
@@ -119,7 +113,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             try {
                 closeable.close();
                 logger.log(Level.FINE, "finalizeCleared");
-            } catch (final FsControllerException ex) {  // report and swallow
+            } catch (final FsControlFlowIOException ex) {  // report and swallow
                 logger.log(Level.WARNING, "finalizeFailed",
                         new AssertionError("Unexpected controller exception!", ex));
             } catch (final Throwable ex) {              // report and swallow
@@ -127,82 +121,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
         }
     }
-
-    private static final class FinalizeReadOnlyFile
-    extends DecoratingReadOnlyFile {
-        volatile IOException close; // accessed by finalizer thread!
-
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        FinalizeReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public void close() throws IOException {
-            try {
-                rof.close();
-            } catch (final FsControllerException ex) {
-                assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
-            } catch (final IOException ex) {
-                throw close = ex;
-            }
-            close = OK;
-        }
-
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                finalize(rof, close);
-            } finally {
-                super.finalize();
-            }
-        }
-    } // FinalizeReadOnlyFile
-
-    private static final class FinalizeSeekableChannel
-    extends DecoratingSeekableChannel {
-        volatile IOException close; // accessed by finalizer thread!
-
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        FinalizeSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
-        }
-
-        @Override
-        public void close() throws IOException {
-            try {
-                channel.close();
-            } catch (final FsControllerException ex) {
-                assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
-            } catch (final IOException ex) {
-                throw close = ex;
-            }
-            close = OK;
-        }
-
-        @Override
-        @SuppressWarnings("FinalizeDeclaration")
-        protected void finalize() throws Throwable {
-            try {
-                finalize(channel, close);
-            } finally {
-                super.finalize();
-            }
-        }
-    } // FinalizeSeekableChannel
 
     private static final class FinalizeInputStream
     extends DecoratingInputStream {
@@ -218,9 +136,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 in.close();
-            } catch (final FsControllerException ex) {
+            } catch (final FsControlFlowIOException ex) {
                 assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
                 // on the decorated resource if this call is NOT retried again.
@@ -256,9 +173,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 out.close();
-            } catch (final FsControllerException ex) {
+            } catch (final FsControlFlowIOException ex) {
                 assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
                 // on the decorated resource if this call is NOT retried again.
@@ -279,4 +195,41 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
         }
     } // FinalizeOutputStream
+
+    private static final class FinalizeSeekableChannel
+    extends DecoratingSeekableChannel {
+        volatile IOException close; // accessed by finalizer thread!
+
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        FinalizeSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public void close() throws IOException {
+            try {
+                channel.close();
+            } catch (final FsControlFlowIOException ex) {
+                assert ex instanceof FsNeedsLockRetryException : ex;
+                // This call may or may not get retried again later.
+                // Do NOT record the status so that finalize() will call close()
+                // on the decorated resource if this call is NOT retried again.
+                throw ex;
+            } catch (final IOException ex) {
+                throw close = ex;
+            }
+            close = OK;
+        }
+
+        @Override
+        @SuppressWarnings("FinalizeDeclaration")
+        protected void finalize() throws Throwable {
+            try {
+                finalize(channel, close);
+            } finally {
+                super.finalize();
+            }
+        }
+    } // FinalizeSeekableChannel
 }

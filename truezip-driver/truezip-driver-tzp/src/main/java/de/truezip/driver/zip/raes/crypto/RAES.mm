@@ -1,9 +1,8 @@
-<map version="0.9.0">
+<map version="1.0.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
-<node COLOR="#000000" CREATED="1143630507250" ID="Freemind_Link_567208098" MODIFIED="1288123585241" TEXT="RAES">
+<node COLOR="#000000" CREATED="1143630507250" ID="Freemind_Link_567208098" MODIFIED="1333744296453" TEXT="RAES">
 <font NAME="SansSerif" SIZE="20"/>
 <icon BUILTIN="password"/>
-<hook NAME="accessories/plugins/AutomaticLayout.properties"/>
 <node COLOR="#0033ff" CREATED="1143672334015" ID="Freemind_Link_1921380347" MODIFIED="1288123568786" POSITION="left" TEXT="Specification">
 <edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
@@ -85,7 +84,7 @@
 <node COLOR="#111111" CREATED="1143675116093" ID="Freemind_Link_1912412120" MODIFIED="1143675127375" TEXT="Advantages">
 <node COLOR="#111111" CREATED="1143675128578" ID="Freemind_Link_117595815" MODIFIED="1143680965468" TEXT="Allows fast processing"/>
 </node>
-<node COLOR="#111111" CREATED="1143675143796" ID="Freemind_Link_909574961" MODIFIED="1311640957507" TEXT="Disadvantages">
+<node COLOR="#111111" CREATED="1143675143796" ID="Freemind_Link_909574961" MODIFIED="1333744149022" TEXT="Disadvantages">
 <hook NAME="accessories/plugins/BlinkingNodeHook.properties"/>
 <node COLOR="#111111" CREATED="1143675155000" ID="Freemind_Link_1516326278" MODIFIED="1143683706109" TEXT="No message authentication">
 <icon BUILTIN="clanbomber"/>
@@ -231,6 +230,13 @@
 <node COLOR="#990000" CREATED="1143642661765" ID="Freemind_Link_1980459774" MODIFIED="1288134164910" TEXT="File format">
 <cloud COLOR="#cccccc"/>
 <font NAME="SansSerif" SIZE="14"/>
+<node COLOR="#111111" CREATED="1333744232359" ID="ID_1569318626" MODIFIED="1333744273795" TEXT="General">
+<cloud/>
+<icon BUILTIN="full-0"/>
+<node COLOR="#111111" CREATED="1333744235479" ID="ID_24907096" MODIFIED="1333744262605" TEXT="Integer Format">
+<node COLOR="#111111" CREATED="1333744251089" ID="ID_1081693691" MODIFIED="1333744258238" TEXT="Little Endian"/>
+</node>
+</node>
 <node COLOR="#111111" CREATED="1143723764984" ID="Freemind_Link_154427550" MODIFIED="1143725387984" TEXT="Lead-In">
 <cloud/>
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
@@ -334,7 +340,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1143675614875" ID="Freemind_Link_1280393464" MODIFIED="1288123568796" POSITION="left" TEXT="Applications">
+<node COLOR="#0033ff" CREATED="1143675614875" ID="Freemind_Link_1280393464" MODIFIED="1333744287626" POSITION="left" TEXT="Applications">
 <edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
 <font NAME="SansSerif" SIZE="18"/>
@@ -386,7 +392,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1143642394203" ID="Freemind_Link_1715794342" MODIFIED="1288123568797" POSITION="right" TEXT="Implementation">
+<node COLOR="#0033ff" CREATED="1143642394203" ID="Freemind_Link_1715794342" MODIFIED="1333744284970" POSITION="right" TEXT="Implementation">
 <edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
 <font NAME="SansSerif" SIZE="18"/>
@@ -396,7 +402,7 @@
 <node COLOR="#990000" CREATED="1143631285625" ID="Freemind_Link_285943267" MODIFIED="1143665164656" TEXT="Random read">
 <font NAME="SansSerif" SIZE="14"/>
 <node COLOR="#111111" CREATED="1144072474513" ID="Freemind_Link_1548606344" MODIFIED="1144072477170" TEXT="Class">
-<node COLOR="#111111" CREATED="1144072477076" ID="Freemind_Link_1336722967" MODIFIED="1144072506545" TEXT="RaesReadOnlyFile">
+<node COLOR="#111111" CREATED="1144072477076" ID="Freemind_Link_1336722967" MODIFIED="1333744123158" TEXT="RaesReadOnlyChannel">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
 <node COLOR="#111111" CREATED="1144072481982" ID="Freemind_Link_142808407" MODIFIED="1144072504670" TEXT="static getInstance(...)">
 <font BOLD="true" NAME="SansSerif" SIZE="12"/>
@@ -448,7 +454,7 @@
 </node>
 </node>
 </node>
-<node COLOR="#0033ff" CREATED="1143642522921" ID="Freemind_Link_685986456" MODIFIED="1288123568806" POSITION="right" TEXT="Reference">
+<node COLOR="#0033ff" CREATED="1143642522921" ID="Freemind_Link_685986456" MODIFIED="1333744285959" POSITION="right" TEXT="Reference">
 <edge STYLE="sharp_bezier" WIDTH="8"/>
 <cloud/>
 <font NAME="SansSerif" SIZE="18"/>

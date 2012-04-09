@@ -13,10 +13,8 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.option.AccessOption;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
+import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -194,18 +192,6 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
                     }
                 }
             }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                while (true) {
-                    try {
-                        return new SyncReadOnlyFile(
-                                getBoundSocket().newReadOnlyFile());
-                    } catch (FsNeedsSyncException ex) {
-                        sync(ex);
-                    }
-                }
-            }
         } // Input
 
         return new Input();
@@ -305,34 +291,6 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
         }
     }
 
-    private final class SyncReadOnlyFile
-    extends DecoratingReadOnlyFile {
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        SyncReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public void close() throws IOException {
-            close(rof);
-        }
-    } // SyncReadOnlyFile
-
-    private final class SyncSeekableChannel
-    extends DecoratingSeekableChannel {
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        SyncSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
-        }
-
-        @Override
-        public void close() throws IOException {
-            close(channel);
-        }
-    } // SyncSeekableChannel
-
     private final class SyncInputStream
     extends DecoratingInputStream {
         @CreatesObligation
@@ -360,4 +318,18 @@ extends FsSyncDecoratingController<FsModel, FsController<?>> {
             close(out);
         }
     } // SyncOutputStream
+
+    private final class SyncSeekableChannel
+    extends DecoratingSeekableChannel {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        SyncSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public void close() throws IOException {
+            close(channel);
+        }
+    } // SyncSeekableChannel
 }

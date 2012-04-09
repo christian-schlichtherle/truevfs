@@ -8,7 +8,7 @@ import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import de.truezip.kernel.cio.DecoratingOutputSocket;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.IOPool;
-import de.truezip.kernel.cio.MultiplexedOutputService;
+import de.truezip.kernel.cio.MultiplexingOutputService;
 import de.truezip.kernel.cio.OutputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class OdfOutputService extends MultiplexedOutputService<ZipDriverEntry> {
+public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";

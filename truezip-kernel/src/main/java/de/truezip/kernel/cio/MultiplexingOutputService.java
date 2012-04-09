@@ -33,11 +33,11 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
- * @param  <E> The type of the archive entries.
+ * @param  <E> The type of the mutable entries.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class MultiplexedOutputService<E extends MutableEntry>
+public class MultiplexingOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     private final IOPool<?> pool;
@@ -60,7 +60,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public MultiplexedOutputService(
+    public MultiplexingOutputService(
             final @WillCloseWhenClosed OutputService<E> output,
             final IOPool<?> pool) {
         super(output);
@@ -115,7 +115,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(MultiplexedOutputService.super.getOutputSocket(entry));
+                super(MultiplexingOutputService.super.getOutputSocket(entry));
             }
 
             @Override

@@ -15,8 +15,6 @@ import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.kernel.util.Threads;
@@ -163,9 +161,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
                         thread.locking = false;
                         lock.unlock();
                     }
-                } catch (final IOException ex) {
-                    if (!(ex instanceof FsNeedsLockRetryException))
-                        throw ex;
+                } catch (FsNeedsLockRetryException ex) {
                     thread.pause();
                 }
             }
@@ -323,18 +319,6 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
                     return new LockSeekableChannel(getBoundSocket().newChannel());
                 }
             } // NewChannel
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return writeLocked(new NewReadOnlyFile());
-            }
-
-            final class NewReadOnlyFile implements IOOperation<ReadOnlyFile> {
-                @Override
-                public ReadOnlyFile call() throws IOException {
-                    return new LockReadOnlyFile(getBoundSocket().newReadOnlyFile());
-                }
-            } // NewReadOnlyFile
         } // Input
 
         return new Input();
@@ -480,34 +464,6 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
         @Nullable T call() throws IOException;
     } // IOOperation
 
-    private final class LockReadOnlyFile
-    extends DecoratingReadOnlyFile {
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        LockReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public void close() throws IOException {
-            close(rof);
-        }
-    } // LockReadOnlyFile
-
-    private final class LockSeekableChannel
-    extends DecoratingSeekableChannel {
-        @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
-        }
-
-        @Override
-        public void close() throws IOException {
-            close(channel);
-        }
-    } // LockSeekableChannel
-
     private final class LockInputStream
     extends DecoratingInputStream {
         @CreatesObligation
@@ -535,6 +491,20 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
             close(out);
         }
     } // LockOutputStream
+
+    private final class LockSeekableChannel
+    extends DecoratingSeekableChannel {
+        @CreatesObligation
+        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+            super(sbc);
+        }
+
+        @Override
+        public void close() throws IOException {
+            close(channel);
+        }
+    } // LockSeekableChannel
 
     @NotThreadSafe
     private static final class ThreadUtil {

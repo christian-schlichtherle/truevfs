@@ -4,17 +4,17 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.driver.zip.io.RawZipFile;
+import de.truezip.driver.zip.io.RawFile;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -26,7 +26,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public final class ZipInputService
-extends RawZipFile<ZipDriverEntry>
+extends RawFile<ZipDriverEntry>
 implements InputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
@@ -39,9 +39,9 @@ implements InputService<ZipDriverEntry> {
     public ZipInputService(
             final ZipDriver driver,
             final FsModel model,
-            final @WillCloseWhenClosed ReadOnlyFile rof)
+            final @WillCloseWhenClosed SeekableByteChannel channel)
     throws IOException {
-        super(rof, driver);
+        super(channel, driver);
         if (null == model)
             throw new NullPointerException();
         this.driver = driver;
@@ -74,7 +74,7 @@ implements InputService<ZipDriverEntry> {
      * @return {@code true} if and only if the target archive file gets entries
      *         appended to it.
      */
-    protected boolean isAppendee() {
+    boolean isAppendee() {
         return appendee;
     }
 
@@ -94,7 +94,7 @@ implements InputService<ZipDriverEntry> {
         if (null == name)
             throw new NullPointerException();
 
-        class Input extends InputSocket<ZipDriverEntry> {
+        final class Input extends InputSocket<ZipDriverEntry> {
             @Override
             public ZipDriverEntry getLocalTarget() throws IOException {
                 final ZipDriverEntry entry = getEntry(name);

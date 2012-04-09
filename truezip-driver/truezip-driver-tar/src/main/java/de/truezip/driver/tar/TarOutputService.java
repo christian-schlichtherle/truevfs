@@ -91,7 +91,7 @@ implements OutputService<TarDriverEntry> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<TarDriverEntry> {
+        final class Output extends OutputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry getLocalTarget() {
                 return entry;

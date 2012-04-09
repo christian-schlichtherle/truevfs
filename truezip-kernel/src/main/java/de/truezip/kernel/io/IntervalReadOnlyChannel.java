@@ -20,7 +20,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
+public final class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
 
     /**
      * The start position of this channel in the decorated channel.
@@ -58,7 +58,7 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      *
      * @param  channel the channel to decorate.
      * @param  size the size of the interval.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -81,7 +81,7 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @param  channel the channel to decorate.
      * @param  start the start of the interval.
      * @param  size the size of the interval.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
@@ -92,7 +92,7 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
     throws IOException {
         this(channel, start, size, false);
     }
-    
+
     private IntervalReadOnlyChannel(
             final SeekableByteChannel channel,
             final long start,
@@ -115,8 +115,8 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
             return 0;
 
         // Check is open and not at EOF.
-        final long size = size();
-        final long pos = this.pos;
+        final long pos = position();
+        final long size = this.size;
         if (pos >= size)
             return -1;
 
@@ -154,7 +154,7 @@ public class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
             assert 0 >= read;
             return -1;
         }
-        assert 0 < read;
+        assert read > 0;
         return read;
     }
 

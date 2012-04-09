@@ -35,7 +35,7 @@ extends DecoratingOutputSocket<E> {
      * Returns the socket socket for lazy initialization.
      * 
      * @return the socket socket for lazy initialization.
-     * @throws IOException on any I/O failure. 
+     * @throws IOException on any I/O error. 
      */
     protected abstract OutputSocket<? extends E> getLazyDelegate()
     throws IOException;

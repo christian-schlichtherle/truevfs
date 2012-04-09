@@ -9,6 +9,7 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsEntry;
+import de.truezip.kernel.FsReadOnlyFileSystemException;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
@@ -85,7 +86,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     protected OutputStream getOutputStream() throws IOException {
-        throw new ReadOnlyFileSystemTypeException();
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override

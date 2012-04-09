@@ -24,7 +24,7 @@ public interface Sink {
      * Buffering should get addressed by the caller instead.
      *
      * @return A new output stream.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      * @throws IllegalStateException if this method has already been called
      *         and a new output stream cannot get created.
      */
@@ -39,7 +39,7 @@ public interface Sink {
      * Buffering should get addressed by the caller instead.
      *
      * @return A new seekable byte channel.
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      * @throws UnsupportedOperationException if this operation is not supported
      *         by the implementation.
      * @throws IllegalStateException if this method has already been called

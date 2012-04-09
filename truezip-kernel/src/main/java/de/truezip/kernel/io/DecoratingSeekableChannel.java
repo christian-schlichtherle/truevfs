@@ -38,8 +38,8 @@ implements SeekableByteChannel {
 
     @CreatesObligation
     protected DecoratingSeekableChannel(
-            final @CheckForNull @WillCloseWhenClosed SeekableByteChannel sbc) {
-        this.channel = sbc;
+            final @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
+        this.channel = channel;
     }
 
     @Override

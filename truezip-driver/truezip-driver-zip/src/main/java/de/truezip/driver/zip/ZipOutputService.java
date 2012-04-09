@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.driver.zip.io.RawZipOutputStream;
+import de.truezip.driver.zip.io.RawOutputStream;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import static de.truezip.driver.zip.io.ZipEntry.UNKNOWN;
@@ -39,7 +39,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public final class ZipOutputService
-extends RawZipOutputStream<ZipDriverEntry>
+extends RawOutputStream<ZipDriverEntry>
 implements OutputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
@@ -50,7 +50,7 @@ implements OutputService<ZipDriverEntry> {
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ZipOutputService(   final ZipDriver driver,
+    public ZipOutputService(final ZipDriver driver,
                             final FsModel model,
                             final @WillCloseWhenClosed OutputStream out,
                             final @CheckForNull @WillNotClose ZipInputService source)
@@ -131,7 +131,7 @@ implements OutputService<ZipDriverEntry> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<ZipDriverEntry> {
+        final class Output extends OutputSocket<ZipDriverEntry> {
             @Override
             public ZipDriverEntry getLocalTarget() {
                 return entry;

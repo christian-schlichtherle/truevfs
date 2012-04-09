@@ -70,7 +70,7 @@ public abstract class IOSocket<LT, PT> {
      * conditions in order to resolve these potential issues.
      *
      * @return The local target for I/O operations.
-     * @throws IOException On any I/O failure. 
+     * @throws IOException On any I/O error. 
      */
     public abstract LT getLocalTarget() throws IOException;
 
@@ -80,7 +80,7 @@ public abstract class IOSocket<LT, PT> {
      * The same considerations as for {@link #getLocalTarget} apply here, too.
      *
      * @return The remote target for I/O operations.
-     * @throws IOException On any I/O failure. 
+     * @throws IOException On any I/O error. 
      */
     public abstract @CheckForNull PT getRemoteTarget() throws IOException;
 

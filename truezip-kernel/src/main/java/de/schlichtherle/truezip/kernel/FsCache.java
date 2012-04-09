@@ -8,8 +8,6 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.Pool;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
@@ -135,7 +133,7 @@ final class FsCache implements Flushable, Closeable {
     /**
      * Clears the entry data from this cache without flushing it.
      * 
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      */
     void clear() throws IOException {
         setBuffer(null);
@@ -451,28 +449,6 @@ final class FsCache implements Flushable, Closeable {
                     closed = true;
                 }
             } // Channel
-            
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return new File();
-            }
-
-            final class File extends DecoratingReadOnlyFile {
-                boolean closed;
-
-                File() throws IOException {
-                    super(getBoundSocket().newReadOnlyFile());
-                }
-
-                @Override
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    rof.close();
-                    getInputBufferPool().release(Buffer.this);
-                    closed = true;
-                }
-            } // File
         } // Input
 
         @NotThreadSafe

@@ -16,7 +16,7 @@ import org.bouncycastle.crypto.Mac;
  * An {@link OutputStream} to produce a file with data ecnrypted according
  * to the Random Access Encryption Specification (RAES).
  *
- * @see    RaesReadOnlyFile
+ * @see    RaesReadOnlyChannel
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -44,10 +44,10 @@ public abstract class RaesOutputStream extends CipherOutputStream {
      * The result is stored in {@code buf}, which must match the given
      * KLAC's output size.
      */
-    static void klac(final Mac klac, long length, final byte[] buf) {
+    static void klac(final Mac klac, long size, final byte[] buf) {
         for (int i = 0; i < 8; i++) {
-            klac.update((byte) length);
-            length >>= 8;
+            klac.update((byte) size);
+            size >>= 8;
         }
         final int bufLength = klac.doFinal(buf, 0);
         assert bufLength == buf.length;

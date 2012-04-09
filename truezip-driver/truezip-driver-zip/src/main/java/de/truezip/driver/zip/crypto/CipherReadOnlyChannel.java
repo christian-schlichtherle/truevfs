@@ -9,50 +9,32 @@ import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.Streams;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import static java.lang.Math.min;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
 
 /**
- * A seekable byte channel for transparent random read-only access to the plain
- * text of an encrypted file.
- * The client must call {@link #init(SeekableBlockCipher)}
- * before it can actually read anything!
+ * Provides buffered random read-only access to the plain text of an encrypted
+ * file.
  * Note that this channel implements its own virtual position.
  *
  * @see    CipherOutputStream
  * @author Christian Schlichtherle
  */
 //
-// Implementation notes:
+// Note that this is mostly a copy of
+// de.truezip.kernel.io.BufferedReadOnlyChannel which has been tuned for
+// performance.
 //
-// In order to provide optimum performance, this class implements a read ahead
-// strategy with lazy decryption.
-// So the encrypted data of the file is read ahead into an internal buffer in
-// order to minimize file access.
-// Upon request by the application only, this buffer is then decrypted block by
-// block into the buffer provided by the application.
-//
-// For similar reasons, this class is not a sub-class of
-// BufferedReadOnlyChannel though its algorithm and code is pretty similar.
-// In fact, this class uses an important performance optimization:
-// Whenever possible, encrypted data in the buffer is directly decrypted into
-// the user provided buffer.
-// If BufferedReadOnlyChannel would be used as the base class instead, we would
-// have to provide another buffer to copy the data into before we could
-// actually decrypt it, which is redundant.
-//
-// TODO: Rip out duplicated IntervalReadOnlyChannel functionality!
 @NotThreadSafe
-public abstract class CipherReadOnlyChannel
-extends DecoratingReadOnlyChannel {
+public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
 
-    /** The size of the encrypted data in the decorated channel. */
-    private long size;
+    private static final long INVALID = Long.MIN_VALUE;
+
+    /** The seekable block cipher for random access decryption. */
+    private final SeekableBlockCipher cipher;
 
     /** The virtual position of this channel. */
     private long pos;
@@ -62,82 +44,64 @@ extends DecoratingReadOnlyChannel {
      * encrypted data starts.
      * This is always a multiple of the cipher's block size.
      */
-    private long bufferPos;
+    private long bufferStart = INVALID;
 
     /**
-     * The buffer to the encrypted data of the decorated channel.
-     * Note that this buffer contains <em>encrypted</em> data.
+     * The buffer for the encrypted channel data.
      * The size of the buffer is a multiple of the cipher's block size.
      */
     private ByteBuffer buffer;
-
-    /** The seekable block cipher for random access decryption. */
-    private @CheckForNull SeekableBlockCipher cipher;
 
     /**
      * The position in the decorated channel where the block with the
      * decrypted data starts.
      * This is always a multiple of the cipher's block size.
      */
-    private long blockPos;
+    private long blockStart = INVALID;
 
-    /**
-     * The block byte buffer to use for the decryption of cipher blocks.
-     * Note that this buffer contains <em>decrypted</em> data.
-     */
+    /** The buffer for the decrypted channel data. */
     private ByteBuffer block;
 
     /**
      * Constructs a new cipher read-only channel.
-     * The client must call {@link #init(SeekableBlockCipher)}
-     * before it can actually read anything!
      *
-     * @param channel A seekable byte channel.
-     *        This may be {@code null} now, but is expected to get initialized
-     *        <em>before</em> a call to {@link #init}.
+     * @param channel a seekable byte channel.
+     * @param cipher a seekable block cipher.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected CipherReadOnlyChannel(
-            @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
-        super(channel);
+    public CipherReadOnlyChannel(
+            final @WillCloseWhenClosed SeekableByteChannel channel,
+            final SeekableBlockCipher cipher) {
+        this(channel, cipher, Streams.BUFFER_SIZE);
     }
 
     /**
-     * Initializes this cipher read-only channel.
-     * This method must get called before the first read access!
+     * Constructs a new cipher read-only channel.
      *
-     * @param  cipher the seekable block cipher.
-     * @throws IllegalStateException if {@link #channel} is {@code null} or
-     *         if this object has already been initialized.
-     * @throws IllegalArgumentException if {@code cipher} is {@code null} or
-     *         if {@code start} or {@code size} are less than zero.
-     * @throws IOException on any I/O failure.
+     * @param channel a seekable byte channel.
+     * @param cipher a seekable block cipher.
+     * @param bufferSize the size of the byte buffer.
+     *        The value gets adjusted to be at least as large as the cipher's
+     *        block size.
      */
-    protected final void init(final SeekableBlockCipher cipher)
-    throws IOException {
-        // Check state.
+    @CreatesObligation
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    public CipherReadOnlyChannel(
+            final @WillCloseWhenClosed SeekableByteChannel channel,
+            final SeekableBlockCipher cipher,
+            int bufferSize) {
+        super(channel);
         if (null == channel)
-            throw new IllegalStateException();
-        if (null != this.cipher)
-            throw new IllegalStateException();
-
-        // Check parameters.
+            throw new NullPointerException();
         if (null == (this.cipher = cipher))
-            throw new IllegalArgumentException();
-
-        size = channel.size();
-        blockPos = size;
+            throw new NullPointerException();
         final int blockSize = cipher.getBlockSize();
         block = ByteBuffer.allocate(blockSize);
-        invalidateBuffer();
-        buffer = ByteBuffer.allocate(Streams.BUFFER_SIZE / blockSize * blockSize); // round down to multiple of block size
-
-        assert 0 == pos;
-        assert blockSize == block.limit();
-        assert blockSize == block.capacity();
+        if (bufferSize < blockSize)
+            bufferSize = blockSize;
+        buffer = ByteBuffer.allocate(bufferSize / blockSize * blockSize); // round down to multiple of block size
         assert buffer.capacity() % blockSize == 0;
-        assert buffer.limit() == buffer.capacity();
     }
 
     /**
@@ -148,86 +112,90 @@ extends DecoratingReadOnlyChannel {
      * has been tampered with meanwhile.
      *
      * @param  mac a properly initialized MAC object.
-     * @return A byte buffer with the authentication code.
-     * @throws IOException on any I/O failure.
+     * @return A byte array with the authentication code.
+     * @throws IOException on any I/O error.
      */
-    protected ByteBuffer computeMac(final Mac mac) throws IOException {
-        final int bufferSize = buffer.limit();
-        final ByteBuffer buf = ByteBuffer.allocate(mac.getMacSize());
+    public byte[] mac(final Mac mac) throws IOException {
         final long position = position();
         try {
-            for (pos = 0; pos < size; pos += bufferSize) {
+            final long size = size();
+            for (pos = 0; pos < size; ) {
                 positionBuffer();
-                final long remaining = size - bufferPos;
-                mac.update(buffer.array(), 0, (int) min(bufferSize, remaining));
+                assert buffer.position() == 0;
+                final int bufferLimit = buffer.limit();
+                mac.update(buffer.array(), buffer.arrayOffset(), bufferLimit);
+                pos += bufferLimit;
             }
-            final int bufLen = mac.doFinal(buf.array(), 0);
-            assert bufLen == buf.limit();
+            final byte[] buf = new byte[mac.getMacSize()];
+            final int bufLength = mac.doFinal(buf, 0);
+            assert bufLength == buf.length;
+            return buf;
         } finally {
             position(position);
         }
-        return buf;
     }
 
     @Override
     public int read(final ByteBuffer dst) throws IOException {
         // Check no-op first for compatibility with FileChannel.
         final int remaining = dst.remaining();
-        if (0 >= remaining)
+        if (remaining <= 0)
             return 0;
 
         // Check is open and not at EOF.
         final long size = size();
-        if (pos >= size) // do NOT cache pos!
+        if (position() >= size)
             return -1;
 
         // Setup.
-        final int blockSize = block.limit();
         int total = 0; // amount of data copied to dst
+        final int blockSize = block.capacity();
 
-        {
-            // Partial read of block data at the start.
-            final int p = (int) (pos % blockSize);
-            if (p != 0) {
-                // The virtual position is NOT starting on a block boundary.
-                positionBlock();
-                block.position(p);
-                total = copy(block, dst);
-                assert total > 0;
-                pos += total;
-            }
+        // Partial read of block data at the start.
+        positionBlock();
+        if (pos != blockStart) {
+            assert pos % blockSize != 0;
+            total = copy(block, dst);
+            assert total > 0;
+            pos += total;
         }
 
-        if (dst.hasArray()) {
+        if (total < remaining && pos < size && dst.hasArray()) {
             // Full read of block data in the middle.
+            assert pos % blockSize == 0;
             final SeekableBlockCipher cipher = this.cipher;
+            final byte[] buffer = this.buffer.array();
+            final byte[] dstArray = dst.array();
+            final int dstArrayOffset = dst.arrayOffset();
+            int dstPosition = dst.position();
             long blockCounter = pos / blockSize;
-            while (total + blockSize < remaining && pos + blockSize < size) {
+            while (total + blockSize <= remaining
+                    && dstPosition + blockSize <= dst.capacity()
+                    && pos + blockSize <= size) {
                 // The virtual position is starting on a block boundary.
                 positionBuffer();
                 cipher.setBlockCounter(blockCounter++);
-                final int copied = cipher.processBlock(buffer.array(), (int) (pos - bufferPos), dst.array(), dst.arrayOffset() + total);
-                assert copied == blockSize;
-                dst.position(dst.position() + copied);
-                total += blockSize;
-                pos += blockSize;
+                final int bufferOff = (int) (pos - bufferStart);
+                final int processed = cipher.processBlock(
+                        buffer, bufferOff,
+                        dstArray, dstArrayOffset + dstPosition);
+                assert processed == blockSize;
+                dst.position(dstPosition += processed);
+                total += processed;
+                pos += processed;
             }
         }
 
         // Read of remaining block data.
         while (total < remaining && pos < size) {
-            // The virtual position is starting on a block boundary.
+            assert pos % blockSize == 0;
             positionBlock();
-            block.rewind();
-            final int copied = copy(block, dst);
-            assert copied > 0;
-            total += copied;
-            pos += copied;
+            final int processed = copy(block, dst);
+            assert processed > 0;
+            total += processed;
+            pos += processed;
         }
 
-        // Assert that at least one byte has been read.
-        // Note that EOF has been checked before.
-        assert 0 < total;
         return total;
     }
 
@@ -246,81 +214,99 @@ extends DecoratingReadOnlyChannel {
         return this;
     }
 
-    @Override
-    public long size() throws IOException {
-        checkOpen();
-        return size;
-    }
-
     /**
      * Positions the block with so that it holds the decrypted data
      * referenced by the virtual file pointer.
      *
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      *         The block is not positioned in this case.
      */
     private void positionBlock() throws IOException {
-        assert null != cipher;
+        final ByteBuffer block = this.block;
+        final int blockSize = block.capacity();
 
         // Check position.
         final long pos = this.pos;
-        final int blockSize = block.limit();
-        if (blockPos <= pos) {
-            final long nextBlockOff = blockPos + blockSize;
-            if (pos < nextBlockOff)
+        long blockStart = this.blockStart;
+        long blockPos = pos - blockStart;
+        if (0 <= blockPos) {
+            final long nextBlockStart = blockStart + blockSize;
+            if (pos < nextBlockStart) {
+                block.position((int) blockPos);
                 return;
+            }
         }
 
         // Move position.
+        final SeekableBlockCipher cipher = this.cipher;
+        assert null != cipher;
         positionBuffer();
         final long blockCounter = pos / blockSize;
-        blockPos = blockCounter * blockSize;
+        cipher.setBlockCounter(blockCounter);
+        this.blockStart = blockStart = blockCounter * blockSize;
+        blockPos = pos - blockStart;
 
         // Decrypt block from buffer.
-        cipher.setBlockCounter(blockCounter);
-        cipher.processBlock(buffer.array(), (int) (blockPos - bufferPos), block.array(), 0);
-    }
-
-    /** Triggers a reload of the buffer on the next read access. */
-    private void invalidateBuffer() {
-        bufferPos = Long.MIN_VALUE;
+        block.clear();
+        final ByteBuffer buffer = this.buffer;
+        final int bufferPos = (int) (blockStart - bufferStart);
+        final int processed = cipher.processBlock(
+                buffer.array(), bufferPos,
+                block.array(), 0);
+        assert processed == blockSize;
+        final int remaining = buffer.limit() - bufferPos;
+        assert remaining > 0;
+        if (remaining < blockSize)
+            block.limit(remaining);
+        block.position((int) blockPos);
     }
 
     /**
      * Positions the buffer so that it holds the encrypted data
-     * referenced by the virtual file pointer.
+     * referenced by the virtual channel pointer.
      *
-     * @throws IOException on any I/O failure.
+     * @throws IOException on any I/O error.
      *         The buffer gets invalidated in this case.
      */
     private void positionBuffer() throws IOException {
+        final ByteBuffer buffer = this.buffer;
+        final int bufferSize = buffer.capacity();
+
         // Check position.
         final long pos = this.pos;
-        final int bufferSize = buffer.limit();
-        final long nextBufferPos = bufferPos + bufferSize;
-        if (bufferPos <= pos && pos < nextBufferPos)
+        long bufferStart = this.bufferStart;
+        long bufferPos = pos - bufferStart;
+        final long nextBufferStart = bufferStart + bufferSize;
+        if (0 <= bufferPos && pos < nextBufferStart) {
+            buffer.position((int) bufferPos);
             return;
+        }
 
         try {
+            final SeekableByteChannel channel = this.channel;
+
             // Move position.
-            bufferPos = pos / bufferSize * bufferSize; // round down to multiple of buffer size
-            if (bufferPos != nextBufferPos)
-                channel.position(bufferPos);
+            // Round down to multiple of buffer size
+            this.bufferStart = bufferStart = pos / bufferSize * bufferSize;
+            bufferPos = pos - bufferStart;
+            if (bufferStart != nextBufferStart)
+                channel.position(bufferStart);
 
             // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
             // depend on this as it would be a violation of the contract for a
             // SeekableByteChannel.
-            buffer.rewind();
+            buffer.clear();
             int total = 0;
             do {
-                int read = channel.read(buffer);
-                if (0 > read)
+                final int read = channel.read(buffer);
+                if (read < 0)
                     break;
                 total += read;
             } while (total < bufferSize);
+            buffer.flip().position((int) bufferPos);
         } catch (final Throwable ex) {
-            invalidateBuffer();
+            this.bufferStart = INVALID;
             throw ex;
         }
     }

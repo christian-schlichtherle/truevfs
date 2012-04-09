@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;
@@ -17,8 +18,6 @@ import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.SyncOption;
 import static de.truezip.kernel.option.SyncOption.FORCE_CLOSE_IO;
 import static de.truezip.kernel.option.SyncOption.WAIT_CLOSE_IO;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -75,11 +74,6 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
             @Override
             public SeekableByteChannel newChannel() throws IOException {
                 return new ResourceSeekableChannel(getBoundSocket().newChannel());
-            }
-
-            @Override
-            public ReadOnlyFile newReadOnlyFile() throws IOException {
-                return new ResourceReadOnlyFile(getBoundSocket().newReadOnlyFile());
             }
         } // Input
 
@@ -188,7 +182,7 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
 
             @Override
             public void warn(IOException cause) throws X {
-                assert !(cause instanceof FsControllerException);
+                assert !(cause instanceof FsControlFlowIOException);
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
         } // IOExceptionHandler
@@ -197,38 +191,6 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
         if (null != acc)
             acc.closeAllResources(new IOExceptionHandler());
     }
-
-    private final class ResourceReadOnlyFile
-    extends DecoratingReadOnlyFile {
-        @CreatesObligation
-        @SuppressWarnings("LeakingThisInConstructor")
-        ResourceReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
-            super(rof);
-            getAccountant().startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
-            rof.close();
-        }
-    } // ResourceReadOnlyFile
-
-    private final class ResourceSeekableChannel
-    extends DecoratingSeekableChannel {
-        @CreatesObligation
-        @SuppressWarnings("LeakingThisInConstructor")
-        ResourceSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
-            getAccountant().startAccountingFor(this);
-        }
-
-        @Override
-        public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
-            channel.close();
-        }
-    } // ResourceSeekableChannel
 
     private final class ResourceInputStream
     extends DecoratingInputStream {
@@ -261,4 +223,20 @@ extends FsDecoratingLockModelController<FsController<? extends FsLockModel>> {
             out.close();
         }
     } // ResourceOutputStream
+
+    private final class ResourceSeekableChannel
+    extends DecoratingSeekableChannel {
+        @CreatesObligation
+        @SuppressWarnings("LeakingThisInConstructor")
+        ResourceSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+            super(sbc);
+            getAccountant().startAccountingFor(this);
+        }
+
+        @Override
+        public void close() throws IOException {
+            getAccountant().stopAccountingFor(this);
+            channel.close();
+        }
+    } // ResourceSeekableChannel
 }

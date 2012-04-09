@@ -6,7 +6,6 @@ package de.truezip.kernel.io;
 
 import static de.truezip.kernel.io.Channels.readByte;
 import static de.truezip.kernel.io.Channels.readFully;
-import de.truezip.kernel.util.ArrayUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Math.max;
@@ -30,10 +29,10 @@ import org.junit.Test;
  *
  * @author Christian Schlichtherle
  */
-public abstract class ReadOnlyChannelTestSuite {
+public abstract class ReadOnlyChannelITSuite {
 
     private static final Logger
-            logger = Logger.getLogger(ReadOnlyChannelTestSuite.class.getName());
+            logger = Logger.getLogger(ReadOnlyChannelITSuite.class.getName());
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -49,10 +48,10 @@ public abstract class ReadOnlyChannelTestSuite {
     private Path temp;
 
     /** The seekable byte channel to use as a reference. */
-    private SeekableByteChannel rsbc;
+    private SeekableByteChannel rchannel;
 
     /** The seekable byte channel to test. */
-    private SeekableByteChannel tsbc;
+    private SeekableByteChannel tchannel;
 
     /** The test data. */
     private byte[] data;
@@ -65,8 +64,8 @@ public abstract class ReadOnlyChannelTestSuite {
                 out.write(DATA);
             }
             assert DATA.length == size(temp);
-            rsbc = newByteChannel(temp);
-            tsbc = newChannel(temp);
+            rchannel = newByteChannel(temp);
+            tchannel = newChannel(temp);
         } catch (final Throwable ex) {
             try {
                 delete(temp);
@@ -86,13 +85,13 @@ public abstract class ReadOnlyChannelTestSuite {
         try {
             try {
                 try {
-                    final SeekableByteChannel tsbc = this.tsbc;
-                    this.tsbc = null;
+                    final SeekableByteChannel tsbc = this.tchannel;
+                    this.tchannel = null;
                     if (tsbc != null)
                         tsbc.close();
                 } finally {
-                    final SeekableByteChannel rsbc = this.rsbc;
-                    this.rsbc = null;
+                    final SeekableByteChannel rsbc = this.rchannel;
+                    this.rchannel = null;
                     if (rsbc != null)
                         rsbc.close();
                 }
@@ -108,13 +107,13 @@ public abstract class ReadOnlyChannelTestSuite {
 
     @Test
     public void testWrite() throws IOException {
-        assertWrite(rsbc);
-        assertWrite(tsbc);
+        assertWrite(rchannel);
+        assertWrite(tchannel);
     }
 
-    private void assertWrite(final SeekableByteChannel sbc) throws IOException {
+    private void assertWrite(final SeekableByteChannel channel) throws IOException {
         try {
-            sbc.write(ByteBuffer.allocate(1));
+            channel.write(ByteBuffer.allocate(1));
             fail();
         } catch (final NonWritableChannelException expected) {
         }
@@ -122,13 +121,13 @@ public abstract class ReadOnlyChannelTestSuite {
 
     @Test
     public void testTruncate() throws IOException {
-        assertTruncate(rsbc);
-        assertTruncate(tsbc);
+        assertTruncate(rchannel);
+        assertTruncate(tchannel);
     }
 
-    private void assertTruncate(final SeekableByteChannel sbc) throws IOException {
+    private void assertTruncate(final SeekableByteChannel channel) throws IOException {
         try {
-            sbc.truncate(0);
+            channel.truncate(0);
             fail();
         } catch (final NonWritableChannelException expected) {
         }
@@ -136,82 +135,82 @@ public abstract class ReadOnlyChannelTestSuite {
 
     @Test
     public void testClose() throws IOException {
-        close(rsbc);
-        close(tsbc);
+        close(rchannel);
+        close(tchannel);
     }
 
-    private static void close(final SeekableByteChannel sbc) throws IOException {
-        sbc.close();
+    private static void close(final SeekableByteChannel channel) throws IOException {
+        channel.close();
 
         try {
-            sbc.size();
+            channel.size();
             fail();
         } catch (IOException expected) {
         }
 
         try {
-            sbc.position();
+            channel.position();
             fail();
         } catch (IOException expected) {
         }
 
         try {
-            sbc.position(0);
+            channel.position(0);
             fail();
         } catch (IOException expected) {
         }
 
         try {
-            assertEquals(0, sbc.read(ByteBuffer.allocate(0)));
+            assertEquals(0, channel.read(ByteBuffer.allocate(0)));
         } catch (IOException mayHappen) {
         }
 
         try {
-            sbc.read(ByteBuffer.allocate(1));
+            channel.read(ByteBuffer.allocate(1));
             fail();
         } catch (IOException expected) {
         }
 
-        sbc.close();
+        channel.close();
     }
 
     @Test
     public void testLength() throws Exception {
-        assertEquals(data.length, rsbc.size());
-        assertEquals(data.length, tsbc.size());
+        assertEquals(data.length, rchannel.size());
+        assertEquals(data.length, tchannel.size());
     }
 
     @Test
     public void testForwardReadBytes() throws IOException {
-        assertForwardReadBytes(rsbc);
-        assertForwardReadBytes(tsbc);
+        assertForwardReadBytes(rchannel);
+        assertForwardReadBytes(tchannel);
     }
 
-    private void assertForwardReadBytes(final SeekableByteChannel sbc)
+    private void assertForwardReadBytes(final SeekableByteChannel channel)
     throws IOException {
-        final long size = sbc.size();
+        final long size = channel.size();
         for (int off = 0; off < size; off++)
-            assertEquals(data[off] & 0xff, readByte(sbc));
-        assertEquals(-1, readByte(sbc));
+            assertEquals(data[off] & 0xff, readByte(channel));
+        assertEquals(-1, readByte(channel));
     }
 
     @Test
     public void testRandomReadBytes() throws IOException {
-        assertRandomReadBytes(rsbc);
-        assertRandomReadBytes(tsbc);
+        assertRandomReadBytes(rchannel);
+        assertRandomReadBytes(tchannel);
     }
 
-    private void assertRandomReadBytes(final SeekableByteChannel sbc)
+    private void assertRandomReadBytes(final SeekableByteChannel channel)
     throws IOException {
-        assertEquals(0, sbc.position());
+        assertEquals(0, channel.position());
 
-        assertReadAtPosition(sbc, 0);
+        assertReadAtPosition(channel, 0);
 
-        final int size = (int) sbc.size();
+        final int size = (int) channel.size();
         for (int i = size; --i >= 0; ) {
             final int tooSmall = rnd.nextInt() | Integer.MIN_VALUE;
             try {
-                assertReadAtPosition(sbc, tooSmall);
+                assertReadAtPosition(channel, tooSmall);
                 fail();
             } catch (final IllegalArgumentException ex) {
             }
@@ -219,94 +218,98 @@ public abstract class ReadOnlyChannelTestSuite {
             // Seeking past the file length may or may not throw an
             // IOException, depending on the implementation.
             // In any case, we want to validate that it yields no side effects.
-            final int tooLarge = max(size + 1, rnd.nextInt() & Integer.MAX_VALUE);
-            assertReadAtPosition(sbc, tooLarge);
+            final int tooLarge = max(size, rnd.nextInt() & Integer.MAX_VALUE);
+            assertReadAtPosition(channel, tooLarge);
 
             final int justRight = rnd.nextInt(size);
-            assertReadAtPosition(sbc, justRight);
+            assertReadAtPosition(channel, justRight);
         }
     }
 
     private void assertReadAtPosition(
-            final SeekableByteChannel sbc,
+            final SeekableByteChannel channel,
             final int pos)
     throws IOException {
-        sbc.position(pos);
-        assertEquals(pos, sbc.position());
-        if (pos < sbc.size()) {
-            assertEquals(data[pos] & 0xff, readByte(sbc));
-            assertEquals(pos + 1, sbc.position());
+        channel.position(pos);
+        assertEquals(pos, channel.position());
+        if (pos < channel.size()) {
+            assertEquals(data[pos] & 0xff, readByte(channel));
+            assertEquals(pos + 1, channel.position());
         } else {
-            assertEquals(-1, readByte(sbc));
-            assertEquals(pos, sbc.position());
+            assertEquals(-1, readByte(channel));
+            assertEquals(pos, channel.position());
         }
     }
     
     @Test
     public void testBackwardReadBytes() throws IOException {
-        assertBackwardReadBytes(rsbc);
-        assertBackwardReadBytes(tsbc);
+        assertBackwardReadBytes(rchannel);
+        assertBackwardReadBytes(tchannel);
     }
 
-    private void assertBackwardReadBytes(final SeekableByteChannel rof)
+    private void assertBackwardReadBytes(final SeekableByteChannel channel)
     throws IOException {
-        final int size = (int) rof.size();
+        final int size = (int) channel.size();
         for (int pos = size; --pos >= 0; )
-            assertReadAtPosition(rof, pos);
+            assertReadAtPosition(channel, pos);
     }
 
     @Test
     public void testForwardReadChunks() throws IOException {
         // Las Vegas algorithm.
-        final int size = (int) rsbc.size();
+        final int size = (int) rchannel.size();
         int pos = 0;
         int read;
         while (true) {
             final byte[] buf = new byte[rnd.nextInt(size / 100)];
-            read = rsbc.read(ByteBuffer.wrap(buf));
+            read = rchannel.read(ByteBuffer.wrap(buf));
             if (0 > read)
                 break;
             if (0 < buf.length) {
                 assertTrue(0 < read);
-                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
+                assertEquals(   ByteBuffer.wrap(data, pos, read),
+                                ByteBuffer.wrap(buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
-                readFully(tsbc, ByteBuffer.wrap(buf, 0, read));
-                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
+                readFully(tchannel, ByteBuffer.wrap(buf, 0, read));
+                assertEquals(   ByteBuffer.wrap(data, pos, read),
+                                ByteBuffer.wrap(buf, 0, read));
             } else {
                 assertEquals(0, read);
-                assertEquals(0, tsbc.read(ByteBuffer.wrap(buf)));
+                assertEquals(0, tchannel.read(ByteBuffer.wrap(buf)));
             }
             pos += read;
         }
 
         assertEquals(pos, size);
         assertEquals(-1, read);
-        assertEquals(-1, readByte(tsbc));
-        assertEquals(0, rsbc.read(ByteBuffer.allocate(0)));
-        assertEquals(0, tsbc.read(ByteBuffer.allocate(0)));
+        assertEquals(-1, readByte(tchannel));
+        assertEquals(0, rchannel.read(ByteBuffer.allocate(0)));
+        assertEquals(0, tchannel.read(ByteBuffer.allocate(0)));
     }
 
     @Test
     public void testRandomReadChunks() throws IOException {
-        final int size = (int) rsbc.size();
+        final int size = (int) rchannel.size();
         for (int i = 100; --i >= 0; ) {
             int pos = rnd.nextInt(size);
-            assertReadAtPosition(rsbc, pos);
-            assertReadAtPosition(tsbc, pos);
+            assertReadAtPosition(rchannel, pos);
+            assertReadAtPosition(tchannel, pos);
             pos++;
             final byte[] buf = new byte[rnd.nextInt(size / 100)];
-            int read = rsbc.read(ByteBuffer.wrap(buf));
+            int read = rchannel.read(ByteBuffer.wrap(buf));
             if (read < 0)
                 continue;
             if (buf.length > 0) {
                 assertTrue(read > 0);
-                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
+                assertEquals(   ByteBuffer.wrap(data, pos, read),
+                                ByteBuffer.wrap(buf, 0, read));
                 java.util.Arrays.fill(buf, (byte) 0);
-                readFully(tsbc, ByteBuffer.wrap(buf, 0, read));
-                assertTrue(ArrayUtils.equals(data, pos, buf, 0, read));
+                readFully(tchannel, ByteBuffer.wrap(buf, 0, read));
+                assertEquals(   ByteBuffer.wrap(data, pos, read),
+                                ByteBuffer.wrap(buf, 0, read));
             } else {
                 assertEquals(0, read);
-                assertEquals(0, tsbc.read(ByteBuffer.wrap(buf)));
+                assertEquals(0, tchannel.read(ByteBuffer.wrap(buf)));
             }
         }
     }

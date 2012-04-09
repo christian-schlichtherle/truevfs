@@ -12,14 +12,10 @@ import static de.truezip.kernel.cio.Entry.Size.STORAGE;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.DecoratingInputStream;
-import de.truezip.kernel.io.DecoratingOutputStream;
+import de.truezip.kernel.io.*;
 import de.truezip.kernel.mock.MockController;
 import de.truezip.kernel.option.AccessOption;
 import de.truezip.kernel.option.AccessOptions;
-import de.truezip.kernel.rof.DecoratingReadOnlyFile;
-import de.truezip.kernel.rof.ReadOnlyFile;
-import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Throwables.contains;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -289,59 +285,36 @@ extends FsArchiveDriverTestBase<D> {
         final InputSocket<? extends E> input = service.getInputSocket(name(i));
 
         {
-            final byte[] buf = new byte[getDataLength()];
-            ReadOnlyFile rof;
+            final PowerBuffer buf = PowerBuffer.allocate(getDataLength());
+            SeekableByteChannel channel;
             try {
-                rof = input.newReadOnlyFile();
-            } catch (UnsupportedOperationException ex) {
-                rof = null;
+                channel = input.newChannel();
+            } catch (final UnsupportedOperationException ex) {
+                channel = null;
                 logger.log(Level.FINE,
                         input.getClass()
-                            + " does not support newReadOnlyFile().",
+                            + " does not support newChannel().",
                         ex);
             }
-            if (null != rof) {
+            if (null != channel) {
                 try {
-                    rof.readFully(buf);
-                    assertEquals(-1, rof.read());
+                    buf.load(channel);
+                    assertEquals(channel.position(), channel.size());
                 } finally {
-                    rof.close();
+                    channel.close();
                 }
-                rof.close(); // expect no issues
-                assertTrue(Arrays.equals(getData(), buf));
-            }
-        }
-
-        {
-            final byte[] buf = new byte[getDataLength()];
-            SeekableByteChannel sbc;
-            try {
-                sbc = input.newChannel();
-            } catch (UnsupportedOperationException ex) {
-                sbc = null;
-                logger.log(Level.FINE,
-                        input.getClass()
-                            + " does not support newSeekableByteChannel().",
-                        ex);
-            }
-            if (null != sbc) {
-                try {
-                    readFully(sbc, ByteBuffer.wrap(buf));
-                    assertEquals(-1, sbc.read(ByteBuffer.wrap(buf)));
-                } finally {
-                    sbc.close();
-                }
-                sbc.close(); // expect no issues
-                assertTrue(Arrays.equals(getData(), buf));
+                channel.close(); // expect no issues
+                assertTrue(Arrays.equals(getData(), buf.array()));
             }
         }
 
         {
             final byte[] buf = new byte[getDataLength()];
             boolean failure = true;
-            final InputStream in = input.newStream();
+            final DataInputStream
+                    in = new DataInputStream(input.newStream());
             try {
-                readFully(in, buf);
+                in.readFully(buf);
                 assertTrue(Arrays.equals(getData(), buf));
                 assertEquals(-1, in.read());
                 failure = false;
@@ -429,24 +402,6 @@ extends FsArchiveDriverTestBase<D> {
         return Integer.toString(i);
     }
 
-    private static void readFully(InputStream in, byte[] b)
-    throws IOException {
-        new DataInputStream(in).readFully(b);
-    }
-
-    private static void readFully(  final ReadableByteChannel rbc,
-                                    final ByteBuffer buf)
-    throws IOException {
-        final int len = buf.remaining();
-        int total = 0;
-        do {
-            final int read = rbc.read(buf);
-            if (0 > read)
-                throw new EOFException();
-            total += read;
-        } while (total < len);
-    }
-
     private MockController newController(final FsModel model) {
         final FsModel pm = model.getParent();
         final FsController<?> pc = null == pm ? null : newController(pm);
@@ -518,10 +473,10 @@ extends FsArchiveDriverTestBase<D> {
                 }
 
                 @Override
-                public ReadOnlyFile newReadOnlyFile()
+                public InputStream newStream()
                 throws IOException {
-                    return new TestReadOnlyFile(
-                            getBoundSocket().newReadOnlyFile());
+                    return new TestInputStream(
+                            getBoundSocket().newStream());
                 }
 
                 @Override
@@ -529,13 +484,6 @@ extends FsArchiveDriverTestBase<D> {
                 throws IOException {
                     return new TestSeekableChannel(
                             getBoundSocket().newChannel());
-                }
-
-                @Override
-                public InputStream newStream()
-                throws IOException {
-                    return new TestInputStream(
-                            getBoundSocket().newStream());
                 }
             } // Input
 
@@ -578,34 +526,6 @@ extends FsArchiveDriverTestBase<D> {
     private interface TestCloseable extends Closeable {
     }
 
-    private final class TestReadOnlyFile
-    extends DecoratingReadOnlyFile
-    implements TestCloseable {
-        TestReadOnlyFile(ReadOnlyFile rof) {
-            super(rof);
-        }
-
-        @Override
-        public void close() throws IOException {
-            checkAllExceptions(this);
-            rof.close();
-        }
-    } // TestReadOnlyfile
-
-    private final class TestSeekableChannel
-    extends DecoratingSeekableChannel
-    implements TestCloseable {
-        TestSeekableChannel(SeekableByteChannel sbc) {
-            super(sbc);
-        }
-
-        @Override
-        public void close() throws IOException {
-            checkAllExceptions(this);
-            channel.close();
-        }
-    } // TestSeekableChannel
-
     private final class TestInputStream
     extends DecoratingInputStream
     implements TestCloseable {
@@ -633,4 +553,18 @@ extends FsArchiveDriverTestBase<D> {
             out.close();
         }
     } // TestOutputStream
+
+    private final class TestSeekableChannel
+    extends DecoratingSeekableChannel
+    implements TestCloseable {
+        TestSeekableChannel(SeekableByteChannel channel) {
+            super(channel);
+        }
+
+        @Override
+        public void close() throws IOException {
+            checkAllExceptions(this);
+            channel.close();
+        }
+    } // TestSeekableChannel
 }

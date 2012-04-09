@@ -2,22 +2,20 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.truezip.kernel;
 
-import de.truezip.kernel.FsDecoratingController;
-import de.truezip.kernel.FsModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Indicates an <em>internal</em> exception in a decorator chain of
- * {@linkplain FsController file system controllers}.
+ * Indicates a condition which requires non-local control flow within a
+ * decorator chain of {@linkplain FsController file system controllers}.
  * <p>
  * File system controllers are typically arranged in a decorator and
  * chain-of-responsibility pattern.
  * Unfortunately, some aspects of file system management make it necessary to
- * use exceptions for non-local flow control in these chains.
+ * use exceptions for non-local control flow in these chains.
  * For example:
  * <ul>
  * <li>
@@ -58,7 +56,7 @@ import javax.annotation.concurrent.Immutable;
  * public FsEntry getEntry(FsEntryName name) throws IOException {
  *     prepareMyResources();
  *     try {
- *         return delegate.getEntry(); // may throw FsControllerException, too!
+ *         return delegate.getEntry(); // may throw FsControlFlowIOException, too!
  *     } finally {
  *         cleanUpMyResources();
  *     }
@@ -70,26 +68,27 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-abstract class FsControllerException extends IOException {
+public abstract class FsControlFlowIOException extends IOException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
      * trace or an empty stack trace.
      * If and only if the system property with the name
-     * {@code de.schlichtherle.truezip.kernel.FsControllerException.traceable}
+     * {@code de.schlichtherle.truezip.kernel.FsControlFlowIOException.traceable}
      * is set to {@code true} (whereby case is ignored), then instances of this
      * class will have a regular stack trace, otherwise their stack trace will
      * be empty.
      * This should be set to {@code true} for debugging purposes only.
      */
-    static final boolean TRACEABLE = Boolean
-            .getBoolean(FsControllerException.class.getName() + ".traceable");
+    public static final boolean TRACEABLE = Boolean
+            .getBoolean(FsControlFlowIOException.class.getName() + ".traceable");
 
-    FsControllerException() { }
+    protected FsControlFlowIOException() { }
 
-    FsControllerException(  final FsModel model,
-                            final @CheckForNull String message, 
-                            final @CheckForNull Throwable cause) {
+    protected FsControlFlowIOException(
+            final FsModel model,
+            final @CheckForNull String message, 
+            final @CheckForNull Throwable cause) {
         super(  TRACEABLE
                     ? null == message
                         ? model.getMountPoint().toString()

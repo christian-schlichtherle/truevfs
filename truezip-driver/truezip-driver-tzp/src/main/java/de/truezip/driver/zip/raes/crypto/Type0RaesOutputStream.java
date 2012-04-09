@@ -13,7 +13,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
-import java.util.Random;
+import java.util.Arrays;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -36,8 +36,6 @@ final class Type0RaesOutputStream extends RaesOutputStream {
      * The iteration count for the derived keys of the cipher, KLAC and MAC.
      */
     final static int ITERATION_COUNT = 2005; // The RAES epoch :-)
-
-    private final SecureRandom shaker = new SecureRandom();
 
     /** The key strength. */
     private final AesKeyStrength keyStrength;
@@ -77,7 +75,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
 
         // Shake the salt.
         final byte[] salt = new byte[keyStrengthBytes];
-        shaker.nextBytes(salt);
+        new SecureRandom().nextBytes(salt);
 
         // Init digest for key generation and KLAC.
         final Digest digest = new SHA256Digest();
@@ -86,7 +84,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         // Init password.
         final char[] pwdChars = param.getWritePassword();
         final byte[] pwdBytes = PBEParametersGenerator.PKCS12PasswordToBytes(pwdChars);
-        paranoidWipe(pwdChars);
+        Arrays.fill(pwdChars, (char) 0);
 
         // Derive cipher and MAC parameters.
         final PBEParametersGenerator gen = new PKCS12ParametersGenerator(digest);
@@ -96,10 +94,10 @@ final class Type0RaesOutputStream extends RaesOutputStream {
                     keyStrengthBits, AES_BLOCK_SIZE_BITS);
         final CipherParameters
                 sha256HMmacParam = gen.generateDerivedMacParameters(keyStrengthBits);
-        paranoidWipe(pwdBytes);
+        Arrays.fill(pwdBytes, (byte) 0);
 
         // Init cipher.
-        this.cipher.init(true, aesCtrParam);
+        cipher.init(true, aesCtrParam);
 
         // Init MAC.
         final Mac mac = this.mac = new HMac(digest);
@@ -143,18 +141,6 @@ final class Type0RaesOutputStream extends RaesOutputStream {
             }
             throw ex;
         }
-    }
-
-    /** Wipe the given array. */
-    private void paranoidWipe(final byte[] passwd) {
-        shaker.nextBytes(passwd);
-    }
-
-    /** Wipe the given array. */
-    private void paranoidWipe(final char[] passwd) {
-        final Random rng = shaker;
-        for (int i = passwd.length; --i >= 0; )
-            passwd[i] = (char) rng.nextInt();
     }
 
     @Override

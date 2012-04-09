@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.kernel.io.SeekableChannelInputStream;
+import de.truezip.kernel.io.ChannelInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
@@ -17,13 +17,12 @@ import javax.annotation.WillCloseWhenClosed;
  *
  * @author Christian Schlichtherle
  */
-final class DummyByteSeekableChannelInputStream
-extends SeekableChannelInputStream {
+final class DummyByteChannelInputStream extends ChannelInputStream {
     private boolean added;
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    DummyByteSeekableChannelInputStream(
+    DummyByteChannelInputStream(
             @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);
     }

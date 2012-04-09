@@ -7,7 +7,6 @@ package de.truezip.extension.jmxjul.jul;
 import de.truezip.extension.jmxjul.InstrumentingInputSocket;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.rof.ReadOnlyFile;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.concurrent.Immutable;
@@ -24,17 +23,12 @@ extends InstrumentingInputSocket<E> {
     }
 
     @Override
-    public ReadOnlyFile newReadOnlyFile() throws IOException {
-        return new JulReadOnlyFile(getBoundSocket());
+    public InputStream newStream() throws IOException {
+        return new JulInputStream(getBoundSocket());
     }
 
     @Override
     public java.nio.channels.SeekableByteChannel newChannel() throws IOException {
         return new JulInputChannel(getBoundSocket());
-    }
-
-    @Override
-    public InputStream newStream() throws IOException {
-        return new JulInputStream(getBoundSocket());
     }
 }

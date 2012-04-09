@@ -9,6 +9,7 @@ import de.truezip.kernel.io.LEDataOutputStream;
 import de.truezip.key.param.KeyStrength;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
@@ -46,8 +47,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
 
     static final int PWD_VERIFIER_BITS = 16;
 
-    private final SecureRandom shaker = new SecureRandom();
-
     private final WinZipAesEntryParameters param;
 
     /** The Message Authentication Code (MAC). */
@@ -75,7 +74,7 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
 
         // Shake the salt.
         final byte[] salt = new byte[keyStrengthBytes / 2];
-        shaker.nextBytes(salt);
+        new SecureRandom().nextBytes(salt);
 
         // Init password.
         final byte[] passwd = param.getWritePassword();
@@ -92,7 +91,7 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
         final KeyParameter keyParam =
                 (KeyParameter) gen.generateDerivedParameters(
                     2 * keyStrengthBits + PWD_VERIFIER_BITS);
-        paranoidWipe(passwd); // must not wipe before generator use!
+        Arrays.fill(passwd, (byte) 0); // must not wipe before generator use!
 
         // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
         final byte[] ctrIv = new byte[AES_BLOCK_SIZE_BITS / 8];
@@ -105,18 +104,18 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 keyStrengthBytes);
 
         // Init cipher.
-        this.cipher.init(true, aesCtrParam);
+        cipher.init(true, aesCtrParam);
 
         // Init MAC.
         final Mac mac = this.mac = new HMac(new SHA1Digest());
         mac.init(sha1HMacParam);
 
         // Reinit chain of output streams as Encrypt-then-MAC.
-        this.dos = (LEDataOutputStream) this.out;
-        this.out = new MacOutputStream(this.dos, mac);
+        final LEDataOutputStream dos = this.dos = (LEDataOutputStream) this.out;
+        this.out = new MacOutputStream(dos, mac);
 
         // Write header.
-        this.dos.write(salt);
+        dos.write(salt);
         writePasswordVerifier(keyParam);
     }
 
@@ -126,11 +125,6 @@ final class WinZipAesEntryOutputStream extends CipherOutputStream {
                 keyParam.getKey(),
                 2 * param.getKeyStrength().getBytes(),
                 PWD_VERIFIER_BITS / 8);
-    }
-
-    /** Wipe the given array. */
-    private void paranoidWipe(final byte[] passwd) {
-        shaker.nextBytes(passwd);
     }
 
     @Override

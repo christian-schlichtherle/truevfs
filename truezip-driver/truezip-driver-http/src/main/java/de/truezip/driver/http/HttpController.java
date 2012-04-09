@@ -4,10 +4,7 @@
  */
 package de.truezip.driver.http;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsModelController;
-import de.truezip.kernel.FsSyncException;
+import de.truezip.kernel.*;
 import de.truezip.kernel.addr.FsEntryName;
 import de.truezip.kernel.addr.FsPath;
 import de.truezip.kernel.cio.Entry;
@@ -101,7 +98,7 @@ public class HttpController extends FsModelController<FsModel>  {
             long value,
             BitField<AccessOption> options)
     throws IOException {
-        throw new ReadOnlyFileSystemTypeException();
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override
@@ -125,13 +122,13 @@ public class HttpController extends FsModelController<FsModel>  {
                         final BitField<AccessOption> options,
                         final @CheckForNull Entry template)
     throws IOException {
-        throw new ReadOnlyFileSystemTypeException();
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override
     public void unlink(FsEntryName name, BitField<AccessOption> options)
     throws IOException {
-        throw new ReadOnlyFileSystemTypeException();
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override
