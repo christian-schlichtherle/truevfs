@@ -4,11 +4,11 @@
  */
 package de.truezip.driver.zip.crypto;
 
-import static de.truezip.kernel.io.Buffers.copy;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.Streams;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import static java.lang.Math.min;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
@@ -50,7 +50,7 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
      * The buffer for the encrypted channel data.
      * The size of the buffer is a multiple of the cipher's block size.
      */
-    private ByteBuffer buffer;
+    private byte[] buffer;
 
     /**
      * The position in the decorated channel where the block with the
@@ -60,7 +60,7 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
     private long blockStart = INVALID;
 
     /** The buffer for the decrypted channel data. */
-    private ByteBuffer block;
+    private byte[] block;
 
     /**
      * Constructs a new cipher read-only channel.
@@ -97,11 +97,11 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
         if (null == (this.cipher = cipher))
             throw new NullPointerException();
         final int blockSize = cipher.getBlockSize();
-        block = ByteBuffer.allocate(blockSize);
+        block = new byte[blockSize];
         if (bufferSize < blockSize)
             bufferSize = blockSize;
-        buffer = ByteBuffer.allocate(bufferSize / blockSize * blockSize); // round down to multiple of block size
-        assert buffer.capacity() % blockSize == 0;
+        buffer = new byte[bufferSize / blockSize * blockSize]; // round down to multiple of block size
+        assert buffer.length % blockSize == 0;
     }
 
     /**
@@ -119,11 +119,12 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
         final long position = position();
         try {
             final long size = size();
+            final int bufferSize = buffer.length;
             for (pos = 0; pos < size; ) {
                 positionBuffer();
-                assert buffer.position() == 0;
-                final int bufferLimit = buffer.limit();
-                mac.update(buffer.array(), buffer.arrayOffset(), bufferLimit);
+                final int bufferLimit = (int) min(bufferSize, size - bufferStart);
+                assert 0 < bufferLimit;
+                mac.update(buffer, 0, bufferLimit);
                 pos += bufferLimit;
             }
             final byte[] buf = new byte[mac.getMacSize()];
@@ -149,40 +150,44 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
 
         // Setup.
         int total = 0; // amount of data copied to dst
-        final int blockSize = block.capacity();
+        final int blockSize = block.length;
 
         // Partial read of block data at the start.
         positionBlock();
         if (pos != blockStart) {
             assert pos % blockSize != 0;
-            total = copy(block, dst);
-            assert total > 0;
-            pos += total;
+            final int blockPos = (int) (pos - blockStart);
+            int blockLimit = min(remaining, blockSize - blockPos);
+            blockLimit = (int) min(blockLimit, size - pos);
+            assert blockLimit > 0;
+            dst.put(block, blockPos, blockLimit);
+            total += blockLimit;
+            pos += blockLimit;
         }
 
         if (total < remaining && pos < size && dst.hasArray()) {
             // Full read of block data in the middle.
-            assert pos % blockSize == 0;
             final SeekableBlockCipher cipher = this.cipher;
-            final byte[] buffer = this.buffer.array();
+            final byte[] buffer = this.buffer;
             final byte[] dstArray = dst.array();
             final int dstArrayOffset = dst.arrayOffset();
             int dstPosition = dst.position();
+            final int dstCapacity = dst.capacity();
             long blockCounter = pos / blockSize;
             while (total + blockSize <= remaining
-                    && dstPosition + blockSize <= dst.capacity()
+                    && dstPosition + blockSize <= dstCapacity
                     && pos + blockSize <= size) {
-                // The virtual position is starting on a block boundary.
+                assert pos % blockSize == 0;
                 positionBuffer();
                 cipher.setBlockCounter(blockCounter++);
                 final int bufferOff = (int) (pos - bufferStart);
-                final int processed = cipher.processBlock(
+                final int blockLimit = cipher.processBlock(
                         buffer, bufferOff,
                         dstArray, dstArrayOffset + dstPosition);
-                assert processed == blockSize;
-                dst.position(dstPosition += processed);
-                total += processed;
-                pos += processed;
+                assert blockLimit == blockSize;
+                dst.position(dstPosition += blockLimit);
+                total += blockLimit;
+                pos += blockLimit;
             }
         }
 
@@ -190,10 +195,13 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
         while (total < remaining && pos < size) {
             assert pos % blockSize == 0;
             positionBlock();
-            final int processed = copy(block, dst);
-            assert processed > 0;
-            total += processed;
-            pos += processed;
+            final int blockPos = (int) (pos - blockStart);
+            int blockLimit = min(remaining - total, blockSize - blockPos);
+            blockLimit = (int) min(blockLimit, size - pos);
+            assert blockLimit > 0;
+            dst.put(block, blockPos, blockLimit);
+            total += blockLimit;
+            pos += blockLimit;
         }
 
         return total;
@@ -222,19 +230,16 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
      *         The block is not positioned in this case.
      */
     private void positionBlock() throws IOException {
-        final ByteBuffer block = this.block;
-        final int blockSize = block.capacity();
+        final byte[] block = this.block;
+        final int blockSize = block.length;
 
         // Check position.
         final long pos = this.pos;
         long blockStart = this.blockStart;
-        long blockPos = pos - blockStart;
-        if (0 <= blockPos) {
+        if (blockStart <= pos) {
             final long nextBlockStart = blockStart + blockSize;
-            if (pos < nextBlockStart) {
-                block.position((int) blockPos);
+            if (pos < nextBlockStart)
                 return;
-            }
         }
 
         // Move position.
@@ -244,21 +249,13 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
         final long blockCounter = pos / blockSize;
         cipher.setBlockCounter(blockCounter);
         this.blockStart = blockStart = blockCounter * blockSize;
-        blockPos = pos - blockStart;
 
         // Decrypt block from buffer.
-        block.clear();
-        final ByteBuffer buffer = this.buffer;
         final int bufferPos = (int) (blockStart - bufferStart);
         final int processed = cipher.processBlock(
-                buffer.array(), bufferPos,
-                block.array(), 0);
+                buffer, bufferPos,
+                block, 0);
         assert processed == blockSize;
-        final int remaining = buffer.limit() - bufferPos;
-        assert remaining > 0;
-        if (remaining < blockSize)
-            block.limit(remaining);
-        block.position((int) blockPos);
     }
 
     /**
@@ -269,43 +266,37 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
      *         The buffer gets invalidated in this case.
      */
     private void positionBuffer() throws IOException {
-        final ByteBuffer buffer = this.buffer;
-        final int bufferSize = buffer.capacity();
+        final int bufferSize = buffer.length;
 
         // Check position.
         final long pos = this.pos;
         long bufferStart = this.bufferStart;
-        long bufferPos = pos - bufferStart;
         final long nextBufferStart = bufferStart + bufferSize;
-        if (0 <= bufferPos && pos < nextBufferStart) {
-            buffer.position((int) bufferPos);
+        if (bufferStart <= pos && pos < nextBufferStart)
             return;
-        }
 
         try {
             final SeekableByteChannel channel = this.channel;
 
             // Move position.
-            // Round down to multiple of buffer size
+            // Round down to multiple of buffer size.
             this.bufferStart = bufferStart = pos / bufferSize * bufferSize;
-            bufferPos = pos - bufferStart;
             if (bufferStart != nextBufferStart)
                 channel.position(bufferStart);
 
             // Fill buffer until end of file or buffer.
             // This should normally complete in one loop cycle, but we do not
-            // depend on this as it would be a violation of the contract for a
-            // SeekableByteChannel.
-            buffer.clear();
+            // depend on this as it would be a violation of ReadOnlyFile's
+            // contract.
             int total = 0;
+            final ByteBuffer buffer = ByteBuffer.wrap(this.buffer);
             do {
-                final int read = channel.read(buffer);
+                int read = channel.read(buffer);
                 if (read < 0)
                     break;
                 total += read;
             } while (total < bufferSize);
-            buffer.flip().position((int) bufferPos);
-        } catch (final Throwable ex) {
+        } catch (final IOException ex) {
             this.bufferStart = INVALID;
             throw ex;
         }
