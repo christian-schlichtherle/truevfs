@@ -37,7 +37,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class MultiplexingOutputService<E extends MutableEntry>
+public final class MultiplexingOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     private final IOPool<?> pool;
