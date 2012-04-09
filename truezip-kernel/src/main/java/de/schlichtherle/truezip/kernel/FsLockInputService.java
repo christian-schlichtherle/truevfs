@@ -2,13 +2,14 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.cio;
+package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.io.LockOutputStream;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.LockInputStream;
 import de.truezip.kernel.io.LockSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
@@ -19,45 +20,29 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Decorates another output service to allow concurrent access which is
+ * Decorates another input service to allow concurrent access which is
  * synchronized by a {@link Lock} object provided to its constructor.
  *
- * @param  <E> the type of the entries in the decorated output service.
- * @see    LockInputService
+ * @param  <E> the type of the entries in the decorated input service.
+ * @see    FsLockOutputService
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class LockOutputService<E extends Entry>
-extends DecoratingOutputService<E, OutputService<E>> {
+class FsLockInputService<E extends Entry>
+extends DecoratingInputService<E, InputService<E>> {
 
     /** The lock on which this object synchronizes. */
-    protected final Lock lock;
+    private final Lock lock = new ReentrantLock();
 
     /**
-     * Constructs a new lock output service.
-     * 
-     * @param output the service to decorate.
+     * Constructs a new lock input service.
+     *
+     * @param input the service to decorate.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public LockOutputService(@WillCloseWhenClosed OutputService<E> output) {
-        this(output, new ReentrantLock());
-    }
-
-    /**
-     * Constructs a new concurrent output service.
-     * 
-     * @param output the service to decorate.
-     * @param lock The lock to use. 
-     */
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public LockOutputService(
-            final @WillCloseWhenClosed OutputService<E> output,
-            final Lock lock) {
-        super(output);
-        if (null == (this.lock = lock))
-            throw new NullPointerException();
+    FsLockInputService(@WillCloseWhenClosed InputService<E> input) {
+        super(input);
     }
 
     @Override
@@ -99,10 +84,10 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<E> getOutputSocket(final E entry) {
-        final class Output extends DecoratingOutputSocket<E> {
-            Output() {
-                super(container.getOutputSocket(entry));
+    public InputSocket<E> getInputSocket(final String name) {
+        final class Input extends DecoratingInputSocket<E> {
+            Input() {
+                super(container.getInputSocket(name));
             }
 
             @Override
@@ -110,7 +95,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             public E getLocalTarget() throws IOException {
                 lock.lock();
                 try {
-                    return entry;
+                    return getBoundSocket().getLocalTarget();
                 } finally {
                     lock.unlock();
                 }
@@ -118,15 +103,15 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public OutputStream newStream() throws IOException {
-                final OutputStream out;
+            public InputStream newStream() throws IOException {
+                final InputStream in;
                 lock.lock();
                 try {
-                    out = getBoundSocket().newStream();
+                    in = getBoundSocket().newStream();
                 } finally {
                     lock.unlock();
                 }
-                return new LockOutputStream(out, lock);
+                return new LockInputStream(in, lock);
             }
 
             @Override
@@ -141,8 +126,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 }
                 return new LockSeekableChannel(channel, lock);
             }
-        } // Output
+        } // Input
 
-        return new Output();
+        return new Input();
     }
 }
