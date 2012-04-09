@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 import static java.nio.file.Files.newByteChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
+        
 /**
  * Tests compression and encryption of data.
  * 
