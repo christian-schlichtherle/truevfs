@@ -40,7 +40,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * @param output the service to decorate.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     LockOutputService(@WillCloseWhenClosed OutputService<E> output) {
         super(output);
     }

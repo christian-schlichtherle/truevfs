@@ -49,7 +49,6 @@ implements OutputService<ZipDriverEntry> {
     private ZipCryptoParameters param;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputService(
             final FsModel model,
             final Sink sink,
@@ -255,7 +254,6 @@ implements OutputService<ZipDriverEntry> {
     private final class EntryOutputStream extends DecoratingOutputStream {
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(ZipDriverEntry entry, boolean process)
         throws IOException {
             super(ZipOutputService.this);

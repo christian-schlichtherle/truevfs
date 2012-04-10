@@ -2625,7 +2625,6 @@ public final class TFile extends File {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void cp(final @WillClose InputStream in, final File dst)
     throws IOException {
         if (null == in)
@@ -3367,7 +3366,6 @@ public final class TFile extends File {
         return this;
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private static void compact(TFile grown) throws IOException {
         assert grown.isArchive();
         grown = grown.getNormalizedFile();

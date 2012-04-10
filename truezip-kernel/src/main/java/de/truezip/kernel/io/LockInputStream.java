@@ -33,7 +33,6 @@ public final class LockInputStream extends DecoratingInputStream {
      * @param lock the lock to use.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public LockInputStream(
             final @Nullable @WillCloseWhenClosed InputStream in,
             final Lock lock) {

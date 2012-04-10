@@ -77,7 +77,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(String path)
     throws FileNotFoundException {
         super(newOutputStream(new TFile(path), false));
@@ -96,7 +95,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(String path, boolean append)
     throws FileNotFoundException {
         super(newOutputStream(new TFile(path), append));
@@ -110,7 +108,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(File file)
     throws FileNotFoundException {
         super(newOutputStream(file, false));
@@ -126,7 +123,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileOutputStream(File file, boolean append)
     throws FileNotFoundException {
         super(newOutputStream(file, append));

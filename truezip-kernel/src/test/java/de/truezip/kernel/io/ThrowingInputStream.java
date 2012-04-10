@@ -25,13 +25,11 @@ public final class ThrowingInputStream extends DecoratingInputStream {
 
     private final ThrowControl control;
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
     public ThrowingInputStream(@WillCloseWhenClosed InputStream in) {
         this(in, null);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
     public ThrowingInputStream( final @WillCloseWhenClosed InputStream in,
                                 final @CheckForNull ThrowControl control) {

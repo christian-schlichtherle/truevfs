@@ -72,7 +72,6 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
             boolean closed;
 
             @CreatesObligation
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             TempReadOnlyChannel() throws IOException {
                 super(temp.getInputSocket().channel()); // bind(*) is considered redundant for IOPool.IOBuffer
             }

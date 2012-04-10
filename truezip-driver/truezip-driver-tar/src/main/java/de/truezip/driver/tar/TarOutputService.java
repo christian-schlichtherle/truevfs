@@ -163,7 +163,6 @@ implements OutputService<TarDriverEntry> {
         boolean closed;
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final TarDriverEntry entry)
         throws IOException {
             super(TarOutputService.this.out);
@@ -199,7 +198,6 @@ implements OutputService<TarDriverEntry> {
         boolean closed;
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(
                 final IOBuffer<?> buffer,
                 final TarDriverEntry entry)

@@ -56,7 +56,6 @@ public final class Raes {
      * parent directory path except the files themselves, which are not
      * recognized as archive files.
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void encrypt(
             final String plainPath,
             final String cipherPath,
@@ -118,7 +117,6 @@ public final class Raes {
      *        Otherwise, only the key/password and the file length get
      *        authenticated.
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public static void decrypt(
             final String cipherPath,
             final String plainPath,

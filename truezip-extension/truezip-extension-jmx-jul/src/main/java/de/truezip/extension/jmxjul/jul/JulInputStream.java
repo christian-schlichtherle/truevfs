@@ -25,7 +25,6 @@ final class JulInputStream extends DecoratingInputStream {
     private final InputSocket<?> socket;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     JulInputStream(final InputSocket<?> socket) throws IOException {
         super(socket.stream());
         this.socket = socket;

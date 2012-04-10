@@ -598,7 +598,6 @@ public final class TPath implements Path {
      * @see    TFileSystem#close()
      * @see    TVFS#umount()
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     public TPath toNonArchivePath() {
         if (!isArchive())
             return this;

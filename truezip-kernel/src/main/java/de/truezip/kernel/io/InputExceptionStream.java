@@ -18,7 +18,6 @@ import java.io.InputStream;
 public final class InputExceptionStream extends DecoratingInputStream {
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public InputExceptionStream(InputStream in) {
         super(in);
     }

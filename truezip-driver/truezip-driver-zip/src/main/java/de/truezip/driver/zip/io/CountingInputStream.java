@@ -29,7 +29,6 @@ final class CountingInputStream extends DecoratingInputStream {
      * @param in the decorated input stream.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     CountingInputStream(@Nullable @WillCloseWhenClosed InputStream in) {
         super(in);
     }

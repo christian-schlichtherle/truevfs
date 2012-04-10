@@ -38,7 +38,6 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
      * @param pool the pool for buffering entry data.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public OdfOutputService(@WillCloseWhenClosed ZipOutputService output, IOPool<?> pool) {
         super(output, pool);
     }

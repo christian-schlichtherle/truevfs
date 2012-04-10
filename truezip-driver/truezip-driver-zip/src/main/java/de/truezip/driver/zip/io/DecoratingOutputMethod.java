@@ -4,6 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipException;
@@ -31,7 +32,7 @@ abstract class DecoratingOutputMethod implements OutputMethod {
     }
 
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+    @CreatesObligation
     public OutputStream start() throws IOException {
         return method.start();
     }

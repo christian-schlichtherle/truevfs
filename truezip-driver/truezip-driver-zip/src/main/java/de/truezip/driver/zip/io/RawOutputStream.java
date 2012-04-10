@@ -92,7 +92,6 @@ implements Iterable<E> {
      * @param  param the parameters for writing the ZIP file.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected RawOutputStream(
             final Sink sink,
             final @CheckForNull @WillNotClose RawFile<E> appendee,
@@ -129,7 +128,6 @@ implements Iterable<E> {
     }
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private static LittleEndianOutputStream newLittleEndianOutputStream(
             final @CheckForNull @WillNotClose RawFile<?> appendee,
             final Sink sink) throws IOException {
@@ -696,7 +694,6 @@ implements Iterable<E> {
     private static final class AppendingLittleEndianOutputStream
     extends LittleEndianOutputStream {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         AppendingLittleEndianOutputStream(
                 final @WillCloseWhenClosed OutputStream out,
                 final @WillNotClose RawFile<?> appendee) {
@@ -914,7 +911,6 @@ implements Iterable<E> {
         }
 
         @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             // see DeflatedOutputMethod.finish().
             final ZipEntry entry = this.entry;
@@ -971,7 +967,6 @@ implements Iterable<E> {
         }
 
         @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             assert null == this.cout;
             assert null == this.dout;
@@ -1018,7 +1013,6 @@ implements Iterable<E> {
         }
 
         @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             assert null == this.out;
             return this.out = new ZipDeflaterOutputStream(
@@ -1047,7 +1041,6 @@ implements Iterable<E> {
         }
 
         @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         public OutputStream start() throws IOException {
             assert null == this.out;
             return this.out = new Crc32OutputStream(this.method.start());

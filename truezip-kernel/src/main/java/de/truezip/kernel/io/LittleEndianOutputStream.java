@@ -45,7 +45,6 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * @param out The underlying output stream which is saved for subsequent use.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public LittleEndianOutputStream(
             @CheckForNull @WillCloseWhenClosed OutputStream out) {
         super(out);

@@ -88,7 +88,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
             public OutputStream stream() throws IOException {
                 return new FinalizeOutputStream(getBoundSocket().stream());
             }
@@ -126,7 +125,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         FinalizeInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
@@ -163,7 +161,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         FinalizeOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
@@ -200,7 +197,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         volatile IOException close; // accessed by finalizer thread!
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         FinalizeSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }

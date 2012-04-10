@@ -51,7 +51,6 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
     private final KeyParameter sha256MacParam;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     Type0RaesReadOnlyChannel(
             final Type0RaesParameters param,
             final @WillCloseWhenClosed SeekableByteChannel channel)

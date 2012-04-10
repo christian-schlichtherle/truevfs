@@ -61,7 +61,6 @@ public final class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public IntervalReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
             final long size)
@@ -84,7 +83,6 @@ public final class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public IntervalReadOnlyChannel(
             final @WillNotClose SeekableByteChannel channel,
             final long start,

@@ -32,7 +32,6 @@ extends DecoratingSeekableChannel {
      * @param channel the nullable seekable byte channel to decorate.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     IOExceptionSeekableChannel(
             @Nullable @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);

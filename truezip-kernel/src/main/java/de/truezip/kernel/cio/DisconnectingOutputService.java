@@ -40,7 +40,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * @param output the service to decorate.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public DisconnectingOutputService(@WillCloseWhenClosed OutputService<E> output) {
         super(output);
     }
@@ -124,7 +123,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     private final class DisconnectingOutputStream
     extends DecoratingOutputStream {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+
+        @CreatesObligation
         DisconnectingOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
@@ -156,7 +156,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     private final class DisconnectingSeekableChannel
     extends DecoratingSeekableChannel {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+
+        @CreatesObligation
         DisconnectingSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
             super(channel);
         }

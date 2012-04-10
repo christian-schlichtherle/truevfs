@@ -29,7 +29,6 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
      * @param out the nullable output stream to decorate.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     IOExceptionOutputStream(@Nullable @WillCloseWhenClosed OutputStream out) {
         super(out);
     }

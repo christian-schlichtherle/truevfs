@@ -40,7 +40,6 @@ extends DecoratingInputService<E, InputService<E>> {
      * @param input the service to decorate.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     LockInputService(@WillCloseWhenClosed InputService<E> input) {
         super(input);
     }

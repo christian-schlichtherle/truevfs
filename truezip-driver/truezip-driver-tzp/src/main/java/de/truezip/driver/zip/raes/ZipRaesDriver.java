@@ -158,11 +158,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model, final OptionOutputSocket output, @CheckForNull
-                                                                  @WillNotClose
-    final ZipInputService source)
+            final FsModel model,
+            final OptionOutputSocket output,
+            final @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
