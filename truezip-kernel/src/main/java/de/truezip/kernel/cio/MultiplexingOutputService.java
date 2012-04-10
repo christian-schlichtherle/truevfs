@@ -282,7 +282,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         boolean store(final boolean discard) throws IOException {
             if (discard)
-                assert closed : "broken archive controller!";
+                assert closed;
             else if (!closed || isBusy())
                 return false;
             Throwable ex = null;
