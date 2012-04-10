@@ -251,7 +251,7 @@ extends FileSystemArchiveController<E> {
                 .set(CACHE);
         final OutputService<E> os;
         try {
-            os = driver.newOutputService(m, is, parent, name, options);
+            os = driver.newOutputService(m, parent, name, options, is);
         } catch (final FsControlFlowIOException ex) {
             assert ex instanceof NeedsLockRetryException;
             throw ex;

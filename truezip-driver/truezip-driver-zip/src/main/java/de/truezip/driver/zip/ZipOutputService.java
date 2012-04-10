@@ -51,14 +51,14 @@ implements OutputService<ZipDriverEntry> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputService(
-            final ZipDriver driver,
             final FsModel model,
+            final Sink sink,
             final @CheckForNull @WillNotClose ZipInputService source,
-            final Sink sink)
+            final ZipDriver driver)
     throws IOException {
-        super(  driver,
+        super(  sink,
                 null != source && source.isAppendee() ? source : null,
-                sink);
+                driver);
         this.driver = driver;
         try {
             if (null == (this.model = model))

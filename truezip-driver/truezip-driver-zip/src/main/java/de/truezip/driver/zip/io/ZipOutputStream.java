@@ -64,7 +64,7 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out)
     throws IOException {
-        super(DEFAULT_PARAM, null, new OneTimeSink(out));
+        super(new OneTimeSink(out), null, DEFAULT_PARAM);
     }
 
     /**
@@ -78,7 +78,8 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset)
     throws IOException {
-        super(new DefaultZipOutputStreamParameters(charset), null, new OneTimeSink(out));
+        super(  new OneTimeSink(out), null,
+                new DefaultZipOutputStreamParameters(charset));
     }
 
     /**
@@ -98,7 +99,7 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
             @WillCloseWhenClosed OutputStream out,
             ZipFile appendee)
     throws IOException {
-        super(DEFAULT_PARAM, appendee, new OneTimeSink(out));
+        super(new OneTimeSink(out), appendee, DEFAULT_PARAM);
         if (null == appendee)
             throw new NullPointerException();
     }

@@ -85,14 +85,14 @@ public class TarBZip2Driver extends TarDriver {
             }
         } // Source
 
-        return new TarInputService(this, model, new Source());
+        return new TarInputService(model, new Source(), this);
     }
 
     @Override
     protected OutputService<TarDriverEntry> newOutputService(
             final FsModel model,
-            final InputService<TarDriverEntry> source,
-            final OutputSocket<?> output)
+            final OutputSocket<?> output,
+            final InputService<TarDriverEntry> source)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
@@ -114,7 +114,7 @@ public class TarBZip2Driver extends TarDriver {
         } // Sink
 
         return new MultiplexingOutputService<>(
-                new TarOutputService(this, model, new Sink()),
+                new TarOutputService(model, new Sink(), this),
                 getIOPool());
     }
 

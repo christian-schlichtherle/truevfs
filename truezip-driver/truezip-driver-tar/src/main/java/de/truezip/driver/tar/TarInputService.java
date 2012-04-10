@@ -65,9 +65,9 @@ implements InputService<TarDriverEntry> {
      */
     @CreatesObligation
     public TarInputService(
-            final TarDriver driver,
             final FsModel model,
-            final Source source)
+            final Source source,
+            final TarDriver driver)
     throws IOException {
         if (null == model)
             throw new NullPointerException();

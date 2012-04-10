@@ -243,13 +243,6 @@ extends FsDriver {
      * and {@link #newOutputService(FsModel, InputService, OutputSocket)}.
      * 
      * @param  model the file system model for the target archive file.
-     * @param  source the nullable {@link InputService} for the target archive
-     *         file.
-     *         If not {@code null}, then the target archive file is going to
-     *         get updated.
-     *         This parameter is guaranteed to be the product of this driver's
-     *         factory method
-     *         {@link #newInputService(FsModel, FsController, FsEntryName, BitField)}.
      * @param  parent the controller for the parent file system with the target
      *         archive file.
      * @param  entry the entry name of the target archive file in the parent
@@ -258,6 +251,13 @@ extends FsDriver {
      *         file.
      *         These may get modified as required by overridding this method
      *         or {@link #getInputSocket}. 
+     * @param  source the nullable {@link InputService} for the target archive
+     *         file.
+     *         If not {@code null}, then the target archive file is going to
+     *         get updated.
+     *         This parameter is guaranteed to be the product of this driver's
+     *         factory method
+     *         {@link #newInputService(FsModel, FsController, FsEntryName, BitField)}.
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
@@ -265,13 +265,13 @@ extends FsDriver {
     @CreatesObligation
     public OutputService<E> newOutputService(
             FsModel model,
-            @CheckForNull @WillNotClose InputService<E> source,
             FsController<?> parent,
             FsEntryName entry,
-            BitField<FsAccessOption> options)
+            BitField<FsAccessOption> options,
+            @CheckForNull @WillNotClose InputService<E> source)
     throws IOException {
-        return newOutputService(model, source,
-                getOutputSocket(parent, entry, options));
+        return newOutputService(model,
+                getOutputSocket(parent, entry, options), source);
     }
 
     /**
@@ -279,9 +279,9 @@ extends FsDriver {
      * given {@code model} to the given {@code output} socket's target.
      * 
      * @param  model the file system model.
-     * @param  source the nullable {@link InputService}.
      * @param  output the output socket for writing the contents of the
      *         archive file to its target.
+     * @param  source the nullable {@link InputService}.
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
@@ -290,8 +290,8 @@ extends FsDriver {
     @CreatesObligation
     protected abstract OutputService<E> newOutputService(
             FsModel model,
-            @CheckForNull @WillNotClose InputService<E> source,
-            OutputSocket<?> output)
+            OutputSocket<?> output,
+            @CheckForNull @WillNotClose InputService<E> source)
     throws IOException;
 
     /**

@@ -111,8 +111,8 @@ public class ZipFile extends RawFile<ZipEntry> {
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new DefaultZipFileParameters(charset, preambled, postambled),
-                new ZipSource(path));
+        super(  new ZipSource(path),
+                new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = path;
     }
 
@@ -172,8 +172,8 @@ public class ZipFile extends RawFile<ZipEntry> {
             final boolean preambled,
             final boolean postambled)
     throws IOException {
-        super(  new DefaultZipFileParameters(charset, preambled, postambled),
-                new ZipSource(file));
+        super(  new ZipSource(file),
+                new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = file.toString();
     }
 
@@ -233,8 +233,8 @@ public class ZipFile extends RawFile<ZipEntry> {
             boolean preambled,
             boolean postambled)
     throws IOException {
-        super(  new DefaultZipFileParameters(charset, preambled, postambled),
-                new OneTimeSource(channel));
+        super(  new OneTimeSource(channel),
+                new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = channel.toString();
     }
 

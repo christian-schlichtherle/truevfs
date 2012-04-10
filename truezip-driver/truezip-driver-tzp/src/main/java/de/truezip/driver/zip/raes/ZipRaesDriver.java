@@ -164,15 +164,15 @@ public abstract class ZipRaesDriver extends JarDriver {
             }
         } // Source
 
-        return new ZipInputService(this, model, new Source());
+        return new ZipInputService(model, new Source(), this);
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final @CheckForNull @WillNotClose ZipInputService source,
-            final OptionOutputSocket output)
+            final FsModel model, final OptionOutputSocket output, @CheckForNull
+                                                                  @WillNotClose
+    final ZipInputService source)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
@@ -182,7 +182,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         } // Sink
 
         return new MultiplexingOutputService<>(
-                new ZipOutputService(this, model, source, new Sink()),
+                new ZipOutputService(model, new Sink(), source, this),
                 getIOPool());
     }
 

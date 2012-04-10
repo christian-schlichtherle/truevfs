@@ -64,9 +64,9 @@ implements OutputService<TarDriverEntry> {
 
     @CreatesObligation
     public TarOutputService(
-            final TarDriver driver,
             final FsModel model,
-            final Sink sink)
+            final Sink sink,
+            final TarDriver driver)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
