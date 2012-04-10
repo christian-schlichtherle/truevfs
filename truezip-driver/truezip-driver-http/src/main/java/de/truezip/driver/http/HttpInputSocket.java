@@ -4,12 +4,12 @@
  */
 package de.truezip.driver.http;
 
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
