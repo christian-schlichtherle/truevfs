@@ -4,7 +4,6 @@
  */
 package de.truezip.driver.zip.raes.crypto;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -23,7 +22,7 @@ public class RaesKeyException extends RaesParametersException {
      * 
      * @param msg the detail message.
      */
-    public RaesKeyException(@CheckForNull String msg) {
+    public RaesKeyException(String msg) {
         super(msg);
     }
 
@@ -33,7 +32,7 @@ public class RaesKeyException extends RaesParametersException {
      * 
      * @param cause the cause for this exception to get thrown.
      */
-    public RaesKeyException(@CheckForNull Throwable cause) {
+    public RaesKeyException(Throwable cause) {
         super(cause);
     }
 }
