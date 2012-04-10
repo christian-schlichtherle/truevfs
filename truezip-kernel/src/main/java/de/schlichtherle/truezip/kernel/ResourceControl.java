@@ -24,22 +24,22 @@ import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Accounts for {@link Closeable} resources
+ * Controls {@link Closeable} resources
  * ({@link InputStream}, {@link OutputStream} etc.) which are used in multiple
  * threads.
  * <p>
- * For synchronization, each accountant uses a lock which has to be provided
- * to its {@link #ResourceAccountant constructor}.
+ * For synchronization, each control uses a lock which has to be provided
+ * to its {@link #ResourceControl constructor}.
  * In order to start accounting for a closeable resource,
- * call {@link #startAccountingFor(Closeable)}.
+ * call {@link #start(Closeable)}.
  * In order to stop accounting for a closeable resource,
- * call {@link #stopAccountingFor(Closeable)}.
+ * call {@link #stop(Closeable)}.
  *
  * @see    FsResourceController
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ResourceAccountant {
+final class ResourceControl {
 
     /**
      * The initial capacity for the hash map accounts for the number of
@@ -73,7 +73,7 @@ final class ResourceAccountant {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    ResourceAccountant(final Lock lock) {
+    ResourceControl(final Lock lock) {
         this.condition = (this.lock = lock).newCondition();
     }
 
@@ -82,7 +82,7 @@ final class ResourceAccountant {
      * 
      * @param resource the closeable resource to start accounting for.
      */
-    void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
+    void start(final @WillCloseWhenClosed Closeable resource) {
         if (null == accounts.get(resource))
             accounts.putIfAbsent(resource, new Account());
     }
@@ -94,7 +94,7 @@ final class ResourceAccountant {
      * 
      * @param resource the closeable resource to stop accounting for.
      */
-    void stopAccountingFor(final @WillNotClose Closeable resource) {
+    void stop(final @WillNotClose Closeable resource) {
         if (null != accounts.remove(resource)) {
             lock.lock();
             try {
@@ -248,8 +248,8 @@ final class ResourceAccountant {
     private final class Account {
         final Thread owner = Thread.currentThread();
 
-        ResourceAccountant getAccountant() {
-            return ResourceAccountant.this;
+        ResourceControl getAccountant() {
+            return ResourceControl.this;
         }
     } // Account
 }

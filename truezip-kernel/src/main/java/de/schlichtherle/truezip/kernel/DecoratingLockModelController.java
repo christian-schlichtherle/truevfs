@@ -22,8 +22,6 @@ abstract class DecoratingLockModelController<
         C extends FsController<? extends LockModel>>
 extends SyncDecoratingController<LockModel, C>  {
 
-    static final int WAIT_TIMEOUT_MILLIS = 100;
-
     /**
      * Constructs a new decorating file system controller.
      * 

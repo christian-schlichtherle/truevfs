@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import static de.schlichtherle.truezip.kernel.LockControl.isLocking;
+import static de.schlichtherle.truezip.kernel.LockControl.locked;
 import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
@@ -14,7 +16,6 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import de.truezip.kernel.util.Threads;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -22,9 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.CheckForNull;
@@ -42,14 +40,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 @Immutable
 final class LockController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
-
-    private static final ThreadLocal<ThreadUtil>
-            threadUtil = new ThreadLocal<ThreadUtil>() {
-                @Override
-                public ThreadUtil initialValue() {
-                    return new ThreadUtil(ThreadLocalRandom.current());
-                }
-            };
 
     private static final BitField<FsSyncOption>
             NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not();
@@ -95,73 +85,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         assert !getModel().isReadLockedByCurrentThread()
                 : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
         return locked(operation, writeLock());
-    }
-
-    /**
-     * Tries to call the given consistent operation while holding the given
-     * lock.
-     * <p>
-     * If this is the first execution of this method on the call stack of the
-     * current thread, then the lock gets acquired using {@link Lock#lock()}.
-     * Once the lock has been acquired the operation gets called.
-     * If this fails for some reason and the thrown exception chain contains a
-     * {@link NeedsLockRetryException}, then the lock gets temporarily
-     * released and the current thread gets paused for a small random time
-     * interval before this procedure starts over again.
-     * Otherwise, the exception chain gets just passed on to the caller.
-     * <p>
-     * If this is <em>not</em> the first execution of this method on the call
-     * stack of the current thread, then the lock gets acquired using
-     * {@link Lock#tryLock()} instead.
-     * If this fails, an {@code NeedsLockRetryException} gets created and
-     * passed to the given exception handler for mapping before finally
-     * throwing the resulting exception by executing
-     * {@code throw handler.fail(new NeedsLockRetryException())}.
-     * Once the lock has been acquired the operation gets called.
-     * If this fails for some reason then the exception chain gets just passed
-     * on to the caller.
-     * <p>
-     * This algorithm prevents dead locks effectively by temporarily unwinding
-     * the stack and releasing all locks for a small random time interval.
-     * Note that this requires some minimal cooperation by the operation:
-     * Whenever it throws an exception, it MUST leave its resources in a
-     * consistent state so that it can get retried again!
-     * Mind that this is standard requirement for any {@link FsController}.
-     * 
-     * @param  <T> The return type of the operation.
-     * @param  operation The atomic operation.
-     * @param  lock The lock to hold while calling the operation.
-     * @return The result of the operation.
-     * @throws IOException As thrown by the operation.
-     * @throws NeedsLockRetryException See above.
-     */
-    private static <T> T locked(final IOOperation<T> operation, final Lock lock)
-    throws IOException {
-        final ThreadUtil thread = threadUtil.get();
-        if (thread.locking) {
-            if (!lock.tryLock())
-                throw NeedsLockRetryException.get();
-            try {
-                return operation.call();
-            } finally {
-                lock.unlock();
-            }
-        } else {
-            while (true) {
-                try {
-                    lock.lock();
-                    thread.locking = true;
-                    try {
-                        return operation.call();
-                    } finally {
-                        thread.locking = false;
-                        lock.unlock();
-                    }
-                } catch (NeedsLockRetryException ex) {
-                    thread.pause();
-                }
-            }
-        }
     }
 
     @Override
@@ -413,7 +336,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
         // MUST not initialize within IOOperation => would always be true!
-        final BitField<FsSyncOption> sync = threadUtil.get().locking
+        final BitField<FsSyncOption> sync = isLocking()
                 ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
                 : options;
 
@@ -494,21 +417,4 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             close(channel);
         }
     } // LockSeekableChannel
-
-    @NotThreadSafe
-    private static final class ThreadUtil {
-        boolean locking;
-        final Random rnd;
-
-        ThreadUtil(Random rnd) { this.rnd = rnd; }
-
-        /**
-         * Delays the current thread for a random time interval between one and
-         * {@link #WAIT_TIMEOUT_MILLIS} milliseconds inclusively.
-         * Interrupting the current thread has no effect on this method.
-         */
-        void pause() {
-            Threads.pause(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
-        }
-    } // ThreadUtil
 }
