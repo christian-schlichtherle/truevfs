@@ -59,7 +59,8 @@ implements OutputService<TarDriverEntry> {
             entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
     private final IOPool<?> pool;
-    private final TarArchiveOutputStream out;
+    private final OutputStream out;
+    private final TarArchiveOutputStream taos;
     private boolean busy;
 
     @CreatesObligation
@@ -71,10 +72,10 @@ implements OutputService<TarDriverEntry> {
         if (null == model)
             throw new NullPointerException();
         this.pool = driver.getIOPool();
-        final OutputStream out = sink.stream();
+        final OutputStream out = this.out = sink.stream();
         try {
             final TarArchiveOutputStream
-                    taos = this.out = new TarArchiveOutputStream(out);
+                    taos = this.taos = new TarArchiveOutputStream(out);
             taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         } catch (final Throwable ex) {
             try {
@@ -149,6 +150,11 @@ implements OutputService<TarDriverEntry> {
 
     @Override
     public void close() throws IOException {
+        taos.close();
+        // Workaround for super class implementation which may not have
+        // been left in a consistent state if the decorated stream has
+        // thrown an IOException upon the first call to its close() method.
+        // See http://java.net/jira/browse/TRUEZIP-234
         out.close();
     }
 
@@ -165,8 +171,8 @@ implements OutputService<TarDriverEntry> {
         @CreatesObligation
         EntryOutputStream(final TarDriverEntry entry)
         throws IOException {
-            super(TarOutputService.this.out);
-            TarOutputService.this.out.putArchiveEntry(entry);
+            super(taos);
+            taos.putArchiveEntry(entry);
             entries.put(entry.getName(), entry);
             busy = true;
         }
@@ -180,7 +186,7 @@ implements OutputService<TarDriverEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-            TarOutputService.this.out.closeArchiveEntry();
+            taos.closeArchiveEntry();
             closed = true;
             busy = false;
         }
@@ -231,11 +237,12 @@ implements OutputService<TarDriverEntry> {
                     entry.setSize(buffer.getSize(DATA));
                     if (UNKNOWN == entry.getModTime().getTime())
                         entry.setModTime(System.currentTimeMillis());
-                    TarOutputService.this.out.putArchiveEntry(entry);
+                    final TarArchiveOutputStream taos = TarOutputService.this.taos;
+                    taos.putArchiveEntry(entry);
                     try {
-                        Streams.cat(in, TarOutputService.this.out);
+                        Streams.cat(in, taos);
                     } finally {
-                        TarOutputService.this.out.closeArchiveEntry();
+                        taos.closeArchiveEntry();
                     }
                 }
             } finally {
