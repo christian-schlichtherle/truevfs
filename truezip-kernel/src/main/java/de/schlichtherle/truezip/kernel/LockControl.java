@@ -4,9 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
-import de.truezip.kernel.*;
-import de.truezip.kernel.util.BitField;
+import de.truezip.kernel.FsController;
 import de.truezip.kernel.util.Threads;
 import java.io.IOException;
 import java.util.Random;
@@ -18,7 +16,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Provides read/write locking for multi-threaded access by its clients.
  * 
- * @see    LockModel
  * @see    NeedsWriteLockException
  * @author Christian Schlichtherle
  */
@@ -27,11 +24,11 @@ final class LockControl {
 
     static final int WAIT_TIMEOUT_MILLIS = 100;
 
-    private static final ThreadLocal<ThreadUtil>
-            threadUtil = new ThreadLocal<ThreadUtil>() {
+    private static final ThreadLocal<LockUtil>
+            util = new ThreadLocal<LockUtil>() {
                 @Override
-                public ThreadUtil initialValue() {
-                    return new ThreadUtil(ThreadLocalRandom.current());
+                public LockUtil initialValue() {
+                    return new LockUtil(ThreadLocalRandom.current());
                 }
             };
 
@@ -76,10 +73,10 @@ final class LockControl {
      * @throws IOException As thrown by the operation.
      * @throws NeedsLockRetryException See above.
      */
-    static <T> T locked(final IOOperation<T> operation, final Lock lock)
+    static <T> T call(final IOOperation<T> operation, final Lock lock)
     throws IOException {
-        final ThreadUtil thread = threadUtil.get();
-        if (thread.locking) {
+        final LockUtil util = LockControl.util.get();
+        if (util.locking) {
             if (!lock.tryLock())
                 throw NeedsLockRetryException.get();
             try {
@@ -91,30 +88,30 @@ final class LockControl {
             while (true) {
                 try {
                     lock.lock();
-                    thread.locking = true;
+                    util.locking = true;
                     try {
                         return operation.call();
                     } finally {
-                        thread.locking = false;
+                        util.locking = false;
                         lock.unlock();
                     }
                 } catch (NeedsLockRetryException ex) {
-                    thread.pause();
+                    util.pause();
                 }
             }
         }
     }
 
     static boolean isLocking() {
-        return threadUtil.get().locking;
+        return util.get().locking;
     }
 
     @NotThreadSafe
-    private static final class ThreadUtil {
+    private static final class LockUtil {
         boolean locking;
         final Random rnd;
 
-        ThreadUtil(Random rnd) { this.rnd = rnd; }
+        LockUtil(final Random rnd) { this.rnd = rnd; }
 
         /**
          * Delays the current thread for a random time interval between one and
@@ -124,5 +121,5 @@ final class LockControl {
         void pause() {
             Threads.pause(1 + rnd.nextInt(WAIT_TIMEOUT_MILLIS));
         }
-    } // ThreadUtil
+    } // LockUtil
 }
