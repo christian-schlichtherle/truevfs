@@ -4,13 +4,10 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.ROOT;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.key.KeyManager;
@@ -70,7 +67,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     throws IOException {
         try {
             return controller.getEntry(name);
-        } catch (final IOException ex) {
+        } catch (final Throwable ex) {
             if (!name.isRoot() || null == findKeyException(ex))
                 throw ex;
             Entry entry = getParent().getEntry(
@@ -101,7 +98,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     throws IOException {
         try {
             controller.unlink(name, options);
-        } catch (final IOException ex) {
+        } catch (final Throwable ex) {
             // If the exception is caused by a key exception, then throw this
             // cause instead in order to avoid treating the target archive file
             // like a false positive and routing this operation to the parent
@@ -110,7 +107,9 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             // encrypted ZIP file just because the user has cancelled key
             // prompting.
             final IOException keyEx = findKeyException(ex);
-            throw null != keyEx ? keyEx : ex;
+            if (null != keyEx)
+                throw keyEx;
+            throw ex;
         }
         if (name.isRoot()) {
             try {
