@@ -4,17 +4,13 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.ROOT;
-import de.truezip.kernel.FsPath;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
@@ -38,8 +34,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * controller of the parent file system in order to continue the operation.
  * If this fails with another exception, then the {@link IOException} which is
  * associated as the cause of the initial exception gets rethrown unless the
- * other exception is an {@link FsControlFlowIOException}.
- * In this case the {@link FsControlFlowIOException} gets rethrown as is in order
+ * other exception is an {@link ControlFlowIOException}.
+ * In this case the {@link ControlFlowIOException} gets rethrown as is in order
  * to enable the caller to resolve it.
  * <p>
  * This algorithm effectively achieves the following objectives:
@@ -53,7 +49,7 @@ import javax.annotation.concurrent.ThreadSafe;
  *     place in order to provide the caller with a good indication of what went
  *     wrong in the first place.
  * <li>Exceptions which are thrown by the TrueZIP Kernel itself identify
- *     themselves by the type {@link FsControlFlowIOException}.
+ *     themselves by the type {@link ControlFlowIOException}.
  *     They are excempt from this masquerade in order to support resolving them
  *     by a more competent caller.
  * </ol>
@@ -502,7 +498,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         throws IOException {
             try {
                 return operation.call(getParent(), resolveParent(name));
-            } catch (final FsControlFlowIOException ex) {
+            } catch (final ControlFlowIOException ex) {
                 assert !(ex instanceof FalsePositiveException);
                 throw ex;
             } catch (final IOException ignored) {

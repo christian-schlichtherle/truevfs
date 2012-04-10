@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsModel;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
@@ -17,18 +16,14 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-final class NeedsWriteLockException extends FsControlFlowIOException {
+final class NeedsWriteLockException extends ControlFlowIOException {
 
     private static final @Nullable NeedsWriteLockException
             SINGLETON = TRACEABLE ? null : new NeedsWriteLockException();
 
-    static NeedsWriteLockException get(FsModel model) {
-        return TRACEABLE ? new NeedsWriteLockException(model) : SINGLETON;
+    static NeedsWriteLockException get() {
+        return TRACEABLE ? new NeedsWriteLockException() : SINGLETON;
     }
 
     private NeedsWriteLockException() { }
-
-    private NeedsWriteLockException(FsModel model) {
-        super(model, null, null);
-    }
 }
