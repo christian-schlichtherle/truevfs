@@ -44,7 +44,7 @@ public final class IOPoolLocator implements IOPoolProvider {
     /** The singleton instance of this class. */
     public static final IOPoolLocator SINGLETON = new IOPoolLocator();
 
-    /* Can't touch this - hammer time! */
+    /** Can't touch this - hammer time! */
     private IOPoolLocator() { }
 
     @Override

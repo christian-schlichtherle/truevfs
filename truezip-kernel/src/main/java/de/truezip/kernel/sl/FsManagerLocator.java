@@ -44,7 +44,7 @@ public final class FsManagerLocator implements FsManagerProvider {
     /** The singleton instance of this class. */
     public static final FsManagerLocator SINGLETON = new FsManagerLocator();
 
-    /* Can't touch this - hammer time! */
+    /** Can't touch this - hammer time! */
     private FsManagerLocator() { }
 
     @Override
