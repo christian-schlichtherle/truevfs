@@ -45,7 +45,7 @@ implements InputService<ZipDriverEntry> {
             final NullPointerException ex = new NullPointerException();
             try {
                 super.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;

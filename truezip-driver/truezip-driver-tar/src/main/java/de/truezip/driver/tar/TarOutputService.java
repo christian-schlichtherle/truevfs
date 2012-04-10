@@ -80,7 +80,7 @@ implements OutputService<TarDriverEntry> {
         } catch (final Throwable ex) {
             try {
                 out.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;

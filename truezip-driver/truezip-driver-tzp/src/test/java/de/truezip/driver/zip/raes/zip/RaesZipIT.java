@@ -45,7 +45,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 ros.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -63,7 +63,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 ros.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -81,7 +81,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 rroc.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -114,7 +114,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 rroc.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -132,7 +132,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 rroc.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -155,7 +155,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 rroc.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -174,7 +174,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 rroc.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -197,7 +197,7 @@ public final class RaesZipIT extends ZipTestSuite {
         } catch (final Throwable ex) {
             try {
                 rroc.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;

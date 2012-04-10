@@ -145,7 +145,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                 } catch (final Throwable ex) {
                     try {
                         channel.close();
-                    } catch (final Throwable ex2) {
+                    } catch (final IOException ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;

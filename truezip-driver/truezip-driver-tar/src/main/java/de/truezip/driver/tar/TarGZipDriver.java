@@ -75,7 +75,7 @@ public class TarGZipDriver extends TarDriver {
                 } catch(final Throwable ex) {
                     try {
                         in.close();
-                    } catch (final Throwable ex2) {
+                    } catch (final IOException ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;
@@ -101,7 +101,7 @@ public class TarGZipDriver extends TarDriver {
                 } catch(final Throwable ex) {
                     try {
                         out.close();
-                    } catch (final Throwable ex2) {
+                    } catch (final IOException ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;
