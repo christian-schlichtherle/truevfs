@@ -67,8 +67,21 @@ implements OutputService<ZipDriverEntry> {
                     // Retain comment and preamble of input ZIP archive.
                     super.setComment(source.getComment());
                     if (0 < source.getPreambleLength()) {
-                        try (final InputStream in = source.getPreambleInputStream()) {
+                        final InputStream in = source.getPreambleInputStream();
+                        Throwable ex = null;
+                        try {
                             Streams.cat(in, source.offsetsConsiderPreamble() ? this : out);
+                        } catch (final Throwable ex2) {
+                            ex = ex2;
+                            throw ex2;
+                        } finally {
+                            try {
+                                in.close();
+                            } catch (final IOException ex2) {
+                                if (null == ex)
+                                    throw ex2;
+                                ex.addSuppressed(ex2);
+                            }
                         }
                     }
                 }
@@ -222,8 +235,10 @@ implements OutputService<ZipDriverEntry> {
         if (null != pa) {
             this.postamble = null;
             final InputSocket<?> is = pa.getInputSocket();
+            Throwable ex = null;
             try {
-                try (final InputStream in = is.stream()) {
+                final InputStream in = is.stream();
+                try {
                     // If the output ZIP file differs in length from the
                     // input ZIP file then pad the output to the next four
                     // byte boundary before appending the postamble.
@@ -233,11 +248,30 @@ implements OutputService<ZipDriverEntry> {
                     final long ipl = is.getLocalTarget().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
-
                     Streams.cat(in, this);
+                } catch (final Throwable ex2) {
+                    ex = ex2;
+                    throw ex2;
+                } finally {
+                    try {
+                        in.close();
+                    } catch (final IOException ex2) {
+                        if (null == ex)
+                            throw ex2;
+                        ex.addSuppressed(ex2);
+                    }
                 }
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
             } finally {
-                pa.release();
+                try {
+                    pa.release();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
             }
         }
         super.close();
@@ -310,8 +344,10 @@ implements OutputService<ZipDriverEntry> {
             assert STORED == entry.getMethod();
 
             ZipOutputService.this.bufferedEntry = null;
+            Throwable ex = null;
             try {
-                try (final InputStream in = buffer.getInputSocket().stream()) {
+                final InputStream in = buffer.getInputSocket().stream();
+                try {
                     final long length = buffer.getSize(DATA);
                     entry.setCrc(getChecksum().getValue());
                     entry.setCompressedSize(length);
@@ -325,9 +361,29 @@ implements OutputService<ZipDriverEntry> {
                     } finally {
                         closeEntry();
                     }
+                } catch (final Throwable ex2) {
+                    ex = ex2;
+                    throw ex2;
+                } finally {
+                    try {
+                        in.close();
+                    } catch (final IOException ex2) {
+                        if (null == ex)
+                            throw ex2;
+                        ex.addSuppressed(ex2);
+                    }
                 }
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
             } finally {
-                buffer.release();
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
             }
         }
     } // BufferedEntryOutputStream
