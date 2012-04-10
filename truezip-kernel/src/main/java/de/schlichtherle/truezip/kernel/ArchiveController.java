@@ -82,9 +82,9 @@ extends LockModelController {
      * it may throw.
      *
      * @param  autoCreate If this is {@code true} and the archive file does not
-     *         exist, then a new archive file system with only a (virtual)
-     *         root directory is created with its last modification time set
-     *         to the system's current time.
+     *         exist, then a new archive file system with only a virtual root
+     *         directory is created with its last modification time set to the
+     *         system's current time.
      * @return An archive file system.
      */
     abstract ArchiveFileSystem<E> autoMount(
