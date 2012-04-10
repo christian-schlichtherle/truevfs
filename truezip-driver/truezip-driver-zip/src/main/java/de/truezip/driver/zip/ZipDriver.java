@@ -90,9 +90,18 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @param charset the character set for encoding entry names and comments.
      */
     protected ZipDriver(IOPoolProvider provider, Charset charset) {
-        super(charset);
         if (null == (this.ioPool = provider.get()))
             throw new NullPointerException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@link #ZIP_CHARSET}.
+     */
+    @Override
+    public Charset getCharset() {
+        return ZIP_CHARSET;
     }
 
     /**
