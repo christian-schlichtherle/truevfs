@@ -21,11 +21,10 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class LockSeekableChannel
-extends DecoratingSeekableChannel {
+public class LockSeekableChannel extends DecoratingSeekableChannel {
 
     /** The lock on which this object synchronizes. */
-    protected final Lock lock;
+    private final Lock lock;
 
     /**
      * Constructs a new lock seekable byte channel.

@@ -21,7 +21,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class LockInputStream extends DecoratingInputStream {
+public class LockInputStream extends DecoratingInputStream {
 
     /** The lock on which this object synchronizes. */
     private final Lock lock;
