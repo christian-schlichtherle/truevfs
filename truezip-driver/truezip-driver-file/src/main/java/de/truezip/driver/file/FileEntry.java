@@ -4,15 +4,15 @@
  */
 package de.truezip.driver.file;
 
+import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.FsAccessOptions;
+import de.truezip.kernel.FsEntry;
+import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsEntryName;
-import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsAccessOptions;
 import de.truezip.kernel.util.BitField;
 import static java.io.File.separatorChar;
 import java.io.IOException;
@@ -164,7 +164,7 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
     public final @Nullable Set<String> getMembers() {
         try {
             try (final DirectoryStream<Path> stream = newDirectoryStream(path)) {
-                final Set<String> result = new LinkedHashSet<String>();
+                final Set<String> result = new LinkedHashSet<>();
                 for (final Path member : stream)
                     result.add(member.getFileName().toString());
                 return result;
