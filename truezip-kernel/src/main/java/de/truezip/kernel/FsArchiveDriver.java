@@ -18,7 +18,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import javax.swing.Icon;
 
 /**
  * An abstract factory for components required for accessing archive files.
@@ -109,38 +108,6 @@ extends FsDriver {
      */
     public boolean getRedundantMetaDataSupport() {
         return false;
-    }
-
-    /**
-     * Returns the icon that should be displayed for the given archive file
-     * if it's open/expanded in the view.
-     * <p>
-     * The implementation in the abstract class {@code FsArchiveDriver} simply
-     * returns {@code null}.
-     *
-     * @param  model the file system model.
-     * @return The icon that should be displayed for the given archive file
-     *         if it's open/expanded in the view.
-     *         If {@code null} is returned, a default icon should be displayed.
-     */
-    public @CheckForNull Icon getOpenIcon(FsModel model) {
-        return null;
-    }
-
-    /**
-     * Returns the icon that should be displayed for the given archive file
-     * if it's closed/collapsed in the view.
-     * <p>
-     * The implementation in the abstract class {@code FsArchiveDriver} simply
-     * returns {@code null}.
-     *
-     * @param  model the file system model.
-     * @return The icon that should be displayed for the given archive file
-     *         if it's closed/collapsed in the view.
-     *         If {@code null} is returned, a default icon should be displayed.
-     */
-    public @CheckForNull Icon getClosedIcon(FsModel model) {
-        return null;
     }
 
     /**
