@@ -83,7 +83,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public interface ExceptionHandler<I extends Exception, O extends Exception> {
+public interface ExceptionHandler<I extends Throwable, O extends Throwable> {
 
     /**
      * Called to handle an exception which <em>doesn't</em> allow the caller
