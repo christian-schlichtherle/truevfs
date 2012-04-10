@@ -32,9 +32,8 @@ public final class FsDriverLocator implements FsDriverProvider {
     /** The singleton instance of this class. */
     public static final FsDriverLocator SINGLETON = new FsDriverLocator();
 
-    /** You cannot instantiate this class. */
-    private FsDriverLocator() {
-    }
+    /* Can't touch this - hammer time! */
+    private FsDriverLocator() { }
 
     @Override
     public Map<FsScheme, FsDriver> getDrivers() {
