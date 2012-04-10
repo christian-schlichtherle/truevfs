@@ -152,7 +152,8 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    void mount(final boolean autoCreate, BitField<FsAccessOption> options) throws IOException {
+    void mount(final boolean autoCreate, BitField<FsAccessOption> options)
+    throws IOException {
         try {
             mount0(autoCreate, options);
         } finally {
@@ -160,7 +161,9 @@ extends FileSystemArchiveController<E> {
         }
     }
 
-    private void mount0(final boolean autoCreate, BitField<FsAccessOption> options)
+    private void mount0(
+            final boolean autoCreate,
+            final BitField<FsAccessOption> options)
     throws IOException {
         // HC SUNT DRACONES!
         
