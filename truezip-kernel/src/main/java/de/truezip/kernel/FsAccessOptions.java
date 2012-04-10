@@ -26,7 +26,7 @@ public final class FsAccessOptions {
      * <code>{@link BitField}.of({@link FsAccessOption#CACHE}, {@link FsAccessOption#CREATE_PARENTS}, {@link FsAccessOption#STORE}, {@link FsAccessOption#COMPRESS}, {@link FsAccessOption#GROW}, {@link FsAccessOption#ENCRYPT})</code>.
      */
     public static final BitField<FsAccessOption> ACCESS_PREFERENCES_MASK
-            = BitField.of(CACHE, CREATE_PARENTS, STORE, COMPRESS, GROW, ENCRYPT);
+            = BitField.of(CACHE, CREATE_PARENTS, GROW, STORE, COMPRESS, ENCRYPT);
 
     /**
      * Converts the given array to a bit field of output options.

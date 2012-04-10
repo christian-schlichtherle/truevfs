@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.FsController;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -92,4 +91,6 @@ public enum FsAccessOption {
      * to the caller.
      */
     ENCRYPT,
+
+    
 }
