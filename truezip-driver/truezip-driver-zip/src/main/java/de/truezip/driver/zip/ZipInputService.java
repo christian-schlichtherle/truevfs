@@ -35,11 +35,11 @@ implements InputService<ZipDriverEntry> {
 
     @CreatesObligation
     public ZipInputService(
-            final ZipDriver driver,
             final FsModel model,
-            final Source source)
+            final Source source,
+            final ZipDriver driver)
     throws IOException {
-        super(driver, source);
+        super(source, driver);
         this.driver = driver;
         if (null == (this.model = model)) {
             final NullPointerException ex = new NullPointerException();
@@ -78,7 +78,7 @@ implements InputService<ZipDriverEntry> {
      * @return {@code true} if and only if the target archive file gets entries
      *         appended to it.
      */
-    public boolean isAppendee() {
+    boolean isAppendee() {
         return appendee;
     }
 
@@ -89,7 +89,7 @@ implements InputService<ZipDriverEntry> {
      * @param appendee {@code true} if and only if the target archive file gets
      *        entries appended to it.
      */
-    public void setAppendee(boolean appendee) {
+    void setAppendee(boolean appendee) {
         this.appendee = appendee;
     }
 

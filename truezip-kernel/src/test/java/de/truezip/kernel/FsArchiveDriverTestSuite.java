@@ -141,22 +141,22 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newOutputService(null, null, parent, entry, NONE);
+        getArchiveDriver().newOutputService(null, parent, entry, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().newOutputService(model, null, null, entry, NONE);
+        getArchiveDriver().newOutputService(model, null, entry, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullEntryName() throws IOException {
-        getArchiveDriver().newOutputService(model, null, parent, null, NONE);
+        getArchiveDriver().newOutputService(model, parent, null, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().newOutputService(model, null, parent, entry, null);
+        getArchiveDriver().newOutputService(model, parent, entry, null, null);
     }
 
     @Test
@@ -167,7 +167,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void output() throws IOException {
         final OutputService<E> os = getArchiveDriver()
-                .newOutputService(model, null, parent, entry, NONE);
+                .newOutputService(model, parent, entry, NONE, null);
         try {
             final Closeable[] streams = new Closeable[getNumEntries()];
             try {

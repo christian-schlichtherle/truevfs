@@ -60,9 +60,9 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      */
     @Override
     protected final OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final @CheckForNull @WillNotClose ZipInputService source,
-            final OptionOutputSocket output)
+            final FsModel model, final OptionOutputSocket output, @CheckForNull
+                                                                  @WillNotClose
+    final ZipInputService source)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
@@ -71,6 +71,6 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
             }
         } // Sink
 
-        return new ZipOutputService(this, model, source, new Sink());
+        return new ZipOutputService(model, new Sink(), source, this);
     }
 }

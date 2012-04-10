@@ -48,11 +48,11 @@ public class OdfDriver extends JarDriver {
     @Override
     protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
-            final @CheckForNull @WillNotClose ZipInputService source,
-            final OptionOutputSocket output)
+            final OptionOutputSocket output,
+            final @CheckForNull @WillNotClose ZipInputService source)
     throws IOException {
         final ZipOutputService
-                service = new ZipOutputService(this, model, source, output);
+                service = new ZipOutputService(model, output, source, this);
         final IOPool<?> pool = getIOPool();
         return null != source && source.isAppendee()
                 ? new MultiplexingOutputService<>(service, pool)

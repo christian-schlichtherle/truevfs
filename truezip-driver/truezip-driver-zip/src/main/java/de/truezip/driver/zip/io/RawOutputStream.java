@@ -94,9 +94,9 @@ implements Iterable<E> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected RawOutputStream(
-            final ZipOutputStreamParameters param,
+            final Sink sink,
             final @CheckForNull @WillNotClose RawFile<E> appendee,
-            final Sink sink)
+            final ZipOutputStreamParameters param)
     throws IOException {
         super(null);
         final OutputStream out = sink.stream();

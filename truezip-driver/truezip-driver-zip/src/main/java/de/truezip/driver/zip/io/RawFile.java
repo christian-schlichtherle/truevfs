@@ -121,8 +121,8 @@ implements Closeable, Iterable<E> {
      */
     @CreatesObligation
     protected RawFile(
-            final ZipFileParameters<E> param,
-            final Source source)
+            final Source source,
+            final ZipFileParameters<E> param)
     throws ZipException, EOFException, IOException {
         this.param = param;
         final SeekableByteChannel channel = this.channel = source.channel();
