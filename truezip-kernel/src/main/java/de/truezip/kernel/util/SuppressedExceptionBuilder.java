@@ -16,7 +16,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class SuppressedExceptionBuilder<X extends Exception>
+public class SuppressedExceptionBuilder<X extends Throwable>
 extends PriorityExceptionBuilder<X> {
 
     /**
@@ -29,11 +29,11 @@ extends PriorityExceptionBuilder<X> {
         super(Null.INSTANCE);
     }
 
-    private static final class Null implements Comparator<Exception> {
+    private static final class Null implements Comparator<Throwable> {
         static final Null INSTANCE = new Null();
 
         @Override
-        public int compare(Exception o1, Exception o2) {
+        public int compare(Throwable o1, Throwable o2) {
             return 0;
         }
     } // Null

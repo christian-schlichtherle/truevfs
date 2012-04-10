@@ -22,7 +22,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class PriorityExceptionBuilder<X extends Exception>
+public class PriorityExceptionBuilder<X extends Throwable>
 extends AbstractExceptionBuilder<X, X> {
 
     private final Comparator<? super X> comparator;

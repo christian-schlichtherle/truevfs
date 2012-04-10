@@ -22,7 +22,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public interface ExceptionBuilder<I extends Exception, O extends Exception>
+public interface ExceptionBuilder<I extends Throwable, O extends Throwable>
 extends ExceptionHandler<I, O> {
 
     /**

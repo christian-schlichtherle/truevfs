@@ -17,8 +17,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class AbstractExceptionBuilder< I extends Exception,
-                                                O extends Exception>
+public abstract class AbstractExceptionBuilder< I extends Throwable,
+                                                O extends Throwable>
 implements ExceptionBuilder<I, O> {
 
     private @CheckForNull O assembly;
