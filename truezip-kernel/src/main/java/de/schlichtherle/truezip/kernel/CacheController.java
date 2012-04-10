@@ -221,7 +221,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     private <X extends IOException> void
     preSync(final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws ControlFlowIOException, X {
+    throws ControlFlowException, X {
         assert isWriteLockedByCurrentThread();
         if (0 >= caches.size())
             return;
@@ -235,7 +235,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 if (flush) {
                     try {
                         cache.flush();
-                    } catch (final ControlFlowIOException ex) {
+                    } catch (final ControlFlowException ex) {
                         clear = false;
                         throw ex;
                     } catch (final IOException ex) {
@@ -247,7 +247,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                     i.remove();
                     try {
                         cache.clear();
-                    } catch (final ControlFlowIOException ex) {
+                    } catch (final ControlFlowException ex) {
                         assert false;
                         throw ex;
                     } catch (final IOException ex) {

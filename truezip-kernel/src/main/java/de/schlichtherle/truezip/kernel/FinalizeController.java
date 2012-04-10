@@ -111,7 +111,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             try {
                 closeable.close();
                 logger.log(Level.FINE, "finalizeCleared");
-            } catch (final ControlFlowIOException ex) {  // report and swallow
+            } catch (final ControlFlowException ex) {  // report and swallow
                 logger.log(Level.WARNING, "finalizeFailed",
                         new AssertionError("Unexpected controller exception!", ex));
             } catch (final Throwable ex) {              // report and swallow
@@ -133,7 +133,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 in.close();
-            } catch (final ControlFlowIOException ex) {
+            } catch (final ControlFlowException ex) {
                 assert ex instanceof NeedsLockRetryException : ex;
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
@@ -169,7 +169,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 out.close();
-            } catch (final ControlFlowIOException ex) {
+            } catch (final ControlFlowException ex) {
                 assert ex instanceof NeedsLockRetryException : ex;
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()
@@ -205,7 +205,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 channel.close();
-            } catch (final ControlFlowIOException ex) {
+            } catch (final ControlFlowException ex) {
                 assert ex instanceof NeedsLockRetryException : ex;
                 // This call may or may not get retried again later.
                 // Do NOT record the status so that finalize() will call close()

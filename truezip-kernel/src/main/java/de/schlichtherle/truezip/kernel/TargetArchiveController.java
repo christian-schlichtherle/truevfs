@@ -170,7 +170,7 @@ extends FileSystemArchiveController<E> {
         final FsEntry pe; // parent entry
         try {
             pe = parent.getEntry(name);
-        } catch (final ControlFlowIOException ex) {
+        } catch (final ControlFlowException ex) {
             assert ex instanceof NeedsLockRetryException;
             throw ex;
         } catch (final IOException inaccessibleEntry) {
@@ -202,14 +202,14 @@ extends FileSystemArchiveController<E> {
                 final InputService<E> is;
                 try {
                     is = driver.newInputService(m, parent, name, MOUNT_OPTIONS);
-                } catch (final ControlFlowIOException ex) {
+                } catch (final ControlFlowException ex) {
                     assert ex instanceof NeedsLockRetryException;
                     throw ex;
                 }
                 final InputArchive<E> ia = new InputArchive<>(is);
                 fs = newPopulatedFileSystem(driver, is, pe, ro);
                 setInputArchive(ia);
-            } catch (final ControlFlowIOException ex) {
+            } catch (final ControlFlowException ex) {
                 assert ex instanceof NeedsLockRetryException;
                 throw ex;
             } catch (final IOException ex) {
@@ -250,7 +250,7 @@ extends FileSystemArchiveController<E> {
         final OutputService<E> os;
         try {
             os = driver.newOutputService(m, parent, name, options, is);
-        } catch (final ControlFlowIOException ex) {
+        } catch (final ControlFlowException ex) {
             assert ex instanceof NeedsLockRetryException;
             throw ex;
         }
@@ -427,7 +427,7 @@ extends FileSystemArchiveController<E> {
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws ControlFlowIOException, X {
+    throws ControlFlowException, X {
         assert isWriteLockedByCurrentThread();
         try {
             sync0(options, handler);
@@ -439,7 +439,7 @@ extends FileSystemArchiveController<E> {
     private <X extends IOException> void
     sync0(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws ControlFlowIOException, X {
+    throws ControlFlowException, X {
         if (!options.get(ABORT_CHANGES))
             copy(handler);
         close(handler);
@@ -471,14 +471,14 @@ extends FileSystemArchiveController<E> {
             public X fail(final IOException input) {
                 assert false : "should not get used by copy()";
                 assert null != input;
-                assert !(input instanceof ControlFlowIOException);
+                assert !(input instanceof ControlFlowException);
                 return handler.fail(new FsSyncException(getModel(), input));
             }
 
             @Override
             public void warn(final IOException input) throws X {
                 assert null != input;
-                assert !(input instanceof ControlFlowIOException);
+                assert !(input instanceof ControlFlowException);
                 if (null != warning || !(input instanceof InputException))
                     throw handler.fail(new FsSyncException(getModel(), input));
                 warning = input;
@@ -571,13 +571,13 @@ extends FileSystemArchiveController<E> {
      */
     private <X extends IOException> void
     close(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws ControlFlowIOException, X {
+    throws ControlFlowException, X {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
         if (null != ia) {
             try {
                 ia.close();
-            } catch (final ControlFlowIOException ex) {
+            } catch (final ControlFlowException ex) {
                 assert ex instanceof NeedsLockRetryException;
                 throw ex;
             } catch (final IOException ex) {
@@ -589,7 +589,7 @@ extends FileSystemArchiveController<E> {
         if (null != oa) {
             try {
                 oa.close();
-            } catch (final ControlFlowIOException ex) {
+            } catch (final ControlFlowException ex) {
                 assert ex instanceof NeedsLockRetryException;
                 throw ex;
             } catch (final IOException ex) {
