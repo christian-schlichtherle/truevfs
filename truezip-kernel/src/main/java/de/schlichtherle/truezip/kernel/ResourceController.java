@@ -4,19 +4,14 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsResourceOpenException;
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.FsSyncWarningException;
-import de.truezip.kernel.FsEntryName;
+import static de.schlichtherle.truezip.kernel.LockControl.WAIT_TIMEOUT_MILLIS;
+import static de.truezip.kernel.FsSyncOption.FORCE_CLOSE_IO;
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsSyncOption;
-import static de.truezip.kernel.FsSyncOption.FORCE_CLOSE_IO;
-import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -31,14 +26,14 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Accounts input and output resources returned by its decorated controller.
  * 
- * @see    ResourceAccountant
+ * @see    ResourceControl
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class ResourceController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
-    private @CheckForNull ResourceAccountant accountant;
+    private @CheckForNull ResourceControl control;
 
     /**
      * Constructs a new file system resource controller.
@@ -49,10 +44,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         super(controller);
     }
 
-    private ResourceAccountant getAccountant() {
+    private ResourceControl getControl() {
         assert isWriteLockedByCurrentThread();
-        final ResourceAccountant a = accountant;
-        return null != a ? a : (accountant = new ResourceAccountant(writeLock()));
+        final ResourceControl control = this.control;
+        return null != control
+                ? control
+                : (this.control = new ResourceControl(writeLock()));
     }
 
     @Override
@@ -120,7 +117,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      * Waits for all entry input and output resources to close or forces
      * them to close, dependending on the {@code options}.
      * Mind that this method deliberately handles entry input and output
-     * streams equally because {@link ResourceAccountant#waitForeignResources}
+     * streams equally because {@link ResourceControl#waitForeignResources}
      * WILL NOT WORK if any two resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
@@ -137,18 +134,19 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // HC SUNT DRACONES!
-        final ResourceAccountant a = accountant;
-        if (null == a)
+        final ResourceControl control = this.control;
+        if (null == control)
             return;
         final boolean force = options.get(FORCE_CLOSE_IO);
-        final int local = a.localResources();
+        final int local = control.localResources();
         final IOException cause;
         if (0 != local && !force) {
-            cause = new FsResourceOpenException(a.totalResources(), local);
+            cause = new FsResourceOpenException(control.totalResources(), local);
             throw handler.fail(new FsSyncException(getModel(), cause));
         }
         final boolean wait = options.get(WAIT_CLOSE_IO);
-        final int total = a.waitForeignResources(wait ? 0 : WAIT_TIMEOUT_MILLIS);
+        final int total = control.waitForeignResources(
+                wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 == total)
             return;
         cause = new FsResourceOpenException(total, local);
@@ -186,9 +184,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // IOExceptionHandler
 
-        final ResourceAccountant acc = accountant;
-        if (null != acc)
-            acc.closeAllResources(new IOExceptionHandler());
+        final ResourceControl control = this.control;
+        if (null != control)
+            control.closeAllResources(new IOExceptionHandler());
     }
 
     private final class ResourceInputStream
@@ -197,12 +195,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
-            getAccountant().startAccountingFor(this);
+            getControl().start(this);
         }
 
         @Override
         public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
+            getControl().stop(this);
             in.close();
         }
     } // ResourceInputStream
@@ -213,12 +211,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
-            getAccountant().startAccountingFor(this);
+            getControl().start(this);
         }
 
         @Override
         public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
+            getControl().stop(this);
             out.close();
         }
     } // ResourceOutputStream
@@ -229,12 +227,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
-            getAccountant().startAccountingFor(this);
+            getControl().start(this);
         }
 
         @Override
         public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
+            getControl().stop(this);
             channel.close();
         }
     } // ResourceSeekableChannel
