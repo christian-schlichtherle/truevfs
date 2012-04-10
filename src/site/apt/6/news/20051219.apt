@@ -1,0 +1,98 @@
+    -----------------------
+    4.0 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 4.0 has been released}
+
+    (December 19th, 2005)
+
+    This is a major update. All users are recommended to upgrade.
+        
+    In order of priority:
+
+    [[1]] <<Enhanced:>> TrueZIP now correctly
+    recognizes and handles <<all>> kinds of <false
+    positive ZIP compatible files>. A false positive ZIP
+    compatible file is a file or directory or a file or directory entry in
+    an enclosing ZIP compatible file which looks like a ZIP compatible file
+    by its path name (e.g. <<<archive<<.zip>>>>>
+    or <<<outer.zip/inner.zip/secret<<.tzp>>>>>),
+    but actually is a plain file or directory or an RAES encrypted ZIP file
+    which's password could not be successfully requested from the user. The
+    previous version only recognized and handled false positives which were
+    actually plain files in the file system. Please note that TrueZIP does <not>
+    (and never did and presumably never will) check the existence or
+    integrity of the manifest in a JAR, EAR or WAR.
+
+    [[1]] <<Enhanced/fixed:>> TrueZIP now provides its
+    own implementation of the standard ZIP character set <<<IBM437>>>
+    (a.k.a. <<<CP437>>>, the original IBM PC character
+    set for the United States and others). Previous versions silently
+    reverted to <<<UTF\-8>>> (this is what Sun's <<<
+    java.util.zip>>> package erratically uses) if <<<CP437>>>
+    is not installed in the JRE. However, at least on the Windows platform,
+    <<<CP437>>> is only installed if the
+    user/administrator chose to install the international character sets in
+    <<<$java.home/lib/charsets.jar>>>, which is more
+    or less unlikely.
+
+    [[1]] <<Fixed:>> Primarily a lot of bugs in the
+    exception handling code (see above), but most notably the methods <<<
+    <<<de.schlichtherle.io.File.renameTo(java.io.File)>>>
+    and <<<de.schlichtherle.io.File.archiveCopyAllTo(*)>>> now treat directory
+    timestamps correctly and refuse to rename/copy into themselves.
+
+    [[1]] <<New/changed:>> The class <<<de.schlichtherle.crypto.io.PasswdManager>>>,
+    which is used to prompt users for passwords for {{{News_RAES}RAES}}
+    encrypted ZIP files, has been refactored to the package
+    <<<de.schlichtherle.crypto.io>>>
+    and heavily redesigned: For end users, the new version supports
+    cancellation of password prompts for new encrypted ZIP files and
+    automatically highlights file paths when they change. For application
+    developers, a mechanism has been added to provide a custom password
+    manager in case they don't want to use the default Swing based
+    implementation. For more information, please refer to the Javadoc for the
+    class <<<de.schlichtherle.crypto.io.PasswdManager>>>.
+
+    [[1]] <<New:>> Some new methods have been added to
+    the File class for convenience. Please check out the Javadoc for the class
+    <<<de.schlichtherle.io.File>>>.
+
+    [[1]] <<New:>> New utility methods and main
+    classes have been added to provide encryption and decryption of
+    ordinary files into and from the RAES format. Please check out the
+    source of the new main classes <<<encrypt>>>, <<<decrypt>>> and the JavaDoc
+    for the utility class <<<de.schlichtherle.io.RaesFileUtils>>>.
+
+    [[1]] <<Enhanced:>> For large ZIP compatible files
+    (e.g. 2 GB) with thousands of entries (e.g. 24k) there is now a huge
+    performance increase to mount the ZIP file system and update the target
+    ZIP file.
+
+    [[1]] <<New/changed:>> The interface <<<de.schlichtherle.io.rof.ReadOnlyFile>>>,
+    which is part of the low level API and is used to read the ZIP
+    file structure from plain or RAES encrypted files, and its companion
+    implementation classes have been refactored to their own package
+    <<< de.schlichtherle.io.rof>>>.
+    New implementation classes which use NIO channels and memory mapped
+    files are provided, too. Please note that these classes are not used
+    within TrueZIP because of some painful bugs in the J2SE API on certain
+    platforms (e.g. Windows and Linux). Please use where appropriate only.
+
+    [[1]] <<Enhanced:>> The logging of the
+    ZipController class has been enhanced. Please refer to the
+    configuration file <<<logging.properties>>> for more information.
+
+    []
+
+    Please note that you should recompile your applications if you
+    are using older versions of TrueZIP, unless you are only <<using
+    >>(i.e. not implementing or subclassing interfaces or classes
+    in) the High\-Level\-API, which consists of all classes in the package
+    <<<de.schlichtherle.io>>> and the class
+    <<<de.schlichtherle.io.swing.FileSystemView>>>.
+    This is because the low level API has been heavily refactored and some
+    of these changes emanate into the High\-Level\-API in order to support
+    the new password manager for RAES encrypted ZIP files.

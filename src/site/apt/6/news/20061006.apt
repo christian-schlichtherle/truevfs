@@ -1,0 +1,16 @@
+    -----------------------
+    6.3 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 6.3 has been released}
+
+    (October 6th, 2006)
+        
+    This is a minor feature release which adds some new update to make it easier
+    to update/unmount archive files safely in multithreaded environments. A few
+    minor bugs have been fixed, too.
+
+    For more information, please refer to the
+    {{{../relnotes/release\-6_3.html}Release Notes}}.

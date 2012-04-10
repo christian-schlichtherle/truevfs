@@ -1,0 +1,1218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<document   xmlns="http://maven.apache.org/XDOC/2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>The TrueZIP 6 Tutorial</title>
+        <author>Christian Schlichtherle</author>
+    </properties>
+    <body>
+        <section name="Obsolescence Notice">
+	        <p><em>The version described in this document is
+	            <strong>obsolete</strong> and should not be used for new
+	            applications anymore.</em></p>
+	        <p>The links to the Javadoc in this document are non-functional
+	            because the package names have been changed in TrueZIP 7.
+	            The Javadoc for TrueZIP 6.8.4 is now available for download via
+	            <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>.</p>
+        </section>
+        <section name="Contents">
+	        <macro name="toc">
+	            <param name="fromDepth" value="1"/>
+	        </macro>
+        </section>
+        <section name="Introduction">
+            <p>Key Claims:</p>
+            <ol>
+            <li><b>Archive files are virtual directories!</b></li>
+            <li><b>Make simple things easy and complex things possible!</b></li>
+            <li><b>Quality matters!</b></li>
+            </ol>
+            <p>TrueZIP is a Java based virtual file system (VFS) implementation for
+                transparent read/write access to archive files as if they were
+                directories. Archive files may be arbitrarily nested and the nesting
+                level is only limited by heap and file system size. TrueZIP's design
+                strategy is to &quot;make simple things easy and complex things possible&quot;.</p>
+            <p>For example, when using the default configuration, the instance
+                <code>new File(&quot;app.ear/web.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF&quot;)</code>
+                would refer to the text file entry <i>META-INF/MANIFEST.MF</i> within
+                the JAR file entry <i>WEB-INF/lib/lib.jar</i> within the WAR file
+                entry <i>web.war</i> within the EAR file <i>app.ear</i>. The same
+                applies for any other supported and configured archive type.</p>
+            <p><b>Limitation:</b> TrueZIP works on <b>files</b> only. If an
+                archive is just available as an <code>InputStream</code>, it needs to
+                be saved to a (temporary) file first. If this is not an option, TrueZIP
+                can't be used.</p>
+            <p>TrueZIP provides a pluggable archive driver architecture to support
+                virtually any archive type: Out of the box, TrueZIP supports ZIP,
+                SFX/EXE, JAR, TZP, TAR, TAR.BZ2 and TAR.GZ. This list will be extended
+                in future releases. Note that some of these archive types require
+                additional JARs on the run time class path.</p>
+            <p>To be minimal intrusive, TrueZIP provides drop-in replacements for
+                many classes in the <code>java.io</code> package. This reduces the
+                learning curve to the essential minimum and allows to introduce
+                TrueZIP's functionality gradually within legacy applications or even
+                other VFS solutions which are currently built on top of
+                <code>java.io.File*</code>.</p>
+            <p>TrueZIP 6 requires only a J2SE 1.4.2 compatible Java Runtime
+                Environment, but version 6.4 and later automatically benefit from new
+                features available in JSE 5 and even JSE 6.</p>
+            <p>TrueZIP 6 is covered under the Apache License, Version 2.0.</p>
+        </section>
+        <section name="Basic Tasks">
+            <subsection name="Setting up the Class Path">
+                <p>With its default configuration file, TrueZIP 6 is self contained, so
+                    all you need to add to the class path is the file <i>truezip.jar</i>.
+                    Note that the file name just includes the major version number in order
+                    to express that a later version should be binary compatible to any
+                    previous version with the same major version number.</p>
+                <p>If the configuration gets customized, additional JARs may be
+                    required on the run time class path. Please see below how to customize
+                    the configuration and refer to the <a href="apidocs/overview-summary.html#defaults">API Overview</a> for
+                    the available options and dependencies.</p>
+                <p><b>Important:</b> If TrueZIP is going to be used in a
+                        multi-class-loader environment (e.g. application servers), it must be
+                        added to the boot class path or extension class path. Otherwise, the
+                        different class definitions may shadow and bypass each other's
+                        associated archive file state, which <i>may even cause <b>loss of data</b></i>!
+                        Please refer to the section &quot;<a href="apidocs/de/schlichtherle/io/package-summary.html#third_parties">Third
+                            Party Access</a>&quot; in the Javadoc for the package <code>de.schlichtherle.io</code>
+                        for for full details and workarounds. Simply consider TrueZIP being an
+                        extension to the JRE, not part of a web application.</p>
+            </subsection>
+            <subsection name="Importing TrueZIP">
+                <p>In order to use TrueZIP, you need to import its packages. Unless
+                    otherwise noted, only the high level API in the package <code>de.schlichtherle.io</code>
+                    is required for the examples in this tutorial. Because it provides
+                    drop-in replacements for some equally named classes in the package <code>java.io</code>,
+                    the following boilerplate is required:</p>
+                <source>
+import de.schlichtherle.io.*;
+import de.schlichtherle.io.File;
+import de.schlichtherle.io.FileInputStream;
+import de.schlichtherle.io.FileOutputStream;
+import java.io.*;
+// ...
+File file = new File(&quot;archive.zip&quot;); // de.schlichtherle.io.File!</source>
+                <p>Please do <i>not</i> do this instead:</p>
+                <source>
+import java.io.*;
+// ...
+<code style="text-decoration: line-through">de.schlichtherle.io.File file = new de.schlichtherle.io.File(&quot;archive.zip&quot;);</code></source>
+                <p>This is for the following reasons:</p>
+                <ol style="list-style-type: decimal">
+                    <li>Accidentally using <code>java.io.File</code> and
+                        <code>de.schlichtherle.io.File</code> instances referring
+                        to the same path concurrently will result in erroneous
+                        behaviour and may even cause <em>loss of data</em>!
+                        Please refer to the section
+                        &quot;<a href="apidocs/de/schlichtherle/io/package-summary.html#third_party_access">Third Party Access</a>&quot;
+                        in the Javadoc for the package <code>de.schlichtherle.io</code>
+                        for full details and workarounds.</li>
+                    <li>A <code>de.schlichtherle.io.File</code> subclasses
+                        <code>java.io.File</code> and thanks to polymorphism can be
+                        used everywhere a <code>java.io.File</code> could be used.</li>
+                    <li>Shorter source code is much easier to read.</li>
+                    <li>I'm not vain enough to want you write my name all over the
+                        place.
+                        If you're becoming a fan, please make a donation instead.
+                        ;-)</li>
+                </ol>
+                <p>If you still need to use <code>java.io.File</code>, please use
+                    this fully qualified class name.</p>
+            </subsection>
+            <subsection name="Casting Return Values">
+                <p>Some methods in the <code>File</code> class return new <code>File</code>
+                    instances. These methods are guaranteed to return a <code>de.schlichtherle.io.File</code>.
+                    However, since TrueZIP 6 is compiled with <code>-source 1.4</code>,
+                    the overridden methods are still declared to return a <code>java.io.File</code>
+                    and hence a cast may be required:</p>
+                <source>
+File file = new File(&quot;archive.zip/entry&quot;);
+File parent = (File) file.getParentFile(); // cast required!</source>
+            <p>This is going to change in TrueZIP 7, which will require Java SE 5.</p>
+            </subsection>
+            <subsection name="Basic Operations">
+                <p>You may already guess how to create a new ZIP file by now:</p>
+                <source>new File(&quot;archive.zip&quot;).mkdir();</source>
+                <p>This works for any archive file suffixes which are configured to be
+                    recognized. By default, this is <code>&quot;ear|jar|war|zip&quot;</code>.</p>
+                <p>Note that the call to <code>
+                        <a href="apidocs/de/schlichtherle/io/File.html#mkdir">mkdir()</a></code>
+                    is actually redundant: TrueZIP creates archive files and any missing
+                    directories inside on the fly unless <code>
+                        <a href="apidocs/de/schlichtherle/io/File.html#setLenient28boolean29">setLenient(false)</a></code>
+                    has been called to switch off lenient behavior. Note again that this
+                    feature only works for archive files and directories inside archive
+                    files: The parent directory of a top level archive file must always
+                    exist.</p>
+                <p>Since TrueZIP 6.5, if the call to <code>mkdir()</code> is omitted,
+                    TrueZIP will not create an entry for the directory in the output
+                    archive file. This is to mimic the behavior of most archive utilities
+                    which do not create archive entries for directories.</p>
+                <p>For example, to start writing a new file entry in a JAR archive you
+                    may simply use:</p>
+                <source>
+OutputStream out = new FileOutputStream(&quot;my-killer-app.jar/META-INF/LICENSE.TXT&quot;);
+try {
+    // Do I/O here...
+} finally {
+    out.close(); // ALWAYS close the stream!
+}</source>
+                <p>However, it's highly recommended to use one of the more advanced <code>cat*</code>
+                    and <code>copy*</code> methods in the <code>File</code> class instead
+                    whenever applicable. These methods provide ease of use, enhanced
+                    features, superior performance and require less space in the temp file
+                    folder (see <a href="#Copying">below</a>).</p>
+                <p>Note how the code ensures to close the stream even if an <code>IOException</code>
+                    is thrown by calling <code>close()</code> in a <code>finally</code>-block: If the client
+                    application does not properly close its streams, TrueZIP may throw a <code>
+                        <a href="apidocs/de/schlichtherle/io/FileBusyException.html">FileBusyException</a></code>,
+                    an <code>
+                        <a href="apidocs/de/schlichtherle/io/ArchiveBusyWarningException.html">ArchiveBusyWarningException</a></code>
+                    or an <code><a href="apidocs/de/schlichtherle/io/ArchiveBusyException.html">ArchiveBusyException</a></code>
+                    on certain operations, as documented in the Javadoc. This idiom is not
+                    at all specific to TrueZIP: Streams often utilize OS resources such as
+                    file descriptors, database or network connections. All OS resources are
+                    limited however and sometimes they are even exclusively allocated for a
+                    stream, so the stream should always be closed as soon as possible
+                    again, especially in long running server applications (relying on <code><b>finalize</b>()</code>
+                    to do this during garbage collection is unsafe). Unfortunately, many
+                    Java applications and libraries fail in this respect.</p>
+                <p>The top level entries in an archive file build its <i>virtual</i>
+                    <i>root directory</i>. Just like a regular directory, you can list its
+                    contents like follows:</p>
+                <source>String[] members = new File(&quot;my-killer-app.jar&quot;).list();</source>
+                <p>Following the previous example, just <code>new String[] { &quot;META-INF&quot; }</code>
+                    would be returned.
+                    So just like a regular directory, only the contents of the
+                    virtual root directory are listed, <i>not</i> including the
+                    contents of its directory members (this method is <i>not</i>
+                    recursive).</p>
+                <p>Note that <i>META-INF</i> is returned although it hasn't been
+                    created with <code>mkdir()</code> and hence will not be output
+                    to the resulting JAR file. Such a directory is called a
+                    <i>ghost directory</i>: A ghost directory behaves like a
+                    regular directory with the exception that its last modification
+                    time returned by
+                    <code><a href="apidocs/de/schlichtherle/io/File.html#lastModified2829">lastModified()</a></code>
+                    is <code>0L</code>. If the client application sets the last
+                    modification time explicitly using <code>
+                        <a href="apidocs/de/schlichtherle/io/File.html#setLastModified28long29">setLastModified(long)</a></code>,
+                    then the ghost directory reincarnates as a regular directory and will
+                    be output to the archive file.</p>
+            </subsection>
+        </section>
+        <section name="Essential Concepts">
+            <p>Unfortunately, before we can continue with the task oriented
+                approach in this tutorial, you'll need to learn about some essential
+                concepts of TrueZIP. This is to keep the examples more concise by
+                skipping the configuration boilerplate and to set you on the right
+                track so that you can safely avoid some common pitfalls (yes, there are
+                some). Please accept my apologies for this - I try to keep this section
+                as short as possible.</p>
+            <p>Since version 6.0, TrueZIP supports a pluggable archive driver
+                architecture which allows it to support virtually any archive type.
+                This enables third parties to develop their own drivers and plug them
+                into the TrueZIP API. The client application can extend or override the
+                configuration provided by TrueZIP and any optional plug-in drivers. </p>
+            <subsection name="The ArchiveDetector Interface">
+                <p>Whenever a
+                    <code><a href="apidocs/de/schlichtherle/io/File.html">File</a></code>
+                    instance is constructed, an instance of the
+                    <code><a href="apidocs/de/schlichtherle/io/ArchiveDetector.html">ArchiveDetector</a></code>
+                    interface is assigned to it which detects archive files
+                    solely by scanning the file path - usually by testing for
+                    file name suffixes like <i>.zip</i> or the like.
+                    Whenever an archive file is recognized, the
+                    <code><a href="apidocs/de/schlichtherle/io/ArchiveDetector.html#getArchiveDriver28String29">ArchiveDetector.getArchiveDriver(String)</a></code>
+                    method returns an instance of the
+                    <code><a href="apidocs/de/schlichtherle/io/archive/spi/ArchiveDriver.html">ArchiveDriver</a></code>
+                    interface which allows to access it.</p>
+                <p><code>ArchiveDetector</code> instances are assigned to
+                    <code>File</code> instances in the following way:</p>
+                <ol style="list-style-type: decimal">
+                    <li>If an archive detector is explicitly provided as a
+                        parameter to the constructor of the <code>File</code>
+                        class or any other method which creates
+                        <code>File</code> instances (e.g.
+                        <code>listFiles(*)</code>), then this archive detector
+                        is used.</li>
+                    <li>Otherwise, the archive detector returned by
+                        <code><a href="apidocs/de/schlichtherle/io/File.html#getDefaultArchiveDetector">File.getDefaultArchiveDetector()</a></code>
+                        is used.
+                        This is initially set to the predefined instance
+                        <code><a href="apidocs/de/schlichtherle/io/ArchiveDetector.html#DEFAULT">ArchiveDetector.DEFAULT</a></code>
+                        .
+                        Both the class property and the predefined instance can
+                        be customized (see below).</li>
+                </ol>
+                <p>For your convenience, the <code>ArchiveDetector</code>
+                    interface provides three predefined instances as constant
+                    fields.
+                    These are actually instances of the
+                    <code>DefaultArchiveDetector</code> class (see next
+                    section).</p>
+                <ul>
+                    <li><code><a href="apidocs/de/schlichtherle/io/ArchiveDetector.html#NULL">ArchiveDetector.NULL</a></code>
+                        never recognizes archive files in a path.
+                        This can be used as the end of a chain of
+                        <code>DefaultArchiveDetector</code> instances or if
+                        archive files shall be treated like ordinary files
+                        rather than (virtual) directories.</li>
+                    <li><code><a href="apidocs/de/schlichtherle/io/ArchiveDetector.html#DEFAULT">ArchiveDetector.DEFAULT</a></code>
+                        recognizes the archive file suffixes defined by the key
+                        <code>DEFAULT</code> in the configuration file(s).
+                        If only TrueZIP's default configuration file is used,
+                        then this is set so that no additional JARs are
+                        required on the run time class path.</li>
+                    <li><code><a href="apidocs/de/schlichtherle/io/ArchiveDetector.html#ALL">ArchiveDetector.ALL</a></code>
+                        recognizes all archive file suffixes registered in the
+                        global registry by the configuration file(s).
+                        This requires
+                        <a href="apidocs/overview-summary.html#defaults">additional JARs</a>
+                        on the run time class path.</li>
+                </ul>
+            </subsection>
+            <subsection name="The DefaultArchiveDetector Class">
+                <p>The class
+                    <code><a href="apidocs/de/schlichtherle/io/DefaultArchiveDetector.html">DefaultArchiveDetector</a></code>
+                    is the default implementation of the
+                    <code>ArchiveDetector</code> interface.
+                    Each instance matches file paths against a pattern of
+                    archive file suffixes in order to detect prospective
+                    archive files and look up their corresponding archive
+                    driver in its <i>registry</i>.</p>
+                <p>When this class is loaded, it uses the current thread's
+                    context class loader to enumerate all instances of the
+                    relative path
+                    <i>META-INF/services/de.schlichtherle.io.registry.properties</i>
+                    on the class path.
+                    These <i>configuration files</i> are processed in arbitrary
+                    order to configure the <i>global registry</i> of archive
+                    file suffixes and archive drivers.
+                    This allows archive drivers to be &quot;plugged in&quot;
+                    by simply providing their own configuration file somewhere
+                    on the class path.
+                    One such instance is located inside <i>truezip.jar</i> and
+                    contains TrueZIP's default configuration (please refer to
+                    this file for full details on the syntax).
+                    Likewise, the client application may provide its own
+                    configuration file somewhere on the class path in order to
+                    extend or override the settings configured by TrueZIP and
+                    any optional plug-in drivers.</p>
+                <p>Each instance has a <i>local registry</i>. Constructors are
+                    provided which allow an instance to:</p>
+                <ol style="list-style-type: decimal">
+                    <li>Filter the set of archive file suffixes in the global
+                        registry.
+                        For example, <code>&quot;tar|zip&quot;</code> could be accepted by
+                        the filter in order to recognize only the TAR and ZIP file
+                        formats.</li>
+                    <li>Add custom archive file suffixes for supported archive
+                        types to the local registry in order to create <i>custom
+                            archive types</i>.
+                        For example, <code>&quot;myapp&quot;</code> could be added as a
+                        custom archive file suffix for the JAR file format.</li>
+                    <li>Add custom archive file suffixes and archive drivers to the
+                        local registry in order to support new archive types.
+                        For example, the suffix <code>&quot;7z&quot;</code> could be
+                        associated to a custom archive driver which supports the
+                        7z file format.</li>
+                    <li>Put multiple instances in a chain of responsibility:
+                        The first instance which holds a mapping for any given
+                        archive file suffix in its registry determines the archive
+                        driver to be used.</li>
+                </ol>
+                <p>Altogether, this enables to build arbitrary complex configurations
+                    with very few lines of Java code or properties in the configuration
+                    file(s).</p>
+            </subsection>
+            <subsection name="Updating Archive Files">
+                <p>To provide random read/write access to archive files, TrueZIP needs
+                    to associate some state for every recognized archive file on the heap
+                    and in the folder for temporary files while the client application is
+                    operating on the VFS.</p>
+                <p>TrueZIP performs the <i>mounting</i> and <i>unmounting</i> of the
+                    VFS for archive files <i>implicitly</i> and you can safely rely on
+                    this. However, sometimes <i>explicit unmounting</i> may be required
+                    if...</p>
+                <ol style="list-style-type: decimal">
+                    <li>third parties require access to the same path, or...</li>
+                    <li>some control is required over the exceptions which may be
+                        thrown when unmounting, or...</li>
+                    <li>the progress of updating large archive files shall get
+                        monitored.</li>
+                </ol>
+                <p>In this context, third parties are:</p>
+                <ol style="list-style-type: decimal">
+                    <li>Instances of the class <code>java.io.File</code> which are
+                        not instances of the class
+                        <code>de.schlichtherle.io.File</code>.</li>
+                    <li>Instances of the class <code>de.schlichtherle.io.File</code>
+                        which do not recognize the same set of archive files in the
+                        path due to the use of a differently working
+                        <code>de.schlichtherle.io.ArchiveDetector</code>.</li>
+                    <li>Other definitions of the classes in this package which have
+                        been loaded by different class loaders.</li>
+                    <li>Other system processes.</li>
+                </ol>
+                <p>Explicit unmounting can simply be performed by calling <code>File.umount()</code>
+                    like this:</p>
+                <source>
+try {
+    File.umount(); // with or without parameters
+} catch (ArchiveWarningException oops) {
+    // Only instances of the class ArchiveWarningException exist in
+    // the sequential chain of exceptions. We decide to ignore this.
+} catch (ArchiveException ouch) {
+    // At least one exception occured which is not just an
+    // ArchiveWarningException. This is a severe situation which
+    // needs to be handled.
+    // Print the sequential chain of exceptions in order of
+    // descending priority and ascending appearance.
+    //ouch.printStackTrace();
+    // Print the sequential chain of exceptions in order of
+    // appearance instead.
+    ouch.sortAppearance().printStackTrace();
+}</source>
+                <p>However, overly calling
+                    <a href="apidocs/de/schlichtherle/io/File.html#umount"><code>umount()</code></a>
+                    can cause serious performance degradation:
+                    Unmounting a modified archive file is a linear runtime
+                    operation.
+                    If the size of the resulting archive file is <dfn>s</dfn>
+                    bytes, the operation always completes in <dfn>O(s)</dfn>,
+                    even if only a single, small archive entry has been
+                    modified within a very large archive file.
+                    Unmounting an unmodified or newly created archive file is
+                    a constant runtime operation:
+                    It always completes in <dfn>O(1)</dfn>.
+                    These magnitudes are independent of whether unmounting was
+                    performed explicitly or implicitly.
+                    Now if the client application modifies each entry in a loop
+                    and accidentally triggers unmounting the archive file on
+                    each iteration, then the overall runtime increases to
+                    <dfn>O(s*s)</dfn>!</p>
+                <p>Here are some guidelines to find the right balance between
+                    performance and control:</p>
+                <ol style="list-style-type: decimal">
+                    <li>When the JVM terminates, TrueZIP's JVM shutdown takes
+                        care of unmounting and prints the stacktrace of any
+                        exceptions on the standard error output.
+                        However, calling <code>umount()</code> is recommended
+                        in order to handle exceptions explicitly.
+                        Furthermore, shutdown hooks shall not take long, but
+                        updating a large archive file may take a considerable
+                        amount of time doing I/O.</li>
+                    <li>Otherwise, in order to achieve best performance,
+                        <code>umount()</code> or <code>update()</code> should
+                        not get called unless either third party access or
+                        explicit exception handling is required.</li>
+                    <li>For the same reason, these methods should never get
+                        called in a loop which modifies an archive file.</li>
+                    <li><code>umount()</code> is generally preferred over
+                        <code>update()</code> for safety reasons.</li>
+                </ol>
+                <p>To get the full story, please refer to the package Javadoc for
+                    <code><a href="apidocs/de/schlichtherle/io/package-summary.html#updating">de.schlichtherle.io</a></code>.</p>
+            </subsection>
+            <subsection name="Recognizing False Positives">
+                <p>If an archive detector hits a file path which probably
+                    denotes an archive file, the file is said to be a
+                    <i>prospective archive file</i>.
+                    On the first read or write access to a prospective archive
+                    file, TrueZIP checks its <i>true state</i> in cooperation
+                    with the registered archive driver for the respective file
+                    suffix.
+                    If the true state of the file turns out to be actually a
+                    directory or to be incompatible with the archive file
+                    format, it's said to be a <i>false positive</i> archive
+                    file.</p>
+                <p>Just like a native file system, the behavior of all read and
+                    write operations in TrueZIP depends on the true state of a
+                    file.
+                    This is an important concept which ensures that TrueZIP
+                    cannot get fooled by a false positive archive file.
+                    However, a false positive archive file sometimes fools the
+                    user.
+                    Consider the following example: The ZIP file
+                    <i>archive.zip</i> has been created by 7-Zip and uses
+                    7-Zip's popular, but proprietary LZMA compression.
+                    Now a user would probably expect
+                    <code>new File(&quot;archive.zip&quot;).list()</code> to
+                    return the contents of the virtual root directory in the
+                    archive file.
+                    However, this method simply returns <code>null</code>
+                    because <i>archive.zip</i> is not compatible to the ZIP
+                    file format specification and hence is treated like a
+                    regular file.
+                    For regular files however, the contract of
+                    <code>File.list()</code> requires to return
+                    <code>null</code>.</p>
+            </subsection>
+        </section>
+        <section name="Customizing Archive File Suffixes and Archive Drivers">
+            <p>Out of the box, the global registry is configured to support the
+                ZIP and TAR file family with all known relatives.
+                For a complete reference of all supported archive file formats
+                and their parameters please refer to the
+                <a href="apidocs/overview-summary.html#defaults">API Overview</a>.</p>
+            <p>However, in order to make TrueZIP's JAR self-contained and avoid
+                unwanted side effects, the default configuration causes the
+                <code><a href="apidocs/de/schlichtherle/io/File.html">File</a></code>
+                class to recognize the archive file suffixes
+                <code>&quot;ear|jar|war|zip&quot;</code> only (whereby case is
+                ignored).
+                Even if this is a super set of the archive file suffixes which
+                need to get recognized in paths, the client application should
+                always customize this set:</p>
+            <ul>
+                <li>Treating an archive file like a virtual directory although
+                    it's not required causes unnecessary memory and runtime
+                    overhead and may even confuse the client application or the
+                    user.</li>
+                <li>The set of archive file suffixes recognized by default may
+                    be extended without prior notice in future releases of
+                    TrueZIP, which adds to the previous point.</li>
+            </ul>
+            <subsection name="Typical Configuration Tasks">
+                <h4>Task #1: Selecting supported Archive File Suffixes</h4>
+                <p>With this task, a subset of all archive file suffixes
+                    registered in the global registry by TrueZIP's
+                    <a href="apidocs/overview-summary.html#defaults">default
+                    configuration file</a> shall get recognized.</p>
+                <p>Suppose that the client application needs to support the
+                    suffix set <code>&quot;tar.bz2|tar.gz|zip&quot;</code>.
+                    Note that for the TAR and BZIP2 support to work,
+                    <i><a href="apidocs/overview-summary.html#defaults">ant.jar</a></i>
+                    from Apache's Ant, version 1.8.1 or higher must be added to
+                    the run time class path.</p>
+                <p>Since archive drivers for both archive file suffixes are
+                    already registered by TrueZIP's default configuration file,
+                    the client application just needs to make these suffixes
+                    recognized whenever a <code>File</code> instance is
+                    created.</p>
+                <h4>Task #2: Defining a custom Document File Format</h4>
+                <p>With this task, a custom application (container) file format
+                    shall get supported by registering and recognizing a custom
+                    archive file suffix for a registered archive driver.</p>
+                <p>Suppose that the client application needs to implement a
+                    custom document file format.
+                    Because a document can be composed of many complex
+                    elements, it's a good idea to choose a well known archive
+                    file format and store the elements as its entries.
+                    This makes the custom document file format easily
+                    extensible without breaking backwards compatibility in
+                    future releases.
+                    If a custom document file suffix is associated to it, the
+                    use of the archive file format is completely opaque to the
+                    users:
+                    They just see flat files with a custom suffix.
+                    This is exactly the idea of the Java Archive format (JAR)
+                    or the OpenDocument Format (ODF).</p>
+                <p>For best results, it's recommended to adopt the JAR file
+                    format for this purpose.
+                    The JAR file format is well documented and provides some
+                    benefits over other archive file formats:</p>
+                <ul>
+                    <li>It uses UTF-8 for file name encoding and comments -
+                        unlike ZIP, which only uses IBM437.</li>
+                    <li>It provides a central directory for fast and storage
+                        efficient random read access to arbitrary archive
+                        entries - unlike TAR.</li>
+                </ul>
+                <p>The client application also has the option of transparently
+                    encrypting the contents of the document file by adopting
+                    TrueZIP's custom TZP file format.
+                    A TZP file is actually a regular JAR file which is entirely
+                    encrypted and wrapped in TrueZIP's custom Random Access
+                    Encryption Specification (RAES) file format.
+                    RAES uses the Advanced Encryption Standard (AES) in Counter
+                    (CTR) mode in order to support transparent, fast random
+                    read access.
+                    For more information about RAES, please refer to the
+                    Javadoc of the package
+                    <code><a href="apidocs/de/schlichtherle/crypto/io/raes/package-summary.html">de.schlichtherle.crypto.io.raes</a></code>
+                    .</p>
+                <p>Just for the fun of it, let's assume you want to adopt the
+                    JAR and TZP file formats with <code>&quot;foo&quot;</code>
+                    and <code>&quot;bar&quot;</code> as their respective custom
+                    suffixes.
+                    Document files with a <i>.foo</i> suffix should then be
+                    unencrypted JAR files, while document files with a
+                    <i>.bar</i> suffix should be JAR files which have been
+                    encrypted and wrapped in the RAES file format.
+                    This yields the additional benefit that any <i>.foo</i>
+                    file can be converted to an encrypted <i>.bar</i> file by
+                    a simple copy operation and vice versa - if provided with
+                    a valid key.</p>
+                <h4>Task #3: Supporting a new Archive File Format</h4>
+                <p>With this task, a new archive type shall get supported by
+                    registering and recognizing a custom archive file suffix
+                    and archive driver.</p>
+                <p>This is actually the same as the previous task.
+                    The only difference is that a custom archive driver needs
+                    to be registered instead of reusing an archive driver which
+                    is already supported out of the box.
+                    Because of this similarity, this task is not further
+                    explained in the following section.</p>
+            </subsection>
+            <subsection name="Approaches to accomplish these Tasks">
+                <p>This section explains the different approaches to accomplish
+                    these two tasks in order of descending preference and
+                    ascending priority.</p>
+                <h4>Approach #1: Supplying a Configuration File on the Class
+                    Path</h4>
+                <p>This approach uses the configuration files on the class path
+                    to configure TrueZIP. It affects all instances of the
+                    <code>File</code> class unless an
+                    <code>ArchiveDetector</code> is explicitly provided.</p>
+                <h5>Task #1: Selecting supported Archive File Suffixes</h5>
+                <p>With this approach, a file with the relative path
+                    <i>META-INF/services/de.schlichtherle.io.registry.properties</i>
+                    needs to be put somewhere on the class path which contains
+                    the following single line:</p>
+                <source>DEFAULT=tar.bz2|tar.gz|zip</source>
+                <p>Note that <code>DEFAULT</code> is a keyword and must be
+                    written in uppercase letters.
+                    The case of <code>tar.bz2|tar.gz|zip</code> doesn't matter,
+                    but the canonical form is all lowercase letters.</p>
+                <p>The value of the <code>DEFAULT</code> entry depends on
+                    TrueZIP's configuration files on the class path which must
+                    configure the global registry to hold mappings for all
+                    archive file suffixes specified in the list to their
+                    respective archive drivers.
+                    The <a href="apidocs/overview-summary.html#defaults">default configuration file</a>
+                    <i>truezip.jar/META-INF/services/de.schlichtherle.io.registry.properties</i>
+                    holds mappings for the archive file suffixes
+                    <code>tar.bz2</code>, <code>tar.gz</code> and
+                    <code>zip</code> and many more, so this is not an issue.</p>
+                <p>The effect is that the predefined
+                    <code>ArchiveDetector.DEFAULT</code> now recognizes exactly
+                    only the specified archive file suffixes.
+                    This archive detector is used for new <code>File</code>
+                    instances unless the class property
+                    <code>defaultArchiveDetector</code> has been changed or an
+                    archive detector is explicitly provided to the
+                    constructor.</p>
+                <h5>Task #2: Defining a custom Document File Format</h5>
+                <p>This time, the configuration file needs to look like this:</p>
+                <source>
+DEFAULT=foo|bar
+foo=de.schlichtherle.io.archive.zip.JarDriver
+bar=de.schlichtherle.io.archive.zip.raes.SafeZipRaesDriver</source>
+                <p>The second and third lines register mappings from an archive
+                    file suffix (e.g. <code>foo</code>), to its respective archive
+                    driver (e.g.
+                    <code>de.schlichtherle.io.archive.zip.JarDriver</code>).
+                    Needless to say that the name of the archive driver class is
+                    case sensitive.
+                    Again, the archive file suffix is case insensitive, but the
+                    canonical form is all lowercase letters.</p>
+                <p>Note that unlike the previous task, this task's configuration
+                    file is self contained:
+                    It does not rely on any other configuration file to be present
+                    on the class path.</p>
+                <h4>Approach #2: Using the Command Line</h4>
+                <p>This approach is even simpler than the previous one. However, it's
+                    only applicable for the first task and requires TrueZIP 6.5.2 or
+                    higher. Like the first approach, it affects all instances of the <code>File</code>
+                    class unless an <code>ArchiveDetector</code> is explicitly provided.
+                    If both approaches are used, this approach takes priority. This is
+                    intended to be used by users who want to override the configuration on
+                    a case by case basis. Client applications should not depend on this.</p>
+                <h5>Task #1: Selecting supported Archive File Suffixes</h5>
+                <p>With this approach, the client application simply configures the
+                    list of archive file suffixes recognized by default on the command line
+                    like this:</p>
+                <source>$ java <b>-Dde.schlichtherle.io.default=tar.bz2|tar.gz|zip</b> -cp truezip.jar ...</source>
+                <p>Again, <code>de.schlichtherle.io.default</code> is a keyword and
+                    must be written in lowercase letters. The case of <code>tar.bz2|tar.gz|zip</code>
+                    doesn't matter, but the canonical form is all lowercase letters.</p>
+                <p>The dependencies on the global registry and the effect is the same
+                    as in the previous approach.</p>
+                <h4>Approach #3: Setting the <code>defaultArchiveDector</code>
+                    Property in the
+                    <code>File</code> class</h4>
+                <p>This approach is equivalent to the first approach if and only if the
+                    property is set right at the start of the client application, before
+                    the first <code>File</code> instance is created.</p>
+                <h5>Task #1: Selecting supported Archive File Suffixes</h5>
+                <p>With this approach, the client application needs to call the
+                    following statement right at application startup:</p>
+                <source>File.setDefaultArchiveDetector(new DefaultArchiveDetector(&quot;tar.bz2|tar.gz|zip&quot;));</source>
+                <p>The effect is that this archive detector is used for new <code>File</code>
+                    instances unless an archive detector is explicitly provided to the
+                    constructor. This overrides any DEFAULT entry in configuration files,
+                    but still uses their registered mappings for archive file suffixes and
+                    archive drivers.</p>
+                <p>Just like the previous approaches, this depends on TrueZIP's
+                    configuration files on the class path which must configure the global
+                    registry to hold mappings for all archive file suffixes specified in
+                    the list to their respective archive drivers.</p>
+                <h5>Task #2: Defining a custom Document File Format</h5>
+                <p>For this task, the client application needs to call the following
+                    statements:</p>
+                <source>
+File.setDefaultArchiveDetector(new DefaultArchiveDetector(
+      ArchiveDetector.NULL, // delegate
+      new String[] {
+          &quot;foo&quot;, &quot;de.schlichtherle.io.archive.zip.JarDriver&quot;,
+           &quot;bar&quot;, &quot;de.schlichtherle.io.archive.zip.raes.SafeZipRaesDriver&quot;,
+      }));</source>
+                <p>Note the use of <code>ArchiveDetector.NULL</code> as a delegate
+                    which's registry is to be used in case there is no mapping in the local
+                    registry for a given suffix. Since the <code>NULL</code> instance does
+                    not contain any mappings, <i>.foo</i> and <i>.bar</i> will be the
+                    only recognized suffixes. Alternatively, the predefined instances <code>ArchiveDetector.DEFAULT</code>
+                    or <code>ArchiveDetector.ALL</code> could be used.</p>
+                <p>Instead of passing fully qualified class name strings, archive
+                    driver instances could also be passed. If class names are passed, they
+                    are loaded using the current thread's context class loader - so please
+                    make sure that the class loader hierarchy is set up correctly. In any
+                    case, the parameter must refer to an implementation/instance of the <code>
+                        <a href="apidocs/de/schlichtherle/io/archive/spi/ArchiveDriver.html">ArchiveDriver</a></code>
+                    interface in the package <code>de.schlichtherle.io.archive.spi</code>.</p>
+                <p>Just like the first approach to this task, this configuration is
+                    self contained.</p>
+                <h4>Approach #4: Explicitly providing an <code>ArchiveDetector</code></h4>
+                <p>With this approach, the client application explicitly provides an <code>ArchiveDetector</code>
+                    to the constructor or method of the File class instead of relying on
+                    the default settings.</p>
+                <p><b>Warning:</b> If incorrectly used, this approach may show unwanted
+                        side effects: TrueZIP caches state information of updated archive files
+                        on the heap and in temporary files until the archive file gets
+                        unmounted. If the same file path is accessed using different archive
+                        detectors, this state information may get bypassed. Depending on how
+                        the client application operates on files, this may even cause <b>loss
+                            of data</b>!</p>
+                <p>So this approach shouldn't be used unless there's good reason to.
+                    One such reason is to create verbatim copies of archive files which
+                    would otherwise be treated like directories and hence be copied
+                    recursively (see <a href="#Copying">below</a>).</p>
+                <h5>Task #1: Selecting supported Archive File Suffixes</h5>
+                <p>Instead of relying on defaults, the client application may also
+                    provide an archive detector explicitly when creating a <code>File</code>
+                    instance:</p>
+                <source>
+ArchiveDetector detector = new DefaultArchiveDetector(&quot;tar.bz2|tar.gz|zip&quot;);
+File file = new File(&quot;archive.zip&quot;, detector);</source>
+                <p>Note that unlike the previous examples and for completeness only,
+                    this example shows the instantiation of the <code>File</code> class.</p>
+                <h5>Task #2: Defining a custom Document File Format</h5>
+                <p>For completeness, here's the same approach using an explicitly
+                    provided archive detector to accomplish the second task:</p>
+                <source>
+ArchiveDetector detector = new DefaultArchiveDetector(
+       ArchiveDetector.NULL,
+       new Object[] {
+          &quot;foo&quot;, new de.schlichtherle.io.archive.zip.JarDriver(),
+          &quot;bar&quot;, new de.schlichtherle.io.archive.zip.raes.SafeZipRaesDriver(),
+      }));
+File file = new File(&quot;archive.foo&quot;, detector);</source>
+                <p>This time, the constructor is passed driver instances instead of
+                    class names.</p>
+            </subsection>
+        </section>
+        <section name="Copying and Concatening">
+        <p>Archive files are typically created (packed) and unpacked from and
+            to directory trees in the real file system. According to the TrueZIP
+            logic, this is essentially a recursive copy operation between the
+            virtual root directory of the archive file and the real directory in
+            the native file system.</p>
+        <p>TrueZIP's <code>File</code> class provides a family of methods
+            which make this task as simple as possible. At the same time, these
+            methods also provide improved performance (equivalent to <code>java.nio.Channel.transfer()</code>)
+            and some enhanced features. For example, under the hood all copy
+            methods work
+            asynchronously: A background thread reads the data from the source,
+            filling up a ring of large buffers, while the foreground thread writes
+            the data to the destination, flushing the ring. If the source and
+            destination are actually entries in a ZIP file, the data is copied
+            directly without decompressing and recompressing it again - this is
+            called <i>Direct Data Copying</i> (DDC). These are just two of the
+            many built-in optimizations which provide improved performance when
+            copying archive files. For more information, please refer to the
+            <a href="apidocs/de/schlichtherle/io/File.html#bulkIOMethods">Javadoc
+                for the
+                <code>File</code> class</a>.</p>
+        <p>In order to keep the examples of this section as short as possible,
+            it's assumed that you have set up the configuration as explained in the
+            previous section.</p>
+        <p><b>Important:</b> Note that the <code>File</code> class does
+                not do path name expansion. So for any file system operation, the
+                client application has to provide <i>complete </i>(relative or
+                absolute) path names.</p>
+        <p>Here's how to pack a directory tree into a ZIP file (for unpacking,
+            simply swap the source and destination):</p>
+        <source>new File(&quot;directory&quot;).copyAllTo(new File(&quot;archive.zip&quot;));</source>
+        <p>This method recursively copies the contents of the
+            <code>&quot;directory&quot;</code> to the ZIP file <code>&quot;archive.zip&quot;</code>.</p>
+        <p>Here's how to convert the ZIP file created in the last example to a
+            TAR.BZ2 file:</p>
+        <source>new File(&quot;archive.zip&quot;).archiveCopyAllTo(new File(&quot;archive.tar.bz2&quot;));</source>
+        <p>This time we use the method <code>File.archiveCopyAllTo(File)</code>
+            to copy the last modification time of all entries in the source to the
+            destination, too. Note that as soon as JSR 203 is in place, this method
+            should copy <i>all </i>accessible meta data - not just the last
+            modification time. For now, unfortunately this is all it can do.</p>
+        <p>Consider the task of defining a custom document file format again:
+            Document files with a <i>.foo</i> suffix should get unencrypted while
+            document files with a <i>
+                .bar</i> suffix should get encrypted.</p>
+        <p>Here's how to convert an unencrypted document file to an encrypted
+            document file:</p>
+        <source>new File(&quot;document.foo&quot;).archiveCopyAllTo(new File(&quot;document.bar&quot;));</source>
+        <p>When this method is called, the user will be prompted with a GUI
+            dialog to enter a new password for <code>&quot;document.bar&quot;</code>,
+            unless this file already exists, in which case the user would be
+            prompted to enter the password for the existing file. If no GUI is
+            available and the JRE conforms to JSE 6, the user is prompted on the
+            console instead. If no console is available, the operation fails.
+            Please see <a href="#RAES">below</a> how to customize passwords.</p>
+        <p>Since archive files may be arbitrarily nested, there's also a way to
+            specify whether archive files <i>inside</i> the top level source and
+            destination folders shall be recognized as virtual directories or plain
+            files.</p>
+        <p>Here's how to inhibit recursing into a nested archive file in order
+            to unpack all archive files in the source to the destination, including
+            nested archive files:</p>
+        <source>
+new File(&quot;archive.zip&quot;).archiveCopyAllTo(new File(&quot;directory&quot;),
+ArchiveDetector.DEFAULT, ArchiveDetector.NULL);</source>
+        <p>The archive detector parameters are respectively used when recursing
+            into source and destination folders: <code>ArchiveDetector.DEFAULT</code>
+            is passed to the constructor of all <code>File</code> instances for
+            the source folder and <code>ArchiveDetector.NULL</code> is passed to
+            the constructor of all <code>File </code>instances for the
+            destination folder. So the effect of this call is that all enclosed
+            archive files in the source tree are copied to plain directories with
+            the same name in the destination tree.</p>
+        <p><b>Warning:</b> Using different archive detectors for the
+                same file system object in different operations may bypass the state
+                TrueZIP's associates with each archive file, which
+                may possibly result in <i>loss of data</i>! In this particular
+                example, if <code>ArchiveDetector.DEFAULT</code>
+                would not recognize an archive file which has been recognized before by
+                a another archive detector (e.g. <code>ArchiveDetector.ALL</code>),
+                the state associated with the archive file would be bypassed and the
+                copy
+                in the destination may get corrupted. As you can guess, this is a
+                pretty
+                unlikely event, but it may happen. Again, the best protection is never
+                to use explicitly provided archive detectors.</p>
+        <p><b>Important:</b> Note that the previously shown methods
+                all return the boolean value <code>false</code>
+                rather than throwing an <code>IOException</code> to indicate failure!
+                When I designed these methods, I thought that coherence with the legacy
+                methods in <code>java.io.File</code> (which just return boolean
+                values, too) would be more important than a decent exception handling
+                mechanism. I was certainly wrong and I apologize for this fault.</p>
+        <p>If this bothers you, there's another option: The <code>File</code>
+            class provides additional static methods
+            named
+            <code>cp</code> and <code>cp_p</code> which throw an <code>IOException</code>
+            to indicate failure. Unfortunately, none of these methods work
+            recursively (yet).</p>
+        <p>Here's how to copy a single file using these methods, preserving the
+            last modification time:</p>
+        <source>File.cp_p(new File(&quot;file1&quot;), new File(&quot;file2&quot;));</source>
+        <p>The method name is modelled after the Unix command line utility <code>cp</code>
+            with the <code>-p</code> option. Unlike the Unix command line utility
+            however, it doesn't do path name expansion. Note again that this method
+            throws an
+            <code>IOException</code> on failure.</p>
+        <p>Finally, we get to the low level transport: If all you need is
+            pumping data from an arbitrary input stream to an arbitrary output
+            stream, please use the following:</p>
+        <source>File.cat(in, out);</source>
+        <p>where <code>in</code> and <code>out</code> are <code>InputStream</code>
+            and
+            <code>OutputStream</code> instances, respectively. This method throws
+            an <code>InputIOException</code> if it can't read from the input
+            stream and an <code>IOException</code> if it can't write to the output
+            stream. Neither stream is ever closed, so you can use this method to
+            concatenate data, too. Again, the method name is modelled after the
+            Unix command line utility <code>cat</code>.</p>
+        <p>Note that this method can't use DDC, but it still benefits from
+            asynchronous data copying in order to provide superior performance.</p>
+        </section><section name="Using RAES encrypted ZIP files">
+        <p>RAES encrypted ZIP files are no more than regular ZIP files which
+            use UTF-8 as their character set encoding (like JARs) and have been
+            encrypted according to the RAES file format. The RAES file format
+            enables transparent random access to its AES encrypted content as if
+            the application were reading decrypted data from a
+            <code>RandomAccessFile</code>. RAES is not at all specific to ZIP files
+            - any kind of content can be encrypted. TrueZIP uses RAES to enable
+            transparent access to encrypted ZIP files as if they were (virtual)
+            directories.</p>
+        <p>To access RAES encrypted ZIP files, the client application needs to</p>
+        <ol style="list-style-type: decimal">
+            <li>
+                <p style="margin-bottom: 0cm;">configure TrueZIP to recognize the
+                    file suffixes configured in the global registry (which are <i>.tzp</i>,
+                    <i>.zip.rae</i> and <i>.zip.raes</i> by default), and</p>
+            </li>
+            <li>
+                <p>have the JAR for Bouncy Castle's Lightweight Crypto API for JDK
+                    1.4 Version 1.30 or higher (<i>lcrypto.jar</i>) on the runtime class
+                    path. You can download it by searching for &quot;lcrypto-jdk14-130&quot; at <a class="externalLink" href="http://www.bouncycastle.org/latest_releases.html">http://www.bouncycastle.org/latest_releases.html</a>.</p>
+            </li>
+        </ol>
+        <p>To meet the first requirement, <code>ArchiveDetector.ALL</code>
+            could simply be used. However, the client application would then not
+            only need to have <i>lcrypto.jar</i> on the run time class path, but
+            also all other dependencies required to access the archive types of all
+            the other suffixes recognized in the global registry. So it's probably
+            better to use a custom archive detector. The following example
+            configures TrueZIP to recognize just the canonical file suffixes for
+            ZIP files and RAES encrypted ZIP files (see before):</p>
+        <source>File.setDefaultArchiveDetector(new DefaultArchiveDetector(&quot;zip|tzp|zip.rae|zip.raes&quot;));</source>
+        <p>Now the following file output stream writes to the entry <i>README</i>
+            within the RAES encrypted ZIP file <i>secret.tzp</i>:</p>
+        <source>OutputStream out = new FileOutputStream(&quot;secret.tzp/README&quot;);</source>
+        <p>As you see from this example, once TrueZIP is configured, the client
+            application treats RAES encrypted ZIP files like any other virtual
+            directory.</p>
+        <p>If you test this example, you should be prompted for a password with
+            a Swing based GUI or a console dialog. This is controlled by the key
+            manager. To configure the default implementation, please refer to the
+            section on
+            <a href="#KeyManager">key management</a> below.</p>
+        <p><b>Miscellaneous:</b></p>
+        <ul>
+            <li>
+                <p>
+                    RAES is <i>not</i> compatible to WinZip's encryption scheme.
+                    This is because of security issues with WinZip's encryption scheme. For
+                    more information, please refer to the <a href="news.html#News_RAES">news
+                        section on RAES</a>.
+                </p>
+            </li>
+            <li>
+                <p>All encryption/decryption is done in Bouncy Castle's <i>lcrypto.jar</i>.
+                    <i>truezip.jar</i> itself does not contain any
+                    encryption/decryption algorithms and hence should not be subject to
+                    export restrictions in the USA. This implies that US organizations
+                    could safely export products which use <i>truezip.jar</i>, but don't
+                    need support for RAES encrypted ZIP files, which would require <i>
+                        lcrypto.jar</i>. However, this information is without any warranties:
+                    I'm not a lawyer and I'm not even a US resident.</p>
+            </li>
+            <li>
+                <p>If you would like to use TrueZIP's RAES implementation to
+                    encrypt custom (non-ZIP file) data, please refer to the source code of
+                    the utility main classes <code>encrypt</code> and <code>decrypt</code>
+                    in the base package.</p>
+            </li>
+            <li>
+                <p>RAES uses AES in CTR mode with a maximum key strength of 256
+                    bits. For PRNG and authentication, SHA-256 is used. RAES is extensible,
+                    so other cipher algorithms or digests could be added - CTR is the only
+                    invariant requirement. For more information please refer to the Javadoc
+                    for the package <code> <a href="apidocs/de/schlichtherle/crypto/io/raes/package-summary.html#description">
+                            de.schlichtherle.crypto.io.raes</a></code>.</p>
+            </li>
+        </ul>
+        <subsection name="Converting Archive Files to RAES encrypted ZIP Files and vice versa">
+        <p>TrueZIP's JAR contains a utility main class called <code>nzip</code>
+            in the base package which you can use to easily convert any archive
+            file to an RAES encrypted ZIP file and vice versa.</p>
+        <p>The following example converts an ordinary ZIP file to an RAES
+            encrypted ZIP file (this example assumes a UNIX platform):</p>
+        <source>
+$ rm archive.tzp
+$ java -cp truezip.jar:lcrypto.jar nzip cp archive.zip archive.tzp</source>
+        <p>The following call reverses the operation:</p>
+        <source>
+$ rm archive.zip
+$ java -cp truezip.jar:lcrypto.jar nzip cp archive.tzp archive.zip</source>
+        <p>The initial removal of the target file is just required to prevent
+            the <code>
+                nzip</code> utility main class to copy the source archive <i>into</i>
+            the destination archive if the latter already exists.</p>
+        <p>The nzip utility main class provides a lot of other Unix-like
+            commands (cp, ll, rm, mv, rm, ...). For more information, please refer
+            to its inline help which is printed if the class is run without
+            arguments.</p>
+        </subsection><subsection name="Private Key Management">
+        <p>Like any kind of symmetric cipher, the AES cipher used for the RAES
+            file format requires a <i>private key</i>. In order to maintain full
+            transparency for the client application, this archive type specific
+            &quot;detail&quot; is handled by the archive driver in cooperation with the <code>
+                <a href="apidocs/de/schlichtherle/key/KeyManager.html">KeyManager</a></code>
+            class in the package <code>de.schlichtherle.key</code>.</p>
+        <p>The key manager is a singleton which maps <i>protected resources </i>to
+            their respective <i>key provider</i>: A protected resource can be
+            virtually anything which can be identified by a unique string (the <i>resource
+                ID</i>) and the key provider can be any instance of the <code>
+                <a href="apidocs/de/schlichtherle/key/KeyProvider.html">KeyProvider</a></code>
+            interface. This interface is generic enough to be agnostic of the
+            actual source and type of a private key: The source could be a GUI
+            dialog, a text console dialog, a secure database, a secure file, etc.
+            and the key may be an arbitrary object.</p>
+        <h4>Default Key Manager Implementations</h4>
+        <p>Out of the box, TrueZIP provides two default implementations of the
+            key manager:</p>
+        <ol style="list-style-type: decimal">
+            <li>If the JVM is not running in headless mode, an instance of the
+                class <code> <a href="apidocs/de/schlichtherle/key/passwd/swing/PromptingKeyManager.html">
+                        de.schlichtherle.key.passwd.swing.PromptingKeyManager</a></code> is
+                used. This key manager uses key provider implementations which prompt
+                the user with a Swing based dialog whenever a private key is required
+                to create or open a protected resource for the first time. The key
+                provider implementations support passwords and key files. For a key
+                file, the first 512 bytes of the file are used as the key. If a new
+                protected resource is to be created and if the file is not read-only,
+                is shorter than 512 bytes or the first 512 bytes are not a good source
+                of entropy (e.g. contain only null bytes), it's rejected and the user
+                is asked to provide a different file again.</li>
+            <li>If the JVM is running in headless mode and is compatible to JSE
+                6, an instance of the class <code> <a href="apidocs/de/schlichtherle/key/passwd/console/PromptingKeyManager.html">
+                        de.schlichtherle.key.passwd.console.PromptingKeyManager</a></code> is
+                used. This key manager uses key provider implementations which prompt
+                the user on the text console whenever a private key is required to
+                create or open a protected resource for the first time. The key
+                provider implementations support passwords only.</li>
+        </ol>
+        <p>If none of the prerequisites is met or the console is not connected
+            to the JVM, key prompting is disabled and any attempt to create or open
+            a protected resource fails with an exception.</p>
+        <p>Note that all dialogs are internationalized. Currently only English
+            and German are implemented, but you can easily translate it to your
+            favorite locale. For more information, please refer to the source code
+            and/or contact the mailing list.</p>
+        <h4>How the Key Manager is used for RAES encrypted ZIP Files</h4>
+        <p>Whenever a member of the archive driver family for RAES encrypted
+            ZIP files accesses an archive file, it asks the key manager for a key
+            provider, using the <i>canonical path</i> (not just the absolute path)
+            of the archive file as the resource ID. The type of key provider
+            requested by the archive driver is <code>
+                <a href="apidocs/de/schlichtherle/key/AesKeyProvider.html">AesKeyProvider</a></code>,
+            a subinterface of <code>KeyProvider</code>. This interface holds an
+            additional property required for the key strength of the AES encryption.</p>
+        <p>The key manager looks up its registry of key provider <i>instances</i>.
+            If a key provider instance doesn't exist yet for the given resource ID,
+            the registry of key provider <i>types</i> is looked up for a class to
+            instantiate. The new instance is then returned to the archive driver.</p>
+        <p>The archive driver then calls the key provider to retrieve the
+            private key. If the key provider throws an exception because key
+            prompting has been cancelled by the user or is disabled, the exception
+            is wrapped in an instance of a subclass of
+            <code>FileNotFoundException</code> and propagated to the client
+            application wherever appropriate - some methods in the <code>File</code>
+            class simply return the boolean value <code>false</code> instead.</p>
+        <h4>Customizing Key Management</h4>
+        <p>This architecture provides several leverages to customize key
+            management. The following sections give an overview of how this can be
+            done.</p>
+        <h5>Approach #1: Custom Key Provider</h5>
+        <p>This approach works best if you want to provide a different private
+            key for each protected resource. As an example, you may want to hard
+            code the private key for a particular RAES encrypted ZIP file so that
+            the user is not bothered with prompting.</p>
+        <p><b>Warning:</b> Hard coding a private key in Java pretty much spoils
+                any security concept because the private key can be easily obtained by
+                reverse engineering, even if you obfuscate the entire code!</p>
+        <p>To follow this approach, you need to implement the <code>de.schlichtherle.key.KeyProvider</code>
+            interface and register it for the <i>identifier (ID)</i> of the
+            particular protected resource with the key manager. More precisely, in
+            case of RAES encrypted ZIP files, the ID of the protected resource is
+            always the <i>canonical path</i> of the particular archive file (not
+            just an absolute path) and the key provider must be an implementation
+            of the <code>AesKeyProvider</code> interface in the same package (not
+            just the
+            <code>KeyProvider</code> interface). Otherwise the user will still be
+            prompted or see a <code>ClassCastException</code> respectively.</p>
+        <p>Consider the following example:</p>
+        <source>
+public class SimpleAesKeyProvider implements AesKeyProvider {
+    public Object getCreateKey() throws UnknownKeyException {
+        return &quot;secret&quot;.toCharArray(); // returns cloned char array!
+    }
+
+    public Object getOpenKey() throws UnknownKeyException {
+        return &quot;secret&quot;.toCharArray(); // returns cloned char array!
+    }
+
+    public void invalidOpenKey() {
+        // This method is called whenever a key for an existing protected
+        // resource is invalid. A real application should deal with this
+        // appropriately, of course.
+        throw new UnsupportedOperationException(&quot;cannot handle invalid keys!&quot;);
+    }
+
+    public int getKeyStrength() {
+        return KEY_STRENGTH_256;
+    }
+
+    public void setKeyStrength(int keyStrength) {
+    }
+}
+
+// ...
+
+KeyManager.getInstance().setKeyProvider(
+        &quot;/home/acme/archive.tzp&quot;,
+        new SimpleAesKeyProvider());</source>
+        <p>where <code>&quot;/home/acme/archive.tzp&quot;</code>
+            would be the canonical path of the RAES encrypted ZIP file to serve as
+            the ID of the protected resource and <code>&quot;secret&quot;</code>
+            would be the password to use as the private key for this file. Note
+            that the password must be cloned on each call and should be a char
+            array, not just a byte array.</p>
+        <h5>Approach #2: Custom Key Manager</h5>
+        <p>This approach works best if you want to provide a different <i>type</i>
+            of key provider for any protected resource. For example, you may want
+            to use a secure database as the source for private keys instead of
+            prompting the user for RAES encrypted ZIP files.</p>
+        <p>To follow this approach, you need to provide a custom key manager
+            implementation by subclassing the class <code>de.schlichtherle.key.KeyManager</code>
+            or <code>de.schlichtherle.key.PromptingKeyManager</code>. The
+            difference between these base classes is that the latter class supports
+            a pluggable user interface architecture. This could be useful if you
+            would like to port the default key manager implementation from Swing to
+            SWT for example.</p>
+        <p>Finally, you must set the system property <code>de.schlichtherle.key.KeyManager</code>
+            to the fully qualified class name of the custom key manager
+            implementation at JVM startup or early in the main method of the client
+            application.</p>
+        <p>Here's a minimal example which reuses the <code>SimpleAesKeyProvider</code>
+            class from the previous example:</p>
+        <source>
+public class CustomKeyManager extends KeyManager {
+    public CustomKeyManager() {
+        mapKeyProviderType(AesKeyProvider.class, SimpleAesKeyProvider.class);
+    }
+}
+
+// ...
+
+System.setProperty(&quot;de.schlichtherle.key.KeyManager&quot;, &quot;com.acme.CustomKeyManager&quot;));</source>
+        <p>where <code>&quot;com.acme.CustomKeyManager&quot;</code>
+            would be the fully qualified name of the custom key manager
+            implementation.</p>
+        <p>The call to <code>mapKeyProviderType()</code> tells the key manager
+            to instantiate the <code>SimpleAesKeyProvider</code> class whenever a
+            new <code>AesKeyProvider</code> is required. This feature replaces the
+            common factory pattern.</p>
+        <h5>Approach #3: Custom Archive Driver</h5>
+        <p>This approach works best if you would like to completely bypass the
+            key manager for a particular <i>type</i> of archive file. For example,
+            you may want to hard code a private key for a custom document file
+            format which is recognized by custom archive file suffixes.</p>
+        <p><b>Warning:</b> Hard coding a private key in Java pretty much spoils
+                any security concept because the private key can be easily obtained by
+                reverse engineering, even if you obfuscate the entire code!</p>
+        <p>To use this approach, you need to implement a custom archive driver.
+            The simplest option to do this is to subclass the class
+            <code><a href="apidocs/de/schlichtherle/io/archive/zip/raes/SafeZipRaesDriver.html">SafeZipRaesDriver</a></code>
+            and override the method
+            <code><a href="apidocs/de/schlichtherle/io/archive/zip/raes/AbstractZipRaesDriver.html#getRaesParameters">getRaesParameters(Archive)</a></code>
+            .
+            This method is expected to return an instance of the
+            <code><a href="apidocs/de/schlichtherle/crypto/io/raes/RaesParameters.html">RaesParameters</a></code>
+            interface, which is a just a marker interface. RAES can support several
+            authentication methods. <i>Type 0</i> files use password based
+            authentication. To read and write RAES files of this type, this method
+            should return an instance of the interface
+            <code><a href="apidocs/de/schlichtherle/crypto/io/raes/Type0RaesParameters.html">Type0RaesParameters</a></code>,
+            which is very similar to the <code>AesKeyProvider</code> interface
+            you've seen before. Next, an instance of the custom archive driver must
+            be registered in a <code>DefaultArchiveDetector</code>. Finally, you
+            need to use the archive detector explicitly or configure TrueZIP to use
+            it implicitly. </p>
+        <p>Here's an example:</p>
+        <source>
+public class SimpleRaesParameters implements Type0RaesParameters {
+    public char[] getCreatePasswd() throws RaesKeyException {
+        return &quot;secret&quot;.toCharArray(); // returns cloned char array!
+    }
+
+    public char[] getOpenPasswd() throws RaesKeyException {
+        return &quot;secret&quot;.toCharArray(); // returns cloned char array!
+    }
+
+    public void invalidOpenPasswd() {
+        throw new UnsupportedOperationException(&quot;cannot handle invalid passwords!&quot;);
+    }
+
+    public int getKeyStrength() {
+        return KEY_STRENGTH_256;
+    }
+
+    public void setKeyStrength(int keyStrength) {
+    }
+}
+
+public class CustomArchiveDriver extends SafeZipRaesDriver {
+    public RaesParameters getRaesParameters(Archive archive) {
+        return new SimpleRaesParameters();
+    }
+}
+
+// ...
+
+File.setDefaultArchiveDetector(new DefaultArchiveDetector(
+        ArchiveDetector.DEFAULT, // delegate
+        &quot;app&quot;, new CustomArchiveDriver()));</source>
+        <p>Note the similarity between <code>SimpleRaesParameters</code> and <code>SimpleAesKeyProvider</code>
+            used in the previous examples. Similar to before, the <code>getCreatePasswd()</code>
+            and <code>getOpenPasswd()</code> methods must return a clone of a char
+            array. The
+            <code>CustomArchiveDriver</code> instantiates this class on every call
+            to the method
+            <code>getRaesParameters(Archive)</code>. Alternatively, a singleton
+            could get returned. Finally, an instance of the custom archive driver
+            is registered in a DefaultArchiveDetector and set as the default
+            archive detector to use whenever a File instance is created and no
+            archive detector is explicitly provided.</p>
+        </subsection></section><section name="Miscellaneous">
+        <p>There's still more to discover in the TrueZIP API, mostly Swing
+            utility classes for dealing with (archive) files. Unfortunately, I
+            can't go into details for now, but here are some interesting features
+            for which you might consider it worth studying the Javadoc:</p>
+        <ul>
+            <li>Since TrueZIP 6.5, OpenDocument Format (ODF) files can be read
+                and written, too. For example, you can use OpenOffice Writer to create
+                a file named <code>&quot;document.odt&quot;</code>
+                and list it with <code>new File(&quot;document.odt&quot;, ArchiveDetector.ALL).list()</code>.
+                Read the Javadoc for the class <code> <a href="apidocs/de/schlichtherle/io/archive/zip/OdfDriver.html">de.schlichtherle.io.archive.zip.OdfDriver</a></code>
+                for more details.</li>
+            <li>Did you ever want file name auto completion like in some Unix
+                shells (e.g. bash) for your Swing based client application? Wouldn't it
+                be cool if it could browse archive files, too? Then have a look at the
+                class <code> <a href="apidocs/de/schlichtherle/io/swing/FileComboBoxBrowser.html">de.schlichtherle.io.swing.FileComboBoxBrowser</a></code>.</li>
+            <li>The class <code> <a href="apidocs/de/schlichtherle/io/swing/JFileTree.html">de.schlichtherle.io.swing.JFileTree</a></code>
+                might come in handy if you want to display and browse a directory tree
+                with Swing, including the contents of archive files. Convenient methods
+                for common tasks (copying, moving, deleting, etc.) are provided, too.</li>
+            <li>If you ever need to browse and pick and entry within archive
+                files with a GUI, consider using the <code> <a href="apidocs/de/schlichtherle/io/swing/JFileChooser.html">de.schlichtherle.io.swing.JFileChooser</a></code>
+                class.</li>
+            <li>The package <a href="apidocs/de/schlichtherle/io/samples/package-summary.html"><code>de.schlichtherle.io.samples</code></a>
+                not only contains the <code>NZip</code> utility main class, but also
+                two other utility main classes which can be used to conveniently <code>Encrypt</code>/<code>Decrypt</code>
+                arbitrary files into/from RAES.</li>
+            <li>The class <code> <a href="apidocs/de/schlichtherle/util/CanonicalStringSet.html">de.schlichtherle.util.CanonicalStringSet</a></code>
+                is a convenient and powerful means to operate with expressions such as <code>&quot;ear|jar|war|zip&quot;</code>.</li>
+            <li>The package <code> <a href="apidocs/de/schlichtherle/util/zip/package-summary.html">de.schlichtherle.util.zip</a></code>
+                holds drop-in replacements for the well known <code>Zip*</code>
+                classes in <code>java.util.zip</code>. The classes in this package
+                provide some advanced features when compared to the genuine
+                implementation. Sometimes it's also referred to as the <i>low level API</i>
+                since it's used by the ZIP archive driver family to read and write ZIP
+                files whereas the high level API is the classes in the package <code><a href="apidocs/de/schlichtherle/io/package-summary.html">de.schlichtherle.io</a></code>
+                .</li>
+        </ul>
+        <hr />
+        <p>That's it,basically. Thank you for reading this tutorial and
+            using TrueZIP!</p>
+    </section>
+    </body>
+</document>
