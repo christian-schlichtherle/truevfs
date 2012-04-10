@@ -4,21 +4,16 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsCovariantEntry;
+import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
+import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import static de.truezip.kernel.FsEntryName.*;
+import de.truezip.kernel.*;
+import de.truezip.kernel.cio.Container;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
-import de.truezip.kernel.cio.Container;
-import de.truezip.kernel.FsArchiveDriver;
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsEntryName;
-import static de.truezip.kernel.FsEntryName.*;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
-import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
-import de.truezip.kernel.FsAccessOptions;
 import de.truezip.kernel.io.Paths.Normalizer;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import static de.truezip.kernel.io.Paths.isRoot;
@@ -216,7 +211,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @throws IOException If the listener's beforeTouch implementation vetoed
      *         the operation for any reason.
      */
-    private void touch() throws IOException {
+    private void touch(final BitField<FsAccessOption> options) throws IOException {
         if (touched)
             return;
         // Order is important here because of veto exceptions!
@@ -224,10 +219,10 @@ implements Iterable<FsCovariantEntry<E>> {
                 e = new ArchiveFileSystemEvent<>(this);
         final ArchiveFileSystemTouchListener<? super E> tl = touchListener;
         if (null != tl)
-            tl.beforeTouch(e);
+            tl.beforeTouch(e, options);
         touched = true;
         if (null != tl)
-            tl.afterTouch(e);
+            tl.afterTouch(e, options);
     }
 
     /**
@@ -416,7 +411,6 @@ implements Iterable<FsCovariantEntry<E>> {
      * should not happen, however.
      */
     private final class PathLink implements ArchiveFileSystemOperation<E> {
-        final boolean createParents;
         final BitField<FsAccessOption> options;
         final SegmentLink<E>[] links;
         long time = UNKNOWN;
@@ -426,9 +420,7 @@ implements Iterable<FsCovariantEntry<E>> {
                     final BitField<FsAccessOption> options,
                     @CheckForNull final Entry template)
         throws IOException {
-            // Consume FsAccessOption.CREATE_PARENTS.
-            this.createParents = options.get(CREATE_PARENTS);
-            this.options = options.clear(CREATE_PARENTS);
+            this.options = options;
             links = newSegmentLinks(1, path, type, template);
         }
 
@@ -456,7 +448,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 newEntry.putEntry(entryType,
                         newCheckedEntry(entryName, entryType, options, template));
                 elements[1] = new SegmentLink<>(memberName, newEntry);
-            } else if (createParents) {
+            } else if (options.get(CREATE_PARENTS)) {
                 elements = newSegmentLinks(
                         level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<>(entryName);
@@ -475,7 +467,7 @@ implements Iterable<FsCovariantEntry<E>> {
         public void commit() throws IOException {
             assert 2 <= links.length;
 
-            touch();
+            touch(options);
             final int l = links.length;
             FsCovariantEntry<E> parentCE = links[0].entry;
             E parentAE = parentCE.getEntry(DIRECTORY);
@@ -546,7 +538,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  name the archive file system entry name.
      * @throws IOException on any I/O error.
      */
-    void unlink(final FsEntryName name)
+    void unlink(final FsEntryName name, BitField<FsAccessOption> options)
     throws IOException {
         // Test.
         final String path = name.getPath();
@@ -562,7 +554,7 @@ implements Iterable<FsCovariantEntry<E>> {
             return;
 
         // Notify listener and modify.
-        touch();
+        touch(options);
         master.remove(path);
         {
             // See http://java.net/jira/browse/TRUEZIP-144 :
@@ -593,7 +585,8 @@ implements Iterable<FsCovariantEntry<E>> {
     boolean setTime(
             final FsEntryName name,
             final BitField<Access> types,
-            final long value)
+            final long value,
+            final BitField<FsAccessOption> options)
     throws IOException {
         if (0 > value)
             throw new IllegalArgumentException(name.toString()
@@ -602,7 +595,7 @@ implements Iterable<FsCovariantEntry<E>> {
         if (null == ce)
             throw new NoSuchFileException(name.toString());
         // Order is important here!
-        touch();
+        touch(options);
         final E ae = ce.getEntry();
         boolean ok = true;
         for (final Access type : types)
@@ -612,13 +605,14 @@ implements Iterable<FsCovariantEntry<E>> {
 
     boolean setTime(
             final FsEntryName name,
-            final Map<Access, Long> times)
+            final Map<Access, Long> times,
+            BitField<FsAccessOption> options)
     throws IOException {
         final FsCovariantEntry<E> ce = master.get(name.getPath());
         if (null == ce)
             throw new NoSuchFileException(name.toString());
         // Order is important here!
-        touch();
+        touch(options);
         final E ae = ce.getEntry();
         boolean ok = true;
         for (final Map.Entry<Access, Long> time : times.entrySet()) {
@@ -630,6 +624,10 @@ implements Iterable<FsCovariantEntry<E>> {
 
     boolean isWritable(FsEntryName name) {
         return !isReadOnly();
+    }
+
+    boolean isExecutable(FsEntryName name) {
+        return false;
     }
 
     void setReadOnly(FsEntryName name)

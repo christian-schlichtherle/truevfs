@@ -42,7 +42,7 @@ implements Iterable<E>, Serializable {
      */
     public static <E extends Enum<E>> BitField<E>
     noneOf(Class<E> elementType) {
-        return new BitField<E>(elementType, false);
+        return new BitField<>(elementType, false);
     }
 
     /**
@@ -56,7 +56,7 @@ implements Iterable<E>, Serializable {
      */
     public static <E extends Enum<E>> BitField<E>
     allOf(Class<E> elementType) {
-        return new BitField<E>(elementType, true);
+        return new BitField<>(elementType, true);
     }
 
     /**
@@ -70,7 +70,7 @@ implements Iterable<E>, Serializable {
      */
     public static <E extends Enum<E>> BitField<E>
     of(E bit) {
-        return new BitField<E>(bit);
+        return new BitField<>(bit);
     }
 
     /**
@@ -84,7 +84,7 @@ implements Iterable<E>, Serializable {
      */
     public static <E extends Enum<E>> BitField<E>
     of(E bit, E... bits) {
-        return new BitField<E>(bit, bits);
+        return new BitField<>(bit, bits);
     }
 
     /**
@@ -99,7 +99,7 @@ implements Iterable<E>, Serializable {
      */
     public static <E extends Enum<E>> BitField<E>
     copyOf(Collection<E> bits) {
-        return new BitField<E>(bits);
+        return new BitField<>(bits);
     }
 
     public static <E extends Enum<E>> BitField<E>
@@ -107,7 +107,7 @@ implements Iterable<E>, Serializable {
         final EnumSet<E> bits = EnumSet.noneOf(elementType);
         for (final String bit : list.split("\\|"))
             bits.add(Enum.valueOf(elementType, bit));
-        return new BitField<E>(bits);
+        return new BitField<>(bits);
     }
 
     /**
@@ -189,7 +189,7 @@ implements Iterable<E>, Serializable {
             bits = this.bits.clone();
             bits.remove(bit);
         }
-        return new BitField<E>(bits);
+        return new BitField<>(bits);
     }
 
     /** Sets the given bit. */
@@ -203,17 +203,17 @@ implements Iterable<E>, Serializable {
     }
 
     public BitField<E> not() {
-        return new BitField<E>(EnumSet.complementOf(bits));
+        return new BitField<>(EnumSet.complementOf(bits));
     }
 
     public BitField<E> and(BitField<E> that) {
         final EnumSet<E> bits = this.bits.clone();
-        return bits.retainAll(that.bits) ? new BitField<E>(bits) : this;
+        return bits.retainAll(that.bits) ? new BitField<>(bits) : this;
     }
 
     public BitField<E> or(BitField<E> that) {
         final EnumSet<E> bits = this.bits.clone();
-        return bits.addAll(that.bits) ? new BitField<E>(bits) : this;
+        return bits.addAll(that.bits) ? new BitField<>(bits) : this;
     }
 
     /** Returns a read-only iterator for the bits in this field. */
