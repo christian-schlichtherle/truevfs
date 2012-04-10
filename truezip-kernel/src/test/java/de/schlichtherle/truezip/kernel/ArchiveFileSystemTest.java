@@ -4,18 +4,16 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsCovariantEntry;
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.ROOT;
 import static de.truezip.kernel.FsEntryName.SEPARATOR;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.mock.MockArchive;
 import de.truezip.kernel.mock.MockArchiveDriver;
 import de.truezip.kernel.mock.MockArchiveDriverEntry;
+import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.UriBuilder;
 import java.util.TooManyListenersException;
 import static org.hamcrest.CoreMatchers.*;
@@ -84,13 +82,13 @@ public final class ArchiveFileSystemTest {
         }
 
         @Override
-        public void beforeTouch(ArchiveFileSystemEvent<?> event) {
+        public void beforeTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
         }
 
         @Override
-        public void afterTouch(ArchiveFileSystemEvent<?> event) {
+        public void afterTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
         }
