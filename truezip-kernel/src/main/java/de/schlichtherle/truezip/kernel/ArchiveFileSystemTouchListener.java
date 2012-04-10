@@ -4,7 +4,9 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.FsArchiveEntry;
+import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.util.EventListener;
 
@@ -25,12 +27,14 @@ extends EventListener {
      *
      * @throws IOException at the discretion of the implementation.
      */
-    void beforeTouch(ArchiveFileSystemEvent<? extends E> event)
+    void beforeTouch(   ArchiveFileSystemEvent<? extends E> event,
+                        BitField<FsAccessOption> options)
     throws IOException;
 
     /**
      * Called immediately after the source archive file system has been
      * modified (touched) for the first time.
      */
-    void afterTouch(ArchiveFileSystemEvent<? extends E> event);
+    void afterTouch(    ArchiveFileSystemEvent<? extends E> event,
+                        BitField<FsAccessOption> options);
 }
