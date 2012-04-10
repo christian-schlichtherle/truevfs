@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.channels.Channel;
 
 /**
+ * A source or sink which provides a given stream or channel at most once.
+ * 
  * @param  <S> the type of the stream which gets returned by {@link #stream()}.
  * @param  <C> the type of the channel which gets returned by {@link #channel()}.
  * @author Christian Schlichtherle

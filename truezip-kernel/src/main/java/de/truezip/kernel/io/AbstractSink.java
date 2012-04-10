@@ -9,6 +9,9 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 
 /**
+ * An abstract provider for output streams and (optionally) seekable byte
+ * channels.
+ * 
  * @author Christian Schlichtherle
  */
 public abstract class AbstractSink implements Sink {

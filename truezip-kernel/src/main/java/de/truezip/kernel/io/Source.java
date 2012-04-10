@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 
 /**
- * A provider for input streams or (optionally) seekable byte channels.
+ * A provider for input streams and (optionally) seekable byte channels.
  * 
  * @see    Sink
  * @author Christian Schlichtherle

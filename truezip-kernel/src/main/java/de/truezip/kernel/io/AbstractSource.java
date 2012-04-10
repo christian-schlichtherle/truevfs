@@ -9,6 +9,9 @@ import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 
 /**
+ * An abstract provider for input streams and (optionally) seekable byte
+ * channels.
+ * 
  * @author Christian Schlichtherle
  */
 public abstract class AbstractSource implements Source {
