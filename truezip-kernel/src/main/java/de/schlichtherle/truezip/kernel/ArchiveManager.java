@@ -5,7 +5,6 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.FsMountPoint;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Link;
 import de.truezip.kernel.util.Link.Type;
@@ -87,9 +86,8 @@ final class ArchiveManager extends FsManager {
                                     new ResetController(
                                         new CacheController(
                                             new ResourceController(
-                                                new ContextController(
-                                                    new TargetArchiveController<>(
-                                                        lockModel, parent, driver))),
+                                                new TargetArchiveController<>(
+                                                        lockModel, parent, driver)),
                                             driver.getIOPool())))))));
     }
 

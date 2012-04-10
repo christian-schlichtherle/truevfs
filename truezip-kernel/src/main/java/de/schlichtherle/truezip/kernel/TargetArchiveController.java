@@ -152,15 +152,19 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    void mount(final boolean autoCreate) throws IOException {
+    void mount(final boolean autoCreate, BitField<FsAccessOption> options)
+    throws IOException {
         try {
-            mount0(autoCreate);
+            mount0(autoCreate, options);
         } finally {
             assert invariants();
         }
     }
 
-    private void mount0(final boolean autoCreate) throws IOException {
+    private void mount0(
+            final boolean autoCreate,
+            final BitField<FsAccessOption> options)
+    throws IOException {
         // HC SUNT DRACONES!
         
         // Check parent file system entry.
@@ -183,7 +187,7 @@ extends FileSystemArchiveController<E> {
             if (autoCreate) {
                 // This may fail e.g. if the container file is an RAES
                 // encrypted ZIP file and the user cancels password prompting.
-                makeOutputArchive();
+                makeOutputArchive(options);
                 fs = newEmptyFileSystem(driver);
             } else {
                 throw new FalsePositiveException(getModel(),
@@ -236,17 +240,15 @@ extends FileSystemArchiveController<E> {
      * @return The output archive.
      */
     @CreatesObligation
-    OutputArchive<E> makeOutputArchive() throws IOException {
+    OutputArchive<E> makeOutputArchive(BitField<FsAccessOption> options)
+    throws IOException {
         OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
             return oa;
         final InputArchive<E> ia = getInputArchive();
         final InputService<E> is = null == ia ? null : ia.getDriverProduct();
         final FsModel m = getModel();
-        final BitField<FsAccessOption> options = getContext()
-                .getOutputOptions()
-                .and(ACCESS_PREFERENCES_MASK)
-                .set(CACHE);
+        options = options.and(ACCESS_PREFERENCES_MASK).set(CACHE);
         final OutputService<E> os;
         try {
             os = driver.newOutputService(m, parent, name, options, is);
@@ -307,12 +309,12 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    OutputSocket<? extends E> getOutputSocket(final E entry) {
+    OutputSocket<? extends E> getOutputSocket(final E entry, final BitField<FsAccessOption> options) {
         final class Output extends ClutchOutputSocket<E> {
             @Override
             protected OutputSocket<? extends E> getLazyDelegate()
             throws IOException {
-                return makeOutputArchive().getOutputSocket(entry);
+                return makeOutputArchive(options).getOutputSocket(entry);
             }
 
             @Override
@@ -355,13 +357,14 @@ extends FileSystemArchiveController<E> {
 
     @Override
     void checkSync(   final FsEntryName name,
-                        final @CheckForNull Access intention)
+                      final @CheckForNull Access intention,
+                      final BitField<FsAccessOption> options)
     throws NeedsSyncException {
         // HC SUNT DRACONES!
 
         // If GROWing and the driver supports the respective access method,
         // then pass the test.
-        if (getContext().get(GROW)) {
+        if (options.get(GROW)) {
             if (null == intention) {
                 if (driver.getRedundantMetaDataSupport())
                     return;
@@ -680,15 +683,17 @@ extends FileSystemArchiveController<E> {
     private final class TouchListener
     implements ArchiveFileSystemTouchListener<E> {
         @Override
-        public void beforeTouch(ArchiveFileSystemEvent<? extends E> event)
+        public void beforeTouch(ArchiveFileSystemEvent<? extends E> event,
+                                BitField<FsAccessOption> options)
         throws IOException {
             assert event.getSource() == getFileSystem();
-            makeOutputArchive();
+            makeOutputArchive(options);
             assert isTouched();
         }
 
         @Override
-        public void afterTouch(ArchiveFileSystemEvent<? extends E> event) {
+        public void afterTouch( ArchiveFileSystemEvent<? extends E> event,
+                                BitField<FsAccessOption> options) {
             assert event.getSource() == getFileSystem();
             assert isTouched();
         }

@@ -4,15 +4,11 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsArchiveDriver;
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsReadOnlyFileSystemException;
-import de.truezip.kernel.FsEntryName;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Container;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.util.Map;
@@ -60,19 +56,25 @@ extends ArchiveFileSystem<E> {
     }
 
     @Override
-    void unlink(FsEntryName path)
+    void unlink(FsEntryName path,
+                BitField<FsAccessOption> options)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
-    boolean setTime(FsEntryName path, BitField<Access> types, long value)
+    boolean setTime(FsEntryName path,
+                    BitField<Access> types,
+                    long value,
+                    BitField<FsAccessOption> options)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
-    boolean setTime(FsEntryName path, Map<Access, Long> times)
+    boolean setTime(FsEntryName path,
+                    Map<Access, Long> times,
+                    BitField<FsAccessOption> options)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
