@@ -23,6 +23,7 @@ import org.bouncycastle.crypto.Mac;
 @NotThreadSafe
 public abstract class RaesOutputStream extends DecoratingOutputStream {
 
+    @CreatesObligation
     RaesOutputStream() {
         super(null);
     }
@@ -73,17 +74,17 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
      */
     @CreatesObligation
     public static RaesOutputStream create(
-            RaesParameters param,
+            final RaesParameters param,
             final Sink sink)
     throws RaesParametersException, IOException {
-        while (null != param) {
+        RaesParameters p = param;
+        while (null != p) {
             // HC SUNT DRACONES!
-            if (param instanceof Type0RaesParameters) {
-                return new Type0RaesOutputStream((Type0RaesParameters) param,
+            if (p instanceof Type0RaesParameters) {
+                return new Type0RaesOutputStream((Type0RaesParameters) p,
                         sink);
-            } else if (param instanceof RaesParametersProvider) {
-                param = ((RaesParametersProvider) param)
-                        .get(RaesParameters.class);
+            } else if (p instanceof RaesParametersProvider) {
+                p = ((RaesParametersProvider) p).get(RaesParameters.class);
             } else {
                 break;
             }

@@ -52,6 +52,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
 
+    @CreatesObligation
     RaesReadOnlyChannel() {
         super(null);
     }
