@@ -142,7 +142,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         } catch (final Throwable ex) {
             try {
                 buffer.release();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -294,7 +294,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             } finally {
                 try {
                     buffer.release();
-                } catch (final Throwable ex2) {
+                } catch (final IOException ex2) {
                     if (null != ex) {
                         ex.addSuppressed(ex2);
                         throw ex;

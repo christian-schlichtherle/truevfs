@@ -81,7 +81,7 @@ public final class Raes {
             } catch (final Throwable ex) {
                 try {
                     in.close();
-                } catch (final Throwable ex2) {
+                } catch (final IOException ex2) {
                     ex.addSuppressed(ex2);
                 }
                 throw ex;
@@ -146,7 +146,7 @@ public final class Raes {
             } catch (final Throwable ex) {
                 try {
                     in.close();
-                } catch (final Throwable ex2) {
+                } catch (final IOException ex2) {
                     ex.addSuppressed(ex2);
                 }
                 throw ex;

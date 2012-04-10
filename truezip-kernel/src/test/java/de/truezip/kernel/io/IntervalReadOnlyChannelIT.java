@@ -38,7 +38,7 @@ public class IntervalReadOnlyChannelIT extends ReadOnlyChannelITSuite {
         } catch (final Throwable ex) {
             try {
                 delete(temp2);
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;

@@ -91,7 +91,7 @@ implements InputService<TarDriverEntry> {
                     } catch (final Throwable ex) {
                         try {
                             temp.release();
-                        } catch (final Throwable ex2) {
+                        } catch (final IOException ex2) {
                             ex.addSuppressed(ex2);
                         }
                         throw ex;
@@ -102,7 +102,7 @@ implements InputService<TarDriverEntry> {
         } catch (final Throwable ex) {
             try {
                 close0();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
