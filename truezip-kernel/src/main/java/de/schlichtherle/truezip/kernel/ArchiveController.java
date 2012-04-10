@@ -219,7 +219,9 @@ extends LockModelController {
             checkSync(name, WRITE, options);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return mknod = autoMount(!name.isRoot() && options.get(CREATE_PARENTS), options)
+            return mknod = autoMount(
+                        !name.isRoot() && options.get(CREATE_PARENTS),
+                        options)
                     .mknod(name, FILE, options, template);
         }
 
@@ -354,6 +356,8 @@ extends LockModelController {
      * @throws NeedsSyncException If a sync operation is required before the
      *         intended access could succeed.
      */
-    abstract void checkSync(FsEntryName name, @CheckForNull Access intention, BitField<FsAccessOption> options)
+    abstract void checkSync(    FsEntryName name,
+                                @CheckForNull Access intention,
+                                BitField<FsAccessOption> options)
     throws NeedsSyncException;
 }
