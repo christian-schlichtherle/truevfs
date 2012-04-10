@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<document xmlns="http://maven.apache.org/XDOC/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+    <properties>
+        <title>Introduction to TrueZIP 6 (obsolete)</title>
+        <author>Christian Schlichtherle</author>
+    </properties>
+    <body>
+        <section name="Obsolescence Notice">
+            <p><em>The version described in this document is
+                <strong>obsolete</strong> and should not be used for new
+                applications anymore.</em></p>
+            <p>The links to the Javadoc in this document are non-functional
+                because the package names have been changed in TrueZIP 7.
+                The Javadoc for TrueZIP 6.8.4 is now available for download via
+                <a href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Maven Central</a>.</p>
+        </section>
+        <section name="Introduction to TrueZIP 6">
+            <p>TrueZIP is a Java based Virtual File System (VFS) to enable
+                transparent, multi-threaded read/write access to archive files
+                (ZIP, TAR etc.) as if they were directories.
+                Its primary features are:</p>
+            <dl>
+                <dt>Easy To Use</dt>
+                <dd>TrueZIP features drop-in replacements for the
+                    <code>java.io.File|FileInputStream|FileOutputStream</code>
+                    classes.
+                    If you know how to deal with these classes,
+                    you can instantly use TrueZIP - though you should
+                    really, really read the
+                    <a href="tutorial.html">tutorial</a>
+                    in order to bypass some common pitfalls and power
+                    up your client applications with some advanced,
+                    yet easy to use I/O tricks.</dd>
+                <dt>Thread-Safe</dt>
+                <dd>Multiple threads can read and write the same archive
+                    file at the same time.
+                    Where restrictions apply, TrueZIP enforces them to
+                    prevent client applications from corrupting archive files.</dd>
+                <dt>Unlimited Nesting</dt>
+                <dd>Client applications can create and access nested
+                    archives up to a virtually unlimited nesting level:
+                    <code>&quot;outer.zip/inner.tar.gz/nuts.jar/META-INF/LICENSE.TXT&quot;</code>
+                    is a perfectly valid path name.</dd>
+                <dt>Strong Cryptography</dt>
+                <dd>TrueZIP's Random Access Encryption Specification (RAES)
+                    features 256 bit AES encryption in CTR block mode with
+                    SHA-256 authentication.
+                    Note that RAES can be applied to any data payload - not
+                    just ZIP files.</dd>
+                <dt>Extensible</dt>
+                <dd>TrueZIP can support virtually any archive type via its
+                    pluggable archive driver architecture.
+                    TrueZIP ships with archive drivers for ZIP, TAR and
+                    many relatives (JAR, TAR.GZ, TAR.BZ2, TZP, ...).</dd>
+                <dt>Robust</dt>
+                <dd>TrueZIP ships with numerous assertions and
+                    comprehensive unit tests to ensure maximum reliability.
+                    Companies like JBoss, Vignette and many more rely on
+                    TrueZIP to deploy applications and content.</dd>
+                <dt>Fast</dt>
+                <dd>Despite the startup time of the JVM and despite the
+                    overhead required to implement a VFS, TrueZIP's
+                    <code>nzip</code> utility main class unzips the
+                    sources for JDK1.5.0_09 even slightly faster than
+                    7-Zip - details to follow in a future article on this
+                    web site.</dd>
+                <dt>Business Friendly</dt>
+                <dd>Covered by the Apache Software License, Version 2.0.</dd>
+                <dt>Pure Java</dt>
+                <dd>No native code incorporated.</dd>
+            </dl>
+            <subsection name="Motivation">
+                <p>Although the
+                    <a class="externalLink" href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">
+                        ZIP File Format Specification
+                    </a>
+                    originated as a proprietary, de-facto standard by PKWARE Inc.,
+                    ZIP files are ubiquitous on the Internet and thus on many
+                    platforms today.
+                    The Java SE API provides the package <code>java.util.zip</code>
+                    with classes like <code>ZipInputStream</code>,
+                    <code>ZipOutputStream</code> and <code>ZipFile</code> for
+                    convenient access to ZIP compatible files.
+                    However, using the package <code>java.util.zip</code> has some
+                    limitations/disadvantages:
+                </p>
+                <ul>
+                    <li>Before JSE 7, the API always used <code>UTF-8</code> for
+                        entry names and comments instead of <code>CP437</code>
+                        (a.k.a. <code>IBM437</code>, the genuine IBM-PC
+                        character set), which is used by the de-facto standard
+                        PKZIP from PKWARE.
+                        As a result, you couldn't read or write ZIP files with
+                        international entry file names such as e.g.
+                        <code>&quot;Mot&#xf6;rhead.xml&quot;</code> in a ZIP file.</li>
+                    <li>Before JSE 7, you could not read or write ZIP64 archive files.</li>
+                    <li>You would need to use an additional API
+                        (the package <code>java.util.zip</code>)
+                        if your application needs to support ZIP compatible
+                        files in addition to ordinary files and directories,
+                        thereby adding more dependencies and complexity,
+                        which requires more work and potential bugs.</li>
+                    <li>You could either read or completely write ZIP compatible
+                        files, but you cannot update individual entries.</li>
+                    <li>The classes would not support the concept of a directory,
+                        which you could create, modify, list, rename,
+                        recursively copy or delete.</li>
+                    <li>You could not browse a ZIP archive file with a
+                        <code>JFileChooser</code>
+                        or
+                        <code>FileSystemView</code>.</li>
+                    <li>There is no GUI tree class to browse and edit file systems.</li>
+                </ul>
+            </subsection>
+            <subsection name="Resolution">
+                <p>The TrueZIP API provides drop-in replacements for the
+                    well-known classes <code>File</code>,
+                    <code>FileInputStream</code> and
+                    <code>FileOutputStream</code>.
+                    This concept makes TrueZIP very simple to use:
+                    To <i>archive-enable</i> a client application, you only need
+                    to add a few import statements for the package
+                    <code>de.schlichtherle.io</code> and add some type casts where
+                    required.</p>
+                <p>(Note that the type casts are an artifact of requiring only
+                    J2SE 1.4.2 for TrueZIP 6.
+                    For the future TrueZIP 7, you will not need any type casts any
+                    more, but it will require JSE 5.)</p>
+                <p>Now you can simply address archive files like directories
+                    in a path name.
+                    For example, the path name <code>&quot;archive.zip/readme&quot;</code>
+                    addresses the archive entry <code>&quot;readme&quot;</code> within
+                    the ZIP file <code>&quot;archive.zip&quot;</code>.
+                    Note that file name extensions are fully configurable and
+                    TrueZIP automatically detects false positives and falls
+                    back to treat them like ordinary files or directories.
+                    This works recursively, so an archive file may even be enclosed
+                    in another archive file, like in
+                    <code>&quot;outer.zip/inner.zip/readme&quot;</code>.</p>
+                <p>When required, TrueZIP updates archive files automatically.
+                    A JVM shutdown hook ensures that no updates get lost even if
+                    the JVM terminates due to an uncatched exception/throwable.
+                    Optionally, a client application could call
+                    <code>File.umount()</code> to flush all pending updates
+                    to the host file system, allowing it to catch any exceptions
+                    during the updating process.</p>
+                <p>TrueZIP features an <i>archive driver</i> interface in order
+                    to support virtually any archive type.
+                    TrueZIP 6 ships with archive drivers for ZIP, TAR and
+                    many relatives (JAR, TAR.GZ, TAR.BZ2, ODF, TZP etc.).
+                    Support for even more archive types is expected to be
+                    added over time (contributors wanted: 7z, ARJ or RAR anyone?).</p>
+                <p>Even if a client application never accesses an archive file,
+                    using TrueZIP is still beneficial because of enhanced and fast
+                    I/O methods in the <code>File</code> class such as recursive
+                    renaming, deleting or copying.
+                    These operations use asynchronous I/O and hence provide
+                    a performance which is equivalent to the method
+                    <code>java.nio.Channel.transfer(...)</code>,
+                    although they operate on plain <code>InputStream</code>
+                    and <code>OutputStream</code> objects.</p>
+                <p>Finally, a client application may just require a simple to use,
+                    yet secure file format for encrypted and authenticated
+                    data which supports transparent random read access just as if
+                    it were reading plain data using a
+                    <code>RandomAccessFile</code>-like interface.
+                    This is provided by the package
+                    <code>de.schlichtherle.crypto.io</code>.</p>
+            </subsection>
+            <subsection name="Features">
+                <ul>
+                    <li>The low level ZIP API in the package
+                        <code>de.schlichtherle.util.zip</code> supports ZIP64
+                        extensions.
+                        This is completely transparent, so that any client
+                        application can read or write ZIP archive files of more
+                        than 4GB size.
+                        By default, they are written to a ZIP file only if they are
+                        required so that maximum interoperability with third party
+                        tools is retained.
+                        ZIP64 extensions may also be enforced - see the
+                        <a href="../relnotes/release-6_7.html">Release Notes for TrueZIP 6.7</a>
+                        ).</li>
+                    <li>Random access to archive files using drop-in
+                        replacements for the classes
+                        <code>File|FileInputStream|FileOutputStream</code>.</li>
+                    <li>Browse archive files using the drop-in replacements for
+                        <code>JFileChooser</code> and <code>FileSystemView</code>.</li>
+                    <li>Browse and edit the file system with a custom
+                        <code>JTree</code>, including archive files up to any
+                        nesting level.</li>
+                    <li>Fully transparent access to RAES encrypted ZIP files
+                        using AES encryption with up to 256 bit key length.</li>
+                    <li>Properly supports nested archive files, i.e.
+                        <code>new FileInputStream(&quot;dir/outer.zip/anotherdir/inner.zip/readme.txt&quot;)</code>
+                        is perfectly OK.</li>
+                    <li>Asynchronous I/O for ordinary copying of
+                        <code>InputStream</code>s to <code>OutputStream</code>s,
+                        delivering equivalent performance to the
+                        <code>java.nio</code> package.</li>
+                    <li>Lots of utility methods for handling File objects
+                        (<code>cat()</code>, <code>catFrom()</code>,
+                        <code>catTo()</code>, <code>copyFrom()</code>,
+                        <code>copyTo()</code>, <code>archiveCopyFrom()</code>,
+                        <code>archiveCopyTo()</code> etc.).</li>
+                    <li>Supports <code>IBM437</code> and any other character
+                        set encodings for ZIP compatible files with international
+                        entry names and comments.</li>
+                    <li>Configurable file extensions for ZIP compatible files
+                        (.zip, .jar, .tzp, .tar, .tbz2, whatever).</li>
+                    <li>Provides an enhanced ZIP API which is fully interoperable
+                        with the genuine <code>java.util.zip</code> package.</li>
+                    <li>In general, classes are thread safe with documented
+                        exceptions.</li>
+                    <li>Requires only J2SE 1.4.2 but benefits from new features in
+                        JSE 5 and JSE 6 by detecting classes reflectively (e.g.
+                        <code>java.io.Console</code> for password prompting if
+                        running headless).</li>
+                    <li>Optimized for maximum performance and minimum memory
+                        footprint (in order of priority).</li>
+                    <li>Lots of unit tests for maximum reliability.</li>
+                </ul>
+            </subsection>
+            <subsection name="Benefits">
+                <ul>
+                    <li>Treats ZIP entries like files or directories,
+                        i.e. you can create, modify or delete each of them
+                        individually.</li>
+                    <li>One API less to get a headache from
+                        (<code>java.util.zip</code>).</li>
+                    <li>Minimal integration efforts:
+                        Some import statements are usually all that is
+                        required to make a client application
+                        <i>archive-enabled</i>.</li>
+                    <li>Provides fully transparent access to RAES encrypted ZIP
+                        files for maximum security.</li>
+                    <li>Eases dealing with nested ZIP compatible files by treating
+                        them as subdirectories of another ZIP compatible file.</li>
+                    <li>Offers enhanced file operations like <code>cat()</code>,
+                        <code>copy*()</code>, <code>archiveCopy*()</code> etc.</li>
+                </ul>
+            </subsection>
+            <subsection name="Limitations / Caveats">
+                <ul>
+                    <li>TrueZIP's various copy methods do <em>not</em> provide
+                        automatic path name completion!
+                        So if you are going to copy the source file
+                        <code>foo</code> to the destination directory
+                        <code>bar</code>, then you have to specify the full
+                        destination path <code>bar/foo</code>.</li>
+                    <li>The RAES encryption is <i>not </i>compatible to
+                        WinZip's encryption scheme.
+                        This is because of security issues with WinZip's
+                        encryption scheme.
+                        For more information, please refer to the
+                        <a href="../news/20051022-1.html">news section on RAES</a>.</li>
+                    <li>TrueZIP may seem to behave erratically if it is loaded
+                        and used by multiple class loaders.
+                        For each archive file which has been presented to
+                        TrueZIP (via the
+                        <code>de.schlichtherle.io.File*</code>
+                        classes),
+                        TrueZIP associates some internal state with it.
+                        This data is held in static maps.
+                        Either make sure that multiple class loader instances
+                        never access the same archive file or prevent the loading
+                        of multiple instances by assigning a shared parent
+                        class loader which loads all TrueZIP classes first.</li>
+                </ul>
+            </subsection>
+        </section>
+        <section name="Documentation">
+            <ul>
+                <li><a href="tutorial.html">The TrueZIP 6 Tutorial</a>:
+                    This is a <i>must-read</i> for any user because it explains
+                    the concept of TrueZIP and explains the usage.</li>
+                <li><a class="externalLink" href="http://repo1.maven.org/maven2/de/schlichtherle/truezip/">Javadoc for the TrueZIP 6 API</a>:
+                    Start with the package <code>de.schlichtherle.io</code>.
+                </li>
+                <li><a href="../samples/Nzip.html">Nzip - a comprehensive command line utility</a></li>
+            </ul>
+        </section>
+        <section name="Getting Started">
+            <p>First and foremost, <i>please</i> read the
+                <a href="tutorial.html">tutorial for TrueZIP 6</a>.
+                It explains the concept of TrueZIP and explains typical use
+                cases.
+                If you find something missing, confusing or wrong, please
+                discuss it on the mailing list
+                <code>users@truezip.dev.java.net</code> for the benefit of the
+                community.</p>
+            <p>Second, I recommend to play around with the <code>nzip</code>
+                utility main class first.
+                For a tutorial about this utility, please read
+                <a href="../samples/Nzip.html">here</a>.</p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<actions>
+    <action>
+        <actionName>CUSTOM-source:jar javadoc:jar deploy</actionName>
+        <displayName>source:jar javadoc:jar deploy</displayName>
+        <goals>
+            <goal>source:jar</goal>
+            <goal>javadoc:jar</goal>
+            <goal>deploy</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-clean compile</actionName>
+        <displayName>clean compile</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>compile</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-clean package javadoc:jar</actionName>
+        <displayName>clean package javadoc:jar</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>package</goal>
+            <goal>javadoc:jar</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-verify</actionName>
+        <displayName>verify</displayName>
+        <goals>
+            <goal>verify</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-package</actionName>
+        <displayName>package</displayName>
+        <goals>
+            <goal>package</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-javadoc:aggregate-jar</actionName>
+        <displayName>javadoc:aggregate-jar</displayName>
+        <goals>
+            <goal>javadoc:aggregate-jar</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-site</actionName>
+        <displayName>site</displayName>
+        <goals>
+            <goal>site</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-help:effective-pom</actionName>
+        <displayName>help:effective-pom</displayName>
+        <goals>
+            <goal>help:effective-pom</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-site:run</actionName>
+        <displayName>site:run</displayName>
+        <goals>
+            <goal>site:run</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-site-deploy</actionName>
+        <displayName>site-deploy</displayName>
+        <goals>
+            <goal>site-deploy</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-release:prepare</actionName>
+        <displayName>release:prepare</displayName>
+        <goals>
+            <goal>release:prepare</goal>
+        </goals>
+        <properties>
+            <autoVersionSubmodules>true</autoVersionSubmodules>
+        </properties>
+    </action>
+    <action>
+        <actionName>CUSTOM-release:perform</actionName>
+        <displayName>release:perform</displayName>
+        <goals>
+            <goal>release:perform</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-release:rollback</actionName>
+        <displayName>release:rollback</displayName>
+        <goals>
+            <goal>release:rollback</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-release:clean</actionName>
+        <displayName>release:clean</displayName>
+        <goals>
+            <goal>release:clean</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-source:aggregate</actionName>
+        <displayName>source:aggregate</displayName>
+        <goals>
+            <goal>source:aggregate</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-versions:display-dependency-updates</actionName>
+        <displayName>versions:display-dependency-updates</displayName>
+        <goals>
+            <goal>versions:display-dependency-updates</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-versions:display-plugin-updates</actionName>
+        <displayName>versions:display-plugin-updates</displayName>
+        <goals>
+            <goal>versions:display-plugin-updates</goal>
+        </goals>
+    </action>
+</actions>
