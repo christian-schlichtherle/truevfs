@@ -12,7 +12,7 @@ import java.nio.channels.SeekableByteChannel;
  * @author Christian Schlichtherle
  */
 public final class OneTimeSource
-extends OneTimeResource<InputStream>
+extends OneTimeFoundry<InputStream, SeekableByteChannel>
 implements Source {
 
     public OneTimeSource(InputStream in) {

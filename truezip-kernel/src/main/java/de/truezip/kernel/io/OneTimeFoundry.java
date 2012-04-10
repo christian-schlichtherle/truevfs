@@ -6,27 +6,28 @@ package de.truezip.kernel.io;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.Channel;
 
 /**
- * @param  <S> the type of the stream which gets returned by {@link #newStream()}.
+ * @param  <S> the type of the stream which gets returned by {@link #stream()}.
+ * @param  <C> the type of the channel which gets returned by {@link #channel()}.
  * @author Christian Schlichtherle
  */
-public abstract class OneTimeResource<S extends Closeable> {
+public abstract class OneTimeFoundry<S extends Closeable, C extends Channel> {
     private S stream;
-    private SeekableByteChannel channel;
+    private C channel;
 
-    OneTimeResource(final S stream) {
+    OneTimeFoundry(final S stream) {
         if (null == (this.stream = stream))
             throw new NullPointerException();
     }
 
-    OneTimeResource(final SeekableByteChannel channel) {
+    OneTimeFoundry(final C channel) {
         if (null == (this.channel = channel))
             throw new NullPointerException();
     }
 
-    public S newStream() throws IOException {
+    public S stream() throws IOException {
         final S stream = this.stream;
         if (null == stream)
             throw new IllegalStateException();
@@ -34,8 +35,8 @@ public abstract class OneTimeResource<S extends Closeable> {
         return stream;
     }
 
-    public SeekableByteChannel newChannel() throws IOException {
-        final SeekableByteChannel channel = this.channel;
+    public C channel() throws IOException {
+        final C channel = this.channel;
         if (null == channel)
             throw new IllegalStateException();
         this.channel = null;

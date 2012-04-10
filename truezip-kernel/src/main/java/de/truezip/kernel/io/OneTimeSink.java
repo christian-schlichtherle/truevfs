@@ -12,7 +12,7 @@ import java.nio.channels.SeekableByteChannel;
  * @author Christian Schlichtherle
  */
 public final class OneTimeSink
-extends OneTimeResource<OutputStream>
+extends OneTimeFoundry<OutputStream, SeekableByteChannel>
 implements Sink {
 
     public OneTimeSink(OutputStream out) {
