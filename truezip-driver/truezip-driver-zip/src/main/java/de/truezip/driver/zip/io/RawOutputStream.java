@@ -13,6 +13,7 @@ import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.LittleEndianOutputStream;
+import de.truezip.kernel.io.Sink;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -93,34 +94,46 @@ implements Iterable<E> {
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected RawOutputStream(
-            final @WillCloseWhenClosed OutputStream out,
+            final ZipOutputStreamParameters param,
             final @CheckForNull @WillNotClose RawFile<E> appendee,
-            final ZipOutputStreamParameters param) {
-        super(newLittleEndianOutputStream(out, appendee));
-        this.leos = (LittleEndianOutputStream) this.out;
-        if (null != appendee) {
-            this.charset = appendee.getRawCharset();
-            this.comment = appendee.getRawComment();
-            final Map<String, E> entries = new LinkedHashMap<>(
-                    initialCapacity(appendee.size() + param.getOverheadSize()));
-            entries.putAll(appendee.getRawEntries());
-            this.entries = entries;
-        } else {
-            this.charset = param.getCharset();
-            this.entries = new LinkedHashMap<>(
-                    initialCapacity(param.getOverheadSize()));
+            final Sink sink)
+    throws IOException {
+        super(null);
+        final OutputStream out = sink.stream();
+        try {
+            this.out = this.leos = null != appendee
+                    ? new AppendingLittleEndianOutputStream(out, appendee)
+                    : new LittleEndianOutputStream(out);
+            if (null != appendee) {
+                this.charset = appendee.getRawCharset();
+                this.comment = appendee.getRawComment();
+                final Map<String, E> entries = new LinkedHashMap<>(
+                        initialCapacity(appendee.size() + param.getOverheadSize()));
+                entries.putAll(appendee.getRawEntries());
+                this.entries = entries;
+            } else {
+                this.charset = param.getCharset();
+                this.entries = new LinkedHashMap<>(
+                        initialCapacity(param.getOverheadSize()));
+            }
+            setMethod0(param.getMethod());
+            setLevel0(param.getLevel());
+        } catch (final Throwable ex) {
+            try {
+                out.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
         }
-        setMethod0(param.getMethod());
-        setLevel0(param.getLevel());
     }
 
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private static LittleEndianOutputStream newLittleEndianOutputStream(
-            final @WillCloseWhenClosed OutputStream out,
-            final @CheckForNull @WillNotClose RawFile<?> appendee) {
-        if (null == out)
-            throw new NullPointerException();
+            final @CheckForNull @WillNotClose RawFile<?> appendee,
+            final Sink sink) throws IOException {
+        final OutputStream out = sink.stream();
         return null != appendee
                 ? new AppendingLittleEndianOutputStream(out, appendee)
                 : new LittleEndianOutputStream(out);

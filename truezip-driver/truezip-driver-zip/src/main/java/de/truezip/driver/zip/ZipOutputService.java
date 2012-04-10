@@ -13,6 +13,7 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.OutputBusyException;
+import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
@@ -26,7 +27,6 @@ import java.util.Iterator;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -54,31 +54,39 @@ implements OutputService<ZipDriverEntry> {
             final ZipDriver driver,
             final FsModel model,
             final @CheckForNull @WillNotClose ZipInputService source,
-            final @WillCloseWhenClosed OutputStream out)
+            final Sink sink)
     throws IOException {
-        super(  out,
+        super(  driver,
                 null != source && source.isAppendee() ? source : null,
-                driver);
-        if (null == model)
-            throw new NullPointerException();
+                sink);
         this.driver = driver;
-        this.model = model;
-        if (null != source) {
-            if (!source.isAppendee()) {
-                // Retain comment and preamble of input ZIP archive.
-                super.setComment(source.getComment());
-                if (0 < source.getPreambleLength()) {
-                    try (final InputStream in = source.getPreambleInputStream()) {
-                        Streams.cat(in, source.offsetsConsiderPreamble() ? this : out);
+        try {
+            if (null == (this.model = model))
+                throw new NullPointerException();
+            if (null != source) {
+                if (!source.isAppendee()) {
+                    // Retain comment and preamble of input ZIP archive.
+                    super.setComment(source.getComment());
+                    if (0 < source.getPreambleLength()) {
+                        try (final InputStream in = source.getPreambleInputStream()) {
+                            Streams.cat(in, source.offsetsConsiderPreamble() ? this : out);
+                        }
                     }
                 }
+                // Retain postamble of input ZIP file.
+                if (0 < source.getPostambleLength()) {
+                    this.postamble = getPool().allocate();
+                    Streams.copy(   source.getPostambleInputStream(),
+                                    this.postamble.getOutputSocket().stream());
+                }
             }
-            // Retain postamble of input ZIP file.
-            if (0 < source.getPostambleLength()) {
-                this.postamble = getPool().allocate();
-                Streams.copy(   source.getPostambleInputStream(),
-                                this.postamble.getOutputSocket().stream());
+        } catch (final Throwable ex) {
+            try {
+                super.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
             }
+            throw ex;
         }
     }
 

@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.zip.ZipException;
 import static org.junit.Assert.assertSame;
 
 /**
@@ -46,7 +45,7 @@ public final class WinZipAesIT extends ZipTestSuite {
     protected ZipOutputStream newZipOutputStream(
             OutputStream out,
             ZipFile appendee)
-    throws ZipException {
+    throws IOException {
         final ZipOutputStream zos = new ZipOutputStream(out, appendee);
         zos.setCryptoParameters(new WinZipAesCryptoParameters());
         return zos;

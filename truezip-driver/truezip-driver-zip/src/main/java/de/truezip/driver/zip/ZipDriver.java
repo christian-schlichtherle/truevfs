@@ -21,14 +21,12 @@ import de.truezip.key.KeyProvider;
 import de.truezip.key.sl.KeyManagerLocator;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 
@@ -369,7 +367,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @CreatesObligation
-    protected ZipInputService newZipInputService(FsModel model, Source source)
+    protected ZipInputService newZipInputService(
+            FsModel model,
+            Source source)
     throws IOException {
         assert null != model;
         return new ZipInputService(this, model, source);
@@ -383,11 +383,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             FsEntryName entry,
             BitField<FsAccessOption> options)
     throws IOException {
-        return newOutputService(model, (ZipInputService) source,
-                getOutputSocket(parent, entry, options));
+        final OptionOutputSocket oos = getOutputSocket(parent, entry, options);
+        final ZipInputService zis = (ZipInputService) source;
+        if (null != zis)
+            zis.setAppendee(oos.getOptions().get(GROW));
+        return newOutputService(model, zis, oos);
     }
 
     @Override
+    @CreatesObligation
     protected final OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> source,
@@ -396,38 +400,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         throw new UnsupportedOperationException();
     }
 
+    @CreatesObligation
     protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final @CheckForNull @WillNotClose ZipInputService source,
             final OptionOutputSocket output)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        if (null != source)
-            source.setAppendee(output.getOptions().get(GROW));
-        final OutputStream out = output.stream();
-        try {
-            return newOutputService(model, source, out);
-        } catch (final Throwable ex) {
-            try {
-                out.close();
-            } catch (final Throwable ex2) {
-                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
-    @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final @CheckForNull @WillNotClose ZipInputService source,
-            final @WillCloseWhenClosed OutputStream out)
-    throws IOException {
         return new MultiplexingOutputService<>(
-                new ZipOutputService(this, model, source, out),
+                new ZipOutputService(this, model, source, output),
                 getIOPool());
     }
 

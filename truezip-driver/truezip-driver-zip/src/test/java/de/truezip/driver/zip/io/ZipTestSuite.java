@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipException;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -109,7 +108,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     protected ZipOutputStream newZipOutputStream(
             OutputStream out,
             ZipFile appendee)
-    throws ZipException {
+    throws IOException {
         return new ZipOutputStream(out, appendee);
     }
 
