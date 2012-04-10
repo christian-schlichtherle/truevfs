@@ -36,7 +36,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
- * @param  <E> The type of the archive entries.
+ * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -178,7 +178,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
         while (i.hasNext()) {
             final BufferedEntryOutputStream out = i.next();
-            boolean remove = true;
+            boolean remove = false;
             try {
                 remove = out.store(false);
             } catch (final InputException ex) {
@@ -287,12 +287,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
                 return false;
-            final InputSocket<Entry> input = this.input;
-            assert null != input;
-            final OutputSocket<? extends E> output = this.output;
-            assert null != output;
-            final IOPool.Entry<?> buffer = this.buffer;
-            assert null != buffer;
             try {
                 if (!discard)
                     IOSocket.copy(input, output);
