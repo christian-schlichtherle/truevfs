@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.kernel;
 import static de.schlichtherle.truezip.kernel.LockControl.locked;
 import de.truezip.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -134,7 +135,7 @@ extends DecoratingInputService<E, InputService<E>> {
         return new Input();
     }
 
-    /*void close(final Closeable closeable) throws IOException {
+    void close(final Closeable closeable) throws IOException {
         final class Close implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
@@ -144,7 +145,7 @@ extends DecoratingInputService<E, InputService<E>> {
         } // Close
 
         locked(new Close(), lock);
-    }*/
+    }
 
     private final class LockInputStream
     extends de.truezip.kernel.io.LockInputStream {
@@ -153,10 +154,10 @@ extends DecoratingInputService<E, InputService<E>> {
             super(in, lock);
         }
 
-        /*@Override
+        @Override
         public void close() throws IOException {
             close(in);
-        }*/
+        }
     } // LockInputStream
 
     private final class LockSeekableChannel
@@ -166,9 +167,9 @@ extends DecoratingInputService<E, InputService<E>> {
             super(channel, lock);
         }
 
-        /*@Override
+        @Override
         public void close() throws IOException {
             close(channel);
-        }*/
+        }
     } // LockSeekableChannel*/
 }
