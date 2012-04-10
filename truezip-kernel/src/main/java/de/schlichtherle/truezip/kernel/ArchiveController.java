@@ -4,10 +4,9 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.kernel.FsCovariantEntry;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsAccessOption.APPEND;
+import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
@@ -17,9 +16,6 @@ import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.InputExceptionSource;
 import de.truezip.kernel.io.Streams;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.APPEND;
-import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
