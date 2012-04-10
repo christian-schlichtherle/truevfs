@@ -33,7 +33,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Note that this implies that the {@code close()} method may fail with
  * an {@link IOException}.
  *
- * @param  <E> The type of the mutable entries.
+ * @param  <E> the type of the mutable entries.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -139,8 +139,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
         final IOBuffer<?> buffer = pool.allocate();
         try {
             return new BufferedEntryOutputStream(buffer, output);
-        } catch (final IOException ex) {
-            buffer.release();
+        } catch (final Throwable ex) {
+            try {
+                buffer.release();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -174,7 +178,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
         while (i.hasNext()) {
             final BufferedEntryOutputStream out = i.next();
-            boolean remove = true;
+            boolean remove = false;
             try {
                 remove = out.store(false);
             } catch (final InputException ex) {
@@ -281,17 +285,22 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
                 return false;
-            final InputSocket<Entry> input = this.input;
-            assert null != input;
-            final OutputSocket<? extends E> output = this.output;
-            assert null != output;
-            final IOBuffer<?> buffer = this.buffer;
-            assert null != buffer;
+            IOException ex = null;
             try {
                 if (!discard)
                     IOSocket.copy(input, output);
+            } catch (final IOException ex2) {
+                throw ex = ex2;
             } finally {
-                buffer.release();
+                try {
+                    buffer.release();
+                } catch (final Throwable ex2) {
+                    if (null != ex) {
+                        ex.addSuppressed(ex2);
+                        throw ex;
+                    }
+                    throw ex2;
+                }
             }
             return true;
         }
