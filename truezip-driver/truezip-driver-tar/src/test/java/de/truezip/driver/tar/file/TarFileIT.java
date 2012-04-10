@@ -5,6 +5,7 @@
 package de.truezip.driver.tar.file;
 
 import de.truezip.driver.tar.TarDriver;
+import de.truezip.kernel.cio.IOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -18,6 +19,11 @@ public final class TarFileIT extends TarFileITSuite<TarDriver> {
 
     @Override
     protected TarDriver newArchiveDriver() {
-        return new TarDriver(getTestConfig().getIOPoolProvider());
+        return new TarDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }

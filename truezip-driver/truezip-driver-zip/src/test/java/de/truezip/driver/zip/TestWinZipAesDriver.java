@@ -4,6 +4,7 @@
  */
 package de.truezip.driver.zip;
 
+import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.key.MockView;
 import de.truezip.key.param.AesPbeParameters;
@@ -13,11 +14,17 @@ import de.truezip.key.param.AesPbeParameters;
  */
 public final class TestWinZipAesDriver extends ZipDriver {
 
+    private final IOPoolProvider ioPoolProvider;
     private final TestKeyManagerProvider service;
 
     public TestWinZipAesDriver(final IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider);
+        this.ioPoolProvider = ioPoolProvider;
         this.service = new TestKeyManagerProvider();
+    }
+
+    @Override
+    public IOPool<?> getIOPool() {
+        return ioPoolProvider.get();
     }
 
     @Override

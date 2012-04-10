@@ -11,6 +11,7 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -39,18 +40,6 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      */
     public static final Charset TAR_CHARSET = Charset.defaultCharset();
 
-    private final IOPool<?> ioPool;
-
-    /**
-     * Constructs a new TAR driver.
-     *
-     * @param provider the provider for the I/O buffer pool.
-     */
-    public TarDriver(final IOPoolProvider provider) {
-        if (null == (this.ioPool = provider.get()))
-            throw new NullPointerException();
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -59,6 +48,11 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     @Override
     public Charset getCharset() {
         return TAR_CHARSET;
+    }
+
+    @Override
+    public IOPool<?> getIOPool() {
+        return IOPoolLocator.SINGLETON.get();
     }
 
     /**
@@ -72,11 +66,6 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     @Override
     public boolean getRedundantContentSupport() {
         return true;
-    }
-
-    @Override
-    public final IOPool<?> getIOPool() {
-        return ioPool;
     }
 
     @Override

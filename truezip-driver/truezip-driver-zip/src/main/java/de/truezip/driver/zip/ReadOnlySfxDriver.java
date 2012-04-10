@@ -5,7 +5,6 @@
 package de.truezip.driver.zip;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.OutputService;
 import de.truezip.kernel.util.BitField;
@@ -28,14 +27,19 @@ import javax.annotation.concurrent.Immutable;
 public class ReadOnlySfxDriver extends ZipDriver {
 
     /**
-     * The character set used in SFX archives by default, which is determined
-     * by calling {@code System.getProperty("file.encoding")}.
+     * The character set for entry names and comments, which is the default
+     * character set.
      */
-    public static final Charset SFX_CHARSET
-            = Charset.forName(System.getProperty("file.encoding"));
+    public static final Charset SFX_CHARSET = Charset.defaultCharset();
 
-    public ReadOnlySfxDriver(IOPoolProvider provider) {
-        super(provider, SFX_CHARSET);
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@link #SFX_CHARSET}.
+     */
+    @Override
+    public Charset getCharset() {
+        return SFX_CHARSET;
     }
 
     /**

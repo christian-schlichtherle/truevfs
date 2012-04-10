@@ -5,6 +5,7 @@
 package de.truezip.driver.tar;
 
 import de.truezip.kernel.FsArchiveDriverTestSuite;
+import de.truezip.kernel.cio.IOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -14,7 +15,12 @@ extends FsArchiveDriverTestSuite<TarDriverEntry, TarBZip2Driver> {
 
     @Override
     protected TarBZip2Driver newArchiveDriver() {
-        return new TarBZip2Driver(getTestConfig().getIOPoolProvider());
+        return new TarBZip2Driver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 
     @Override

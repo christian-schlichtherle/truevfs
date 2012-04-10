@@ -15,7 +15,6 @@ import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.MultiplexingOutputService;
 import de.truezip.kernel.cio.OutputService;
 import de.truezip.kernel.io.AbstractSink;
@@ -40,15 +39,6 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public abstract class ZipRaesDriver extends JarDriver {
-
-    /**
-     * Constructs a new RAES encrypted ZIP file driver.
-     *
-     * @param ioPoolProvider the provider for the I/O buffer pool.
-     */
-    public ZipRaesDriver(final IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider);
-    }
 
     /**
      * {@inheritDoc}

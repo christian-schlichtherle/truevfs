@@ -111,8 +111,8 @@ implements Closeable, Iterable<E> {
      * Reads the given {@code zip} file in order to provide random access
      * to its entries.
      *
-     * @param  param the parameters for reading the ZIP file.
      * @param  source the source for reading the ZIP file from.
+     * @param  param the parameters for reading the ZIP file.
      * @throws ZipException if the source data is not compatible to the ZIP
      *         File Format Specification.
      * @throws EOFException on premature end-of-file.

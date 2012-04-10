@@ -5,9 +5,10 @@
 package de.truezip.driver.tar.path;
 
 import de.truezip.driver.tar.TarDriver;
+import de.truezip.kernel.cio.IOPool;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class TarPathIT extends TarPathITSuite<TarDriver> {
 
@@ -18,6 +19,11 @@ public final class TarPathIT extends TarPathITSuite<TarDriver> {
 
     @Override
     protected TarDriver newArchiveDriver() {
-        return new TarDriver(getTestConfig().getIOPoolProvider());
+        return new TarDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }

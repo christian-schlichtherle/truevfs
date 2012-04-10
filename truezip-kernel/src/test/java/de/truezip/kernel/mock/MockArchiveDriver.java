@@ -52,13 +52,9 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
         return MOCK_CHARSET;
     }
 
-    private IOPoolProvider getIOPoolProvider() {
-        return config.getIOPoolProvider();
-    }
-
     @Override
-    public final IOPool<?> getIOPool() {
-        return getIOPoolProvider().get();
+    public IOPool<?> getIOPool() {
+        return config.getIOPoolProvider().get();
     }
 
     @Override

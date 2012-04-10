@@ -6,6 +6,7 @@ package de.truezip.driver.tar.file;
 
 import de.truezip.driver.tar.TarDriver;
 import de.truezip.file.ConcurrentSyncITSuite;
+import de.truezip.kernel.cio.IOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -20,6 +21,11 @@ extends ConcurrentSyncITSuite<TarDriver> {
 
     @Override
     protected TarDriver newArchiveDriver() {
-        return new TarDriver(getTestConfig().getIOPoolProvider());
+        return new TarDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }

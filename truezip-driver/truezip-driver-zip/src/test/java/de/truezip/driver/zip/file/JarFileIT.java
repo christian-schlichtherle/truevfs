@@ -6,6 +6,7 @@ package de.truezip.driver.zip.file;
 
 import de.truezip.driver.zip.JarDriver;
 import de.truezip.file.TFileITSuite;
+import de.truezip.kernel.cio.IOPool;
 
 /**
  * @author  Christian Schlichtherle
@@ -19,6 +20,11 @@ public final class JarFileIT extends TFileITSuite<JarDriver> {
 
     @Override
     protected JarDriver newArchiveDriver() {
-        return new JarDriver(getTestConfig().getIOPoolProvider());
+        return new JarDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }

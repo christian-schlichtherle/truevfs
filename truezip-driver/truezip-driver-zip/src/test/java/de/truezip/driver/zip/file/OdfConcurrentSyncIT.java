@@ -6,6 +6,7 @@ package de.truezip.driver.zip.file;
 
 import de.truezip.driver.zip.OdfDriver;
 import de.truezip.file.ConcurrentSyncITSuite;
+import de.truezip.kernel.cio.IOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -19,6 +20,11 @@ public final class OdfConcurrentSyncIT extends ConcurrentSyncITSuite<OdfDriver> 
 
     @Override
     protected OdfDriver newArchiveDriver() {
-        return new OdfDriver(getTestConfig().getIOPoolProvider());
+        return new OdfDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }

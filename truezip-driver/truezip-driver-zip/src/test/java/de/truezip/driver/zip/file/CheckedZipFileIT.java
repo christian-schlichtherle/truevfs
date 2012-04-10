@@ -6,6 +6,7 @@ package de.truezip.driver.zip.file;
 
 import de.truezip.driver.zip.CheckedZipDriver;
 import de.truezip.file.TFileITSuite;
+import de.truezip.kernel.cio.IOPool;
 
 /**
  * @author  Christian Schlichtherle
@@ -19,6 +20,11 @@ public final class CheckedZipFileIT extends TFileITSuite<CheckedZipDriver> {
 
     @Override
     protected CheckedZipDriver newArchiveDriver() {
-        return new CheckedZipDriver(getTestConfig().getIOPoolProvider());
+        return new CheckedZipDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }
