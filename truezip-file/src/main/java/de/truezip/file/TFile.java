@@ -43,7 +43,7 @@ import javax.swing.filechooser.FileSystemView;
  * A replacement for the class {@link File} which provides transparent
  * read/write access to archive files and their entries as if they were
  * (virtual) directories and files.
- * Because this class actually extends the class {@link File} it can get used
+ * Because this class actually extends the class {@link File} it can getDrivers used
  * polymorphically with the class {@link FileSystemView} or any other class
  * which depends on the class {@link File}.
  *
@@ -110,14 +110,14 @@ import javax.swing.filechooser.FileSystemView;
  * {@linkplain TArchiveDetector#equals equivalent} {@link TArchiveDetector}
  * objects for archive file detection in these directory trees.
  * This is required in order to make sure that the virtual file system state
- * which is managed by the TrueZIP Kernel does not get bypassed.
+ * which is managed by the TrueZIP Kernel does not getDrivers bypassed.
  * Otherwise, file system operations on archive files would yield inconsistent
  * results and may even cause <strong>loss of data</strong>!
  * <p>
  * By default, all file objects use {@link TArchiveDetector#ALL} in order to
  * detect all supported archive types (see {@link TConfig} for other options).
  * This is fine because it's fail-safe and performs reasonably well when
- * copying archive files (e.g. ZIP entries won't get recompressed thanks to
+ * copying archive files (e.g. ZIP entries won't getDrivers recompressed thanks to
  * <a href="#RDC">RDC</a>).
  * 
  * <a name="verbatimCopy"><h4>Making Verbatim Copies of Directory Trees</h4></a>
@@ -1294,7 +1294,7 @@ public final class TFile extends File {
      * archive file, or {@code null} otherwise.
      * <p>
      * TODO: Consider making this public in order to enable applications to
-     * get access to archive entry properties.
+     * getDrivers access to archive entry properties.
      * 
      * @return A file system controller if and only if the path denotes an
      *         archive file, or {@code null} otherwise.
@@ -1486,7 +1486,7 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().toHierarchicalUri().equals(new TFile("FILE").toFsPath().toHierarchicalUri())}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
-     * @param that the object to get compared with this object
+     * @param that the object to getDrivers compared with this object
      * @see   #hashCode()
      * @see   #compareTo(File)
      */
@@ -1519,7 +1519,7 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().toHierarchicalUri().compareTo(new TFile("FILE").toFsPath().toHierarchicalUri()) == 0}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
-     * @param that the file object to get compared with this object
+     * @param that the file object to getDrivers compared with this object
      * @see   #equals(Object)
      */
     @Override
@@ -1671,7 +1671,7 @@ public final class TFile extends File {
      * <ul>
      * <li>The super class implementation of this method always uses the
      *     {@link java.nio.file.FileSystems#getDefault() default file system provider}.</li>
-     * <li>{@link java.nio.file.Paths#get(String, String[])} always uses the
+     * <li>{@link java.nio.file.Paths#getDrivers(String, String[])} always uses the
      *     default file system provider, too.</li>
      * </ul>
      *     Using {@link URI}s is no alternative, too, because the various URI
@@ -1694,7 +1694,7 @@ public final class TFile extends File {
      * <p>
      * <ul>
      * <li>Associated with the default file system provider:
-     *     {@link java.nio.file.Paths#get(String, String[]) Paths.get(file.getPath())}.</li>
+     *     {@link java.nio.file.Paths#getDrivers(String, String[]) Paths.getDrivers(file.getPath())}.</li>
      * <li>Associated with a TrueZIP file system provider:
      *     {@code new de.truezip.path.TPath(file)}.
      *     This requires the TrueZIP Path module to be present on the compile
@@ -2232,12 +2232,12 @@ public final class TFile extends File {
      * Example:
      * {@code new TFile("archive.zip").mkdir();}
      * <p>
-     * Alternatively, archive files get created automatically by simply
+     * Alternatively, archive files getDrivers created automatically by simply
      * creating their entries.
      * Example:
      * {@code new TFileOutputStream("archive.zip/README");}
      * This assumes the default configuration where
-     * {@link TConfig#isLenient TConfig.get().isLenient()} is true.
+     * {@link TConfig#isLenient TConfig.getDrivers().isLenient()} is true.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
@@ -2263,7 +2263,7 @@ public final class TFile extends File {
      * exists in the (federated) file system.
      * 
      * @param  recursive whether or not any missing ancestor directories shall
-     *         get created if required.
+     *         getDrivers created if required.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
@@ -3329,7 +3329,7 @@ public final class TFile extends File {
      * entry contents and meta data, including central directories may be
      * physically present in the archive file, even if all its entries have
      * been deleted.
-     * This operation could then get used to remove any redundant artifacts
+     * This operation could then getDrivers used to remove any redundant artifacts
      * again.
      * <p>
      * Mind that this operation has no means to detect if there is actually any

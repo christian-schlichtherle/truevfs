@@ -25,7 +25,7 @@ public class TestZipRaesDriver extends SafeZipRaesDriver {
 
     @Override
     public IOPool<?> getIOPool() {
-        return ioPoolProvider.get();
+        return ioPoolProvider.getIOPool();
     }
     
     @Override

@@ -14,6 +14,6 @@ import org.junit.Test;
 public final class IOPoolLocatorTest {
     @Test
     public void testIsLocatable() {
-        assertNotNull(IOPoolLocator.SINGLETON.get());
+        assertNotNull(IOPoolLocator.SINGLETON.getIOPool());
     }
 }

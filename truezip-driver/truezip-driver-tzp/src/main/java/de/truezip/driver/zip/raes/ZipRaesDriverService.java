@@ -30,7 +30,7 @@ import javax.annotation.concurrent.Immutable;
 </table>
  * <p>
  * Note that the regular expression is actually decomposed into separate
- * {@link FsScheme} objects which get mapped individually.
+ * {@link FsScheme} objects which getDrivers mapped individually.
  * 
  * @author  Christian Schlichtherle
  */
@@ -81,7 +81,7 @@ public final class ZipRaesDriverService extends FsDriverService {
             });
 
     @Override
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return DRIVERS;
     }
 }

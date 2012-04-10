@@ -23,7 +23,7 @@ public final class CheckedZipPathIT extends TPathITSuite<CheckedZipDriver> {
         return new CheckedZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

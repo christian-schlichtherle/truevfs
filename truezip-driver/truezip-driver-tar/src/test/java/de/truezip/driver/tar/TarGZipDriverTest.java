@@ -18,7 +18,7 @@ extends FsArchiveDriverTestSuite<TarDriverEntry, TarGZipDriver> {
         return new TarGZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

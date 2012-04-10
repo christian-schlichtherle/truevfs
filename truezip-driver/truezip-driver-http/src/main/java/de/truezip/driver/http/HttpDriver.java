@@ -41,7 +41,7 @@ public class HttpDriver extends FsDriver {
     }
 
     final IOPool<?> getPool() {
-        return provider.get();
+        return provider.getIOPool();
     }
 
     /**

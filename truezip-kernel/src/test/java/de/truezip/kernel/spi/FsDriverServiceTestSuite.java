@@ -19,6 +19,6 @@ public abstract class FsDriverServiceTestSuite extends FsDriverProviderTestSuite
     @Test
     public void testIsLocatable() {
         for (final String extension : new ExtensionSet(getExtensions()))
-            assertNotNull(FsDriverLocator.SINGLETON.get().get(FsScheme.create(extension)));
+            assertNotNull(FsDriverLocator.SINGLETON.getDrivers().get(FsScheme.create(extension)));
     }
 }

@@ -23,7 +23,7 @@ public final class TarBZip2FileIT extends TarFileITSuite<TarBZip2Driver> {
         class TestDriver extends TarBZip2Driver {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
 
             @Override

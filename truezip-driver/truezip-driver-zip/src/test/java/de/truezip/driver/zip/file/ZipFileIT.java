@@ -23,7 +23,7 @@ public final class ZipFileIT extends TFileITSuite<ZipDriver> {
         return new ZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

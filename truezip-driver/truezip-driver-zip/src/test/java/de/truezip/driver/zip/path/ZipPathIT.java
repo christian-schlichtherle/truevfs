@@ -23,7 +23,7 @@ public final class ZipPathIT extends TPathITSuite<ZipDriver> {
         return new ZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

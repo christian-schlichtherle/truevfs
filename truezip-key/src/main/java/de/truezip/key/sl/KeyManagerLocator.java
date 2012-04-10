@@ -35,7 +35,7 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
     private KeyManagerLocator() { }
 
     @Override
-    public Map<Class<?>, KeyManager<?>> get() {
+    public Map<Class<?>, KeyManager<?>> getKeyManagers() {
         return Boot.MANAGERS;
     }
 
@@ -58,7 +58,7 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
                 KeyManagerService service = i.next();
                 logger.log(CONFIG, "located", service);
                 for (final Map.Entry<Class<?>, KeyManager<?>> entry
-                        : service.get().entrySet()) {
+                        : service.getKeyManagers().entrySet()) {
                     final Class<?> type = entry.getKey();
                     final KeyManager<?> newManager = entry.getValue();
                     if (null != type && null != newManager) {

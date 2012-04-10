@@ -32,7 +32,7 @@ extends KeyManagerService {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<Class<?>, KeyManager<?>> get() {
+    public Map<Class<?>, KeyManager<?>> getKeyManagers() {
         return managers;
     }
 }

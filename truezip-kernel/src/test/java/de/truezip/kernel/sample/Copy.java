@@ -5,8 +5,6 @@
 package de.truezip.kernel.sample;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.FsPath;
-import de.truezip.kernel.FsUriModifier;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
@@ -54,7 +52,7 @@ public final class Copy {
     static void copy(String src, String dst) throws IOException {
         // Get a manager for the life cycle of controllers for federated
         // file systems.
-        FsManager manager = FsManagerLocator.SINGLETON.get();
+        FsManager manager = FsManagerLocator.SINGLETON.getManager();
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.

@@ -4,14 +4,14 @@
  */
 package de.truezip.kernel.mock;
 
+import de.truezip.kernel.TestConfig;
+import de.truezip.kernel.ThrowControl;
 import static de.truezip.kernel.cio.Entry.ALL_ACCESS_SET;
 import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
 import de.truezip.kernel.util.Maps;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -68,7 +68,7 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     final IOPool<?> getIOPool() {
-        return getIOPoolProvider().get();
+        return getIOPoolProvider().getIOPool();
     }
 
     @Override

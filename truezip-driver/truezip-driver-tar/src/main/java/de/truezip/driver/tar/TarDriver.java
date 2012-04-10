@@ -52,7 +52,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     @Override
     public IOPool<?> getIOPool() {
-        return IOPoolLocator.SINGLETON.get();
+        return IOPoolLocator.SINGLETON.getIOPool();
     }
 
     /**

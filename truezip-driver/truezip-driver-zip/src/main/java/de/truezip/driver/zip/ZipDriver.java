@@ -82,7 +82,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
 
     @Override
     public IOPool<?> getIOPool() {
-        return IOPoolLocator.SINGLETON.get();
+        return IOPoolLocator.SINGLETON.getIOPool();
     }
 
     /**
@@ -195,7 +195,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * Whether or not the content of the given entry shall get
+     * Whether or not the content of the given entry shall getIOPool
      * checked/authenticated when reading it.
      * If this method returns {@code true} and the check fails,
      * then an {@link IOException} gets thrown.
@@ -230,7 +230,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * and should return {@code false} unless both target entries can mutually
      * agree on transferring raw (unprocessed) content.
      * Note that it is an error to compare the properties of the target entries
-     * because this method may get called before the local output target gets
+     * because this method may getIOPool called before the local output target gets
      * mutated to compare equal with the remote input target!
      * <p>
      * The implementation in the class {@link ZipDriver} returns
@@ -240,8 +240,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * 
      * @param  input the input target entry for copying the contents.
      * @param  output the output target entry for copying the contents.
-     * @return Whether the content to get copied from the input target entry
-     *         to the output target entry needs to get processed or can get
+     * @return Whether the content to getIOPool copied from the input target entry
+     *         to the output target entry needs to getIOPool processed or can getIOPool
      *         sent in raw format.
      */
     protected boolean process(ZipDriverEntry input, ZipDriverEntry output) {
@@ -319,7 +319,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * The implementation in the class {@link ZipDriver} decorates the
      * given controller with a package private controller which keeps track of
      * the AES PBE parameters.
-     * This should get overridden in order to return just {@code controller} if
+     * This should getIOPool overridden in order to return just {@code controller} if
      * and only if you are overriding
      * {@link #zipCryptoParameters(FsModel, Charset)}, too, and do not want to
      * use the locatable key manager to resolve passwords, e.g. for WinZip AES
@@ -408,9 +408,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * <p>
      * The resulting output socket is then wrapped in a private nested class
      * for an upcast in {@link #newOutputService}.
-     * Thus, when overriding this method, {@link #newOutputService} should get
+     * Thus, when overriding this method, {@link #newOutputService} should getIOPool
      * overridden, too.
-     * Otherwise, a class cast exception will get thrown in
+     * Otherwise, a class cast exception will getIOPool thrown in
      * {@link #newOutputService}.
      */
     @Override

@@ -25,6 +25,6 @@ public final class TempFilePoolServiceTest {
 
     @Test
     public void testGet() {
-        assertSame(instance.get(), TempFilePool.INSTANCE);
+        assertSame(instance.getIOPool(), TempFilePool.INSTANCE);
     }
 }

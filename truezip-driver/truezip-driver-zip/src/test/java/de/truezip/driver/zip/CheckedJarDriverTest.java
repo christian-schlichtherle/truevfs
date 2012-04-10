@@ -18,7 +18,7 @@ extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedJarDriver> {
         return new CheckedJarDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

@@ -18,7 +18,7 @@ extends FsArchiveDriverTestSuite<TarDriverEntry, TarBZip2Driver> {
         return new TarBZip2Driver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }
