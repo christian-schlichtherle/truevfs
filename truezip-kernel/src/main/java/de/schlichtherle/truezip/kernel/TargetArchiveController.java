@@ -176,8 +176,7 @@ extends FileSystemArchiveController<E> {
         } catch (final IOException inaccessibleEntry) {
             throw autoCreate
                     ? inaccessibleEntry
-                    : new FalsePositiveException(getModel(),
-                        inaccessibleEntry);
+                    : new FalsePositiveException(inaccessibleEntry);
         }
 
         // Obtain file system by creating or loading it from the parent entry.
@@ -189,7 +188,7 @@ extends FileSystemArchiveController<E> {
                 makeOutputArchive(options);
                 fs = newEmptyFileSystem(driver);
             } else {
-                throw new FalsePositiveException(getModel(),
+                throw new FalsePositiveException(
                         new NoSuchFileException(name.toString(), null,
                             "Missing parent file entry!"));
             }
@@ -215,8 +214,8 @@ extends FileSystemArchiveController<E> {
                 throw ex;
             } catch (final IOException ex) {
                 throw pe.isType(SPECIAL)
-                        ? new FalsePositiveException(getModel(), ex)
-                        : new PersistentFalsePositiveException(getModel(), ex);
+                        ? new FalsePositiveException(ex)
+                        : new PersistentFalsePositiveException(ex);
             }
         }
 
