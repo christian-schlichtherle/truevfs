@@ -4,11 +4,13 @@
  */
 package de.truezip.driver.tar;
 
+import de.truezip.kernel.FsModel;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.OutputBusyException;
+import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.Maps;
 import static de.truezip.kernel.util.Maps.initialCapacity;
@@ -21,7 +23,6 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
@@ -45,7 +46,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  */
 @NotThreadSafe
 public final class TarOutputService
-extends TarArchiveOutputStream
 implements OutputService<TarDriverEntry> {
 
     /**
@@ -58,17 +58,32 @@ implements OutputService<TarDriverEntry> {
     private final Map<String, TarDriverEntry>
             entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
-    private final OutputStream out;
     private final IOPool<?> pool;
+    private final TarArchiveOutputStream out;
     private boolean busy;
 
     @CreatesObligation
-    public TarOutputService(final TarDriver driver,
-                            final @WillCloseWhenClosed OutputStream out) {
-        super(out);
-        this.out = out;
-        super.setLongFileMode(LONGFILE_GNU);
+    public TarOutputService(
+            final TarDriver driver,
+            final FsModel model,
+            final Sink sink)
+    throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         this.pool = driver.getIOPool();
+        final OutputStream out = sink.stream();
+        try {
+            final TarArchiveOutputStream
+                    taos = this.out = new TarArchiveOutputStream(out);
+            taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+        } catch (final Throwable ex) {
+            try {
+                out.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
     }
 
     @Override
@@ -134,11 +149,6 @@ implements OutputService<TarDriverEntry> {
 
     @Override
     public void close() throws IOException {
-        super.close();
-        // Workaround for super class implementation which may not have
-        // been left in a consistent state if the decorated stream has
-        // thrown an IOException upon the first call to its close() method.
-        // See http://java.net/jira/browse/TRUEZIP-234
         out.close();
     }
 
@@ -156,8 +166,8 @@ implements OutputService<TarDriverEntry> {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final TarDriverEntry entry)
         throws IOException {
-            super(TarOutputService.this);
-            putArchiveEntry(entry);
+            super(TarOutputService.this.out);
+            TarOutputService.this.out.putArchiveEntry(entry);
             entries.put(entry.getName(), entry);
             busy = true;
         }
@@ -171,7 +181,7 @@ implements OutputService<TarDriverEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-            closeArchiveEntry();
+            TarOutputService.this.out.closeArchiveEntry();
             closed = true;
             busy = false;
         }
@@ -223,11 +233,11 @@ implements OutputService<TarDriverEntry> {
                     entry.setSize(buffer.getSize(DATA));
                     if (UNKNOWN == entry.getModTime().getTime())
                         entry.setModTime(System.currentTimeMillis());
-                    putArchiveEntry(entry);
+                    TarOutputService.this.out.putArchiveEntry(entry);
                     try {
-                        Streams.cat(in, TarOutputService.this);
+                        Streams.cat(in, TarOutputService.this.out);
                     } finally {
-                        closeArchiveEntry();
+                        TarOutputService.this.out.closeArchiveEntry();
                     }
                 }
             } finally {

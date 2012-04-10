@@ -69,6 +69,8 @@ implements InputService<TarDriverEntry> {
             final FsModel model,
             final Source source)
     throws IOException {
+        if (null == model)
+            throw new NullPointerException();
         final IOPool<?> pool = driver.getIOPool();
         try (final InputStream in = source.stream()) {
             final TarArchiveInputStream tin = newValidatedTarInputStream(in);

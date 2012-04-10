@@ -9,10 +9,9 @@ import static de.truezip.kernel.FsAccessOption.STORE;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.cio.IOPoolProvider;
-import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.AbstractSink;
 import de.truezip.kernel.io.AbstractSource;
-import de.truezip.kernel.io.Source;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
@@ -64,18 +63,18 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected TarInputService newTarInputService(
+    protected InputService<TarDriverEntry> newInputService(
             final FsModel model,
-            final Source source)
+            final InputSocket<?> input)
     throws IOException {
-        final class BZip2Source extends AbstractSource {
+        final class Source extends AbstractSource {
             @Override
             public InputStream stream() throws IOException {
-                final InputStream in = source.stream();
+                final InputStream in = input.stream();
                 try {
                     return new BZip2CompressorInputStream(
                             new BufferedInputStream(in, getBufferSize()));
-                } catch(final Throwable ex) {
+                } catch (final Throwable ex) {
                     try {
                         in.close();
                     } catch (final Throwable ex2) {
@@ -84,22 +83,39 @@ public class TarBZip2Driver extends TarDriver {
                     throw ex;
                 }
             }
-        } // BZip2Source
+        } // Source
 
-        return new TarInputService(this, model, new BZip2Source());
+        return new TarInputService(this, model, new Source());
     }
 
     @Override
-    protected TarOutputService newTarOutputService(
+    protected OutputService<TarDriverEntry> newOutputService(
             final FsModel model,
-            final OutputStream out,
-            final TarInputService source)
+            final InputService<TarDriverEntry> source,
+            final OutputSocket<?> output)
     throws IOException {
-        return super.newTarOutputService(model,
-                new BZip2CompressorOutputStream(
-                    new BufferedOutputStream(out, getBufferSize()),
-                    getLevel()),
-                source);
+        final class Sink extends AbstractSink {
+            @Override
+            public OutputStream stream() throws IOException {
+                final OutputStream out = output.stream();
+                try {
+                    return new BZip2CompressorOutputStream(
+                            new BufferedOutputStream(out, getBufferSize()),
+                            getLevel());
+                } catch (final Throwable ex) {
+                    try {
+                        out.close();
+                    } catch (final Throwable ex2) {
+                        ex.addSuppressed(ex2);
+                    }
+                    throw ex;
+                }
+            }
+        } // Sink
+
+        return new MultiplexingOutputService<>(
+                new TarOutputService(this, model, new Sink()),
+                getIOPool());
     }
 
     /**
