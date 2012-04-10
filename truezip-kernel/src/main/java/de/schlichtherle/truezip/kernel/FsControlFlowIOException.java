@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel;
+package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
@@ -68,7 +69,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public abstract class FsControlFlowIOException extends IOException {
+abstract class FsControlFlowIOException extends IOException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
@@ -80,12 +81,12 @@ public abstract class FsControlFlowIOException extends IOException {
      * be empty.
      * This should be set to {@code true} for debugging purposes only.
      */
-    public static final boolean TRACEABLE = Boolean
+    static final boolean TRACEABLE = Boolean
             .getBoolean(FsControlFlowIOException.class.getName() + ".traceable");
 
-    protected FsControlFlowIOException() { }
+    FsControlFlowIOException() { }
 
-    protected FsControlFlowIOException(
+    FsControlFlowIOException(
             final FsModel model,
             final @CheckForNull String message, 
             final @CheckForNull Throwable cause) {

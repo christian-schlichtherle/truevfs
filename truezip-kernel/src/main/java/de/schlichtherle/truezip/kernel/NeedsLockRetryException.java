@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsModel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
