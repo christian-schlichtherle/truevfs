@@ -37,9 +37,7 @@ public final class TFileWriter extends OutputStreamWriter {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings({
-        "DM_DEFAULT_ENCODING", "OBL_UNSATISFIED_OBLIGATION"
-    })
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING" )
     public TFileWriter(File file) throws FileNotFoundException {
         super(new TFileOutputStream(file));
     }
@@ -55,9 +53,7 @@ public final class TFileWriter extends OutputStreamWriter {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings({
-        "DM_DEFAULT_ENCODING", "OBL_UNSATISFIED_OBLIGATION"
-    })
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
     public TFileWriter(File file, boolean append) throws FileNotFoundException {
         super(new TFileOutputStream(file, append));
     }
@@ -72,7 +68,6 @@ public final class TFileWriter extends OutputStreamWriter {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileWriter(File file, boolean append, Charset charset)
     throws FileNotFoundException {
         super(new TFileOutputStream(file, append), charset);
@@ -88,7 +83,6 @@ public final class TFileWriter extends OutputStreamWriter {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileWriter(File file, boolean append, CharsetEncoder encoder)
     throws FileNotFoundException {
         super(new TFileOutputStream(file, append), encoder);

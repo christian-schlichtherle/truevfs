@@ -34,7 +34,6 @@ extends DecoratingSeekableChannel {
      * @param lock the lock to use.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public LockSeekableChannel(
             final @Nullable @WillCloseWhenClosed SeekableByteChannel channel,
             final Lock lock) {

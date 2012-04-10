@@ -25,13 +25,11 @@ public final class ThrowingOutputStream extends DecoratingOutputStream {
 
     private final ThrowControl control;
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
     public ThrowingOutputStream(@WillCloseWhenClosed OutputStream out) {
         this(out, null);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
     public ThrowingOutputStream(final @WillCloseWhenClosed OutputStream out,
                                 final @CheckForNull ThrowControl control) {

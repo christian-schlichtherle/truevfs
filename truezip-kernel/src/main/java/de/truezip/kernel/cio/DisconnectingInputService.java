@@ -40,7 +40,6 @@ extends DecoratingInputService<E, InputService<E>> {
      * @param input the service to decorate.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public DisconnectingInputService(@WillCloseWhenClosed InputService<E> input) {
         super(input);
     }
@@ -124,7 +123,8 @@ extends DecoratingInputService<E, InputService<E>> {
 
     private final class DisconnectingInputStream
     extends DecoratingInputStream {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+
+        @CreatesObligation
         DisconnectingInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
@@ -174,7 +174,8 @@ extends DecoratingInputService<E, InputService<E>> {
 
     private final class DisconnectingSeekableChannel
     extends DecoratingReadOnlyChannel {
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+
+        @CreatesObligation
         DisconnectingSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }

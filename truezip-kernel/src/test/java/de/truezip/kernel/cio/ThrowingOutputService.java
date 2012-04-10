@@ -25,13 +25,11 @@ extends DecoratingOutputService<E, OutputService<E>> {
     private volatile @CheckForNull ThrowControl control;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ThrowingOutputService(  final @WillCloseWhenClosed OutputService<E> service) {
         this(service, null);
     }
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ThrowingOutputService(  final @WillCloseWhenClosed OutputService<E> service,
                                 final @CheckForNull TestConfig config) {
         super(service);

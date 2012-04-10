@@ -7,6 +7,7 @@ package de.truezip.kernel.cio;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import de.truezip.kernel.io.ByteBufferChannel;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -232,7 +233,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
     private final class DataInputChannel extends ByteBufferChannel {
         boolean closed;
 
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        @CreatesObligation
         DataInputChannel() {
             super(ByteBuffer.wrap(data).asReadOnlyBuffer());
         }
@@ -250,7 +251,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
     private final class DataOutputChannel extends ByteBufferChannel {
         boolean closed;
 
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
+        @CreatesObligation
         DataOutputChannel() {
             super((ByteBuffer) ByteBuffer.allocate(initialCapacity).limit(0));
         }

@@ -25,14 +25,12 @@ public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
 
     private final ThrowControl control;
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
     public ThrowingSeekableChannel(
             @WillCloseWhenClosed SeekableByteChannel sbc) {
         this(sbc, null);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     @CreatesObligation
     public ThrowingSeekableChannel(
             final @WillCloseWhenClosed SeekableByteChannel sbc,

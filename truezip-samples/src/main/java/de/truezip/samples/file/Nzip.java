@@ -323,7 +323,6 @@ public class Nzip extends Application {
         }
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive!
     private void cpOrMv(final String[] args, final boolean mv)
     throws IllegalUsageException, IOException {
         if (args.length < 2)

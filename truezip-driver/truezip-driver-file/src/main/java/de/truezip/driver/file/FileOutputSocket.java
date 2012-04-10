@@ -213,7 +213,6 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
             boolean closed;
 
             @CreatesObligation
-            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             Stream() throws IOException {
                 super(Files.newOutputStream(temp.getPath(), optionArray()));
             }

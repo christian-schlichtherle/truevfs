@@ -467,7 +467,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     private final class LockInputStream
     extends DecoratingInputStream {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         LockInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
@@ -481,7 +480,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     private final class LockOutputStream
     extends DecoratingOutputStream {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         LockOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
@@ -495,7 +493,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     private final class LockSeekableChannel
     extends DecoratingSeekableChannel {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }

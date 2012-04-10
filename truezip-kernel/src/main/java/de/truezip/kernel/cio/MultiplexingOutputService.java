@@ -59,7 +59,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * @param pool the pool for buffering entry data.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public MultiplexingOutputService(
             final @WillCloseWhenClosed OutputService<E> output,
             final IOPool<?> pool) {
@@ -195,7 +194,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
         boolean closed;
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
             super(output.stream());
@@ -228,7 +226,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         BufferedEntryOutputStream(  final IOBuffer<?> buffer,
                                     final OutputSocket<? extends E> output)
         throws IOException {

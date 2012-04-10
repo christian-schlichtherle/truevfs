@@ -36,9 +36,7 @@ public final class TFileReader extends InputStreamReader {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings({
-        "DM_DEFAULT_ENCODING", "OBL_UNSATISFIED_OBLIGATION"
-    })
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
     public TFileReader(File file) throws FileNotFoundException {
 	super(new TFileInputStream(file));
     }
@@ -51,7 +49,6 @@ public final class TFileReader extends InputStreamReader {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileReader(File file, Charset charset)
     throws FileNotFoundException {
 	super(new TFileInputStream(file), charset);
@@ -65,7 +62,6 @@ public final class TFileReader extends InputStreamReader {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileReader(File file, CharsetDecoder decoder)
     throws FileNotFoundException {
 	super(new TFileInputStream(file), decoder);

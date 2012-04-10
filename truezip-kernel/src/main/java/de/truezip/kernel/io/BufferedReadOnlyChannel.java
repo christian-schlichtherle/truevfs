@@ -42,7 +42,6 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @param channel the channel to decorate.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel) {
         this(channel, Streams.BUFFER_SIZE);
@@ -55,7 +54,6 @@ public class BufferedReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @param bufferSize the size of the byte buffer.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public BufferedReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
             final int bufferSize) {

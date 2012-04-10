@@ -19,7 +19,6 @@ final class JmxOutputStream extends DecoratingOutputStream {
     private final JmxIOStatistics stats;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     JmxOutputStream(@WillCloseWhenClosed OutputStream out, JmxIOStatistics stats) {
         super(out);
         assert null != stats;

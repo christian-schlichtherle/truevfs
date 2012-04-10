@@ -12,7 +12,9 @@ import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
 import de.truezip.kernel.io.*;
 import static de.truezip.kernel.util.Maps.initialCapacity;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
@@ -56,6 +59,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
+@CleanupObligation
 public abstract class RawFile<E extends ZipEntry>
 implements Closeable, Iterable<E> {
 
@@ -129,7 +133,7 @@ implements Closeable, Iterable<E> {
         try {
             length = channel.size();
             charset = param.getCharset();
-            final SeekableByteChannel
+            final @WillNotClose SeekableByteChannel
                     bchannel = new SafeBufferedReadOnlyChannel(channel, length);
             if (!param.getPreambled())
                 checkZipFileSignature(bchannel);
@@ -489,11 +493,9 @@ implements Closeable, Iterable<E> {
      */
     public RawFile<E> recoverLostEntries()
     throws ZipException, EOFException, IOException {
-        checkOpen();
-        assert null != channel; // make FindBugs happy!
-        final long length = this.length;
         final SeekableByteChannel
-                channel = new SafeBufferedReadOnlyChannel(this.channel, length);
+                channel = new SafeBufferedReadOnlyChannel(channel(), length);
+        final long length = this.length;
         while (0 < postamble) {
             long pos = length - postamble;
             final PowerBuffer lfh = PowerBuffer
@@ -786,7 +788,6 @@ implements Closeable, Iterable<E> {
      */
     @CreatesObligation
     public InputStream getPreambleInputStream() throws IOException {
-        checkOpen();
         return new ChannelInputStream(
                 new EntryReadOnlyChannel(0, preamble));
     }
@@ -817,7 +818,7 @@ implements Closeable, Iterable<E> {
      */
     @CreatesObligation
     public InputStream getPostambleInputStream() throws IOException {
-        checkOpen();
+        channel();
         return new ChannelInputStream(
                 new EntryReadOnlyChannel(length - postamble, postamble));
     }
@@ -929,14 +930,13 @@ implements Closeable, Iterable<E> {
      * @throws IOException If the entry cannot get load from this ZipFile.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected @Nullable InputStream getInputStream(
             final String name,
             @CheckForNull Boolean check,
             final boolean process)
     throws IOException {
-        checkOpen();
-        if (name == null)
+        final SeekableByteChannel channel = channel();
+        if (null == name)
             throw new NullPointerException();
         final ZipEntry entry = entries.get(name);
         if (null == entry)
@@ -944,8 +944,6 @@ implements Closeable, Iterable<E> {
         long pos = entry.getOffset();
         assert UNKNOWN != pos;
         pos = mapper.map(pos);
-        final SeekableByteChannel channel = this.channel;
-        assert null != channel;
         final PowerBuffer lfh = PowerBuffer
                 .allocate(LFH_MIN_LEN)
                 .littleEndian()
@@ -1056,9 +1054,11 @@ implements Closeable, Iterable<E> {
     }
 
     /** Asserts that this ZIP file is still open for reading its entries. */
-    final void checkOpen() throws ZipException {
-        if (null == this.channel)
+    private SeekableByteChannel channel() throws ZipException {
+        final SeekableByteChannel channel = this.channel;
+        if (null == channel)
             throw new ZipException("ZIP file closed!");
+        return channel;
     }
 
     /**
@@ -1068,6 +1068,7 @@ implements Closeable, Iterable<E> {
      * @throws IOException if an error occurs closing the file.
      */
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         try (SeekableByteChannel sbc = this.channel) {
             if (null == sbc)
@@ -1086,11 +1087,11 @@ implements Closeable, Iterable<E> {
         boolean closed;
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        EntryReadOnlyChannel(final long start, final long size)
+        EntryReadOnlyChannel(
+                final long start,
+                final long size)
         throws IOException {
-            super(new IntervalReadOnlyChannel(RawFile.this.channel, start, size));
-            assert null != RawFile.this.channel;
+            super(new IntervalReadOnlyChannel(channel(), start, size));
             RawFile.this.open++;
         }
 
@@ -1114,7 +1115,6 @@ implements Closeable, Iterable<E> {
         final long size;
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         SafeBufferedReadOnlyChannel(
                 final @WillCloseWhenClosed SeekableByteChannel channel,
                 final long size) {

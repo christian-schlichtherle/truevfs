@@ -315,7 +315,6 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             final class Stream extends DecoratingInputStream {
                 @CreatesObligation
-                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
                     super(Input.super.stream());
                     assert getModel().isTouched();
@@ -374,7 +373,6 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             final class Stream extends DecoratingOutputStream {
                 @CreatesObligation
-                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
                     // Note that the super class implementation MUST get
                     // bypassed because the channel MUST get kept even upon an
@@ -399,7 +397,6 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             final class Channel extends DecoratingSeekableChannel {
                 @CreatesObligation
-                @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Channel() throws IOException {
                     // Note that the super class implementation MUST get
                     // bypassed because the channel MUST get kept even upon an

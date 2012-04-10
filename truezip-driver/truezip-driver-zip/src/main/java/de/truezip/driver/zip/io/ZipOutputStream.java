@@ -61,7 +61,6 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      * @param  out The output stream to write the ZIP file to.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out)
     throws IOException {
         super(new OneTimeSink(out), null, DEFAULT_PARAM);
@@ -75,7 +74,6 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      * @param  charset the character set to use.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset)
     throws IOException {
         super(  new OneTimeSink(out), null,
@@ -94,7 +92,6 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      *         This may already be closed.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(
             @WillCloseWhenClosed OutputStream out,
             ZipFile appendee)

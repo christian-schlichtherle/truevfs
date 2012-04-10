@@ -69,7 +69,6 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @param channel the seekable byte channel.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public CipherReadOnlyChannel(
             final SeekableBlockCipher cipher,
             final @WillCloseWhenClosed SeekableByteChannel channel) {
@@ -86,7 +85,6 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
      *        blocksize or the cipher's blocksize, whatever is larger.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public CipherReadOnlyChannel(
             final SeekableBlockCipher cipher,
             final @WillCloseWhenClosed SeekableByteChannel channel,

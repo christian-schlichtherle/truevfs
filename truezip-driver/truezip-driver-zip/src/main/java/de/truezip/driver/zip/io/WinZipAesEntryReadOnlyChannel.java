@@ -55,7 +55,6 @@ final class WinZipAesEntryReadOnlyChannel extends DecoratingReadOnlyChannel {
     private final ZipEntry entry;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     WinZipAesEntryReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
             final WinZipAesEntryParameters param)

@@ -160,7 +160,6 @@ extends FileSystemArchiveController<E> {
         }
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private void mount0(final boolean autoCreate) throws IOException {
         // HC SUNT DRACONES!
         
@@ -237,7 +236,6 @@ extends FileSystemArchiveController<E> {
      * @return The output archive.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     OutputArchive<E> makeOutputArchive() throws IOException {
         OutputArchive<E> oa = getOutputArchive();
         if (null != oa)
@@ -639,7 +637,6 @@ extends FileSystemArchiveController<E> {
         final InputService<E> archive;
 
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         InputArchive(final @WillCloseWhenClosed InputService<E> input) {
             super(new DisconnectingInputService<>(input));
             this.archive = input;
@@ -666,7 +663,6 @@ extends FileSystemArchiveController<E> {
     private static final class OutputArchive<E extends FsArchiveEntry>
     extends LockOutputService<E> {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         OutputArchive(final @WillCloseWhenClosed OutputService<E> output) {
             super(new DisconnectingOutputService<>(output));
         }

@@ -75,7 +75,6 @@ public final class TFileInputStream extends DecoratingInputStream {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileInputStream(String path)
     throws FileNotFoundException {
         super(newInputStream(new TFile(path)));
@@ -89,7 +88,6 @@ public final class TFileInputStream extends DecoratingInputStream {
      * @throws FileNotFoundException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public TFileInputStream(File file)
     throws FileNotFoundException {
         super(newInputStream(file));

@@ -45,7 +45,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
 final class Cache implements Flushable, Closeable {
 
     private final Strategy strategy;

@@ -294,7 +294,6 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
     private final class SyncInputStream
     extends DecoratingInputStream {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         SyncInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
@@ -308,7 +307,6 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
     private final class SyncOutputStream
     extends DecoratingOutputStream {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         SyncOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
@@ -322,7 +320,6 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
     private final class SyncSeekableChannel
     extends DecoratingSeekableChannel {
         @CreatesObligation
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         SyncSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }

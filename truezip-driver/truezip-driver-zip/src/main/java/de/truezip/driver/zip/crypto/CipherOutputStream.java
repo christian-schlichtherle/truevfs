@@ -52,7 +52,6 @@ public final class CipherOutputStream extends DecoratingOutputStream {
      * @param out the output stream.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public CipherOutputStream(
             final BufferedBlockCipher cipher,
             final @WillCloseWhenClosed OutputStream out) {

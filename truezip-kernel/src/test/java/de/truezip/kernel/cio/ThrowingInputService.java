@@ -25,13 +25,11 @@ extends DecoratingInputService<E, InputService<E>> {
     private volatile @CheckForNull ThrowControl control;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ThrowingInputService(   final @WillCloseWhenClosed InputService<E> service) {
         this(service, null);
     }
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ThrowingInputService(   final @WillCloseWhenClosed InputService<E> service,
                                 final @CheckForNull TestConfig config) {
         super(service);

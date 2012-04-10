@@ -20,7 +20,6 @@ final class JmxSeekableChannel extends DecoratingSeekableChannel {
     private final JmxIOStatistics stats;
 
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     JmxSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc, JmxIOStatistics stats) {
         super(sbc);
         assert null != stats;
