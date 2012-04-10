@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import java.io.IOException;
+import de.truezip.kernel.*;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -67,7 +67,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-abstract class ControlFlowException extends IOException {
+abstract class ControlFlowException extends RuntimeException {
 
     /**
      * Controls whether or not instances of this class have a regular stack

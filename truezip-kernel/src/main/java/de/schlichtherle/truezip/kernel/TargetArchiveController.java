@@ -170,13 +170,10 @@ extends FileSystemArchiveController<E> {
         final FsEntry pe; // parent entry
         try {
             pe = parent.getEntry(name);
-        } catch (final ControlFlowException ex) {
-            assert ex instanceof NeedsLockRetryException;
-            throw ex;
         } catch (final IOException inaccessibleEntry) {
-            throw autoCreate
-                    ? inaccessibleEntry
-                    : new FalsePositiveException(inaccessibleEntry);
+            if (autoCreate)
+                throw inaccessibleEntry;
+            throw new FalsePositiveException(inaccessibleEntry);
         }
 
         // Obtain file system by creating or loading it from the parent entry.
@@ -199,19 +196,11 @@ extends FileSystemArchiveController<E> {
                 // to TRUE once a file is opened for reading!
                 final boolean ro = !parent.isWritable(name);
                 final FsModel m = getModel();
-                final InputService<E> is;
-                try {
-                    is = driver.newInputService(m, parent, name, MOUNT_OPTIONS);
-                } catch (final ControlFlowException ex) {
-                    assert ex instanceof NeedsLockRetryException;
-                    throw ex;
-                }
+                final InputService<E> is = driver
+                        .newInputService(m, parent, name, MOUNT_OPTIONS);
                 final InputArchive<E> ia = new InputArchive<>(is);
                 fs = newPopulatedFileSystem(driver, is, pe, ro);
                 setInputArchive(ia);
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException;
-                throw ex;
             } catch (final IOException ex) {
                 throw pe.isType(SPECIAL)
                         ? new FalsePositiveException(ex)
@@ -247,13 +236,8 @@ extends FileSystemArchiveController<E> {
         final InputService<E> is = null == ia ? null : ia.getDriverProduct();
         final FsModel m = getModel();
         options = options.and(ACCESS_PREFERENCES_MASK).set(CACHE);
-        final OutputService<E> os;
-        try {
-            os = driver.newOutputService(m, parent, name, options, is);
-        } catch (final ControlFlowException ex) {
-            assert ex instanceof NeedsLockRetryException;
-            throw ex;
-        }
+        final OutputService<E> os = driver
+                .newOutputService(m, parent, name, options, is);
         oa = new OutputArchive<>(os);
         setOutputArchive(oa);
         return oa;
@@ -272,8 +256,8 @@ extends FileSystemArchiveController<E> {
             public E getLocalTarget() throws IOException {
                 try {
                     return super.getLocalTarget();
-                } catch (InputClosedException ex) {
-                    throw map(ex);
+                } catch (InputClosedException ignored) {
+                    throw NeedsSyncException.get();
                 }
             }
 
@@ -281,8 +265,8 @@ extends FileSystemArchiveController<E> {
             public InputStream stream() throws IOException {
                 try {
                     return super.stream();
-                } catch (InputClosedException ex) {
-                    throw map(ex);
+                } catch (InputClosedException ignored) {
+                    throw NeedsSyncException.get();
                 }
             }
 
@@ -290,16 +274,9 @@ extends FileSystemArchiveController<E> {
             public SeekableByteChannel channel() throws IOException {
                 try {
                     return super.channel();
-                } catch (InputClosedException ex) {
-                    throw map(ex);
+                } catch (InputClosedException ignored) {
+                    throw NeedsSyncException.get();
                 }
-            }
-
-            IOException map(IOException ex) {
-                // DON'T try to sync() locally - this could make the state of
-                // clients inconsistent if they have cached other artifacts of
-                // this controller, e.g. the archive file system.
-                return NeedsSyncException.get();
             }
         } // Input
 
@@ -319,8 +296,8 @@ extends FileSystemArchiveController<E> {
             public E getLocalTarget() throws IOException {
                 try {
                     return super.getLocalTarget();
-                } catch (OutputClosedException ex) {
-                    throw map(ex);
+                } catch (OutputClosedException ignored) {
+                    throw NeedsSyncException.get();
                 }
             }
 
@@ -328,8 +305,8 @@ extends FileSystemArchiveController<E> {
             public SeekableByteChannel channel() throws IOException {
                 try {
                     return super.channel();
-                } catch (OutputClosedException ex) {
-                    throw map(ex);
+                } catch (OutputClosedException ignored) {
+                    throw NeedsSyncException.get();
                 }
             }
 
@@ -337,16 +314,9 @@ extends FileSystemArchiveController<E> {
             public OutputStream stream() throws IOException {
                 try {
                     return super.stream();
-                } catch (OutputClosedException ex) {
-                    throw map(ex);
+                } catch (OutputClosedException ignored) {
+                    throw NeedsSyncException.get();
                 }
-            }
-
-            IOException map(IOException ex) {
-                // DON'T try to sync() locally - this could make the state of
-                // clients inconsistent if they have cached other artifacts of
-                // this controller, e.g. the archive file system.
-                return NeedsSyncException.get();
             }
         } // Output
 
@@ -427,7 +397,7 @@ extends FileSystemArchiveController<E> {
     public <X extends IOException> void
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws ControlFlowException, X {
+    throws X {
         assert isWriteLockedByCurrentThread();
         try {
             sync0(options, handler);
@@ -439,7 +409,7 @@ extends FileSystemArchiveController<E> {
     private <X extends IOException> void
     sync0(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
-    throws ControlFlowException, X {
+    throws X {
         if (!options.get(ABORT_CHANGES))
             copy(handler);
         close(handler);
@@ -471,14 +441,12 @@ extends FileSystemArchiveController<E> {
             public X fail(final IOException input) {
                 assert false : "should not get used by copy()";
                 assert null != input;
-                assert !(input instanceof ControlFlowException);
                 return handler.fail(new FsSyncException(getModel(), input));
             }
 
             @Override
             public void warn(final IOException input) throws X {
                 assert null != input;
-                assert !(input instanceof ControlFlowException);
                 if (null != warning || !(input instanceof InputException))
                     throw handler.fail(new FsSyncException(getModel(), input));
                 warning = input;
@@ -571,15 +539,12 @@ extends FileSystemArchiveController<E> {
      */
     private <X extends IOException> void
     close(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws ControlFlowException, X {
+    throws X {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
         if (null != ia) {
             try {
                 ia.close();
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException;
-                throw ex;
             } catch (final IOException ex) {
                 handler.warn(new FsSyncWarningException(getModel(), ex));
             }
@@ -589,9 +554,6 @@ extends FileSystemArchiveController<E> {
         if (null != oa) {
             try {
                 oa.close();
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException;
-                throw ex;
             } catch (final IOException ex) {
                 throw handler.fail(new FsSyncException(getModel(), ex));
             }

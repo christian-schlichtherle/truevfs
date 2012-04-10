@@ -32,26 +32,22 @@ import javax.annotation.concurrent.ThreadSafe;
  * Whenever the decorated controller for the prospective file system throws a
  * {@link FalsePositiveException}, the file system operation is routed to the
  * controller of the parent file system in order to continue the operation.
- * If this fails with another exception, then the {@link IOException} which is
- * associated as the cause of the initial exception gets rethrown unless the
- * other exception is an {@link ControlFlowException}.
- * In this case the {@link ControlFlowException} gets rethrown as is in order
- * to enable the caller to resolve it.
+ * If this fails with an {@link IOException}, then the {@code IOException}
+ * which is associated as the original cause of the initial
+ * {@code FalsePositiveException} gets rethrown.
  * <p>
  * This algorithm effectively achieves the following objectives:
  * <ol>
- * <li>False positive federated file systems (i.e. false positive archive files)
- *     get resolved correctly by accessing them as entities of the parent file
- *     system.
+ * <li>False positive archive files get resolved correctly by accessing them as
+ *     entities of the parent file system.
  * <li>If the file system driver for the parent file system throws another
  *     exception, then it gets discarded and the exception initially thrown by
  *     the file system driver for the false positive archive file takes its
  *     place in order to provide the caller with a good indication of what went
  *     wrong in the first place.
- * <li>Exceptions which are thrown by the TrueZIP Kernel itself identify
- *     themselves by the type {@link ControlFlowException}.
- *     They are excempt from this masquerade in order to support resolving them
- *     by a more competent caller.
+ * <li>Non-{@code IOException}s are excempt from this masquerade in order to
+ *     support resolving them by a more competent caller.
+ *     This is required to make {@link ControlFlowException}s work as designed.
  * </ol>
  * <p>
  * As an example consider accessing a RAES encrypted ZIP file:
@@ -498,10 +494,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         throws IOException {
             try {
                 return operation.call(getParent(), resolveParent(name));
-            } catch (final ControlFlowException ex) {
-                assert !(ex instanceof FalsePositiveException);
-                throw ex;
-            } catch (final IOException ignored) {
+            } catch (final IOException discarded) {
                 throw originalCause;
             }
         }

@@ -4,15 +4,11 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsDecoratingController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsEntryName;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
-import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -113,7 +109,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 logger.log(Level.FINE, "finalizeCleared");
             } catch (final ControlFlowException ex) {  // report and swallow
                 logger.log(Level.WARNING, "finalizeFailed",
-                        new AssertionError("Unexpected controller exception!", ex));
+                        new AssertionError("Unexpected control flow exception!", ex));
             } catch (final Throwable ex) {              // report and swallow
                 logger.log(Level.INFO, "finalizeFailed", ex);
             }
@@ -133,12 +129,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 in.close();
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException : ex;
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
             } catch (final IOException ex) {
                 throw close = ex;
             }
@@ -169,12 +159,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 out.close();
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException : ex;
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
             } catch (final IOException ex) {
                 throw close = ex;
             }
@@ -205,12 +189,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public void close() throws IOException {
             try {
                 channel.close();
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException : ex;
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
             } catch (final IOException ex) {
                 throw close = ex;
             }
