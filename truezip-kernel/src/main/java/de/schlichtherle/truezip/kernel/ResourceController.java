@@ -181,7 +181,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public void warn(IOException cause) throws X {
-                assert !(cause instanceof FsControlFlowIOException);
+                assert !(cause instanceof ControlFlowIOException);
                 handler.warn(new FsSyncWarningException(getModel(), cause));
             }
         } // IOExceptionHandler

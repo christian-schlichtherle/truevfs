@@ -4,17 +4,14 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsSyncOption;
-import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.kernel.util.Threads;
@@ -31,7 +28,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -139,12 +135,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      * @throws IOException As thrown by the operation.
      * @throws NeedsLockRetryException See above.
      */
-    private <T> T locked(final IOOperation<T> operation, final Lock lock)
+    private static <T> T locked(final IOOperation<T> operation, final Lock lock)
     throws IOException {
         final ThreadUtil thread = threadUtil.get();
         if (thread.locking) {
             if (!lock.tryLock())
-                throw NeedsLockRetryException.get(getModel());
+                throw NeedsLockRetryException.get();
             try {
                 return operation.call();
             } finally {
@@ -438,7 +434,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 } catch (final FsSyncException ex) {
                     if (sync != options // OK, see contract for BitField.and()!
                             && ex.getCause() instanceof FsResourceOpenException)
-                        throw NeedsLockRetryException.get(getModel());
+                        throw NeedsLockRetryException.get();
                     throw ex;
                 }
                 return null;
@@ -459,10 +455,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
         writeLocked(new Close());
     }
-
-    private interface IOOperation<T> {
-        @Nullable T call() throws IOException;
-    } // IOOperation
 
     private final class LockInputStream
     extends DecoratingInputStream {
