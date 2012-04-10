@@ -71,41 +71,69 @@ implements InputService<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final IOPool<?> pool = driver.getIOPool();
-        try (final InputStream in = source.stream()) {
-            final TarArchiveInputStream tin = newValidatedTarInputStream(in);
-            TarArchiveEntry tinEntry;
-            while (null != (tinEntry = tin.getNextTarEntry())) {
-                final String name = getName(tinEntry);
-                TarDriverEntry entry = entries.get(name);
-                if (null != entry)
-                    entry.release();
-                entry = driver.newEntry(name, tinEntry);
-                if (!tinEntry.isDirectory()) {
-                    final IOBuffer<?> temp = pool.allocate();
-                    entry.setTemp(temp);
-                    try {
-                        try (final OutputStream out = temp.getOutputSocket().stream()) {
-                            Streams.cat(tin, out);
-                        }
-                    } catch (final Throwable ex) {
-                        try {
-                            temp.release();
-                        } catch (final IOException ex2) {
-                            ex.addSuppressed(ex2);
-                        }
-                        throw ex;
-                    }
-                }
-                entries.put(name, entry);
-            }
-        } catch (final Throwable ex) {
+        final InputStream in = source.stream();
+        Throwable ex = null;
+        try {
+            unpack(newValidatedTarInputStream(in), driver);
+        } catch (final Throwable ex2) {
+            ex = ex2;
             try {
                 close0();
+            } catch (final IOException ex3) {
+                ex2.addSuppressed(ex3);
+            }
+            throw ex2;
+        } finally {
+            try {
+                in.close();
             } catch (final IOException ex2) {
+                if (null == ex)
+                    throw ex2;
                 ex.addSuppressed(ex2);
             }
-            throw ex;
+        }
+    }
+
+    private void unpack(final TarArchiveInputStream tin,
+                        final TarDriver driver) throws IOException {
+        final IOPool<?> pool = driver.getIOPool();
+        for (   TarArchiveEntry tinEntry;
+                null != (tinEntry = tin.getNextTarEntry()); ) {
+            final String name = getName(tinEntry);
+            TarDriverEntry entry = entries.get(name);
+            if (null != entry)
+                entry.release();
+            entry = driver.newEntry(name, tinEntry);
+            if (!tinEntry.isDirectory()) {
+                final IOBuffer<?> temp = pool.allocate();
+                entry.setTemp(temp);
+                try {
+                    Throwable ex = null;
+                    final OutputStream out = temp.getOutputSocket().stream();
+                    try {
+                        Streams.cat(tin, out);
+                    } catch (final Throwable ex2) {
+                        ex = ex2;
+                        throw ex2;
+                    } finally {
+                        try {
+                            out.close();
+                        } catch (final IOException ex2) {
+                            if (null == ex)
+                                throw ex2;
+                            ex.addSuppressed(ex2);
+                        }
+                    }
+                } catch (final Throwable ex) {
+                    try {
+                        temp.release();
+                    } catch (final IOException ex2) {
+                        ex.addSuppressed(ex2);
+                    }
+                    throw ex;
+                }
+            }
+            entries.put(name, entry);
         }
     }
 

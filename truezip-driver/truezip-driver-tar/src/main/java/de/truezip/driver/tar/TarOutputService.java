@@ -225,28 +225,60 @@ implements OutputService<TarDriverEntry> {
         }
 
         void store() throws IOException {
-            final IOBuffer<?> buffer = this.buffer;
-            assert null != buffer;
-
-            final TarDriverEntry entry = this.entry;
-            assert null != entry;
-
-            TarOutputService.this.busy = false;
+            busy = false;
+            Throwable ex = null;
             try {
-                try (final InputStream in = buffer.getInputSocket().stream()) {
-                    entry.setSize(buffer.getSize(DATA));
-                    if (UNKNOWN == entry.getModTime().getTime())
-                        entry.setModTime(System.currentTimeMillis());
-                    final TarArchiveOutputStream taos = TarOutputService.this.taos;
-                    taos.putArchiveEntry(entry);
+                put();
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
+            } finally {
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
+            }
+        }
+
+        void put() throws IOException {
+            final IOBuffer<?> buffer = this.buffer;
+            final InputStream in = buffer.getInputSocket().stream();
+            Throwable ex = null;
+            try {
+                final TarDriverEntry entry = this.entry;
+                entry.setSize(buffer.getSize(DATA));
+                if (UNKNOWN == entry.getModTime().getTime())
+                    entry.setModTime(System.currentTimeMillis());
+                final TarArchiveOutputStream taos = TarOutputService.this.taos;
+                taos.putArchiveEntry(entry);
+                try {
+                    Streams.cat(in, taos);
+                } catch (final Throwable ex2) {
+                    ex = ex2;
+                    throw ex2;
+                } finally {
                     try {
-                        Streams.cat(in, taos);
-                    } finally {
                         taos.closeArchiveEntry();
+                    } catch (final IOException ex2) {
+                        if (null == ex)
+                            throw ex2;
+                        ex.addSuppressed(ex2);
                     }
                 }
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
             } finally {
-                buffer.release();
+                try {
+                    in.close();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
             }
         }
     } // BufferedEntryOutputStream
