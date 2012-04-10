@@ -47,13 +47,6 @@ public final class Streams {
     /* Can't touch this - hammer time! */
     private Streams() { }
 
-    public static void copy(Source source, Sink sink) throws IOException {
-        try (InputStream in = new InputExceptionSource(source).stream();
-             OutputStream out = sink.stream()) {
-            cat(in, out);
-        }
-    }
-
     /**
      * Copies the data from the given input stream to the given output stream
      * and <em>always</em> closes <em>both</em> streams - even if an exception
@@ -73,9 +66,62 @@ public final class Streams {
      */
     public static void copy(final @WillClose InputStream in,
                             final @WillClose OutputStream out)
-    throws IOException {
-        try (InputStream in2 = in; OutputStream out2 = out) {
-            cat(in2, out2);
+    throws InputException, IOException {
+        copy(new OneTimeSource(in), new OneTimeSink(out));
+    }
+
+    /**
+     * Copies the data from the given source to the given sink.
+     * <p>
+     * This is a high performance implementation which uses a pooled background
+     * thread to fill a FIFO of pooled buffers which is concurrently flushed by
+     * the current thread.
+     * It performs best when used with <em>unbuffered</em> streams.
+     *
+     * @param  source the source for reading the data from.
+     * @param  sink the sink for writing the data to.
+     * @throws InputException if copying the data fails because of an
+     *         {@code IOException} thrown by the <em>input stream</em>.
+     * @throws IOException if copying the data fails because of an
+     *         {@code IOException} thrown by the <em>output stream</em>.
+     */
+    public static void copy(final Source source, final Sink sink) 
+    throws InputException, IOException {
+        final InputStream in;
+        try {
+            in = source.stream();
+        } catch (final IOException ex) {
+            throw new InputException(ex);
+        }
+        Throwable ex = null;
+        try {
+            final OutputStream out = sink.stream();
+            try {
+                cat(in, out);
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
+            } finally {
+                try {
+                    out.close();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
+            }
+        } catch (final Throwable ex2) {
+            ex = ex2;
+            throw ex2;
+        } finally {
+            try {
+                in.close();
+            } catch (final IOException ex2) {
+                final IOException ex3 = new InputException(ex2);
+                if (null == ex)
+                    throw ex3;
+                ex.addSuppressed(ex3);
+            }
         }
     }
 
@@ -105,7 +151,7 @@ public final class Streams {
      */
     public static void cat( final @WillNotClose InputStream in,
                             final @WillNotClose OutputStream out)
-    throws IOException {
+    throws InputException, IOException {
         if (null == in || null == out)
             throw new NullPointerException();
 

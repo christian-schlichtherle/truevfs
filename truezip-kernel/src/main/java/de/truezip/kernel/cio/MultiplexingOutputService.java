@@ -285,21 +285,20 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 assert closed : "broken archive controller!";
             else if (!closed || isBusy())
                 return false;
-            IOException ex = null;
+            Throwable ex = null;
             try {
                 if (!discard)
                     IOSocket.copy(input, output);
-            } catch (final IOException ex2) {
-                throw ex = ex2;
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
             } finally {
                 try {
                     buffer.release();
                 } catch (final IOException ex2) {
-                    if (null != ex) {
-                        ex.addSuppressed(ex2);
-                        throw ex;
-                    }
-                    throw ex2;
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
                 }
             }
             return true;

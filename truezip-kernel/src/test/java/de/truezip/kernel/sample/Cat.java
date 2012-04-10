@@ -77,8 +77,21 @@ public final class Cat {
                     .getController(     path.getMountPoint(), driver)
                     .getInputSocket(    path.getEntryName(),
                                         BitField.noneOf(FsAccessOption.class));
-            try (final InputStream in = socket.stream()) {
+            Throwable ex = null;
+            final InputStream in = socket.stream();
+            try {
                 Streams.cat(in, System.out); // copy the data
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
+            } finally {
+                try {
+                    in.close();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
             }
         } finally {
             // Commit all unsynchronized changes to the contents of federated

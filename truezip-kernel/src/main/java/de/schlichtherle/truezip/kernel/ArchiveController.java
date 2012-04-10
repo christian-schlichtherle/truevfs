@@ -15,7 +15,6 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.InputExceptionSource;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
@@ -247,30 +246,43 @@ extends LockModelController {
             InputStream in = null;
             if (options.get(APPEND)) {
                 try {
-                    in = new InputExceptionSource(new Input(name, options)).stream();
-                } catch (IOException ex) {
-                    // When appending, there is no need for the entry to exist,
-                    // so we can safely ignore this - fall through!
+                    in = new Input(name, options).stream();
+                } catch (final IOException ex) {
+                    // When appending, there is no need for the entry to be
+                    // readable, so we can safely ignore this - fall through!
                 }
             }
-            try (final InputStream in2 = in) {
+            Throwable ex = null;
+            try {
                 final OutputSocket<? extends E> os = getOutputSocket(ae, options);
-                if (null == in2) // do NOT bind when appending!
+                if (null == in) // do NOT bind when appending!
                     os.bind(this);
                 final OutputStream out = os.stream();
                 try {
                     mknod.commit();
-                    if (null != in2)
-                        Streams.cat(in2, out);
-                } catch (final Throwable ex) {
+                    if (null != in)
+                        Streams.cat(in, out);
+                } catch (final Throwable ex2) {
                     try {
                         out.close();
-                    } catch (final IOException ex2) {
-                        ex.addSuppressed(ex2);
+                    } catch (final IOException ex3) {
+                        ex2.addSuppressed(ex3);
                     }
-                    throw ex;
+                    throw ex2;
                 }
                 return out;
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
+            } finally {
+                try {
+                    if (null != in)
+                        in.close();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
             }
         }
     } // Output
