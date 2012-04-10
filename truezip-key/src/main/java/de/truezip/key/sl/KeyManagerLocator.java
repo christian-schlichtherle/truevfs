@@ -31,7 +31,7 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
     /** The singleton instance of this class. */
     public static final KeyManagerLocator SINGLETON = new KeyManagerLocator();
 
-    /* Can't touch this - hammer time! */
+    /** Can't touch this - hammer time! */
     private KeyManagerLocator() { }
 
     @Override

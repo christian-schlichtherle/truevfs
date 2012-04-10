@@ -32,7 +32,7 @@ public final class FsDriverLocator implements FsDriverProvider {
     /** The singleton instance of this class. */
     public static final FsDriverLocator SINGLETON = new FsDriverLocator();
 
-    /* Can't touch this - hammer time! */
+    /** Can't touch this - hammer time! */
     private FsDriverLocator() { }
 
     @Override
