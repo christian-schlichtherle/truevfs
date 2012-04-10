@@ -7,6 +7,7 @@ package de.truezip.kernel.io;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.Channel;
+import javax.annotation.CheckForNull;
 
 /**
  * A source or sink which provides a given stream or channel at most once.
@@ -16,8 +17,8 @@ import java.nio.channels.Channel;
  * @author Christian Schlichtherle
  */
 public abstract class OneTimeFoundry<S extends Closeable, C extends Channel> {
-    private S stream;
-    private C channel;
+    private @CheckForNull S stream;
+    private @CheckForNull C channel;
 
     OneTimeFoundry(final S stream) {
         if (null == (this.stream = stream))
