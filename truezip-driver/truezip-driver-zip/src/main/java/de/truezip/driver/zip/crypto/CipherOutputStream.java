@@ -8,6 +8,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.BufferedBlockCipher;
@@ -35,7 +36,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 public final class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for processing the output. */
-    private BufferedBlockCipher cipher;
+    private @CheckForNull BufferedBlockCipher cipher;
 
     /**
      * The cipher output buffer used for processing the output
