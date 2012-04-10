@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsResourceOpenException;
 import de.truezip.kernel.FsSyncException;

@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsControlFlowIOException;
 import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.FsModel;
