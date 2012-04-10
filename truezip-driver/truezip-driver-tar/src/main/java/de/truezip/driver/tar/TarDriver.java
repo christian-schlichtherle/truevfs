@@ -47,9 +47,18 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * @param provider the provider for the I/O buffer pool.
      */
     public TarDriver(final IOPoolProvider provider) {
-        super(TAR_CHARSET);
         if (null == (this.ioPool = provider.get()))
             throw new NullPointerException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@link #TAR_CHARSET}.
+     */
+    @Override
+    public Charset getCharset() {
+        return TAR_CHARSET;
     }
 
     /**

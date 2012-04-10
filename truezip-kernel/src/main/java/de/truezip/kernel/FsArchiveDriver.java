@@ -33,31 +33,19 @@ import javax.annotation.concurrent.Immutable;
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 
-    private final Charset charset;
-
     /**
-     * Constructs a new archive driver.
-     *
-     * @param charset the character set to use for encoding entry names and
-     *        probably other meta data when reading or writing an archive file.
-     */
-    protected FsArchiveDriver(final Charset charset) {
-        if (null == (this.charset = charset))
-            throw new NullPointerException();
-    }
-
-    /**
-     * Returns the character set provided to the constructor.
+     * Returns the character set to use for encoding character based meta data
+     * such as entry names or file comments to binary data when writing
+     * an archive file.
+     * Depending on the archive file format, this may get used for decoding
+     * binary data when reading an archive file, too.
      * Subsequent calls must return the same object.
      *
-     * @return The character set to use for encoding entry names and
-     *         probably other meta data when writing an archive file.
-     *         Depending on the archive file format, this may get used for
-     *         reading an archive file, too.
+     * @return The character set to use for encoding character based meta data
+     *         such as entry names or file comments to binary data when writing
+     *         an archive file.
      */
-    public Charset getCharset() {
-        return charset;
-    }
+    public abstract Charset getCharset();
 
     /**
      * {@inheritDoc}

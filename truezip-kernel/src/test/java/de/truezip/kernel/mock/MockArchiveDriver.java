@@ -24,8 +24,8 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
-    private static final Charset charset = Charset.forName("UTF-8");
-    
+    public static final Charset MOCK_CHARSET = Charset.forName("UTF-8");
+
     private final TestConfig config;
     private final ConcurrentMap<FsMountPoint, MockArchive>
             containers;
@@ -35,12 +35,21 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     public MockArchiveDriver(@CheckForNull TestConfig config) {
-        super(charset);
         if (null == config)
             config = TestConfig.get();
         this.config = config;
         this.containers = new ConcurrentHashMap<>(
                 Maps.initialCapacity(config.getNumEntries()));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@link #MOCK_CHARSET}.
+     */
+    @Override
+    public Charset getCharset() {
+        return MOCK_CHARSET;
     }
 
     private IOPoolProvider getIOPoolProvider() {
