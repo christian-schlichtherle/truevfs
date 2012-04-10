@@ -22,7 +22,7 @@ public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
         return new TarGZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

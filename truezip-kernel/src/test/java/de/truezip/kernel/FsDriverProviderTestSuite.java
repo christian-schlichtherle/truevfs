@@ -28,14 +28,14 @@ public abstract class FsDriverProviderTestSuite {
     @Test
     public void testGet() {
         for (final String extension : new ExtensionSet(getExtensions()))
-            assertNotNull(provider.get().get(FsScheme.create(extension)));
+            assertNotNull(provider.getDrivers().get(FsScheme.create(extension)));
     }
 
     @Test
     public void testImmutability() {
         for (final String extension : new ExtensionSet(getExtensions()) ) {
             try {
-                provider.get().remove(FsScheme.create(extension));
+                provider.getDrivers().remove(FsScheme.create(extension));
                 fail();
             } catch (UnsupportedOperationException expected) {
             }

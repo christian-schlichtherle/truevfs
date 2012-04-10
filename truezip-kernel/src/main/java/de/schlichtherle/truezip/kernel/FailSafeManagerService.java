@@ -18,7 +18,7 @@ public final class FailSafeManagerService extends FsManagerService {
             manager = new FailSafeManager(new ArchiveManager());
 
     @Override
-    public FsManager get() {
+    public FsManager getManager() {
         return manager;
     }
 

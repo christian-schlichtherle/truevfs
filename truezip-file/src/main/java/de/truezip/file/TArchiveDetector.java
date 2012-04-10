@@ -38,7 +38,7 @@ import javax.annotation.concurrent.Immutable;
  *     files.
  * <li>Constructors which decorate a given file system driver provider with a
  *     given map of file system schemes to file system drivers.
- *     This can get used to specify custom archive file name extensions or
+ *     This can getDrivers used to specify custom archive file name extensions or
  *     archive drivers.
  *     For example, the file name extension list {@code "foo|bar"} could be used
  *     to detect a custom variant of the JAR file format (you need to provide
@@ -59,7 +59,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * This instance never recognizes any archive files in a path.
-     * This can get used as the end of a chain of
+     * This can getDrivers used as the end of a chain of
      * {@code TArchiveDetector} instances or if archive files
      * shall be treated like regular files rather than (virtual) directories.
      */
@@ -108,7 +108,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      */
     public TArchiveDetector(final FsDriverProvider provider,
                             final @CheckForNull String extensions) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.get();
+        final Map<FsScheme, FsDriver> inDrivers = provider.getDrivers();
         final ExtensionSet inExtensions;
         final Map<FsScheme, FsDriver> outDrivers;
         if (null != extensions) {
@@ -191,7 +191,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can get converted to a set of file name extensions by calling
+     *         can getDrivers converted to a set of file name extensions by calling
      *         {@link ExtensionSet#ExtensionSet(String) new ExtensionSet(o.toString())}
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
@@ -231,7 +231,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      */
     public TArchiveDetector(final FsDriverProvider provider,
                             final Map<FsScheme, FsDriver> config) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.get();
+        final Map<FsScheme, FsDriver> inDrivers = provider.getDrivers();
         final Map<FsScheme, FsDriver> 
                 outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
         final ExtensionSet outExtensions = new ExtensionSet();
@@ -262,7 +262,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return drivers;
     }
 

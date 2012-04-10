@@ -23,13 +23,13 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
      * A static factory method for an unmodifiable driver map which is
      * constructed from the given configuration.
      * This method is intended to be used by implementations of this class
-     * for convenient creation of the map to return by their {@link #get()}
+     * for convenient creation of the map to return by their {@link #getDrivers()}
      * method.
      *
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can get converted to a set of file name extensions by calling
+     *         can getDrivers converted to a set of file name extensions by calling
      *         <code> new {@link ExtensionSet#ExtensionSet(String) ExtensionSet}(o.toString())</code>
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
@@ -91,6 +91,6 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
     public String toString() {
         return String.format("%s[map=%s]",
                 getClass().getName(),
-                get());
+                getDrivers());
     }
 }

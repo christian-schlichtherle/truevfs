@@ -39,7 +39,7 @@ public final class TestKeyManagerProvider extends AbstractKeyManagerProvider {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<Class<?>, KeyManager<?>> get() {
+    public Map<Class<?>, KeyManager<?>> getKeyManagers() {
         return managers;
     }
 }

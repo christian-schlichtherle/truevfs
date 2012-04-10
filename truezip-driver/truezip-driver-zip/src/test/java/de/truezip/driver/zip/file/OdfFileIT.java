@@ -23,7 +23,7 @@ public final class OdfFileIT extends TFileITSuite<OdfDriver> {
         return new OdfDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

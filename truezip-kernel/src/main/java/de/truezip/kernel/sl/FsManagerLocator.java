@@ -49,8 +49,8 @@ public final class FsManagerLocator implements FsManagerProvider {
     }
 
     @Override
-    public FsManager get() {
-        return Boot.SERVICE.get();
+    public FsManager getManager() {
+        return Boot.SERVICE.getManager();
     }
 
     /** A static data utility class used for lazy initialization. */

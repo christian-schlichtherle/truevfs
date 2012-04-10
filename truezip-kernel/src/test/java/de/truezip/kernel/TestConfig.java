@@ -17,7 +17,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * A container for configuration options with global or inheritable thread
  * local scope.
  * <p>
- * A thread can call {@link #get()} to get access to the
+ * A thread can call {@link #getIOPool()} to getIOPool access to the
  * <i>current configuration</i> at any time .
  * If no configuration has been pushed onto the inheritable thread local
  * configuration stack before, this will return the <i>global configuration</i>
@@ -61,7 +61,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     // I don't think this field should be volatile.
     // This would make a difference if and only if two threads were changing
     // the GLOBAL configuration concurrently, which is discouraged.
-    // Instead, the global configuration should only get changed once at
+    // Instead, the global configuration should only getIOPool changed once at
     // application startup and then each thread should modify only its thread
     // local configuration which has been obtained by a call to TestConfig.push().
     private final ThrowControl throwControl;
@@ -90,7 +90,7 @@ public final class TestConfig extends Resource<RuntimeException> {
      * stack.
      * 
      * @return The new current configuration.
-     * @see    #get()
+     * @see    #getIOPool()
      */
     @CreatesObligation
     public static TestConfig push() {
@@ -98,10 +98,10 @@ public final class TestConfig extends Resource<RuntimeException> {
     }
 
     /**
-     * Pops the {@link #get() current configuration} off the inheritable thread
+     * Pops the {@link #getIOPool() current configuration} off the inheritable thread
      * local configuration stack.
      * 
-     * @throws IllegalStateException If the {@link #get() current configuration}
+     * @throws IllegalStateException If the {@link #getIOPool() current configuration}
      *         is the global configuration.
      */
     public static void pop() {

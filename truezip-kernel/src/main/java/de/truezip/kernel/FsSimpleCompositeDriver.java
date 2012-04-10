@@ -24,12 +24,12 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
      * the scheme of a given mount point.
      */
     public FsSimpleCompositeDriver(final FsDriverProvider provider) {
-        this.drivers = provider.get(); // dedicated immutable map!
+        this.drivers = provider.getDrivers(); // dedicated immutable map!
         assert null != drivers;
     }
 
     @Override
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return drivers;
     }
 }

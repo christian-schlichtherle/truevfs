@@ -22,7 +22,7 @@ public final class TarPathIT extends TarPathITSuite<TarDriver> {
         return new TarDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

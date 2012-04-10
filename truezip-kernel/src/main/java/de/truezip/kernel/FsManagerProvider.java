@@ -15,12 +15,9 @@ public interface FsManagerProvider {
 
     /**
      * Returns the singleton file system manager.
-     * <p>
-     * Calling this method several times must return the <em>same</em> file
-     * system manager in order to ensure integrity of the virtual file system
-     * space.
+     * This is an immutable property - multiple calls must return the same value.
      *
      * @return The file system manager.
      */
-    FsManager get();
+    FsManager getManager();
 }

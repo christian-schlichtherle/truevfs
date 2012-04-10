@@ -46,7 +46,7 @@ public final class DriverMap implements Runnable {
 
     @Override
     public void run() {
-        final Map<FsScheme, FsDriver> map = provider.get();
+        final Map<FsScheme, FsDriver> map = provider.getDrivers();
         final Map<String, ExtensionSet> compact = compact(map);
         out     .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
                 .append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n")
@@ -67,7 +67,7 @@ public final class DriverMap implements Runnable {
                 .append("      <tbody>\n");
         for (Entry<String, ExtensionSet> entry : compact.entrySet()) {
             String clazz = entry.getKey();
-            List<String> set = new ArrayList<String>(entry.getValue());
+            List<String> set = new ArrayList<>(entry.getValue());
             String federated = Boolean.toString(
                     map .get(FsScheme.create(set.iterator().next()))
                         .isFederated());
@@ -91,8 +91,7 @@ public final class DriverMap implements Runnable {
 
     private static Map<String, ExtensionSet> compact(
             final Map<FsScheme, FsDriver> input) {
-        final Map<String, ExtensionSet>
-                output = new TreeMap<String, ExtensionSet>();
+        final Map<String, ExtensionSet> output = new TreeMap<>();
         for (final Entry<FsScheme, FsDriver> entry : input.entrySet()) {
             final String scheme = entry.getKey().toString();
             final String clazz = entry.getValue().getClass().getName();

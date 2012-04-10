@@ -39,7 +39,7 @@ extends AbstractKeyManagerProvider {
     }
 
     @Override
-    public Map<Class<?>, KeyManager<?>> get() {
+    public Map<Class<?>, KeyManager<?>> getKeyManagers() {
         return managers;
     }
 }

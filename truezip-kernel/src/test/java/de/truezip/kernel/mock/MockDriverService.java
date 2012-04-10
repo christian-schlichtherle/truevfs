@@ -26,7 +26,7 @@ public final class MockDriverService extends FsDriverService {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return drivers;
     }
 }

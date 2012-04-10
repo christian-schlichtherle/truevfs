@@ -13,6 +13,6 @@ import org.junit.Test;
 public final class FsManagerLocatorTest {
     @Test
     public void testIsLocatable() {
-        assertNotNull(FsManagerLocator.SINGLETON.get());
+        assertNotNull(FsManagerLocator.SINGLETON.getManager());
     }
 }

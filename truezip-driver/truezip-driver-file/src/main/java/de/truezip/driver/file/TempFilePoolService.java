@@ -17,7 +17,7 @@ import javax.annotation.concurrent.Immutable;
 public final class TempFilePoolService extends IOPoolService {
 
     @Override
-    public IOPool<?> get() {
+    public IOPool<?> getIOPool() {
         return TempFilePool.INSTANCE;
     }
 

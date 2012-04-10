@@ -20,10 +20,10 @@ public final class CompositeManagerService extends FsManagerService {
     private final FsManager manager =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    new FailSafeManagerService().get()));
+                    new FailSafeManagerService().getManager()));
 
     @Override
-    public FsManager get() {
+    public FsManager getManager() {
         return manager;
     }
 }

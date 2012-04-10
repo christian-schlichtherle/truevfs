@@ -62,7 +62,7 @@ extends FsArchiveDriverTestBase<D> {
         // issues in case this invariant is not met.
         // See http://truezip.java.net/truezip-file/usage.html#Third_Party_Access
         if (ISOLATE_FS_MANAGER)
-            config.setManager(new FailSafeManagerService().get());
+            config.setManager(new FailSafeManagerService().getManager());
         config.setLenient(true);
         config.setArchiveDetector(detector);
     }

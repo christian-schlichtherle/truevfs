@@ -42,7 +42,7 @@ import javax.annotation.concurrent.Immutable;
 </table>
  * <p>
  * Note that the regular expression is actually decomposed into separate
- * {@link FsScheme} objects which get mapped individually.
+ * {@link FsScheme} objects which getDrivers mapped individually.
  *
  * @see     <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part1.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 1: OpenDocument Schema; Appendix C: MIME Types and File Name Extensions (Non Normative)</a>
  * @author  Christian Schlichtherle
@@ -59,7 +59,7 @@ public final class ZipDriverService extends FsDriverService {
             });
 
     @Override
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, FsDriver> getDrivers() {
         return drivers;
     }
 }

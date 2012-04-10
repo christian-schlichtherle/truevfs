@@ -23,7 +23,7 @@ public final class JarPathIT extends TPathITSuite<JarDriver> {
         return new JarDriver() {
             @Override
             public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().get();
+                return getTestConfig().getIOPoolProvider().getIOPool();
             }
         };
     }

@@ -54,7 +54,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
     @Override
     public IOPool<?> getIOPool() {
-        return config.getIOPoolProvider().get();
+        return config.getIOPoolProvider().getIOPool();
     }
 
     @Override

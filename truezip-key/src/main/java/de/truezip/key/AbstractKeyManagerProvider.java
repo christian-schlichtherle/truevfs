@@ -26,7 +26,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      * A static factory method for an unmodifiable key manager map which is
      * constructed from the given configuration.
      * This method is intended to be used by implementations of this class
-     * for convenient creation of the map to return by their {@link #get()}
+     * for convenient creation of the map to return by their {@link #getKeyManagers()}
      * method.
      *
      * @param  config an array of key-value pair arrays.
@@ -39,7 +39,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      *         {@link Class key manager class}, a
      *         {@link String fully qualified name of a key manager class},
      *         or {@code null}.
-     * @return The new map to use as the return value of {@link #get()}.
+     * @return The new map to use as the return value of {@link #getKeyManagers()}.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
@@ -61,21 +61,20 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
     @Override
     @SuppressWarnings("unchecked")
     public final <K> KeyManager<K> get(final Class<K> type) {
-        final KeyManager<?> manager = get().get(type);
+        final KeyManager<?> manager = getKeyManagers().get(type);
         if (null == manager)
             throw new ServiceConfigurationError("No key manager available for " + type + '.');
         return (KeyManager<K>) manager;
     }
 
     /**
-     * Returns an unmodifiable map of secret key classes to key managers.
-     * Neither the keys nor the values of the returned map may be {@code null}
-     * and subsequent calls must return a map which compares at least
-     * {@link Map#equals(Object) equal} with the previously returned map.
+     * Returns an immutable map of secret key classes to key managers.
+     * Neither the keys nor the values of the returned map may be {@code null}.
+     * This is an immutable property - multiple calls must return the same value.
      * 
      * @return an unmodifiable map of secret key classes to key managers.
      */
-    public abstract Map<Class<?>, KeyManager<?>> get();
+    public abstract Map<Class<?>, KeyManager<?>> getKeyManagers();
 
     /**
      * Returns a string representation of this object for debugging and logging
@@ -85,6 +84,6 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
     public String toString() {
         return String.format("%s[map=%s]",
                 getClass().getName(),
-                get());
+                getKeyManagers());
     }
 }

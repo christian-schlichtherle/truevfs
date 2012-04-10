@@ -293,10 +293,10 @@ public final class TConfig extends Resource<RuntimeException> {
     }
 
     /**
-     * Pops the {@link #get() current configuration} off the inheritable thread
+     * Pops the {@linkplain #get() current configuration} off the inheritable thread
      * local configuration stack.
      * 
-     * @throws IllegalStateException If the {@link #get() current configuration}
+     * @throws IllegalStateException If the {@linkplain #get() current configuration}
      *         is the global configuration.
      */
     @DischargesObligation
@@ -306,7 +306,7 @@ public final class TConfig extends Resource<RuntimeException> {
 
     /** Default constructor for the global configuration. */
     private TConfig() {
-        this.manager = FsManagerLocator.SINGLETON.get();
+        this.manager = FsManagerLocator.SINGLETON.getManager();
         this.detector = TArchiveDetector.ALL;
         this.accessPreferences = DEFAULT_ACCESS_PREFERENCES;
     }

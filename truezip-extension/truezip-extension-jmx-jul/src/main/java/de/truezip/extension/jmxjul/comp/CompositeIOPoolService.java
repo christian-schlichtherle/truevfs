@@ -23,10 +23,10 @@ public final class CompositeIOPoolService extends IOPoolService {
     private final IOPool<?> pool =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    (IOPool) service.get()));
+                    (IOPool) service.getIOPool()));
 
     @Override
-    public IOPool<?> get() {
+    public IOPool<?> getIOPool() {
         return pool;
     }
 }
