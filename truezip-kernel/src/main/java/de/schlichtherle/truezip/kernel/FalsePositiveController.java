@@ -34,8 +34,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * controller of the parent file system in order to continue the operation.
  * If this fails with another exception, then the {@link IOException} which is
  * associated as the cause of the initial exception gets rethrown unless the
- * other exception is an {@link ControlFlowIOException}.
- * In this case the {@link ControlFlowIOException} gets rethrown as is in order
+ * other exception is an {@link ControlFlowException}.
+ * In this case the {@link ControlFlowException} gets rethrown as is in order
  * to enable the caller to resolve it.
  * <p>
  * This algorithm effectively achieves the following objectives:
@@ -49,7 +49,7 @@ import javax.annotation.concurrent.ThreadSafe;
  *     place in order to provide the caller with a good indication of what went
  *     wrong in the first place.
  * <li>Exceptions which are thrown by the TrueZIP Kernel itself identify
- *     themselves by the type {@link ControlFlowIOException}.
+ *     themselves by the type {@link ControlFlowException}.
  *     They are excempt from this masquerade in order to support resolving them
  *     by a more competent caller.
  * </ol>
@@ -498,7 +498,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         throws IOException {
             try {
                 return operation.call(getParent(), resolveParent(name));
-            } catch (final ControlFlowIOException ex) {
+            } catch (final ControlFlowException ex) {
                 assert !(ex instanceof FalsePositiveException);
                 throw ex;
             } catch (final IOException ignored) {

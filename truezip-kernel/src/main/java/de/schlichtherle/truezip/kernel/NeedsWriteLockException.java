@@ -16,7 +16,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-final class NeedsWriteLockException extends ControlFlowIOException {
+final class NeedsWriteLockException extends ControlFlowException {
 
     private static final @Nullable NeedsWriteLockException
             SINGLETON = TRACEABLE ? null : new NeedsWriteLockException();

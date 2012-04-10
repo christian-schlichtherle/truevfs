@@ -55,7 +55,7 @@ import javax.annotation.concurrent.Immutable;
  * public FsEntry getEntry(FsEntryName name) throws IOException {
  *     prepareMyResources();
  *     try {
- *         return delegate.getEntry(); // may throw ControlFlowIOException, too!
+ *         return delegate.getEntry(); // may throw ControlFlowException, too!
  *     } finally {
  *         cleanUpMyResources();
  *     }
@@ -67,24 +67,24 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-abstract class ControlFlowIOException extends IOException {
+abstract class ControlFlowException extends IOException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
      * trace or an empty stack trace.
      * If and only if the system property with the name
-     * {@code de.schlichtherle.truezip.kernel.ControlFlowIOException.traceable}
+     * {@code de.schlichtherle.truezip.kernel.ControlFlowException.traceable}
      * is set to {@code true} (whereby case is ignored), then instances of this
      * class will have a regular stack trace, otherwise their stack trace will
      * be empty.
      * This should be set to {@code true} for debugging purposes only.
      */
     static final boolean TRACEABLE = Boolean
-            .getBoolean(ControlFlowIOException.class.getName() + ".traceable");
+            .getBoolean(ControlFlowException.class.getName() + ".traceable");
 
-    ControlFlowIOException() { }
+    ControlFlowException() { }
 
-    ControlFlowIOException(Throwable cause) {
+    ControlFlowException(Throwable cause) {
         super(cause);
     }
 
