@@ -11,11 +11,8 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
@@ -74,63 +71,22 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected final TarInputService newInputService(
+    protected InputService<TarDriverEntry> newInputService(
             final FsModel model,
             final InputSocket<?> input)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        return newTarInputService(model, input);
+        return new TarInputService(this, model, input);
     }
 
-    @CreatesObligation
-    protected TarInputService newTarInputService(FsModel model, Source source)
-    throws IOException {
-        assert null != model;
-        return new TarInputService(this, model, source);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link TarDriver} acquires an output
-     * stream from the given socket, forwards the call to
-     * {@link #newTarOutputService} and wraps the result in a new
-     * {@link MultiplexingOutputService}.
-     */
     @Override
     protected OutputService<TarDriverEntry> newOutputService(
             final FsModel model,
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> source,
             final OutputSocket<?> output)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        final OutputStream out = output.stream();
-        try {
-            return new MultiplexingOutputService<>(
-                    newTarOutputService(model, out, (TarInputService) source),
-                    getIOPool());
-        } catch (final Throwable ex) {
-            try {
-                out.close();
-            } catch (final Throwable ex2) {
-                assert !(ex2 instanceof FsControlFlowIOException) : ex2;
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
-    @CreatesObligation
-    protected TarOutputService newTarOutputService(
-            FsModel model,
-            OutputStream out,
-            @CheckForNull @WillNotClose TarInputService source)
-    throws IOException {
-        assert null != model;
-        return new TarOutputService(this, out);
+        return new MultiplexingOutputService<>(
+                new TarOutputService(this, model, output),
+                getIOPool());
     }
 
     /**
