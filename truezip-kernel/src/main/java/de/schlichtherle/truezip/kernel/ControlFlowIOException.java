@@ -4,9 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsModel;
 import java.io.IOException;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -86,16 +84,8 @@ abstract class ControlFlowIOException extends IOException {
 
     ControlFlowIOException() { }
 
-    ControlFlowIOException(
-            final FsModel model,
-            final @CheckForNull String message, 
-            final @CheckForNull Throwable cause) {
-        super(  TRACEABLE
-                    ? null == message
-                        ? model.getMountPoint().toString()
-                        : model.getMountPoint() + " (" + message + ')'
-                    : null,
-                cause);
+    ControlFlowIOException(Throwable cause) {
+        super(cause);
     }
 
     /**

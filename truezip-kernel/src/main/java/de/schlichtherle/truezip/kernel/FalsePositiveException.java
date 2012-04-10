@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsModel;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -23,8 +22,8 @@ import javax.annotation.concurrent.Immutable;
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
 class FalsePositiveException extends ControlFlowIOException {
 
-    FalsePositiveException(FsModel model, IOException cause) {
-        super(model, null, cause);
+    FalsePositiveException(IOException cause) {
+        super(cause);
     }
 
     @Override
