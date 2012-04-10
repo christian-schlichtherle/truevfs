@@ -6,7 +6,6 @@ package de.truezip.driver.zip;
 
 import de.truezip.driver.zip.io.DateTimeConverter;
 import de.truezip.driver.zip.io.ZipEntry;
-import de.truezip.kernel.cio.IOPoolProvider;
 import java.nio.charset.Charset;
 import javax.annotation.concurrent.Immutable;
 
@@ -44,14 +43,13 @@ public class JarDriver extends ZipDriver {
     public static final Charset JAR_CHARSET = Charset.forName("UTF-8");
 
     /**
-     * Constructs a new JAR file driver.
-     * This constructor uses {@link #JAR_CHARSET} for encoding entry names
-     * and comments.
-     *
-     * @param provider the provider for the I/O buffer pool.
+     * {@inheritDoc}
+     * 
+     * @return {@link #JAR_CHARSET}.
      */
-    public JarDriver(IOPoolProvider provider) {
-        super(provider, JAR_CHARSET);
+    @Override
+    public Charset getCharset() {
+        return JAR_CHARSET;
     }
 
     /**

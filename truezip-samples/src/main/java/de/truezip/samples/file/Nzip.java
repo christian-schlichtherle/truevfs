@@ -73,9 +73,9 @@ public class Nzip extends Application {
     protected TArchiveDetector newArchiveDetector() {
         return new TArchiveDetector(TArchiveDetector.ALL,
             new Object[][] {
-                { "ear|jar|war", new CheckedJarDriver(POOL_PROVIDER) },// check CRC-32
-                { "zip", new CheckedZipDriver(POOL_PROVIDER) }, // check CRC-32
-                { "exe", new CheckedReadOnlySfxDriver(POOL_PROVIDER) }, // check CRC-32
+                { "ear|jar|war", new CheckedJarDriver() },// check CRC-32
+                { "zip", new CheckedZipDriver() }, // check CRC-32
+                { "exe", new CheckedReadOnlySfxDriver() }, // check CRC-32
             });
     }
 
@@ -84,31 +84,31 @@ public class Nzip extends Application {
         assert null != charset;
         return new TArchiveDetector(TArchiveDetector.ALL,
                 new Object[][] {
-                    { "ear|jar|war|zip", new CheckedZipDriver(POOL_PROVIDER) { // check CRC-32
+                    { "ear|jar|war|zip", new CheckedZipDriver() { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     } },
-                    { "exe", new CheckedReadOnlySfxDriver(POOL_PROVIDER) { // check CRC-32
+                    { "exe", new CheckedReadOnlySfxDriver() { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     } },
-                    { "tar", new TarDriver(POOL_PROVIDER) {
+                    { "tar", new TarDriver() {
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     } },
-                    { "tgz|tar.gz", new TarGZipDriver(POOL_PROVIDER) {
+                    { "tgz|tar.gz", new TarGZipDriver() {
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     } },
-                    { "tbz|tb2|tar.bz2", new TarBZip2Driver(POOL_PROVIDER) {
+                    { "tbz|tb2|tar.bz2", new TarBZip2Driver() {
                         @Override
                         public Charset getCharset() {
                             return charset;

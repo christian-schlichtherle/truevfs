@@ -4,7 +4,6 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.kernel.cio.IOPoolProvider;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -27,10 +26,6 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public class CheckedZipDriver extends ZipDriver {
-
-    public CheckedZipDriver(IOPoolProvider provider) {
-        super(provider);
-    }
 
     /**
      * {@inheritDoc}

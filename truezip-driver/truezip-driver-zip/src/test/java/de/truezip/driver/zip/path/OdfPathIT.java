@@ -5,6 +5,7 @@
 package de.truezip.driver.zip.path;
 
 import de.truezip.driver.zip.OdfDriver;
+import de.truezip.kernel.cio.IOPool;
 import de.truezip.path.TPathITSuite;
 
 /**
@@ -19,6 +20,11 @@ public final class OdfPathIT extends TPathITSuite<OdfDriver> {
 
     @Override
     protected OdfDriver newArchiveDriver() {
-        return new OdfDriver(getTestConfig().getIOPoolProvider());
+        return new OdfDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }

@@ -62,7 +62,7 @@ extends FsDriver {
      * Returns the pool to use for allocating I/O buffers.
      * <p>
      * Multiple invocations may return different I/O buffer pools, so callers
-     * may need to cache the result.
+     * should cache the result.
      *
      * @return The pool to use for allocating I/O buffers.
      */
@@ -195,7 +195,7 @@ extends FsDriver {
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #getOutputSocket}
-     * and {@link #newOutputService(FsModel, InputService, OutputSocket)}.
+     * and {@link #newOutputService(FsModel, OutputSocket, InputService)}.
      * 
      * @param  model the file system model for the target archive file.
      * @param  parent the controller for the parent file system with the target
@@ -240,7 +240,7 @@ extends FsDriver {
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #newOutputService(FsModel, InputService, FsController, FsEntryName, BitField) 
+     * @see    #newOutputService(FsModel, FsController, FsEntryName, BitField, InputService) 
      */
     @CreatesObligation
     protected abstract OutputService<E> newOutputService(
@@ -287,7 +287,7 @@ extends FsDriver {
      * @param  name the entry name.
      * @param  options the options to use.
      * @return An output socket for writing an artifact of this driver.
-     * @see    #newOutputService(FsModel, InputService, FsController, FsEntryName, BitField) 
+     * @see    #newOutputService(FsModel, FsController, FsEntryName, BitField, InputService) 
      */
     protected OutputSocket<?> getOutputSocket(
             FsController<?> controller,

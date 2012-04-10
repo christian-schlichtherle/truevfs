@@ -13,7 +13,6 @@ import de.truezip.file.TConfig;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.key.*;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.param.AesPbeParameters;
@@ -69,7 +68,6 @@ public final class KeyManagement {
         final RaesParameters param;
         
         CustomZipRaesDriver(char[] password) {
-            super(IOPoolLocator.SINGLETON);
             param = new CustomRaesParameters(password);
         }
         
@@ -166,7 +164,6 @@ public final class KeyManagement {
         final KeyManagerProvider provider;
         
         CustomZipRaesDriver2(char[] password) {
-            super(IOPoolLocator.SINGLETON);
             this.provider = new PromptingKeyManagerProvider(
                     AesPbeParameters.class,
                     new CustomView(password));

@@ -6,7 +6,6 @@ package de.truezip.driver.zip.raes;
 
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsScheme;
-import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.spi.FsDriverService;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
@@ -77,7 +76,7 @@ public final class ZipRaesDriverService extends FsDriverService {
                     // undetectable modification.
                     // The driver also uses unencrypted temporary files for
                     // archive entries whenever required.
-                    new SafeZipRaesDriver(IOPoolLocator.SINGLETON),
+                    new SafeZipRaesDriver(),
                 },
             });
 

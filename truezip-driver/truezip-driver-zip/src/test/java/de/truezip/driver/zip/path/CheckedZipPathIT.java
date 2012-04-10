@@ -5,6 +5,7 @@
 package de.truezip.driver.zip.path;
 
 import de.truezip.driver.zip.CheckedZipDriver;
+import de.truezip.kernel.cio.IOPool;
 import de.truezip.path.TPathITSuite;
 
 /**
@@ -19,6 +20,11 @@ public final class CheckedZipPathIT extends TPathITSuite<CheckedZipDriver> {
 
     @Override
     protected CheckedZipDriver newArchiveDriver() {
-        return new CheckedZipDriver(getTestConfig().getIOPoolProvider());
+        return new CheckedZipDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 }

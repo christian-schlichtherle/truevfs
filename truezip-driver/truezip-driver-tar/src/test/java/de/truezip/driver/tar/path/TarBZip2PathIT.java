@@ -5,6 +5,7 @@
 package de.truezip.driver.tar.path;
 
 import de.truezip.driver.tar.TarBZip2Driver;
+import de.truezip.kernel.cio.IOPool;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
@@ -20,8 +21,9 @@ public final class TarBZip2PathIT extends TarPathITSuite<TarBZip2Driver> {
     @Override
     protected TarBZip2Driver newArchiveDriver() {
         class TestDriver extends TarBZip2Driver {
-            TestDriver() {
-                super(getTestConfig().getIOPoolProvider());
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
             }
 
             @Override

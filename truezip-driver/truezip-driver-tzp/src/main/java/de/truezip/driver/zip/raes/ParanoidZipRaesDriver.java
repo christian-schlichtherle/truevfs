@@ -10,7 +10,6 @@ import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.ZipOutputService;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputService;
 import de.truezip.kernel.io.AbstractSink;
 import java.io.IOException;
@@ -39,10 +38,6 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public class ParanoidZipRaesDriver extends ZipRaesDriver {
-
-    public ParanoidZipRaesDriver(IOPoolProvider ioPoolProvider) {
-        super(ioPoolProvider);
-    }
 
     @Override
     public final long getAuthenticationTrigger() {

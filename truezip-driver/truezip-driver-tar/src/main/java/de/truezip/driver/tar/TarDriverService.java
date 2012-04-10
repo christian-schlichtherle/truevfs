@@ -6,7 +6,6 @@ package de.truezip.driver.tar;
 
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsScheme;
-import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.spi.FsDriverService;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
@@ -45,9 +44,9 @@ public final class TarDriverService extends FsDriverService {
 
     private final Map<FsScheme, FsDriver>
             drivers = newMap(new Object[][] {
-                { "tar", new TarDriver(IOPoolLocator.SINGLETON) },
-                { "tar.gz|tgz", new TarGZipDriver(IOPoolLocator.SINGLETON) },
-                { "tar.bz2|tb2|tbz", new TarBZip2Driver(IOPoolLocator.SINGLETON) },
+                { "tar", new TarDriver() },
+                { "tar.gz|tgz", new TarGZipDriver() },
+                { "tar.bz2|tb2|tbz", new TarBZip2Driver() },
             });
 
     @Override

@@ -5,6 +5,7 @@
 package de.truezip.driver.zip;
 
 import de.truezip.kernel.FsArchiveDriverTestSuite;
+import de.truezip.kernel.cio.IOPool;
 
 /**
  * @author Christian Schlichtherle
@@ -14,7 +15,12 @@ extends FsArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
 
     @Override
     protected ZipDriver newArchiveDriver() {
-        return new ZipDriver(getTestConfig().getIOPoolProvider());
+        return new ZipDriver() {
+            @Override
+            public IOPool<?> getIOPool() {
+                return getTestConfig().getIOPoolProvider().get();
+            }
+        };
     }
 
     @Override

@@ -14,6 +14,7 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.Source;
+import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import de.truezip.key.KeyManagerProvider;
@@ -69,31 +70,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      */
     private static final Charset ZIP_CHARSET = Charset.forName("IBM437");
 
-    private final IOPool<?> ioPool;
-
-    /**
-     * Constructs a new ZIP driver.
-     * This constructor uses {@link #ZIP_CHARSET} for encoding entry names
-     * and comments.
-     *
-     * @param ioPoolProvider the provider for I/O entry pools for allocating
-     *        temporary I/O entries (buffers).
-     */
-    public ZipDriver(IOPoolProvider ioPoolProvider) {
-        this(ioPoolProvider, ZIP_CHARSET);
-    }
-
-    /**
-     * Constructs a new ZIP driver.
-     *
-     * @param provider the provider for the I/O buffer pool.
-     * @param charset the character set for encoding entry names and comments.
-     */
-    protected ZipDriver(IOPoolProvider provider, Charset charset) {
-        if (null == (this.ioPool = provider.get()))
-            throw new NullPointerException();
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -102,6 +78,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     public Charset getCharset() {
         return ZIP_CHARSET;
+    }
+
+    @Override
+    public IOPool<?> getIOPool() {
+        return IOPoolLocator.SINGLETON.get();
     }
 
     /**
@@ -265,11 +246,6 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      */
     protected boolean process(ZipDriverEntry input, ZipDriverEntry output) {
         return input.isEncrypted() || output.isEncrypted();
-    }
-
-    @Override
-    public final IOPool<?> getIOPool() {
-        return ioPool;
     }
 
     /**

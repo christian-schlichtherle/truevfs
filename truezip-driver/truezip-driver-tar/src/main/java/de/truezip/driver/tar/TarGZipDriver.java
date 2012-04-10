@@ -31,10 +31,6 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class TarGZipDriver extends TarDriver {
 
-    public TarGZipDriver(IOPoolProvider provider) {
-        super(provider);
-    }
-
     /**
      * The buffer size used for reading and writing.
      * Optimized for performance.

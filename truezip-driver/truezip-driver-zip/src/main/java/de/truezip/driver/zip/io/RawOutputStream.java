@@ -83,7 +83,7 @@ implements Iterable<E> {
      * Constructs a raw ZIP output stream which decorates the given output
      * stream and optionally apppends to the given raw ZIP file.
      *
-     * @param  out The output stream to write the ZIP file to.
+     * @param  sink the sink to write the ZIP file to.
      *         If {@code appendee} is not {@code null}, then this must be set
      *         up so that it appends to the same ZIP file from which
      *         {@code appendee} is reading.

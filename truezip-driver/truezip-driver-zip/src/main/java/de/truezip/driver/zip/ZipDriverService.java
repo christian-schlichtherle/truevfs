@@ -6,7 +6,6 @@ package de.truezip.driver.zip;
 
 import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsScheme;
-import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.spi.FsDriverService;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
@@ -53,10 +52,10 @@ public final class ZipDriverService extends FsDriverService {
 
     private final Map<FsScheme, FsDriver>
             drivers = newMap(new Object[][] {
-                { "zip", new ZipDriver(IOPoolLocator.SINGLETON) },
-                { "ear|jar|war", new JarDriver(IOPoolLocator.SINGLETON) },
-                { "odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb", new OdfDriver(IOPoolLocator.SINGLETON) },
-                { "exe", new ReadOnlySfxDriver(IOPoolLocator.SINGLETON) },
+                { "zip", new ZipDriver() },
+                { "ear|jar|war", new JarDriver() },
+                { "odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb", new OdfDriver() },
+                { "exe", new ReadOnlySfxDriver() },
             });
 
     @Override

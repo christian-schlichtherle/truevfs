@@ -74,7 +74,6 @@ public final class KeyManagement {
         final ZipCryptoParameters param;
         
         CustomJarDriver1(byte[] password) {
-            super(IOPoolLocator.SINGLETON);
             param = new CustomWinZipAesParameters(password);
         }
         
@@ -194,7 +193,6 @@ public final class KeyManagement {
         final KeyManagerProvider provider;
         
         CustomJarDriver2(char[] password) {
-            super(IOPoolLocator.SINGLETON);
             this.provider = new PromptingKeyManagerProvider(
                     AesPbeParameters.class,
                     new CustomView(password));

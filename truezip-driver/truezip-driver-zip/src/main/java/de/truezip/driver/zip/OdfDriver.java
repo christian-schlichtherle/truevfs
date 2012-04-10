@@ -6,10 +6,8 @@ package de.truezip.driver.zip;
 
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.IOPool;
-import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.MultiplexingOutputService;
 import de.truezip.kernel.cio.OutputService;
-import de.truezip.kernel.io.Sink;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
@@ -40,10 +38,6 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public class OdfDriver extends JarDriver {
-
-    public OdfDriver(IOPoolProvider provider) {
-        super(provider);
-    }
 
     @Override
     protected OutputService<ZipDriverEntry> newOutputService(

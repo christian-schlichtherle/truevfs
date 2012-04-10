@@ -28,10 +28,6 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
 
-    public CheckedReadOnlySfxDriver(IOPoolProvider provider) {
-        super(provider);
-    }
-
     /**
      * {@inheritDoc}
      * 

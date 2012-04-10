@@ -28,10 +28,6 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 @Immutable
 public class TarBZip2Driver extends TarDriver {
 
-    public TarBZip2Driver(IOPoolProvider provider) {
-        super(provider);
-    }
-
     /**
      * The buffer size used for reading and writing.
      * Optimized for performance.
