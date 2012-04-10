@@ -9,10 +9,9 @@ import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.MultiplexingOutputService;
 import de.truezip.kernel.cio.OutputService;
+import de.truezip.kernel.io.Sink;
 import java.io.IOException;
-import java.io.OutputStream;
 import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 
@@ -47,14 +46,13 @@ public class OdfDriver extends JarDriver {
     }
 
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final @CheckForNull @WillNotClose ZipInputService source,
-            final @WillCloseWhenClosed OutputStream out)
+            final OptionOutputSocket output)
     throws IOException {
         final ZipOutputService
-                service = new ZipOutputService(this, model, source, out);
+                service = new ZipOutputService(this, model, source, output);
         final IOPool<?> pool = getIOPool();
         return null != source && source.isAppendee()
                 ? new MultiplexingOutputService<>(service, pool)

@@ -4,10 +4,7 @@
  */
 package de.truezip.driver.zip.raes;
 
-import de.truezip.driver.zip.JarDriver;
-import de.truezip.driver.zip.OptionOutputSocket;
-import de.truezip.driver.zip.ZipDriverEntry;
-import de.truezip.driver.zip.ZipInputService;
+import de.truezip.driver.zip.*;
 import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.driver.zip.raes.crypto.RaesParameters;
 import de.truezip.driver.zip.raes.crypto.RaesReadOnlyChannel;
@@ -19,12 +16,15 @@ import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.IOPoolProvider;
+import de.truezip.kernel.cio.MultiplexingOutputService;
 import de.truezip.kernel.cio.OutputService;
+import de.truezip.kernel.io.AbstractSink;
 import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
@@ -140,11 +140,11 @@ public abstract class ZipRaesDriver extends JarDriver {
      * implementation.
      */
     @Override
-    protected final ZipInputService newZipInputService(
+    protected ZipInputService newZipInputService(
             final FsModel model,
             final Source source)
     throws IOException {
-        final class RaesSource extends AbstractSource {
+        final class Source extends AbstractSource {
             @Override
             public SeekableByteChannel channel() throws IOException {
                 final RaesReadOnlyChannel channel = RaesReadOnlyChannel
@@ -162,34 +162,28 @@ public abstract class ZipRaesDriver extends JarDriver {
                 }
                 return channel;
             }
-        } // RaesSource
+        } // Source
 
-        return new ZipInputService(this, model, new RaesSource());
+        return new ZipInputService(this, model, new Source());
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    protected final OutputService<ZipDriverEntry> newOutputService(
+    protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
             final @CheckForNull @WillNotClose ZipInputService source,
             final OptionOutputSocket output)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        if (null != source)
-            source.setAppendee(output.getOptions().get(GROW));
-        final RaesOutputStream ros = RaesOutputStream
-                .create(raesParameters(model), output);
-        try {
-            return newOutputService(model, source, ros);
-        } catch (final Throwable ex) {
-            try {
-                ros.close();
-            } catch (final Throwable ex2) {
-                ex.addSuppressed(ex2);
+        final class Sink extends AbstractSink {
+            @Override
+            public OutputStream stream() throws IOException {
+                return RaesOutputStream.create(raesParameters(model), output);
             }
-            throw ex;
-        }
+        } // Sink
+
+        return new MultiplexingOutputService<>(
+                new ZipOutputService(this, model, source, new Sink()),
+                getIOPool());
     }
 
     /**

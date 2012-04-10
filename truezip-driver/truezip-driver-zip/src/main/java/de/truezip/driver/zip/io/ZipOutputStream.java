@@ -4,7 +4,9 @@
  */
 package de.truezip.driver.zip.io;
 
+import de.truezip.kernel.io.OneTimeSink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -60,8 +62,9 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ZipOutputStream(@WillCloseWhenClosed OutputStream out) {
-        super(out, null, DEFAULT_PARAM);
+    public ZipOutputStream(@WillCloseWhenClosed OutputStream out)
+    throws IOException {
+        super(DEFAULT_PARAM, null, new OneTimeSink(out));
     }
 
     /**
@@ -73,8 +76,9 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-    public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset) {
-        super(out, null, new DefaultZipOutputStreamParameters(charset));
+    public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset)
+    throws IOException {
+        super(new DefaultZipOutputStreamParameters(charset), null, new OneTimeSink(out));
     }
 
     /**
@@ -92,8 +96,9 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public ZipOutputStream(
             @WillCloseWhenClosed OutputStream out,
-            ZipFile appendee) {
-        super(out, appendee, DEFAULT_PARAM);
+            ZipFile appendee)
+    throws IOException {
+        super(DEFAULT_PARAM, appendee, new OneTimeSink(out));
         if (null == appendee)
             throw new NullPointerException();
     }

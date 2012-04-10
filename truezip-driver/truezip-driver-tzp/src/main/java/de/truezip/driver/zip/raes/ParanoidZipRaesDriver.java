@@ -4,12 +4,15 @@
  */
 package de.truezip.driver.zip.raes;
 
+import de.truezip.driver.zip.OptionOutputSocket;
 import de.truezip.driver.zip.ZipDriverEntry;
 import de.truezip.driver.zip.ZipInputService;
 import de.truezip.driver.zip.ZipOutputService;
+import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.IOPoolProvider;
 import de.truezip.kernel.cio.OutputService;
+import de.truezip.kernel.io.AbstractSink;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
@@ -57,10 +60,17 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      */
     @Override
     protected final OutputService<ZipDriverEntry> newOutputService(
-            FsModel model,
-            @CheckForNull @WillNotClose ZipInputService source,
-            OutputStream out)
+            final FsModel model,
+            final @CheckForNull @WillNotClose ZipInputService source,
+            final OptionOutputSocket output)
     throws IOException {
-        return new ZipOutputService(this, model, source, out);
+        final class Sink extends AbstractSink {
+            @Override
+            public OutputStream stream() throws IOException {
+                return RaesOutputStream.create(raesParameters(model), output);
+            }
+        } // Sink
+
+        return new ZipOutputService(this, model, source, new Sink());
     }
 }
