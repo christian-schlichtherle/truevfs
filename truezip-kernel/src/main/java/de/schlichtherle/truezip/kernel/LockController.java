@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.LockControl.isLocking;
-import static de.schlichtherle.truezip.kernel.LockControl.call;
+import static de.schlichtherle.truezip.kernel.LockControl.locked;
 import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
@@ -78,13 +78,13 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     <T> T readLocked(IOOperation<T> operation) throws IOException {
-        return call(operation, readLock());
+        return locked(operation, readLock());
     }
 
     <T> T writeLocked(IOOperation<T> operation) throws IOException {
         assert !getModel().isReadLockedByCurrentThread()
                 : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
-        return call(operation, writeLock());
+        return locked(operation, writeLock());
     }
 
     @Override

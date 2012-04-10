@@ -73,7 +73,7 @@ final class LockControl {
      * @throws IOException As thrown by the operation.
      * @throws NeedsLockRetryException See above.
      */
-    static <T> T call(final IOOperation<T> operation, final Lock lock)
+    static <T> T locked(final IOOperation<T> operation, final Lock lock)
     throws IOException {
         final LockUtil util = LockControl.util.get();
         if (util.locking) {

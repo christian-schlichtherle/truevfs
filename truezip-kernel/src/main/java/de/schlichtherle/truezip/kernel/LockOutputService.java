@@ -4,9 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import static de.schlichtherle.truezip.kernel.LockControl.locked;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.LockOutputStream;
-import de.truezip.kernel.io.LockSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,12 +46,15 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @Override
     @GuardedBy("lock")
     public void close() throws IOException {
-        lock.lock();
-        try {
-            container.close();
-        } finally {
-            lock.unlock();
-        }
+        final class Close implements IOOperation<Void> {
+            @Override
+            public Void call() throws IOException {
+                container.close();
+                return null;
+            }
+        } // Close
+
+        locked(new Close(), lock);
     }
 
     @Override
@@ -92,41 +94,81 @@ extends DecoratingOutputService<E, OutputService<E>> {
             @Override
             @GuardedBy("lock")
             public E getLocalTarget() throws IOException {
-                lock.lock();
-                try {
-                    return entry;
-                } finally {
-                    lock.unlock();
-                }
+                final class GetLocalTarget implements IOOperation<E> {
+                    @Override
+                    public E call() throws IOException {
+                        return entry;
+                    }
+                } // GetLocalTarget
+
+                return locked(new GetLocalTarget(), lock);
             }
 
             @Override
             @GuardedBy("lock")
             public OutputStream stream() throws IOException {
-                final OutputStream out;
-                lock.lock();
-                try {
-                    out = getBoundSocket().stream();
-                } finally {
-                    lock.unlock();
-                }
-                return new LockOutputStream(out, lock);
+                final class Stream implements IOOperation<OutputStream> {
+                    @Override
+                    public OutputStream call() throws IOException {
+                        return getBoundSocket().stream();
+                    }
+                } // Stream
+
+                return new LockOutputStream(locked(new Stream(), lock));
             }
 
             @Override
             @GuardedBy("lock")
             public SeekableByteChannel channel() throws IOException {
-                final SeekableByteChannel channel;
-                lock.lock();
-                try {
-                    channel = getBoundSocket().channel();
-                } finally {
-                    lock.unlock();
-                }
-                return new LockSeekableChannel(channel, lock);
+                final class Channel implements IOOperation<SeekableByteChannel> {
+                    @Override
+                    public SeekableByteChannel call() throws IOException {
+                        return getBoundSocket().channel();
+                    }
+                } // Channel
+
+                return new LockSeekableChannel(locked(new Channel(), lock));
             }
         } // Output
 
         return new Output();
     }
+
+    /*void close(final Closeable closeable) throws IOException {
+        final class Close implements IOOperation<Void> {
+            @Override
+            public Void call() throws IOException {
+                closeable.close();
+                return null;
+            }
+        } // Close
+
+        locked(new Close(), lock);
+    }*/
+
+    private final class LockOutputStream
+    extends de.truezip.kernel.io.LockOutputStream {
+        @CreatesObligation
+        LockOutputStream(@WillCloseWhenClosed OutputStream out) {
+            super(out, lock);
+        }
+
+        /*@Override
+        public void close() throws IOException {
+            close(out);
+        }*/
+    } // LockOutputStream
+
+    private final class LockSeekableChannel
+    extends de.truezip.kernel.io.LockSeekableChannel {
+        @CreatesObligation
+        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+            super(channel, lock);
+        }
+
+        /*@Override
+        public void close() throws IOException {
+            close(channel);
+        }*/
+    } // LockSeekableChannel
 }
