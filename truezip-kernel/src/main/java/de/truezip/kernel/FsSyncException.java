@@ -5,8 +5,6 @@
 package de.truezip.kernel;
 
 import java.io.IOException;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -14,34 +12,20 @@ import javax.annotation.concurrent.ThreadSafe;
  * federated file system to its parent file system.
  * Unless this is an instance of the sub-class {@link FsSyncWarningException},
  * an exception of this class implies that some or all
- * of the data of the federated file system has been lost.
+ * of the data in the federated file system has been lost.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class FsSyncException extends IOException {
-
     private static final long serialVersionUID = 4893219420357369739L;
 
-    public FsSyncException(FsModel model, IOException cause) {
+    public FsSyncException(FsModel model, Throwable cause) {
         super(model.getMountPoint().toString(), cause);
     }
 
     /** @return {@code 0}. */
     public int getPriority() {
         return 0;
-    }
-    
-    @Override
-    public @Nullable IOException getCause() {
-        return (IOException) super.getCause();
-    }
-
-    @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
-    public final FsSyncException initCause(final @CheckForNull Throwable cause) {
-        //assert super.getCause() instanceof IOException;
-        super.initCause((IOException) cause);
-        return this;
     }
 }
