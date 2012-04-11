@@ -13,7 +13,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * This may be used in scenarios where a cooperative algorithm needs to
  * continue its task even if one or more input exceptions occur.
  * This interface would then allow to collect all cause exceptions during
- * the processing by calling {@link #warn(Exception)} and later check out the
+ * the processing by calling {@link #warn(Throwable)} and later check out the
  * assembled exception by calling {@link #fail(Throwable)} or
  * {@link #check()}.
  *
