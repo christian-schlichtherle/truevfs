@@ -95,6 +95,9 @@ extends IOSocket<E, Entry> implements Sink {
      * The implementation in the class {@link OutputSocket} calls
      * {@link #channel()} and wraps the result in a
      * {@link ChannelOutputStream} adapter.
+     * Note that this violates the contract for this method unless you
+     * override either this method or {@link #channel()} with a valid
+     * implementation.
      * 
      * @return A <em>new</em> output stream for writing bytes.
      */
