@@ -92,17 +92,11 @@ extends IOSocket<E, Entry> implements Sink {
     /**
      * {@inheritDoc}
      * <p>
-     * Implementations must support calling this method multiple times.
-     * <p>
      * The implementation in the class {@link OutputSocket} calls
      * {@link #channel()} and wraps the result in a
      * {@link ChannelOutputStream} adapter.
-     * Note that this may intentionally violate the contract for this method
-     * because {@link #channel()} may throw an
-     * {@link UnsupportedOperationException} while this method may not,
-     * so override appropriately.
      * 
-     * @return A new output stream for writing bytes upon each call.
+     * @return A <em>new</em> output stream for writing bytes.
      */
     @Override
     public OutputStream stream() throws IOException {
@@ -112,7 +106,7 @@ extends IOSocket<E, Entry> implements Sink {
     /**
      * {@inheritDoc}
      * 
-     * @return A new seekable byte channel for writing bytes upon each call.
+     * @return A <em>new</em> seekable byte channel for writing bytes.
      * @throws UnsupportedOperationException the implementation in the class
      *         {@link OutputSocket} <em>always</em> throws an exception of
      *         this type.

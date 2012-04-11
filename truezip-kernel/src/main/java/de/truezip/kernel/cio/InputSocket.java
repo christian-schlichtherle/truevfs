@@ -95,12 +95,8 @@ extends IOSocket<E, Entry> implements Source {
      * The implementation in the class {@link InputSocket} calls
      * {@link #channel()} and wraps the result in a
      * {@link ChannelInputStream} adapter.
-     * Note that this may intentionally violate the contract for this method
-     * because {@link #channel()} may throw an
-     * {@link UnsupportedOperationException} while this method may not,
-     * so override appropriately.
      * 
-     * @return A new input stream for reading bytes upon each call.
+     * @return A <em>new</em> input stream for reading bytes.
      */
     @Override
     public InputStream stream() throws IOException {
@@ -110,7 +106,7 @@ extends IOSocket<E, Entry> implements Source {
     /**
      * {@inheritDoc}
      * 
-     * @return A new seekable byte channel for reading bytes upon each call.
+     * @return A <em>new</em> seekable byte channel for reading bytes.
      * @throws UnsupportedOperationException the implementation in the class
      *         {@link InputSocket} <em>always</em> throws an exception of
      *         this type.

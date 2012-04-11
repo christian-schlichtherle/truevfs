@@ -8,8 +8,8 @@ import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 
 /**
- * A source which provides a given input stream or seekable byte channel at
- * most once.
+ * A source which can get used only once to obtain a given input stream or
+ * seekable byte channel.
  * 
  * @see    OneTimeSink
  * @author Christian Schlichtherle

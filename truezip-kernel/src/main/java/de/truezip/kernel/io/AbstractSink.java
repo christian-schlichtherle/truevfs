@@ -9,8 +9,7 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 
 /**
- * An abstract provider for output streams and (optionally) seekable byte
- * channels.
+ * An abstract provider for output streams or seekable byte channels.
  * 
  * @author Christian Schlichtherle
  */
@@ -22,10 +21,6 @@ public abstract class AbstractSink implements Sink {
      * The implementation in the class {@link AbstractSink} calls
      * {@link #channel()} and wraps the result in a
      * {@link ChannelOutputStream} adapter.
-     * Note that this may intentionally violate the contract for this method
-     * because {@link #channel()} may throw an
-     * {@link UnsupportedOperationException} while this method may not,
-     * so override appropriately.
      */
     @Override
     public OutputStream stream() throws IOException {
