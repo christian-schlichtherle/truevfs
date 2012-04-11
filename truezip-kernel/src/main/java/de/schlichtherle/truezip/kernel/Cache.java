@@ -311,8 +311,12 @@ final class Cache implements Flushable, Closeable {
                 buffer = new Buffer();
                 try {
                     IOSocket.copy(input, buffer.data.getOutputSocket());
-                } catch (IOException ex) {
-                    buffer.release();
+                } catch (final IOException ex) {
+                    try {
+                        buffer.release();
+                    } catch (final IOException ex2) {
+                        ex.addSuppressed(ex2);
+                    }
                     throw ex;
                 }
                 setBuffer(buffer);
