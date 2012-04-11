@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.util;
 
+import java.lang.reflect.InvocationTargetException;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -25,17 +26,20 @@ public class Throwables {
      * @param  t the throwable to wrap in a new instance of the same class.
      * @return a new instance of the same class as the throwable {@code t}
      *         with its {@linkplain Throwable#getCause() cause} initialized to
-     *         {@code t} or simply {@code t} if the wrapping fails due to
-     *         another exception.
+     *         {@code t} or, if the instantiation fails for some reason,
+     *         {@code t} with the failure exception added as a
+     *         {@linkplain Throwable#addSuppressed(Throwable) suppressed exception}.
+     * @throws SecurityException if getting the constructor fails with this
+     *         exception type.
      */
-    @SuppressWarnings({"unchecked", "UseSpecificCatch"})
+    @SuppressWarnings("unchecked")
     public static <T extends Throwable> T wrap(final T t) {
         try {
             return (T) t.getClass()
                         .getConstructor(String.class)
                         .newInstance(t.toString())
                         .initCause(t);
-        } catch (final Throwable ex) {
+        } catch (final NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             t.addSuppressed(ex);
             return t;
         }
