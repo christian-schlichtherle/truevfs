@@ -152,7 +152,7 @@ implements Closeable, Iterable<E> {
         } catch (final Throwable ex) {
             try {
                 channel.close();
-            } catch (final Throwable ex2) {
+            } catch (final IOException ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -619,7 +619,7 @@ implements Closeable, Iterable<E> {
                 } finally {
                     try {
                         cin.close();
-                    } catch (final Throwable ex2) {
+                    } catch (final IOException ex2) {
                         if (null == ex)
                             throw ex2;
                         ex.addSuppressed(ex2);
