@@ -3,8 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Implements the {@code file} scheme for accessing the platform file system
- * based on the NIO.2 API for JSE&#160;7 and later.
+ * Implements the {@code file} scheme for accessing the platform file system.
  * 
  * @author Christian Schlichtherle
  */
