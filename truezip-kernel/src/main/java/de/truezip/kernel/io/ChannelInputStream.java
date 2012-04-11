@@ -116,7 +116,7 @@ public class ChannelInputStream extends InputStream {
         try {
             channel.position(channel.position());
             return true;
-        } catch (IOException failure) {
+        } catch (IOException ex) {
             return false;
         }
     }    
