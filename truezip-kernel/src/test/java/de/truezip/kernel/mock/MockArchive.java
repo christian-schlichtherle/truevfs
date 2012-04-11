@@ -5,7 +5,7 @@
 package de.truezip.kernel.mock;
 
 import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
+import de.truezip.kernel.ThrowManager;
 import static de.truezip.kernel.cio.Entry.ALL_ACCESS_SET;
 import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
 import de.truezip.kernel.cio.Entry.Access;
@@ -34,7 +34,7 @@ implements Container<MockArchiveDriverEntry> {
 
     final Map<String, MockArchiveDriverEntry> entries;
     private final TestConfig config;
-    private @CheckForNull ThrowControl control;
+    private @CheckForNull ThrowManager control;
 
     public static MockArchive create(
             @CheckForNull TestConfig config) {
@@ -53,8 +53,8 @@ implements Container<MockArchiveDriverEntry> {
         this.config = config;
     }
 
-    private ThrowControl getThrowControl() {
-        final ThrowControl control = this.control;
+    private ThrowManager getThrowControl() {
+        final ThrowManager control = this.control;
         return null != control ? control : (this.control = config.getThrowControl());
     }
 

@@ -15,13 +15,13 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-public final class ThrowControl {
+public final class ThrowManager {
 
     private final Map<Class<?>, Throwable> throwables;
 
     /** Default constructor. */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    public ThrowControl() {
+    public ThrowManager() {
         this.throwables = new HashMap<>();
     }
 
@@ -30,7 +30,7 @@ public final class ThrowControl {
      * 
      * @param template The template to copy.
      */
-    public ThrowControl(final ThrowControl template) {
+    public ThrowManager(final ThrowManager template) {
         this.throwables = new HashMap<>(template.throwables);
     }
 

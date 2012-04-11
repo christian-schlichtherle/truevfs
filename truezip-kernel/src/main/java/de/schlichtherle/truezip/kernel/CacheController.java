@@ -5,20 +5,15 @@
 package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.Cache.Strategy.WRITE_BACK;
-import de.truezip.kernel.FsResourceOpenException;
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.FsSyncWarningException;
-import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
-import de.truezip.kernel.FsSyncOption;
-import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
-import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
@@ -169,10 +164,10 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     }
 
     @Override
-    public <X extends IOException> void sync(
-            final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         NeedsSyncException preSyncEx;
         do {
             preSyncEx = null;

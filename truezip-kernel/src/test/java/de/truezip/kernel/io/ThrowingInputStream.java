@@ -5,7 +5,7 @@
 package de.truezip.kernel.io;
 
 import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
+import de.truezip.kernel.ThrowManager;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public final class ThrowingInputStream extends DecoratingInputStream {
 
-    private final ThrowControl control;
+    private final ThrowManager control;
 
     @CreatesObligation
     public ThrowingInputStream(@WillCloseWhenClosed InputStream in) {
@@ -32,7 +32,7 @@ public final class ThrowingInputStream extends DecoratingInputStream {
 
     @CreatesObligation
     public ThrowingInputStream( final @WillCloseWhenClosed InputStream in,
-                                final @CheckForNull ThrowControl control) {
+                                final @CheckForNull ThrowManager control) {
         super(in);
         if (null == in)
             throw new NullPointerException();

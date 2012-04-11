@@ -36,7 +36,7 @@ public class MockController extends FsModelController<FsModel> {
     private final ConcurrentMap<FsEntryName, IOEntry<?>>
             map = new ConcurrentHashMap<>();
     private final TestConfig config;
-    private volatile @CheckForNull ThrowControl control;
+    private volatile @CheckForNull ThrowManager control;
 
     public MockController(FsModel model, @CheckForNull FsController<?> parent) {
         this(model, parent, null);
@@ -60,8 +60,8 @@ public class MockController extends FsModelController<FsModel> {
         this.config = null != config ? config : TestConfig.get();
     }
 
-    private ThrowControl getThrowControl() {
-        final ThrowControl control = this.control;
+    private ThrowManager getThrowControl() {
+        final ThrowManager control = this.control;
         return null != control ? control : (this.control = config.getThrowControl());
     }
 
@@ -253,11 +253,12 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
-        checkAllExceptions(this);
+    public void
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
+        getThrowControl().check(this, FsSyncException.class);
+        checkUndeclaredExceptions(this);
         assert null != options;
         assert null != handler;
     }

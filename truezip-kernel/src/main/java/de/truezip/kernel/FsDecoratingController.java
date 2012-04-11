@@ -128,10 +128,10 @@ extends FsController<M> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         controller.sync(options, handler);
     }
 

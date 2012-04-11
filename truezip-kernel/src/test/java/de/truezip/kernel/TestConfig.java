@@ -64,7 +64,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     // Instead, the global configuration should only getIOPool changed once at
     // application startup and then each thread should modify only its thread
     // local configuration which has been obtained by a call to TestConfig.push().
-    private final ThrowControl throwControl;
+    private final ThrowManager throwControl;
     private int numEmtries = DEFAULT_NUM_ENTRIES;
     private int dataSize = DEFAULT_DATA_LENGTH;
     private IOPoolProvider ioPoolProvider;
@@ -110,18 +110,18 @@ public final class TestConfig extends Resource<RuntimeException> {
 
     /** Default constructor for the global configuration. */
     private TestConfig() {
-        this.throwControl = new ThrowControl();
+        this.throwControl = new ThrowManager();
     }
 
     /** Copy constructor for inheritable thread local configurations. */
     private TestConfig(final TestConfig template) {
-        this.throwControl = new ThrowControl(template.getThrowControl());
+        this.throwControl = new ThrowManager(template.getThrowControl());
         this.numEmtries = template.getNumEntries();
         this.dataSize = template.getDataSize();
         this.ioPoolProvider = template.getIOPoolProvider();
     }
 
-    public ThrowControl getThrowControl() {
+    public ThrowManager getThrowControl() {
         return this.throwControl;
     }
 

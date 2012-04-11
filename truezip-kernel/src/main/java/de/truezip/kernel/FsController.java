@@ -343,11 +343,10 @@ public abstract class FsController<M extends FsModel> {
      * @param  options the synchronization options.
      * @throws FsSyncException if committing the changes fails because of any
      *         I/O error.
-     * @throws IOException on any other (not necessarily I/O related) error.
      */
     public final void
     sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, IOException {
+    throws FsSyncException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
@@ -366,19 +365,19 @@ public abstract class FsController<M extends FsModel> {
      * Otherwise, the state of this file system controller is reset.
      *
      * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and mapping them to output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws X at the discretion of the exception {@code handler}
-     *         upon the occurence of any {@link FsSyncException}.
-     * @throws IOException on any other (not necessarily I/O related) failure.
+     * @param  handler the exception handling strategy for
+     *         {@code FsSyncException}s.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream gets forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
      */
-    public abstract <X extends IOException> void
+    public abstract void
     sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws X, IOException;
+            ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException;
 
     /**
      * Two file system controllers are considered equal if and only if they

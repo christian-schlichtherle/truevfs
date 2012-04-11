@@ -5,7 +5,7 @@
 package de.truezip.kernel.io;
 
 import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
+import de.truezip.kernel.ThrowManager;
 import de.truezip.kernel.cio.ByteArrayIOBuffer;
 import static de.truezip.kernel.util.Throwables.contains;
 import java.io.IOException;
@@ -86,7 +86,7 @@ public class StreamsTest {
             @Override
             void cat(final TestInputStream in, final TestOutputStream out)
             throws IOException {
-                final ThrowControl control = TestConfig.get().getThrowControl();
+                final ThrowManager control = TestConfig.get().getThrowControl();
                 control.trigger(ThrowingInputStream.class, expected);
                 final ThrowingInputStream
                         tis = new ThrowingInputStream(in, control);
@@ -115,7 +115,7 @@ public class StreamsTest {
             @Override
             void cat(final TestInputStream in, final TestOutputStream out)
             throws IOException {
-                final ThrowControl control = TestConfig.get().getThrowControl();
+                final ThrowManager control = TestConfig.get().getThrowControl();
                 control.trigger(ThrowingOutputStream.class, expected);
                 final ThrowingOutputStream tos = new ThrowingOutputStream(out);
                 Streams.cat(in, out);

@@ -394,10 +394,10 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public <X extends IOException> void
+    public void
     sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
         try {
             sync0(options, handler);
@@ -406,10 +406,10 @@ extends FileSystemArchiveController<E> {
         }
     }
 
-    private <X extends IOException> void
+    private void
     sync0(  final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         if (!options.get(ABORT_CHANGES))
             copy(handler);
         close(handler);
@@ -431,29 +431,9 @@ extends FileSystemArchiveController<E> {
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void
-    copy(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        final class Filter implements ExceptionHandler<IOException, X> {
-            IOException warning;
-
-            @Override
-            public X fail(final IOException input) {
-                assert false : "should not get used by copy()";
-                assert null != input;
-                return handler.fail(new FsSyncException(getModel(), input));
-            }
-
-            @Override
-            public void warn(final IOException input) throws X {
-                assert null != input;
-                if (null != warning || !(input instanceof InputException))
-                    throw handler.fail(new FsSyncException(getModel(), input));
-                warning = input;
-                handler.warn(new FsSyncWarningException(getModel(), input));
-            }
-        } // Filter
-
+    private void
+    copy(final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         // Skip (In|Out)putArchive for better performance.
         // This is safe because the FsResourceController has already shut down
         // all concurrent access by closing the respective resources (streams,
@@ -479,15 +459,16 @@ extends FileSystemArchiveController<E> {
             is = null != ia  ? ia.getClutch() : new DummyInputService<E>();
         }
 
-        copy(getFileSystem(), is, os, new Filter());
+        copy(getFileSystem(), is, os, handler);
     }
 
-    private static <E extends FsArchiveEntry, X extends IOException> void
+    private <E extends FsArchiveEntry> void
     copy(   final ArchiveFileSystem<E> fs,
             final InputService<E> is,
             final OutputService<E> os,
-            final ExceptionHandler<? super IOException, X> handler)
-    throws X {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
+        IOException warning = null;
         for (final FsCovariantEntry<E> fse : fs) {
             for (final E ae : fse.getEntries()) {
                 final String aen = ae.getName();
@@ -512,7 +493,10 @@ extends FileSystemArchiveController<E> {
                         os.getOutputSocket(ae).stream().close();
                     }
                 } catch (final IOException ex) {
-                    handler.warn(ex);
+                    if (null != warning || !(ex instanceof InputException))
+                        throw handler.fail(new FsSyncException(getModel(), ex));
+                    warning = ex;
+                    handler.warn(new FsSyncWarningException(getModel(), ex));
                 }
             }
         }
@@ -537,9 +521,9 @@ extends FileSystemArchiveController<E> {
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void
-    close(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    private void
+    close(final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
         if (null != ia) {

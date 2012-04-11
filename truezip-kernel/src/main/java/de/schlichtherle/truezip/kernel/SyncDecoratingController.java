@@ -4,12 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsDecoratingController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsSyncException;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
-import java.io.IOException;
+import de.truezip.kernel.*;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -26,21 +22,24 @@ class SyncDecoratingController<
         C extends FsController<? extends M>>
 extends FsDecoratingController<M, C> {
 
-    /**
-     * Constructs a new file system sync controller.
-     *
-     * @param controller the decorated file system controller.
-     */
-    SyncDecoratingController(C controller) {
-        super(controller);
-    }
+    SyncDecoratingController(C controller) { super(controller); }
 
-    final void
-    sync(final NeedsSyncException trigger)
-    throws IOException {
+    /**
+     * Syncs this controller.
+     * 
+     * @param  trigger the triggering exception.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream gets forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
+     */
+    final void sync(final NeedsSyncException trigger)
+    throws FsSyncWarningException, FsSyncException {
         try {
             sync(SYNC);
-        } catch (final IOException ex) {
+        } catch (final FsSyncException ex) {
             ex.addSuppressed(trigger);
             throw ex;
         }

@@ -133,10 +133,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public final <X extends IOException> void
+    public void
     sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         controller.sync(options, handler);
         try {
             getKeyManager().unlock(driver.mountPointUri(getModel()));

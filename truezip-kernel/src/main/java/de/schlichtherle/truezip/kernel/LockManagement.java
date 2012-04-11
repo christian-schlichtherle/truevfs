@@ -14,13 +14,13 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Provides read/write locking for multi-threaded access by its clients.
+ * Provides thread-local lock management services.
  * 
- * @see    NeedsWriteLockException
+ * @see    NeedsLockRetryException
  * @author Christian Schlichtherle
  */
 @Immutable
-final class LockControl {
+final class LockManagement {
 
     static final int WAIT_TIMEOUT_MILLIS = 100;
 
@@ -33,7 +33,7 @@ final class LockControl {
             };
 
     /** Can't touch this - hammer time! */
-    private LockControl() { }
+    private LockManagement() { }
 
     /**
      * Tries to call the given consistent operation while holding the given
@@ -66,16 +66,18 @@ final class LockControl {
      * consistent state so that it can get retried again!
      * Mind that this is standard requirement for any {@link FsController}.
      * 
-     * @param  <T> The return type of the operation.
+     * @param  <T> the return type of the operation.
+     * @param  <X> the exception type of the operation.
      * @param  operation The atomic operation.
      * @param  lock The lock to hold while calling the operation.
      * @return The result of the operation.
-     * @throws IOException As thrown by the operation.
+     * @throws X As thrown by the operation.
      * @throws NeedsLockRetryException See above.
      */
-    static <T> T locked(final IOOperation<T> operation, final Lock lock)
-    throws IOException {
-        final LockUtil util = LockControl.util.get();
+    static <T, X extends Exception> T
+    locked(final Operation<T, X> operation, final Lock lock)
+    throws X {
+        final LockUtil util = LockManagement.util.get();
         if (util.locking) {
             if (!lock.tryLock())
                 throw NeedsLockRetryException.get();
