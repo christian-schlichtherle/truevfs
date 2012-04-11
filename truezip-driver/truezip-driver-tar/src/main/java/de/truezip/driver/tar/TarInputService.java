@@ -172,7 +172,7 @@ implements InputService<TarDriverEntry> {
             final long expected;
             try {
                 expected = TarUtils.parseOctal(buf, CHECKSUM_OFFSET, 8);
-            } catch (final Throwable ex) {
+            } catch (final RuntimeException ex) {
                 throw new TarException("Illegal initial record in TAR file!", ex);
             }
             for (int i = 0; i < 8; i++)
