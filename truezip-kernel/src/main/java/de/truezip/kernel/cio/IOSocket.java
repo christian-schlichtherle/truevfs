@@ -103,7 +103,7 @@ public abstract class IOSocket<LT, PT> {
      */
     public static void copy(final InputSocket <?> input,
                             final OutputSocket<?> output)
-    throws IOException {
+    throws InputException, IOException {
         // Call connect on output for early NPE check!
         Streams.copy(input, output.connect(input));
         // Disconnect for subsequent use, if any.
