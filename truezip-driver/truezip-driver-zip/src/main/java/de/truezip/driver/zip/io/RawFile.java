@@ -600,9 +600,9 @@ implements Closeable, Iterable<E> {
                     // Sync file pointer on deflated input again.
                     switch (method) {
                         case DEFLATED:
-                            Inflater inf = ((ZipInflaterInputStream) in)
+                            final Inflater inf = ((ZipInflaterInputStream) in)
                                     .getInflater();
-                            assert inf.finished(); // JDK6: R/W 1210/2057; JDK 7: R/W 1193/2057
+                            assert inf.finished();
                             pos += inf.getBytesRead();
                             break;
                         case BZIP2:

@@ -4,17 +4,11 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
 import static de.truezip.kernel.FsAccessOption.GROW;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.ROOT;
 import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
-import de.truezip.kernel.FsMountPoint;
-import de.truezip.kernel.FsPath;
-import de.truezip.kernel.FsScheme;
+import de.truezip.kernel.*;
 import static de.truezip.kernel.FsUriModifier.CANONICALIZE;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Size;
@@ -3395,7 +3389,7 @@ public final class TFile extends File {
                 // file like a regular file.
                 if (!move(compact.toNonArchiveFile(), grown.toNonArchiveFile()))
                     throw new IOException(compact + " (cannot move to " + grown + ")");
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 compact.rm();
                 throw ex;
             }
