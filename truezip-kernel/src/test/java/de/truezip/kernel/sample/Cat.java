@@ -78,20 +78,8 @@ public final class Cat {
                     .getInputSocket(    path.getEntryName(),
                                         BitField.noneOf(FsAccessOption.class));
             Throwable ex = null;
-            final InputStream in = socket.stream();
-            try {
+            try (InputStream in = socket.stream()) {
                 Streams.cat(in, System.out); // copy the data
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
-                try {
-                    in.close();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
-                }
             }
         } finally {
             // Commit all unsynchronized changes to the contents of federated
