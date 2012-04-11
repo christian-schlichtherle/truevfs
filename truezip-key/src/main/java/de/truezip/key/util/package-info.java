@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides utilities.
+ * Provides utilities for key management.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package de.truezip.key.util;

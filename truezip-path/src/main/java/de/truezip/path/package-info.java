@@ -4,9 +4,8 @@
  */
 /**
  * Provides uniform, transparent, thread-safe, read/write access to archive
- * files as if they were just plain directories in a file system path by means
- * of the {@link de.truezip.path.TPath} class and its
- * dependent classes.
+ * files as if they were just plain directories by means of the
+ * {@link de.truezip.path.TPath} class et al.
  * <p>
  * This is the primary API for JSE&nbsp;7 compliant TrueZIP applications:
  * Like the API of the module TrueZIP File*, this API is just a facade for the
