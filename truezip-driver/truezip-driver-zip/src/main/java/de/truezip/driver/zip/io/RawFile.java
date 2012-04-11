@@ -152,7 +152,7 @@ implements Closeable, Iterable<E> {
         } catch (final Throwable ex) {
             try {
                 channel.close();
-            } catch (final IOException ex2) {
+            } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -428,7 +428,7 @@ implements Closeable, Iterable<E> {
                 lfhOff = mapper.map(entry.getOffset());
                 if (lfhOff < preamble)
                     preamble = lfhOff;
-            } catch (RuntimeException cause) {
+            } catch (IllegalArgumentException cause) {
                 final ZipException ex = new ZipException(entry.getName()
                         + " (invalid ZIP entry)");
                 ex.initCause(cause);
@@ -591,7 +591,9 @@ implements Closeable, Iterable<E> {
                                 + method
                                 + " is not supported)");
                 }
-                try (final CheckedInputStream cin = new CheckedInputStream(in, new CRC32())) {
+                final CheckedInputStream cin = new CheckedInputStream(in, new CRC32());
+                Throwable ex = null;
+                try {
                     entry.setRawSize(cin.skip(Long.MAX_VALUE));
                     if (null != field && field.getVendorVersion() == VV_AE_2)
                         entry.setRawCrc(0);
@@ -610,6 +612,17 @@ implements Closeable, Iterable<E> {
                             break;
                         default:
                             throw new AssertionError();
+                    }
+                } catch (final Throwable ex2) {
+                    ex = ex2;
+                    throw ex2;
+                } finally {
+                    try {
+                        cin.close();
+                    } catch (final Throwable ex2) {
+                        if (null == ex)
+                            throw ex2;
+                        ex.addSuppressed(ex2);
                     }
                 }
                 if (null != field)
@@ -1070,8 +1083,8 @@ implements Closeable, Iterable<E> {
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        try (SeekableByteChannel sbc = this.channel) {
-            if (null == sbc)
+        try (SeekableByteChannel channel = this.channel) {
+            if (null == channel)
                 return;
         }
         this.channel = null;

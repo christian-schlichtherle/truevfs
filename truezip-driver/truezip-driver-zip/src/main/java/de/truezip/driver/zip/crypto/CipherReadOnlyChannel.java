@@ -294,7 +294,7 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
                     break;
                 total += read;
             } while (total < bufferSize);
-        } catch (final IOException ex) {
+        } catch (final Throwable ex) {
             this.bufferStart = INVALID;
             throw ex;
         }
