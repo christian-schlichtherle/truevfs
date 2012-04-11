@@ -14,7 +14,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * continue its task even if one or more input exceptions occur.
  * This interface would then allow to collect all cause exceptions during
  * the processing by calling {@link #warn(Exception)} and later check out the
- * assembled exception by calling {@link #fail(Exception)} or
+ * assembled exception by calling {@link #fail(Throwable)} or
  * {@link #check()}.
  *
  * @param  <I> the type of the input exceptions.
