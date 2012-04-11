@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.extension.jmxjul.comp;
+package de.truezip.extension.jmxjul;
 
 import de.truezip.driver.file.TempFilePoolService;
 import de.truezip.extension.jmxjul.jmx.JmxDirector;
