@@ -230,20 +230,20 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 if (flush) {
                     try {
                         cache.flush();
-                    } catch (final IOException ex) {
-                        throw handler.fail(new FsSyncException(getModel(), ex));
-                    } catch (final Throwable ex) {
-                        clear = false;
-                        throw ex;
+                    } catch (final IOException ex2) {
+                        throw handler.fail(new FsSyncException(getModel(), ex2));
                     }
                 }
+            } catch (final Throwable ex2) {
+                clear = false;
+                throw ex2;
             } finally {
                 if (clear) {
                     i.remove();
                     try {
                         cache.clear();
-                    } catch (final IOException ex) {
-                        handler.warn(new FsSyncWarningException(getModel(), ex));
+                    } catch (final IOException ex2) {
+                        handler.warn(new FsSyncWarningException(getModel(), ex2));
                     }
                 }
             }
