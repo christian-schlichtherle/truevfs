@@ -29,4 +29,9 @@ public class InputException extends IOException {
     public InputException(@CheckForNull IOException cause) {
         super(cause);
     }
+
+    @Override
+    public IOException getCause() {
+        return (IOException) super.getCause();
+    }
 }
