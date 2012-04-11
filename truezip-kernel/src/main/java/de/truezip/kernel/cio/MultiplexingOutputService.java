@@ -175,19 +175,16 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         final SuppressedExceptionBuilder<IOException>
                 builder = new SuppressedExceptionBuilder<>();
-        final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
-        while (i.hasNext()) {
+        for (   final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
+                i.hasNext(); ) {
             final BufferedEntryOutputStream out = i.next();
-            boolean remove = false;
             try {
-                remove = out.store(false);
+                if (out.store())
+                    i.remove();
             } catch (final InputException ex) {
                 builder.warn(ex);
             } catch (final IOException ex) {
                 throw builder.fail(ex);
-            } finally {
-                if (remove)
-                    i.remove();
             }
         }
         builder.check();
@@ -252,7 +249,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             final BufferedEntryOutputStream
                     old = buffers.put(local.getName(), this);
             if (null != old)
-                old.store(true);
+                old.discard();
         }
 
         E getTarget() {
@@ -280,15 +277,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     dst.setTime(type, src.getTime(type));
         }
 
-        boolean store(final boolean discard) throws IOException {
-            if (discard)
-                assert closed;
-            else if (!closed || isBusy())
+        boolean store() throws IOException {
+            if (!closed || isBusy())
                 return false;
             Throwable ex = null;
             try {
-                if (!discard)
-                    IOSocket.copy(input, output);
+                IOSocket.copy(input, output);
             } catch (final Throwable ex2) {
                 ex = ex2;
                 throw ex2;
@@ -302,6 +296,11 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 }
             }
             return true;
+        }
+
+        void discard() throws IOException {
+            assert closed;
+            buffer.release();
         }
     } // BufferedEntryOutputStream
 }
