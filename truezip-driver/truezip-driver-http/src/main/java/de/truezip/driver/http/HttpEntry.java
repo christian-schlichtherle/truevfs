@@ -4,21 +4,17 @@
  */
 package de.truezip.driver.http;
 
+import de.truezip.kernel.*;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsReadOnlyFileSystemException;
-import de.truezip.kernel.FsEntryName;
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsAccessOptions;
 import de.truezip.kernel.util.BitField;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
@@ -81,7 +77,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         final HttpResponse response = executeGet();
         final HttpEntity entity = response.getEntity();
         if (null == entity)
-            throw new FileNotFoundException(name + " (" + response.getStatusLine() + ")");
+            throw new NoSuchFileException(name, null, response.getStatusLine().toString());
         return entity.getContent();
     }
 

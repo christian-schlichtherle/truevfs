@@ -4,11 +4,8 @@
  */
 package de.truezip.driver.file;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsModelController;
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.*;
@@ -16,18 +13,11 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
-import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
-import java.nio.file.Files;
 import static java.nio.file.Files.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumMap;
@@ -105,7 +95,7 @@ final class FileController extends FsModelController<FsModel>  {
             if (exists(file))
                 throw new AccessDeniedException(file.toString()); // just guessing here
             else
-                throw new FileNotFoundException(file.toString());
+                throw new NoSuchFileException(file.toString());
     }
 
     @Override

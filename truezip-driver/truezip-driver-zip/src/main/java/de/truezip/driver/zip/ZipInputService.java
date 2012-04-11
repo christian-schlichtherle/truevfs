@@ -12,9 +12,9 @@ import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -103,7 +103,9 @@ implements InputService<ZipDriverEntry> {
             public ZipDriverEntry getLocalTarget() throws IOException {
                 final ZipDriverEntry entry = getEntry(name);
                 if (null == entry)
-                    throw new FileNotFoundException(name + " (entry not found)");
+                    throw new NoSuchFileException(name, null, "Entry not found!");
+                if (entry.isDirectory())
+                    throw new NoSuchFileException(name, null, "Cannot read directory entries!");
                 return entry;
             }
 

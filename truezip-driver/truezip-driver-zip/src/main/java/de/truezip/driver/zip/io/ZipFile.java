@@ -7,7 +7,7 @@ package de.truezip.driver.zip.io;
 import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.LockInputStream;
 import de.truezip.kernel.io.OneTimeSource;
-import java.io.FileNotFoundException;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -76,33 +76,32 @@ public class ZipFile extends RawFile<ZipEntry> {
      * Opens the ZIP file identified by the given path name for reading its
      * entries.
      *
-     * @param path the path name of the file.
-     * @param charset the charset to use for decoding entry names and ZIP file
-     *        comment.
-     * @param preambled if this is {@code true}, then the ZIP file may have a
-     *        preamble.
-     *        Otherwise, the ZIP file must start with either a Local File
-     *        Header (LFH) signature or an End Of Central Directory (EOCD)
-     *        Header, causing this constructor to fail if the file is actually
-     *        a false positive ZIP file, i.e. not compatible to the ZIP File
-     *        Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX), which
-     *        usually contain the application code required for extraction in
-     *        the preamble.
-     * @param postambled if this is {@code true}, then the ZIP file may have a
-     *        postamble of arbitrary length.
-     *        Otherwise, the ZIP file must not have a postamble which exceeds
-     *        64KB size, including the End Of Central Directory record
-     *        (i.e. including the ZIP file comment), causing this constructor
-     *        to fail if the file is actually a false positive ZIP file, i.e.
-     *        not compatible to the ZIP File Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX) with
-     *        large postambles.
-     * @throws FileNotFoundException if {@code name} cannot get opened for
-     *         reading.
-     * @throws ZipException if {@code name} is not compatible with the ZIP
+     * @param  path the path name of the file.
+     * @param  charset the charset to use for decoding entry names and ZIP file
+     *         comment.
+     * @param  preambled if this is {@code true}, then the ZIP file may have a
+     *         preamble.
+     *         Otherwise, the ZIP file must start with either a Local File
+     *         Header (LFH) signature or an End Of Central Directory (EOCD)
+     *         Header, causing this constructor to fail if the file is actually
+     *         a false positive ZIP file, i.e. not compatible to the ZIP File
+     *         Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX),
+     *         which usually contain the application code required for
+     *         extraction in the preamble.
+     * @param  postambled if this is {@code true}, then the ZIP file may have a
+     *         postamble of arbitrary length.
+     *         Otherwise, the ZIP file must not have a postamble which exceeds
+     *         64KB size, including the End Of Central Directory record
+     *         (i.e. including the ZIP file comment), causing this constructor
+     *         to fail if the file is actually a false positive ZIP file, i.e.
+     *         not compatible to the ZIP File Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX) with
+     *         large postambles.
+     * @throws ZipException if the file data is not compatible with the ZIP
      *         File Format Specification.
-     * @throws IOException on any other I/O related issue.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
     public ZipFile(
@@ -110,8 +109,8 @@ public class ZipFile extends RawFile<ZipEntry> {
             final Charset charset,
             final boolean preambled,
             final boolean postambled)
-    throws IOException {
-        super(  new ZipSource(path),
+    throws ZipException, EOFException, IOException {
+        super(  new ZipSource(Paths.get(path)),
                 new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = path;
     }
@@ -137,33 +136,32 @@ public class ZipFile extends RawFile<ZipEntry> {
     /**
      * Opens the given {@code file} for reading its entries.
      *
-     * @param file the file.
-     * @param charset the charset to use for decoding entry names and ZIP file
-     *        comment.
-     * @param preambled if this is {@code true}, then the ZIP file may have a
-     *        preamble.
-     *        Otherwise, the ZIP file must start with either a Local File
-     *        Header (LFH) signature or an End Of Central Directory (EOCD)
-     *        Header, causing this constructor to fail if the file is actually
-     *        a false positive ZIP file, i.e. not compatible to the ZIP File
-     *        Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX), which
-     *        usually contain the application code required for extraction in
-     *        the preamble.
-     * @param postambled if this is {@code true}, then the ZIP file may have a
-     *        postamble of arbitrary length.
-     *        Otherwise, the ZIP file must not have a postamble which exceeds
-     *        64KB size, including the End Of Central Directory record
-     *        (i.e. including the ZIP file comment), causing this constructor
-     *        to fail if the file is actually a false positive ZIP file, i.e.
-     *        not compatible to the ZIP File Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX) with
-     *        large postambles.
-     * @throws FileNotFoundException if {@code file} cannot get opened for
-     *         reading.
-     * @throws ZipException if {@code file} is not compatible with the ZIP
+     * @param  file the file.
+     * @param  charset the charset to use for decoding entry names and ZIP file
+     *         comment.
+     * @param  preambled if this is {@code true}, then the ZIP file may have a
+     *         preamble.
+     *         Otherwise, the ZIP file must start with either a Local File
+     *         Header (LFH) signature or an End Of Central Directory (EOCD)
+     *         Header, causing this constructor to fail if the file is actually
+     *         a false positive ZIP file, i.e. not compatible to the ZIP File
+     *         Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX),
+     *         which usually contain the application code required for
+     *         extraction in the preamble.
+     * @param  postambled if this is {@code true}, then the ZIP file may have a
+     *         postamble of arbitrary length.
+     *         Otherwise, the ZIP file must not have a postamble which exceeds
+     *         64KB size, including the End Of Central Directory record
+     *         (i.e. including the ZIP file comment), causing this constructor
+     *         to fail if the file is actually a false positive ZIP file, i.e.
+     *         not compatible to the ZIP File Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX) with
+     *         large postambles.
+     * @throws ZipException if the file data is not compatible with the ZIP
      *         File Format Specification.
-     * @throws IOException on any other I/O related issue.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
     public ZipFile(
@@ -171,7 +169,7 @@ public class ZipFile extends RawFile<ZipEntry> {
             final Charset charset,
             final boolean preambled,
             final boolean postambled)
-    throws IOException {
+    throws ZipException, EOFException, IOException {
         super(  new ZipSource(file),
                 new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = file.toString();
@@ -198,33 +196,32 @@ public class ZipFile extends RawFile<ZipEntry> {
     /**
      * Opens the given {@link SeekableByteChannel} for reading its entries.
      *
-     * @param channel the channel to read.
-     * @param charset the charset to use for decoding entry names and ZIP file
-     *        comment.
-     * @param preambled if this is {@code true}, then the ZIP file may have a
-     *        preamble.
-     *        Otherwise, the ZIP file must start with either a Local File
-     *        Header (LFH) signature or an End Of Central Directory (EOCD)
-     *        Header, causing this constructor to fail if the file is actually
-     *        a false positive ZIP file, i.e. not compatible to the ZIP File
-     *        Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX), which
-     *        usually contain the application code required for extraction in
-     *        the preamble.
-     * @param postambled if this is {@code true}, then the ZIP file may have a
-     *        postamble of arbitrary length.
-     *        Otherwise, the ZIP file must not have a postamble which exceeds
-     *        64KB size, including the End Of Central Directory record
-     *        (i.e. including the ZIP file comment), causing this constructor
-     *        to fail if the file is actually a false positive ZIP file, i.e.
-     *        not compatible to the ZIP File Format Specification.
-     *        This may be useful to read Self Extracting ZIP files (SFX) with
-     *        large postambles.
-     * @throws FileNotFoundException if {@code rof} cannot get opened for
-     *         reading.
-     * @throws ZipException if {@code rof} is not compatible with the ZIP
+     * @param  channel the channel to read.
+     * @param  charset the charset to use for decoding entry names and ZIP file
+     *         comment.
+     * @param  preambled if this is {@code true}, then the ZIP file may have a
+     *         preamble.
+     *         Otherwise, the ZIP file must start with either a Local File
+     *         Header (LFH) signature or an End Of Central Directory (EOCD)
+     *         Header, causing this constructor to fail if the file is actually
+     *         a false positive ZIP file, i.e. not compatible to the ZIP File
+     *         Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX),
+     *         which usually contain the application code required for
+     *         extraction in the preamble.
+     * @param  postambled if this is {@code true}, then the ZIP file may have a
+     *         postamble of arbitrary length.
+     *         Otherwise, the ZIP file must not have a postamble which exceeds
+     *         64KB size, including the End Of Central Directory record
+     *         (i.e. including the ZIP file comment), causing this constructor
+     *         to fail if the file is actually a false positive ZIP file, i.e.
+     *         not compatible to the ZIP File Format Specification.
+     *         This may be useful to read Self Extracting ZIP files (SFX) with
+     *         large postambles.
+     * @throws ZipException if the channel data is not compatible with the ZIP
      *         File Format Specification.
-     * @throws IOException on any other I/O related issue.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
     public ZipFile(
@@ -232,7 +229,7 @@ public class ZipFile extends RawFile<ZipEntry> {
             Charset charset,
             boolean preambled,
             boolean postambled)
-    throws IOException {
+    throws ZipException, EOFException, IOException {
         super(  new OneTimeSource(channel),
                 new DefaultZipFileParameters(charset, preambled, postambled));
         this.name = channel.toString();
@@ -404,10 +401,6 @@ public class ZipFile extends RawFile<ZipEntry> {
      */
     private static final class ZipSource extends AbstractSource {
         final Path file;
-
-        ZipSource(String name) {
-            this(Paths.get(name));
-        }
 
         ZipSource(final Path file) {
             this.file = file;

@@ -9,9 +9,9 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.NoSuchFileException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
@@ -67,7 +67,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
         final MockArchive
                 c = containers.get(mp);
         if (null == c)
-            throw new FileNotFoundException(mp.toString());
+            throw new NoSuchFileException(mp.toString());
         return c.newInputService();
     }
 

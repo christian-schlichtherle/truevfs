@@ -18,10 +18,7 @@ import de.truezip.key.param.SafePbeParameters;
 import de.truezip.key.param.SafePbeParametersView;
 import java.awt.EventQueue;
 import java.awt.Window;
-import java.io.EOFException;
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
@@ -74,11 +71,13 @@ extends SafePbeParametersView<P> {
      * Reads the encryption key as a byte sequence from the given pathname
      * into a new buffer of exactly {@code KEY_FILE_LEN} bytes and returns it.
      *
+     * @throws FileNotFoundException if the file cannot get opened for reading.
      * @throws EOFException If the file is not at least {@code KEY_FILE_LEN}
      *         bytes long.
      * @throws IOException on any other I/O related issue.
      */
-    static byte[] readKeyFile(File file) throws IOException {
+    static byte[] readKeyFile(File file)
+    throws FileNotFoundException, EOFException, IOException {
         final byte[] buf = new byte[KEY_FILE_LEN];
         try (final RandomAccessFile raf = new RandomAccessFile(file, "r")) {
             raf.readFully(buf);
