@@ -4,11 +4,11 @@
  */
 package de.truezip.extension.jmxjul;
 
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.FsCompositeDriver;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.cio.*;
 import javax.annotation.concurrent.Immutable;
 
 /**
