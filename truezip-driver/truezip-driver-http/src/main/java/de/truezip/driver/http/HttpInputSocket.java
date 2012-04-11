@@ -57,7 +57,11 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
                     Streams.cat(in, out);
                 }
             } catch (final Throwable ex) {
-                temp.release();
+                try {
+                    temp.release();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
                 throw ex;
             }
         } finally {
