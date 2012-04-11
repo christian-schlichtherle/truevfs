@@ -9,8 +9,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Abstract implementation of an exception builder.
- * Subclasses must implement {@link #update(Exception, Exception)} and may
- * override {@link #post(Exception)}.
+ * Subclasses must implement {@link #update(Throwable, Throwable)} and may
+ * override {@link #post(Throwable)}.
  *
  * @param  <I> the type of the input exceptions.
  * @param  <O> the type of the assembled (output) exceptions.
@@ -52,8 +52,8 @@ implements ExceptionBuilder<I, O> {
     /**
      * {@inheritDoc}
      *
-     * @see #update(Exception, Exception)
-     * @see #post(Exception)
+     * @see #update(Throwable, Throwable)
+     * @see #post(Throwable)
      */
     @Override
     public final O fail(I input) {
@@ -70,7 +70,7 @@ implements ExceptionBuilder<I, O> {
      * Note that the implementation in the class
      * {@link AbstractExceptionBuilder} does <em>not</em> throw an exception.
      *
-     * @see #update(Exception, Exception)
+     * @see #update(Throwable, Throwable)
      */
     @Override
     public final void warn(I input) {
@@ -82,7 +82,7 @@ implements ExceptionBuilder<I, O> {
     /**
      * {@inheritDoc}
      *
-     * @see    #post(Exception)
+     * @see    #post(Throwable)
      */
     @Override
     public final void check() throws O {
