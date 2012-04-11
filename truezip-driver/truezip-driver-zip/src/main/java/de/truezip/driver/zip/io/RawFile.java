@@ -1083,7 +1083,7 @@ implements Closeable, Iterable<E> {
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        try (SeekableByteChannel channel = this.channel) {
+        try (final SeekableByteChannel channel = this.channel) {
             if (null == channel)
                 return;
         }
