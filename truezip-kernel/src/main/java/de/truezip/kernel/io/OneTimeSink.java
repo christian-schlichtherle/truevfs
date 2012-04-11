@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 
 /**
- * A sink which provides a given output stream or seekable byte channel at
- * most once.
+ * A sink which can get used only once to obtain a given output stream or
+ * seekable byte channel.
  * 
  * @see    OneTimeSource
  * @author Christian Schlichtherle
