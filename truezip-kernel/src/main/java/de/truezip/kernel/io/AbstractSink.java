@@ -21,6 +21,9 @@ public abstract class AbstractSink implements Sink {
      * The implementation in the class {@link AbstractSink} calls
      * {@link #channel()} and wraps the result in a
      * {@link ChannelOutputStream} adapter.
+     * Note that this violates the contract for this method unless you
+     * override either this method or {@link #channel()} with a valid
+     * implementation.
      */
     @Override
     public OutputStream stream() throws IOException {

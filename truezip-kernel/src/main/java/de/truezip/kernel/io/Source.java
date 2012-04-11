@@ -7,6 +7,7 @@ package de.truezip.kernel.io;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
 
 /**
@@ -18,13 +19,12 @@ import java.nio.channels.SeekableByteChannel;
 public interface Source {
 
     /**
-     * <b>Optional operation:</b> Returns an input stream for reading bytes.
+     * Returns an input stream for reading bytes.
      * The returned input stream should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
      *
      * @return An input stream for reading bytes.
      * @throws IOException on any I/O error.
-     * @throws UnsupportedOperationException if this operation is not supported.
      * @throws IllegalStateException if another input stream is not available.
      */
     @CreatesObligation
@@ -36,6 +36,10 @@ public interface Source {
      * If this operation is supported, then the returned seekable byte channel
      * should <em>not</em> be buffered.
      * Buffering should get addressed by the caller instead.
+     * <p>
+     * Because the intention of this interface is input, the returned channel
+     * may not be able to do output and any attempt to do so may fail with a
+     * {@link NonWritableChannelException}.
      *
      * @return A seekable byte channel for reading bytes.
      * @throws IOException on any I/O error.
