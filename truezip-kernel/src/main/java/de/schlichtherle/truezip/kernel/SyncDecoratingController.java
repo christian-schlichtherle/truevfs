@@ -4,7 +4,10 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.*;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsDecoratingController;
+import de.truezip.kernel.FsModel;
+import de.truezip.kernel.FsSyncException;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
