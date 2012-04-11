@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.io;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +16,7 @@ import java.nio.channels.SeekableByteChannel;
  * @see    Sink
  * @author Christian Schlichtherle
  */
-//@CleanupObligation
+@CleanupObligation
 public interface Source {
 
     /**
