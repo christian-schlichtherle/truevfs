@@ -5,7 +5,6 @@
 package de.truezip.kernel.io;
 
 import de.truezip.kernel.util.ThreadGroups;
-import static de.truezip.kernel.util.Throwables.wrap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -273,7 +272,11 @@ public final class Streams {
                     final byte[] buf = buffer.buf;
                     out.write(buf, 0, write);
                 } catch (final Throwable ex) {
-                    cancel(result);
+                    try {
+                        cancel(result);
+                    } catch (final Throwable ex2) {
+                        ex.addSuppressed(ex2);
+                    }
                     throw ex;
                 }
 
@@ -296,8 +299,8 @@ public final class Streams {
                 else if (ex instanceof IOException)
                     throw new InputException((IOException) ex);
                 else if (ex instanceof RuntimeException)
-                    throw (RuntimeException) wrap(ex);
-                throw (Error) wrap(ex);
+                    throw (RuntimeException) ex;
+                throw (Error) ex;
             }
         } finally {
             if (interrupted)
