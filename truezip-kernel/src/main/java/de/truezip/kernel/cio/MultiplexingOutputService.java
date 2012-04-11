@@ -191,7 +191,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     /** This entry output stream writes directly to this output service. */
-    private class EntryOutputStream extends DecoratingOutputStream {
+    private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
         @CreatesObligation
@@ -218,10 +218,10 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
-    private class BufferedEntryOutputStream extends DecoratingOutputStream {
+    private final class BufferedEntryOutputStream extends DecoratingOutputStream {
+        final IOBuffer<?> buffer;
         final InputSocket<Entry> input;
         final OutputSocket<? extends E> output;
-        final IOBuffer<?> buffer;
         final E local;
         boolean closed;
 
@@ -231,20 +231,19 @@ extends DecoratingOutputService<E, OutputService<E>> {
                                     final OutputSocket<? extends E> output)
         throws IOException {
             super(buffer.getOutputSocket().stream());
-            this.output = output;
-            this.local = output.getLocalTarget();
+            this.buffer = buffer;
+            final E local = this.local = (this.output = output).getLocalTarget();
             final Entry peer = output.getPeerTarget();
-            class InputProxy extends DecoratingInputSocket<Entry> {
+            final class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() {
                     super(buffer.getInputSocket());
                 }
 
                 @Override
-                public Entry getLocalTarget() {
+                public Entry getLocalTarget() throws IOException {
                     return null != peer ? peer : buffer;
                 }
             }
-            this.buffer = buffer;
             this.input = new InputProxy();
             final BufferedEntryOutputStream
                     old = buffers.put(local.getName(), this);
@@ -268,7 +267,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         void copyProperties() throws IOException {
             final Entry src = input.getLocalTarget();
-            final E dst = getTarget();
+            final E dst = local;
             // Never copy anything but the DATA size!
             if (UNKNOWN == dst.getSize(DATA))
                 dst.setSize(DATA, src.getSize(DATA));
@@ -280,21 +279,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
         boolean store() throws IOException {
             if (!closed || isBusy())
                 return false;
-            Throwable ex = null;
-            try {
-                IOSocket.copy(input, output);
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
-                try {
-                    buffer.release();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
-                }
-            }
+            IOSocket.copy(input, output);
+            buffer.release();
             return true;
         }
 
