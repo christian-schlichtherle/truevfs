@@ -276,7 +276,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     dst.setTime(type, src.getTime(type));
         }
 
-        boolean store() throws IOException {
+        boolean store() throws InputException, IOException {
             if (!closed || isBusy())
                 return false;
             IOSocket.copy(input, output);
