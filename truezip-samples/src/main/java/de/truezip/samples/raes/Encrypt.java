@@ -5,6 +5,7 @@
 package de.truezip.samples.raes;
 
 import de.truezip.kernel.FsSyncException;
+import de.truezip.path.TPath;
 import de.truezip.samples.file.Application;
 import de.truezip.samples.file.IllegalUsageException;
 import java.io.IOException;
@@ -39,7 +40,8 @@ public class Encrypt extends Application {
     throws IllegalUsageException, IOException {
         if (args.length != 2)
             throw new IllegalUsageException(resources.getString("usage"));
-        Raes.encrypt(args[0], args[1]);
+        Raes.encrypt(   new TPath(args[0]).toNonArchivePath(),
+                        new TPath(args[1]).toNonArchivePath());
         return 0;
     }
 }
