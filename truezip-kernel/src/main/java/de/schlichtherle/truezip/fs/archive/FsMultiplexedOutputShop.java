@@ -220,9 +220,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * output shop and finally deleted unless this output shop is still busy.
      */
     private class BufferedEntryOutputStream extends DecoratingOutputStream {
+        final IOPool.Entry<?> buffer;
         final InputSocket<Entry> input;
         final OutputSocket<? extends E> output;
-        final IOPool.Entry<?> buffer;
         final E local;
         boolean closed;
 
@@ -233,8 +233,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                                     final OutputSocket<? extends E> output)
         throws IOException {
             super(buffer.getOutputSocket().newOutputStream());
-            this.output = output;
-            this.local = output.getLocalTarget();
+            this.buffer = buffer;
+            final E local = this.local = (this.output = output).getLocalTarget();
             final Entry peer = output.getPeerTarget();
             class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() {
@@ -246,7 +246,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                     return null != peer ? peer : buffer;
                 }
             }
-            this.buffer = buffer;
             this.input = new InputProxy();
             final BufferedEntryOutputStream
                     old = buffers.put(local.getName(), this);
@@ -282,11 +281,8 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         boolean store() throws IOException {
             if (!closed || isBusy())
                 return false;
-            try {
-                IOSocket.copy(input, output);
-            } finally {
-                buffer.release();
-            }
+            IOSocket.copy(input, output);
+            buffer.release();
             return true;
         }
 
