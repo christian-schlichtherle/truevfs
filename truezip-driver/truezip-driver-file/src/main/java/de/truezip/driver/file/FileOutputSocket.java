@@ -4,13 +4,13 @@
  */
 package de.truezip.driver.file;
 
+import de.truezip.kernel.FsAccessOption;
+import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -98,12 +98,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return temp;
     }
 
-    private void append(final FileEntry temp) throws IOException {
+    void append(final FileEntry temp) throws IOException {
         if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
             IOSocket.copy(entry.getInputSocket(), temp.getOutputSocket());
     }
 
-    private Set<OpenOption> optionSet() {
+    Set<OpenOption> optionSet() {
         final Set<OpenOption> set = new HashSet<>(INITIAL_CAPACITY);
         Collections.addAll(set, WRITE_STANDARD_OPEN_OPTION);
         if (options.get(APPEND)) {
@@ -115,12 +115,12 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return set;
     }
 
-    private OpenOption[] optionArray() {
+    OpenOption[] optionArray() {
         final Set<OpenOption> set = optionSet();
         return set.toArray(new OpenOption[set.size()]);
     }
 
-    private void close(final FileEntry temp, final boolean commit)
+    void close(final FileEntry temp, final boolean commit)
     throws IOException {
         final Path entryFile = entry.getPath();
         if (temp != entry) {
@@ -161,7 +161,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 
-    private void release(
+    void release(
             final FileEntry temp,
             final @CheckForNull IOException ex)
     throws IOException {
