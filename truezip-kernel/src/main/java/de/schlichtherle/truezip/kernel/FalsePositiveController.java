@@ -448,15 +448,11 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public <X extends IOException> void
+    public void
     sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
-        try {
-            controller.sync(options, handler);
-        } catch (FalsePositiveException ex) {
-            throw new AssertionError(ex);
-        }
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
+        controller.sync(options, handler);
         state = new TryChild();
     }
 

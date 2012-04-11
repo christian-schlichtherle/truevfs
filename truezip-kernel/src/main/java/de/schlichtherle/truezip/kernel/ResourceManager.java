@@ -29,7 +29,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * threads.
  * <p>
  * For synchronization, each control uses a lock which has to be provided
- * to its {@link #ResourceControl constructor}.
+ * to its {@link #ResourceManager constructor}.
  * In order to start accounting for a closeable resource,
  * call {@link #start(Closeable)}.
  * In order to stop accounting for a closeable resource,
@@ -39,7 +39,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ResourceControl {
+final class ResourceManager {
 
     /**
      * The initial capacity for the hash map accounts for the number of
@@ -73,7 +73,7 @@ final class ResourceControl {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    ResourceControl(final Lock lock) {
+    ResourceManager(final Lock lock) {
         this.condition = (this.lock = lock).newCondition();
     }
 
@@ -248,8 +248,8 @@ final class ResourceControl {
     private final class Account {
         final Thread owner = Thread.currentThread();
 
-        ResourceControl getAccountant() {
-            return ResourceControl.this;
+        ResourceManager getAccountant() {
+            return ResourceManager.this;
         }
     } // Account
 }

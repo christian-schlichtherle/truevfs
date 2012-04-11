@@ -4,13 +4,16 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import java.io.IOException;
+import java.util.concurrent.Callable;
+import javax.annotation.Nullable;
 
 /**
  * A callable for I/O operations.
  * 
  * @author Christian Schlichtherle
  */
-@SuppressWarnings("MarkerInterface")
-interface IOOperation<V> extends Operation<V, IOException> {
+interface Operation<V, X extends Exception> extends Callable<V> {
+
+    @Override
+    @Nullable V call() throws X;
 }

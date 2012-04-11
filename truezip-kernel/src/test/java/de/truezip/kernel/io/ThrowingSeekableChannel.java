@@ -5,7 +5,7 @@
 package de.truezip.kernel.io;
 
 import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
+import de.truezip.kernel.ThrowManager;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -23,7 +23,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
 
-    private final ThrowControl control;
+    private final ThrowManager control;
 
     @CreatesObligation
     public ThrowingSeekableChannel(
@@ -34,7 +34,7 @@ public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
     @CreatesObligation
     public ThrowingSeekableChannel(
             final @WillCloseWhenClosed SeekableByteChannel sbc,
-            final @CheckForNull ThrowControl control) {
+            final @CheckForNull ThrowManager control) {
         super(sbc);
         if (null == sbc)
             throw new NullPointerException();

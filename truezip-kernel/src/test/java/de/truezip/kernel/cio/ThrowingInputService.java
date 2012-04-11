@@ -5,7 +5,7 @@
 package de.truezip.kernel.cio;
 
 import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.ThrowControl;
+import de.truezip.kernel.ThrowManager;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.Iterator;
@@ -22,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
 public class ThrowingInputService<E extends Entry>
 extends DecoratingInputService<E, InputService<E>> {
     private final TestConfig config;
-    private volatile @CheckForNull ThrowControl control;
+    private volatile @CheckForNull ThrowManager control;
 
     @CreatesObligation
     public ThrowingInputService(   final @WillCloseWhenClosed InputService<E> service) {
@@ -36,8 +36,8 @@ extends DecoratingInputService<E, InputService<E>> {
         this.config = null != config ? config : TestConfig.get();
     }
 
-    private ThrowControl getThrowControl() {
-        final ThrowControl control = this.control;
+    private ThrowManager getThrowControl() {
+        final ThrowManager control = this.control;
         return null != control ? control : (this.control = config.getThrowControl());
     }
 

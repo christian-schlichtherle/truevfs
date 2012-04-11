@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockControl.locked;
+import static de.schlichtherle.truezip.kernel.LockManagement.locked;
 import de.truezip.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -25,6 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @param  <E> the type of the entries in the decorated output service.
  * @see    FsLockInputService
+ * @see    LockManagement
  * @author Christian Schlichtherle
  */
 @ThreadSafe

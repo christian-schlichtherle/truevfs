@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockControl.WAIT_TIMEOUT_MILLIS;
+import static de.schlichtherle.truezip.kernel.LockManagement.WAIT_TIMEOUT_MILLIS;
 import static de.truezip.kernel.FsSyncOption.FORCE_CLOSE_IO;
 import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;
@@ -26,14 +26,14 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Accounts input and output resources returned by its decorated controller.
  * 
- * @see    ResourceControl
+ * @see    ResourceManager
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class ResourceController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
-    private @CheckForNull ResourceControl control;
+    private @CheckForNull ResourceManager control;
 
     /**
      * Constructs a new file system resource controller.
@@ -44,12 +44,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         super(controller);
     }
 
-    private ResourceControl getControl() {
+    private ResourceManager getControl() {
         assert isWriteLockedByCurrentThread();
-        final ResourceControl control = this.control;
+        final ResourceManager control = this.control;
         return null != control
                 ? control
-                : (this.control = new ResourceControl(writeLock()));
+                : (this.control = new ResourceManager(writeLock()));
     }
 
     @Override
@@ -103,10 +103,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public <X extends IOException> void
+    public void
     sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
         waitIdle(options, handler);
         closeAll(handler);
@@ -117,7 +117,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      * Waits for all entry input and output resources to close or forces
      * them to close, dependending on the {@code options}.
      * Mind that this method deliberately handles entry input and output
-     * streams equally because {@link ResourceControl#waitForeignResources}
+     * streams equally because {@link ResourceManager#waitForeignResources}
      * WILL NOT WORK if any two resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
@@ -134,7 +134,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // HC SUNT DRACONES!
-        final ResourceControl control = this.control;
+        final ResourceManager control = this.control;
         if (null == control)
             return;
         final boolean force = options.get(FORCE_CLOSE_IO);
@@ -183,7 +183,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // IOExceptionHandler
 
-        final ResourceControl control = this.control;
+        final ResourceManager control = this.control;
         if (null != control)
             control.closeAllResources(new IOExceptionHandler());
     }

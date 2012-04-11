@@ -4,8 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockControl.isLocking;
-import static de.schlichtherle.truezip.kernel.LockControl.locked;
+import static de.schlichtherle.truezip.kernel.LockManagement.isLocking;
+import static de.schlichtherle.truezip.kernel.LockManagement.locked;
 import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
@@ -34,7 +34,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Provides read/write locking for multi-threaded access by its clients.
  * 
  * @see    LockModel
- * @see    LockControl
+ * @see    NeedsWriteLockException
+ * @see    LockManagement
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -68,8 +69,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         return this.writeLock;
     }
 
-    <T> T readOrWriteLocked(IOOperation<T> operation)
-    throws IOException {
+    <T, X extends Exception> T readOrWriteLocked(Operation<T, X> operation)
+    throws X {
         try {
             return readLocked(operation);
         } catch (NeedsWriteLockException ex) {
@@ -77,11 +78,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
     }
 
-    <T> T readLocked(IOOperation<T> operation) throws IOException {
+    <T, X extends Exception> T readLocked(Operation<T, X> operation) throws X {
         return locked(operation, readLock());
     }
 
-    <T> T writeLocked(IOOperation<T> operation) throws IOException {
+    <T, X extends Exception> T writeLocked(Operation<T, X> operation) throws X {
         assert !getModel().isReadLockedByCurrentThread()
                 : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
         return locked(operation, writeLock());
@@ -331,18 +332,18 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public <X extends IOException> void
+    public void
     sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         // MUST not initialize within IOOperation => would always be true!
         final BitField<FsSyncOption> sync = isLocking()
                 ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
                 : options;
 
-        final class Sync implements IOOperation<Void> {
+        final class Sync implements Operation<Void, FsSyncException> {
             @Override
-            public Void call() throws IOException {
+            public Void call() throws FsSyncWarningException, FsSyncException {
                 // Prevent potential dead locks by performing a timed wait for
                 // open I/O resources if the current thread is already holding
                 // a file system lock.

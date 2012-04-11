@@ -8,9 +8,9 @@ import de.truezip.extension.jmxjul.InstrumentingManager;
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncOption;
+import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -37,10 +37,10 @@ final class JmxManager extends InstrumentingManager {
      * {@link JmxDirector#getKernelIOStatistics}.
      */
     @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    public void
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         try {
             manager.sync(options, handler);
         } finally {

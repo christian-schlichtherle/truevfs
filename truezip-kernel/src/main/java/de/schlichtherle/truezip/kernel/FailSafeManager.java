@@ -83,10 +83,10 @@ final class FailSafeManager extends FsDecoratingManager<FsManager> {
      * finished processing some changes to some archive files!
      */
     @Override
-    public <X extends IOException> void
+    public void
     sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         if (null != this.shutdownHook) {
             synchronized (this) {
                 final ShutdownHook shutdownHook = this.shutdownHook;

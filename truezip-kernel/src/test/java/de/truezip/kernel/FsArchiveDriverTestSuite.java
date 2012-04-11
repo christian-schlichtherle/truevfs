@@ -422,13 +422,13 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void checkAllExceptions(final Object thiz) throws IOException {
-        final ThrowControl ctl = getThrowControl();
+        final ThrowManager ctl = getThrowControl();
         ctl.check(thiz, IOException.class);
         ctl.check(thiz, RuntimeException.class);
         ctl.check(thiz, Error.class);
     }
 
-    private ThrowControl getThrowControl() {
+    private ThrowManager getThrowControl() {
         return getTestConfig().getThrowControl();
     }
 

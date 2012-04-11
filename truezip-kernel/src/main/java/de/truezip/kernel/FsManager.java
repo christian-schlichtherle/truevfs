@@ -7,7 +7,6 @@ package de.truezip.kernel;
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import java.io.IOException;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -93,13 +92,19 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * method is called to check out any {@link FsSyncWarningException}, too.
      *
      * @param  options a bit field of synchronization options.
-     * @throws FsSyncException if committing the changes fails for any reason.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream gets forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
      *         is set.
      */
     public final void
-    sync(final BitField<FsSyncOption> options) throws FsSyncException {
+    sync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         sync(options, builder);
         builder.check();
@@ -117,21 +122,22 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * system controllers.
      *
      * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code IOException}s and mapping them to output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws X at the discretion of the exception {@code handler}
-     *         upon the occurence of any {@code IOException}.
+     * @param  handler the exception handling strategy for
+     *         {@code FsSyncException}s.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream gets forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
      *         is set.
      */
-    public <X extends IOException> void
+    public void
     sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    throws FsSyncWarningException, FsSyncException {
         if (options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
         for (final FsController<?> controller : this) {
@@ -139,8 +145,6 @@ public abstract class FsManager implements Iterable<FsController<?>> {
                 controller.sync(options, handler);
             } catch (final FsSyncException ex) {
                 handler.warn(ex);
-            } catch (final IOException ex) {
-                handler.warn(new FsSyncException(controller.getModel(), ex));
             }
         }
     }
