@@ -112,11 +112,11 @@ public class ReadKeyPanel extends KeyPanel {
                     param.setKeyFileBytes(key);
                     Arrays.fill(key, (byte) 0);
                     return true;
-                } catch (EOFException ex) {
-                    setError(resources.getString("keyFile.eofException"));
-                    return false;
                 } catch (FileNotFoundException ex) {
                     setError(resources.getString("keyFile.fileNotFoundException"));
+                    return false;
+                } catch (EOFException ex) {
+                    setError(resources.getString("keyFile.eofException"));
                     return false;
                 } catch (IOException ex) {
                     setError(resources.getString("keyFile.ioException"));

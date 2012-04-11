@@ -5,7 +5,6 @@
 package de.truezip.kernel.mock;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
@@ -14,11 +13,11 @@ import de.truezip.kernel.io.ThrowingOutputStream;
 import de.truezip.kernel.io.ThrowingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -165,7 +164,7 @@ public class MockController extends FsModelController<FsModel> {
                 checkAllExceptions(this);
                 final IOEntry<?> buffer = map.get(name);
                 if (null == buffer)
-                    throw new FileNotFoundException(name.toString());
+                    throw new NoSuchFileException(name.toString());
                 return buffer.getInputSocket();
             }
 

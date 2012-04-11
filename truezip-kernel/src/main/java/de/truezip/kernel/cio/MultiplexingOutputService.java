@@ -9,9 +9,7 @@ import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.util.JointIterator;
-import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -173,21 +171,10 @@ extends DecoratingOutputService<E, OutputService<E>> {
         if (isBusy())
             return;
 
-        final SuppressedExceptionBuilder<IOException>
-                builder = new SuppressedExceptionBuilder<>();
         for (   final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
-                i.hasNext(); ) {
-            final BufferedEntryOutputStream out = i.next();
-            try {
-                if (out.store())
-                    i.remove();
-            } catch (final InputException ex) {
-                builder.warn(ex);
-            } catch (final IOException ex) {
-                throw builder.fail(ex);
-            }
-        }
-        builder.check();
+                i.hasNext(); )
+            if (i.next().store())
+                i.remove();
     }
 
     /** This entry output stream writes directly to this output service. */
@@ -240,7 +227,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 }
 
                 @Override
-                public Entry getLocalTarget() throws IOException {
+                public Entry getLocalTarget() {
                     return null != peer ? peer : buffer;
                 }
             }
@@ -276,11 +263,17 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     dst.setTime(type, src.getTime(type));
         }
 
-        boolean store() throws IOException {
+        boolean store() {
             if (!closed || isBusy())
                 return false;
-            IOSocket.copy(input, output);
-            buffer.release();
+            try {
+                try {
+                    IOSocket.copy(input, output);
+                } catch (IOException ignore) {
+                    buffer.release();
+                }
+            } catch (IOException ignore) {
+            }
             return true;
         }
 

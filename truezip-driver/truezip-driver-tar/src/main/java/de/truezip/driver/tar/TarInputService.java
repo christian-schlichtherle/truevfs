@@ -8,7 +8,10 @@ import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.cio.*;
+import de.truezip.kernel.cio.IOBuffer;
+import de.truezip.kernel.cio.IOPool;
+import de.truezip.kernel.cio.InputService;
+import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.io.Streams;
 import static de.truezip.kernel.util.Maps.initialCapacity;
@@ -16,6 +19,7 @@ import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -232,9 +236,9 @@ implements InputService<TarDriverEntry> {
             public TarDriverEntry getLocalTarget() throws IOException {
                 final TarDriverEntry entry = getEntry(name);
                 if (null == entry)
-                    throw new FileNotFoundException(name + " (entry not found)");
+                    throw new NoSuchFileException(name, null, "Entry not found!");
                 if (entry.isDirectory())
-                    throw new FileNotFoundException(name + " (cannot read directory entries)");
+                    throw new NoSuchFileException(name, null, "Cannot read directory entries!");
                 return entry;
             }
 
@@ -249,7 +253,7 @@ implements InputService<TarDriverEntry> {
                 return getInputSocket().channel();
             }
 
-            InputSocket<? extends IOEntry<?>> getInputSocket()
+            InputSocket<? extends IOBuffer<?>> getInputSocket()
             throws IOException {
                 return getLocalTarget().getTemp().getInputSocket();
             }

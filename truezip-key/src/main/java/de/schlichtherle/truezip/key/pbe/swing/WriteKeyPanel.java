@@ -131,11 +131,11 @@ class WriteKeyPanel extends KeyPanel {
                     final byte[] key;
                     try {
                         key = SwingSafePbeParametersView.readKeyFile(keyFile);
-                    } catch (EOFException ex) {
-                        setError(resources.getString("keyFile.eofException"));
-                        return false;
                     } catch (FileNotFoundException ex) {
                         setError(resources.getString("keyFile.fileNotFoundException"));
+                        return false;
+                    } catch (EOFException ex) {
+                        setError(resources.getString("keyFile.eofException"));
                         return false;
                     } catch (IOException ex) {
                         setError(resources.getString("keyFile.ioException"));

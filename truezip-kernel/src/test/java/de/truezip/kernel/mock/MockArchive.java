@@ -13,11 +13,11 @@ import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.util.Maps;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -126,7 +126,7 @@ implements Container<MockArchiveDriverEntry> {
                 throws IOException {
                     final MockArchiveDriverEntry entry = entries.get(name);
                     if (null == entry)
-                        throw new FileNotFoundException(name + " (entry not found)");
+                        throw new NoSuchFileException(name, null, "Entry not found!");
                     return entry;
                 }
 
