@@ -18,7 +18,7 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Drop-in replacement for
+ * Replacement for
  * {@link java.util.zip.ZipOutputStream java.util.zip.ZipOutputStream}.
  * <p>
  * This class starts writing ordinary ZIP32 File Format.
@@ -59,6 +59,7 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      * using the {@code "UTF-8"} charset.
      * 
      * @param  out The output stream to write the ZIP file to.
+     * @throws IOException on any I/O error. 
      */
     @CreatesObligation
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out)
@@ -72,6 +73,7 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      *
      * @param  out The output stream to write the ZIP file to.
      * @param  charset the character set to use.
+     * @throws IOException on any I/O error. 
      */
     @CreatesObligation
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset)
@@ -90,6 +92,7 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      *         {@code appendee} is reading.
      * @param  appendee the ZIP file to append to.
      *         This may already be closed.
+     * @throws IOException on any I/O error. 
      */
     @CreatesObligation
     public ZipOutputStream(
@@ -116,7 +119,7 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
             final Iterator<ZipEntry> i;
 
             EntryIterator() {
-                List<ZipEntry> l = new ArrayList<ZipEntry>(ZipOutputStream.super.size());
+                List<ZipEntry> l = new ArrayList<>(ZipOutputStream.super.size());
                 Iterator<ZipEntry> si = ZipOutputStream.super.iterator();
                 while (si.hasNext())
                     l.add(si.next());
@@ -146,7 +149,9 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
      * Returns a clone of the entry for the given name or {@code null} if no
      * entry with this name exists.
      *
-     * @param name the name of the ZIP entry.
+     * @param  name the name of the ZIP entry.
+     * @return A clone of the entry for the given name or {@code null} if no
+     *         entry with this name exists. 
      */
     @Override
     public ZipEntry getEntry(String name) {

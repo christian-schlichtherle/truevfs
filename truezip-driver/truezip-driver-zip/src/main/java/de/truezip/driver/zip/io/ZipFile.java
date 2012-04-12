@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Drop-in replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
+ * Replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
  * <p>
  * Where the constructors of this class accept a {@code charset}
  * parameter, this is used to decode comments and entry names in the ZIP file.
