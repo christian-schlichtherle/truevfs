@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.Cache.Strategy.WRITE_BACK;
+import static de.schlichtherle.truezip.kernel.CacheEntry.Strategy.WRITE_BACK;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
@@ -256,7 +256,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     @Immutable
     private final class EntryCache {
         final FsEntryName name;
-        final Cache cache;
+        final CacheEntry cache;
 
         EntryCache(final FsEntryName name) {
             this.name = name;
@@ -416,7 +416,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             void postOutput() throws IOException {
                 mknod(  options.clear(EXCLUSIVE),
-                        null != template ? template : cache.getEntry());
+                        null != template ? template : cache);
                 register();
             }
 

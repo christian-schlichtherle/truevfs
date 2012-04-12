@@ -141,7 +141,7 @@ public final class ArchiveFileSystemTest {
 
         // Check file system.
         assert paramss.length <= fileSystem.getSize();
-        assertNotNull(fileSystem.getEntry(ROOT));
+        assertNotNull(fileSystem.entry(ROOT));
         params: for (String[] params : paramss) {
             final String aen = params[0];
             if (1 == params.length)
@@ -155,7 +155,7 @@ public final class ArchiveFileSystemTest {
                 final FsEntryName entryName = new FsEntryName(
                         new UriBuilder().path(cen).getUri());
                 assertEquals(cen, entryName.getPath());
-                assertEquals(cen, fileSystem.getEntry(entryName).getName());
+                assertEquals(cen, fileSystem.entry(entryName).getName());
             }
 
             // Test if an archive entry with a name matching path is present when iterating
