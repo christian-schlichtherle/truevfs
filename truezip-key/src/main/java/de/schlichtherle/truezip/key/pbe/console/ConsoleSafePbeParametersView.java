@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truezip.key.pbe.console;
 
-import de.truezip.key.PromptingKeyProviderController;
-import de.truezip.key.param.SafePbeParametersView;
 import de.truezip.key.KeyPromptingDisabledException;
+import de.truezip.key.PromptingKeyProvider.Controller;
 import de.truezip.key.param.KeyStrength;
 import de.truezip.key.param.SafePbeParameters;
+import de.truezip.key.param.SafePbeParametersView;
 import java.io.Console;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -51,7 +51,7 @@ extends SafePbeParametersView<P> {
     private static final String NO = resources.getString("no");
 
     @Override
-    public final void promptWriteKey(final PromptingKeyProviderController<P> controller)
+    public final void promptWriteKey(final Controller<P> controller)
     throws KeyPromptingDisabledException {
         final Console con = System.console();
         if (null == con)
@@ -140,7 +140,7 @@ extends SafePbeParametersView<P> {
 
     @Override
     public void promptReadKey(
-            final PromptingKeyProviderController<P> controller,
+            final Controller<P> controller,
             final boolean invalid)
     throws KeyPromptingDisabledException {
         final Console con = System.console();

@@ -4,6 +4,7 @@
  */
 package de.truezip.key;
 
+import de.truezip.key.PromptingKeyProvider.View;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 
@@ -31,10 +32,10 @@ extends AbstractKeyManagerProvider {
      */
     public <K extends SafeKey<K>> PromptingKeyManagerProvider(
             final Class<K> clazz,
-            final PromptingKeyProviderView<K> view) {
+            final View<K> view) {
         this.managers = newMap(new Object[][] {{
             clazz,
-            new PromptingKeyManager<K>(view)
+            new PromptingKeyManager<>(view)
         }});
     }
 

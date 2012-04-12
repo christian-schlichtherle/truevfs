@@ -6,7 +6,7 @@ package de.truezip.driver.zip;
 
 import de.truezip.key.PromptingKeyManager;
 import de.truezip.key.PromptingKeyProvider;
-import de.truezip.key.PromptingKeyProviderView;
+import de.truezip.key.PromptingKeyProvider.View;
 import de.truezip.key.SafeKey;
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.ThreadSafe;
 public final class TestKeyManager<K extends SafeKey<K>>
 extends PromptingKeyManager<K> {
 
-    public TestKeyManager(final PromptingKeyProviderView<K> view) {
+    public TestKeyManager(final View<K> view) {
         super(view);
     }
 

@@ -13,11 +13,11 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A "safe" key provider which prompts the user for a key for its protected
  * resource.
- * The user is prompted via an instance of the {@link PromptingKeyProviderView}
+ * The user is prompted via an instance of the {@link View}
  * interface.
  * The view may then display the resource URI by calling {@link #getResource}
  * on this instance and set the key by using the given
- * {@link PromptingKeyProviderController}.
+ * {@link Controller}.
  *
  * @param  <K> the type of the safe keys.
  * @see    PromptingKeyManager
@@ -27,7 +27,7 @@ import javax.annotation.concurrent.ThreadSafe;
 public final class PromptingKeyProvider<K extends SafeKey<K>>
 extends SafeKeyProvider<K> {
 
-    private final PromptingKeyProviderView<K> view;
+    private final View<K> view;
 
     private volatile State state = State.RESET;
 
@@ -42,7 +42,7 @@ extends SafeKeyProvider<K> {
         this.view = manager.getView();
     }
 
-    private PromptingKeyProviderView<K> getView() {
+    private View<K> getView() {
         return view;
     }
 
@@ -296,11 +296,144 @@ extends SafeKeyProvider<K> {
     } // State
 
     /**
-     * Proxies access to the secret key for {@link PromptingKeyProviderView}
+     * Used for the actual prompting of the user for a key (a password for
+     * example) which is required to access a protected resource.
+     * This interface is not depending on any particular techology, so
+     * prompting could be implemented using Swing, the console, a web page or
+     * no user interface technology at all.
+     * <p>
+     * Implementations of this interface are maintained by a
+     * {@link PromptingKeyManager}.
+     * <p>
+     * Implementations of this interface must be thread safe
+     * and should have no side effects!
+     * 
+     * @param  <K> the type of the safe keys.
+     * @author Christian Schlichtherle
+     */
+    @SuppressWarnings("PublicInnerClass")
+    public interface View<K extends SafeKey<K>> {
+
+        /**
+         * Prompts the user for the key for (over)writing the contents of a
+         * new or existing protected resource.
+         * Upon return, the implementation should have updated the
+         * {@link Controller#setKey key} property of the given
+         * {@code controller}.
+         * <p>
+         * If the implementation has called
+         * {@link Controller#setKey} with a non-{@code null}
+         * parameter, then a clone of this object will be used as the key.
+         * <p>
+         * Otherwise, prompting for a key is permanently disabled and each
+         * subsequent call to {@link PromptingKeyProvider#getWriteKey} or
+         * {@link PromptingKeyProvider#getReadKey}
+         * results in a {@link KeyPromptingCancelledException} until
+         * {@link PromptingKeyProvider#resetCancelledKey()} or
+         * {@link PromptingKeyProvider#resetUnconditionally()} gets
+         * called.
+         *
+         * @param  controller The key controller for storing the result.
+         * @throws UnknownKeyException if key prompting fails for any reason.
+         */
+        void promptWriteKey(Controller<K> controller)
+        throws UnknownKeyException;
+
+        /**
+         * Prompts the user for the key for reading the contents of an
+         * existing protected resource.
+         * Upon return, the implementation should have updated the
+         * {@link Controller#setKey key} property of the given
+         * {@code controller}.
+         * <p>
+         * If the implementation has called
+         * {@link Controller#setKey} with a non-{@code null}
+         * parameter, then a clone of this object will be used as the key.
+         * <p>
+         * Otherwise, if the implementation has called
+         * {@link Controller#setKey} with a {@code null}
+         * parameter or throws a {@link KeyPromptingCancelledException}, then
+         * prompting for the key is permanently disabled and each subsequent call
+         * to {@link PromptingKeyProvider#getWriteKey} or
+         * {@link PromptingKeyProvider#getReadKey} results in a
+         * {@link KeyPromptingCancelledException} until
+         * {@link PromptingKeyProvider#resetCancelledKey()} or
+         * {@link PromptingKeyProvider#resetUnconditionally()} gets
+         * called.
+         * <p>
+         * Otherwise, the state of the key provider is not changed and this
+         * method gets called again.
+         *
+         * @param  controller The key controller for storing the result.
+         * @param  invalid {@code true} iff a previous call to this method
+         *         resulted in an invalid key.
+         * @throws UnknownKeyException if key prompting fails for any reason.
+         */
+        void promptReadKey(Controller<K> controller, boolean invalid)
+        throws UnknownKeyException;
+    } // View
+
+    /**
+     * Proxies access to the key for {@link PromptingKeyProviderView}
+     * implementations.
+     *
+     * @param  <K> the type of the safe keys.
+     * @author Christian Schlichtherle
+     */
+    @NotThreadSafe
+    @SuppressWarnings("PublicInnerClass")
+    public interface Controller<K extends SafeKey<K>> {
+
+        /**
+         * Returns the unique resource identifier (resource ID) of the
+         * protected resource for which this controller is used.
+         *
+         * @return The unique resource identifier (resource ID) of the
+         *         protected resource for which this controller is used.
+         * @throws IllegalStateException if getting this property is not legal
+         *         in the current state.
+         */
+        URI getResource();
+
+        /**
+         * Returns the protected resource's key.
+         *
+         * @return The protected resource's key.
+         * @throws IllegalStateException if getting key is not legal in the
+         *         current state.
+         */
+        @CheckForNull K getKey();
+
+        /**
+         * Sets the protected resource's key to a clone of the given key.
+         *
+         * @param  key The key to clone to use for the protected resource.
+         * @throws IllegalStateException if setting key is not legal in the
+         *         current state.
+         */
+        void setKey(@CheckForNull K key);
+
+        /**
+         * Requests to prompt the user for a new key upon the next call to
+         * {@link PromptingKeyProvider#getWriteKey()}, provided that the key is
+         * {@link PromptingKeyProvider#setKey set} by then.
+         *
+         * @param  changeRequested whether or not the user shall get prompted
+         *         for a new key upon the next call to
+         *         {@link PromptingKeyProvider#getWriteKey()}, provided that the
+         *         key is {@link PromptingKeyProvider#setKey set} then.
+         * @throws IllegalStateException if setting this property is illegal in the
+         *         current state.
+         */
+        void setChangeRequested(boolean changeRequested);
+    } // Controller
+
+    /**
+     * Proxies access to the secret key for {@link View}
      * implementations.
      */
     @NotThreadSafe
-    private abstract class BaseController implements PromptingKeyProviderController<K>, Closeable {
+    private abstract class BaseController implements Controller<K>, Closeable {
         private @CheckForNull State state;
 
         BaseController(final State state) {

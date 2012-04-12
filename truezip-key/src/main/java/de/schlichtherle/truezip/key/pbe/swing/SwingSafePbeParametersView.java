@@ -11,7 +11,7 @@ import de.schlichtherle.truezip.key.pbe.swing.feedback.UnknownKeyFeedback;
 import de.schlichtherle.truezip.key.swing.Windows;
 import de.truezip.kernel.util.ServiceLocator;
 import de.truezip.key.KeyPromptingInterruptedException;
-import de.truezip.key.PromptingKeyProviderController;
+import de.truezip.key.PromptingKeyProvider.Controller;
 import de.truezip.key.UnknownKeyException;
 import de.truezip.key.param.KeyStrength;
 import de.truezip.key.param.SafePbeParameters;
@@ -113,7 +113,7 @@ extends SafePbeParametersView<P> {
 
     @Override
     public void promptWriteKey(
-            final PromptingKeyProviderController<P> controller)
+            final Controller<P> controller)
     throws UnknownKeyException {
         class PromptWriteKey implements Runnable {
             @Override
@@ -129,7 +129,7 @@ extends SafePbeParametersView<P> {
      * so it doesn't need to be thread safe.
      */
     private void promptWriteKeyEDT(
-            final PromptingKeyProviderController<P> controller) {
+            final Controller<P> controller) {
         assert EventQueue.isDispatchThread();
 
         final URI resource = controller.getResource();
@@ -181,7 +181,7 @@ extends SafePbeParametersView<P> {
 
     @Override
     public void promptReadKey(
-            final PromptingKeyProviderController<P> controller,
+            final Controller<P> controller,
             final boolean invalid)
     throws UnknownKeyException {
         class PromptReadKey implements Runnable {
@@ -198,7 +198,7 @@ extends SafePbeParametersView<P> {
      * so it doesn't need to be thread safe.
      */
     private void promptReadKeyEDT(
-            final PromptingKeyProviderController<P> controller,
+            final Controller<P> controller,
             final boolean invalid) {
         assert EventQueue.isDispatchThread();
 
