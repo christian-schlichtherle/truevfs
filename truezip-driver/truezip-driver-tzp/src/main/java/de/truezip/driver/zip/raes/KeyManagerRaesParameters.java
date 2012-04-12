@@ -45,7 +45,7 @@ implements RaesParametersProvider {
     public KeyManagerRaesParameters(
             final KeyManagerProvider provider,
             final URI raes) {
-        this(provider.get(AesPbeParameters.class), raes);
+        this(provider.getKeyManager(AesPbeParameters.class), raes);
     }
 
     /**
@@ -67,7 +67,7 @@ implements RaesParametersProvider {
      * {@inheritDoc}
      * <p>
      * If {@code type} is assignable from {@link Type0RaesParameters}, then the
-     * {@link KeyManager} for {@link AesPbeParameters} will get used which
+     * {@link KeyManager} for {@link AesPbeParameters} will getKeyManager used which
      * has been provided to the constructor.
      * <p>
      * Otherwise, {@code null} gets returned.

@@ -15,6 +15,6 @@ import org.junit.Test;
 public final class KeyManagerLocatorTest {
     @Test
     public void testGetManager() {
-        assertNotNull(KeyManagerLocator.SINGLETON.get(AesPbeParameters.class));
+        assertNotNull(KeyManagerLocator.SINGLETON.getKeyManager(AesPbeParameters.class));
     }
 }

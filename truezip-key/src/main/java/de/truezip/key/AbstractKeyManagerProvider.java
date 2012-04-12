@@ -26,7 +26,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      * A static factory method for an unmodifiable key manager map which is
      * constructed from the given configuration.
      * This method is intended to be used by implementations of this class
-     * for convenient creation of the map to return by their {@link #getKeyManagers()}
+     * for convenient creation of the map to return by their {@link #getKeyManager()}
      * method.
      *
      * @param  config an array of key-value pair arrays.
@@ -39,14 +39,15 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      *         {@link Class key manager class}, a
      *         {@link String fully qualified name of a key manager class},
      *         or {@code null}.
-     * @return The new map to use as the return value of {@link #getKeyManagers()}.
+     * @return The new map to use as the return value of {@link #getKeyManager()}.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
      *         does not hold.
      */
     public static Map<Class<?>, KeyManager<?>> newMap(final Object[][] config) {
-        final Map<Class<?>, KeyManager<?>> managers = new HashMap<Class<?>, KeyManager<?>>(Maps.initialCapacity(config.length));
+        final Map<Class<?>, KeyManager<?>> managers = new HashMap<>(
+                Maps.initialCapacity(config.length));
         for (final Object[] param : config) {
             final Class<?> type = ServiceLocator.promote(param[0], Class.class);
             final KeyManager<?> newManager = ServiceLocator.promote(param[1], KeyManager.class);
@@ -60,10 +61,10 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final <K> KeyManager<K> get(final Class<K> type) {
+    public final <K> KeyManager<K> getKeyManager(final Class<K> type) {
         final KeyManager<?> manager = getKeyManagers().get(type);
         if (null == manager)
-            throw new ServiceConfigurationError("No key manager available for " + type + '.');
+            throw new ServiceConfigurationError("No key manager available for " + type + ".");
         return (KeyManager<K>) manager;
     }
 

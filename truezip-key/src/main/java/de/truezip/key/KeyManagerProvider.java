@@ -26,5 +26,5 @@ public interface KeyManagerProvider {
      * @throws ServiceConfigurationError if no appropriate key manager is
      *         available.
      */
-    <K> KeyManager<K> get(Class<K> type);
+    <K> KeyManager<K> getKeyManager(Class<K> type);
 }

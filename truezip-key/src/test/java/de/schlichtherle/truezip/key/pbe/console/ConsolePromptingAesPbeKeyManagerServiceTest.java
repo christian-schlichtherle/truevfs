@@ -17,6 +17,6 @@ extends PromptingKeyManagerTestSuite {
     @Override
     protected PromptingKeyManager<?> newKeyManager() {
         return (PromptingKeyManager<?>) new ConsolePromptingAesPbeKeyManagerService()
-                .get(AesPbeParameters.class);
+                .getKeyManager(AesPbeParameters.class);
     }
 }
