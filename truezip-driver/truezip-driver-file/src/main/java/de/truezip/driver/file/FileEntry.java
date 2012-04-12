@@ -176,12 +176,12 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
     }
 
     @Override
-    public final InputSocket<FileEntry> getInputSocket() {
+    public final InputSocket<FileEntry> inputSocket() {
         return new FileInputSocket(this);
     }
 
     @Override
-    public final OutputSocket<FileEntry> getOutputSocket() {
+    public final OutputSocket<FileEntry> outputSocket() {
         return new FileOutputSocket(this, FsAccessOptions.NONE, null);
     }
 

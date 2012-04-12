@@ -165,7 +165,7 @@ public class MockController extends FsModelController<FsModel> {
                 final IOEntry<?> buffer = map.get(name);
                 if (null == buffer)
                     throw new NoSuchFileException(name.toString());
-                return buffer.getInputSocket();
+                return buffer.inputSocket();
             }
 
             @Override
@@ -207,7 +207,7 @@ public class MockController extends FsModelController<FsModel> {
                 IOEntry<?> o = map.get(name);
                 if (null == o)
                     o = map.putIfAbsent(name, n);
-                return (null != o ? o : n).getOutputSocket();
+                return (null != o ? o : n).outputSocket();
             }
 
             @Override

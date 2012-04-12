@@ -35,7 +35,7 @@ extends Closeable, Container<E> {
      * @param  name an {@link Entry#getName() entry name}.
      * @return An input socket for reading from the entry with the given name.
      */
-    InputSocket<E> getInputSocket(String name);
+    InputSocket<E> inputSocket(String name);
 
     @Override
     @DischargesObligation

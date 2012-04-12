@@ -11,7 +11,7 @@ import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.io.Paths;
+import de.truezip.kernel.util.Paths;
 import de.truezip.kernel.util.BitField;
 import java.io.File;
 import java.io.IOException;
@@ -215,7 +215,7 @@ final class TBIO {
         BitField<FsAccessOption> preferences = config.getAccessPreferences();
         final InputSocket<?> input = getInputSocket(src, preferences);
         final OutputSocket<?> output = getOutputSocket(dst, preferences,
-                preserve ? input.getLocalTarget() : null);
+                preserve ? input.localTarget() : null);
         IOSocket.copy(input, output);
     }
 

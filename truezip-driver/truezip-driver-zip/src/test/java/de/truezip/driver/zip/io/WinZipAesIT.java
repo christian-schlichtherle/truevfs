@@ -52,23 +52,6 @@ public final class WinZipAesIT extends ZipTestSuite {
     }
 
     @Override
-    protected ZipFile newZipFile(String name)
-    throws IOException {
-        final ZipFile zf = new ZipFile(name);
-        zf.setCryptoParameters(new WinZipAesCryptoParameters());
-        return zf.recoverLostEntries();
-    }
-
-    @Override
-    protected ZipFile newZipFile(
-            String name, Charset charset)
-    throws IOException {
-        final ZipFile zf = new ZipFile(name, charset);
-        zf.setCryptoParameters(new WinZipAesCryptoParameters());
-        return zf.recoverLostEntries();
-    }
-
-    @Override
     protected ZipFile newZipFile(Path file)
     throws IOException {
         final ZipFile zf = new ZipFile(file);

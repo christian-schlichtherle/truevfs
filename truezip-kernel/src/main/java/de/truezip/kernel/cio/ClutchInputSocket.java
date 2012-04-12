@@ -14,16 +14,12 @@ import javax.annotation.concurrent.NotThreadSafe;
  * upon any {@link Throwable}.
  *
  * @see    ClutchOutputSocket
- * @param  <E> the type of the {@link #getLocalTarget() local target}.
+ * @param  <E> the type of the {@link #localTarget() local target}.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public abstract class ClutchInputSocket<E extends Entry>
 extends DecoratingInputSocket<E> {
-
-    public ClutchInputSocket() {
-        super(null);
-    }
 
     @Override
     protected final InputSocket<? extends E> getSocket() throws IOException {
@@ -41,9 +37,9 @@ extends DecoratingInputSocket<E> {
     throws IOException;
 
     @Override
-    public E getLocalTarget() throws IOException {
+    public E localTarget() throws IOException {
         try {
-            return getBoundSocket().getLocalTarget();
+            return getBoundSocket().localTarget();
         } catch (final Throwable ex) {
             reset();
             throw ex;

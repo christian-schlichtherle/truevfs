@@ -146,7 +146,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
-    public InputSocket<HttpEntry> getInputSocket() {
+    public InputSocket<HttpEntry> inputSocket() {
         return newInputSocket(FsAccessOptions.NONE);
     }
 
@@ -155,7 +155,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
-    public OutputSocket<HttpEntry> getOutputSocket() {
+    public OutputSocket<HttpEntry> outputSocket() {
         return newOutputSocket(FsAccessOptions.NONE, null);
     }
 

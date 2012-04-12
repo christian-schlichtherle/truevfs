@@ -13,8 +13,7 @@ import javax.annotation.CheckForNull;
  * @param  <E> the type of the entries in this container.
  * @author Christian Schlichtherle
  */
-public interface Container<E extends Entry>
-extends Iterable<E> {
+public interface Container<E extends Entry> extends Iterable<E> {
 
     /**
      * Returns the number of entries in this container.
@@ -41,12 +40,12 @@ extends Iterable<E> {
     Iterator<E> iterator();
 
     /**
-     * Returns the entry for the given {@link Entry#getName() name} or
-     * {@code null} if no entry with this name exists in this container.
+     * Returns the entry for the given {@code name} or {@code null} if no entry
+     * with this name exists in this container.
      *
-     * @param  name an entry name.
-     * @return The entry for the given {@link Entry#getName() name} or
-     *         {@code null} if no entry with this name exists in this container.
+     * @param  name the name of the entry.
+     * @return The entry for the given {@code name} or {@code null} if no entry
+     *         with this name exists in this container.
      */
-    @CheckForNull E getEntry(String name);
+    @CheckForNull E entry(String name);
 }

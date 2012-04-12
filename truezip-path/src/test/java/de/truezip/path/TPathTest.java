@@ -10,7 +10,7 @@ import de.truezip.file.TConfig;
 import static de.truezip.kernel.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.FsPath;
-import de.truezip.kernel.io.Paths;
+import de.truezip.kernel.util.Paths;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.nio.file.Path;

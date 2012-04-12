@@ -8,6 +8,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.io.OutputClosedException;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -20,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Decorates another output service in order to disconnect any resources when this
  * output service gets closed.
  * Once {@linkplain #close() closed}, all methods of all products of this service,
- * including all sockets, streams etc. but excluding {@link #getOutputSocket}
+ * including all sockets, streams etc. but excluding {@link #outputSocket}
  * and all {@link #close()} methods, will throw an
  * {@link OutputClosedException} when called.
  *
@@ -39,7 +40,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * 
      * @param output the service to decorate.
      */
-    @CreatesObligation
     public DisconnectingOutputService(@WillCloseWhenClosed OutputService<E> output) {
         super(output);
     }
@@ -71,14 +71,14 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public E getEntry(String name) {
+    public E entry(String name) {
         assertOpenService();
-        return container.getEntry(name);
+        return container.entry(name);
     }
 
     @Override
-    public final OutputSocket<E> getOutputSocket(E entry) {
-        return new Output(container.getOutputSocket(entry));
+    public final OutputSocket<E> outputSocket(E entry) {
+        return new Output(container.outputSocket(entry));
     }
 
     /**
@@ -92,6 +92,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * @throws IOException on any I/O error.
      */
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         closed = true;
         container.close();
@@ -148,6 +149,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (!closed)
                 out.close();
@@ -206,6 +208,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (!closed)
                 channel.close();

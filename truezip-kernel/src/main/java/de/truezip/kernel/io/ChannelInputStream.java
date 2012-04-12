@@ -44,7 +44,6 @@ public class ChannelInputStream extends InputStream {
      */
     private long mark = -1;
 
-    @CreatesObligation
     public ChannelInputStream(
             final @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
         this.channel = channel;

@@ -97,7 +97,6 @@ implements Iterable<E> {
             final @CheckForNull @WillNotClose RawFile<E> appendee,
             final ZipOutputStreamParameters param)
     throws IOException {
-        super(null);
         final OutputStream out = sink.stream();
         try {
             this.out = this.leos = null != appendee
@@ -125,16 +124,6 @@ implements Iterable<E> {
             }
             throw ex;
         }
-    }
-
-    @CreatesObligation
-    private static LittleEndianOutputStream newLittleEndianOutputStream(
-            final @CheckForNull @WillNotClose RawFile<?> appendee,
-            final Sink sink) throws IOException {
-        final OutputStream out = sink.stream();
-        return null != appendee
-                ? new AppendingLittleEndianOutputStream(out, appendee)
-                : new LittleEndianOutputStream(out);
     }
 
     private byte[] encode(String string) {
@@ -181,14 +170,16 @@ implements Iterable<E> {
     }
 
     /**
-     * Returns the entry for the given name or {@code null} if no entry with
-     * this name exists.
-     * Note that the returned entry is shared with this instance.
-     * It is illegal to change its state!
+     * Returns the entry for the given {@code name} or {@code null} if no entry
+     * with this name exists in this ZIP file.
+     * Note that the returned entry is shared with this instance - it is an
+     * error to change its state!
      *
-     * @param name the name of the ZIP entry.
+     * @param  name the name of the ZIP entry.
+     * @return The entry for the given {@code name} or {@code null} if no entry
+     *         with this name exists in this ZIP file.
      */
-    public E getEntry(String name) {
+    public E entry(String name) {
         return entries.get(name);
     }
 
@@ -352,7 +343,7 @@ implements Iterable<E> {
         method.init(entry);
         this.out = method.start();
         this.processor = method;
-        // Store entry now so that a subsequent call to getEntry(...) returns
+        // Store entry now so that a subsequent call to entry(...) returns
         // it.
         this.entries.put(entry.getName(), entry);
         this.entry = entry;
@@ -693,12 +684,10 @@ implements Iterable<E> {
     /** Adjusts the number of written bytes in the offset for appending mode. */
     private static final class AppendingLittleEndianOutputStream
     extends LittleEndianOutputStream {
-        @CreatesObligation
         AppendingLittleEndianOutputStream(
                 final @WillCloseWhenClosed OutputStream out,
                 final @WillNotClose RawFile<?> appendee) {
             super(out);
-            assert null != out;
             super.written = appendee.getOffsetMapper().unmap(appendee.length());
         }
     } // AppendingLEDataOutputStream

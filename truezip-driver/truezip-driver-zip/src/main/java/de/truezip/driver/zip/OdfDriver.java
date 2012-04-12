@@ -48,7 +48,7 @@ public class OdfDriver extends JarDriver {
         final ZipOutputService zos = new ZipOutputService(model, oos, zis, this);
         final IOPool<?> pool = getIOPool();
         return null != zis && zis.isAppendee()
-                ? new MultiplexingOutputService<>(zos, pool)
-                : new OdfOutputService(zos, pool);
+                ? new MultiplexingOutputService<>(pool, zos)
+                : new OdfOutputService(pool, zos);
     }
 }

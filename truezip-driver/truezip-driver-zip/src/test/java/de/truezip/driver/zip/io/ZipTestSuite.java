@@ -112,17 +112,6 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         return new ZipOutputStream(out, appendee);
     }
 
-    protected ZipFile newZipFile(String name)
-    throws IOException {
-        return new ZipFile(name).recoverLostEntries();
-    }
-
-    protected ZipFile newZipFile(
-            String name, Charset charset)
-    throws IOException {
-        return new ZipFile(name, charset).recoverLostEntries();
-    }
-
     protected ZipFile newZipFile(Path file)
     throws IOException {
         return new ZipFile(file).recoverLostEntries();
@@ -176,24 +165,6 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
             try {
                 newZipOutputStream(null, Charset.forName("UTF-8"));
-                fail();
-            } catch (NullPointerException ex) {
-            }
-
-            try {
-                newZipFile((String) null);
-                fail();
-            } catch (NullPointerException ex) {
-            }
-
-            try {
-                newZipFile((String) null, null);
-                fail();
-            } catch (NullPointerException ex) {
-            }
-
-            try {
-                newZipFile((String) null, Charset.forName("UTF-8"));
                 fail();
             } catch (NullPointerException ex) {
             }
@@ -541,7 +512,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
             final byte[] buf = new byte[data1.length];
             for (int i = 0; i < 30; i++) {
                 final String name = i + ".txt";
-                final ZipEntry entry = zf.getEntry(name);
+                final ZipEntry entry = zf.entry(name);
                 assertEquals(data1.length, entry.getSize());
                 try (final InputStream in = zf.getInputStream(name)) {
                     int off = 0;

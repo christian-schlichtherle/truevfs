@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 
@@ -33,9 +32,12 @@ implements SeekableByteChannel {
     /** The nullable decorated seekable byte channel. */
     protected @Nullable SeekableByteChannel channel;
 
+    protected DecoratingSeekableChannel() { }
+
     protected DecoratingSeekableChannel(
-            final @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
-        this.channel = channel;
+            final @WillCloseWhenClosed SeekableByteChannel channel) {
+        if (null == (this.channel = channel))
+            throw new NullPointerException();
     }
 
     @Override

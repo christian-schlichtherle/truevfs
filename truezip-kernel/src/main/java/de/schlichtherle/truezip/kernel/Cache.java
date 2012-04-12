@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
@@ -28,13 +29,13 @@ import javax.annotation.concurrent.NotThreadSafe;
  *     backing store and temporarily stored in the cache.
  *     Subsequent or concurrent read operations will be served from the cache
  *     without re-reading the entry data from the backing store again until
- *     the cache gets {@link #clear cleared}.
+ *     the cache gets {@link #release cleared}.
  * <li>At the discretion of the {@link Strategy}, entry data written to the
  *     cache may not be written to the backing store until the cache gets
  *     {@link #flush flushed}.
  * <li>After a write operation, the entry data will be stored in the cache
  *     for subsequent read operations until the cache gets
- *     {@link #clear cleared}.
+ *     {@link #release cleared}.
  * <li>As a side effect, caching decouples the underlying storage from its
  *     clients, allowing it to create, read, update or delete the entry data
  *     while some clients are still busy on reading or writing the cached
@@ -45,7 +46,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-final class Cache implements Flushable, Closeable {
+final class Cache implements Entry, Flushable, Closeable {
 
     private final Strategy strategy;
     private final IOPool<?> pool;
@@ -67,10 +68,9 @@ final class Cache implements Flushable, Closeable {
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
-    @CreatesObligation
     private Cache(final Strategy strategy, final IOPool<?> pool) {
-        if (null == (this.strategy = strategy))
-            throw new NullPointerException();
+        assert null != strategy;
+        this.strategy = strategy;
         if (null == (this.pool = pool))
             throw new NullPointerException();
     }
@@ -81,7 +81,7 @@ final class Cache implements Flushable, Closeable {
      * This method needs to be called before any input can be done -
      * otherwise a {@link NullPointerException} will be thrown on the first
      * read attempt.
-     * Note that calling this method does <em>not</em> {@link #clear() clear}
+     * Note that calling this method does <em>not</em> {@link #release() release}
      * this cache.
      *
      * @param  input an input socket for reading the entry data from the
@@ -134,12 +134,12 @@ final class Cache implements Flushable, Closeable {
      * 
      * @throws IOException on any I/O error.
      */
-    void clear() throws IOException {
+    public void release() throws IOException {
         setBuffer(null);
     }
 
     /**
-     * {@linkplain #flush() Flushes} and finally {@linkplain #clear() clears}
+     * {@linkplain #flush() Flushes} and finally {@linkplain #release() releases}
      * the cached entry data.
      */
     @Override
@@ -148,12 +148,29 @@ final class Cache implements Flushable, Closeable {
         try {
             flush();
         } finally {
-            clear();
+            release();
         }
     }
 
+    @Override
+    public String getName() {
+        return "Johnny Cache";
+    }
+
+    @Override
+    public long getSize(Entry.Size type) {
+        final Buffer buffer = getBuffer();
+        return null == buffer ? UNKNOWN : buffer.data.getSize(type);
+    }
+
+    @Override
+    public long getTime(Entry.Access type) {
+        final Buffer buffer = getBuffer();
+        return null == buffer ? UNKNOWN : buffer.data.getTime(type);
+    }
+
     @Nullable Entry getEntry() {
-        Buffer buffer = getBuffer();
+        final Buffer buffer = getBuffer();
         return null == buffer ? null : buffer.data;
     }
 
@@ -162,7 +179,7 @@ final class Cache implements Flushable, Closeable {
      *
      * @return An input socket for reading the cached entry data.
      */
-    InputSocket<?> getInputSocket() {
+    public InputSocket<Entry> inputSocket() {
         return new Input();
     }
 
@@ -171,7 +188,7 @@ final class Cache implements Flushable, Closeable {
      *
      * @return An output socket for writing the cached entry data.
      */
-    OutputSocket<?> getOutputSocket() {
+    public OutputSocket<Entry> outputSocket() {
         return new Output();
     }
 
@@ -212,7 +229,7 @@ final class Cache implements Flushable, Closeable {
 
         /**
          * A write-through cache flushes any written data as soon as the
-         * output stream created by {@link #getOutputSocket} gets closed.
+         * output stream created by {@link #outputSocket} gets closed.
          */
         WRITE_THROUGH {
             @Override
@@ -250,35 +267,61 @@ final class Cache implements Flushable, Closeable {
         abstract Cache.OutputBufferPool newOutputBufferPool(Cache cache);
     } // Strategy
 
-    private final class Input extends DelegatingInputSocket<Entry> {
+    private final class Input extends InputSocket<Entry> {
         @CheckForNull Buffer buffer;
 
-        @Override
-        protected InputSocket<? extends Entry> getSocket() throws IOException {
-            return (buffer = getInputBufferPool().allocate()).getInputSocket();
+        InputSocket<? extends Entry> getSocket() throws IOException {
+            return (buffer = getInputBufferPool().allocate()).inputSocket();
+        }
+
+        InputSocket<? extends Entry> getBoundSocket() throws IOException {
+            return getSocket().bind(this);
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
+        public Entry localTarget() throws IOException {
             final Buffer b = buffer;
             return null != b ? b.data : new ProxyEntry(
-                    input/*.bind(this)*/.getLocalTarget()); // do NOT bind!
+                    input/*.bind(this)*/.localTarget()); // do NOT bind!
+        }
+
+        @Override
+        public InputStream stream() throws IOException {
+            return getBoundSocket().stream();
+        }
+
+        @Override
+        public SeekableByteChannel channel() throws IOException {
+            return getBoundSocket().channel();
         }
     } // Input
 
-    private final class Output extends DelegatingOutputSocket<Entry> {
+    private final class Output extends OutputSocket<Entry> {
         @CheckForNull Buffer buffer;
 
-        @Override
-        protected OutputSocket<? extends Entry> getSocket() throws IOException {
-            return (buffer = getOutputBufferPool().allocate()).getOutputSocket();
+        OutputSocket<? extends Entry> getSocket() throws IOException {
+            return (buffer = getOutputBufferPool().allocate()).outputSocket();
+        }
+
+        OutputSocket<? extends Entry> getBoundSocket() throws IOException {
+            return getSocket().bind(this);
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
+        public Entry localTarget() throws IOException {
             final Buffer b = buffer;
             return null != b ? b.data : new ProxyEntry(
-                    output/*.bind(this)*/.getLocalTarget()); // do NOT bind!
+                    output/*.bind(this)*/.localTarget()); // do NOT bind!
+        }
+
+        @Override
+        public OutputStream stream() throws IOException {
+            return getBoundSocket().stream();
+        }
+
+        @Override
+        public SeekableByteChannel channel() throws IOException {
+            return getBoundSocket().channel();
         }
     } // Output
 
@@ -288,7 +331,7 @@ final class Cache implements Flushable, Closeable {
         ProxyEntry(Entry entry) {
             super(entry);
         }
-    } // Proxy
+    } // ProxyEntry
 
     @Immutable
     private final class InputBufferPool
@@ -299,7 +342,7 @@ final class Cache implements Flushable, Closeable {
             if (null == buffer) {
                 buffer = new Buffer();
                 try {
-                    IOSocket.copy(input, buffer.data.getOutputSocket());
+                    IOSocket.copy(input, buffer.data.outputSocket());
                 } catch (final IOException ex) {
                     try {
                         buffer.release();
@@ -325,6 +368,29 @@ final class Cache implements Flushable, Closeable {
     } // InputBufferPool
 
     @Immutable
+    private abstract class OutputBufferPool
+    implements Pool<Buffer, IOException> {
+        @Override
+        public Buffer allocate() throws IOException {
+            final Buffer buffer = new Buffer();
+            assert 0 == buffer.readers;
+            buffer.writers = 1;
+            return buffer;
+        }
+
+        @Override
+        public void release(final Buffer buffer) throws IOException {
+            assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
+            buffer.writers = 0;
+            try {
+                IOSocket.copy(buffer.data.inputSocket(), output);
+            } finally {
+                setBuffer(buffer);
+            }
+        }
+    } // OutputBufferPool
+
+    @Immutable
     private final class WriteThroughOutputBufferPool extends OutputBufferPool {
         @Override
         public void release(Buffer buffer) throws IOException {
@@ -345,31 +411,8 @@ final class Cache implements Flushable, Closeable {
         }
     } // WriteBackOutputBufferPool
 
-    @Immutable
-    private abstract class OutputBufferPool
-    implements Pool<Buffer, IOException> {
-        @Override
-        public Buffer allocate() throws IOException {
-            final Buffer buffer = new Buffer();
-            assert 0 == buffer.readers;
-            buffer.writers = 1;
-            return buffer;
-        }
-
-        @Override
-        public void release(final Buffer buffer) throws IOException {
-            assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
-            buffer.writers = 0;
-            try {
-                IOSocket.copy(buffer.data.getInputSocket(), output);
-            } finally {
-                setBuffer(buffer);
-            }
-        }
-    } // OutputBufferPool
-
-    /** A buffer for the contents of the cache. */
-    private final class Buffer {
+    /** An I/O buffer with the cached contents. */
+    private final class Buffer implements IOBuffer<Buffer> {
         final IOBuffer<?> data;
 
         int readers, writers; // max one writer!
@@ -378,24 +421,49 @@ final class Cache implements Flushable, Closeable {
             data = pool.allocate();
         }
 
-        InputSocket<?> getInputSocket() {
+        @Override
+        public String getName() {
+            return data.getName();
+        }
+
+        @Override
+        public long getSize(Size type) {
+            return data.getSize(type);
+        }
+
+        @Override
+        public long getTime(Access type) {
+            return data.getTime(type);
+        }
+
+        @Override
+        public InputSocket<Buffer> inputSocket() {
             return new Input();
         }
 
-        OutputSocket<?> getOutputSocket() {
+        @Override
+        public OutputSocket<Buffer> outputSocket() {
             return new Output();
         }
 
-        void release() throws IOException {
+        @Override
+        public void release() throws IOException {
             assert 0 == writers;
             assert 0 == readers;
             data.release();
         }
 
         @NotThreadSafe
-        final class Input extends DecoratingInputSocket<Entry> {
-            Input() {
-                super(data.getInputSocket());
+        final class Input extends InputSocket<Buffer> {
+            final InputSocket<?> socket = data.inputSocket();
+
+            InputSocket<?> getBoundSocket() {
+                return socket.bind(this);
+            }
+
+            @Override
+            public Buffer localTarget() throws IOException {
+                return Buffer.this;
             }
 
             @Override
@@ -411,9 +479,11 @@ final class Cache implements Flushable, Closeable {
                 }
 
                 @Override
+                @DischargesObligation
                 public void close() throws IOException {
                     if (closed)
                         return;
+                    // HC SUNT DRACONES!
                     in.close();
                     getInputBufferPool().release(Buffer.this);
                     closed = true;
@@ -433,9 +503,11 @@ final class Cache implements Flushable, Closeable {
                 }
 
                 @Override
+                @DischargesObligation
                 public void close() throws IOException {
                     if (closed)
                         return;
+                    // HC SUNT DRACONES!
                     channel.close();
                     getInputBufferPool().release(Buffer.this);
                     closed = true;
@@ -444,9 +516,16 @@ final class Cache implements Flushable, Closeable {
         } // Input
 
         @NotThreadSafe
-        final class Output extends DecoratingOutputSocket<Entry> {
-            Output() {
-                super(data.getOutputSocket());
+        final class Output extends OutputSocket<Buffer> {
+            final OutputSocket<?> socket = data.outputSocket();
+
+            OutputSocket<?> getBoundSocket() {
+                return socket.bind(this);
+            }
+
+            @Override
+            public Buffer localTarget() throws IOException {
+                return Buffer.this;
             }
 
             @Override
@@ -462,9 +541,11 @@ final class Cache implements Flushable, Closeable {
                 }
 
                 @Override
+                @DischargesObligation
                 public void close() throws IOException {
                     if (closed)
                         return;
+                    // HC SUNT DRACONES!
                     out.close();
                     getOutputBufferPool().release(Buffer.this);
                     closed = true;
@@ -484,9 +565,11 @@ final class Cache implements Flushable, Closeable {
                 }
 
                 @Override
+                @DischargesObligation
                 public void close() throws IOException {
                     if (closed)
                         return;
+                    // HC SUNT DRACONES!
                     channel.close();
                     getOutputBufferPool().release(Buffer.this);
                     closed = true;

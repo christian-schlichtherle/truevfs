@@ -387,8 +387,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final OptionOutputSocket oos = (OptionOutputSocket) output;
         final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(
-                new ZipOutputService(model, oos, zis, this),
-                getIOPool());
+                getIOPool(), new ZipOutputService(model, oos, zis, this));
     }
 
     /**
@@ -427,8 +426,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     public ZipDriverEntry newEntry(
             String name,
             final Type type,
-            final Entry template,
-            final BitField<FsAccessOption> mknod) {
+            final BitField<FsAccessOption> mknod,
+            final @CheckForNull Entry template) {
         name = normalize(name, type);
         final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {

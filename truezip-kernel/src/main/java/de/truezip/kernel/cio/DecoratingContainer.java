@@ -23,8 +23,11 @@ implements Container<E> {
     /** The nullable decorated entry container. */
     protected @Nullable C container;
 
-    protected DecoratingContainer(final @CheckForNull C container) {
-        this.container = container;
+    protected DecoratingContainer() { }
+
+    protected DecoratingContainer(final C container) {
+        if (null == (this.container = container))
+            throw new NullPointerException();
     }
 
     @Override
@@ -38,8 +41,8 @@ implements Container<E> {
     }
 
     @Override
-    public @CheckForNull E getEntry(String name) {
-        return container.getEntry(name);
+    public @CheckForNull E entry(String name) {
+        return container.entry(name);
     }
 
     /**

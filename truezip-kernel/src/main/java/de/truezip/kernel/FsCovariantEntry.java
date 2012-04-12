@@ -57,9 +57,7 @@ implements Cloneable {
         for (final Map.Entry<Type, E> mapping : this.map.entrySet()) {
             final FsArchiveEntry entry = mapping.getValue();
             cloneMap.put(mapping.getKey(),
-                        driver.newEntry(entry.getName(),
-                                        entry.getType(),
-                                        entry));
+                    driver.newEntry(entry.getName(), entry.getType(), entry));
         }
         final LinkedHashSet<String> members = this.members;
         if (null != members)

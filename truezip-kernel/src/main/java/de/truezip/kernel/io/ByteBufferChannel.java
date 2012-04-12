@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -19,7 +17,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-@CleanupObligation
 public class ByteBufferChannel implements SeekableByteChannel {
 
     private ByteBuffer buffer;
@@ -36,7 +33,6 @@ public class ByteBufferChannel implements SeekableByteChannel {
      *         supports no {@linkplain ByteBuffer#array() array access} for
      *         resizing it.
      */
-    @CreatesObligation
     public ByteBufferChannel(final ByteBuffer buffer) {
         if (!buffer.isReadOnly() && !buffer.hasArray())
             throw new IllegalArgumentException();

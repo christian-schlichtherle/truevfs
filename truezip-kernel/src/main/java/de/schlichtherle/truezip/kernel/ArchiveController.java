@@ -162,10 +162,10 @@ extends LockModelController {
         }
 
         @Override
-        public FsArchiveEntry getLocalTarget() throws IOException {
+        public FsArchiveEntry localTarget() throws IOException {
             if (null != localTarget)
                 return localTarget;
-            getPeerTarget(); // may sync() if in same target archive file!
+            peerTarget(); // may sync() if in same target archive file!
             checkSync(name, READ, options);
             final FsCovariantEntry<E> fse = autoMount(options).getEntry(name);
             if (null == fse)
@@ -177,7 +177,7 @@ extends LockModelController {
         protected InputSocket<? extends FsArchiveEntry> getSocket()
         throws IOException {
             localTarget = null;
-            final FsArchiveEntry ae = getLocalTarget();
+            final FsArchiveEntry ae = localTarget();
             if (FILE != ae.getType())
                 throw new FileSystemException(name.toString(), null,
                         "Not a file entry!");
@@ -225,7 +225,7 @@ extends LockModelController {
         }
 
         @Override
-        public FsArchiveEntry getLocalTarget() throws IOException {
+        public FsArchiveEntry localTarget() throws IOException {
             final E ae = mknod().getTarget().getEntry();
             if (options.get(APPEND)) {
                 // A proxy entry must get returned here in order to inhibit

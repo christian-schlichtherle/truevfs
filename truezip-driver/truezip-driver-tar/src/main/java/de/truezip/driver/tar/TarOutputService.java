@@ -98,18 +98,18 @@ implements OutputService<TarDriverEntry> {
     }
 
     @Override
-    public @CheckForNull TarDriverEntry getEntry(String name) {
+    public @CheckForNull TarDriverEntry entry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public OutputSocket<TarDriverEntry> getOutputSocket(final TarDriverEntry entry) {
+    public OutputSocket<TarDriverEntry> outputSocket(final TarDriverEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
         final class Output extends OutputSocket<TarDriverEntry> {
             @Override
-            public TarDriverEntry getLocalTarget() {
+            public TarDriverEntry localTarget() {
                 return entry;
             }
 
@@ -121,7 +121,7 @@ implements OutputService<TarDriverEntry> {
                     entry.setSize(0);
                     return new EntryOutputStream(entry);
                 }
-                final Entry peer = getPeerTarget();
+                final Entry peer = peerTarget();
                 long size;
                 if (null != peer && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);
@@ -163,7 +163,7 @@ implements OutputService<TarDriverEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #getOutputSocket(TarDriverEntry)}.
+     * These preconditions are checked by {@link #outputSocket(TarDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
@@ -208,7 +208,7 @@ implements OutputService<TarDriverEntry> {
                 final IOBuffer<?> buffer,
                 final TarDriverEntry entry)
         throws IOException {
-            super(buffer.getOutputSocket().stream());
+            super(buffer.outputSocket().stream());
             this.buffer = buffer;
             this.entry = entry;
             entries.put(entry.getName(), entry);
@@ -245,7 +245,7 @@ implements OutputService<TarDriverEntry> {
 
         void put() throws IOException {
             final IOBuffer<?> buffer = this.buffer;
-            final InputStream in = buffer.getInputSocket().stream();
+            final InputStream in = buffer.inputSocket().stream();
             Throwable ex = null;
             try {
                 final TarDriverEntry entry = this.entry;

@@ -9,8 +9,8 @@ import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
-import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import de.truezip.kernel.util.BitField;
+import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -312,7 +312,7 @@ extends FsDriver {
      * @return A new entry for the given name.
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template) {
-        return newEntry(name, type, template, FsAccessOptions.NONE);
+        return newEntry(name, type, FsAccessOptions.NONE, template);
     }
 
     /**
@@ -330,18 +330,18 @@ extends FsDriver {
      *
      * @param  name an entry name.
      * @param  type an entry type.
+     * @param  mknod when called from {@link FsController#mknod}, this is its
+     *         {@code options} parameter, otherwise it's typically an empty set.
      * @param  template if not {@code null}, then the new entry shall inherit
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
-     * @param  mknod when called from {@link FsController#mknod}, this is its
-     *         {@code options} parameter, otherwise it's typically an empty set.
      * @return A new entry for the given name.
      */
     public abstract E newEntry(
             String name,
             Type type,
-            @CheckForNull Entry template,
-            BitField<FsAccessOption> mknod);
+            BitField<FsAccessOption> mknod,
+            @CheckForNull Entry template);
 
     /**
      * Normalizes the given entry name so that it forms a valid entry name for

@@ -6,7 +6,6 @@ package de.truezip.kernel.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -36,15 +35,9 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
     /** This buffer is used for writing data. */
     private final byte[] buf = new byte[8];
 
-    /**
-     * Creates a new data output stream to write data to the specified
-     * underlying output stream. The counter {@code written} is
-     * set to zero.
-     *
-     * @param out The underlying output stream which is saved for subsequent use.
-     */
-    public LittleEndianOutputStream(
-            @CheckForNull @WillCloseWhenClosed OutputStream out) {
+    protected LittleEndianOutputStream() { }
+
+    public LittleEndianOutputStream(@WillCloseWhenClosed OutputStream out) {
         super(out);
     }
 
@@ -66,7 +59,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * Implements the {@code write} method of {@code OutputStream}.
      *
      * @param b The {@code byte} to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     @Override
     public void write(int b) throws IOException {
@@ -83,7 +76,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * @param b The data.
      * @param off The start offset in the data.
      * @param len The number of bytes to write.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     @Override
     public void write(byte b[], int off, int len) throws IOException {
@@ -100,7 +93,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by one.
      *
      * @param b The {@code boolean} value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     public final void writeBoolean(boolean b) throws IOException {
 	out.write(b ? 1 : 0);
@@ -114,7 +107,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by one.
      *
      * @param b The {@code byte} value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     public final void writeByte(int b) throws IOException {
 	out.write(b);
@@ -128,7 +121,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by two.
      *
      * @param s The short integer value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     public final void writeShort(int s) throws IOException {
         buf[0] = (byte) s;
@@ -145,7 +138,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by two.
      *
      * @param c The {@code char} value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     public final void writeChar(int c) throws IOException {
         writeShort(c);
@@ -158,7 +151,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by four.
      *
      * @param i The integer value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     public final void writeInt(int i) throws IOException {
         buf[0] = (byte) i;
@@ -179,7 +172,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by eight.
      *
      * @param l The long integer value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     public final void writeLong(long l) throws IOException {
         buf[0] = (byte) l;
@@ -210,7 +203,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by {@code 4}.
      *
      * @param f The {@code float} value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      * @see java.lang.Float#floatToIntBits(float)
      */
     public final void writeFloat(float f) throws IOException {
@@ -226,7 +219,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by {@code 8}.
      *
      * @param d The {@code double} value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      * @see java.lang.Double#doubleToLongBits(double)
      */
     public final void writeDouble(double d) throws IOException {
@@ -241,7 +234,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by the length of {@code s}.
      *
      * @param s The string of bytes to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      */
     public final void writeBytes(String s) throws IOException {
 	final int len = s.length();
@@ -257,7 +250,7 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      * incremented by twice the length of {@code s}.
      *
      * @param s The {@code String} value to be written.
-     * @throws IOException If an I/O error occurs.
+     * @throws IOException on any I/O error.
      * @see java.io.DataOutputStream#writeChar(int)
      */
     public final void writeChars(String s) throws IOException {

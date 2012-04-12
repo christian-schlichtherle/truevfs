@@ -15,7 +15,8 @@ public interface IOPoolProvider {
 
     /**
      * Returns the I/O buffer pool to use for allocating temporary I/O buffers.
-     * This is an immutable property - multiple calls must return the same value.
+     * This is an immutable property - multiple calls must return the same
+     * object.
      *
      * @return The I/O buffer pool to use for allocating temporary I/O buffers.
      */

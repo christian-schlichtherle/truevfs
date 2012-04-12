@@ -467,6 +467,7 @@ public final class TConfig extends Resource<RuntimeException> {
 
     // This one is just for you, NetBeans.
     @Override
+    @DischargesObligation
     public void close() {
         super.close();
     }

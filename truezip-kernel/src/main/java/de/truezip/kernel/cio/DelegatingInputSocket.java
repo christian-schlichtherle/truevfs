@@ -13,7 +13,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Delegates all methods to another input socket.
  * 
  * @see    DelegatingOutputSocket
- * @param  <E> the type of the {@link #getLocalTarget() local target}.
+ * @param  <E> the type of the {@link #localTarget() local target}.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -41,8 +41,8 @@ extends InputSocket<E> {
     }
 
     @Override
-    public E getLocalTarget() throws IOException {
-        return getBoundSocket().getLocalTarget();
+    public E localTarget() throws IOException {
+        return getBoundSocket().localTarget();
     }
 
     @Override

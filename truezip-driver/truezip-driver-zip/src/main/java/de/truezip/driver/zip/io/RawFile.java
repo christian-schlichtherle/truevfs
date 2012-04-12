@@ -757,14 +757,16 @@ implements Closeable, Iterable<E> {
     }
 
     /**
-     * Returns the entry for the given name or {@code null} if no entry with
-     * this name exists.
-     * Note that the returned entry is shared with this instance.
-     * It is illegal to change its state!
+     * Returns the entry for the given {@code name} or {@code null} if no entry
+     * with this name exists in this ZIP file.
+     * Note that the returned entry is shared with this instance - it is an
+     * error to change its state!
      *
-     * @param name the name of the ZIP entry.
+     * @param  name the name of the ZIP entry.
+     * @return The entry for the given {@code name} or {@code null} if no entry
+     *         with this name exists in this ZIP file.
      */
-    public E getEntry(String name) {
+    public E entry(String name) {
         return entries.get(name);
     }
 

@@ -55,67 +55,6 @@ public class ZipFile extends RawFile<ZipEntry> {
     private volatile @CheckForNull ZipCryptoParameters cryptoParameters;
 
     /**
-     * Equivalent to {@link #ZipFile(String, Charset, boolean, boolean)
-     * ZipFile(name, DEFAULT_CHARSET, true, false)}
-     */
-    public ZipFile(String path)
-    throws IOException {
-        this(path, DEFAULT_CHARSET, true, false);
-    }
-
-    /**
-     * Equivalent to {@link #ZipFile(String, Charset, boolean, boolean)
-     * ZipFile(name, charset, true, false)}
-     */
-    public ZipFile(String path, Charset charset)
-    throws IOException {
-        this(path, charset, true, false);
-    }
-
-    /**
-     * Opens the ZIP file identified by the given path name for reading its
-     * entries.
-     *
-     * @param  path the path name of the file.
-     * @param  charset the charset to use for decoding entry names and ZIP file
-     *         comment.
-     * @param  preambled if this is {@code true}, then the ZIP file may have a
-     *         preamble.
-     *         Otherwise, the ZIP file must start with either a Local File
-     *         Header (LFH) signature or an End Of Central Directory (EOCD)
-     *         Header, causing this constructor to fail if the file is actually
-     *         a false positive ZIP file, i.e. not compatible to the ZIP File
-     *         Format Specification.
-     *         This may be useful to read Self Extracting ZIP files (SFX),
-     *         which usually contain the application code required for
-     *         extraction in the preamble.
-     * @param  postambled if this is {@code true}, then the ZIP file may have a
-     *         postamble of arbitrary length.
-     *         Otherwise, the ZIP file must not have a postamble which exceeds
-     *         64KB size, including the End Of Central Directory record
-     *         (i.e. including the ZIP file comment), causing this constructor
-     *         to fail if the file is actually a false positive ZIP file, i.e.
-     *         not compatible to the ZIP File Format Specification.
-     *         This may be useful to read Self Extracting ZIP files (SFX) with
-     *         large postambles.
-     * @throws ZipException if the file data is not compatible with the ZIP
-     *         File Format Specification.
-     * @throws EOFException on premature end-of-file.
-     * @throws IOException on any I/O error.
-     * @see    #recoverLostEntries()
-     */
-    public ZipFile(
-            final String path,
-            final Charset charset,
-            final boolean preambled,
-            final boolean postambled)
-    throws ZipException, EOFException, IOException {
-        super(  new ZipSource(Paths.get(path)),
-                new DefaultZipFileParameters(charset, preambled, postambled));
-        this.name = path;
-    }
-
-    /**
      * Equivalent to {@link #ZipFile(Path, Charset, boolean, boolean)
      * ZipFile(file, DEFAULT_CHARSET, true, false)}
      */
@@ -307,14 +246,16 @@ public class ZipFile extends RawFile<ZipEntry> {
     }
 
     /**
-     * Returns a clone of the entry for the given name or {@code null} if no
-     * entry with this name exists.
+     * Returns a clone of the entry for the given {@code name} or {@code null}
+     * if no entry with this name exists in this ZIP file.
      *
-     * @param name the name of the ZIP entry.
+     * @param  name the name of the ZIP entry.
+     * @return A clone of the entry for the given {@code name} or {@code null}
+     *         if no entry with this name exists in this ZIP file.
      */
     @Override
-    public ZipEntry getEntry(String name) {
-        final ZipEntry ze = super.getEntry(name);
+    public ZipEntry entry(String name) {
+        final ZipEntry ze = super.entry(name);
         return ze != null ? ze.clone() : null;
     }
 
@@ -328,7 +269,7 @@ public class ZipFile extends RawFile<ZipEntry> {
         } finally {
             lock.unlock();
         }
-        return new LockInputStream(in, lock);
+        return new LockInputStream(lock, in);
     }
 
     @Override
@@ -341,7 +282,7 @@ public class ZipFile extends RawFile<ZipEntry> {
         } finally {
             lock.unlock();
         }
-        return new LockInputStream(in, lock);
+        return new LockInputStream(lock, in);
     }
 
     @Override
@@ -382,7 +323,7 @@ public class ZipFile extends RawFile<ZipEntry> {
         } finally {
             lock.unlock();
         }
-        return in == null ? null : new LockInputStream(in, lock);
+        return in == null ? null : new LockInputStream(lock, in);
     }
 
     @Override

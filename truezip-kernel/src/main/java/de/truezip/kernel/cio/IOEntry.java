@@ -14,19 +14,19 @@ public interface IOEntry<E extends IOEntry<E>> extends Entry {
 
     /**
      * Returns an input socket for reading this entry.
-     * The method {@link InputSocket#getLocalTarget()} of the returned socket
+     * The method {@link InputSocket#localTarget()} of the returned socket
      * must return this entry.
      *
      * @return An input socket for reading this entry.
      */
-    InputSocket<E> getInputSocket();
+    InputSocket<E> inputSocket();
 
     /**
      * Returns an output socket for writing this entry.
-     * The method {@link InputSocket#getLocalTarget()} of the returned socket
+     * The method {@link InputSocket#localTarget()} of the returned socket
      * must return this entry.
      *
      * @return An output socket for writing this entry.
      */
-    OutputSocket<E> getOutputSocket();
+    OutputSocket<E> outputSocket();
 }

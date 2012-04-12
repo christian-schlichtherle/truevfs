@@ -12,7 +12,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.util.JointIterator;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -58,10 +58,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * @param output the decorated output service.
      * @param pool the pool for buffering entry data.
      */
-    @CreatesObligation
     public MultiplexingOutputService(
-            final @WillCloseWhenClosed OutputService<E> output,
-            final IOPool<?> pool) {
+            final IOPool<?> pool,
+            final @WillCloseWhenClosed OutputService<E> output) {
         super(output);
         if (null == (this.pool = pool))
             throw new NullPointerException();
@@ -99,8 +98,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public @CheckForNull E getEntry(String name) {
-        final E entry = container.getEntry(name);
+    public @CheckForNull E entry(String name) {
+        final E entry = container.entry(name);
         if (null != entry)
             return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
@@ -108,45 +107,29 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<E> getOutputSocket(final E entry) {
+    public OutputSocket<E> outputSocket(final E entry) {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratingOutputSocket<E> {
+        final class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(MultiplexingOutputService.super.getOutputSocket(entry));
+                super(MultiplexingOutputService.super.outputSocket(entry));
             }
 
             @Override
-            public E getLocalTarget() throws IOException {
+            public E localTarget() throws IOException {
                 return entry;
             }
 
             @Override
             public OutputStream stream() throws IOException {
-                return isBusy()
-                        ? newBufferedEntryOutputStream(getBoundSocket())
-                        : new EntryOutputStream(getBoundSocket());
+                final OutputSocket<? extends E> output = getBoundSocket();
+                return isBusy() ? new BufferedEntryOutputStream(output)
+                                : new EntryOutputStream(output);
             }
         } // Output
 
         return new Output();
-    }
-
-    private BufferedEntryOutputStream newBufferedEntryOutputStream(
-            final OutputSocket<? extends E> output)
-    throws IOException {
-        final IOBuffer<?> buffer = pool.allocate();
-        try {
-            return new BufferedEntryOutputStream(buffer, output);
-        } catch (final Throwable ex) {
-            try {
-                buffer.release();
-            } catch (final IOException ex2) {
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
     }
 
     /**
@@ -161,6 +144,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         if (isBusy())
             throw new IOException("Output service is still busy!");
@@ -194,7 +178,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
     private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
-        @CreatesObligation
         EntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
             super(output.stream());
@@ -202,6 +185,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (closed)
                 return;
@@ -218,37 +202,45 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
-    private final class BufferedEntryOutputStream extends DecoratingOutputStream {
-        final IOBuffer<?> buffer;
+    private final class BufferedEntryOutputStream
+    extends DecoratingOutputStream {
+        final E local;
         final InputSocket<Entry> input;
         final OutputSocket<? extends E> output;
-        final E local;
+        final IOBuffer<?> buffer;
+        final BufferedEntryOutputStream next;
         boolean closed;
 
-        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        BufferedEntryOutputStream(  final IOBuffer<?> buffer,
-                                    final OutputSocket<? extends E> output)
+        BufferedEntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
-            super(buffer.getOutputSocket().stream());
-            this.buffer = buffer;
-            final E local = this.local = (this.output = output).getLocalTarget();
-            final Entry peer = output.getPeerTarget();
+            // HC SUNT DRACONES!
+            final E local = this.local = (this.output = output).localTarget();
+            final Entry peer = output.peerTarget();
+            final IOBuffer<?> buffer = this.buffer = pool.allocate();
             final class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() {
-                    super(buffer.getInputSocket());
+                    super(buffer.inputSocket());
                 }
 
                 @Override
-                public Entry getLocalTarget() {
+                public Entry localTarget() {
                     return null != peer ? peer : buffer;
                 }
+            } // InputProxy
+            try {
+                this.input = new InputProxy();
+                this.out = buffer.outputSocket().stream();
+            } catch (final Throwable ex) {
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
+                throw ex;
             }
-            this.input = new InputProxy();
-            final BufferedEntryOutputStream
-                    old = buffers.put(local.getName(), this);
-            if (null != old)
-                old.discard();
+            this.next = buffers.put(local.getName(), this);
+            assert null == next;
         }
 
         E getTarget() {
@@ -256,6 +248,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (closed)
                 return;
@@ -266,7 +259,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         void copyProperties() throws IOException {
-            final Entry src = input.getLocalTarget();
+            final Entry src = input.localTarget();
             final E dst = local;
             // Never copy anything but the DATA size!
             if (UNKNOWN == dst.getSize(DATA))
@@ -282,11 +275,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
             IOSocket.copy(input, output);
             buffer.release();
             return true;
-        }
-
-        void discard() throws IOException {
-            assert closed;
-            buffer.release();
         }
     } // BufferedEntryOutputStream
 }

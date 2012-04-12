@@ -2,10 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.io;
+package de.truezip.kernel.util;
 
-import de.truezip.kernel.io.PathSplitter;
-import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
+import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
 import java.io.File;
 import java.net.URI;
 import static org.junit.Assert.*;

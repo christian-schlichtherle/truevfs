@@ -14,9 +14,9 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
-import de.truezip.kernel.io.PathNormalizer;
-import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
-import static de.truezip.kernel.io.Paths.isRoot;
+import de.truezip.kernel.util.PathNormalizer;
+import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
+import static de.truezip.kernel.util.Paths.isRoot;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Link;
 import static de.truezip.kernel.util.Maps.OVERHEAD_SIZE;
@@ -310,7 +310,7 @@ implements Iterable<FsCovariantEntry<E>> {
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        return driver.newEntry(name, type, template, mknod);
+        return driver.newEntry(name, type, mknod, template);
     }
 
     /**
@@ -337,7 +337,7 @@ implements Iterable<FsCovariantEntry<E>> {
         if (!encoder.canEncode(name))
             throw new CharConversionException(name +
                     " (not encodable with " + driver.getCharset() + ")");
-        return driver.newEntry(name, type, template, mknod);
+        return driver.newEntry(name, type, mknod, template);
     }
 
     /**
@@ -698,7 +698,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     /** Splits a given path name into its parent path name and base name. */
     private static final class PathSplitter
-    extends de.truezip.kernel.io.PathSplitter {
+    extends de.truezip.kernel.util.PathSplitter {
         PathSplitter() {
             super(SEPARATOR_CHAR, false);
         }

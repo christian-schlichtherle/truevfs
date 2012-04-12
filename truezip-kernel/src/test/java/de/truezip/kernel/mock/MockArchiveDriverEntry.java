@@ -14,7 +14,7 @@ import java.util.EnumMap;
 import javax.annotation.CheckForNull;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class MockArchiveDriverEntry implements FsArchiveEntry {
 
@@ -26,13 +26,18 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             times = new EnumMap<>(Access.class);
     private @CheckForNull IOBuffer<?> buffer;
 
-    public MockArchiveDriverEntry(  final String name,
-                                    final Type type,
-                                    final @CheckForNull Entry template) {
+    public MockArchiveDriverEntry(final String name, final Type type) {
         assert null != name;
         assert null != type;
         this.name = name;
         this.type = type;
+    }
+
+    public MockArchiveDriverEntry(
+            final String name,
+            final Type type,
+            final @CheckForNull Entry template) {
+        this(name, type);
         if (null != template) {
             for (final Size size : ALL_SIZE_SET) {
                 final long value = template.getSize(size);

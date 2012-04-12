@@ -8,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 
@@ -26,9 +25,12 @@ public abstract class DecoratingOutputStream extends OutputStream {
     /** The nullable decorated output stream. */
     protected @Nullable OutputStream out;
 
+    protected DecoratingOutputStream() { }
+
     protected DecoratingOutputStream(
-            final @CheckForNull @WillCloseWhenClosed OutputStream out) {
-        this.out = out;
+            final @WillCloseWhenClosed OutputStream out) {
+        if (null == (this.out = out))
+            throw new NullPointerException();
     }
 
     @Override

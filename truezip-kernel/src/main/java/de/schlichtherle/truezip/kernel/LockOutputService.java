@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.LockManagement.locked;
 import de.truezip.kernel.cio.*;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,13 +40,13 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * 
      * @param output the service to decorate.
      */
-    @CreatesObligation
     LockOutputService(@WillCloseWhenClosed OutputService<E> output) {
         super(output);
     }
 
     @Override
     @GuardedBy("lock")
+    @DischargesObligation
     public void close() throws IOException {
         final class Close implements IOOperation<Void> {
             @Override
@@ -61,10 +61,10 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     @GuardedBy("lock")
-    public @CheckForNull E getEntry(String name) {
+    public @CheckForNull E entry(String name) {
         lock.lock();
         try {
-            return container.getEntry(name);
+            return container.entry(name);
         } finally {
             lock.unlock();
         }
@@ -87,15 +87,15 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<E> getOutputSocket(final E entry) {
+    public OutputSocket<E> outputSocket(final E entry) {
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(container.getOutputSocket(entry));
+                super(container.outputSocket(entry));
             }
 
             @Override
             @GuardedBy("lock")
-            public E getLocalTarget() throws IOException {
+            public E localTarget() throws IOException {
                 final class GetLocalTarget implements IOOperation<E> {
                     @Override
                     public E call() throws IOException {
@@ -150,12 +150,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     private final class LockOutputStream
     extends de.truezip.kernel.io.LockOutputStream {
-        @CreatesObligation
         LockOutputStream(@WillCloseWhenClosed OutputStream out) {
-            super(out, lock);
+            super(lock, out);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(out);
         }
@@ -163,12 +163,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     private final class LockSeekableChannel
     extends de.truezip.kernel.io.LockSeekableChannel {
-        @CreatesObligation
         LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
-            super(channel, lock);
+            super(lock, channel);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(channel);
         }

@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.cio;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -21,13 +20,11 @@ implements Entry {
     /** The nullable decorated entry. */
     protected @Nullable E entry;
 
-    /**
-     * Constructs a new decorating file system entry.
-     *
-     * @param entry the decorated entry.
-     */
-    protected DecoratingEntry(final @CheckForNull E entry) {
-        this.entry = entry;
+    protected DecoratingEntry() { }
+
+    protected DecoratingEntry(final E entry) {
+        if (null == (this.entry = entry))
+            throw new NullPointerException();
     }
 
     @Override

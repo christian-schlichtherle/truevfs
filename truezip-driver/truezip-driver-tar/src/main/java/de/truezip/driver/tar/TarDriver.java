@@ -83,8 +83,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
         return new MultiplexingOutputService<>(
-                new TarOutputService(model, output, this),
-                getIOPool());
+                getIOPool(), new TarOutputService(model, output, this));
     }
 
     /**
@@ -115,8 +114,8 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     public TarDriverEntry newEntry(
             String name,
             final Type type,
-            final Entry template,
-            final BitField<FsAccessOption> mknod) {
+            final BitField<FsAccessOption> mknod,
+            final @CheckForNull Entry template) {
         name = normalize(name, type);
         final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {

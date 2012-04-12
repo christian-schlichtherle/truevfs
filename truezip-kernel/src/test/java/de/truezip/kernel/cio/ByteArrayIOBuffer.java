@@ -158,12 +158,12 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
     }
 
     @Override
-    public final InputSocket<ByteArrayIOBuffer> getInputSocket() {
+    public final InputSocket<ByteArrayIOBuffer> inputSocket() {
         return new Input();
     }
 
     @Override
-    public final OutputSocket<ByteArrayIOBuffer> getOutputSocket() {
+    public final OutputSocket<ByteArrayIOBuffer> outputSocket() {
         return new Output();
     }
 
@@ -184,7 +184,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
 
     private final class Input extends InputSocket<ByteArrayIOBuffer> {
         @Override
-        public ByteArrayIOBuffer getLocalTarget() throws IOException {
+        public ByteArrayIOBuffer localTarget() throws IOException {
             return ByteArrayIOBuffer.this;
         }
 
@@ -209,7 +209,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
 
     private final class Output extends OutputSocket<ByteArrayIOBuffer> {
         @Override
-        public ByteArrayIOBuffer getLocalTarget() throws IOException {
+        public ByteArrayIOBuffer localTarget() throws IOException {
             return ByteArrayIOBuffer.this;
         }
 

@@ -20,7 +20,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import static java.nio.file.Files.newByteChannel;
 import java.nio.file.Path;
-import java.nio.file.Paths;
         
 /**
  * Tests compression and encryption of data.
@@ -70,24 +69,6 @@ public final class RaesZipIT extends ZipTestSuite {
         }
     }
 
-    @Override
-    protected ZipFile newZipFile(final String name)
-    throws IOException {
-        final RaesReadOnlyChannel rroc = newRaesReadOnlyChannel(Paths.get(name));
-        try {
-            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
-                rroc.authenticate();
-            return new ZipFile(rroc);
-        } catch (final Throwable ex) {
-            try {
-                rroc.close();
-            } catch (final IOException ex2) {
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
-    }
-
     private RaesReadOnlyChannel newRaesReadOnlyChannel(final Path file)
     throws IOException {
         return RaesReadOnlyChannel.create(
@@ -98,27 +79,6 @@ public final class RaesZipIT extends ZipTestSuite {
                         return newByteChannel(file);
                     }
                 });
-    }
-    @Override
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile newZipFile(final String name, final Charset cs)
-    throws IOException {
-        if (null == cs)
-            throw new NullPointerException();
-        new String(new byte[0], cs); // may throw UnsupportedEncodingExceoption!
-        final RaesReadOnlyChannel rroc = newRaesReadOnlyChannel(Paths.get(name));
-        try {
-            if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
-                rroc.authenticate();
-            return new ZipFile(rroc, cs);
-        } catch (final Throwable ex) {
-            try {
-                rroc.close();
-            } catch (final IOException ex2) {
-                ex.addSuppressed(ex2);
-            }
-            throw ex;
-        }
     }
 
     @Override

@@ -14,7 +14,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -190,7 +190,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class ResourceInputStream
     extends DecoratingInputStream {
-        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
@@ -198,6 +197,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             getControl().stop(this);
             in.close();
@@ -206,7 +206,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class ResourceOutputStream
     extends DecoratingOutputStream {
-        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
@@ -214,6 +213,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             getControl().stop(this);
             out.close();
@@ -222,7 +222,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class ResourceSeekableChannel
     extends DecoratingSeekableChannel {
-        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
@@ -230,6 +229,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             getControl().stop(this);
             channel.close();
