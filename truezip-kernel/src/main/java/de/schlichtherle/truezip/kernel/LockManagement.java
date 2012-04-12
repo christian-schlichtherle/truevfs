@@ -6,7 +6,6 @@ package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.util.Threads;
-import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.Lock;
@@ -24,13 +23,7 @@ final class LockManagement {
 
     static final int WAIT_TIMEOUT_MILLIS = 100;
 
-    private static final ThreadLocal<LockUtil>
-            util = new ThreadLocal<LockUtil>() {
-                @Override
-                public LockUtil initialValue() {
-                    return new LockUtil(ThreadLocalRandom.current());
-                }
-            };
+    private static final ThreadLocal<LockUtil> util = new ThreadLocalLockUtil();
 
     /** Can't touch this - hammer time! */
     private LockManagement() { }
@@ -107,6 +100,14 @@ final class LockManagement {
     static boolean isLocking() {
         return util.get().locking;
     }
+
+    private static final class ThreadLocalLockUtil
+    extends ThreadLocal<LockUtil> {
+        @Override
+        public LockUtil initialValue() {
+            return new LockUtil(ThreadLocalRandom.current());
+        }
+    } // ThreadLocalLockUtil
 
     @NotThreadSafe
     private static final class LockUtil {
