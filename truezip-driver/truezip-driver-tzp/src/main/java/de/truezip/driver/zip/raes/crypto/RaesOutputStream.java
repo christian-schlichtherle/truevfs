@@ -23,7 +23,6 @@ import org.bouncycastle.crypto.Mac;
 @NotThreadSafe
 public abstract class RaesOutputStream extends DecoratingOutputStream {
 
-    @CreatesObligation
     RaesOutputStream() {
         super(null);
     }

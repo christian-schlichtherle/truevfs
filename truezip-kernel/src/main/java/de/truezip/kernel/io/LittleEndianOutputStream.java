@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
@@ -44,7 +43,6 @@ public class LittleEndianOutputStream extends DecoratingOutputStream {
      *
      * @param out The underlying output stream which is saved for subsequent use.
      */
-    @CreatesObligation
     public LittleEndianOutputStream(
             @CheckForNull @WillCloseWhenClosed OutputStream out) {
         super(out);

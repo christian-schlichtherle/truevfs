@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.nio.ByteBuffer;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
@@ -21,7 +20,6 @@ import javax.annotation.WillCloseWhenClosed;
 public abstract class DecoratingReadOnlyChannel
 extends DecoratingSeekableChannel {
 
-    @CreatesObligation
     protected DecoratingReadOnlyChannel(
             @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);

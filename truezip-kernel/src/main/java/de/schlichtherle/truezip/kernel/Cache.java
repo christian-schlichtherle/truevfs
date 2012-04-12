@@ -211,17 +211,6 @@ final class Cache implements Flushable, Closeable {
     enum Strategy {
 
         /**
-         * Any attempt to obtain an output socket will result in a
-         * {@link NullPointerException}.
-         */
-        READ_ONLY {
-            @Override
-            Cache.OutputBufferPool newOutputBufferPool(Cache cache) {
-                throw new AssertionError(); // should throw an NPE before we can get here!
-            }
-        },
-
-        /**
          * A write-through cache flushes any written data as soon as the
          * output stream created by {@link #getOutputSocket} gets closed.
          */

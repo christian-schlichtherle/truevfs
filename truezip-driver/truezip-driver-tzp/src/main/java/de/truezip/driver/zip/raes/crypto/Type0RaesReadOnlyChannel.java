@@ -13,7 +13,6 @@ import de.truezip.kernel.io.IntervalReadOnlyChannel;
 import de.truezip.kernel.io.PowerBuffer;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.util.SuspensionPenalty;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -50,7 +49,6 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
      */
     private final KeyParameter sha256MacParam;
 
-    @CreatesObligation
     Type0RaesReadOnlyChannel(
             final Type0RaesParameters param,
             final @WillCloseWhenClosed SeekableByteChannel channel)
