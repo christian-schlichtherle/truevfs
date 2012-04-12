@@ -13,7 +13,7 @@ import de.truezip.kernel.FsScheme;
 import static de.truezip.kernel.FsUriModifier.CANONICALIZE;
 import static de.truezip.kernel.FsUriModifier.NULL;
 import de.truezip.kernel.io.Paths;
-import de.truezip.kernel.io.Paths.Splitter;
+import de.truezip.kernel.io.PathSplitter;
 import de.truezip.kernel.util.QuotedUriSyntaxException;
 import de.truezip.kernel.util.UriBuilder;
 import java.net.URI;
@@ -39,7 +39,7 @@ final class TPathScanner {
     static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
 
     private final TArchiveDetector detector;
-    private final Splitter splitter = new Splitter(SEPARATOR_CHAR, false);
+    private final PathSplitter splitter = new PathSplitter(SEPARATOR_CHAR, false);
     private FsPath root;
     private String memberQuery;
     private final UriBuilder uri = new UriBuilder();
