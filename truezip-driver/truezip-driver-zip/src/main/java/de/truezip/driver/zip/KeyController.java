@@ -59,7 +59,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         final KeyManager<?> manager = this.manager;
         return null != manager
                 ? manager
-                : (this.manager = driver.getKeyManagerProvider().get(getKeyType()));
+                : (this.manager = driver.getKeyManagerProvider().getKeyManager(getKeyType()));
     }
 
     @Override

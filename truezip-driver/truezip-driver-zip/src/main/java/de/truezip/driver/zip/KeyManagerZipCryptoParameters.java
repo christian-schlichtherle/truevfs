@@ -66,7 +66,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
      * {@inheritDoc}
      * <p>
      * If {@code type} is assignable from {@link WinZipAesParameters}, then a
-     * {@link KeyManager} for {@link AesPbeParameters} will get used which
+     * {@link KeyManager} for {@link AesPbeParameters} will getKeyManager used which
      * is obtained from the {@link KeyManagerProvider provider} which has been
      * provided to the constructor.
      * <p>
@@ -82,7 +82,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
     /**
      * A template method to derive password bytes from the given password
      * characters and the given entry name.
-     * Typically, only the given password characters should get encoded to
+     * Typically, only the given password characters should getKeyManager encoded to
      * form the result.
      * Optionally, the given entry name can be mixed into the result for
      * authentication.
@@ -113,7 +113,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
     }
 
     private <K> KeyManager<K> keyManager(Class<K> type) {
-        return driver.getKeyManagerProvider().get(type);
+        return driver.getKeyManagerProvider().getKeyManager(type);
     }
 
     private URI resourceUri(String name) {

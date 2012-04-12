@@ -55,14 +55,14 @@ public abstract class ZipRaesDriver extends JarDriver {
      * Returns the RAES parameters for the given file system model.
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns
-     * {@code new KeyManagerRaesParameters(getKeyManagerProvider().get(AesPbeParameters.class), mountPointUri(model))}.
+     * {@code new KeyManagerRaesParameters(getKeyManagerProvider().getKeyManager(AesPbeParameters.class), mountPointUri(model))}.
      * 
      * @param  model the file system model.
      * @return The RAES parameters for the given file system model.
      */
     protected RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
-                getKeyManagerProvider().get(AesPbeParameters.class),
+                getKeyManagerProvider().getKeyManager(AesPbeParameters.class),
                 mountPointUri(model));
     }
 
@@ -76,7 +76,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * <p>
      * Otherwise, if the cipher text length of an input RAES file is greater
      * than this value, then initially only the cipher key and the cipher text
-     * length get authenticated.
+     * length getKeyManager authenticated.
      * In addition, whenever an entry is subsequently accessed, then it's
      * CRC-32 value is checked.
      * <p>
@@ -104,7 +104,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * The implementation in the class {@link ZipRaesDriver} decorates the
      * given controller with a package private controller which keeps track of
      * the encryption keys.
-     * This should get overridden in order to return just {@code controller} if
+     * This should getKeyManager overridden in order to return just {@code controller} if
      * and only if you are overriding
      * {@link #raesParameters(FsModel)}, too, and do not want to use the
      * locatable key manager to resolve passwords for RAES encryption.
@@ -215,7 +215,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         final ZipDriverEntry entry
                 = super.newEntry(path, type, template, mknod.set(COMPRESS));
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
-        // Entry level encryption is enabled if mknod.get(ENCRYPTED) is true
+        // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true
         // OR template is an instance of ZipEntry
         // AND ((ZipEntry) template).isEncrypted() is true.
         // Now switch off entry level encryption because encryption is already
