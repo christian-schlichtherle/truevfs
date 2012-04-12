@@ -72,14 +72,14 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public HttpEntry getEntry(FsEntryName name) throws IOException {
+    public HttpEntry entry(FsEntryName name) throws IOException {
         HttpEntry entry = newEntry(name);
         return entry.isType(FILE) ? entry : null;
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        return null != getEntry(name);
+        return null != entry(name);
     }
 
     @Override
@@ -102,14 +102,14 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<?> inputSocket(
             FsEntryName name,
             BitField<FsAccessOption> options) {
         return newEntry(name).newInputSocket(options);
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<?> outputSocket(
             FsEntryName name,
             BitField<FsAccessOption> options,
             @CheckForNull Entry template) {

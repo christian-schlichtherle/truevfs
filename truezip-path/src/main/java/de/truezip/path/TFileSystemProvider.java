@@ -347,8 +347,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
                 }
             }
         }
-        final InputSocket<?> input = src.getInputSocket(src.getAccessPreferences());
-        final OutputSocket<?> output = dst.getOutputSocket(o,
+        final InputSocket<?> input = src.inputSocket(src.getAccessPreferences());
+        final OutputSocket<?> output = dst.outputSocket(o,
                 preserve ? input.localTarget() : null);
         IOSocket.copy(input, output);
     }

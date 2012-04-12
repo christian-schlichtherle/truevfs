@@ -63,14 +63,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public final FsEntry getEntry(final FsEntryName name)
+    public final FsEntry entry(final FsEntryName name)
     throws IOException {
         try {
-            return controller.getEntry(name);
+            return controller.entry(name);
         } catch (final Throwable ex) {
             if (!name.isRoot() || null == findKeyException(ex))
                 throw ex;
-            Entry entry = getParent().getEntry(
+            Entry entry = getParent().entry(
                     getModel()
                         .getMountPoint()
                         .getPath()

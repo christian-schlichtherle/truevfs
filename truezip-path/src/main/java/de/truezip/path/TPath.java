@@ -8,20 +8,15 @@ import de.truezip.file.TArchiveDetector;
 import de.truezip.file.TConfig;
 import de.truezip.file.TFile;
 import de.truezip.file.TVFS;
-import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOption.*;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.*;
-import de.truezip.kernel.FsMountPoint;
-import de.truezip.kernel.FsPath;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.util.Paths;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.kernel.util.Paths;
 import de.truezip.kernel.util.QuotedUriSyntaxException;
 import de.truezip.kernel.util.UriBuilder;
 import static de.truezip.path.TPathScanner.*;
@@ -960,16 +955,16 @@ public final class TPath implements Path {
     }
 
     FsEntry getEntry() throws IOException {
-        return getFileSystem().getEntry(this);
+        return getFileSystem().entry(this);
     }
 
-    InputSocket<?> getInputSocket(BitField<FsAccessOption> options) {
-        return getFileSystem().getInputSocket(this, options);
+    InputSocket<?> inputSocket(BitField<FsAccessOption> options) {
+        return getFileSystem().inputSocket(this, options);
     }
 
-    OutputSocket<?> getOutputSocket(BitField<FsAccessOption> options,
+    OutputSocket<?> outputSocket(BitField<FsAccessOption> options,
                                     @CheckForNull Entry template) {
-        return getFileSystem().getOutputSocket(this, options, template);
+        return getFileSystem().outputSocket(this, options, template);
     }
 
     void checkAccess(AccessMode... modes) throws IOException {

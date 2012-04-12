@@ -118,11 +118,11 @@ public class TarGZipDriver extends TarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected OutputSocket<?> getOutputSocket(
+    protected OutputSocket<?> outputSocket(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.getOutputSocket(name, options.set(STORE), null);
+        return controller.outputSocket(name, options.set(STORE), null);
     }
 
     /** Extends its super class to set the deflater level. */

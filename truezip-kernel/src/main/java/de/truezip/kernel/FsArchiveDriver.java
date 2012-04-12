@@ -136,7 +136,7 @@ extends FsDriver {
      * new input service for its target archive file.
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
-     * to {@link #getInputSocket}
+     * to {@link #inputSocket}
      * and {@link #newInputService(FsModel, InputSocket)}.
      * 
      * @param  model the file system model for the target archive file.
@@ -168,7 +168,7 @@ extends FsDriver {
             BitField<FsAccessOption> options)
     throws IOException {
         return newInputService(model,
-                getInputSocket(parent, entry, options));
+                inputSocket(parent, entry, options));
     }
 
     /**
@@ -193,7 +193,7 @@ extends FsDriver {
      * new output service for its target archive file.
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
-     * to {@link #getOutputSocket}
+     * to {@link #outputSocket}
      * and {@link #newOutputService(FsModel, OutputSocket, InputService)}.
      * 
      * @param  model the file system model for the target archive file.
@@ -204,7 +204,7 @@ extends FsDriver {
      * @param  options the options to use when accessing the target archive
      *         file.
      *         These may get modified as required by overridding this method
-     *         or {@link #getInputSocket}. 
+     *         or {@link #inputSocket}. 
      * @param  input the nullable {@link InputService} for the target archive
      *         file.
      *         If not {@code null}, then the target archive file is going to
@@ -225,7 +225,7 @@ extends FsDriver {
             @CheckForNull @WillNotClose InputService<E> input)
     throws IOException {
         return newOutputService(model,
-                getOutputSocket(parent, entry, options), input);
+                outputSocket(parent, entry, options), input);
     }
 
     /**
@@ -269,11 +269,11 @@ extends FsDriver {
      * @return An input socket for reading an artifact of this driver.
      * @see    #newInputService(FsModel, FsController, FsEntryName, BitField) 
      */
-    protected InputSocket<?> getInputSocket(
+    protected InputSocket<?> inputSocket(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.getInputSocket(name, options);
+        return controller.inputSocket(name, options);
     }
 
     /**
@@ -293,11 +293,11 @@ extends FsDriver {
      * @return An output socket for writing an artifact of this driver.
      * @see    #newOutputService(FsModel, FsController, FsEntryName, BitField, InputService) 
      */
-    protected OutputSocket<?> getOutputSocket(
+    protected OutputSocket<?> outputSocket(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.getOutputSocket(name, options, null);
+        return controller.outputSocket(name, options, null);
     }
 
     /**

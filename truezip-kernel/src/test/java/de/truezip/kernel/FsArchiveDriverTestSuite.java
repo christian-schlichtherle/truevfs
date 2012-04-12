@@ -443,7 +443,7 @@ extends FsArchiveDriverTestBase<D> {
         }
 
         @Override
-        public InputSocket<?> getInputSocket(
+        public InputSocket<?> inputSocket(
                 final FsEntryName name,
                 final BitField<FsAccessOption> options) {
             if (null == name)
@@ -453,7 +453,7 @@ extends FsArchiveDriverTestBase<D> {
 
             final class Input extends DecoratingInputSocket<Entry> {
                 Input() {
-                    super(ParentController.super.getInputSocket(name, options));
+                    super(ParentController.super.inputSocket(name, options));
                 }
 
                 @Override
@@ -475,7 +475,7 @@ extends FsArchiveDriverTestBase<D> {
         }
 
         @Override
-        public OutputSocket<?> getOutputSocket(
+        public OutputSocket<?> outputSocket(
                 final FsEntryName name,
                 final BitField<FsAccessOption> options,
                 final Entry template) {
@@ -486,7 +486,7 @@ extends FsArchiveDriverTestBase<D> {
 
             final class Output extends DecoratingOutputSocket<Entry> {
                 Output() {
-                    super(ParentController.super.getOutputSocket(name, options, template));
+                    super(ParentController.super.outputSocket(name, options, template));
                 }
 
                 @Override

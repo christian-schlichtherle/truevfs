@@ -245,15 +245,15 @@ implements InputService<TarDriverEntry> {
             @Override
             public InputStream stream()
             throws IOException {
-                return getInputSocket().stream();
+                return inputSocket().stream();
             }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return getInputSocket().channel();
+                return inputSocket().channel();
             }
 
-            InputSocket<? extends IOBuffer<?>> getInputSocket()
+            InputSocket<? extends IOBuffer<?>> inputSocket()
             throws IOException {
                 return localTarget().getTemp().inputSocket();
             }

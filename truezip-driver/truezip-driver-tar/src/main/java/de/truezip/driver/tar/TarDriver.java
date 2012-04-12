@@ -91,11 +91,11 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected InputSocket<?> getInputSocket(
+    protected InputSocket<?> inputSocket(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.getInputSocket(name, options.clear(CACHE));
+        return controller.inputSocket(name, options.clear(CACHE));
     }
 
     /**
@@ -103,11 +103,11 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected OutputSocket<?> getOutputSocket(
+    protected OutputSocket<?> outputSocket(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.getOutputSocket(name, options.set(COMPRESS), null);
+        return controller.outputSocket(name, options.set(COMPRESS), null);
     }
 
     @Override

@@ -62,7 +62,7 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public FileEntry getEntry(FsEntryName name) throws IOException {
+    public FileEntry entry(FsEntryName name) throws IOException {
         FileEntry entry = new FileEntry(target, name);
         return exists(entry.getPath()) ? entry : null;
     }
@@ -129,18 +129,18 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<?> inputSocket(
             FsEntryName name,
             BitField<FsAccessOption> options) {
         return new FileEntry(target, name).inputSocket();
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<?> outputSocket(
             FsEntryName name,
             BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
-        return new FileEntry(target, name).getOutputSocket(options, template);
+        return new FileEntry(target, name).outputSocket(options, template);
     }
 
     @Override

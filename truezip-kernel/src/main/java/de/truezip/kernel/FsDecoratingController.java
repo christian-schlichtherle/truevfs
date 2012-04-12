@@ -52,9 +52,9 @@ extends FsController<M> {
     }
 
     @Override
-    public FsEntry getEntry(FsEntryName name)
+    public FsEntry entry(FsEntryName name)
     throws IOException {
-        return controller.getEntry(name);
+        return controller.entry(name);
     }
 
     @Override
@@ -98,17 +98,17 @@ extends FsController<M> {
 
     @Override
     public InputSocket<?>
-    getInputSocket( FsEntryName name,
+    inputSocket( FsEntryName name,
                     BitField<FsAccessOption> options) {
-        return controller.getInputSocket(name, options);
+        return controller.inputSocket(name, options);
     }
 
     @Override
     public OutputSocket<?>
-    getOutputSocket(    FsEntryName name,
+    outputSocket(    FsEntryName name,
                         BitField<FsAccessOption> options,
                         Entry template) {
-        return controller.getOutputSocket(name, options, template);
+        return controller.outputSocket(name, options, template);
     }
 
     @Override

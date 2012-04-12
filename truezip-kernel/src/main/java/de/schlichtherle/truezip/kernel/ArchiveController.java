@@ -97,7 +97,7 @@ extends LockModelController {
     }
 
     @Override
-    public final FsEntry getEntry(FsEntryName name)
+    public final FsEntry entry(FsEntryName name)
     throws IOException {
         return autoMount(NONE).getEntry(name);
     }
@@ -142,7 +142,7 @@ extends LockModelController {
     }
 
     @Override
-    public final InputSocket<?> getInputSocket(
+    public final InputSocket<?> inputSocket(
             FsEntryName name,
             BitField<FsAccessOption> options) {
         return new Input(name, options);
@@ -181,14 +181,14 @@ extends LockModelController {
             if (FILE != ae.getType())
                 throw new FileSystemException(name.toString(), null,
                         "Not a file entry!");
-            return getInputSocket(ae.getName());
+            return inputSocket(ae.getName());
         }
     } // Input
 
-    abstract InputSocket<? extends E> getInputSocket(String name);
+    abstract InputSocket<? extends E> inputSocket(String name);
 
     @Override
-    public final OutputSocket<?> getOutputSocket(
+    public final OutputSocket<?> outputSocket(
             FsEntryName name,
             BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
@@ -254,7 +254,7 @@ extends LockModelController {
             }
             Throwable ex = null;
             try {
-                final OutputSocket<? extends E> os = getOutputSocket(ae, options);
+                final OutputSocket<? extends E> os = outputSocket(ae, options);
                 if (null == in) // do NOT bind when appending!
                     os.bind(this);
                 final OutputStream out = os.stream();
@@ -310,7 +310,7 @@ extends LockModelController {
         }
     } // ProxyEntry
 
-    abstract OutputSocket<? extends E> getOutputSocket(E entry, BitField<FsAccessOption> options);
+    abstract OutputSocket<? extends E> outputSocket(E entry, BitField<FsAccessOption> options);
 
     @Override
     public final void mknod(

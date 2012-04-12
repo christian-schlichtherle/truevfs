@@ -61,11 +61,11 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public FsEntry getEntry(final FsEntryName name)
+    public FsEntry entry(final FsEntryName name)
     throws IOException {
         while (true) {
             try {
-                return controller.getEntry(name);
+                return controller.entry(name);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
@@ -149,13 +149,13 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<?> inputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
         @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
-                super(controller.getInputSocket(name, options));
+                super(controller.inputSocket(name, options));
             }
 
             @Override
@@ -199,14 +199,14 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<?> outputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
         @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {
             Output() {
-                super(controller.getOutputSocket(name, options, template));
+                super(controller.outputSocket(name, options, template));
             }
 
             @Override

@@ -170,7 +170,7 @@ extends FileSystemArchiveController<E> {
         // Check parent file system entry.
         final FsEntry pe; // parent entry
         try {
-            pe = parent.getEntry(name);
+            pe = parent.entry(name);
         } catch (final IOException inaccessibleEntry) {
             if (autoCreate)
                 throw inaccessibleEntry;
@@ -245,7 +245,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    InputSocket<? extends E> getInputSocket(final String name) {
+    InputSocket<? extends E> inputSocket(final String name) {
         class Input extends ClutchInputSocket<E> {
             @Override
             protected InputSocket<? extends E> getLazyDelegate()
@@ -285,7 +285,7 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    OutputSocket<? extends E> getOutputSocket(final E entry, final BitField<FsAccessOption> options) {
+    OutputSocket<? extends E> outputSocket(final E entry, final BitField<FsAccessOption> options) {
         final class Output extends ClutchOutputSocket<E> {
             @Override
             protected OutputSocket<? extends E> getLazyDelegate()
