@@ -13,10 +13,8 @@ import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.MultiplexingOutputService;
-import de.truezip.kernel.cio.OutputService;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.AbstractSink;
 import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.Source;
@@ -160,8 +158,8 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     protected OutputService<ZipDriverEntry> newOutputService(
             final FsModel model,
-            final OptionOutputSocket output,
-            final @CheckForNull @WillNotClose ZipInputService source)
+            final OutputSocket<?> output,
+            final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
@@ -170,8 +168,9 @@ public abstract class ZipRaesDriver extends JarDriver {
             }
         } // Sink
 
+        final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(
-                new ZipOutputService(model, new Sink(), source, this),
+                new ZipOutputService(model, new Sink(), zis, this),
                 getIOPool());
     }
 

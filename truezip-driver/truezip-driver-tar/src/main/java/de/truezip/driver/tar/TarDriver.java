@@ -80,7 +80,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     protected OutputService<TarDriverEntry> newOutputService(
             final FsModel model,
             final OutputSocket<?> output,
-            final @CheckForNull @WillNotClose InputService<TarDriverEntry> source)
+            final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
         return new MultiplexingOutputService<>(
                 new TarOutputService(model, output, this),

@@ -90,7 +90,7 @@ public class TarGZipDriver extends TarDriver {
     protected OutputService<TarDriverEntry> newOutputService(
             final FsModel model,
             final OutputSocket<?> output,
-            final InputService<TarDriverEntry> source)
+            final InputService<TarDriverEntry> input)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
