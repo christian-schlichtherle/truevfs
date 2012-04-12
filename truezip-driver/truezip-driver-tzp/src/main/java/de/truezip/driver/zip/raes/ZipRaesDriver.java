@@ -92,7 +92,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected abstract long getAuthenticationTrigger();
 
     @Override
-    protected final boolean check(ZipInputService input, ZipDriverEntry entry) {
+    protected final boolean check(ZipDriverEntry entry, ZipInputService input) {
         // Optimization: If the cipher text alias the encrypted ZIP file is
         // smaller than the authentication trigger, then its entire cipher text
         // has already been authenticated by {@link ZipRaesDriver#newZipInputService}.
