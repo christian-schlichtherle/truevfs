@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -23,13 +21,11 @@ import javax.annotation.WillCloseWhenClosed;
  * @see    DecoratingOutputStream
  * @author Christian Schlichtherle
  */
-@CleanupObligation
 public abstract class DecoratingInputStream extends InputStream {
 
     /** The nullable decorated input stream. */
     protected @Nullable InputStream in;
 
-    @CreatesObligation
     protected DecoratingInputStream(
             final @CheckForNull @WillCloseWhenClosed InputStream in) {
         this.in = in;

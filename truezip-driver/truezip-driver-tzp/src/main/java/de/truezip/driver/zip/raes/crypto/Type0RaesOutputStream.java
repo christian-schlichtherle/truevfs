@@ -10,7 +10,6 @@ import static de.truezip.driver.zip.raes.crypto.Constants.*;
 import de.truezip.kernel.io.LittleEndianOutputStream;
 import de.truezip.kernel.io.Sink;
 import de.truezip.key.param.AesKeyStrength;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,7 +58,6 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     /** The offset where the encrypted application data starts. */
     private long start;
 
-    @CreatesObligation
     Type0RaesOutputStream(
             final Type0RaesParameters param,
             final Sink sink)

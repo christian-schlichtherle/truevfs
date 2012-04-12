@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -29,14 +27,12 @@ import javax.annotation.WillCloseWhenClosed;
  *
  * @author Christian Schlichtherle
  */
-@CleanupObligation
 public abstract class DecoratingSeekableChannel
 implements SeekableByteChannel {
 
     /** The nullable decorated seekable byte channel. */
     protected @Nullable SeekableByteChannel channel;
 
-    @CreatesObligation
     protected DecoratingSeekableChannel(
             final @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
         this.channel = channel;
