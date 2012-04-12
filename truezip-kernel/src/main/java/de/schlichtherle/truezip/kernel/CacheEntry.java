@@ -47,7 +47,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-final class CacheEntry
+class CacheEntry
 implements Entry, Flushable, Releasable<IOException>, Closeable {
 
     private final Strategy strategy;
@@ -70,7 +70,9 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
-    private CacheEntry(final Strategy strategy, final IOPool<?> pool) {
+    private CacheEntry(
+            final Strategy strategy,
+            final IOPool<?> pool) {
         assert null != strategy;
         this.strategy = strategy;
         if (null == (this.pool = pool))
@@ -90,7 +92,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    CacheEntry configure(final InputSocket<?> input) {
+    public CacheEntry configure(final InputSocket<?> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -110,7 +112,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    CacheEntry configure(final OutputSocket<?> output) {
+    public CacheEntry configure(final OutputSocket<?> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -123,13 +125,13 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
     }
 
     @Override
-    public long getSize(Entry.Size type) {
+    public long getSize(Size type) {
         final Buffer buffer = this.buffer;
         return null == buffer ? UNKNOWN : buffer.getSize(type);
     }
 
     @Override
-    public long getTime(Entry.Access type) {
+    public long getTime(Access type) {
         final Buffer buffer = this.buffer;
         return null == buffer ? UNKNOWN : buffer.getTime(type);
     }
@@ -250,7 +252,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
          * @return A new cache.
          */
         @CreatesObligation
-        CacheEntry newCache(IOPool<?> pool) {
+        public CacheEntry newCache(IOPool<?> pool) {
             return new CacheEntry(this, pool);
         }
 
@@ -274,8 +276,8 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
         @Override
         public Entry localTarget() throws IOException {
-            final Buffer b = buffer;
-            return null != b ? b : new ProxyEntry(
+            final Buffer buffer = this.buffer;
+            return null != buffer ? buffer : new ProxyEntry(
                     input/*.bind(this)*/.localTarget()); // do NOT bind!
         }
 
@@ -303,8 +305,8 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
         @Override
         public Entry localTarget() throws IOException {
-            final Buffer b = buffer;
-            return null != b ? b : new ProxyEntry(
+            final Buffer buffer = this.buffer;
+            return null != buffer ? buffer : new ProxyEntry(
                     output/*.bind(this)*/.localTarget()); // do NOT bind!
         }
 
