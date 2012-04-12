@@ -80,12 +80,12 @@ system space.
     </scm>
 
     <properties>
-        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
-
         <!-- While using an older Maven version may work, this hasn't been
              tested and is probably not producing exactly the same results. -->
         <maven.enforcer.requireMavenVersion>3.0.4</maven.enforcer.requireMavenVersion>
         <maven.enforcer.requireJavaVersion>1.7</maven.enforcer.requireJavaVersion>
+
+        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
 
         <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
         <maven.compiler.source>1.7</maven.compiler.source>
