@@ -118,11 +118,11 @@ public class TarBZip2Driver extends TarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected OutputSocket<?> getOutputSocket(
+    protected OutputSocket<?> outputSocket(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.getOutputSocket(name, options.set(STORE), null);
+        return controller.outputSocket(name, options.set(STORE), null);
     }
 
     private static final class BZip2CompressorOutputStream

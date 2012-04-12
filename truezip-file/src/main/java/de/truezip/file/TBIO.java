@@ -11,8 +11,8 @@ import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.IOSocket;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.util.Paths;
 import de.truezip.kernel.util.BitField;
+import de.truezip.kernel.util.Paths;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -213,8 +213,8 @@ final class TBIO {
     throws IOException {
         final TConfig config = TConfig.get();
         BitField<FsAccessOption> preferences = config.getAccessPreferences();
-        final InputSocket<?> input = getInputSocket(src, preferences);
-        final OutputSocket<?> output = getOutputSocket(dst, preferences,
+        final InputSocket<?> input = inputSocket(src, preferences);
+        final OutputSocket<?> output = outputSocket(dst, preferences,
                 preserve ? input.localTarget() : null);
         IOSocket.copy(input, output);
     }
@@ -265,13 +265,13 @@ final class TBIO {
      */
     @SuppressWarnings("deprecation")
     static InputSocket<?>
-    getInputSocket(final File src, final BitField<FsAccessOption> options) {
+    inputSocket(final File src, final BitField<FsAccessOption> options) {
         if (src instanceof TFile) {
             final TFile tsrc = (TFile) src;
             final TFile archive = tsrc.getInnerArchive();
             if (null != archive)
                 return archive  .getController()
-                                .getInputSocket(tsrc.getInnerFsEntryName(),
+                                .inputSocket(tsrc.getInnerFsEntryName(),
                                                 options);
         }
         final FsPath path = new FsPath(src);
@@ -279,7 +279,7 @@ final class TBIO {
                 .get()
                 .getFsManager()
                 .getController( path.getMountPoint(), getDetector(src))
-                .getInputSocket(path.getEntryName(), options);
+                .inputSocket(path.getEntryName(), options);
     }
 
     /**
@@ -293,7 +293,7 @@ final class TBIO {
      */
     @SuppressWarnings("deprecation")
     static OutputSocket<?>
-    getOutputSocket(final File dst,
+    outputSocket(final File dst,
                     final BitField<FsAccessOption> options,
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
@@ -301,7 +301,7 @@ final class TBIO {
             final TFile archive = tdst.getInnerArchive();
             if (null != archive)
                 return archive  .getController()
-                                .getOutputSocket(   tdst.getInnerFsEntryName(),
+                                .outputSocket(   tdst.getInnerFsEntryName(),
                                                     options,
                                                     template);
         }
@@ -310,7 +310,7 @@ final class TBIO {
                 .get()
                 .getFsManager()
                 .getController(     path.getMountPoint(), getDetector(dst))
-                .getOutputSocket(   path.getEntryName(),
+                .outputSocket(   path.getEntryName(),
                                     options.clear(CREATE_PARENTS),
                                     template);
     }

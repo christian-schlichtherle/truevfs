@@ -134,7 +134,7 @@ public abstract class FsController<M extends FsModel> {
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    public abstract @Nullable FsEntry getEntry(FsEntryName name)
+    public abstract @Nullable FsEntry entry(FsEntryName name)
     throws IOException;
 
     /**
@@ -254,7 +254,7 @@ public abstract class FsController<M extends FsModel> {
      * @return An {@code InputSocket}.
      */
     public abstract InputSocket<?>
-    getInputSocket( FsEntryName name,
+    inputSocket(    FsEntryName name,
                     BitField<FsAccessOption> options);
 
     /**
@@ -271,7 +271,7 @@ public abstract class FsController<M extends FsModel> {
      * @return An {@code OutputSocket}.
      */
     public abstract OutputSocket<?>
-    getOutputSocket(FsEntryName name,
+    outputSocket(   FsEntryName name,
                     BitField<FsAccessOption> options,
                     @CheckForNull Entry template);
 

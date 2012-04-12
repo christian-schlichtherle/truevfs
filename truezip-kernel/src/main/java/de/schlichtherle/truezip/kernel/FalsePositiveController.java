@@ -134,7 +134,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     } // IsReadOnly
     
     @Override
-    public FsEntry getEntry(final FsEntryName name) throws IOException {
+    public FsEntry entry(final FsEntryName name) throws IOException {
         return call(new GetEntry(), name);
     }
 
@@ -143,7 +143,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public FsEntry call(final FsController<?> controller,
                             final FsEntryName name)
         throws IOException {
-            return controller.getEntry(name);
+            return controller.entry(name);
         }
     } // GetEntry
 
@@ -242,7 +242,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<?> inputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
         @NotThreadSafe
@@ -255,7 +255,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return (lastController == controller
                         ? socket
                         : (socket = (lastController = controller)
-                            .getInputSocket(name, options)))
+                            .inputSocket(name, options)))
                         .bind(this);
             }
 
@@ -314,7 +314,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<?> outputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
@@ -328,7 +328,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return (lastController == controller
                         ? socket
                         : (socket = (lastController = controller)
-                            .getOutputSocket(name, options, template)))
+                            .outputSocket(name, options, template)))
                         .bind(this);
             }
 

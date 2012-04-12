@@ -88,7 +88,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public FsEntry getEntry(FsEntryName name) throws IOException {
+    public FsEntry entry(FsEntryName name) throws IOException {
         checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
@@ -150,7 +150,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<?> inputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
         checkUndeclaredExceptions(this);
@@ -189,7 +189,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<?> outputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final Entry template) {

@@ -96,7 +96,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     }
 
     @Override
-    public InputSocket<?> getInputSocket(
+    public InputSocket<?> inputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
         /** This class requires ON-DEMAND LOOKUP of its in! */
@@ -107,10 +107,10 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
-                        return controller.getInputSocket(name, options);
+                        return controller.inputSocket(name, options);
                     cache = new EntryCache(name);
                 }
-                return cache.getInputSocket(options);
+                return cache.inputSocket(options);
             }
         } // Input
 
@@ -119,7 +119,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive!
-    public OutputSocket<?> getOutputSocket(
+    public OutputSocket<?> outputSocket(
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
@@ -131,10 +131,10 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
-                        return controller.getOutputSocket(name, options, template);
+                        return controller.outputSocket(name, options, template);
                     cache = new EntryCache(name);
                 }
-                return cache.getOutputSocket(options, template);
+                return cache.outputSocket(options, template);
             }
         } // Output
 
@@ -263,11 +263,11 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             this.cache = WRITE_BACK.newCache(CacheController.this.pool);
         }
 
-        InputSocket<?> getInputSocket(BitField<FsAccessOption> options) {
+        InputSocket<?> inputSocket(BitField<FsAccessOption> options) {
             return cache.configure(new Input(options)).inputSocket();
         }
 
-        OutputSocket<?> getOutputSocket(BitField<FsAccessOption> options,
+        OutputSocket<?> outputSocket(   BitField<FsAccessOption> options,
                                         @CheckForNull Entry template) {
             return new Output(options, template);
         }
@@ -299,7 +299,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             @Override
             protected InputSocket<? extends Entry> getLazyDelegate() {
-                return controller.getInputSocket(name, options);
+                return controller.inputSocket(name, options);
             }
 
             @Override
@@ -345,7 +345,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             @Override
             protected OutputSocket<? extends Entry> getLazyDelegate() {
-                return cache.configure( controller.getOutputSocket(
+                return cache.configure( controller.outputSocket(
                                             name,
                                             options.clear(EXCLUSIVE),
                                             template))

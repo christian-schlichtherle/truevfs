@@ -18,8 +18,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsFilteringManager
-extends FsDecoratingManager<FsManager> {
+public final class FsFilteringManager extends FsDecoratingManager<FsManager> {
 
     private final URI prefix;
 

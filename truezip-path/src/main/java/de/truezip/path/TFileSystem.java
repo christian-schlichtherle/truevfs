@@ -7,11 +7,9 @@ package de.truezip.path;
 import de.truezip.file.TConfig;
 import de.truezip.file.TVFS;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import static de.truezip.kernel.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.FsSyncOptions.UMOUNT;
 import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
-import static de.truezip.kernel.FsEntryName.SEPARATOR;
-import de.truezip.kernel.FsMountPoint;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.*;
@@ -241,17 +239,17 @@ public final class TFileSystem extends FileSystem {
             final BitField<FsAccessOption>
                     o = path.mapInput(options).set(FsAccessOption.CACHE);
             return controller
-                    .getInputSocket(name, o)
+                    .inputSocket(name, o)
                     .channel();
         } else {
             final BitField<FsAccessOption>
                     o = path.mapOutput(options).set(FsAccessOption.CACHE);
             try {
                 return controller
-                        .getOutputSocket(name, o, null)
+                        .outputSocket(name, o, null)
                         .channel();
             } catch (final IOException ex) {
-                if (o.get(EXCLUSIVE) && null != controller.getEntry(name))
+                if (o.get(EXCLUSIVE) && null != controller.entry(name))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
                 throw ex;
@@ -262,7 +260,7 @@ public final class TFileSystem extends FileSystem {
     InputStream newInputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .getInputSocket(
+                .inputSocket(
                     path.getEntryName(),
                     path.mapInput(options))
                 .stream();
@@ -271,7 +269,7 @@ public final class TFileSystem extends FileSystem {
     OutputStream newOutputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .getOutputSocket(
+                .outputSocket(
                     path.getEntryName(),
                     path.mapOutput(options),
                     null)
@@ -282,7 +280,7 @@ public final class TFileSystem extends FileSystem {
             final TPath path,
             final Filter<? super Path> filter)
     throws IOException {
-        final FsEntry entry = getEntry(path);
+        final FsEntry entry = entry(path);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
             throw new NotDirectoryException(path.toString());
@@ -360,7 +358,7 @@ public final class TFileSystem extends FileSystem {
                     path.getAccessPreferences(),
                     null);
         } catch (IOException ex) {
-            if (null != controller.getEntry(name))
+            if (null != controller.entry(name))
                 throw (IOException) new FileAlreadyExistsException(path.toString())
                         .initCause(ex);
             throw ex;
@@ -371,28 +369,26 @@ public final class TFileSystem extends FileSystem {
         getController().unlink(path.getEntryName(), path.getAccessPreferences());
     }
 
-    FsEntry getEntry(TPath path) throws IOException {
-        return getController().getEntry(path.getEntryName());
+    FsEntry entry(TPath path) throws IOException {
+        return getController().entry(path.getEntryName());
     }
 
-    InputSocket<?> getInputSocket(  TPath path,
-                                    BitField<FsAccessOption> options) {
-        return getController()
-                .getInputSocket(path.getEntryName(), options);
+    InputSocket<?> inputSocket( TPath path,
+                                BitField<FsAccessOption> options) {
+        return getController().inputSocket(path.getEntryName(), options);
     }
 
-    OutputSocket<?> getOutputSocket(TPath path,
+    OutputSocket<?> outputSocket(   TPath path,
                                     BitField<FsAccessOption> options,
                                     @CheckForNull Entry template) {
-        return getController()
-                .getOutputSocket(path.getEntryName(), options, template);
+        return getController().outputSocket(path.getEntryName(), options, template);
     }
 
     void checkAccess(final TPath path, final AccessMode... modes)
     throws IOException {
         final FsEntryName name = path.getEntryName();
         final FsController<?> controller = getController();
-        if (null == controller.getEntry(name))
+        if (null == controller.entry(name))
             throw new NoSuchFileException(path.toString());
         for (final AccessMode m : modes) {
             switch (m) {
@@ -478,7 +474,7 @@ public final class TFileSystem extends FileSystem {
         private final FsEntry entry;
 
         FsEntryAttributes(final TPath path) throws IOException {
-            if (null == (entry = getController().getEntry(path.getEntryName())))
+            if (null == (entry = getController().entry(path.getEntryName())))
                 throw new NoSuchFileException(path.toString());
         }
 
