@@ -73,7 +73,7 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     multiplexing, caching and accounting so that archive file system drivers
     do not need to take care of these aspects of a virtual file system.
 
-    There is no tutorial for how to write a file system driver,
+    Unfortunately, there is no tutorial for how to write a file system driver,
     but there's comprehensive Javadoc and sample code:
 
     * If you are going to write a federated file system driver
