@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.io;
 
-import de.truezip.kernel.io.Paths.Splitter;
+import de.truezip.kernel.io.PathSplitter;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import java.io.File;
 import java.net.URI;
@@ -136,7 +136,7 @@ public class PathsTest {
         final String parent = file.getParent();
         final String member = file.getName();
 
-        final Splitter splitter = Paths.split(path, File.separatorChar, false);
+        final PathSplitter splitter = Paths.split(path, File.separatorChar, false);
         assertEquals(parent, splitter.getParentPath());
         assertEquals(member, splitter.getMemberName());
     }

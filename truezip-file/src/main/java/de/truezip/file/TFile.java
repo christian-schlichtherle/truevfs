@@ -16,7 +16,7 @@ import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.io.Paths;
-import de.truezip.kernel.io.Paths.Splitter;
+import de.truezip.kernel.io.PathSplitter;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.UriBuilder;
@@ -767,7 +767,7 @@ public final class TFile extends File {
         assert null != detector;
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
-        scan(ancestor, detector, 0, path, enclEntryNameBuf, new Splitter(separatorChar, false));
+        scan(ancestor, detector, 0, path, enclEntryNameBuf, new PathSplitter(separatorChar, false));
         try {
             enclEntryName = 0 >= enclEntryNameBuf.length()
                     ? null
@@ -785,7 +785,7 @@ public final class TFile extends File {
             int skip,
             final String path,
             final StringBuilder enclEntryNameBuf,
-            final Splitter splitter) {
+            final PathSplitter splitter) {
         if (path == null) {
             assert null == enclArchive;
             enclEntryNameBuf.setLength(0);

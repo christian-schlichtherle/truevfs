@@ -14,7 +14,7 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
-import de.truezip.kernel.io.Paths.Normalizer;
+import de.truezip.kernel.io.PathNormalizer;
 import static de.truezip.kernel.io.Paths.cutTrailingSeparators;
 import static de.truezip.kernel.io.Paths.isRoot;
 import de.truezip.kernel.util.BitField;
@@ -46,7 +46,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private static final String ROOT_PATH = ROOT.getPath();
 
-    private final Splitter splitter = new Splitter();
+    private final PathSplitter splitter = new PathSplitter();
     private final FsArchiveDriver<E> driver;
     private final EntryTable<E> master;
 
@@ -137,7 +137,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 initialCapacity(archive.size() + OVERHEAD_SIZE));
         // Load entries from input archive.
         final List<String> paths = new ArrayList<>(archive.size());
-        final Normalizer normalizer = new Normalizer(SEPARATOR_CHAR);
+        final PathNormalizer normalizer = new PathNormalizer(SEPARATOR_CHAR);
         for (final E entry : archive) {
             final String path = cutTrailingSeparators(
                 normalizer.normalize(
@@ -697,9 +697,9 @@ implements Iterable<FsCovariantEntry<E>> {
     } // EntryTable
 
     /** Splits a given path name into its parent path name and base name. */
-    private static final class Splitter
-    extends de.truezip.kernel.io.Paths.Splitter {
-        Splitter() {
+    private static final class PathSplitter
+    extends de.truezip.kernel.io.PathSplitter {
+        PathSplitter() {
             super(SEPARATOR_CHAR, false);
         }
 
