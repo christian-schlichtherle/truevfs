@@ -75,7 +75,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     protected OutputService<MockArchiveDriverEntry> newOutputService(
             final FsModel model,
             final OutputSocket<?> output,
-            final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> source)
+            final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         output.getLocalTarget(); // don't care for the result
