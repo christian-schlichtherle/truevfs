@@ -117,6 +117,41 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         return this;
     }
 
+    @Override
+    public String getName() {
+        return "Johnny Cache!";
+    }
+
+    @Override
+    public long getSize(Entry.Size type) {
+        final Buffer buffer = this.buffer;
+        return null == buffer ? UNKNOWN : buffer.getSize(type);
+    }
+
+    @Override
+    public long getTime(Entry.Access type) {
+        final Buffer buffer = this.buffer;
+        return null == buffer ? UNKNOWN : buffer.getTime(type);
+    }
+
+    /**
+     * Returns an input socket for reading the cached entry data.
+     *
+     * @return An input socket for reading the cached entry data.
+     */
+    public InputSocket<Entry> inputSocket() {
+        return new Input();
+    }
+
+    /**
+     * Returns an output socket for writing the cached entry data.
+     *
+     * @return An output socket for writing the cached entry data.
+     */
+    public OutputSocket<Entry> outputSocket() {
+        return new Output();
+    }
+
     /**
      * Writes the cached entry data to the backing store unless already done.
      * Whether or not this method needs to be called depends on the caching
@@ -153,41 +188,6 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         } finally {
             release();
         }
-    }
-
-    @Override
-    public String getName() {
-        return "Johnny Cache!";
-    }
-
-    @Override
-    public long getSize(Entry.Size type) {
-        final Buffer buffer = this.buffer;
-        return null == buffer ? UNKNOWN : buffer.data.getSize(type);
-    }
-
-    @Override
-    public long getTime(Entry.Access type) {
-        final Buffer buffer = this.buffer;
-        return null == buffer ? UNKNOWN : buffer.data.getTime(type);
-    }
-
-    /**
-     * Returns an input socket for reading the cached entry data.
-     *
-     * @return An input socket for reading the cached entry data.
-     */
-    public InputSocket<Entry> inputSocket() {
-        return new Input();
-    }
-
-    /**
-     * Returns an output socket for writing the cached entry data.
-     *
-     * @return An output socket for writing the cached entry data.
-     */
-    public OutputSocket<Entry> outputSocket() {
-        return new Output();
     }
 
     private InputBufferPool getInputBufferPool() {
@@ -275,7 +275,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         @Override
         public Entry localTarget() throws IOException {
             final Buffer b = buffer;
-            return null != b ? b.data : new ProxyEntry(
+            return null != b ? b : new ProxyEntry(
                     input/*.bind(this)*/.localTarget()); // do NOT bind!
         }
 
@@ -304,7 +304,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         @Override
         public Entry localTarget() throws IOException {
             final Buffer b = buffer;
-            return null != b ? b.data : new ProxyEntry(
+            return null != b ? b : new ProxyEntry(
                     output/*.bind(this)*/.localTarget()); // do NOT bind!
         }
 
@@ -336,8 +336,8 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
             if (null == buffer) {
                 buffer = new Buffer();
                 try {
-                    IOSocket.copy(input, buffer.data.outputSocket());
-                } catch (final IOException ex) {
+                    buffer.load(input);
+                } catch (final Throwable ex) {
                     try {
                         buffer.release();
                     } catch (final IOException ex2) {
@@ -378,7 +378,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
             assert Strategy.WRITE_BACK == strategy || 0 == buffer.readers;
             buffer.writers = 0;
             try {
-                IOSocket.copy(buffer.data.inputSocket(), output);
+                buffer.save(output);
             } finally {
                 setBuffer(buffer);
             }
@@ -439,6 +439,14 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         @Override
         public OutputSocket<Buffer> outputSocket() {
             return new Output();
+        }
+
+        void load(InputSocket<?> input) throws IOException {
+            IOSocket.copy(input, data.outputSocket());
+        }
+
+        void save(OutputSocket<?> output) throws IOException {
+            IOSocket.copy(data.inputSocket(), output);
         }
 
         @Override
