@@ -89,7 +89,7 @@ implements OutputService<ZipDriverEntry> {
                 if (0 < source.getPostambleLength()) {
                     this.postamble = getPool().allocate();
                     Streams.copy(   source.getPostambleInputStream(),
-                                    this.postamble.getOutputSocket().stream());
+                                    this.postamble.outputSocket().stream());
                 }
             }
         } catch (final Throwable ex) {
@@ -139,8 +139,8 @@ implements OutputService<ZipDriverEntry> {
     }
 
     @Override
-    public @CheckForNull ZipDriverEntry getEntry(final String name) {
-        ZipDriverEntry entry = super.getEntry(name);
+    public @CheckForNull ZipDriverEntry entry(final String name) {
+        ZipDriverEntry entry = super.entry(name);
         if (null != entry)
             return entry;
         entry = this.bufferedEntry;
@@ -148,13 +148,13 @@ implements OutputService<ZipDriverEntry> {
     }
 
     @Override
-    public OutputSocket<ZipDriverEntry> getOutputSocket(final ZipDriverEntry entry) { // local target
+    public OutputSocket<ZipDriverEntry> outputSocket(final ZipDriverEntry entry) { // local target
         if (null == entry)
             throw new NullPointerException();
 
         final class Output extends OutputSocket<ZipDriverEntry> {
             @Override
-            public ZipDriverEntry getLocalTarget() {
+            public ZipDriverEntry localTarget() {
                 return entry;
             }
 
@@ -172,7 +172,7 @@ implements OutputService<ZipDriverEntry> {
                     entry.setCompressedSize(0);
                     entry.setSize(0);
                     return new EntryOutputStream(entry, true);
-                } else if (null != (peer = getPeerTarget())
+                } else if (null != (peer = peerTarget())
                         && UNKNOWN != (size = peer.getSize(DATA))) {
                     entry.setSize(size);
                     if (peer instanceof ZipDriverEntry) {
@@ -234,7 +234,7 @@ implements OutputService<ZipDriverEntry> {
         final IOBuffer<?> pa = this.postamble;
         if (null != pa) {
             this.postamble = null;
-            final InputSocket<?> is = pa.getInputSocket();
+            final InputSocket<?> is = pa.inputSocket();
             Throwable ex = null;
             try {
                 final InputStream in = is.stream();
@@ -245,7 +245,7 @@ implements OutputService<ZipDriverEntry> {
                     // This might be required for self extracting files on
                     // some platforms, e.g. Windows x86.
                     final long ol = length();
-                    final long ipl = is.getLocalTarget().getSize(DATA);
+                    final long ipl = is.localTarget().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
                     Streams.cat(in, this);
@@ -283,7 +283,7 @@ implements OutputService<ZipDriverEntry> {
      * writing another entry and the entry holds enough information to write
      * the entry header.
      * These preconditions are checked by
-     * {@link #getOutputSocket(ZipDriverEntry)}.
+     * {@link #outputSocket(ZipDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
 
@@ -318,7 +318,7 @@ implements OutputService<ZipDriverEntry> {
                 final ZipDriverEntry entry,
                 final boolean process)
         throws IOException {
-            super(buffer.getOutputSocket().stream(), new CRC32());
+            super(buffer.outputSocket().stream(), new CRC32());
             assert STORED == entry.getMethod();
             this.buffer = buffer;
             ZipOutputService.this.bufferedEntry = entry;
@@ -346,7 +346,7 @@ implements OutputService<ZipDriverEntry> {
             ZipOutputService.this.bufferedEntry = null;
             Throwable ex = null;
             try {
-                final InputStream in = buffer.getInputSocket().stream();
+                final InputStream in = buffer.inputSocket().stream();
                 try {
                     final long length = buffer.getSize(DATA);
                     entry.setCrc(getChecksum().getValue());

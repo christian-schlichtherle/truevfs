@@ -36,7 +36,6 @@ public class ChannelOutputStream extends OutputStream {
      */
     protected @Nullable WritableByteChannel channel;
 
-    @CreatesObligation
     public ChannelOutputStream(
             final @CheckForNull @WillCloseWhenClosed WritableByteChannel sbc) {
         this.channel = sbc;

@@ -63,7 +63,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
             final InputSocket<?> input)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
-        input.getLocalTarget(); // don't care for the result
+        input.localTarget(); // don't care for the result
         final MockArchive
                 c = containers.get(mp);
         if (null == c)
@@ -78,7 +78,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
             final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
-        output.getLocalTarget(); // don't care for the result
+        output.localTarget(); // don't care for the result
         final MockArchive
                 n = MockArchive.create(config);
         MockArchive o = containers.get(mp);
@@ -91,8 +91,8 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     public MockArchiveDriverEntry newEntry(
             String name,
             Type type,
-            Entry template,
-            BitField<FsAccessOption> mknod) {
+            BitField<FsAccessOption> mknod,
+            @CheckForNull Entry template) {
         return new MockArchiveDriverEntry(normalize(name, type), type, template);
     }
 }

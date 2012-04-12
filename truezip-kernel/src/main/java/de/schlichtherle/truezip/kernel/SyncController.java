@@ -16,7 +16,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -159,10 +159,10 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public Entry getLocalTarget() throws IOException {
+            public Entry localTarget() throws IOException {
                 while (true) {
                     try {
-                        return getBoundSocket().getLocalTarget();
+                        return getBoundSocket().localTarget();
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -210,10 +210,10 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public Entry getLocalTarget() throws IOException {
+            public Entry localTarget() throws IOException {
                 while (true) {
                     try {
-                        return getBoundSocket().getLocalTarget();
+                        return getBoundSocket().localTarget();
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -293,12 +293,12 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
 
     private final class SyncInputStream
     extends DecoratingInputStream {
-        @CreatesObligation
         SyncInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(in);
         }
@@ -306,12 +306,12 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
 
     private final class SyncOutputStream
     extends DecoratingOutputStream {
-        @CreatesObligation
         SyncOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(out);
         }
@@ -319,12 +319,12 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
 
     private final class SyncSeekableChannel
     extends DecoratingSeekableChannel {
-        @CreatesObligation
         SyncSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(channel);
         }

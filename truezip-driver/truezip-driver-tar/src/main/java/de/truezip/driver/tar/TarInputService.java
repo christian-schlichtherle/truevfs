@@ -113,7 +113,7 @@ implements InputService<TarDriverEntry> {
                 entry.setTemp(temp);
                 try {
                     Throwable ex = null;
-                    final OutputStream out = temp.getOutputSocket().stream();
+                    final OutputStream out = temp.outputSocket().stream();
                     try {
                         Streams.cat(tin, out);
                     } catch (final Throwable ex2) {
@@ -223,18 +223,18 @@ implements InputService<TarDriverEntry> {
     }
 
     @Override
-    public @CheckForNull TarDriverEntry getEntry(String name) {
+    public @CheckForNull TarDriverEntry entry(String name) {
         return entries.get(name);
     }
 
     @Override
-    public InputSocket<TarDriverEntry> getInputSocket(final String name) {
+    public InputSocket<TarDriverEntry> inputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
         final class Input extends InputSocket<TarDriverEntry> {
             @Override
-            public TarDriverEntry getLocalTarget() throws IOException {
-                final TarDriverEntry entry = getEntry(name);
+            public TarDriverEntry localTarget() throws IOException {
+                final TarDriverEntry entry = entry(name);
                 if (null == entry)
                     throw new NoSuchFileException(name, null, "Entry not found!");
                 if (entry.isDirectory())
@@ -255,7 +255,7 @@ implements InputService<TarDriverEntry> {
 
             InputSocket<? extends IOBuffer<?>> getInputSocket()
             throws IOException {
-                return getLocalTarget().getTemp().getInputSocket();
+                return localTarget().getTemp().inputSocket();
             }
         } // Input
 

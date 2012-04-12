@@ -4,6 +4,9 @@
  */
 package de.truezip.kernel.util;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
+
 /**
  * An interface for pooling strategies.
  * <p>
@@ -26,6 +29,7 @@ public interface Pool<R, X extends Exception> {
      * @return A resource.
      * @throws X if allocating the resource failed for any reason.
      */
+    @CreatesObligation
     R allocate() throws X;
 
     /**
@@ -39,5 +43,6 @@ public interface Pool<R, X extends Exception> {
      *         implementation cannot tolerate this.
      * @throws X if releasing the resource failed for any other reason.
      */
+    @DischargesObligation
     void release(R resource) throws X;
 }

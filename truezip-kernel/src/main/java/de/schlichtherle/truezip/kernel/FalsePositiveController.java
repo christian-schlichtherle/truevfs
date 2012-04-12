@@ -260,7 +260,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public Entry getLocalTarget() throws IOException {                
+            public Entry localTarget() throws IOException {                
                 return call(new GetLocalTarget(), name);
             }
 
@@ -271,7 +271,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         final FsEntryName name)
                 throws IOException {
                     return getBoundDelegate(controller, name)
-                            .getLocalTarget();
+                            .localTarget();
                 }
             } // GetLocalTarget
 
@@ -333,7 +333,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             @Override
-            public Entry getLocalTarget() throws IOException {                
+            public Entry localTarget() throws IOException {                
                 return call(new GetLocalTarget(), name);
             }
 
@@ -344,7 +344,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         final FsEntryName name)
                 throws IOException {
                     return getBoundDelegate(controller, name)
-                            .getLocalTarget();
+                            .localTarget();
                 }
             } // GetLocalTarget
 

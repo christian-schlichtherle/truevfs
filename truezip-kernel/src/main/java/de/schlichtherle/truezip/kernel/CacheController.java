@@ -18,6 +18,7 @@ import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,9 +39,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <ul>
  * <li>Caching and buffering for an entry needs to get activated by using the
  *     method
- *     {@link #getInputSocket input socket} with the input option
+ *     {@link #inputSocket input socket} with the input option
  *     {@link FsAccessOption#CACHE} or the method
- *     {@link #getOutputSocket output socket} with the output option
+ *     {@link #outputSocket output socket} with the output option
  *     {@link FsAccessOption#CACHE}.
  * <li>Unless a write operation succeeds, upon each read operation the entry
  *     data gets copied from the backing store for buffering purposes only.
@@ -208,9 +209,9 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 logger.log(Level.FINE, "recovering", invalidState);
                 preSyncEx = invalidState; // trigger another iteration
             }
-            // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in
+            // TODO: Consume FsSyncOption.CLEAR_CACHE and release a flag in
             // the model instead.
-            controller.sync(options/*.clear(CLEAR_CACHE)*/, handler);
+            controller.sync(options/*.release(CLEAR_CACHE)*/, handler);
         } while (null != preSyncEx);
     }
 
@@ -263,7 +264,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
         }
 
         InputSocket<?> getInputSocket(BitField<FsAccessOption> options) {
-            return cache.configure(new Input(options)).getInputSocket();
+            return cache.configure(new Input(options)).inputSocket();
         }
 
         OutputSocket<?> getOutputSocket(BitField<FsAccessOption> options,
@@ -276,7 +277,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
         }
 
         void clear() throws IOException {
-            cache.clear();
+            cache.release();
         }
 
         void register() {
@@ -314,6 +315,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 }
 
                 @Override
+                @DischargesObligation
                 public void close() throws IOException {
                     in.close();
                     register();
@@ -347,15 +349,15 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                                             name,
                                             options.clear(EXCLUSIVE),
                                             template))
-                            .getOutputSocket();
+                            .outputSocket();
             }
 
             @Override
-            public Entry getLocalTarget() throws IOException {
+            public Entry localTarget() throws IOException {
                 // Note that the super class implementation MUST get
                 // bypassed because the channel MUST get kept even upon an
                 // exception!
-                return getBoundSocket().getLocalTarget();
+                return getBoundSocket().localTarget();
             }
 
             @Override
@@ -376,6 +378,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 }
 
                 @Override
+                @DischargesObligation
                 public void close() throws IOException {
                     out.close();
                     postOutput();
@@ -400,6 +403,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 }
 
                 @Override
+                @DischargesObligation
                 public void close() throws IOException {
                     channel.close();
                     postOutput();

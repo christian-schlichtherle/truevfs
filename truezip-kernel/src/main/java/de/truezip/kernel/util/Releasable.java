@@ -4,12 +4,16 @@
  */
 package de.truezip.kernel.util;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
+
 /**
  * A resource which can release itself to its associated {@link Pool}.
  *
  * @param  <X> The type of the exceptions thrown by this releasable.
  * @author Christian Schlichtherle
  */
+@CleanupObligation
 public interface Releasable<X extends Exception> {
 
     /**
@@ -20,5 +24,6 @@ public interface Releasable<X extends Exception> {
      *         this.
      * @throws X if releasing the resource failed for any other reason.
      */
+    @DischargesObligation
     void release() throws X;
 }

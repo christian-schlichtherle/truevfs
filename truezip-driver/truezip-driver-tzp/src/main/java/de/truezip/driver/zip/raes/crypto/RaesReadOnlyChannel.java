@@ -52,10 +52,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
 
-    RaesReadOnlyChannel() {
-        super(null);
-    }
-
     /**
      * Creates a new RAES read-only channel.
      *

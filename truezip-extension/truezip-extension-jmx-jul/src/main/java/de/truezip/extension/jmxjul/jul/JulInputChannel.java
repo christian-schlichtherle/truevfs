@@ -40,7 +40,7 @@ final class JulInputChannel extends DecoratingReadOnlyChannel {
     private void log(String message) {
         Entry target;
         try {
-            target = socket.getLocalTarget();
+            target = socket.localTarget();
         } catch (final IOException ignore) {
             target = null;
         }

@@ -127,10 +127,10 @@ public final class ArchiveFileSystemTest {
             final MockArchiveDriverEntry ae = driver.newEntry(aen, type, null);
             assertEquals(aen, ae.getName());
             archive   .newOutputService()
-                        .getOutputSocket(ae)
+                        .outputSocket(ae)
                         .stream()
                         .close();
-            assertSame(ae, archive.getEntry(aen));
+            assertSame(ae, archive.entry(aen));
         }
         assertEquals(paramss.length, archive.size());
 

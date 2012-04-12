@@ -94,14 +94,14 @@ implements InputService<ZipDriverEntry> {
     }
 
     @Override
-    public InputSocket<ZipDriverEntry> getInputSocket(final String name) {
+    public InputSocket<ZipDriverEntry> inputSocket(final String name) {
         if (null == name)
             throw new NullPointerException();
 
         final class Input extends InputSocket<ZipDriverEntry> {
             @Override
-            public ZipDriverEntry getLocalTarget() throws IOException {
-                final ZipDriverEntry entry = getEntry(name);
+            public ZipDriverEntry localTarget() throws IOException {
+                final ZipDriverEntry entry = entry(name);
                 if (null == entry)
                     throw new NoSuchFileException(name, null, "Entry not found!");
                 if (entry.isDirectory())
@@ -111,8 +111,8 @@ implements InputService<ZipDriverEntry> {
 
             @Override
             public InputStream stream() throws IOException {
-                final ZipDriverEntry lt = getLocalTarget();
-                final Entry pt = getPeerTarget();
+                final ZipDriverEntry lt = localTarget();
+                final Entry pt = peerTarget();
                 final ZipDriverEntry zpt = pt instanceof ZipDriverEntry
                         ? (ZipDriverEntry) pt
                         : null;

@@ -170,8 +170,7 @@ public abstract class ZipRaesDriver extends JarDriver {
 
         final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(
-                new ZipOutputService(model, new Sink(), zis, this),
-                getIOPool());
+                getIOPool(), new ZipOutputService(model, new Sink(), zis, this));
     }
 
     /**
@@ -210,10 +209,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     public ZipDriverEntry newEntry(
             final String path,
             final Type type,
-            final Entry template,
-            final BitField<FsAccessOption> mknod) {
+            final BitField<FsAccessOption> mknod,
+            final Entry template) {
         final ZipDriverEntry entry
-                = super.newEntry(path, type, template, mknod.set(COMPRESS));
+                = super.newEntry(path, type, mknod.set(COMPRESS), template);
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
         // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true
         // OR template is an instance of ZipEntry

@@ -4,9 +4,8 @@
  */
 package de.truezip.kernel.cio;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
-import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 
 /**
@@ -22,18 +21,19 @@ public abstract class DecoratingInputService<   E extends Entry,
 extends DecoratingContainer<E, I>
 implements InputService<E> {
 
-    @CreatesObligation
-    protected DecoratingInputService(
-            @CheckForNull @WillCloseWhenClosed I input) {
+    protected DecoratingInputService() { }
+
+    protected DecoratingInputService(@WillCloseWhenClosed I input) {
         super(input);
     }
 
     @Override
-    public InputSocket<E> getInputSocket(String name) {
-        return container.getInputSocket(name);
+    public InputSocket<E> inputSocket(String name) {
+        return container.inputSocket(name);
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         container.close();
     }

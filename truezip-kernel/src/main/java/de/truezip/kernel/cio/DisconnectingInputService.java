@@ -8,6 +8,7 @@ import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.InputClosedException;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -20,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Decorates another input service in order to disconnect any resources when this
  * input service gets closed.
  * Once {@linkplain #close() closed}, all methods of all products of this service,
- * including all sockets, streams etc. but excluding {@link #getInputSocket}
+ * including all sockets, streams etc. but excluding {@link #inputSocket}
  * and all {@link #close()} methods, will throw an
  * {@link InputClosedException} when called.
  *
@@ -39,7 +40,6 @@ extends DecoratingInputService<E, InputService<E>> {
      *
      * @param input the service to decorate.
      */
-    @CreatesObligation
     public DisconnectingInputService(@WillCloseWhenClosed InputService<E> input) {
         super(input);
     }
@@ -71,14 +71,14 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public E getEntry(String name) {
+    public E entry(String name) {
         assertOpenService();
-        return container.getEntry(name);
+        return container.entry(name);
     }
 
     @Override
-    public InputSocket<E> getInputSocket(String name) {
-        return new Input(container.getInputSocket(name));
+    public InputSocket<E> inputSocket(String name) {
+        return new Input(container.inputSocket(name));
     }
 
     /**
@@ -92,6 +92,7 @@ extends DecoratingInputService<E, InputService<E>> {
      * @throws IOException on any I/O error.
      */
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         closed = true;
         container.close();
@@ -166,6 +167,7 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (!closed)
                 in.close();
@@ -211,6 +213,7 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (!closed)
                 channel.close();

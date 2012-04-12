@@ -23,10 +23,6 @@ import org.bouncycastle.crypto.Mac;
 @NotThreadSafe
 public abstract class RaesOutputStream extends DecoratingOutputStream {
 
-    RaesOutputStream() {
-        super(null);
-    }
-
     /**
      * Returns the key strength which is actually used to encrypt the data of
      * the RAES file.

@@ -10,7 +10,7 @@ import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.MultiplexingOutputService;
 import de.truezip.kernel.cio.OutputSocket;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.WillCloseWhenClosed;
@@ -37,23 +37,24 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
      * @param output the decorated output service.
      * @param pool the pool for buffering entry data.
      */
-    @CreatesObligation
-    public OdfOutputService(@WillCloseWhenClosed ZipOutputService output, IOPool<?> pool) {
-        super(output, pool);
+    public OdfOutputService(
+            IOPool<?> pool,
+            @WillCloseWhenClosed ZipOutputService output) {
+        super(pool, output);
     }
 
     @Override
-    public OutputSocket<ZipDriverEntry> getOutputSocket(final ZipDriverEntry entry) {
+    public OutputSocket<ZipDriverEntry> outputSocket(final ZipDriverEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
         class Output extends DecoratingOutputSocket<ZipDriverEntry> {
             Output() {
-                super(OdfOutputService.super.getOutputSocket(entry));
+                super(OdfOutputService.super.outputSocket(entry));
             }
 
             @Override
-            public ZipDriverEntry getLocalTarget() throws IOException {
+            public ZipDriverEntry localTarget() throws IOException {
                 return entry;
             }
 
@@ -77,6 +78,7 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         mimetype = true; // trigger writing temps
         super.close();

@@ -7,7 +7,6 @@ package de.truezip.kernel.io;
 import java.nio.ByteBuffer;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 
 /**
@@ -20,8 +19,10 @@ import javax.annotation.WillCloseWhenClosed;
 public abstract class DecoratingReadOnlyChannel
 extends DecoratingSeekableChannel {
 
+    protected DecoratingReadOnlyChannel() { }
+
     protected DecoratingReadOnlyChannel(
-            @CheckForNull @WillCloseWhenClosed SeekableByteChannel channel) {
+            @WillCloseWhenClosed SeekableByteChannel channel) {
         super(channel);
     }
 

@@ -6,7 +6,7 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.LockManagement.locked;
 import de.truezip.kernel.cio.*;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,13 +40,13 @@ extends DecoratingInputService<E, InputService<E>> {
      *
      * @param input the service to decorate.
      */
-    @CreatesObligation
     LockInputService(@WillCloseWhenClosed InputService<E> input) {
         super(input);
     }
 
     @Override
     @GuardedBy("lock")
+    @DischargesObligation
     public void close() throws IOException {
         final class Close implements IOOperation<Void> {
             @Override
@@ -61,10 +61,10 @@ extends DecoratingInputService<E, InputService<E>> {
 
     @Override
     @GuardedBy("lock")
-    public @CheckForNull E getEntry(String name) {
+    public @CheckForNull E entry(String name) {
         lock.lock();
         try {
-            return container.getEntry(name);
+            return container.entry(name);
         } finally {
             lock.unlock();
         }
@@ -87,19 +87,19 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<E> getInputSocket(final String name) {
+    public InputSocket<E> inputSocket(final String name) {
         final class Input extends DecoratingInputSocket<E> {
             Input() {
-                super(container.getInputSocket(name));
+                super(container.inputSocket(name));
             }
 
             @Override
             @GuardedBy("lock")
-            public E getLocalTarget() throws IOException {
+            public E localTarget() throws IOException {
                 final class GetLocalTarget implements IOOperation<E> {
                     @Override
                     public E call() throws IOException {
-                        return getBoundSocket().getLocalTarget();
+                        return getBoundSocket().localTarget();
                     }
                 } // GetLocalTarget
 
@@ -150,12 +150,12 @@ extends DecoratingInputService<E, InputService<E>> {
 
     private final class LockInputStream
     extends de.truezip.kernel.io.LockInputStream {
-        @CreatesObligation
         LockInputStream(@WillCloseWhenClosed InputStream in) {
-            super(in, lock);
+            super(lock, in);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(in);
         }
@@ -163,12 +163,12 @@ extends DecoratingInputService<E, InputService<E>> {
 
     private final class LockSeekableChannel
     extends de.truezip.kernel.io.LockSeekableChannel {
-        @CreatesObligation
         LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
-            super(channel, lock);
+            super(lock, channel);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(channel);
         }

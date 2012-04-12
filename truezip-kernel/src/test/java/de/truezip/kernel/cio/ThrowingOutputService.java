@@ -6,7 +6,7 @@ package de.truezip.kernel.cio;
 
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.ThrowManager;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.util.Iterator;
 import javax.annotation.CheckForNull;
@@ -24,14 +24,14 @@ extends DecoratingOutputService<E, OutputService<E>> {
     private final TestConfig config;
     private volatile @CheckForNull ThrowManager control;
 
-    @CreatesObligation
-    public ThrowingOutputService(  final @WillCloseWhenClosed OutputService<E> service) {
+    public ThrowingOutputService(
+            final @WillCloseWhenClosed OutputService<E> service) {
         this(service, null);
     }
 
-    @CreatesObligation
-    public ThrowingOutputService(  final @WillCloseWhenClosed OutputService<E> service,
-                                final @CheckForNull TestConfig config) {
+    public ThrowingOutputService(
+            final @WillCloseWhenClosed OutputService<E> service,
+            final @CheckForNull TestConfig config) {
         super(service);
         this.config = null != config ? config : TestConfig.get();
     }
@@ -64,20 +64,21 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public E getEntry(String name) {
+    public E entry(String name) {
         checkUndeclaredExceptions();
-        return container.getEntry(name);
+        return container.entry(name);
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         checkAllExceptions();
         container.close();
     }
 
     @Override
-    public OutputSocket<E> getOutputSocket(E entry) {
+    public OutputSocket<E> outputSocket(E entry) {
         checkUndeclaredExceptions();
-        return container.getOutputSocket(entry);
+        return container.outputSocket(entry);
     }
 }

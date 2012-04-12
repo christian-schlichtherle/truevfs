@@ -37,7 +37,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
     }
 
     @Override
-    public HttpEntry getLocalTarget() {
+    public HttpEntry localTarget() {
         return entry;
     }
 
@@ -53,7 +53,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
         try {
             temp = entry.getPool().allocate();
             try {
-                try (final OutputStream out = temp.getOutputSocket().stream()) {
+                try (final OutputStream out = temp.outputSocket().stream()) {
                     Streams.cat(in, out);
                 }
             } catch (final Throwable ex) {
@@ -77,7 +77,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
 
             @CreatesObligation
             TempReadOnlyChannel() throws IOException {
-                super(temp.getInputSocket().channel()); // bind(*) is considered redundant for IOPool.IOBuffer
+                super(temp.inputSocket().channel()); // bind(*) is considered redundant for IOPool.IOBuffer
             }
 
             @Override

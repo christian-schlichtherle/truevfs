@@ -28,6 +28,7 @@ import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -249,13 +250,13 @@ extends FileSystemArchiveController<E> {
             @Override
             protected InputSocket<? extends E> getLazyDelegate()
             throws IOException {
-                return getInputArchive().getInputSocket(name);
+                return getInputArchive().inputSocket(name);
             }
 
             @Override
-            public E getLocalTarget() throws IOException {
+            public E localTarget() throws IOException {
                 try {
-                    return super.getLocalTarget();
+                    return super.localTarget();
                 } catch (InputClosedException ignored) {
                     throw NeedsSyncException.get();
                 }
@@ -289,13 +290,13 @@ extends FileSystemArchiveController<E> {
             @Override
             protected OutputSocket<? extends E> getLazyDelegate()
             throws IOException {
-                return makeOutputArchive(options).getOutputSocket(entry);
+                return makeOutputArchive(options).outputSocket(entry);
             }
 
             @Override
-            public E getLocalTarget() throws IOException {
+            public E localTarget() throws IOException {
                 try {
-                    return super.getLocalTarget();
+                    return super.localTarget();
                 } catch (OutputClosedException ignored) {
                     throw NeedsSyncException.get();
                 }
@@ -366,7 +367,7 @@ extends FileSystemArchiveController<E> {
             final OutputArchive<E> oa = getOutputArchive();
             if (null != oa) {
                 aen = fse.getEntry().getName();
-                if (null != oa.getEntry(aen))
+                if (null != oa.entry(aen))
                     throw NeedsSyncException.get();
             } else {
                 aen = null;
@@ -384,7 +385,7 @@ extends FileSystemArchiveController<E> {
             if (null != ia) {
                 if (null == aen)
                     aen = fse.getEntry().getName();
-                iae = ia.getEntry(aen);
+                iae = ia.entry(aen);
             } else {
                 iae = null;
             }
@@ -472,16 +473,16 @@ extends FileSystemArchiveController<E> {
         for (final FsCovariantEntry<E> fse : fs) {
             for (final E ae : fse.getEntries()) {
                 final String aen = ae.getName();
-                if (null != os.getEntry(aen))
+                if (null != os.entry(aen))
                     continue; // entry has already been output
                 try {
                     if (DIRECTORY == ae.getType()) {
                         if (!fse.isRoot()) // never output the root directory!
                             if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
-                                os.getOutputSocket(ae).stream().close();
-                    } else if (null != is.getEntry(aen)) {
-                        IOSocket.copy(  is.getInputSocket(aen),
-                                        os.getOutputSocket(ae));
+                                os.outputSocket(ae).stream().close();
+                    } else if (null != is.entry(aen)) {
+                        IOSocket.copy(  is.inputSocket(aen),
+                                        os.outputSocket(ae));
                     } else {
                         // The file system entry is a newly created
                         // non-directory entry which hasn't received any
@@ -490,7 +491,7 @@ extends FileSystemArchiveController<E> {
                         for (final Size size : ALL_SIZE_SET)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
-                        os.getOutputSocket(ae).stream().close();
+                        os.outputSocket(ae).stream().close();
                     }
                 } catch (final IOException ex) {
                     if (null != warning || !(ex instanceof InputException))
@@ -564,16 +565,17 @@ extends FileSystemArchiveController<E> {
         }
 
         @Override
-        public @CheckForNull E getEntry(String name) {
+        public @CheckForNull E entry(String name) {
             return null;
         }
 
         @Override
-        public InputSocket<E> getInputSocket(String name) {
+        public InputSocket<E> inputSocket(String name) {
             throw new AssertionError();
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             throw new AssertionError();
         }
@@ -583,7 +585,6 @@ extends FileSystemArchiveController<E> {
     extends LockInputService<E> {
         final InputService<E> archive;
 
-        @CreatesObligation
         InputArchive(final @WillCloseWhenClosed InputService<E> input) {
             super(new DisconnectingInputService<>(input));
             this.archive = input;
@@ -609,7 +610,6 @@ extends FileSystemArchiveController<E> {
 
     private static final class OutputArchive<E extends FsArchiveEntry>
     extends LockOutputService<E> {
-        @CreatesObligation
         OutputArchive(final @WillCloseWhenClosed OutputService<E> output) {
             super(new DisconnectingOutputService<>(output));
         }

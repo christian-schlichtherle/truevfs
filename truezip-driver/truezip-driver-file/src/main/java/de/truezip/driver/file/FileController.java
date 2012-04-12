@@ -132,7 +132,7 @@ final class FileController extends FsModelController<FsModel>  {
     public InputSocket<?> getInputSocket(
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return new FileEntry(target, name).getInputSocket();
+        return new FileEntry(target, name).inputSocket();
     }
 
     @Override

@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.io;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -60,7 +60,6 @@ public final class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @param  size the size of the interval.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public IntervalReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
             final long size)
@@ -82,7 +81,6 @@ public final class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @param  size the size of the interval.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public IntervalReadOnlyChannel(
             final @WillNotClose SeekableByteChannel channel,
             final long start,
@@ -184,6 +182,7 @@ public final class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @throws IOException On any I/O error.
      */
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         if (exclusive)
             channel.close();

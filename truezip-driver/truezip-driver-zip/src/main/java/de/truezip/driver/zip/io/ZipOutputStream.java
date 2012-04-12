@@ -146,16 +146,16 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
     }
 
     /**
-     * Returns a clone of the entry for the given name or {@code null} if no
-     * entry with this name exists.
+     * Returns a clone of the entry for the given {@code name} or {@code null}
+     * if no entry with this name exists in this ZIP file.
      *
      * @param  name the name of the ZIP entry.
-     * @return A clone of the entry for the given name or {@code null} if no
-     *         entry with this name exists. 
+     * @return A clone of the entry for the given {@code name} or {@code null}
+     *         if no entry with this name exists in this ZIP file.
      */
     @Override
-    public ZipEntry getEntry(String name) {
-        final ZipEntry entry = super.getEntry(name);
+    public ZipEntry entry(String name) {
+        final ZipEntry entry = super.entry(name);
         return entry != null ? entry.clone() : null;
     }
 

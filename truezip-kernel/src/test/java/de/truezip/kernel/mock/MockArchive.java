@@ -13,6 +13,7 @@ import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.util.Maps;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,7 +27,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class MockArchive
@@ -36,8 +37,7 @@ implements Container<MockArchiveDriverEntry> {
     private final TestConfig config;
     private @CheckForNull ThrowManager control;
 
-    public static MockArchive create(
-            @CheckForNull TestConfig config) {
+    public static MockArchive create(@CheckForNull TestConfig config) {
         if (null == config)
             config = TestConfig.get();
         return new MockArchive(
@@ -63,11 +63,11 @@ implements Container<MockArchiveDriverEntry> {
         getThrowControl().check(this, Error.class);
     }
 
-    private IOPoolProvider getIOPoolProvider() {
+    public IOPoolProvider getIOPoolProvider() {
         return config.getIOPoolProvider();
     }
 
-    final IOPool<?> getIOPool() {
+    public final IOPool<?> getIOPool() {
         return getIOPoolProvider().getIOPool();
     }
 
@@ -84,23 +84,23 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     @Override
-    public MockArchiveDriverEntry getEntry(String name) {
+    public MockArchiveDriverEntry entry(String name) {
         checkUndeclaredExceptions();
         return entries.get(name);
     }
 
     public InputService<MockArchiveDriverEntry> newInputService() {
         checkUndeclaredExceptions();
-        return new ThrowingInputService<MockArchiveDriverEntry>(
-                new DisconnectingInputService<MockArchiveDriverEntry>(
+        return new ThrowingInputService<>(
+                new DisconnectingInputService<>(
                     new MockInputService(entries, config)),
                 config);
     }
 
     public OutputService<MockArchiveDriverEntry> newOutputService() {
         checkUndeclaredExceptions();
-        return new ThrowingOutputService<MockArchiveDriverEntry>(
-                new DisconnectingOutputService<MockArchiveDriverEntry>(
+        return new ThrowingOutputService<>(
+                new DisconnectingOutputService<>(
                     new MockOutputService(entries, config)),
                 config);
     }
@@ -115,14 +115,14 @@ implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
-        public InputSocket<MockArchiveDriverEntry> getInputSocket(
+        public InputSocket<MockArchiveDriverEntry> inputSocket(
                 final String name) {
             if (null == name)
                 throw new NullPointerException();
 
             class Input extends InputSocket<MockArchiveDriverEntry> {
                 @Override
-                public MockArchiveDriverEntry getLocalTarget()
+                public MockArchiveDriverEntry localTarget()
                 throws IOException {
                     final MockArchiveDriverEntry entry = entries.get(name);
                     if (null == entry)
@@ -143,9 +143,9 @@ implements Container<MockArchiveDriverEntry> {
 
                 InputSocket<? extends IOEntry<?>>
                 getBufferInputSocket() throws IOException {
-                    return getLocalTarget()
+                    return localTarget()
                             .getBuffer(getIOPool())
-                            .getInputSocket();
+                            .inputSocket();
                 }
             } // Input
 
@@ -153,6 +153,7 @@ implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
+        @DischargesObligation
         public void close() { }
     } // MockInputService
 
@@ -166,14 +167,14 @@ implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
-        public OutputSocket<MockArchiveDriverEntry> getOutputSocket(
+        public OutputSocket<MockArchiveDriverEntry> outputSocket(
                 final MockArchiveDriverEntry entry) {
             if (null == entry)
                 throw new NullPointerException();
 
             class Output extends OutputSocket<MockArchiveDriverEntry> {
                 @Override
-                public MockArchiveDriverEntry getLocalTarget() {
+                public MockArchiveDriverEntry localTarget() {
                     return entry;
                 }
 
@@ -204,13 +205,13 @@ implements Container<MockArchiveDriverEntry> {
                 OutputSocket<? extends IOEntry<?>>
                 getBufferOutputSocket() throws IOException {
                     entries.put(entry.getName(), entry);
-                    return getLocalTarget()
+                    return localTarget()
                             .getBuffer(getIOPool())
-                            .getOutputSocket();
+                            .outputSocket();
                 }
 
                 void copyProperties() {
-                    final MockArchiveDriverEntry dst = getLocalTarget();
+                    final MockArchiveDriverEntry dst = localTarget();
                     final IOBuffer<?> src;
                     try {
                         src = dst.getBuffer(getIOPool());
@@ -228,6 +229,7 @@ implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
+        @DischargesObligation
         public void close() { }
     } // MockOutputService
 }

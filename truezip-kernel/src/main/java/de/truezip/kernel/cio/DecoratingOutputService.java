@@ -4,9 +4,8 @@
  */
 package de.truezip.kernel.cio;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
-import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 
 /**
@@ -22,18 +21,19 @@ public abstract class DecoratingOutputService<  E extends Entry,
 extends DecoratingContainer<E, O>
 implements OutputService<E> {
 
-    @CreatesObligation
-    protected DecoratingOutputService(
-            @CheckForNull @WillCloseWhenClosed O output) {
+    protected DecoratingOutputService() { }
+
+    protected DecoratingOutputService(@WillCloseWhenClosed O output) {
         super(output);
     }
 
     @Override
-    public OutputSocket<E> getOutputSocket(E entry) {
-        return container.getOutputSocket(entry);
+    public OutputSocket<E> outputSocket(E entry) {
+        return container.outputSocket(entry);
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         container.close();
     }

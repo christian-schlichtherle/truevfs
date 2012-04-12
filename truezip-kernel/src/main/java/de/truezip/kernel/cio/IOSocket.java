@@ -24,12 +24,12 @@ import javax.annotation.concurrent.ThreadSafe;
  * throw an {@link IOException} when creating a socket.
  * <p>
  * The entry is called the <i>local target</i> of a socket and can get resolved
- * anytime by calling the abstract method {@link #getLocalTarget()}.
+ * anytime by calling the abstract method {@link #localTarget()}.
  * However, this operation may fail with an {@link IOException} at the
  * discretion of the implementation.
  * <p>
  * A socket may have an optional <i>peer target</i> which can get resolved
- * anytime by calling the abstract method {@link #getPeerTarget()}.
+ * anytime by calling the abstract method {@link #peerTarget()}.
  * If this method returns {@code null}, then the socket does not have a peer
  * target.
  * Again, this operation may fail with an {@code IOException}.
@@ -41,9 +41,9 @@ import javax.annotation.concurrent.ThreadSafe;
  * For example, this could get used by an implementation in order to avoid
  * redundant decompression and recompression when copying compressed entry data.
  *
- * @param  <LT> the type of the {@link #getLocalTarget() local target}
+ * @param  <LT> the type of the {@link #localTarget() local target}
  *         for I/O operations.
- * @param  <PT> the type of the {@link #getPeerTarget() peer target}
+ * @param  <PT> the type of the {@link #peerTarget() peer target}
  *         for I/O operations.
  * @author Christian Schlichtherle
  */
@@ -66,23 +66,23 @@ public abstract class IOSocket<LT, PT> {
      * Consequently, the result of doing so is undefined, too.
      * In particular, a subsequent I/O operation may not reflect the change
      * or may even fail.
-     * Sub-interfaces or implementations may add additional terms and
+     * Sub-interfaces or implementations should add additional terms and
      * conditions in order to resolve these potential issues.
      *
      * @return The local target for I/O operations.
      * @throws IOException On any I/O error. 
      */
-    public abstract LT getLocalTarget() throws IOException;
+    public abstract LT localTarget() throws IOException;
 
     /**
-     * Resolves the <i>peer target</i> for I/O operations.
+     * Resolves the nullable <i>peer target</i> for I/O operations.
      * <p>
-     * The same considerations as for {@link #getLocalTarget} apply here, too.
+     * The same considerations as for {@link #localTarget} apply here, too.
      *
-     * @return The peer target for I/O operations.
+     * @return The nullable peer target for I/O operations.
      * @throws IOException On any I/O error. 
      */
-    public abstract @CheckForNull PT getPeerTarget() throws IOException;
+    public abstract @CheckForNull PT peerTarget() throws IOException;
 
     /**
      * Copies an input stream {@link InputSocket#stream created}
@@ -118,13 +118,13 @@ public abstract class IOSocket<LT, PT> {
     public String toString() {
         Object lt;
         try {
-            lt = getLocalTarget();
+            lt = localTarget();
         } catch (final IOException ex) {
             lt = ex;
         }
         Object pt;
         try {
-            pt = getPeerTarget();
+            pt = peerTarget();
         } catch (final IOException ex) {
             pt = ex;
         }

@@ -5,7 +5,6 @@
 package de.truezip.kernel.cio;
 
 import java.io.IOException;
-import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -13,7 +12,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * An abstract decorator for an input socket.
  * 
  * @see    DecoratingOutputSocket
- * @param  <E> the type of the {@link #getLocalTarget() local target}.
+ * @param  <E> the type of the {@link #localTarget() local target}.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -23,9 +22,11 @@ extends DelegatingInputSocket<E> {
     /** The nullable decorated input socket. */
     protected @Nullable InputSocket<? extends E> socket;
 
-    protected DecoratingInputSocket(
-            final @CheckForNull InputSocket<? extends E> socket) {
-        this.socket = socket;
+    protected DecoratingInputSocket() { }
+
+    protected DecoratingInputSocket(final InputSocket<? extends E> socket) {
+        if (null == (this.socket = socket))
+            throw new NullPointerException();
     }
 
     @Override

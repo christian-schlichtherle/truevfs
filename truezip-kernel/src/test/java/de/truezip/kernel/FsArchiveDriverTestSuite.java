@@ -207,16 +207,16 @@ extends FsArchiveDriverTestBase<D> {
     throws IOException {
         final String name = name(i);
         final E entry = newEntry(name);
-        final OutputSocket<? extends E> output = service.getOutputSocket(entry);
-        assertSame(entry, output.getLocalTarget());
+        final OutputSocket<? extends E> output = service.outputSocket(entry);
+        assertSame(entry, output.localTarget());
 
-        assertNull(service.getEntry(name));
+        assertNull(service.entry(name));
         assertEquals(i, service.size());
 
         boolean failure = true;
         final OutputStream out = output.stream();
         try {
-            assertSame(entry, service.getEntry(name));
+            assertSame(entry, service.entry(name));
             assertEquals(i + 1, service.size());
             out.write(getData());
             failure = false;
@@ -269,7 +269,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private InputStream input(final InputService<E> service, final int i)
     throws IOException {
-        final InputSocket<? extends E> input = service.getInputSocket(name(i));
+        final InputSocket<? extends E> input = service.inputSocket(name(i));
 
         {
             final PowerBuffer buf = PowerBuffer.allocate(getDataLength());
@@ -351,7 +351,7 @@ extends FsArchiveDriverTestBase<D> {
                 fail();
             } catch (UnsupportedOperationException expected) {
             }
-            assertSame(e, container.getEntry(e.getName()));
+            assertSame(e, container.entry(e.getName()));
         }
         assertFalse(it.hasNext());
         try {

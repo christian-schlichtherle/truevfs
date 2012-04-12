@@ -21,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * is n:1, i.e. any input socket can have at most one peer output socket, but
  * it may be the peer of many other output sockets.
  *
- * @param  <E> the type of the {@link #getLocalTarget() local target}
+ * @param  <E> the type of the {@link #localTarget() local target}
  *         for I/O operations.
  * @see    OutputSocket
  * @author Christian Schlichtherle
@@ -43,13 +43,13 @@ extends IOSocket<E, Entry> implements Source {
      */
     // See https://java.net/jira/browse/TRUEZIP-203
     @Override
-    public final @Nullable Entry getPeerTarget() throws IOException {
-        return null == peer ? null : peer.getLocalTarget();
+    public final @Nullable Entry peerTarget() throws IOException {
+        return null == peer ? null : peer.localTarget();
     }
 
     /**
      * Binds this socket to given socket by inheriting its
-     * {@link #getPeerTarget() peer target}.
+     * {@link #peerTarget() peer target}.
      * Note that this method does <em>not</em> change the state of the
      * given socket and does <em>not</em> connect this socket to the peer
      * socket, that is it does not set this socket as the peer of of the given

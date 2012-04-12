@@ -110,8 +110,7 @@ public class TarGZipDriver extends TarDriver {
         } // Sink
 
         return new MultiplexingOutputService<>(
-                new TarOutputService(model, new Sink(), this),
-                getIOPool());
+                getIOPool(), new TarOutputService(model, new Sink(), this));
     }
 
     /**

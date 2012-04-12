@@ -4,11 +4,10 @@
  */
 package de.truezip.kernel.io;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.locks.Lock;
-import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
@@ -26,18 +25,16 @@ public class LockOutputStream extends DecoratingOutputStream {
     /** The lock on which this object synchronizes. */
     private final Lock lock;
 
-    /**
-     * Constructs a new lock output stream.
-     *
-     * @param out the output stream to decorate.
-     * @param lock the lock to use.
-     */
-    @CreatesObligation
-    public LockOutputStream(
-            final @Nullable @WillCloseWhenClosed OutputStream out,
-            final Lock lock) {
-        super(out);
+    protected LockOutputStream(final Lock lock) {
         if (null == (this.lock = lock))
+            throw new NullPointerException();
+    }
+
+    public LockOutputStream(
+            final Lock lock,
+            final @WillCloseWhenClosed OutputStream out) {
+        this(lock);
+        if (null == (this.out = out))
             throw new NullPointerException();
     }
 
@@ -76,6 +73,7 @@ public class LockOutputStream extends DecoratingOutputStream {
 
     @Override
     @GuardedBy("lock")
+    @DischargesObligation
     public void close() throws IOException {
         lock.lock();
         try {

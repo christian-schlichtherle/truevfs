@@ -60,7 +60,7 @@ public final class CacheTest {
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(front.getData(), nullValue());
             try {
-                IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
+                IOSocket.copy(cache.inputSocket(), front.outputSocket());
                 fail();
             } catch (IOException expected) {
             }
@@ -71,8 +71,8 @@ public final class CacheTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getEntry(), nullValue());
 
-            cache   .configure(back.getInputSocket())
-                    .configure(back.getOutputSocket());
+            cache   .configure(back.inputSocket())
+                    .configure(back.outputSocket());
             assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
@@ -83,7 +83,7 @@ public final class CacheTest {
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
-            IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
+            IOSocket.copy(cache.inputSocket(), front.outputSocket());
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
@@ -105,7 +105,7 @@ public final class CacheTest {
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_READ.length()));
 
             try {
-                IOSocket.copy(front.getInputSocket(), cache.getOutputSocket());
+                IOSocket.copy(front.inputSocket(), cache.outputSocket());
                 if (WRITE_THROUGH != strategy) {
                     assertThat( back.getCount(WRITE), is(0));
                     cache.flush();
@@ -121,8 +121,8 @@ public final class CacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            cache   .configure(back.getInputSocket())
-                    .configure(back.getOutputSocket());
+            cache   .configure(back.inputSocket())
+                    .configure(back.outputSocket());
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
@@ -131,7 +131,7 @@ public final class CacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            IOSocket.copy(front.getInputSocket(), cache.getOutputSocket());
+            IOSocket.copy(front.inputSocket(), cache.outputSocket());
             if (WRITE_THROUGH != strategy) {
                 assertThat( back.getCount(WRITE), is(0));
                 cache.flush();
@@ -159,7 +159,7 @@ public final class CacheTest {
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
-            IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
+            IOSocket.copy(cache.inputSocket(), front.outputSocket());
             assertThat(cache.getEntry(), notNullValue());
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
@@ -169,7 +169,7 @@ public final class CacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            cache.clear();
+            cache.release();
             assertThat(cache.getEntry(), nullValue());
             assertThat(pool.size(), is(0));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
@@ -180,7 +180,7 @@ public final class CacheTest {
 
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             try {
-                IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
+                IOSocket.copy(cache.inputSocket(), front.outputSocket());
                 fail();
             } catch (IOException excepted) {
             }
@@ -192,8 +192,8 @@ public final class CacheTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getEntry(), nullValue());
 
-            cache   .configure(back.getInputSocket())
-                    .configure(back.getOutputSocket());
+            cache   .configure(back.inputSocket())
+                    .configure(back.outputSocket());
             assertThat(cache.getEntry(), nullValue());
             assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
@@ -202,7 +202,7 @@ public final class CacheTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getEntry(), nullValue());
 
-            IOSocket.copy(cache.getInputSocket(), front.getOutputSocket());
+            IOSocket.copy(cache.inputSocket(), front.outputSocket());
             assertThat(cache.getEntry(), notNullValue());
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_READ));
@@ -226,7 +226,7 @@ public final class CacheTest {
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_READ.length()));
 
             try {
-                IOSocket.copy(front.getInputSocket(), cache.getOutputSocket());
+                IOSocket.copy(front.inputSocket(), cache.outputSocket());
                 if (WRITE_THROUGH != strategy) {
                     assertThat( back.getCount(WRITE), is(0));
                     cache.flush();
@@ -243,8 +243,8 @@ public final class CacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            cache   .configure(back.getInputSocket())
-                    .configure(back.getOutputSocket());
+            cache   .configure(back.inputSocket())
+                    .configure(back.outputSocket());
             assertThat(cache.getEntry(), notNullValue());
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
@@ -254,7 +254,7 @@ public final class CacheTest {
             assertThat(cache.getEntry(), notNullValue());
             assertThat(cache.getEntry().getSize(DATA), equalTo((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            IOSocket.copy(front.getInputSocket(), cache.getOutputSocket());
+            IOSocket.copy(front.inputSocket(), cache.outputSocket());
             if (WRITE_THROUGH != strategy) {
                 assertThat( back.getCount(WRITE), is(0));
                 cache.flush();
@@ -270,7 +270,7 @@ public final class CacheTest {
 
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back))
-                    .clear();
+                    .release();
             assertThat(cache.getEntry(), nullValue());
             assertThat(pool.size(), is(0));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
@@ -292,7 +292,7 @@ public final class CacheTest {
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
+        public Entry localTarget() throws IOException {
             return entry;
         }
 
@@ -321,7 +321,7 @@ public final class CacheTest {
         }
 
         @Override
-        public Entry getLocalTarget() throws IOException {
+        public Entry localTarget() throws IOException {
             return entry;
         }
 

@@ -10,7 +10,7 @@ import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -120,12 +120,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     extends DecoratingInputStream {
         volatile IOException close; // accessed by finalizer thread!
 
-        @CreatesObligation
         FinalizeInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             try {
                 in.close();
@@ -137,6 +137,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
+        @DischargesObligation
         protected void finalize() throws Throwable {
             try {
                 finalize(in, close);
@@ -150,12 +151,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     extends DecoratingOutputStream {
         volatile IOException close; // accessed by finalizer thread!
 
-        @CreatesObligation
         FinalizeOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             try {
                 out.close();
@@ -167,6 +168,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
+        @DischargesObligation
         protected void finalize() throws Throwable {
             try {
                 finalize(out, close);
@@ -180,12 +182,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     extends DecoratingSeekableChannel {
         volatile IOException close; // accessed by finalizer thread!
 
-        @CreatesObligation
-        FinalizeSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
+        FinalizeSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+            super(channel);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             try {
                 channel.close();
@@ -197,6 +199,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
         @Override
         @SuppressWarnings("FinalizeDeclaration")
+        @DischargesObligation
         protected void finalize() throws Throwable {
             try {
                 finalize(channel, close);

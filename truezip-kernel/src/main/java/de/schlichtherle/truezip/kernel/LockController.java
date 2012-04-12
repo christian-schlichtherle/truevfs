@@ -16,7 +16,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.ExceptionHandler;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -205,14 +205,14 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
 
             @Override
-            public Entry getLocalTarget() throws IOException {
+            public Entry localTarget() throws IOException {
                 return writeLocked(new GetLocalTarget());
             }
 
             final class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return getBoundSocket().getLocalTarget();
+                    return getBoundSocket().localTarget();
                 }
             } // GetLocalTarget
 
@@ -257,14 +257,14 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
 
             @Override
-            public Entry getLocalTarget() throws IOException {
+            public Entry localTarget() throws IOException {
                 return writeLocked(new GetLocalTarget());
             }
 
             final class GetLocalTarget implements IOOperation<Entry> {
                 @Override
                 public Entry call() throws IOException {
-                    return getBoundSocket().getLocalTarget();
+                    return getBoundSocket().localTarget();
                 }
             } // GetLocalTarget
 
@@ -382,12 +382,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class LockInputStream
     extends DecoratingInputStream {
-        @CreatesObligation
         LockInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(in);
         }
@@ -395,12 +395,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class LockOutputStream
     extends DecoratingOutputStream {
-        @CreatesObligation
         LockOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(out);
         }
@@ -408,12 +408,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class LockSeekableChannel
     extends DecoratingSeekableChannel {
-        @CreatesObligation
         LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             close(channel);
         }

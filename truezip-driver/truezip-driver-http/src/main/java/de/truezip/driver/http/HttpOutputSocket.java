@@ -34,7 +34,7 @@ public class HttpOutputSocket extends OutputSocket<HttpEntry> {
     }
 
     @Override
-    public HttpEntry getLocalTarget() {
+    public HttpEntry localTarget() {
         return entry;
     }
 

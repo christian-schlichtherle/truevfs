@@ -82,7 +82,7 @@ public final class Copy {
                     .getOutputSocket(   dstPath.getEntryName(),
                                         BitField.of(FsAccessOption.CREATE_PARENTS,
                                                     FsAccessOption.EXCLUSIVE),
-                                        srcSocket.getLocalTarget());
+                                        srcSocket.localTarget());
             IOSocket.copy(srcSocket, dstSocket); // copy the data
         } finally {
             // Commit all unsynchronized changes to the contents of federated

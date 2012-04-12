@@ -29,7 +29,7 @@ final class FileInputSocket extends InputSocket<FileEntry> {
     }
 
     @Override
-    public FileEntry getLocalTarget() {
+    public FileEntry localTarget() {
         return entry;
     }
 
