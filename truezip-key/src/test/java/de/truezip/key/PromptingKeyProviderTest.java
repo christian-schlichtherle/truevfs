@@ -23,10 +23,10 @@ public class PromptingKeyProviderTest {
 
     @Before
     public void setUp() {
-        view = new MockView<DummyKey>();
+        view = new MockView<>();
         view.setResource(RESOURCE);
         view.setChangeRequested(true);
-        manager = new PromptingKeyManager<DummyKey>(view);
+        manager = new PromptingKeyManager<>(view);
         provider = manager.make(RESOURCE);
     }
 

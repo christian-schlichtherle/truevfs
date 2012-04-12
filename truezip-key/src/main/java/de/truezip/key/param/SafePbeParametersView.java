@@ -4,7 +4,7 @@
  */
 package de.truezip.key.param;
 
-import de.truezip.key.PromptingKeyProviderView;
+import de.truezip.key.PromptingKeyProvider.View;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -17,7 +17,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public abstract class SafePbeParametersView<P extends SafePbeParameters<P, ?>>
-implements PromptingKeyProviderView<P> {
+implements View<P> {
 
     /**
      * Returns new parameters for safe password based encryption.

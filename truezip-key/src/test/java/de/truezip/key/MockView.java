@@ -5,6 +5,8 @@
 package de.truezip.key;
 
 import static de.truezip.key.MockView.Action.ENTER;
+import de.truezip.key.PromptingKeyProvider.Controller;
+import de.truezip.key.PromptingKeyProvider.View;
 import java.net.URI;
 import java.util.Random;
 import javax.annotation.CheckForNull;
@@ -18,7 +20,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class MockView<K extends SafeKey<K>> implements PromptingKeyProviderView<K> {
+public final class MockView<K extends SafeKey<K>> implements View<K> {
     private volatile @CheckForNull URI resource;
     private volatile @CheckForNull K key;
     private volatile Action action = ENTER;
@@ -60,7 +62,7 @@ public final class MockView<K extends SafeKey<K>> implements PromptingKeyProvide
 
     @Override
     public synchronized void
-    promptWriteKey(PromptingKeyProviderController<K> controller)
+    promptWriteKey(Controller<K> controller)
     throws UnknownKeyException {
         final URI resource = getResource();
         if (null != resource && !resource.equals(controller.getResource()))
@@ -81,7 +83,7 @@ public final class MockView<K extends SafeKey<K>> implements PromptingKeyProvide
 
     @Override
     public synchronized void
-    promptReadKey(PromptingKeyProviderController<K> controller, boolean invalid)
+    promptReadKey(Controller<K> controller, boolean invalid)
     throws UnknownKeyException {
         final URI resource = getResource();
         if (null != resource && !resource.equals(controller.getResource()))
@@ -99,7 +101,7 @@ public final class MockView<K extends SafeKey<K>> implements PromptingKeyProvide
         ENTER {
             @Override
             <K extends SafeKey<K>> void
-            promptWriteKey(PromptingKeyProviderController<? super K> controller, K key)
+            promptWriteKey(Controller<? super K> controller, K key)
             throws UnknownKeyException {
                 controller.setKey(null);
                 controller.setKey(null != key ? key.clone() : null);
@@ -107,7 +109,7 @@ public final class MockView<K extends SafeKey<K>> implements PromptingKeyProvide
 
             @Override
             <K extends SafeKey<K>> void
-            promptReadKey(PromptingKeyProviderController<? super K> controller, K key, boolean changeRequested)
+            promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
             throws UnknownKeyException {
                 controller.setKey(null);
                 controller.setChangeRequested(false);
@@ -122,7 +124,7 @@ public final class MockView<K extends SafeKey<K>> implements PromptingKeyProvide
 
             @Override
             <K extends SafeKey<K>> void
-            promptWriteKey(PromptingKeyProviderController<? super K> controller, K key)
+            promptWriteKey(Controller<? super K> controller, K key)
             throws UnknownKeyException {
                 if (rnd.nextBoolean()) {
                     throw new KeyPromptingCancelledException();
@@ -133,7 +135,7 @@ public final class MockView<K extends SafeKey<K>> implements PromptingKeyProvide
 
             @Override
             <K extends SafeKey<K>> void
-            promptReadKey(PromptingKeyProviderController<? super K> controller, K key, boolean changeRequested)
+            promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
             throws UnknownKeyException {
                 if (rnd.nextBoolean()) {
                     throw new KeyPromptingCancelledException();
@@ -148,23 +150,23 @@ public final class MockView<K extends SafeKey<K>> implements PromptingKeyProvide
         IGNORE {
             @Override
             <K extends SafeKey<K>> void
-            promptWriteKey(PromptingKeyProviderController<? super K> controller, K key)
+            promptWriteKey(Controller<? super K> controller, K key)
             throws UnknownKeyException {
             }
 
             @Override
             <K extends SafeKey<K>> void
-            promptReadKey(PromptingKeyProviderController<? super K> controller, K key, boolean changeRequested)
+            promptReadKey(Controller<? super K> controller, K key, boolean changeRequested)
             throws UnknownKeyException {
             }
         };
 
         abstract <K extends SafeKey<K>> void
-        promptWriteKey(PromptingKeyProviderController<? super K> controller, @CheckForNull K key)
+        promptWriteKey(Controller<? super K> controller, @CheckForNull K key)
         throws UnknownKeyException;
 
         abstract <K extends SafeKey<K>> void
-        promptReadKey(PromptingKeyProviderController<? super K> controller, @CheckForNull K key, boolean changeRequested)
+        promptReadKey(Controller<? super K> controller, @CheckForNull K key, boolean changeRequested)
         throws UnknownKeyException;
     } // enum Action
 }

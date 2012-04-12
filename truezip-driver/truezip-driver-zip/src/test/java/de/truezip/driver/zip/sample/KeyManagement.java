@@ -14,8 +14,11 @@ import de.truezip.file.TConfig;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.sl.IOPoolLocator;
-import de.truezip.key.*;
+import de.truezip.key.KeyManagerProvider;
+import de.truezip.key.PromptingKeyManagerProvider;
+import de.truezip.key.PromptingKeyProvider.Controller;
+import de.truezip.key.PromptingKeyProvider.View;
+import de.truezip.key.UnknownKeyException;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.param.AesPbeParameters;
 import java.nio.charset.Charset;
@@ -205,7 +208,7 @@ public final class KeyManagement {
     } // CustomJarDriver2
     
     private static final class CustomView
-    implements PromptingKeyProviderView<AesPbeParameters> {
+    implements View<AesPbeParameters> {
         final char[] password;
         
         CustomView(char[] password) {
@@ -224,7 +227,7 @@ public final class KeyManagement {
         }
         
         @Override
-        public void promptWriteKey(PromptingKeyProviderController<AesPbeParameters> controller)
+        public void promptWriteKey(Controller<AesPbeParameters> controller)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
@@ -235,7 +238,7 @@ public final class KeyManagement {
         }
         
         @Override
-        public void promptReadKey(  PromptingKeyProviderController<AesPbeParameters> controller,
+        public void promptReadKey(  Controller<AesPbeParameters> controller,
                                     boolean invalid)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
