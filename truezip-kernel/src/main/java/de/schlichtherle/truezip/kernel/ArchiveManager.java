@@ -74,9 +74,7 @@ final class ArchiveManager extends FsManager {
                     final FsModel model,
                     final FsController<?> parent) {
         assert !(model instanceof LockModel);
-        final LockModel lockModel = model instanceof LockModel
-                ? (LockModel) model
-                : new LockModel(model);
+        final LockModel lmodel = new LockModel(model);
         // HC SUNT DRACONES!
         return  new FalsePositiveController(
                     new FinalizeController(
@@ -84,11 +82,10 @@ final class ArchiveManager extends FsManager {
                             new SyncController(
                                 new LockController(
                                     new ResetController(
-                                        new CacheController(
+                                        new CacheController(driver.getIOPool(),
                                             new ResourceController(
                                                 new TargetArchiveController<>(
-                                                        lockModel, parent, driver)),
-                                            driver.getIOPool())))))));
+                                                        lmodel, parent, driver)))))))));
     }
 
     @Override

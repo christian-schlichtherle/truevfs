@@ -86,8 +86,9 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
      * @param controller the decorated file system controller.
      * @param pool the pool of I/O buffers to hold the cached entry contents.
      */
-    CacheController(  final SyncDecoratingController<? extends LockModel, ?> controller,
-                        final IOPool<?> pool) {
+    CacheController(
+            final IOPool<?> pool,
+            final SyncDecoratingController<? extends LockModel, ?> controller) {
         super(controller);
         if (null == (this.pool = pool))
             throw new NullPointerException();
