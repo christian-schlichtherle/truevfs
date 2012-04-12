@@ -99,12 +99,12 @@ extends LockModelController {
     @Override
     public final FsEntry entry(FsEntryName name)
     throws IOException {
-        return autoMount(NONE).getEntry(name);
+        return autoMount(NONE).entry(name);
     }
 
     @Override
     public final boolean isReadable(FsEntryName name) throws IOException {
-        return autoMount(NONE).getEntry(name) != null;
+        return autoMount(NONE).entry(name) != null;
     }
 
     @Override
@@ -167,7 +167,7 @@ extends LockModelController {
                 return localTarget;
             peerTarget(); // may sync() if in same target archive file!
             checkSync(name, READ, options);
-            final FsCovariantEntry<E> fse = autoMount(options).getEntry(name);
+            final FsCovariantEntry<E> fse = autoMount(options).entry(name);
             if (null == fse)
                 throw new NoSuchFileException(name.toString());
             return localTarget = fse.getEntry();

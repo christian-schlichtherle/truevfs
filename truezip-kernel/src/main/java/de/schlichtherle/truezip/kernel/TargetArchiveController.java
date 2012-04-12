@@ -350,7 +350,7 @@ extends FileSystemArchiveController<E> {
         final FsCovariantEntry<E> fse; // file system entry
         {
             final ArchiveFileSystem<E> fs;
-            if (null == (fs = getFileSystem()) || null == (fse = fs.getEntry(name)))
+            if (null == (fs = getFileSystem()) || null == (fse = fs.entry(name)))
                 return;
         }
 

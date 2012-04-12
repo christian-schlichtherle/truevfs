@@ -288,7 +288,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *         entry exists for the given name.
      */
     @Nullable
-    final FsCovariantEntry<E> getEntry(final FsEntryName name) {
+    final FsCovariantEntry<E> entry(final FsEntryName name) {
         final FsCovariantEntry<E> entry = master.get(name.getPath());
         return null == entry ? null : entry.clone(driver);
     }

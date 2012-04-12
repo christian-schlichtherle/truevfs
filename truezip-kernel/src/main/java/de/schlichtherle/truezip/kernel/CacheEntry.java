@@ -11,6 +11,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.Pool;
+import de.truezip.kernel.util.Releasable;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -46,7 +47,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-final class Cache implements Entry, Flushable, Closeable {
+final class CacheEntry
+implements Entry, Flushable, Releasable<IOException>, Closeable {
 
     private final Strategy strategy;
     private final IOPool<?> pool;
@@ -68,7 +70,7 @@ final class Cache implements Entry, Flushable, Closeable {
      * @param strategy the caching strategy.
      * @param pool the pool for allocating and releasing temporary I/O entries.
      */
-    private Cache(final Strategy strategy, final IOPool<?> pool) {
+    private CacheEntry(final Strategy strategy, final IOPool<?> pool) {
         assert null != strategy;
         this.strategy = strategy;
         if (null == (this.pool = pool))
@@ -88,7 +90,7 @@ final class Cache implements Entry, Flushable, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    Cache configure(final InputSocket<?> input) {
+    CacheEntry configure(final InputSocket<?> input) {
         if (null == input)
             throw new NullPointerException();
         this.input = input;
@@ -108,7 +110,7 @@ final class Cache implements Entry, Flushable, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    Cache configure(final OutputSocket<?> output) {
+    CacheEntry configure(final OutputSocket<?> output) {
         if (null == output)
             throw new NullPointerException();
         this.output = output;
@@ -124,7 +126,7 @@ final class Cache implements Entry, Flushable, Closeable {
      */
     @Override
     public void flush() throws IOException {
-        final Buffer buffer = getBuffer();
+        final Buffer buffer = this.buffer;
         if (null != buffer)
             getOutputBufferPool().release(buffer);
     }
@@ -134,6 +136,7 @@ final class Cache implements Entry, Flushable, Closeable {
      * 
      * @throws IOException on any I/O error.
      */
+    @Override
     public void release() throws IOException {
         setBuffer(null);
     }
@@ -154,24 +157,19 @@ final class Cache implements Entry, Flushable, Closeable {
 
     @Override
     public String getName() {
-        return "Johnny Cache";
+        return "Johnny Cache!";
     }
 
     @Override
     public long getSize(Entry.Size type) {
-        final Buffer buffer = getBuffer();
+        final Buffer buffer = this.buffer;
         return null == buffer ? UNKNOWN : buffer.data.getSize(type);
     }
 
     @Override
     public long getTime(Entry.Access type) {
-        final Buffer buffer = getBuffer();
+        final Buffer buffer = this.buffer;
         return null == buffer ? UNKNOWN : buffer.data.getTime(type);
-    }
-
-    @Nullable Entry getEntry() {
-        final Buffer buffer = getBuffer();
-        return null == buffer ? null : buffer.data;
     }
 
     /**
@@ -206,10 +204,6 @@ final class Cache implements Entry, Flushable, Closeable {
                 : (outputBufferPool = strategy.newOutputBufferPool(this));
     }
 
-    private @CheckForNull Buffer getBuffer() {
-        return buffer;
-    }
-
     private void setBuffer(final @CheckForNull Buffer newBuffer)
     throws IOException {
         final Buffer oldBuffer = this.buffer;
@@ -233,7 +227,7 @@ final class Cache implements Entry, Flushable, Closeable {
          */
         WRITE_THROUGH {
             @Override
-            Cache.OutputBufferPool newOutputBufferPool(Cache cache) {
+            CacheEntry.OutputBufferPool newOutputBufferPool(CacheEntry cache) {
                 return cache.new WriteThroughOutputBufferPool();
             }
         },
@@ -244,7 +238,7 @@ final class Cache implements Entry, Flushable, Closeable {
          */
         WRITE_BACK {
             @Override
-            Cache.OutputBufferPool newOutputBufferPool(Cache cache) {
+            CacheEntry.OutputBufferPool newOutputBufferPool(CacheEntry cache) {
                 return cache.new WriteBackOutputBufferPool();
             }
         };
@@ -256,15 +250,15 @@ final class Cache implements Entry, Flushable, Closeable {
          * @return A new cache.
          */
         @CreatesObligation
-        Cache newCache(IOPool<?> pool) {
-            return new Cache(this, pool);
+        CacheEntry newCache(IOPool<?> pool) {
+            return new CacheEntry(this, pool);
         }
 
-        Cache.InputBufferPool newInputBufferPool(Cache cache) {
+        CacheEntry.InputBufferPool newInputBufferPool(CacheEntry cache) {
             return cache.new InputBufferPool();
         }
 
-        abstract Cache.OutputBufferPool newOutputBufferPool(Cache cache);
+        abstract CacheEntry.OutputBufferPool newOutputBufferPool(CacheEntry cache);
     } // Strategy
 
     private final class Input extends InputSocket<Entry> {
@@ -338,7 +332,7 @@ final class Cache implements Entry, Flushable, Closeable {
     implements Pool<Buffer, IOException> {
         @Override
         public Buffer allocate() throws IOException {
-            Buffer buffer = getBuffer();
+            Buffer buffer = CacheEntry.this.buffer;
             if (null == buffer) {
                 buffer = new Buffer();
                 try {
@@ -361,7 +355,8 @@ final class Cache implements Entry, Flushable, Closeable {
         @Override
         public void release(final Buffer buffer) throws IOException {
             assert Strategy.WRITE_BACK == strategy || 0 == buffer.writers;
-            if (0 == --buffer.readers && 0 == buffer.writers && getBuffer() != buffer) {
+            if (0 == --buffer.readers && 0 == buffer.writers
+                    && CacheEntry.this.buffer != buffer) {
                 buffer.release();
             }
         }
@@ -404,7 +399,7 @@ final class Cache implements Entry, Flushable, Closeable {
         @Override
         public void release(final Buffer buffer) throws IOException {
             if (0 != buffer.writers)
-                if (getBuffer() != buffer)
+                if (CacheEntry.this.buffer != buffer)
                     setBuffer(buffer);
                 else
                     super.release(buffer);
