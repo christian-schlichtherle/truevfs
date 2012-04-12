@@ -33,7 +33,7 @@ public class CheckedJarDriver extends JarDriver {
      * @return {@code true}
      */
     @Override
-    protected boolean check(ZipInputService input, ZipDriverEntry entry) {
+    protected boolean check(ZipDriverEntry entry, ZipInputService input) {
         return true;
     }
 }
