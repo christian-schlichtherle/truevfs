@@ -374,7 +374,7 @@ extends SafeKeyProvider<K> {
     } // View
 
     /**
-     * Proxies access to the key for {@link PromptingKeyProviderView}
+     * Proxies access to the key for {@link View}
      * implementations.
      *
      * @param  <K> the type of the safe keys.

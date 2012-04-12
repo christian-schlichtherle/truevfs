@@ -26,7 +26,8 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      * A static factory method for an unmodifiable key manager map which is
      * constructed from the given configuration.
      * This method is intended to be used by implementations of this class
-     * for convenient creation of the map to return by their {@link #getKeyManager()}
+     * for convenient creation of the map to return by their
+     * {@link #getKeyManagers()}
      * method.
      *
      * @param  config an array of key-value pair arrays.
@@ -39,7 +40,8 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      *         {@link Class key manager class}, a
      *         {@link String fully qualified name of a key manager class},
      *         or {@code null}.
-     * @return The new map to use as the return value of {@link #getKeyManager()}.
+     * @return The new map to use as the return value of
+     *         {@link #getKeyManagers()}.
      * @throws NullPointerException if a required configuration element is
      *         {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
