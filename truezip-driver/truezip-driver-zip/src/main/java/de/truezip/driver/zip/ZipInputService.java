@@ -119,7 +119,7 @@ implements InputService<ZipDriverEntry> {
                 final ZipDriver driver = ZipInputService.this.driver;
                 return getInputStream(
                         lt.getName(),
-                        driver.check(ZipInputService.this, lt),
+                        driver.check(lt, ZipInputService.this),
                         null == zpt || driver.process(ZipInputService.this, lt, zpt));
             }
         } // Input

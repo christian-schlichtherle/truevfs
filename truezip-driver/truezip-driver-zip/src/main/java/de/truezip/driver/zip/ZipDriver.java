@@ -195,16 +195,18 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * Whether or not the content of the given entry shall getIOPool
+     * Whether or not the content of the given entry shall get
      * checked/authenticated when reading it.
-     * If this method returns {@code true} and the check fails,
-     * then an {@link IOException} gets thrown.
+     * If this method returns {@code true} and the check fails, then an
+     * {@link IOException} gets thrown.
      * 
+     * @param input the origin of the entry.
+     * @param entry the entry to test.
      * @return {@code entry.isEncrypted()}.
      */
     protected boolean check(
-            @WillNotClose ZipInputService input,
-            ZipDriverEntry entry) {
+            ZipDriverEntry entry,
+            @WillNotClose ZipInputService input) {
         return entry.isEncrypted();
     }
 
@@ -478,6 +480,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * other properties copied from the given template.
      *
      * @param  name the entry name.
+     * @param  template the entry template.
      * @return {@code new ZipDriverEntry(name, template)}
      */
     public ZipDriverEntry newEntry(String name, ZipEntry template) {
