@@ -364,14 +364,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
 
     @Override
     public OutputService<ZipDriverEntry> newOutputService(
-            FsModel model,
-            FsController<?> parent,
-            FsEntryName entry,
-            BitField<FsAccessOption> options,
-            @CheckForNull @WillNotClose InputService<ZipDriverEntry> source)
+            final FsModel model,
+            final FsController<?> parent,
+            final FsEntryName entry,
+            final BitField<FsAccessOption> options,
+            final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
         final OptionOutputSocket oos = getOutputSocket(parent, entry, options);
-        final ZipInputService zis = (ZipInputService) source;
+        final ZipInputService zis = (ZipInputService) input;
         if (null != zis)
             zis.setAppendee(oos.getOptions().get(GROW));
         return newOutputService(model, oos, zis);
@@ -379,22 +379,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
 
     @Override
     @CreatesObligation
-    protected final OutputService<ZipDriverEntry> newOutputService(
+    protected OutputService<ZipDriverEntry> newOutputService(
             FsModel model,
             OutputSocket<?> output,
-            @CheckForNull @WillNotClose final InputService<ZipDriverEntry> source)
+            final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        throw new UnsupportedOperationException();
-    }
-
-    @CreatesObligation
-    protected OutputService<ZipDriverEntry> newOutputService(
-            final FsModel model,
-            final OptionOutputSocket output,
-            final @CheckForNull @WillNotClose ZipInputService source)
-    throws IOException {
+        final OptionOutputSocket oos = (OptionOutputSocket) output;
+        final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(
-                new ZipOutputService(model, output, source, this),
+                new ZipOutputService(model, oos, zis, this),
                 getIOPool());
     }
 
