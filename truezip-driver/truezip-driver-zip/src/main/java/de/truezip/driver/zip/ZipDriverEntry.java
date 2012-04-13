@@ -4,14 +4,14 @@
  */
 package de.truezip.driver.zip;
 
+import de.truezip.driver.zip.io.DateTimeConverter;
+import de.truezip.driver.zip.io.ZipEntry;
+import de.truezip.kernel.FsArchiveEntries;
+import de.truezip.kernel.FsArchiveEntry;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
-import de.truezip.kernel.FsArchiveEntries;
-import de.truezip.kernel.FsArchiveEntry;
-import de.truezip.driver.zip.io.DateTimeConverter;
-import de.truezip.driver.zip.io.ZipEntry;
 
 /**
  * ZIP archive entries apply the date/time conversion rules as defined by
