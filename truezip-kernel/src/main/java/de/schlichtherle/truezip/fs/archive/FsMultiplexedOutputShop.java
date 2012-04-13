@@ -15,7 +15,9 @@ import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.JointIterator;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -61,7 +63,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * @param output the decorated output shop.
      * @param pool the pool for buffering entry data.
      */
-    @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     public FsMultiplexedOutputShop(
             final @WillCloseWhenClosed OutputShop<E> output,
@@ -93,7 +94,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @Override
         public E next() {
-            return i.next().getTarget();
+            return i.next().getLocalTarget();
         }
 
         @Override
@@ -108,7 +109,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         if (null != entry)
             return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
-        return null == out ? null : out.getTarget();
+        return null == out ? null : out.getLocalTarget();
     }
 
     @Override
@@ -116,7 +117,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratingOutputSocket<E> {
+        final class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(FsMultiplexedOutputShop.super.getOutputSocket(entry));
             }
@@ -128,25 +129,13 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                return isBusy()
-                        ? newBufferedEntryOutputStream(getBoundSocket())
-                        : new EntryOutputStream(getBoundSocket());
+                final OutputSocket<? extends E> output = getBoundSocket();
+                return isBusy() ? new BufferedEntryOutputStream(output)
+                                : new EntryOutputStream(output);
             }
         } // Output
 
         return new Output();
-    }
-
-    private BufferedEntryOutputStream newBufferedEntryOutputStream(
-            final OutputSocket<? extends E> output)
-    throws IOException {
-        final IOPool.Entry<?> buffer = pool.allocate();
-        try {
-            return new BufferedEntryOutputStream(buffer, output);
-        } catch (final IOException ex) {
-            buffer.release();
-            throw ex;
-        }
     }
 
     /**
@@ -161,6 +150,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     @Override
+    @DischargesObligation
     public void close() throws IOException {
         if (isBusy())
             throw new IOException("Output shop is still busy!");
@@ -179,7 +169,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         while (i.hasNext()) {
             final BufferedEntryOutputStream out = i.next();
             try {
-                if (out.store())
+                if (out.storeBuffer())
                     i.remove();
             } catch (final InputException ex) {
                 builder.warn(ex);
@@ -191,10 +181,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     /** This entry output stream writes directly to this output shop. */
-    private class EntryOutputStream extends DecoratingOutputStream {
+    private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
-        @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
@@ -203,12 +192,13 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (closed)
                 return;
             delegate.close();
-            closed = true;
             busy = false;
+            closed = true;
             storeBuffers();
         }
     } // EntryOutputStream
@@ -219,76 +209,94 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
      * When the stream gets closed, the I/O pool entry is then copied to this
      * output shop and finally deleted unless this output shop is still busy.
      */
-    private class BufferedEntryOutputStream extends DecoratingOutputStream {
-        final IOPool.Entry<?> buffer;
+    @CleanupObligation
+    private final class BufferedEntryOutputStream
+    extends DecoratingOutputStream {
         final InputSocket<Entry> input;
         final OutputSocket<? extends E> output;
-        final E local;
+        final IOPool.Entry<?> buffer;
         boolean closed;
 
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        BufferedEntryOutputStream(  final IOPool.Entry<?> buffer,
-                                    final OutputSocket<? extends E> output)
+        BufferedEntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
-            super(buffer.getOutputSocket().newOutputStream());
-            this.buffer = buffer;
-            final E local = this.local = (this.output = output).getLocalTarget();
-            final Entry peer = output.getPeerTarget();
-            class InputProxy extends DecoratingInputSocket<Entry> {
-                InputProxy() {
-                    super(buffer.getInputSocket());
-                }
+            super(null);
+            // FC SUNT DRACONES!
+            final E local = (this.output = output).getLocalTarget();
+            final Entry _peer = output.getPeerTarget();
+            final IOPool.Entry<?> buffer = this.buffer = pool.allocate();
+            final Entry peer = null != _peer ? _peer : buffer;
+            final class InputProxy extends DecoratingInputSocket<Entry> {
+                InputProxy() { super(buffer.getInputSocket()); }
 
                 @Override
                 public Entry getLocalTarget() {
-                    return null != peer ? peer : buffer;
+                    return peer;
                 }
             }
-            this.input = new InputProxy();
-            final BufferedEntryOutputStream
-                    old = buffers.put(local.getName(), this);
-            if (null != old)
-                old.discard();
+            try {
+                this.input = new InputProxy();
+                this.delegate = buffer.getOutputSocket().newOutputStream();
+            } catch (final IOException ex) {
+                buffer.release();
+                throw ex;
+            }
+            buffers.put(local.getName(), this);
         }
 
-        E getTarget() {
-            return local;
+        E getLocalTarget() {
+            try {
+                return output.getLocalTarget();
+            } catch (final IOException ex) {
+                throw new AssertionError(ex);
+            }
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (closed)
                 return;
             delegate.close();
             closed = true;
-            copyProperties();
-            storeBuffers();
+            saveBuffers();
         }
 
-        void copyProperties() throws IOException {
-            final Entry src = input.getLocalTarget();
-            final E dst = getTarget();
-            // Never copy anything but the DATA size!
-            if (UNKNOWN == dst.getSize(DATA))
-                dst.setSize(DATA, src.getSize(DATA));
+        void saveBuffers() throws IOException {
+            try {
+                final E local = output.getLocalTarget();
+                final Entry peer = input.getLocalTarget();
+                if (this == buffers.get(local.getName()))
+                    updateProperties(local, peer);
+                else
+                    discardBuffer();
+            } finally {
+                storeBuffers();
+            }
+        }
+
+        void updateProperties(final E local, final Entry peer) {
+            // Never copy any but the DATA size!
+            if (UNKNOWN == local.getSize(DATA))
+                local.setSize(DATA, peer.getSize(DATA));
             for (final Access type : ALL_ACCESS_SET)
-                if (UNKNOWN == dst.getTime(type))
-                    dst.setTime(type, src.getTime(type));
+                if (UNKNOWN == local.getTime(type))
+                    local.setTime(type, peer.getTime(type));
         }
 
-        boolean store() throws IOException {
+        void discardBuffer() throws IOException {
+            assert closed;
+            buffer.release();
+        }
+
+        boolean storeBuffer() throws InputException, IOException {
             if (!closed || isBusy())
                 return false;
             IOSocket.copy(input, output);
             buffer.release();
             return true;
-        }
-
-        void discard() throws IOException {
-            assert closed;
-            buffer.release();
         }
     } // BufferedEntryOutputStream
 }

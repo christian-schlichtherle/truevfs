@@ -116,16 +116,18 @@ implements InputShop<ZipDriverEntry> {
 
             @Override
             public InputStream newInputStream() throws IOException {
-                final ZipDriverEntry lt = getLocalTarget();
-                final Entry pt = getPeerTarget();
-                final ZipDriverEntry zpt = pt instanceof ZipDriverEntry
-                        ? (ZipDriverEntry) pt
+                final ZipDriverEntry local = getLocalTarget();
+                final Entry peer = getPeerTarget();
+                final ZipDriverEntry zpeer = peer instanceof ZipDriverEntry
+                        ? (ZipDriverEntry) peer
                         : null;
                 final ZipDriver driver = ZipInputShop.this.driver;
                 return getInputStream(
-                        lt.getName(),
-                        driver.check(ZipInputShop.this, lt),
-                        null == zpt || driver.process(ZipInputShop.this, lt, zpt));
+                        local.getName(),
+                        driver.check(ZipInputShop.this, local),
+                        null == zpeer
+                        || 0 == local.getSize()
+                        || driver.process(ZipInputShop.this, local, zpeer));
             }
         } // Input
 

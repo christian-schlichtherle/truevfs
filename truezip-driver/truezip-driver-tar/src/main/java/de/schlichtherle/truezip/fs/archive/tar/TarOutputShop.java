@@ -16,7 +16,9 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -96,42 +98,65 @@ implements OutputShop<TarDriverEntry> {
     }
 
     @Override
-    public OutputSocket<TarDriverEntry> getOutputSocket(final TarDriverEntry entry) {
-        if (null == entry)
+    public OutputSocket<TarDriverEntry> getOutputSocket(final TarDriverEntry local) {
+        if (null == local)
             throw new NullPointerException();
 
         class Output extends OutputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry getLocalTarget() {
-                return entry;
+                return local;
             }
 
             @Override
             public OutputStream newOutputStream() throws IOException {
                 if (isBusy())
-                    throw new OutputBusyException(entry.getName());
-                if (entry.isDirectory()) {
-                    entry.setSize(0);
-                    return new EntryOutputStream(entry);
+                    throw new OutputBusyException(local.getName());
+                if (local.isDirectory()) {
+                    updateProperties(local, DirectoryTemplate.INSTANCE);
+                    return new EntryOutputStream(local);
                 }
                 final Entry peer = getPeerTarget();
-                long size;
-                if (null != peer && UNKNOWN != (size = peer.getSize(DATA))) {
-                    entry.setSize(size);
-                    return new EntryOutputStream(entry);
+                if (null != peer) {
+                    updateProperties(local, peer);
+                    return new EntryOutputStream(local);
                 }
-                // The source entry does not exist or cannot support Raw Data
-                // Copying (RDC) to the destination entry.
-                // So we need to write the output to a temporary buffer and
-                // copy it upon close().
-                return new BufferedEntryOutputStream(
-                        pool.allocate(),
-                        entry);
+                return new BufferedEntryOutputStream(local);
             }
         } // Output
 
         return new Output();
     }
+
+    void updateProperties(
+            final TarDriverEntry local,
+            final @CheckForNull Entry peer) {
+        if (UNKNOWN == local.getModTime().getTime())
+            local.setModTime(System.currentTimeMillis());
+        if (null != peer) {
+            if (UNKNOWN == local.getSize())
+                local.setSize(peer.getSize(DATA));
+        }
+    }
+
+    private static final class DirectoryTemplate implements Entry {
+        static final DirectoryTemplate INSTANCE = new DirectoryTemplate();
+
+        @Override
+        public String getName() {
+            return "/";
+        }
+
+        @Override
+        public long getSize(Size type) {
+            return 0;
+        }
+
+        @Override
+        public long getTime(Access type) {
+            return UNKNOWN;
+        }
+    } // DirectoryTemplate
 
     /**
      * Returns whether this output archive is busy writing an archive entry
@@ -158,31 +183,28 @@ implements OutputShop<TarDriverEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #getOutputSocket(TarDriverEntry)}.
      */
+    @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        EntryOutputStream(final TarDriverEntry entry)
+        EntryOutputStream(final TarDriverEntry local)
         throws IOException {
             super(TarOutputShop.this);
-            putArchiveEntry(entry);
-            entries.put(entry.getName(), entry);
+            putArchiveEntry(local);
+            entries.put(local.getName(), local);
             busy = true;
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            delegate.write(b, off, len);
-        }
-
-        @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (closed)
                 return;
             closeArchiveEntry();
-            closed = true;
             busy = false;
+            closed = true;
         }
     } // EntryOutputStream
 
@@ -191,60 +213,65 @@ implements OutputShop<TarDriverEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
+    @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
         final IOPool.Entry<?> buffer;
-        final TarDriverEntry entry;
+        final TarDriverEntry local;
         boolean closed;
 
         @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        BufferedEntryOutputStream(
-                final IOPool.Entry<?> buffer,
-                final TarDriverEntry entry)
+        BufferedEntryOutputStream(final TarDriverEntry local)
         throws IOException {
-            super(buffer.getOutputSocket().newOutputStream());
-            this.buffer = buffer;
-            this.entry = entry;
-            entries.put(entry.getName(), entry);
+            super(null);
+            this.local = local;
+            final IOPool.Entry<?> buffer = this.buffer = pool.allocate();
+            try {
+                this.delegate = buffer.getOutputSocket().newOutputStream();
+            } catch (final IOException ex) {
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
+                throw ex;
+            }
+            entries.put(local.getName(), local);
             busy = true;
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             if (closed)
                 return;
             delegate.close();
+            busy = false;
+            saveBuffer();
             closed = true;
-            store();
         }
 
-        void store() throws IOException {
+        void saveBuffer() throws IOException {
+            updateProperties(local, buffer);
+            storeBuffer();
+        }
+
+        void storeBuffer() throws IOException {
             final IOPool.Entry<?> buffer = this.buffer;
-            assert null != buffer;
-
-            final TarDriverEntry entry = this.entry;
-            assert null != entry;
-
-            TarOutputShop.this.busy = false;
+            final InputStream in = buffer.getInputSocket().newInputStream();
             try {
-                final InputStream in = buffer.getInputSocket().newInputStream();
+                final TarArchiveOutputStream taos = TarOutputShop.this;
+                taos.putArchiveEntry(local);
                 try {
-                    entry.setSize(buffer.getSize(DATA));
-                    if (UNKNOWN == entry.getModTime().getTime())
-                        entry.setModTime(System.currentTimeMillis());
-                    putArchiveEntry(entry);
-                    try {
-                        Streams.cat(in, TarOutputShop.this);
-                    } finally {
-                        closeArchiveEntry();
-                    }
+                    Streams.cat(in, taos);
                 } finally {
-                    in.close();
+                    taos.closeArchiveEntry();
                 }
             } finally {
-                buffer.release();
+                in.close();
             }
+            buffer.release();
         }
     } // BufferedEntryOutputStream
 }
