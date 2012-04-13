@@ -150,7 +150,7 @@ implements OutputService<ZipDriverEntry> {
     }
 
     @Override
-    public OutputSocket<ZipDriverEntry> outputSocket(final ZipDriverEntry local) { // local target
+    public OutputSocket<ZipDriverEntry> output(final ZipDriverEntry local) { // local target
         if (null == local)
             throw new NullPointerException();
 
@@ -311,7 +311,7 @@ implements OutputService<ZipDriverEntry> {
      * writing another entry and the entry holds enough information to write
      * the entry header.
      * These preconditions are checked by
-     * {@link #outputSocket(ZipDriverEntry)}.
+     * {@link #output(ZipDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
         EntryOutputStream(final ZipDriverEntry local, final boolean rdc)

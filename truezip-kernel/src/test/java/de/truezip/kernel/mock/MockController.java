@@ -150,7 +150,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public InputSocket<?> inputSocket(
+    public InputSocket<?> input(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
         checkUndeclaredExceptions(this);
@@ -189,7 +189,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public OutputSocket<?> outputSocket(
+    public OutputSocket<?> output(
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final Entry template) {

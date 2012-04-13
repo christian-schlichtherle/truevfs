@@ -44,13 +44,13 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
     }
 
     @Override
-    public OutputSocket<ZipDriverEntry> outputSocket(final ZipDriverEntry entry) {
+    public OutputSocket<ZipDriverEntry> output(final ZipDriverEntry entry) {
         if (null == entry)
             throw new NullPointerException();
 
         final class Output extends DecoratingOutputSocket<ZipDriverEntry> {
             Output() {
-                super(OdfOutputService.super.outputSocket(entry));
+                super(OdfOutputService.super.output(entry));
             }
 
             @Override

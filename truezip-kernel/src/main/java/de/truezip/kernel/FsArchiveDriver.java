@@ -136,7 +136,7 @@ extends FsDriver {
      * new input service for its target archive file.
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
-     * to {@link #inputSocket}
+     * to {@link #input}
      * and {@link #newInputService(FsModel, InputSocket)}.
      * 
      * @param  model the file system model for the target archive file.
@@ -193,7 +193,7 @@ extends FsDriver {
      * new output service for its target archive file.
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
-     * to {@link #outputSocket}
+     * to {@link #output}
      * and {@link #newOutputService(FsModel, OutputSocket, InputService)}.
      * 
      * @param  model the file system model for the target archive file.
@@ -204,7 +204,7 @@ extends FsDriver {
      * @param  options the options to use when accessing the target archive
      *         file.
      *         These may get modified as required by overridding this method
-     *         or {@link #inputSocket}. 
+     *         or {@link #input}. 
      * @param  input the nullable {@link InputService} for the target archive
      *         file.
      *         If not {@code null}, then the target archive file is going to
@@ -273,7 +273,7 @@ extends FsDriver {
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.inputSocket(name, options);
+        return controller.input(name, options);
     }
 
     /**
@@ -297,7 +297,7 @@ extends FsDriver {
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.outputSocket(name, options, null);
+        return controller.output(name, options, null);
     }
 
     /**

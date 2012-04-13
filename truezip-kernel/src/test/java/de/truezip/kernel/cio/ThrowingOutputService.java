@@ -77,8 +77,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<E> outputSocket(E entry) {
+    public OutputSocket<E> output(E entry) {
         checkUndeclaredExceptions();
-        return container.outputSocket(entry);
+        return container.output(entry);
     }
 }

@@ -21,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Decorates another output service in order to disconnect any resources when this
  * output service gets closed.
  * Once {@linkplain #close() closed}, all methods of all products of this service,
- * including all sockets, streams etc. but excluding {@link #outputSocket}
+ * including all sockets, streams etc. but excluding {@link #output}
  * and all {@link #close()} methods, will throw an
  * {@link OutputClosedException} when called.
  *
@@ -77,8 +77,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public final OutputSocket<E> outputSocket(E entry) {
-        return new Output(container.outputSocket(entry));
+    public final OutputSocket<E> output(E entry) {
+        return new Output(container.output(entry));
     }
 
     /**

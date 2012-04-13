@@ -245,12 +245,12 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    InputSocket<? extends E> inputSocket(final String name) {
+    InputSocket<? extends E> input(final String name) {
         class Input extends ClutchInputSocket<E> {
             @Override
             protected InputSocket<? extends E> getLazyDelegate()
             throws IOException {
-                return getInputArchive().inputSocket(name);
+                return getInputArchive().input(name);
             }
 
             @Override
@@ -285,12 +285,14 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    OutputSocket<? extends E> outputSocket(final E entry, final BitField<FsAccessOption> options) {
+    OutputSocket<? extends E> output(
+            final E entry,
+            final BitField<FsAccessOption> options) {
         final class Output extends ClutchOutputSocket<E> {
             @Override
             protected OutputSocket<? extends E> getLazyDelegate()
             throws IOException {
-                return makeOutputArchive(options).outputSocket(entry);
+                return makeOutputArchive(options).output(entry);
             }
 
             @Override
@@ -479,10 +481,10 @@ extends FileSystemArchiveController<E> {
                     if (DIRECTORY == ae.getType()) {
                         if (!fse.isRoot()) // never output the root directory!
                             if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
-                                os.outputSocket(ae).stream().close();
+                                os.output(ae).stream().close();
                     } else if (null != is.entry(aen)) {
-                        IOSocket.copy(  is.inputSocket(aen),
-                                        os.outputSocket(ae));
+                        IOSocket.copy(  is.input(aen),
+                                        os.output(ae));
                     } else {
                         // The file system entry is a newly created
                         // non-directory entry which hasn't received any
@@ -491,7 +493,7 @@ extends FileSystemArchiveController<E> {
                         for (final Size size : ALL_SIZE_SET)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
-                        os.outputSocket(ae).stream().close();
+                        os.output(ae).stream().close();
                     }
                 } catch (final IOException ex) {
                     if (null != warning || !(ex instanceof InputException))
@@ -570,7 +572,7 @@ extends FileSystemArchiveController<E> {
         }
 
         @Override
-        public InputSocket<E> inputSocket(String name) {
+        public InputSocket<E> input(String name) {
             throw new AssertionError();
         }
 

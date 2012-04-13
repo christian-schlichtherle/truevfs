@@ -110,7 +110,7 @@ implements OutputService<TarDriverEntry> {
     }
 
     @Override
-    public OutputSocket<TarDriverEntry> outputSocket(final TarDriverEntry local) {
+    public OutputSocket<TarDriverEntry> output(final TarDriverEntry local) {
         if (null == local)
             throw new NullPointerException();
 
@@ -193,7 +193,7 @@ implements OutputService<TarDriverEntry> {
      * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #outputSocket(TarDriverEntry)}.
+     * These preconditions are checked by {@link #output(TarDriverEntry)}.
      */
     @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {

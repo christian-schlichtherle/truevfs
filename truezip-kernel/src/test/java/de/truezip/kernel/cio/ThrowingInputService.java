@@ -77,8 +77,8 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<E> inputSocket(String name) {
+    public InputSocket<E> input(String name) {
         checkUndeclaredExceptions();
-        return container.inputSocket(name);
+        return container.input(name);
     }
 }

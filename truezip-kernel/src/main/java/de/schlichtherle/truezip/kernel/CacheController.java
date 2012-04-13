@@ -39,9 +39,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <ul>
  * <li>Caching and buffering for an entry needs to get activated by using the
  *     method
- *     {@link #inputSocket input socket} with the input option
+ *     {@link #input input socket} with the input option
  *     {@link FsAccessOption#CACHE} or the method
- *     {@link #outputSocket output socket} with the output option
+ *     {@link #output output socket} with the output option
  *     {@link FsAccessOption#CACHE}.
  * <li>Unless a write operation succeeds, upon each read operation the entry
  *     data gets copied from the backing store for buffering purposes only.
@@ -96,7 +96,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     }
 
     @Override
-    public InputSocket<?> inputSocket(
+    public InputSocket<?> input(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
         /** This class requires ON-DEMAND LOOKUP of its in! */
@@ -107,7 +107,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
-                        return controller.inputSocket(name, options);
+                        return controller.input(name, options);
                     cache = new EntryCache(name);
                 }
                 return cache.inputSocket(options);
@@ -119,7 +119,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive!
-    public OutputSocket<?> outputSocket(
+    public OutputSocket<?> output(
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
@@ -131,7 +131,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
-                        return controller.outputSocket(name, options, template);
+                        return controller.output(name, options, template);
                     cache = new EntryCache(name);
                 }
                 return cache.outputSocket(options, template);
@@ -299,7 +299,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             @Override
             protected InputSocket<? extends Entry> getLazyDelegate() {
-                return controller.inputSocket(name, options);
+                return controller.input(name, options);
             }
 
             @Override
@@ -345,7 +345,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             @Override
             protected OutputSocket<? extends Entry> getLazyDelegate() {
-                return cache.configure( controller.outputSocket(
+                return cache.configure( controller.output(
                                             name,
                                             options.clear(EXCLUSIVE),
                                             template))

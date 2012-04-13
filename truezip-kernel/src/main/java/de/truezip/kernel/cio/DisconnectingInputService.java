@@ -21,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * Decorates another input service in order to disconnect any resources when this
  * input service gets closed.
  * Once {@linkplain #close() closed}, all methods of all products of this service,
- * including all sockets, streams etc. but excluding {@link #inputSocket}
+ * including all sockets, streams etc. but excluding {@link #input}
  * and all {@link #close()} methods, will throw an
  * {@link InputClosedException} when called.
  *
@@ -77,8 +77,8 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<E> inputSocket(String name) {
-        return new Input(container.inputSocket(name));
+    public InputSocket<E> input(String name) {
+        return new Input(container.input(name));
     }
 
     /**

@@ -98,17 +98,17 @@ extends FsController<M> {
 
     @Override
     public InputSocket<?>
-    inputSocket( FsEntryName name,
+    input( FsEntryName name,
                     BitField<FsAccessOption> options) {
-        return controller.inputSocket(name, options);
+        return controller.input(name, options);
     }
 
     @Override
     public OutputSocket<?>
-    outputSocket(    FsEntryName name,
+    output(    FsEntryName name,
                         BitField<FsAccessOption> options,
                         Entry template) {
-        return controller.outputSocket(name, options, template);
+        return controller.output(name, options, template);
     }
 
     @Override

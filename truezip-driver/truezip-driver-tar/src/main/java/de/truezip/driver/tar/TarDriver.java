@@ -95,7 +95,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.inputSocket(name, options.clear(CACHE));
+        return controller.input(name, options.clear(CACHE));
     }
 
     /**
@@ -107,7 +107,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.outputSocket(name, options.set(COMPRESS), null);
+        return controller.output(name, options.set(COMPRESS), null);
     }
 
     @Override

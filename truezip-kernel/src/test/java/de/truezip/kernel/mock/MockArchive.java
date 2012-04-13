@@ -115,7 +115,7 @@ implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
-        public InputSocket<MockArchiveDriverEntry> inputSocket(
+        public InputSocket<MockArchiveDriverEntry> input(
                 final String name) {
             if (null == name)
                 throw new NullPointerException();
@@ -168,7 +168,7 @@ implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
-        public OutputSocket<MockArchiveDriverEntry> outputSocket(
+        public OutputSocket<MockArchiveDriverEntry> output(
                 final MockArchiveDriverEntry entry) {
             if (null == entry)
                 throw new NullPointerException();

@@ -228,7 +228,7 @@ implements InputService<TarDriverEntry> {
     }
 
     @Override
-    public InputSocket<TarDriverEntry> inputSocket(final String name) {
+    public InputSocket<TarDriverEntry> input(final String name) {
         if (null == name)
             throw new NullPointerException();
         final class Input extends InputSocket<TarDriverEntry> {
