@@ -286,7 +286,7 @@ system space.
                                  it would also conceal any multithreading bugs
                                  in the classes under test, so it's generally
                                  discouraged. -->
-                            <de.truezip.file.ConfiguredClientTestBase.isolateFsManager>false</de.truezip.file.ConfiguredClientTestBase.isolateFsManager>
+                            <de.truezip.kernel.isolateFsManager>false</de.truezip.kernel.isolateFsManager>
                             <de.truezip.driver.zip.io.forceZip64Ext>false</de.truezip.driver.zip.io.forceZip64Ext>
                             <de.schlichtherle.truezip.kernel.FsControllerException.traceable>true</de.schlichtherle.truezip.kernel.FsControllerException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>

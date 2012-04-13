@@ -33,15 +33,6 @@ extends FsArchiveDriverTestBase<D> {
     protected static final String[] NO_STRINGS = new String[0];
     private static final String ARCHIVE_DETECTOR = "archiveDetector";
 
-    private static final boolean ISOLATE_FS_MANAGER = Boolean
-            .getBoolean(ConfiguredClientTestBase.class.getName() + ".isolateFsManager");
-    static {
-        Logger  .getLogger(ConfiguredClientTestBase.class.getName())
-                .log(   Level.CONFIG,
-                        "Isolate file system manager: {0}",
-                        ISOLATE_FS_MANAGER);
-    }
-
     private TArchiveDetector detector;
     private Map<String, ?> environment;
 

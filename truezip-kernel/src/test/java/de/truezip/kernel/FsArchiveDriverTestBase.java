@@ -10,6 +10,8 @@ import edu.umd.cs.findbugs.annotations.OverrideMustInvoke;
 import edu.umd.cs.findbugs.annotations.When;
 import java.io.IOException;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
 
@@ -18,6 +20,15 @@ import org.junit.Before;
  * @author Christian Schlichtherle
  */
 public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
+
+    protected static final boolean ISOLATE_FS_MANAGER = Boolean.getBoolean(
+            FsArchiveDriverTestBase.class.getPackage().getName() + ".isolateFsManager");
+    static {
+        Logger  .getLogger(FsArchiveDriverTestBase.class.getName())
+                .log(   Level.CONFIG,
+                        "Isolate file system manager: {0}",
+                        ISOLATE_FS_MANAGER);
+    }
 
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
