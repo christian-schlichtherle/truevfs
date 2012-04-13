@@ -122,7 +122,7 @@ public class TarBZip2Driver extends TarDriver {
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.outputSocket(name, options.set(STORE), null);
+        return controller.output(name, options.set(STORE), null);
     }
 
     private static final class BZip2CompressorOutputStream

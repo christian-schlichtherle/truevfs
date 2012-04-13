@@ -242,7 +242,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public InputSocket<?> inputSocket(
+    public InputSocket<?> input(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
         @NotThreadSafe
@@ -255,7 +255,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return (lastController == controller
                         ? socket
                         : (socket = (lastController = controller)
-                            .inputSocket(name, options)))
+                            .input(name, options)))
                         .bind(this);
             }
 
@@ -314,7 +314,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
-    public OutputSocket<?> outputSocket(
+    public OutputSocket<?> output(
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
@@ -328,7 +328,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return (lastController == controller
                         ? socket
                         : (socket = (lastController = controller)
-                            .outputSocket(name, options, template)))
+                            .output(name, options, template)))
                         .bind(this);
             }
 

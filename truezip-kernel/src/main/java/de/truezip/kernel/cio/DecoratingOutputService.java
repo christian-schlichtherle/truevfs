@@ -28,8 +28,8 @@ implements OutputService<E> {
     }
 
     @Override
-    public OutputSocket<E> outputSocket(E entry) {
-        return container.outputSocket(entry);
+    public OutputSocket<E> output(E entry) {
+        return container.output(entry);
     }
 
     @Override

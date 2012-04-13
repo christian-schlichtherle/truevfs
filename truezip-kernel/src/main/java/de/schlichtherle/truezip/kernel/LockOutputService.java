@@ -87,10 +87,10 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<E> outputSocket(final E entry) {
+    public OutputSocket<E> output(final E entry) {
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(container.outputSocket(entry));
+                super(container.output(entry));
             }
 
             @Override

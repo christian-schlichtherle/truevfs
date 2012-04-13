@@ -254,8 +254,8 @@ public abstract class FsController<M extends FsModel> {
      * @return An {@code InputSocket}.
      */
     public abstract InputSocket<?>
-    inputSocket(    FsEntryName name,
-                    BitField<FsAccessOption> options);
+    input(  FsEntryName name,
+            BitField<FsAccessOption> options);
 
     /**
      * Returns an output socket for writing the contents of the entry addressed
@@ -271,9 +271,9 @@ public abstract class FsController<M extends FsModel> {
      * @return An {@code OutputSocket}.
      */
     public abstract OutputSocket<?>
-    outputSocket(   FsEntryName name,
-                    BitField<FsAccessOption> options,
-                    @CheckForNull Entry template);
+    output( FsEntryName name,
+            BitField<FsAccessOption> options,
+            @CheckForNull Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries

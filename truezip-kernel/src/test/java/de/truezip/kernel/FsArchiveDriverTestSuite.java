@@ -200,7 +200,7 @@ extends FsArchiveDriverTestBase<D> {
     throws IOException {
         final String name = name(i);
         final E entry = newEntry(name);
-        final OutputSocket<? extends E> output = service.outputSocket(entry);
+        final OutputSocket<? extends E> output = service.output(entry);
         assertSame(entry, output.localTarget());
 
         assertNull(service.entry(name));
@@ -255,7 +255,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private InputStream input(final InputService<E> service, final int i)
     throws IOException {
-        final InputSocket<? extends E> input = service.inputSocket(name(i));
+        final InputSocket<? extends E> input = service.input(name(i));
 
         {
             final PowerBuffer buf = PowerBuffer.allocate(getDataLength());
@@ -432,7 +432,7 @@ extends FsArchiveDriverTestBase<D> {
         }
 
         @Override
-        public InputSocket<?> inputSocket(
+        public InputSocket<?> input(
                 final FsEntryName name,
                 final BitField<FsAccessOption> options) {
             if (null == name)
@@ -442,7 +442,7 @@ extends FsArchiveDriverTestBase<D> {
 
             final class Input extends DecoratingInputSocket<Entry> {
                 Input() {
-                    super(ParentController.super.inputSocket(name, options));
+                    super(ParentController.super.input(name, options));
                 }
 
                 @Override
@@ -464,7 +464,7 @@ extends FsArchiveDriverTestBase<D> {
         }
 
         @Override
-        public OutputSocket<?> outputSocket(
+        public OutputSocket<?> output(
                 final FsEntryName name,
                 final BitField<FsAccessOption> options,
                 final Entry template) {
@@ -475,7 +475,7 @@ extends FsArchiveDriverTestBase<D> {
 
             final class Output extends DecoratingOutputSocket<Entry> {
                 Output() {
-                    super(ParentController.super.outputSocket(name, options, template));
+                    super(ParentController.super.output(name, options, template));
                 }
 
                 @Override

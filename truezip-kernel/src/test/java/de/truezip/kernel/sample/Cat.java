@@ -75,7 +75,7 @@ public final class Cat {
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager
                     .getController(     path.getMountPoint(), driver)
-                    .inputSocket(    path.getEntryName(),
+                    .input(    path.getEntryName(),
                                         BitField.noneOf(FsAccessOption.class));
             Throwable ex = null;
             try (InputStream in = socket.stream()) {

@@ -87,10 +87,10 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<E> inputSocket(final String name) {
+    public InputSocket<E> input(final String name) {
         final class Input extends DecoratingInputSocket<E> {
             Input() {
-                super(container.inputSocket(name));
+                super(container.input(name));
             }
 
             @Override

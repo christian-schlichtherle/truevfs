@@ -239,14 +239,14 @@ public final class TFileSystem extends FileSystem {
             final BitField<FsAccessOption>
                     o = path.mapInput(options).set(FsAccessOption.CACHE);
             return controller
-                    .inputSocket(name, o)
+                    .input(name, o)
                     .channel();
         } else {
             final BitField<FsAccessOption>
                     o = path.mapOutput(options).set(FsAccessOption.CACHE);
             try {
                 return controller
-                        .outputSocket(name, o, null)
+                        .output(name, o, null)
                         .channel();
             } catch (final IOException ex) {
                 if (o.get(EXCLUSIVE) && null != controller.entry(name))
@@ -260,7 +260,7 @@ public final class TFileSystem extends FileSystem {
     InputStream newInputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .inputSocket(
+                .input(
                     path.getEntryName(),
                     path.mapInput(options))
                 .stream();
@@ -269,7 +269,7 @@ public final class TFileSystem extends FileSystem {
     OutputStream newOutputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .outputSocket(
+                .output(
                     path.getEntryName(),
                     path.mapOutput(options),
                     null)
@@ -375,13 +375,13 @@ public final class TFileSystem extends FileSystem {
 
     InputSocket<?> inputSocket( TPath path,
                                 BitField<FsAccessOption> options) {
-        return getController().inputSocket(path.getEntryName(), options);
+        return getController().input(path.getEntryName(), options);
     }
 
     OutputSocket<?> outputSocket(   TPath path,
                                     BitField<FsAccessOption> options,
                                     @CheckForNull Entry template) {
-        return getController().outputSocket(path.getEntryName(), options, template);
+        return getController().output(path.getEntryName(), options, template);
     }
 
     void checkAccess(final TPath path, final AccessMode... modes)

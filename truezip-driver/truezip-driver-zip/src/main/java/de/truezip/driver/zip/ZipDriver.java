@@ -417,7 +417,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         if (options.get(GROW))
             options = options.set(APPEND).clear(CACHE);
         return new OptionOutputSocket(
-                controller.outputSocket(name, options, null),
+                controller.output(name, options, null),
                 options);
     }
 

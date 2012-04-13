@@ -102,14 +102,14 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public InputSocket<?> inputSocket(
+    public InputSocket<?> input(
             FsEntryName name,
             BitField<FsAccessOption> options) {
         return newEntry(name).newInputSocket(options);
     }
 
     @Override
-    public OutputSocket<?> outputSocket(
+    public OutputSocket<?> output(
             FsEntryName name,
             BitField<FsAccessOption> options,
             @CheckForNull Entry template) {

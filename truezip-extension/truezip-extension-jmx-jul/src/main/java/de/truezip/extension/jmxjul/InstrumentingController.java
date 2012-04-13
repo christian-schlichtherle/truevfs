@@ -35,12 +35,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public InputSocket<?> inputSocket(FsEntryName name, BitField<FsAccessOption> options) {
-        return director.instrument(controller.inputSocket(name, options), this);
+    public InputSocket<?> input(FsEntryName name, BitField<FsAccessOption> options) {
+        return director.instrument(controller.input(name, options), this);
     }
 
     @Override
-    public OutputSocket<?> outputSocket(FsEntryName name, BitField<FsAccessOption> options, Entry template) {
-        return director.instrument(controller.outputSocket(name, options, template), this);
+    public OutputSocket<?> output(FsEntryName name, BitField<FsAccessOption> options, Entry template) {
+        return director.instrument(controller.output(name, options, template), this);
     }
 }

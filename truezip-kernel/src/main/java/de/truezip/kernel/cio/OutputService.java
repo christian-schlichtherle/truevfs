@@ -42,7 +42,7 @@ extends Closeable, Container<E> {
      *         output socket.
      * @return An output socket for writing to the given entry.
      */
-    OutputSocket<E> outputSocket(E entry);
+    OutputSocket<E> output(E entry);
 
     @Override
     @DischargesObligation

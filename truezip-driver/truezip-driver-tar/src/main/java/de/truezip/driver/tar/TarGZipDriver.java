@@ -122,7 +122,7 @@ public class TarGZipDriver extends TarDriver {
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
-        return controller.outputSocket(name, options.set(STORE), null);
+        return controller.output(name, options.set(STORE), null);
     }
 
     /** Extends its super class to set the deflater level. */

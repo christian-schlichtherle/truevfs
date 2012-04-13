@@ -29,7 +29,7 @@ public class MultiplexingOutputServiceTest {
         final String[] names = { "foo", "bar", "baz" };
         for (final String name : names) {
             final OutputSocket<MockArchiveDriverEntry> socket = service
-                    .outputSocket(new MockArchiveDriverEntry(name, FILE));
+                    .output(new MockArchiveDriverEntry(name, FILE));
             assertThat(service.entry(name), nullValue());
             socket.stream();
             assertThat(service.entry(name), notNullValue());

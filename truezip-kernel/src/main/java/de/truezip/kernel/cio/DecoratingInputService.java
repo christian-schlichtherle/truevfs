@@ -28,8 +28,8 @@ implements InputService<E> {
     }
 
     @Override
-    public InputSocket<E> inputSocket(String name) {
-        return container.inputSocket(name);
+    public InputSocket<E> input(String name) {
+        return container.input(name);
     }
 
     @Override

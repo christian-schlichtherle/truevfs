@@ -187,7 +187,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
         // opportunity to apply its own preferences to sort out such a conflict.
         return new OptionOutputSocket(
-                controller.outputSocket(name, options.set(STORE), null),
+                controller.output(name, options.set(STORE), null),
                 options); // use modified options!
     }
 

@@ -94,7 +94,7 @@ implements InputService<ZipDriverEntry> {
     }
 
     @Override
-    public InputSocket<ZipDriverEntry> inputSocket(final String name) {
+    public InputSocket<ZipDriverEntry> input(final String name) {
         if (null == name)
             throw new NullPointerException();
 

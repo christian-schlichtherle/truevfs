@@ -271,7 +271,7 @@ final class TBIO {
             final TFile archive = tsrc.getInnerArchive();
             if (null != archive)
                 return archive  .getController()
-                                .inputSocket(tsrc.getInnerFsEntryName(),
+                                .input(tsrc.getInnerFsEntryName(),
                                                 options);
         }
         final FsPath path = new FsPath(src);
@@ -279,7 +279,7 @@ final class TBIO {
                 .get()
                 .getFsManager()
                 .getController( path.getMountPoint(), getDetector(src))
-                .inputSocket(path.getEntryName(), options);
+                .input(path.getEntryName(), options);
     }
 
     /**
@@ -301,7 +301,7 @@ final class TBIO {
             final TFile archive = tdst.getInnerArchive();
             if (null != archive)
                 return archive  .getController()
-                                .outputSocket(   tdst.getInnerFsEntryName(),
+                                .output(   tdst.getInnerFsEntryName(),
                                                     options,
                                                     template);
         }
@@ -310,7 +310,7 @@ final class TBIO {
                 .get()
                 .getFsManager()
                 .getController(     path.getMountPoint(), getDetector(dst))
-                .outputSocket(   path.getEntryName(),
+                .output(   path.getEntryName(),
                                     options.clear(CREATE_PARENTS),
                                     template);
     }
