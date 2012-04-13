@@ -949,7 +949,7 @@ implements Closeable, Iterable<E> {
             final String name,
             @CheckForNull Boolean check,
             final boolean process)
-    throws IOException {
+    throws ZipException, IOException {
         final SeekableByteChannel channel = channel();
         if (null == name)
             throw new NullPointerException();
