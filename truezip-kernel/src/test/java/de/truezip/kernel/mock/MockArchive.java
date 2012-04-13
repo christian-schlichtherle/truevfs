@@ -181,10 +181,10 @@ implements Container<MockArchiveDriverEntry> {
 
                 @Override
                 public OutputStream stream() throws IOException {
-                    final class MockOutputStream extends DecoratingOutputStream {
+                    final class Stream extends DecoratingOutputStream {
                         boolean closed;
 
-                        MockOutputStream() throws IOException {
+                        Stream() throws IOException {
                             if (busy)
                                 throw new IOException("Busy!");
                             this.out = getBufferOutputSocket().stream();
@@ -196,13 +196,13 @@ implements Container<MockArchiveDriverEntry> {
                             if (closed)
                                 return;
                             out.close();
-                            closed = true;
                             busy = false;
                             copyProperties();
+                            closed = true;
                         }
-                    } // MockOutputStream
+                    } // Stream
 
-                    return new MockOutputStream();
+                    return new Stream();
                 }
 
                 /*@Override
@@ -219,17 +219,17 @@ implements Container<MockArchiveDriverEntry> {
                 }
 
                 void copyProperties() {
-                    final MockArchiveDriverEntry dst = localTarget();
-                    final IOBuffer<?> src;
+                    final MockArchiveDriverEntry target = localTarget();
+                    final IOBuffer<?> buffer;
                     try {
-                        src = dst.getBuffer(getIOPool());
-                    } catch (IOException ex) {
+                        buffer = target.getBuffer(getIOPool());
+                    } catch (final IOException ex) {
                         throw new AssertionError(ex);
                     }
                     for (final Size type : ALL_SIZE_SET)
-                        dst.setSize(type, src.getSize(type));
+                        target.setSize(type, buffer.getSize(type));
                     for (final Access type : ALL_ACCESS_SET)
-                        dst.setTime(type, src.getTime(type));
+                        target.setTime(type, buffer.getTime(type));
                 }
             } // Output
 
