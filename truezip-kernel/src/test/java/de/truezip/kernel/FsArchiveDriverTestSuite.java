@@ -166,24 +166,24 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void output() throws IOException {
-        final OutputService<E> os = getArchiveDriver()
+        final OutputService<E> service = getArchiveDriver()
                 .newOutputService(model, parent, entry, NONE, null);
         try {
             final Closeable[] streams = new Closeable[getNumEntries()];
             try {
                 for (int i = 0; i < streams.length; i++)
-                    streams[i] = output(os, i);
+                    streams[i] = output(service, i);
             } finally {
                 close(streams);
             }
-            check(os);
+            check(service);
         } finally {
             final IOException expected = new IOException();
             trigger(TestCloseable.class, expected);
             try {
                 // This call may succeed if the archive driver is not using the
                 // parent controller (i.e. the MockArchiveDriver).
-                os.close();
+                service.close();
                 //fail();
             } catch (final IOException got) {
                 if (!contains(got, expected))
@@ -191,15 +191,8 @@ extends FsArchiveDriverTestBase<D> {
             } finally {
                 clear(TestCloseable.class);
             }
-            os.close();
+            service.close();
         }
-        // This is undefined in the contract, so the kernel decorates the
-        // driver product with a DisconnectingOutputService to assert this.
-        /*try {
-            output(os, getNumEntries()).close();
-            fail();
-        } catch (IOException expected) {
-        }*/
     }
 
     @CreatesObligation
@@ -228,15 +221,15 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void input() throws IOException {
-        final InputService<E> is = getArchiveDriver()
+        final InputService<E> service = getArchiveDriver()
                 .newInputService(model, parent, entry, NONE);
         try {
-            check(is);
+            check(service);
             final Closeable[] streams = new Closeable[getNumEntries()];
             try {
                 for (int i = 0; i < streams.length; i++) {
-                    input(is, i).close(); // first attempt
-                    streams[i] = input(is, i); // second attempt
+                    input(service, i).close(); // first attempt
+                    streams[i] = input(service, i); // second attempt
                 }
             } finally {
                 close(streams);
@@ -248,7 +241,7 @@ extends FsArchiveDriverTestBase<D> {
                 // This call may succeed if the archive driver is not using the
                 // parent controller (i.e. the MockArchiveDriver) or has been
                 // reading the archive file upfront (e.g. the TAR driver).
-                is.close();
+                service.close();
                 //fail();
             } catch (final IOException got) {
                 if (!contains(got, expected))
@@ -256,15 +249,8 @@ extends FsArchiveDriverTestBase<D> {
             } finally {
                 clear(TestCloseable.class);
             }
-            is.close();
+            service.close();
         }
-        // This is undefined in the contract, so the kernel decorates the
-        // driver product with a DisconnectingInputService to assert this.
-        /*try {
-            input(is, getNumEntries()).close();
-            fail();
-        } catch (IOException expected) {
-        }*/
     }
 
     private InputStream input(final InputService<E> service, final int i)
@@ -314,22 +300,25 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private static void close(final Closeable[] resources) throws IOException {
-        IOException failure = null;
+        IOException ex = null;
         for (final Closeable resource : resources) {
             if (null == resource)
-                break;
+                continue;
             try {
                 try {
                     resource.close();
                 } finally {
                     resource.close(); // must be idempotent on side effects
                 }
-            } catch (final IOException ex) {
-                failure = ex;
+            } catch (final IOException ex2) {
+                if (null != ex)
+                    ex.addSuppressed(ex2);
+                else
+                    ex = ex2;
             }
         }
-        if (null != failure)
-            throw failure;
+        if (null != ex)
+            throw ex;
     }
 
     private <E extends FsArchiveEntry> void check(
