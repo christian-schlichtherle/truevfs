@@ -351,7 +351,7 @@ implements Iterable<E> {
      * @throws IOException On any I/O error.
      */
     public void putNextEntry(final E entry, final boolean process)
-    throws IOException {
+    throws ZipException, IOException {
         closeEntry();
         final OutputMethod method = newOutputMethod(entry, process);
         method.init(entry.clone()); // test!
