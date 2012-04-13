@@ -191,7 +191,7 @@ implements OutputShop<ZipDriverEntry> {
                 // deflation for enhanced authentication security.
                 final ZipDriverEntry zpeer = (ZipDriverEntry) peer;
                 process = driver.process(this, local, zpeer);
-                if (process) {
+                if (!process) {
                     local.setPlatform(zpeer.getPlatform());
                     local.setEncrypted(zpeer.isEncrypted());
                     local.setMethod(zpeer.getMethod());
@@ -287,7 +287,7 @@ implements OutputShop<ZipDriverEntry> {
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        EntryOutputStream(ZipDriverEntry entry, boolean process)
+        EntryOutputStream(final ZipDriverEntry entry, final boolean process)
         throws IOException {
             super(ZipOutputShop.this);
             putNextEntry(entry, process);
