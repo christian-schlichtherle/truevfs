@@ -64,8 +64,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         input.localTarget(); // don't care for the result
-        final MockArchive
-                c = containers.get(mp);
+        final MockArchive c = containers.get(mp);
         if (null == c)
             throw new NoSuchFileException(mp.toString());
         return c.newInputService();
@@ -79,12 +78,12 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         output.localTarget(); // don't care for the result
-        final MockArchive
-                n = MockArchive.create(config);
+        final MockArchive n = MockArchive.create(config);
         MockArchive o = containers.get(mp);
         if (null == o)
             o = containers.putIfAbsent(mp, n);
-        return (null != o ? o : n).newOutputService();
+        return new MultiplexingOutputService<>(getIOPool(),
+                (null != o ? o : n).newOutputService());
     }
 
     @Override
