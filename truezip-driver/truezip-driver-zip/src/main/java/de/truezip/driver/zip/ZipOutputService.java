@@ -7,10 +7,11 @@ package de.truezip.driver.zip;
 import de.truezip.driver.zip.io.RawOutputStream;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import static de.truezip.driver.zip.io.ZipEntry.STORED;
-import static de.truezip.driver.zip.io.ZipEntry.UNKNOWN;
 import de.truezip.kernel.FsModel;
-import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import de.truezip.kernel.cio.Entry.Access;
+import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
+import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.OutputBusyException;
@@ -149,69 +150,96 @@ implements OutputService<ZipDriverEntry> {
     }
 
     @Override
-    public OutputSocket<ZipDriverEntry> outputSocket(final ZipDriverEntry entry) { // local target
-        if (null == entry)
+    public OutputSocket<ZipDriverEntry> outputSocket(final ZipDriverEntry local) { // local target
+        if (null == local)
             throw new NullPointerException();
 
         final class Output extends OutputSocket<ZipDriverEntry> {
             @Override
             public ZipDriverEntry localTarget() {
-                return entry;
+                return local;
             }
 
             @Override
-            public OutputStream stream()
-            throws IOException {
+            public OutputStream stream() throws IOException {
                 if (isBusy())
-                    throw new OutputBusyException(entry.getName());
-                final Entry peer;
-                final long size;
-                boolean process = true;
-                if (entry.isDirectory()) {
-                    entry.setMethod(STORED);
-                    entry.setCrc(0);
-                    entry.setCompressedSize(0);
-                    entry.setSize(0);
-                    return new EntryOutputStream(entry, true);
-                } else if (null != (peer = peerTarget())
-                        && UNKNOWN != (size = peer.getSize(DATA))) {
-                    entry.setSize(size);
-                    if (peer instanceof ZipDriverEntry) {
-                        // Set up entry attributes for Raw Data Copying (RDC).
-                        // A preset method in the entry takes priority.
-                        // The ZIP.RAES drivers use this feature to enforce
-                        // deflation for enhanced authentication security.
-                        final ZipDriverEntry zpt = (ZipDriverEntry) peer;
-                        process = driver.process(ZipOutputService.this, entry, zpt);
-                        if (!process) {
-                            entry.setPlatform(zpt.getPlatform());
-                            entry.setEncrypted(zpt.isEncrypted());
-                            entry.setMethod(zpt.getMethod());
-                            entry.setCompressedSize(zpt.getCompressedSize());
-                            entry.setCrc(zpt.getCrc());
-                            entry.setExtra(zpt.getExtra());
-                        }
+                    throw new OutputBusyException(local.getName());
+                if (local.isDirectory()) {
+                    updateProperties(local, DirectoryTemplate.INSTANCE);
+                    return new EntryOutputStream(local, false);
+                }
+                final Entry peer = peerTarget();
+                final boolean rdc = updateProperties(local, peer);
+                if (STORED == local.getMethod()) {
+                    if (UNKNOWN == local.getCrc()
+                            || UNKNOWN == local.getSize()
+                            || UNKNOWN == local.getCompressedSize()) {
+                        assert !rdc : "The CRC-32, size and compressed size properties must be set when using RDC!";
+                        return new BufferedEntryOutputStream(local);
                     }
                 }
-                if (0 == entry.getSize())
-                    entry.setMethod(STORED);
-                if (STORED == entry.getMethod()) {
-                    if (0 == entry.getSize()) {
-                        entry.setCompressedSize(0);
-                        entry.setCrc(0);
-                    } else if (UNKNOWN == entry.getSize()
-                            || UNKNOWN == entry.getCompressedSize()
-                            || UNKNOWN == entry.getCrc()) {
-                        assert process : "The CRC-32, compressed size and size properties should be set in the peer target!";
-                        return new BufferedEntryOutputStream(entry, process);
-                    }
-                }
-                return new EntryOutputStream(entry, process);
+                return new EntryOutputStream(local, rdc);
             }
         } // Output
 
         return new Output();
     }
+
+    boolean updateProperties(
+            final ZipDriverEntry local,
+            final @CheckForNull Entry peer) {
+        boolean rdc = false;
+        if (UNKNOWN == local.getTime())
+            local.setTime(System.currentTimeMillis());
+        if (peer != null) {
+            if (UNKNOWN == local.getSize())
+                local.setSize(peer.getSize(DATA));
+            if (peer instanceof ZipDriverEntry) {
+                // Set up entry attributes for Raw Data Copying (RDC).
+                // A preset method in the entry takes priority.
+                // The ZIP.RAES drivers use this feature to enforce
+                // deflation for enhanced authentication security.
+                final ZipDriverEntry zpeer = (ZipDriverEntry) peer;
+                rdc = driver.rdc(this, local, zpeer);
+                if (rdc) {
+                    local.setPlatform(zpeer.getPlatform());
+                    local.setEncrypted(zpeer.isEncrypted());
+                    local.setMethod(zpeer.getMethod());
+                    local.setCrc(zpeer.getCrc());
+                    local.setSize(zpeer.getSize());
+                    local.setCompressedSize(zpeer.getCompressedSize());
+                    local.setExtra(zpeer.getExtra());
+                }
+            }
+        }
+        if (0 == local.getSize()) {
+            rdc = false;
+            local.clearEncryption();
+            local.setMethod(STORED);
+            local.setCrc(0);
+            local.setCompressedSize(0);
+        }
+        return rdc;
+    }
+
+    private static final class DirectoryTemplate implements Entry {
+        static final DirectoryTemplate INSTANCE = new DirectoryTemplate();
+
+        @Override
+        public String getName() {
+            return "/";
+        }
+
+        @Override
+        public long getSize(Size type) {
+            return 0;
+        }
+
+        @Override
+        public long getTime(Access type) {
+            return UNKNOWN;
+        }
+    } // DirectoryTemplate
 
     /**
      * Returns whether this output archive is busy writing an archive entry
@@ -286,10 +314,10 @@ implements OutputService<ZipDriverEntry> {
      * {@link #outputSocket(ZipDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
-        EntryOutputStream(final ZipDriverEntry entry, final boolean process)
+        EntryOutputStream(final ZipDriverEntry local, final boolean rdc)
         throws IOException {
             super(ZipOutputService.this);
-            putNextEntry(entry, process);
+            putNextEntry(local, !rdc);
         }
 
         @Override
@@ -309,21 +337,19 @@ implements OutputService<ZipDriverEntry> {
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
         final IOBuffer<?> buffer;
-        final ZipDriverEntry entry;
-        final boolean process;
+        final ZipDriverEntry local;
         boolean closed;
 
         @CreatesObligation
-        BufferedEntryOutputStream(
-                final ZipDriverEntry entry,
-                final boolean process)
+        BufferedEntryOutputStream(final ZipDriverEntry local)
         throws IOException {
-            assert STORED == entry.getMethod();
-            this.entry = entry;
-            this.process = process;
+            assert STORED == local.getMethod();
+            this.local = local;
             final IOBuffer<?> buffer = this.buffer = getIOPool().allocate();
             try {
-                this.out = new CheckedOutputStream(buffer.outputSocket().stream(), new CRC32());
+                this.out = new CheckedOutputStream(
+                        buffer.outputSocket().stream(),
+                        new CRC32());
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
@@ -332,7 +358,7 @@ implements OutputService<ZipDriverEntry> {
                 }
                 throw ex;
             }
-            bufferedEntry = entry;
+            bufferedEntry = local;
         }
 
         @Override
@@ -341,38 +367,24 @@ implements OutputService<ZipDriverEntry> {
             if (closed)
                 return;
             out.close();
-            save();
             bufferedEntry = null;
+            saveBuffer();
             closed = true;
         }
 
-        void save() throws IOException {
-            Throwable ex = null;
-            try {
-                copyProperties();
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
-                try {
-                    storeBuffer();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
-                }
-            }
+        void saveBuffer() throws IOException {
+            updateProperties();
+            storeBuffer();
         }
 
-        void copyProperties() {
-            final IOBuffer<?> src = this.buffer;
-            final ZipDriverEntry dst = this.entry;
-            dst.setCrc(((CheckedOutputStream) out).getChecksum().getValue());
-            final long length = src.getSize(DATA);
-            dst.setCompressedSize(length);
-            dst.setSize(length);
-            if (UNKNOWN == dst.getTime())
-                dst.setTime(src.getTime(WRITE));
+        void updateProperties() {
+            final ZipDriverEntry local = this.local;
+            final IOBuffer<?> buffer = this.buffer;
+            local.setCrc(((CheckedOutputStream) out).getChecksum().getValue());
+            final long length = buffer.getSize(DATA);
+            local.setSize(length);
+            local.setCompressedSize(length);
+            ZipOutputService.this.updateProperties(local, buffer);
         }
 
         void storeBuffer() throws IOException {
@@ -380,7 +392,7 @@ implements OutputService<ZipDriverEntry> {
             final InputStream in = buffer.inputSocket().stream();
             Throwable ex = null;
             try {
-                putNextEntry(entry, process);
+                putNextEntry(local, true);
                 try {
                     Streams.cat(in, ZipOutputService.this);
                 } catch (final Throwable ex2) {

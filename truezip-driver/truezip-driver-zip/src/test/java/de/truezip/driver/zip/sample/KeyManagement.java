@@ -107,7 +107,7 @@ public final class KeyManagement {
         }
         
         @Override
-        protected boolean process(
+        protected boolean rdc(
                 ZipDriverEntry input,
                 ZipDriverEntry output) {
             // Because we are using the same encryption key for all entries
@@ -118,7 +118,7 @@ public final class KeyManagement {
             // This reduces the processing pipeline to a simple copy operation
             // and is a DRASTIC performance improvement, e.g. when compacting
             // an archive file.
-            return false;
+            return true;
             
             // This is the default implementation - try to see the difference.
             //return input.isEncrypted() || output.isEncrypted();

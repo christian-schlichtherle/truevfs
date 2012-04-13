@@ -111,16 +111,18 @@ implements InputService<ZipDriverEntry> {
 
             @Override
             public InputStream stream() throws IOException {
-                final ZipDriverEntry lt = localTarget();
-                final Entry pt = peerTarget();
-                final ZipDriverEntry zpt = pt instanceof ZipDriverEntry
-                        ? (ZipDriverEntry) pt
+                final ZipDriverEntry local = localTarget();
+                final Entry peer = peerTarget();
+                final ZipDriverEntry zpeer = peer instanceof ZipDriverEntry
+                        ? (ZipDriverEntry) peer
                         : null;
                 final ZipDriver driver = ZipInputService.this.driver;
                 return getInputStream(
-                        lt.getName(),
-                        driver.check(lt, ZipInputService.this),
-                        null == zpt || driver.process(ZipInputService.this, lt, zpt));
+                        local.getName(),
+                        driver.check(local, ZipInputService.this),
+                        null == zpeer
+                        || 0 == zpeer.getSize()
+                        || !driver.rdc(ZipInputService.this, local, zpeer));
             }
         } // Input
 
