@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Drop-in replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
+ * Replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
  * For every numeric property of this class, the default value is
  * {@code UNKNOWN} in order to indicate an unknown state and it's
  * permitted to set this value explicitly in order to reset the property.
@@ -77,10 +77,10 @@ public class ZipEntry implements Cloneable {
     static final int WINZIP_AES = 99;
 
     /** General Purpose Bit Flag mask for encrypted data. */
-    static int GPBF_ENCRYPTED = 1;
+    static final int GPBF_ENCRYPTED = 1;
 
-    static int GPBF_DATA_DESCRIPTOR = 1 << 3;
-    static int GPBF_UTF8 = 1 << 11;
+    static final int GPBF_DATA_DESCRIPTOR = 1 << 3;
+    static final int GPBF_UTF8 = 1 << 11;
 
     /**
      * Smallest supported DOS date/time value in a ZIP file,
