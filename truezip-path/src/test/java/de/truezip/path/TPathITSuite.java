@@ -34,8 +34,7 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -932,7 +931,7 @@ extends ConfiguredClientTestBase<D> {
         // Test copy a to b.
         copy(a, b, StandardCopyOption.REPLACE_EXISTING);
         assertThat(size(b), is(size(a)));
-        assertThat(getLastModifiedTime(b).toMillis(), not(is(getLastModifiedTime(a).toMillis())));
+        assertThat(getLastModifiedTime(b).toMillis(), is(not(getLastModifiedTime(a).toMillis())));
         copy(a, b, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         assertThat(size(b), is(size(a)));
         long almd = getLastModifiedTime(a).toMillis() / granularity * granularity;
@@ -946,7 +945,7 @@ extends ConfiguredClientTestBase<D> {
         // Test copy b to a.
         copy(b, a, StandardCopyOption.REPLACE_EXISTING);
         assertThat(size(a), is(size(b)));
-        assertThat(getLastModifiedTime(a).toMillis(), not(is(getLastModifiedTime(b).toMillis())));
+        assertThat(getLastModifiedTime(a).toMillis(), is(not(getLastModifiedTime(b).toMillis())));
         copy(b, a, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
         assertThat(size(a), is(size(b)));
         almd = getLastModifiedTime(a).toMillis() / granularity * granularity;
