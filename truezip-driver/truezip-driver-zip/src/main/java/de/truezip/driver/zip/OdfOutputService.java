@@ -48,7 +48,7 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
         if (null == entry)
             throw new NullPointerException();
 
-        class Output extends DecoratingOutputSocket<ZipDriverEntry> {
+        final class Output extends DecoratingOutputSocket<ZipDriverEntry> {
             Output() {
                 super(OdfOutputService.super.outputSocket(entry));
             }
