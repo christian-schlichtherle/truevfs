@@ -40,5 +40,4 @@ public interface MutableEntry extends Entry {
      * {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
      */
     boolean setTime(Access type, long value);
-    
 }
