@@ -120,7 +120,7 @@ implements Container<MockArchiveDriverEntry> {
             if (null == name)
                 throw new NullPointerException();
 
-            class Input extends InputSocket<MockArchiveDriverEntry> {
+            final class Input extends InputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry localTarget()
                 throws IOException {
@@ -160,6 +160,7 @@ implements Container<MockArchiveDriverEntry> {
     private static final class MockOutputService
     extends MockArchive
     implements OutputService<MockArchiveDriverEntry> {
+        boolean busy;
 
         MockOutputService( Map<String, MockArchiveDriverEntry> entries,
                         TestConfig config) {
@@ -172,35 +173,42 @@ implements Container<MockArchiveDriverEntry> {
             if (null == entry)
                 throw new NullPointerException();
 
-            class Output extends OutputSocket<MockArchiveDriverEntry> {
+            final class Output extends OutputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry localTarget() {
                     return entry;
                 }
 
                 @Override
-                public SeekableByteChannel channel()
-                throws IOException {
-                    return getBufferOutputSocket().channel();
-                }
+                public OutputStream stream() throws IOException {
+                    final class MockOutputStream extends DecoratingOutputStream {
+                        boolean closed;
 
-                @Override
-                public OutputStream stream()
-                throws IOException {
-                    class MockOutputStream extends DecoratingOutputStream {
                         MockOutputStream() throws IOException {
-                            super(getBufferOutputSocket().stream());
+                            if (busy)
+                                throw new IOException("Busy!");
+                            this.out = getBufferOutputSocket().stream();
+                            busy = true;
                         }
 
                         @Override
                         public void close() throws IOException {
+                            if (closed)
+                                return;
                             out.close();
+                            closed = true;
+                            busy = false;
                             copyProperties();
                         }
                     } // MockOutputStream
 
                     return new MockOutputStream();
                 }
+
+                /*@Override
+                public SeekableByteChannel channel() throws IOException {
+                    return getBufferOutputSocket().channel();
+                }*/
 
                 OutputSocket<? extends IOEntry<?>>
                 getBufferOutputSocket() throws IOException {

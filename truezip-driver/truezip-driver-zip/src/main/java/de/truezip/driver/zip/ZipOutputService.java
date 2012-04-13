@@ -9,6 +9,7 @@ import de.truezip.driver.zip.io.ZipCryptoParameters;
 import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import static de.truezip.driver.zip.io.ZipEntry.UNKNOWN;
 import de.truezip.kernel.FsModel;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
@@ -42,8 +43,8 @@ public final class ZipOutputService
 extends RawOutputStream<ZipDriverEntry>
 implements OutputService<ZipDriverEntry> {
 
-    private final ZipDriver driver;
     private final FsModel model;
+    private final ZipDriver driver;
     private @CheckForNull IOBuffer<?> postamble;
     private @CheckForNull ZipDriverEntry bufferedEntry;
     private ZipCryptoParameters param;
@@ -87,7 +88,7 @@ implements OutputService<ZipDriverEntry> {
                 }
                 // Retain postamble of input ZIP file.
                 if (0 < source.getPostambleLength()) {
-                    this.postamble = getPool().allocate();
+                    this.postamble = getIOPool().allocate();
                     Streams.copy(   source.getPostambleInputStream(),
                                     this.postamble.outputSocket().stream());
                 }
@@ -111,7 +112,7 @@ implements OutputService<ZipDriverEntry> {
         return model;
     }
 
-    private IOPool<?> getPool() {
+    private IOPool<?> getIOPool() {
         return driver.getIOPool();
     }
 
@@ -202,8 +203,7 @@ implements OutputService<ZipDriverEntry> {
                             || UNKNOWN == entry.getCompressedSize()
                             || UNKNOWN == entry.getCrc()) {
                         assert process : "The CRC-32, compressed size and size properties should be set in the peer target!";
-                        return new BufferedEntryOutputStream(
-                                getPool().allocate(), entry, process);
+                        return new BufferedEntryOutputStream(entry, process);
                     }
                 }
                 return new EntryOutputStream(entry, process);
@@ -286,15 +286,14 @@ implements OutputService<ZipDriverEntry> {
      * {@link #outputSocket(ZipDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
-
-        @CreatesObligation
-        EntryOutputStream(ZipDriverEntry entry, boolean process)
+        EntryOutputStream(final ZipDriverEntry entry, final boolean process)
         throws IOException {
             super(ZipOutputService.this);
             putNextEntry(entry, process);
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
             closeEntry();
         }
@@ -307,22 +306,33 @@ implements OutputService<ZipDriverEntry> {
      * output service and finally deleted.
      */
     @CleanupObligation
-    private final class BufferedEntryOutputStream extends CheckedOutputStream {
+    private final class BufferedEntryOutputStream
+    extends DecoratingOutputStream {
         final IOBuffer<?> buffer;
+        final ZipDriverEntry entry;
         final boolean process;
         boolean closed;
 
         @CreatesObligation
         BufferedEntryOutputStream(
-                final IOBuffer<?> buffer,
                 final ZipDriverEntry entry,
                 final boolean process)
         throws IOException {
-            super(buffer.outputSocket().stream(), new CRC32());
             assert STORED == entry.getMethod();
-            this.buffer = buffer;
-            ZipOutputService.this.bufferedEntry = entry;
+            this.entry = entry;
             this.process = process;
+            final IOBuffer<?> buffer = this.buffer = getIOPool().allocate();
+            try {
+                this.out = new CheckedOutputStream(buffer.outputSocket().stream(), new CRC32());
+            } catch (final Throwable ex) {
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
+                throw ex;
+            }
+            bufferedEntry = entry;
         }
 
         @Override
@@ -330,43 +340,55 @@ implements OutputService<ZipDriverEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-            super.close();
+            out.close();
+            save();
+            bufferedEntry = null;
             closed = true;
-            store();
         }
 
-        void store() throws IOException {
-            final IOBuffer<?> buffer = this.buffer;
-            assert null != buffer;
-
-            final ZipDriverEntry entry = ZipOutputService.this.bufferedEntry;
-            assert null != entry;
-            assert STORED == entry.getMethod();
-
-            ZipOutputService.this.bufferedEntry = null;
+        void save() throws IOException {
             Throwable ex = null;
             try {
-                final InputStream in = buffer.inputSocket().stream();
+                copyProperties();
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
+            } finally {
                 try {
-                    final long length = buffer.getSize(DATA);
-                    entry.setCrc(getChecksum().getValue());
-                    entry.setCompressedSize(length);
-                    entry.setSize(length);
-                    // Redundant because the super class does this.
-                    /*if (UNKNOWN == entry.getTime())
-                        entry.setTime(System.currentTimeMillis());*/
-                    putNextEntry(entry, this.process);
-                    try {
-                        Streams.cat(in, ZipOutputService.this);
-                    } finally {
-                        closeEntry();
-                    }
+                    storeBuffer();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
+            }
+        }
+
+        void copyProperties() {
+            final IOBuffer<?> src = this.buffer;
+            final ZipDriverEntry dst = this.entry;
+            dst.setCrc(((CheckedOutputStream) out).getChecksum().getValue());
+            final long length = src.getSize(DATA);
+            dst.setCompressedSize(length);
+            dst.setSize(length);
+            if (UNKNOWN == dst.getTime())
+                dst.setTime(src.getTime(WRITE));
+        }
+
+        void storeBuffer() throws IOException {
+            final IOBuffer<?> buffer = this.buffer;
+            final InputStream in = buffer.inputSocket().stream();
+            Throwable ex = null;
+            try {
+                putNextEntry(entry, process);
+                try {
+                    Streams.cat(in, ZipOutputService.this);
                 } catch (final Throwable ex2) {
                     ex = ex2;
                     throw ex2;
                 } finally {
                     try {
-                        in.close();
+                        closeEntry();
                     } catch (final IOException ex2) {
                         if (null == ex)
                             throw ex2;
@@ -378,13 +400,14 @@ implements OutputService<ZipDriverEntry> {
                 throw ex2;
             } finally {
                 try {
-                    buffer.release();
+                    in.close();
                 } catch (final IOException ex2) {
                     if (null == ex)
                         throw ex2;
                     ex.addSuppressed(ex2);
                 }
             }
+            buffer.release();
         }
     } // BufferedEntryOutputStream
 }

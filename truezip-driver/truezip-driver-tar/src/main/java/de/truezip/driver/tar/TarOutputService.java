@@ -5,6 +5,7 @@
 package de.truezip.driver.tar;
 
 import de.truezip.kernel.FsModel;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
@@ -14,6 +15,7 @@ import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.Maps;
 import static de.truezip.kernel.util.Maps.initialCapacity;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,9 +60,9 @@ implements OutputService<TarDriverEntry> {
     private final Map<String, TarDriverEntry>
             entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
-    private final IOPool<?> pool;
     private final OutputStream out;
     private final TarArchiveOutputStream taos;
+    private final TarDriver driver;
     private boolean busy;
 
     @CreatesObligation
@@ -71,7 +73,8 @@ implements OutputService<TarDriverEntry> {
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        this.pool = driver.getIOPool();
+        if (null == (this.driver = driver))
+            throw new NullPointerException();
         final OutputStream out = this.out = sink.stream();
         try {
             final TarArchiveOutputStream
@@ -85,6 +88,10 @@ implements OutputService<TarDriverEntry> {
             }
             throw ex;
         }
+    }
+
+    private IOPool<?> getIOPool() {
+        return driver.getIOPool();
     }
 
     @Override
@@ -131,9 +138,7 @@ implements OutputService<TarDriverEntry> {
                 // Copying (RDC) to the destination entry.
                 // So we need to write the output to a temporary buffer and
                 // copy it upon close().
-                return new BufferedEntryOutputStream(
-                        pool.allocate(),
-                        entry);
+                return new BufferedEntryOutputStream(entry);
             }
         } // Output
 
@@ -178,17 +183,12 @@ implements OutputService<TarDriverEntry> {
         }
 
         @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            out.write(b, off, len);
-        }
-
-        @Override
         public void close() throws IOException {
             if (closed)
                 return;
             taos.closeArchiveEntry();
-            closed = true;
             busy = false;
+            closed = true;
         }
     } // EntryOutputStream
 
@@ -197,6 +197,7 @@ implements OutputService<TarDriverEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
+    @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
         final IOBuffer<?> buffer;
@@ -204,13 +205,20 @@ implements OutputService<TarDriverEntry> {
         boolean closed;
 
         @CreatesObligation
-        BufferedEntryOutputStream(
-                final IOBuffer<?> buffer,
-                final TarDriverEntry entry)
+        BufferedEntryOutputStream(final TarDriverEntry entry)
         throws IOException {
-            super(buffer.outputSocket().stream());
-            this.buffer = buffer;
             this.entry = entry;
+            final IOBuffer<?> buffer = this.buffer = getIOPool().allocate();
+            try {
+                this.out = buffer.outputSocket().stream();
+            } catch (final Throwable ex) {
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
+                throw ex;
+            }
             entries.put(entry.getName(), entry);
             busy = true;
         }
@@ -220,21 +228,21 @@ implements OutputService<TarDriverEntry> {
             if (closed)
                 return;
             out.close();
+            save();
+            busy = false;
             closed = true;
-            store();
         }
 
-        void store() throws IOException {
-            busy = false;
+        void save() throws IOException {
             Throwable ex = null;
-            try {
-                put();
+            try { 
+                copyProperties();
             } catch (final Throwable ex2) {
                 ex = ex2;
                 throw ex2;
             } finally {
                 try {
-                    buffer.release();
+                    storeBuffer();
                 } catch (final IOException ex2) {
                     if (null == ex)
                         throw ex2;
@@ -243,15 +251,19 @@ implements OutputService<TarDriverEntry> {
             }
         }
 
-        void put() throws IOException {
+        void copyProperties() {
+            final IOBuffer<?> src = this.buffer;
+            final TarDriverEntry dst = this.entry;
+            dst.setSize(src.getSize(DATA));
+            if (UNKNOWN == dst.getModTime().getTime())
+                dst.setModTime(src.getTime(WRITE));
+        }
+
+        void storeBuffer() throws IOException {
             final IOBuffer<?> buffer = this.buffer;
             final InputStream in = buffer.inputSocket().stream();
             Throwable ex = null;
             try {
-                final TarDriverEntry entry = this.entry;
-                entry.setSize(buffer.getSize(DATA));
-                if (UNKNOWN == entry.getModTime().getTime())
-                    entry.setModTime(System.currentTimeMillis());
                 final TarArchiveOutputStream taos = TarOutputService.this.taos;
                 taos.putArchiveEntry(entry);
                 try {
@@ -280,6 +292,7 @@ implements OutputService<TarDriverEntry> {
                     ex.addSuppressed(ex2);
                 }
             }
+            buffer.release();
         }
     } // BufferedEntryOutputStream
 }

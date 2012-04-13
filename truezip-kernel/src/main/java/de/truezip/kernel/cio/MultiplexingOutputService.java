@@ -12,6 +12,8 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.util.JointIterator;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -163,7 +165,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 i.hasNext(); ) {
             final BufferedEntryOutputStream out = i.next();
             try {
-                if (out.store())
+                if (out.storeBuffer())
                     i.remove();
             } catch (final InputException ex) {
                 builder.warn(ex);
@@ -190,9 +192,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
             if (closed)
                 return;
             out.close();
-            closed = true;
-            busy = false;
             storeBuffers();
+            busy = false;
+            closed = true;
         }
     } // EntryOutputStream
 
@@ -202,15 +204,16 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
+    @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
         final E local;
         final InputSocket<Entry> input;
         final OutputSocket<? extends E> output;
         final IOBuffer<?> buffer;
-        final BufferedEntryOutputStream next;
         boolean closed;
 
+        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         BufferedEntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
@@ -239,8 +242,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 }
                 throw ex;
             }
-            this.next = buffers.put(local.getName(), this);
-            assert null == next;
+            buffers.put(local.getName(), this);
         }
 
         E getTarget() {
@@ -253,9 +255,30 @@ extends DecoratingOutputService<E, OutputService<E>> {
             if (closed)
                 return;
             out.close();
+            save();
             closed = true;
-            copyProperties();
-            storeBuffers();
+        }
+
+        void save() throws IOException {
+            Throwable ex = null;
+            try {
+                final E local = this.local;
+                if (this == buffers.get(local.getName()))
+                    copyProperties();
+                else
+                    discardBuffer();
+            } catch (final Throwable ex2) {
+                ex = ex2;
+                throw ex2;
+            } finally {
+                try {
+                    storeBuffers();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    ex.addSuppressed(ex2);
+                }
+            }
         }
 
         void copyProperties() throws IOException {
@@ -269,7 +292,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     dst.setTime(type, src.getTime(type));
         }
 
-        boolean store() throws InputException, IOException {
+        void discardBuffer() throws IOException {
+            assert closed;
+            buffer.release();
+        }
+
+        boolean storeBuffer() throws InputException, IOException {
             if (!closed || isBusy())
                 return false;
             IOSocket.copy(input, output);
