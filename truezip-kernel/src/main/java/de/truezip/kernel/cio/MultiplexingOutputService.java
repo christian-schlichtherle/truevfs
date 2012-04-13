@@ -11,7 +11,6 @@ import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.util.JointIterator;
-import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -90,7 +89,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         public E next() {
-            return i.next().getTarget();
+            return i.next().getLocalTarget();
         }
 
         @Override
@@ -105,7 +104,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         if (null != entry)
             return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
-        return null == out ? null : out.getTarget();
+        return null == out ? null : out.getLocalTarget();
     }
 
     @Override
@@ -115,11 +114,11 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(MultiplexingOutputService.super.outputSocket(entry));
+                super(container.outputSocket(entry));
             }
 
             @Override
-            public E localTarget() throws IOException {
+            public E localTarget() {
                 return entry;
             }
 
@@ -159,21 +158,26 @@ extends DecoratingOutputService<E, OutputService<E>> {
         if (isBusy())
             return;
 
-        final SuppressedExceptionBuilder<IOException>
-                builder = new SuppressedExceptionBuilder<>();
+        IOException ex = null;
         for (   final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
                 i.hasNext(); ) {
             final BufferedEntryOutputStream out = i.next();
             try {
                 if (out.storeBuffer())
                     i.remove();
-            } catch (final InputException ex) {
-                builder.warn(ex);
-            } catch (final IOException ex) {
-                throw builder.fail(ex);
+            } catch (final InputException ex2) {
+                if (null != ex)
+                    ex.addSuppressed(ex2);
+                else
+                    ex = ex2;
+            } catch (final IOException ex2) {
+                if (null != ex)
+                    ex2.addSuppressed(ex);
+                throw ex2;
             }
         }
-        builder.check();
+        if (null != ex)
+            throw ex;
     }
 
     /** This entry output stream writes directly to this output service. */
@@ -192,9 +196,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
             if (closed)
                 return;
             out.close();
-            storeBuffers();
             busy = false;
             closed = true;
+            storeBuffers();
         }
     } // EntryOutputStream
 
@@ -207,8 +211,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final E local;
-        final InputSocket<Entry> input;
+        final InputSocket<?> input;
         final OutputSocket<? extends E> output;
         final IOBuffer<?> buffer;
         boolean closed;
@@ -218,17 +221,16 @@ extends DecoratingOutputService<E, OutputService<E>> {
         BufferedEntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
             // HC SUNT DRACONES!
-            final E local = this.local = (this.output = output).localTarget();
-            final Entry peer = output.peerTarget();
+            final E local = (this.output = output).localTarget();
+            final Entry _peer = output.peerTarget();
             final IOBuffer<?> buffer = this.buffer = pool.allocate();
+            final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
-                InputProxy() {
-                    super(buffer.inputSocket());
-                }
+                InputProxy() { super(buffer.inputSocket()); }
 
                 @Override
                 public Entry localTarget() {
-                    return null != peer ? peer : buffer;
+                    return peer;
                 }
             } // InputProxy
             try {
@@ -245,8 +247,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
             buffers.put(local.getName(), this);
         }
 
-        E getTarget() {
-            return local;
+        E getLocalTarget() {
+            try {
+                return output.localTarget();
+            } catch (final IOException ex) {
+                throw new AssertionError(ex);
+            }
         }
 
         @Override
@@ -255,16 +261,17 @@ extends DecoratingOutputService<E, OutputService<E>> {
             if (closed)
                 return;
             out.close();
-            save();
             closed = true;
+            saveBuffers();
         }
 
-        void save() throws IOException {
+        void saveBuffers() throws IOException {
             Throwable ex = null;
             try {
-                final E local = this.local;
+                final E local = output.localTarget();
+                final Entry peer = input.localTarget();
                 if (this == buffers.get(local.getName()))
-                    copyProperties();
+                    updateProperties(local, peer);
                 else
                     discardBuffer();
             } catch (final Throwable ex2) {
@@ -281,15 +288,13 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
         }
 
-        void copyProperties() throws IOException {
-            final Entry src = input.localTarget();
-            final E dst = local;
-            // Never copy anything but the DATA size!
-            if (UNKNOWN == dst.getSize(DATA))
-                dst.setSize(DATA, src.getSize(DATA));
+        void updateProperties(final E local, final Entry peer) {
+            // Never copy any but the DATA size!
+            if (UNKNOWN == local.getSize(DATA))
+                local.setSize(DATA, peer.getSize(DATA));
             for (final Access type : ALL_ACCESS_SET)
-                if (UNKNOWN == dst.getTime(type))
-                    dst.setTime(type, src.getTime(type));
+                if (UNKNOWN == local.getTime(type))
+                    local.setTime(type, peer.getTime(type));
         }
 
         void discardBuffer() throws IOException {

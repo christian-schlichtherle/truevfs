@@ -210,44 +210,43 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         return entry.isEncrypted();
     }
 
-    final boolean process(
+    protected boolean rdc(
             @WillNotClose ZipInputService input,
             ZipDriverEntry local,
-            ZipDriverEntry remote) {
-        return process(local, remote);
+            ZipDriverEntry peer) {
+        return rdc(local, peer);
     }
 
-    final boolean process(
+    protected boolean rdc(
             @WillNotClose ZipOutputService output,
             ZipDriverEntry local,
-            ZipDriverEntry remote) {
-        return process(remote, local);
+            ZipDriverEntry peer) {
+        return rdc(peer, local);
     }
 
     /**
      * Returns {@code true} if and only if the content of the given input
-     * target entry needs processing when it gets copied to the given output
-     * target entry.
+     * target entry is eligible for Raw Data Copying (RDC).
      * This method gets called twice (once on each side of a copy operation)
      * and should return {@code false} unless both target entries can mutually
      * agree on transferring raw (unprocessed) content.
      * Note that it is an error to compare the properties of the target entries
-     * because this method may getIOPool called before the local output target gets
-     * mutated to compare equal with the remote input target!
+     * because this method may get called <em>before</em> the output target
+     * entry gets mutated to compare equal with the input target entry!
      * <p>
      * The implementation in the class {@link ZipDriver} returns
-     * {@code local.isEncrypted() || remote.isEncrypted()} in order to cover the
-     * typical case that the cipher keys of both targets are not the same.
+     * {@code !local.isEncrypted() && !remote.isEncrypted()} in order to cover
+     * the typical case that the cipher keys of both targets are not the same.
      * Note that there is no secure way to explicitly test for this.
      * 
      * @param  input the input target entry for copying the contents.
      * @param  output the output target entry for copying the contents.
-     * @return Whether the content to getIOPool copied from the input target entry
-     *         to the output target entry needs to getIOPool processed or can getIOPool
-     *         sent in raw format.
+     * @return Whether the content to get copied from the input target entry
+     *         to the output target entry is eligible for Raw Data Copying
+     *         (RDC).
      */
-    protected boolean process(ZipDriverEntry input, ZipDriverEntry output) {
-        return input.isEncrypted() || output.isEncrypted();
+    protected boolean rdc(ZipDriverEntry input, ZipDriverEntry output) {
+        return !input.isEncrypted() && !output.isEncrypted();
     }
 
     /**

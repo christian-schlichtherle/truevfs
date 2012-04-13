@@ -65,13 +65,13 @@ public final class KeyManagement {
             String extensions,
             char[] password) {
         return new TArchiveDetector(provider,
-                extensions, new CustomZipRaesDriver(password));
+                extensions, new CustomZipRaesDriver1(password));
     }
     
-    private static final class CustomZipRaesDriver extends SafeZipRaesDriver {
+    private static final class CustomZipRaesDriver1 extends SafeZipRaesDriver {
         final RaesParameters param;
         
-        CustomZipRaesDriver(char[] password) {
+        CustomZipRaesDriver1(char[] password) {
             param = new CustomRaesParameters(password);
         }
         
