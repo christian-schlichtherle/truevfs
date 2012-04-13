@@ -30,8 +30,7 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -905,7 +904,7 @@ extends ConfiguredClientTestBase<D> {
         // Test copy a to b.
         TFile.cp(a, b);
         assertThat(b.length(), is(a.length()));
-        assertThat(b.lastModified(), not(is(a.lastModified())));
+        assertThat(b.lastModified(), is(not(a.lastModified())));
         TFile.cp_p(a, b);
         assertThat(b.length(), is(a.length()));
         long almd = a.lastModified() / granularity * granularity;
@@ -919,7 +918,7 @@ extends ConfiguredClientTestBase<D> {
         // Test copy b to a.
         TFile.cp(b, a);
         assertThat(a.length(), is(b.length()));
-        assertThat(a.lastModified(), not(is(b.lastModified())));
+        assertThat(a.lastModified(), is(not(b.lastModified())));
         TFile.cp_p(b, a);
         assertThat(a.length(), is(b.length()));
         almd = a.lastModified() / granularity * granularity;
