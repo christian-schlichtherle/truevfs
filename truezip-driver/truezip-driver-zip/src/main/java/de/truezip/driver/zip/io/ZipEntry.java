@@ -183,11 +183,11 @@ public class ZipEntry implements Cloneable {
         return name.endsWith("/");
     }
 
-    public final short getPlatform() {
-        return isInit(PLATFORM) ? (short) (platform & UByte.MAX_VALUE) : UNKNOWN;
+    public final int getPlatform() {
+        return isInit(PLATFORM) ? platform & UByte.MAX_VALUE : UNKNOWN;
     }
 
-    public final void setPlatform(final short platform) {
+    public final void setPlatform(final int platform) {
         final boolean known = UNKNOWN != platform;
         if (known) {
             UByte.check(platform, name, "Platform out of range");
@@ -198,8 +198,8 @@ public class ZipEntry implements Cloneable {
         setInit(PLATFORM, known);
     }
 
-    final short getRawPlatform() {
-        return (short) (platform & UByte.MAX_VALUE);
+    final int getRawPlatform() {
+        return platform & UByte.MAX_VALUE;
     }
 
     final void setRawPlatform(final int platform) {
