@@ -39,7 +39,7 @@ extends IOSocket<E, Entry> implements Sink {
      * The peer target is {@code null} if and only if this socket is not
      * {@link #connect}ed to another socket.
      * 
-     * @throws IOException On any I/O error.
+     * @throws IOException on any I/O error.
      */
     // See https://java.net/jira/browse/TRUEZIP-203
     @Override
