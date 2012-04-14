@@ -14,6 +14,9 @@ import java.nio.charset.Charset;
  */
 final class Constants {
 
+    /* Can't touch this - hammer time! */
+    private Constants() { }
+
     /**
      * This boolean field is set by the system property
      * {@code de.truezip.driver.zip.io.forceZip64Ext}.
@@ -27,7 +30,6 @@ final class Constants {
      * Note that it's impossible to inhibit ZIP64 extensions if they are
      * required.
      */
-    // TODO: Rename this to forceZip64Extensions
     static final boolean FORCE_ZIP64_EXT = Boolean.getBoolean(
             Constants.class.getPackage().getName() + ".forceZip64Ext");
 
@@ -155,7 +157,4 @@ final class Constants {
 
     /** An empty byte array. */
     static final byte[] EMPTY = new byte[0];
-
-    /* Can't touch this - hammer time! */
-    private Constants() { }
 }
