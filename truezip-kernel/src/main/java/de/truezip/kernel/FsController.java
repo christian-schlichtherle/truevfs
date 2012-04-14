@@ -200,7 +200,7 @@ public abstract class FsController<M extends FsModel> {
      * 
      * @param  name the file system entry name.
      * @param  times the access times.
-     * @param  options the file system output options.
+     * @param  options the file system access options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code times} succeeded.
      * @throws IOException on any I/O error.
@@ -233,7 +233,7 @@ public abstract class FsController<M extends FsModel> {
      * @param  name the file system entry name.
      * @param  types the access types.
      * @param  value the last access time.
-     * @param  options the file system output options.
+     * @param  options the file system access options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code types} succeeded.
      * @throws IOException on any I/O error.
@@ -260,14 +260,16 @@ public abstract class FsController<M extends FsModel> {
     /**
      * Returns an output socket for writing the contents of the entry addressed
      * by the given name to the file system.
-     * If {@code template} is not {@code null}, then the output entry shall
-     * have as many of its properties copied as reasonable, e.g. the last
-     * modification time.
      *
-     * @param  name a file system entry name.
-     * @param  options a bit field of output options.
-     * @param  template a nullable template for the properties of the output
-     *         entry.
+     * @param  name the file system entry name.
+     * @param  options the file system access options.
+     *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
+     *         parent directories will be created and linked into the file
+     *         system with its last modification time set to the system's
+     *         current time.
+     * @param  template if not {@code null}, then the file system entry
+     *         at the end of the chain shall inherit as much properties from
+     *         this entry as possible - with the exception of its name and type.
      * @return An {@code OutputSocket}.
      */
     public abstract OutputSocket<?>
@@ -281,7 +283,7 @@ public abstract class FsController<M extends FsModel> {
      *
      * @param  name the file system entry name.
      * @param  type the file system entry type.
-     * @param  options the file system output options.
+     * @param  options the file system access options.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
      *         parent directories will be created and linked into the file
      *         system with its last modification time set to the system's
@@ -316,7 +318,7 @@ public abstract class FsController<M extends FsModel> {
      * If the named file system entry is a directory, it must be empty.
      * 
      * @param  name the file system entry name.
-     * @param  options output options for this operation.
+     * @param  options access options for this operation.
      * @throws IOException on any I/O error.
      */
     public abstract void
