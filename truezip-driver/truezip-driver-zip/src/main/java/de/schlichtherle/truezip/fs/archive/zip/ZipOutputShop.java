@@ -150,8 +150,7 @@ implements OutputShop<ZipDriverEntry> {
             }
 
             @Override
-            public OutputStream newOutputStream()
-            throws IOException {
+            public OutputStream newOutputStream() throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(local.getName());
                 if (local.isDirectory()) {
