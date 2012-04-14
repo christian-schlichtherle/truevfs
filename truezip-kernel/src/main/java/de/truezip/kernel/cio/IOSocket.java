@@ -48,7 +48,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class IOSocket<LT, PT> {
+public abstract class IOSocket<LT extends Entry, PT extends Entry> {
 
     /** You cannot instantiate this class outside its package. */
     IOSocket() { }
@@ -57,17 +57,14 @@ public abstract class IOSocket<LT, PT> {
      * Resolves the <i>local target</i> for I/O operations.
      * <p>
      * Note that this interface contract does <em>not</em> state any other
-     * terms or conditions for the returned object.
-     * In particular, clients need to consider that multiple invocations of
-     * this method could return different objects (e.g. defensive copies) which
-     * may even fail the {@link Object#equals} test.
-     * On the other hand, implementations need to consider that clients could
-     * attempt to change the state of the returned object in arbitrary manner.
-     * Consequently, the result of doing so is undefined, too.
-     * In particular, a subsequent I/O operation may not reflect the change
-     * or may even fail.
-     * Sub-interfaces or implementations should add additional terms and
-     * conditions in order to resolve these potential issues.
+     * terms or conditions for the returned entry.
+     * In particular, the returned object may or may not be a defensive copy
+     * and it may or may not reflect the effect of subsequent I/O operations.
+     * So a client may only assume that the returned entry accurately reflects
+     * the state of its represented entity <em>before</em> the client does
+     * subsequent I/O.
+     * Implementations may add some constraints to ease the situation for
+     * clients.
      *
      * @return The local target for I/O operations.
      * @throws IOException On any I/O error. 
