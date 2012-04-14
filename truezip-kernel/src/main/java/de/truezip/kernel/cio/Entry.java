@@ -126,7 +126,7 @@ public interface Entry {
 
         /** Last access. */
         READ,
-        
+
         /** Creation. */
         CREATE,
     }
