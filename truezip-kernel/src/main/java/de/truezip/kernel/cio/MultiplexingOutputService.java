@@ -226,7 +226,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
             final IOBuffer<?> buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
-                InputProxy() { super(buffer.input()); }
+                InputProxy() {
+                    super(buffer.input());
+                }
 
                 @Override
                 public Entry localTarget() {
