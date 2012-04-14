@@ -108,18 +108,18 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     @Override
-    public OutputSocket<E> output(final E entry) {
-        if (null == entry)
+    public OutputSocket<E> output(final E local) {
+        if (null == local)
             throw new NullPointerException();
 
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(container.output(entry));
+                super(container.output(local));
             }
 
             @Override
             public E localTarget() {
-                return entry;
+                return local;
             }
 
             @Override
