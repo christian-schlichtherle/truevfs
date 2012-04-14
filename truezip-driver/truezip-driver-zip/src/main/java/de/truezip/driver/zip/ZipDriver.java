@@ -369,7 +369,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             final BitField<FsAccessOption> options,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final OptionOutputSocket oos = outputSocket(parent, entry, options);
+        final OptionOutputSocket oos = output(parent, entry, options);
         final ZipInputService zis = (ZipInputService) input;
         if (null != zis)
             zis.setAppendee(oos.getOptions().get(GROW));
@@ -407,7 +407,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * {@link #newOutputService}.
      */
     @Override
-    protected OptionOutputSocket outputSocket(
+    protected OptionOutputSocket output(
             final FsController<?> controller,
             final FsEntryName name,
             BitField<FsAccessOption> options) {

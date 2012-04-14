@@ -96,7 +96,7 @@ public final class TFileInputStream extends DecoratingInputStream {
     @CreatesObligation
     private static InputStream newInputStream(final File src)
     throws FileNotFoundException {
-        final InputSocket<?> input = TBIO.inputSocket(src,
+        final InputSocket<?> input = TBIO.input(src,
                 TConfig.get().getAccessPreferences());
         try {
             return input.stream();

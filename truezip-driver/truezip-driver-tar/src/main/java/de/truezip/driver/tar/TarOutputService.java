@@ -237,7 +237,7 @@ implements OutputService<TarDriverEntry> {
             this.local = local;
             final IOBuffer<?> buffer = this.buffer = getIOPool().allocate();
             try {
-                this.out = buffer.outputSocket().stream();
+                this.out = buffer.output().stream();
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
@@ -268,7 +268,7 @@ implements OutputService<TarDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IOBuffer<?> buffer = this.buffer;
-            final InputStream in = buffer.inputSocket().stream();
+            final InputStream in = buffer.input().stream();
             Throwable ex = null;
             try {
                 final TarArchiveOutputStream taos = TarOutputService.this.taos;

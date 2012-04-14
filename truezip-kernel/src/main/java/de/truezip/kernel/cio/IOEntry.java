@@ -19,7 +19,7 @@ public interface IOEntry<E extends IOEntry<E>> extends Entry {
      *
      * @return An input socket for reading this entry.
      */
-    InputSocket<E> inputSocket();
+    InputSocket<E> input();
 
     /**
      * Returns an output socket for writing this entry.
@@ -28,5 +28,5 @@ public interface IOEntry<E extends IOEntry<E>> extends Entry {
      *
      * @return An output socket for writing this entry.
      */
-    OutputSocket<E> outputSocket();
+    OutputSocket<E> output();
 }

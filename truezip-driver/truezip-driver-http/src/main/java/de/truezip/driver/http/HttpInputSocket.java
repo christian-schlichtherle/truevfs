@@ -53,7 +53,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
         try {
             temp = entry.getPool().allocate();
             try {
-                try (final OutputStream out = temp.outputSocket().stream()) {
+                try (final OutputStream out = temp.output().stream()) {
                     Streams.cat(in, out);
                 }
             } catch (final Throwable ex) {
@@ -77,7 +77,7 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
 
             @CreatesObligation
             TempReadOnlyChannel() throws IOException {
-                super(temp.inputSocket().channel()); // bind(*) is considered redundant for IOPool.IOBuffer
+                super(temp.input().channel()); // bind(*) is considered redundant for IOPool.IOBuffer
             }
 
             @Override

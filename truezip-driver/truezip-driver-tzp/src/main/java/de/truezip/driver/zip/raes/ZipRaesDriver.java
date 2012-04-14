@@ -179,7 +179,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     @Override
     protected final OptionOutputSocket
-    outputSocket(
+    output(
             final FsController<?> controller,
             final FsEntryName name,
             BitField<FsAccessOption> options) {

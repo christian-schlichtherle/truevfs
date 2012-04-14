@@ -118,7 +118,7 @@ public class TarBZip2Driver extends TarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected OutputSocket<?> outputSocket(
+    protected OutputSocket<?> output(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {

@@ -373,14 +373,14 @@ public final class TFileSystem extends FileSystem {
         return getController().entry(path.getEntryName());
     }
 
-    InputSocket<?> inputSocket( TPath path,
-                                BitField<FsAccessOption> options) {
+    InputSocket<?> input(   TPath path,
+                            BitField<FsAccessOption> options) {
         return getController().input(path.getEntryName(), options);
     }
 
-    OutputSocket<?> outputSocket(   TPath path,
-                                    BitField<FsAccessOption> options,
-                                    @CheckForNull Entry template) {
+    OutputSocket<?> output( TPath path,
+                            BitField<FsAccessOption> options,
+                            @CheckForNull Entry template) {
         return getController().output(path.getEntryName(), options, template);
     }
 

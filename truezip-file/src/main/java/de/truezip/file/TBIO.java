@@ -213,8 +213,8 @@ final class TBIO {
     throws IOException {
         final TConfig config = TConfig.get();
         BitField<FsAccessOption> preferences = config.getAccessPreferences();
-        final InputSocket<?> input = inputSocket(src, preferences);
-        final OutputSocket<?> output = outputSocket(dst, preferences,
+        final InputSocket<?> input = input(src, preferences);
+        final OutputSocket<?> output = output(dst, preferences,
                 preserve ? input.localTarget() : null);
         IOSocket.copy(input, output);
     }
@@ -265,7 +265,7 @@ final class TBIO {
      */
     @SuppressWarnings("deprecation")
     static InputSocket<?>
-    inputSocket(final File src, final BitField<FsAccessOption> options) {
+    input(final File src, final BitField<FsAccessOption> options) {
         if (src instanceof TFile) {
             final TFile tsrc = (TFile) src;
             final TFile archive = tsrc.getInnerArchive();
@@ -293,7 +293,7 @@ final class TBIO {
      */
     @SuppressWarnings("deprecation")
     static OutputSocket<?>
-    outputSocket(final File dst,
+    output(final File dst,
                     final BitField<FsAccessOption> options,
                     final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
