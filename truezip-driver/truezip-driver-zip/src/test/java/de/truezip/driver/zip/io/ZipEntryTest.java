@@ -4,12 +4,6 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.io.DateTimeConverter;
-import de.truezip.driver.zip.io.UByte;
-import de.truezip.driver.zip.io.UInt;
-import de.truezip.driver.zip.io.ULong;
-import de.truezip.driver.zip.io.UShort;
-import de.truezip.driver.zip.io.ZipEntry;
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import java.util.Arrays;
 import static org.junit.Assert.*;
