@@ -300,11 +300,11 @@ extends FsDriver {
     }
 
     /**
-     * Equivalent to {@link #newEntry(java.lang.String, de.truezip.kernel.cio.Entry.Type, de.truezip.kernel.cio.Entry, de.truezip.kernel.util.BitField)
-     * newEntry(name, type, template, FsAccessOptions.NONE)}.
+     * Equivalent to {@link #newEntry(String, Entry.Type, BitField, Entry)
+     * newEntry(name, type, FsAccessOptions.NONE, template)}.
      * 
-     * @param  name an entry name.
-     * @param  type an entry type.
+     * @param  name the entry name.
+     * @param  type the entry type.
      * @param  template if not {@code null}, then the new entry shall inherit
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
@@ -316,19 +316,11 @@ extends FsDriver {
 
     /**
      * Returns a new entry for the given name.
-     * The implementation may need to fix this name in order to 
-     * form a valid {@link Entry#getName() entry name} for their
-     * particular requirements.
-     * <p>
-     * If {@code template} is not {@code null}, then the returned entry shall
-     * inherit as much properties from this template as possible - with the
-     * exception of its name and type.
-     * Furthermore, if {@code name} and {@code type} are equal to the name and
-     * type of this template, then the returned entry shall be a (deep) clone
-     * of the template which shares no mutable state with the template.
+     * The implementation may change this name in order to form a valid
+     * {@link Entry#getName() entry name} for their particular requirements.
      *
-     * @param  name an entry name.
-     * @param  type an entry type.
+     * @param  name the entry name.
+     * @param  type the entry type.
      * @param  mknod when called from {@link FsController#mknod}, this is its
      *         {@code options} parameter, otherwise it's typically an empty set.
      * @param  template if not {@code null}, then the new entry shall inherit
