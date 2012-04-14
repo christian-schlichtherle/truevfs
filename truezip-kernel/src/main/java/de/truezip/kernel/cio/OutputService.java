@@ -21,7 +21,6 @@ import java.util.Iterator;
  * @see     InputService
  * @author  Christian Schlichtherle
  */
-// TODO: Consider renaming to OutputArchive
 @CleanupObligation
 public interface OutputService<E extends Entry>
 extends Closeable, Container<E> {
@@ -38,8 +37,8 @@ extends Closeable, Container<E> {
      * Returns an output socket for writing to the given entry.
      *
      * @param  entry the entry, which will be the
-     *         {@link OutputSocket#getLocalTarget local target} of the returned
-     *         output socket.
+     *         {@linkplain OutputSocket#localTarget local target} of the
+     *         returned output socket.
      * @return An output socket for writing to the given entry.
      */
     OutputSocket<E> output(E entry);
