@@ -113,18 +113,18 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     @Override
-    public OutputSocket<? extends E> getOutputSocket(final E entry) {
-        if (null == entry)
+    public OutputSocket<? extends E> getOutputSocket(final E local) {
+        if (null == local)
             throw new NullPointerException();
 
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
-                super(FsMultiplexedOutputShop.super.getOutputSocket(entry));
+                super(FsMultiplexedOutputShop.super.getOutputSocket(local));
             }
 
             @Override
             public E getLocalTarget() throws IOException {
-                return entry;
+                return local;
             }
 
             @Override
