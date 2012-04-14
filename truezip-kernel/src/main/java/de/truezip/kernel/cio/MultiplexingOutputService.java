@@ -289,12 +289,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         void updateProperties(final E local, final Entry peer) {
-            // Never copy any but the DATA size!
-            if (UNKNOWN == local.getSize(DATA))
-                local.setSize(DATA, peer.getSize(DATA));
             for (final Access type : ALL_ACCESS_SET)
                 if (UNKNOWN == local.getTime(type))
                     local.setTime(type, peer.getTime(type));
+            // Never copy any but the DATA size!
+            if (UNKNOWN == local.getSize(DATA))
+                local.setSize(DATA, peer.getSize(DATA));
         }
 
         void discardBuffer() throws IOException {
