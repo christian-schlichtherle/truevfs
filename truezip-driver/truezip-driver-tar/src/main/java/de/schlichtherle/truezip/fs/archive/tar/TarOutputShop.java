@@ -117,11 +117,10 @@ implements OutputShop<TarDriverEntry> {
                     return new EntryOutputStream(local);
                 }
                 final Entry peer = getPeerTarget();
-                if (null != peer) {
-                    updateProperties(local, peer);
-                    return new EntryOutputStream(local);
-                }
-                return new BufferedEntryOutputStream(local);
+                updateProperties(local, peer);
+                if (UNKNOWN == local.getSize())
+                    return new BufferedEntryOutputStream(local);
+                return new EntryOutputStream(local);
             }
         } // Output
 
