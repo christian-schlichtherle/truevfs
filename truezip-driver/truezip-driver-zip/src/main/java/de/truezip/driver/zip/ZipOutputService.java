@@ -91,7 +91,7 @@ implements OutputService<ZipDriverEntry> {
                 if (0 < source.getPostambleLength()) {
                     this.postamble = getIOPool().allocate();
                     Streams.copy(   source.getPostambleInputStream(),
-                                    this.postamble.outputSocket().stream());
+                                    this.postamble.output().stream());
                 }
             }
         } catch (final Throwable ex) {
@@ -262,7 +262,7 @@ implements OutputService<ZipDriverEntry> {
         final IOBuffer<?> pa = this.postamble;
         if (null != pa) {
             this.postamble = null;
-            final InputSocket<?> is = pa.inputSocket();
+            final InputSocket<?> is = pa.input();
             Throwable ex = null;
             try {
                 final InputStream in = is.stream();
@@ -348,7 +348,7 @@ implements OutputService<ZipDriverEntry> {
             final IOBuffer<?> buffer = this.buffer = getIOPool().allocate();
             try {
                 this.out = new CheckedOutputStream(
-                        buffer.outputSocket().stream(),
+                        buffer.output().stream(),
                         new CRC32());
             } catch (final Throwable ex) {
                 try {
@@ -389,7 +389,7 @@ implements OutputService<ZipDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IOBuffer<?> buffer = this.buffer;
-            final InputStream in = buffer.inputSocket().stream();
+            final InputStream in = buffer.input().stream();
             Throwable ex = null;
             try {
                 putNextEntry(local, true);

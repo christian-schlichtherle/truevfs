@@ -158,12 +158,12 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
     }
 
     @Override
-    public final InputSocket<ByteArrayIOBuffer> inputSocket() {
+    public final InputSocket<ByteArrayIOBuffer> input() {
         return new Input();
     }
 
     @Override
-    public final OutputSocket<ByteArrayIOBuffer> outputSocket() {
+    public final OutputSocket<ByteArrayIOBuffer> output() {
         return new Output();
     }
 

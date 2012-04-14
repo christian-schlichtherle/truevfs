@@ -91,7 +91,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected InputSocket<?> inputSocket(
+    protected InputSocket<?> input(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
@@ -103,7 +103,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected OutputSocket<?> outputSocket(
+    protected OutputSocket<?> output(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {

@@ -167,8 +167,7 @@ extends FsDriver {
             FsEntryName entry,
             BitField<FsAccessOption> options)
     throws IOException {
-        return newInputService(model,
-                inputSocket(parent, entry, options));
+        return newInputService(model, input(parent, entry, options));
     }
 
     /**
@@ -225,7 +224,7 @@ extends FsDriver {
             @CheckForNull @WillNotClose InputService<E> input)
     throws IOException {
         return newOutputService(model,
-                outputSocket(parent, entry, options), input);
+                output(parent, entry, options), input);
     }
 
     /**
@@ -269,7 +268,7 @@ extends FsDriver {
      * @return An input socket for reading an artifact of this driver.
      * @see    #newInputService(FsModel, FsController, FsEntryName, BitField) 
      */
-    protected InputSocket<?> inputSocket(
+    protected InputSocket<?> input(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
@@ -293,7 +292,7 @@ extends FsDriver {
      * @return An output socket for writing an artifact of this driver.
      * @see    #newOutputService(FsModel, FsController, FsEntryName, BitField, InputService) 
      */
-    protected OutputSocket<?> outputSocket(
+    protected OutputSocket<?> output(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {

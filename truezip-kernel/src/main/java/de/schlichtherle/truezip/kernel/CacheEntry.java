@@ -141,7 +141,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *
      * @return An input socket for reading the cached entry data.
      */
-    public InputSocket<Entry> inputSocket() {
+    public InputSocket<Entry> input() {
         return new Input();
     }
 
@@ -150,7 +150,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *
      * @return An output socket for writing the cached entry data.
      */
-    public OutputSocket<Entry> outputSocket() {
+    public OutputSocket<Entry> output() {
         return new Output();
     }
 
@@ -225,7 +225,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
         /**
          * A write-through cache flushes any written data as soon as the
-         * output stream created by {@link #outputSocket} gets closed.
+         * output stream created by {@link #output} gets closed.
          */
         WRITE_THROUGH {
             @Override
@@ -267,7 +267,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         @CheckForNull Buffer buffer;
 
         InputSocket<? extends Entry> getSocket() throws IOException {
-            return (buffer = getInputBufferPool().allocate()).inputSocket();
+            return (buffer = getInputBufferPool().allocate()).input();
         }
 
         InputSocket<? extends Entry> getBoundSocket() throws IOException {
@@ -296,7 +296,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         @CheckForNull Buffer buffer;
 
         OutputSocket<? extends Entry> getSocket() throws IOException {
-            return (buffer = getOutputBufferPool().allocate()).outputSocket();
+            return (buffer = getOutputBufferPool().allocate()).output();
         }
 
         OutputSocket<? extends Entry> getBoundSocket() throws IOException {
@@ -434,21 +434,21 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         }
 
         @Override
-        public InputSocket<Buffer> inputSocket() {
+        public InputSocket<Buffer> input() {
             return new Input();
         }
 
         @Override
-        public OutputSocket<Buffer> outputSocket() {
+        public OutputSocket<Buffer> output() {
             return new Output();
         }
 
         void load(InputSocket<?> input) throws IOException {
-            IOSocket.copy(input, data.outputSocket());
+            IOSocket.copy(input, data.output());
         }
 
         void save(OutputSocket<?> output) throws IOException {
-            IOSocket.copy(data.inputSocket(), output);
+            IOSocket.copy(data.input(), output);
         }
 
         @Override
@@ -460,7 +460,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
         @NotThreadSafe
         final class Input extends InputSocket<Buffer> {
-            final InputSocket<?> socket = data.inputSocket();
+            final InputSocket<?> socket = data.input();
 
             InputSocket<?> getBoundSocket() {
                 return socket.bind(this);
@@ -522,7 +522,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
         @NotThreadSafe
         final class Output extends OutputSocket<Buffer> {
-            final OutputSocket<?> socket = data.outputSocket();
+            final OutputSocket<?> socket = data.output();
 
             OutputSocket<?> getBoundSocket() {
                 return socket.bind(this);

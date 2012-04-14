@@ -46,13 +46,13 @@ public class InstrumentingIOPool<B extends IOBuffer<B>> implements IOPool<B> {
         }
 
         @Override
-        public InputSocket<B> inputSocket() {
-            return director.instrument(entry.inputSocket(), this);
+        public InputSocket<B> input() {
+            return director.instrument(entry.input(), this);
         }
 
         @Override
-        public OutputSocket<B> outputSocket() {
-            return director.instrument(entry.outputSocket(), this);
+        public OutputSocket<B> output() {
+            return director.instrument(entry.output(), this);
         }
 
         @Override

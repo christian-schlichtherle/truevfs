@@ -145,7 +145,7 @@ implements Container<MockArchiveDriverEntry> {
                 getBufferInputSocket() throws IOException {
                     return localTarget()
                             .getBuffer(getIOPool())
-                            .inputSocket();
+                            .input();
                 }
             } // Input
 
@@ -215,7 +215,7 @@ implements Container<MockArchiveDriverEntry> {
                     entries.put(entry.getName(), entry);
                     return localTarget()
                             .getBuffer(getIOPool())
-                            .outputSocket();
+                            .output();
                 }
 
                 void copyProperties() {

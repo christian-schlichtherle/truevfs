@@ -110,7 +110,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                         return controller.input(name, options);
                     cache = new EntryCache(name);
                 }
-                return cache.inputSocket(options);
+                return cache.input(options);
             }
         } // Input
 
@@ -134,7 +134,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                         return controller.output(name, options, template);
                     cache = new EntryCache(name);
                 }
-                return cache.outputSocket(options, template);
+                return cache.output(options, template);
             }
         } // Output
 
@@ -263,12 +263,12 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             this.cache = WRITE_BACK.newCache(CacheController.this.pool);
         }
 
-        InputSocket<?> inputSocket(BitField<FsAccessOption> options) {
-            return cache.configure(new Input(options)).inputSocket();
+        InputSocket<?> input(BitField<FsAccessOption> options) {
+            return cache.configure(new Input(options)).input();
         }
 
-        OutputSocket<?> outputSocket(   BitField<FsAccessOption> options,
-                                        @CheckForNull Entry template) {
+        OutputSocket<?> output( BitField<FsAccessOption> options,
+                                @CheckForNull Entry template) {
             return new Output(options, template);
         }
 
@@ -349,7 +349,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                                             name,
                                             options.clear(EXCLUSIVE),
                                             template))
-                            .outputSocket();
+                            .output();
             }
 
             @Override

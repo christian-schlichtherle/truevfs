@@ -100,7 +100,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     void append(final FileEntry temp) throws IOException {
         if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
-            IOSocket.copy(entry.inputSocket(), temp.outputSocket());
+            IOSocket.copy(entry.input(), temp.output());
     }
 
     Set<OpenOption> optionSet() {
@@ -134,8 +134,8 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     /*Files.copy(tempFile, entryFile,
                             StandardCopyOption.REPLACE_EXISTING);*/
                     // Fast.
-                    IOSocket.copy(  temp.inputSocket(),
-                                    entry.outputSocket());
+                    IOSocket.copy(  temp.input(),
+                                    entry.output());
                     copyAttributes(entryFile);
                 }
                 release(temp, null);

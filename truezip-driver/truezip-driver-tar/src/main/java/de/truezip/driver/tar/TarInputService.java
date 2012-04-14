@@ -113,7 +113,7 @@ implements InputService<TarDriverEntry> {
                 entry.setTemp(temp);
                 try {
                     Throwable ex = null;
-                    final OutputStream out = temp.outputSocket().stream();
+                    final OutputStream out = temp.output().stream();
                     try {
                         Streams.cat(tin, out);
                     } catch (final Throwable ex2) {
@@ -243,19 +243,17 @@ implements InputService<TarDriverEntry> {
             }
 
             @Override
-            public InputStream stream()
-            throws IOException {
-                return inputSocket().stream();
+            public InputStream stream() throws IOException {
+                return input().stream();
             }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return inputSocket().channel();
+                return input().channel();
             }
 
-            InputSocket<? extends IOBuffer<?>> inputSocket()
-            throws IOException {
-                return localTarget().getTemp().inputSocket();
+            InputSocket<? extends IOBuffer<?>> input() throws IOException {
+                return localTarget().getTemp().input();
             }
         } // Input
 

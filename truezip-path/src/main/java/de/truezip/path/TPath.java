@@ -958,13 +958,13 @@ public final class TPath implements Path {
         return getFileSystem().entry(this);
     }
 
-    InputSocket<?> inputSocket(BitField<FsAccessOption> options) {
-        return getFileSystem().inputSocket(this, options);
+    InputSocket<?> input(BitField<FsAccessOption> options) {
+        return getFileSystem().input(this, options);
     }
 
-    OutputSocket<?> outputSocket(BitField<FsAccessOption> options,
-                                    @CheckForNull Entry template) {
-        return getFileSystem().outputSocket(this, options, template);
+    OutputSocket<?> output( BitField<FsAccessOption> options,
+                            @CheckForNull Entry template) {
+        return getFileSystem().output(this, options, template);
     }
 
     void checkAccess(AccessMode... modes) throws IOException {
