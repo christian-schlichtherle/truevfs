@@ -137,11 +137,11 @@ public class TarBZip2Driver extends TarDriver {
 
         @Override
         public void close() throws IOException {
-            super.close();
-            // Workaround for super class implementation which may not have
-            // been left in a consistent state if the decorated stream has
-            // thrown an IOException upon the first call to its close() method.
+            // Workaround for super class implementation which fails to close
+            // the decorated stream on a subsequent call if the initial attempt
+            // failed with an IOException.
             // See http://java.net/jira/browse/TRUEZIP-234
+            super.close();
             out.close();
         }
     } // BZip2CompressorOutputStream

@@ -8,12 +8,11 @@ import de.truezip.kernel.FsModel;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.OutputBusyException;
-import de.truezip.kernel.io.Sink;
-import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.io.*;
+import de.truezip.kernel.util.ExceptionBuilder;
 import de.truezip.kernel.util.Maps;
 import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -61,7 +60,7 @@ implements OutputService<TarDriverEntry> {
             entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
     private final OutputStream out;
-    private final TarArchiveOutputStream taos;
+    private final TarArchiveOutputStream tos;
     private final TarDriver driver;
     private boolean busy;
 
@@ -78,8 +77,8 @@ implements OutputService<TarDriverEntry> {
         final OutputStream out = this.out = sink.stream();
         try {
             final TarArchiveOutputStream
-                    taos = this.taos = new TarArchiveOutputStream(out);
-            taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+                    tos = this.tos = new TarArchiveOutputStream(out);
+            tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         } catch (final Throwable ex) {
             try {
                 out.close();
@@ -128,8 +127,7 @@ implements OutputService<TarDriverEntry> {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local);
                 }
-                final Entry peer = peerTarget();
-                updateProperties(local, peer);
+                updateProperties(local, peerTarget());
                 if (UNKNOWN == local.getSize())
                     return new BufferedEntryOutputStream(local);
                 return new EntryOutputStream(local);
@@ -179,12 +177,7 @@ implements OutputService<TarDriverEntry> {
 
     @Override
     public void close() throws IOException {
-        taos.close();
-        // Workaround for super class implementation which may not have
-        // been left in a consistent state if the decorated stream has
-        // thrown an IOException upon the first call to its close() method.
-        // See http://java.net/jira/browse/TRUEZIP-234
-        out.close();
+        tos.close();
     }
 
     /**
@@ -201,8 +194,8 @@ implements OutputService<TarDriverEntry> {
         @CreatesObligation
         EntryOutputStream(final TarDriverEntry local)
         throws IOException {
-            super(taos);
-            taos.putArchiveEntry(local);
+            super(tos);
+            tos.putArchiveEntry(local);
             entries.put(local.getName(), local);
             busy = true;
         }
@@ -212,9 +205,9 @@ implements OutputService<TarDriverEntry> {
         public void close() throws IOException {
             if (closed)
                 return;
-            taos.closeArchiveEntry();
-            busy = false;
+            tos.closeArchiveEntry();
             closed = true;
+            busy = false;
         }
     } // EntryOutputStream
 
@@ -255,14 +248,10 @@ implements OutputService<TarDriverEntry> {
             if (closed)
                 return;
             out.close();
-            busy = false;
-            saveBuffer();
-            closed = true;
-        }
-
-        void saveBuffer() throws IOException {
             updateProperties(local, buffer);
             storeBuffer();
+            closed = true;
+            busy = false;
         }
 
         void storeBuffer() throws IOException {
@@ -270,22 +259,21 @@ implements OutputService<TarDriverEntry> {
             final InputStream in = buffer.input().stream();
             Throwable ex = null;
             try {
-                final TarArchiveOutputStream taos = TarOutputService.this.taos;
-                taos.putArchiveEntry(local);
+                final ExceptionBuilder<IOException, IOException>
+                        builder = new SuppressedExceptionBuilder<>();
+                final TarArchiveOutputStream tos = TarOutputService.this.tos;
+                tos.putArchiveEntry(local);
                 try {
-                    Streams.cat(in, taos);
-                } catch (final Throwable ex2) {
-                    ex = ex2;
-                    throw ex2;
-                } finally {
-                    try {
-                        taos.closeArchiveEntry();
-                    } catch (final IOException ex2) {
-                        if (null == ex)
-                            throw ex2;
-                        ex.addSuppressed(ex2);
-                    }
+                    Streams.cat(in, tos);
+                } catch (final InputException ex2) { // NOT IOException!
+                    builder.warn(ex2);
                 }
+                try {
+                    tos.closeArchiveEntry();
+                } catch (final IOException ex2) {
+                    builder.warn(ex2);
+                }
+                builder.check();
             } catch (final Throwable ex2) {
                 ex = ex2;
                 throw ex2;

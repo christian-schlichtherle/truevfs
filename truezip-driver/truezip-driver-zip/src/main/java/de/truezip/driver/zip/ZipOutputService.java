@@ -13,11 +13,10 @@ import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.io.OutputBusyException;
-import de.truezip.kernel.io.Sink;
-import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.io.*;
+import de.truezip.kernel.util.ExceptionBuilder;
 import de.truezip.kernel.util.JointIterator;
+import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -168,8 +167,7 @@ implements OutputService<ZipDriverEntry> {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local, false);
                 }
-                final Entry peer = peerTarget();
-                final boolean rdc = updateProperties(local, peer);
+                final boolean rdc = updateProperties(local, peerTarget());
                 if (STORED == local.getMethod()) {
                     if (UNKNOWN == local.getCrc()
                             || UNKNOWN == local.getSize()
@@ -258,7 +256,7 @@ implements OutputService<ZipDriverEntry> {
      */
     @Override
     public void close() throws IOException {
-        finish();
+        super.finish();
         final IOBuffer<?> pa = this.postamble;
         if (null != pa) {
             this.postamble = null;
@@ -367,14 +365,10 @@ implements OutputService<ZipDriverEntry> {
             if (closed)
                 return;
             out.close();
-            bufferedEntry = null;
-            saveBuffer();
-            closed = true;
-        }
-
-        void saveBuffer() throws IOException {
             updateProperties();
             storeBuffer();
+            closed = true;
+            bufferedEntry = null;
         }
 
         void updateProperties() {
@@ -392,21 +386,21 @@ implements OutputService<ZipDriverEntry> {
             final InputStream in = buffer.input().stream();
             Throwable ex = null;
             try {
-                putNextEntry(local, true);
+                final ExceptionBuilder<IOException, IOException>
+                        builder = new SuppressedExceptionBuilder<>();
+                final ZipOutputService zos = ZipOutputService.this;
+                zos.putNextEntry(local, true);
                 try {
-                    Streams.cat(in, ZipOutputService.this);
-                } catch (final Throwable ex2) {
-                    ex = ex2;
-                    throw ex2;
-                } finally {
-                    try {
-                        closeEntry();
-                    } catch (final IOException ex2) {
-                        if (null == ex)
-                            throw ex2;
-                        ex.addSuppressed(ex2);
-                    }
+                    Streams.cat(in, zos);
+                } catch (final InputException ex2) { // NOT IOException!
+                    builder.warn(ex2);
                 }
+                try {
+                    zos.closeEntry();
+                } catch (final IOException ex2) {
+                    builder.warn(ex2);
+                }
+                builder.check();
             } catch (final Throwable ex2) {
                 ex = ex2;
                 throw ex2;
