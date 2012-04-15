@@ -9,9 +9,7 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.*;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -102,7 +100,7 @@ implements OutputShop<TarDriverEntry> {
         if (null == local)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<TarDriverEntry> {
+        final class Output extends OutputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry getLocalTarget() {
                 return local;
@@ -116,8 +114,7 @@ implements OutputShop<TarDriverEntry> {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local);
                 }
-                final Entry peer = getPeerTarget();
-                updateProperties(local, peer);
+                updateProperties(local, getPeerTarget());
                 if (UNKNOWN == local.getSize())
                     return new BufferedEntryOutputStream(local);
                 return new EntryOutputStream(local);
@@ -165,16 +162,6 @@ implements OutputShop<TarDriverEntry> {
         return busy;
     }
 
-    @Override
-    public void close() throws IOException {
-        super.close();
-        // Workaround for super class implementation which may not have
-        // been left in a consistent state if the decorated stream has
-        // thrown an IOException upon the first call to its close() method.
-        // See http://java.net/jira/browse/TRUEZIP-234
-        delegate.close();
-    }
-
     /**
      * This entry output stream writes directly to our subclass.
      * It can only be used if this output stream is not currently busy
@@ -202,8 +189,8 @@ implements OutputShop<TarDriverEntry> {
             if (closed)
                 return;
             closeArchiveEntry();
-            busy = false;
             closed = true;
+            busy = false;
         }
     } // EntryOutputStream
 
@@ -246,27 +233,31 @@ implements OutputShop<TarDriverEntry> {
             if (closed)
                 return;
             delegate.close();
-            busy = false;
-            saveBuffer();
-            closed = true;
-        }
-
-        void saveBuffer() throws IOException {
             updateProperties(local, buffer);
             storeBuffer();
+            closed = true;
+            busy = false;
         }
 
         void storeBuffer() throws IOException {
             final IOPool.Entry<?> buffer = this.buffer;
             final InputStream in = buffer.getInputSocket().newInputStream();
             try {
+                final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                        = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
                 final TarArchiveOutputStream taos = TarOutputShop.this;
                 taos.putArchiveEntry(local);
                 try {
                     Streams.cat(in, taos);
-                } finally {
-                    taos.closeArchiveEntry();
+                } catch (final InputException ex2) { // NOT IOException!
+                    builder.warn(ex2);
                 }
+                try {
+                    taos.closeArchiveEntry();
+                } catch (final IOException ex2) {
+                    builder.warn(ex2);
+                }
+                builder.check();
             } finally {
                 in.close();
             }

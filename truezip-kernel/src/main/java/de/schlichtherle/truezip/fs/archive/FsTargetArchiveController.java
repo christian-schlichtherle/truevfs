@@ -458,23 +458,12 @@ extends FsFileSystemArchiveController<E> {
     throws FsControllerException, X {
         assert isWriteLockedByCurrentThread();
         try {
-            sync0(options, handler);
+            if (!options.get(ABORT_CHANGES))
+                copy(handler);
+            close(options, handler);
         } finally {
             assert invariants();
         }
-    }
-
-    private <X extends IOException> void
-    sync0(  final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws FsControllerException, X {
-        if (!options.get(ABORT_CHANGES))
-            copy(handler);
-        close(handler);
-        // TODO: Remove a condition and clear a flag in the model
-        // instead.
-        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-            setTouched(false);
     }
 
     /**
@@ -598,34 +587,42 @@ extends FsFileSystemArchiveController<E> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private <X extends IOException> void
-    close(final ExceptionHandler<? super FsSyncException, X> handler)
+    close(  final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
         if (null != ia) {
             try {
                 ia.close();
-            } catch (final FsControllerException nonLocalFlowControl) {
-                assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
-                throw nonLocalFlowControl;
+            } catch (final FsControllerException nonLocalControlFlow) {
+                assert nonLocalControlFlow instanceof FsNeedsLockRetryException;
+                throw nonLocalControlFlow;
             } catch (final IOException ex) {
                 handler.warn(new FsSyncWarningException(getModel(), ex));
             }
             setInputArchive(null);
         }
+        FsSyncException ex = null;
         final OutputArchive<E> oa = outputArchive;
         if (null != oa) {
             try {
                 oa.close();
-            } catch (final FsControllerException nonLocalFlowControl) {
-                assert nonLocalFlowControl instanceof FsNeedsLockRetryException;
-                throw nonLocalFlowControl;
-            } catch (final IOException ex) {
-                throw handler.fail(new FsSyncException(getModel(), ex));
+            } catch (final FsControllerException nonLocalControlFlow) {
+                assert nonLocalControlFlow instanceof FsNeedsLockRetryException;
+                throw nonLocalControlFlow;
+            } catch (final IOException ex2) {
+                ex = new FsSyncException(getModel(), ex2);
             }
             setOutputArchive(null);
         }
         setFileSystem(null);
+        // TODO: Remove a condition and clear a flag in the model
+        // instead.
+        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+            setTouched(false);
+        if (null != ex)
+            throw handler.fail(ex);
     }
 
     /**
