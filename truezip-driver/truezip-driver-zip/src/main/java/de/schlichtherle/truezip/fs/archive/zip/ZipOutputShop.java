@@ -8,9 +8,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
-import de.schlichtherle.truezip.io.DecoratingOutputStream;
-import de.schlichtherle.truezip.io.OutputBusyException;
-import de.schlichtherle.truezip.io.Streams;
+import de.schlichtherle.truezip.io.*;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
@@ -143,7 +141,7 @@ implements OutputShop<ZipDriverEntry> {
         if (null == local)
             throw new NullPointerException();
 
-        class Output extends OutputSocket<ZipDriverEntry> {
+        final class Output extends OutputSocket<ZipDriverEntry> {
             @Override
             public ZipDriverEntry getLocalTarget() {
                 return local;
@@ -157,8 +155,7 @@ implements OutputShop<ZipDriverEntry> {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local, false);
                 }
-                final Entry peer = getPeerTarget();
-                final boolean process = updateProperties(local, peer);
+                final boolean process = updateProperties(local, getPeerTarget());
                 if (STORED == local.getMethod()) {
                     if (UNKNOWN == local.getCrc()
                             || UNKNOWN == local.getSize()
@@ -247,7 +244,7 @@ implements OutputShop<ZipDriverEntry> {
      */
     @Override
     public void close() throws IOException {
-        finish();
+        super.finish();
         final IOPool.Entry<?> pa = this.postamble;
         if (null != pa) {
             this.postamble = null;
@@ -336,14 +333,10 @@ implements OutputShop<ZipDriverEntry> {
             if (closed)
                 return;
             delegate.close();
-            bufferedEntry = null;
-            saveBuffer();
-            closed = true;
-        }
-
-        void saveBuffer() throws IOException {
             updateProperties();
             storeBuffer();
+            closed = true;
+            bufferedEntry = null;
         }
 
         void updateProperties() {
@@ -360,12 +353,21 @@ implements OutputShop<ZipDriverEntry> {
             final IOPool.Entry<?> buffer = this.buffer;
             final InputStream in = buffer.getInputSocket().newInputStream();
             try {
-                putNextEntry(local, true);
+                final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                        = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
+                final ZipOutputShop zos = ZipOutputShop.this;
+                zos.putNextEntry(local);
                 try {
-                    Streams.cat(in, ZipOutputShop.this);
-                } finally {
-                    closeEntry();
+                    Streams.cat(in, zos);
+                } catch (final InputException ex2) { // NOT IOException!
+                    builder.warn(ex2);
                 }
+                try {
+                    zos.closeEntry();
+                } catch (final IOException ex2) {
+                    builder.warn(ex2);
+                }
+                builder.check();
             } finally {
                 in.close();
             }

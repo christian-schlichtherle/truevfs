@@ -153,13 +153,13 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     @DischargesObligation
     public void close() throws IOException {
         if (isBusy())
-            throw new IOException("Output shop is still busy!");
+            throw new IOException("The output service is busy with writing a stream!");
         storeBuffers();
         assert buffers.isEmpty();
         delegate.close();
     }
 
-    private void storeBuffers() throws IOException {
+    final void storeBuffers() throws IOException {
         if (isBusy())
             return;
 
@@ -194,12 +194,23 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
-            delegate.close();
-            busy = false;
-            closed = true;
-            storeBuffers();
+            final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                    = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
+            if (!closed) {
+                try {
+                    delegate.close();
+                    closed = true;
+                    busy = false;
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                }
+            }
+            try {
+                storeBuffers();
+            } catch (final IOException ex) {
+                builder.warn(ex);
+            }
+            builder.check();
         }
     } // EntryOutputStream
 
@@ -257,24 +268,27 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
-            delegate.close();
-            closed = true;
-            saveBuffers();
-        }
-
-        void saveBuffers() throws IOException {
-            try {
-                final E local = output.getLocalTarget();
-                final Entry peer = input.getLocalTarget();
-                if (this == buffers.get(local.getName()))
-                    updateProperties(local, peer);
-                else
-                    discardBuffer();
-            } finally {
-                storeBuffers();
+            final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                    = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
+            if (!closed) {
+                try {
+                    delegate.close();
+                    closed = true;
+                    final E local = output.getLocalTarget();
+                    if (this == buffers.get(local.getName()))
+                        updateProperties(local, input.getLocalTarget());
+                    else
+                        discardBuffer();
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                }
             }
+            try {
+                storeBuffers();
+            } catch (final IOException ex) {
+                builder.warn(ex);
+            }
+            builder.check();
         }
 
         void updateProperties(final E local, final Entry peer) {
