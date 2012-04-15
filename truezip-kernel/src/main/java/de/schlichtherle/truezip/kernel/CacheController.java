@@ -211,7 +211,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             }
             // TODO: Consume FsSyncOption.CLEAR_CACHE and release a flag in
             // the model instead.
-            controller.sync(options/*.release(CLEAR_CACHE)*/, handler);
+            controller.sync(options/*.clear(CLEAR_CACHE)*/, handler);
         } while (null != preSyncEx);
     }
 
