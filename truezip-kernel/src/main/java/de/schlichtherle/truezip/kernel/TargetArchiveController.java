@@ -403,23 +403,12 @@ extends FileSystemArchiveController<E> {
     throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
         try {
-            sync0(options, handler);
+            if (!options.get(ABORT_CHANGES))
+                copy(handler);
+            close(options, handler);
         } finally {
             assert invariants();
         }
-    }
-
-    private void
-    sync0(  final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
-    throws FsSyncWarningException, FsSyncException {
-        if (!options.get(ABORT_CHANGES))
-            copy(handler);
-        close(handler);
-        // TODO: Remove a condition and clear a flag in the model
-        // instead.
-        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-            setTouched(false);
     }
 
     /**
@@ -525,7 +514,8 @@ extends FileSystemArchiveController<E> {
      *         upon the occurence of an {@link FsSyncException}.
      */
     private void
-    close(final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    close(  final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
     throws FsSyncWarningException, FsSyncException {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
@@ -537,16 +527,23 @@ extends FileSystemArchiveController<E> {
             }
             setInputArchive(null);
         }
+        FsSyncException ex = null;
         final OutputArchive<E> oa = outputArchive;
         if (null != oa) {
             try {
                 oa.close();
-            } catch (final IOException ex) {
-                throw handler.fail(new FsSyncException(getModel(), ex));
+            } catch (final IOException ex2) {
+                ex = new FsSyncException(getModel(), ex2);
             }
             setOutputArchive(null);
         }
         setFileSystem(null);
+        // TODO: Remove a condition and clear a flag in the model
+        // instead.
+        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
+            setTouched(false);
+        if (null != ex)
+            throw handler.fail(ex);
     }
 
     /**

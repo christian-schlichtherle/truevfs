@@ -10,7 +10,9 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.InputException;
+import de.truezip.kernel.util.ExceptionBuilder;
 import de.truezip.kernel.util.JointIterator;
+import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -148,13 +150,13 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @DischargesObligation
     public void close() throws IOException {
         if (isBusy())
-            throw new IOException("Output service is still busy!");
+            throw new IOException("The output service is busy with writing a stream!");
         storeBuffers();
         assert buffers.isEmpty();
         container.close();
     }
 
-    private void storeBuffers() throws IOException {
+    final void storeBuffers() throws IOException {
         if (isBusy())
             return;
 
@@ -193,12 +195,23 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
-            out.close();
-            busy = false;
-            closed = true;
-            storeBuffers();
+            final ExceptionBuilder<IOException, IOException>
+                    builder = new SuppressedExceptionBuilder<>();
+            if (!closed) {
+                try {
+                    out.close();
+                    closed = true;
+                    busy = false;
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                }
+            }
+            try {
+                storeBuffers();
+            } catch (final IOException ex) {
+                builder.warn(ex);
+            }
+            builder.check();
         }
     } // EntryOutputStream
 
@@ -260,34 +273,27 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
-            out.close();
-            closed = true;
-            saveBuffers();
-        }
-
-        void saveBuffers() throws IOException {
-            Throwable ex = null;
-            try {
-                final E local = output.localTarget();
-                final Entry peer = input.localTarget();
-                if (this == buffers.get(local.getName()))
-                    updateProperties(local, peer);
-                else
-                    discardBuffer();
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
+            final ExceptionBuilder<IOException, IOException>
+                    builder = new SuppressedExceptionBuilder<>();
+            if (!closed) {
                 try {
-                    storeBuffers();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
+                    out.close();
+                    closed = true;
+                    final E local = output.localTarget();
+                    if (this == buffers.get(local.getName()))
+                        updateProperties(local, input.localTarget());
+                    else
+                        discardBuffer();
+                } catch (final IOException ex) {
+                    builder.warn(ex);
                 }
             }
+            try {
+                storeBuffers();
+            } catch (final IOException ex) {
+                builder.warn(ex);
+            }
+            builder.check();
         }
 
         void updateProperties(final E local, final Entry peer) {
