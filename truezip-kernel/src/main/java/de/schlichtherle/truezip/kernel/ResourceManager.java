@@ -4,8 +4,9 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.util.ExceptionHandler;
+import de.truezip.kernel.util.ExceptionBuilder;
 import de.truezip.kernel.util.Maps;
+import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -213,14 +214,11 @@ final class ResourceManager {
      * for closeable resources again unless the caller also locks the lock
      * provided to the constructor - use with care!
      */
-    <X extends Exception>
-    void closeAllResources(
-            final ExceptionHandler<? super IOException, X> handler)
-    throws X {
-        assert null != handler;
-
+    void closeAllResources() throws IOException {
         lock.lock();
         try {
+            final ExceptionBuilder<IOException, IOException>
+                    builder = new SuppressedExceptionBuilder<>();
             for (   final Iterator<Entry<Closeable, Account>>
                         i = accounts.entrySet().iterator();
                     i.hasNext(); ) {
@@ -235,10 +233,11 @@ final class ResourceManager {
                     // ConcurrentModificationException because the closeable
                     // has already been removed.
                     entry.getKey().close();
-                } catch (IOException ex) {
-                    handler.warn(ex); // may throw an exception!
+                } catch (final IOException ex) {
+                    builder.warn(ex); // may throw an exception!
                 }
             }
+            builder.check();
         } finally {
             condition.signalAll();
             lock.unlock();

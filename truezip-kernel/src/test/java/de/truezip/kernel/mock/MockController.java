@@ -12,7 +12,6 @@ import de.truezip.kernel.io.ThrowingInputStream;
 import de.truezip.kernel.io.ThrowingOutputStream;
 import de.truezip.kernel.io.ThrowingSeekableChannel;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -253,13 +252,10 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         getThrowControl().check(this, FsSyncException.class);
         checkUndeclaredExceptions(this);
         assert null != options;
-        assert null != handler;
     }
 }

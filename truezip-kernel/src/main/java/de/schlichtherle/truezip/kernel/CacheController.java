@@ -16,7 +16,6 @@ import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
@@ -166,15 +165,13 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     }
 
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         NeedsSyncException preSyncEx;
         do {
             preSyncEx = null;
             try {
-                preSync(options, handler);
+                preSync(options);
             } catch (final NeedsSyncException invalidState) {
                 // The target archive controller is in an invalid state because
                 // it reports to need a sync() while the current thread is
@@ -211,20 +208,19 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             }
             // TODO: Consume FsSyncOption.CLEAR_CACHE and release a flag in
             // the model instead.
-            controller.sync(options/*.clear(CLEAR_CACHE)*/, handler);
+            controller.sync(options/*.clear(CLEAR_CACHE)*/);
         } while (null != preSyncEx);
     }
 
-    private <X extends IOException> void
-    preSync(final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    private void preSync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
         if (0 >= caches.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
         boolean clear = !flush || options.get(CLEAR_CACHE);
         assert flush || clear;
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         for (   final Iterator<EntryCache> i = caches.values().iterator();
                 i.hasNext(); ) {
             final EntryCache cache = i.next();
@@ -233,7 +229,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                     try {
                         cache.flush();
                     } catch (final IOException ex2) {
-                        throw handler.fail(new FsSyncException(getModel(), ex2));
+                        throw builder.fail(new FsSyncException(getModel(), ex2));
                     }
                 }
             } catch (final Throwable ex2) {
@@ -245,11 +241,12 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                     try {
                         cache.clear();
                     } catch (final IOException ex2) {
-                        handler.warn(new FsSyncWarningException(getModel(), ex2));
+                        builder.warn(new FsSyncWarningException(getModel(), ex2));
                     }
                 }
             }
         }
+        builder.check();
     }
 
     /** A cache for the contents of an individual archive entry. */

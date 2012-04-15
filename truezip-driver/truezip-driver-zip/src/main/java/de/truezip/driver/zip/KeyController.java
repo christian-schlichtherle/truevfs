@@ -9,7 +9,6 @@ import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import de.truezip.key.KeyManager;
 import java.io.IOException;
 import java.util.ServiceConfigurationError;
@@ -133,11 +132,14 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        controller.sync(options, handler);
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        try {
+            controller.sync(options);
+        } catch (final FsSyncWarningException ex) {
+            builder.warn(ex);
+        }
         try {
             getKeyManager().unlock(driver.mountPointUri(getModel()));
         } catch (final ServiceConfigurationError ignore) {
@@ -145,5 +147,6 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             // This can only mean that the target archive file doesn't
             // require any keys, so we can and should ignore this exception.
         }
+        builder.check();
     }
 }

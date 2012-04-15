@@ -15,7 +15,6 @@ import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -332,9 +331,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         // MUST not initialize within IOOperation => would always be true!
         final BitField<FsSyncOption> sync = isLocking()
@@ -352,7 +349,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 // when accessing deeply nested archive files, e.g. for the
                 // integration tests.
                 try {
-                    controller.sync(sync, handler);
+                    controller.sync(sync);
                 } catch (final FsSyncWarningException ex) {
                     throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
                 } catch (final FsSyncException ex) {

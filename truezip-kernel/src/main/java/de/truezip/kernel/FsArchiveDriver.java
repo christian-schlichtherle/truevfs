@@ -153,9 +153,8 @@ extends FsDriver {
      *         parent file system and is <em>not</em> a {@link Type#SPECIAL}
      *         type, then this exception is deemed to indicate a
      *         <em>persistent false positive</em> archive file and gets cached
-     *         until the file system controller for the given model is
-     *         {@linkplain FsController#sync(BitField, de.truezip.kernel.util.ExceptionHandler) synced}
-     *         again.
+     *         until the file system controller for the given model gets
+     *         {@linkplain FsController#sync(BitField) synced} again.
      *         Otherwise, this exception is deemed to indicate a
      *         <em>transient false positive</em> archive file and does not
      *         get cached.

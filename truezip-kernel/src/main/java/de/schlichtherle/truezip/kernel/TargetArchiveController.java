@@ -26,7 +26,6 @@ import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
@@ -397,15 +396,15 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
         try {
+            final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
             if (!options.get(ABORT_CHANGES))
-                copy(handler);
-            close(options, handler);
+                copy(builder);
+            close(options, builder);
+            builder.check();
         } finally {
             assert invariants();
         }
@@ -415,17 +414,10 @@ extends FileSystemArchiveController<E> {
      * Synchronizes all entries in the (virtual) archive file system with the
      * (temporary) output archive file.
      *
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
+     * @param  builder the strategy for assembling sync exceptions.
      */
-    private void
-    copy(final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
-    throws FsSyncWarningException, FsSyncException {
+    private void copy(final FsSyncExceptionBuilder builder)
+    throws FsSyncException {
         // Skip (In|Out)putArchive for better performance.
         // This is safe because the FsResourceController has already shut down
         // all concurrent access by closing the respective resources (streams,
@@ -451,15 +443,15 @@ extends FileSystemArchiveController<E> {
             is = null != ia  ? ia.getClutch() : new DummyInputService<E>();
         }
 
-        copy(getFileSystem(), is, os, handler);
+        copy(getFileSystem(), is, os, builder);
     }
 
     private <E extends FsArchiveEntry> void
     copy(   final ArchiveFileSystem<E> fs,
             final InputService<E> is,
             final OutputService<E> os,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
-    throws FsSyncWarningException, FsSyncException {
+            final FsSyncExceptionBuilder builder)
+    throws FsSyncException {
         IOException warning = null;
         for (final FsCovariantEntry<E> fse : fs) {
             for (final E ae : fse.getEntries()) {
@@ -486,9 +478,9 @@ extends FileSystemArchiveController<E> {
                     }
                 } catch (final IOException ex) {
                     if (null != warning || !(ex instanceof InputException))
-                        throw handler.fail(new FsSyncException(getModel(), ex));
+                        throw builder.fail(new FsSyncException(getModel(), ex));
                     warning = ex;
-                    handler.warn(new FsSyncWarningException(getModel(), ex));
+                    builder.warn(new FsSyncWarningException(getModel(), ex));
                 }
             }
         }
@@ -505,35 +497,27 @@ extends FileSystemArchiveController<E> {
      * Note that in this case closing the output archive is likely to fail and
      * override the IOException thrown by this method, too.
      *
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
+     * @param builder the strategy for assembling sync exceptions.
      */
     private void
     close(  final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
-    throws FsSyncWarningException, FsSyncException {
+            final FsSyncExceptionBuilder builder) {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
         if (null != ia) {
             try {
                 ia.close();
             } catch (final IOException ex) {
-                handler.warn(new FsSyncWarningException(getModel(), ex));
+                builder.warn(new FsSyncWarningException(getModel(), ex));
             }
             setInputArchive(null);
         }
-        FsSyncException ex = null;
         final OutputArchive<E> oa = outputArchive;
         if (null != oa) {
             try {
                 oa.close();
-            } catch (final IOException ex2) {
-                ex = new FsSyncException(getModel(), ex2);
+            } catch (final IOException ex) {
+                builder.warn(new FsSyncException(getModel(), ex));
             }
             setOutputArchive(null);
         }
@@ -542,8 +526,6 @@ extends FileSystemArchiveController<E> {
         // instead.
         if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
             setTouched(false);
-        if (null != ex)
-            throw handler.fail(ex);
     }
 
     /**

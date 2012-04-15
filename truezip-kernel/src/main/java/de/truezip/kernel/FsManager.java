@@ -6,7 +6,6 @@ package de.truezip.kernel;
 
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -85,11 +84,6 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * file systems were accessed read-only.
      * As a side effect, this will reset the state of the respective file
      * system controllers.
-     * <p>
-     * This method calls {@link #sync sync(options, builder)}, where builder is
-     * an instance of {@link FsSyncExceptionBuilder}.
-     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
-     * method is called to check out any {@link FsSyncWarningException}, too.
      *
      * @param  options a bit field of synchronization options.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
@@ -102,51 +96,19 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
      *         is set.
      */
-    public final void
-    sync(final BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException {
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        sync(options, builder);
-        builder.check();
-    }
-
-    /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems managed by this instance to their respective parent file system,
-     * releases the associated resources (e.g. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
-     * Note that temporary resources may get allocated even if the federated
-     * file systems were accessed read-only.
-     * As a side effect, this will reset the state of the respective file
-     * system controllers.
-     *
-     * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for
-     *         {@code FsSyncException}s.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         apply.
-     *         This implies that the respective parent file system has been
-     *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream gets forcibly closed.
-     * @throws FsSyncException if any error conditions apply.
-     * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
-     *         is set.
-     */
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         if (options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         for (final FsController<?> controller : this) {
             try {
-                controller.sync(options, handler);
+                controller.sync(options);
             } catch (final FsSyncException ex) {
-                handler.warn(ex);
+                builder.warn(ex);
             }
         }
+        builder.check();
     }
 
     /**
