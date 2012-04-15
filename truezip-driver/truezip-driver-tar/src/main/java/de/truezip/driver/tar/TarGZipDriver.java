@@ -132,7 +132,6 @@ public class TarGZipDriver extends TarDriver {
         throws IOException {
             super(out, size);
             def.setLevel(level);
-            this.out = out;
         }
     } // GZIPOutputStream
 }
