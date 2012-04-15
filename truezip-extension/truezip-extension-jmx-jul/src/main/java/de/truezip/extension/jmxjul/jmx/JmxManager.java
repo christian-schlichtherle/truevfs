@@ -37,12 +37,10 @@ final class JmxManager extends InstrumentingManager {
      * {@link JmxDirector#getKernelIOStatistics}.
      */
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         try {
-            manager.sync(options, handler);
+            manager.sync(options);
         } finally {
             JmxDirector d = ((JmxDirector) director);
             d.setApplicationIOStatistics(new JmxIOStatistics());

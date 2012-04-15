@@ -4,14 +4,9 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsResourceOpenException;
-import de.truezip.kernel.FsSyncException;
-import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.io.InputClosedException;
 import de.truezip.kernel.io.OutputClosedException;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -19,7 +14,6 @@ import javax.annotation.concurrent.Immutable;
  * Defines options for (federated) file system synchronization.
  *
  * @see    FsController#sync(BitField)
- * @see    FsController#sync(BitField, ExceptionHandler) 
  * @author Christian Schlichtherle
  */
 @Immutable

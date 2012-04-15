@@ -10,7 +10,6 @@ import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
 import javax.annotation.CheckForNull;
@@ -336,39 +335,8 @@ public abstract class FsController<M extends FsModel> {
      * If this is not a federated file system, i.e. if its not a member of a
      * parent file system, then nothing happens.
      * Otherwise, the state of this file system controller is reset.
-     * <p>
-     * This method calls {@link #sync sync(options, builder)}, where builder is
-     * an instance of {@link FsSyncExceptionBuilder}.
-     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
-     * method is called to check out any {@link FsSyncWarningException}, too.
-     *
-     * @param  options the synchronization options.
-     * @throws FsSyncException if committing the changes fails because of any
-     *         I/O error.
-     */
-    public final void
-    sync(final BitField<FsSyncOption> options)
-    throws FsSyncException {
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        sync(options, builder);
-        builder.check();
-    }
-
-    /**
-     * Commits all unsynchronized changes to the contents of this file system
-     * to its parent file system,
-     * releases the associated resources (e.g. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
-     * Note that temporary resources may get allocated even if the federated
-     * file systems were accessed read-only.
-     * If this is not a federated file system, i.e. if its not a member of a
-     * parent file system, then nothing happens.
-     * Otherwise, the state of this file system controller is reset.
      *
      * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for
-     *         {@code FsSyncException}s.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been
@@ -376,9 +344,7 @@ public abstract class FsController<M extends FsModel> {
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    public abstract void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public abstract void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException;
 
     /**

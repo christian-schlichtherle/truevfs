@@ -33,7 +33,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class ResourceController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
-    private @CheckForNull ResourceManager control;
+    private final ResourceManager manager;
 
     /**
      * Constructs a new file system resource controller.
@@ -42,14 +42,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      */
     ResourceController(FsController<? extends LockModel> controller) {
         super(controller);
-    }
-
-    private ResourceManager getControl() {
-        assert isWriteLockedByCurrentThread();
-        final ResourceManager control = this.control;
-        return null != control
-                ? control
-                : (this.control = new ResourceManager(writeLock()));
+        this.manager = new ResourceManager(writeLock());
     }
 
     @Override
@@ -103,14 +96,18 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
-        waitIdle(options, handler);
-        closeAll(handler);
-        controller.sync(options, handler);
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        waitIdle(options, builder);
+        closeAll(builder);
+        try {
+            controller.sync(options);
+        } catch (final FsSyncException ex) {
+            builder.warn(ex);
+        }
+        builder.check();
     }
 
     /**
@@ -121,71 +118,48 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      * WILL NOT WORK if any two resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
+     * @param  builder the exception handling strategy.
      * @param  <X> The type of the {@code IOException} to throw at the
      *         discretion of the exception {@code handler}.
      * @throws IOException at the discretion of the exception {@code handler}
      *         upon the occurence of an {@link FsSyncException}.
      */
-    private <X extends IOException> void
-    waitIdle(   final BitField<FsSyncOption> options,
-                final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    private void waitIdle(  final BitField<FsSyncOption> options,
+                            final FsSyncExceptionBuilder builder)
+    throws FsSyncException {
         // HC SUNT DRACONES!
-        final ResourceManager control = this.control;
-        if (null == control)
-            return;
+        final ResourceManager manager = this.manager;
         final boolean force = options.get(FORCE_CLOSE_IO);
-        final int local = control.localResources();
-        final IOException cause;
+        final int local = manager.localResources();
+        final IOException ex;
         if (0 != local && !force) {
-            cause = new FsResourceOpenException(control.totalResources(), local);
-            throw handler.fail(new FsSyncException(getModel(), cause));
+            ex = new FsResourceOpenException(manager.totalResources(), local);
+            throw builder.fail(new FsSyncException(getModel(), ex));
         }
         final boolean wait = options.get(WAIT_CLOSE_IO);
-        final int total = control.waitForeignResources(
+        final int total = manager.waitForeignResources(
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 == total)
             return;
-        cause = new FsResourceOpenException(total, local);
+        ex = new FsResourceOpenException(total, local);
         if (!force)
-            throw handler.fail(new FsSyncException(getModel(), cause));
-        handler.warn(new FsSyncWarningException(getModel(), cause));
+            throw builder.fail(new FsSyncException(getModel(), ex));
+        builder.warn(new FsSyncWarningException(getModel(), ex));
     }
 
     /**
      * Closes and disconnects all entry streams of the output and input
      * archive.
-     *
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
+     * 
+     * @param  builder the exception handling strategy.
      */
-    private <X extends IOException> void
-    closeAll(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
-        final class IOExceptionHandler
-        implements ExceptionHandler<IOException, X> {
-            @Override
-            public X fail(IOException shouldNotHappen) {
-                throw new AssertionError(shouldNotHappen);
-            }
-
-            @Override
-            public void warn(IOException cause) throws X {
-                handler.warn(new FsSyncWarningException(getModel(), cause));
-            }
-        } // IOExceptionHandler
-
-        final ResourceManager control = this.control;
-        if (null != control)
-            control.closeAllResources(new IOExceptionHandler());
+    private void closeAll(final FsSyncExceptionBuilder builder) {
+        final ResourceManager manager = this.manager;
+        try {
+            manager.closeAllResources();
+        } catch (final IOException ex) {
+            builder.warn(new FsSyncWarningException(getModel(), ex));
+        }
     }
 
     private final class ResourceInputStream
@@ -193,13 +167,13 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
-            getControl().start(this);
+            manager.start(this);
         }
 
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            getControl().stop(this);
+            manager.stop(this);
             in.close();
         }
     } // ResourceInputStream
@@ -209,13 +183,13 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
-            getControl().start(this);
+            manager.start(this);
         }
 
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            getControl().stop(this);
+            manager.stop(this);
             out.close();
         }
     } // ResourceOutputStream
@@ -225,13 +199,13 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
-            getControl().start(this);
+            manager.start(this);
         }
 
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            getControl().stop(this);
+            manager.stop(this);
             channel.close();
         }
     } // ResourceSeekableChannel

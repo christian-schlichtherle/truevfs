@@ -448,12 +448,10 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler)
+    public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        controller.sync(options, handler);
         state = new TryChild();
+        controller.sync(options);
     }
 
     private interface IOOperation<T> {

@@ -187,8 +187,6 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, ? extends FsSyncException> handler) {
+    public void sync(BitField<FsSyncOption> options) {
     }
 }
