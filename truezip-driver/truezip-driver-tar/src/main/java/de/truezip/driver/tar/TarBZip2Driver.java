@@ -9,10 +9,11 @@ import static de.truezip.kernel.FsAccessOption.STORE;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.cio.*;
-import de.truezip.kernel.io.AbstractSink;
-import de.truezip.kernel.io.AbstractSource;
-import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.cio.InputService;
+import de.truezip.kernel.cio.MultiplexingOutputService;
+import de.truezip.kernel.cio.OutputService;
+import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.io.*;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
@@ -47,26 +48,26 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     /**
-     * Returns the compression level to use when writing a BZIP2 output stream.
+     * Returns the compression level to use when writing a BZIP2 sink stream.
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
      * {@link BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
      * 
-     * @return The compression level to use when writing a BZIP2 output stream.
+     * @return The compression level to use when writing a BZIP2 sink stream.
      */
     public int getLevel() {
         return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
     }
 
     @Override
-    protected InputService<TarDriverEntry> newInputService(
+    protected InputService<TarDriverEntry> input(
             final FsModel model,
-            final InputSocket<?> input)
+            final Source source)
     throws IOException {
         final class Source extends AbstractSource {
             @Override
             public InputStream stream() throws IOException {
-                final InputStream in = input.stream();
+                final InputStream in = source.stream();
                 try {
                     return new BZip2CompressorInputStream(
                             new BufferedInputStream(in, getBufferSize()));
@@ -85,15 +86,15 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected OutputService<TarDriverEntry> newOutputService(
+    protected OutputService<TarDriverEntry> output(
             final FsModel model,
-            final OutputSocket<?> output,
+            final Sink sink,
             final InputService<TarDriverEntry> input)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
             public OutputStream stream() throws IOException {
-                final OutputStream out = output.stream();
+                final OutputStream out = sink.stream();
                 try {
                     return new BZip2CompressorOutputStream(
                             new BufferedOutputStream(out, getBufferSize()),
@@ -118,7 +119,7 @@ public class TarBZip2Driver extends TarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected OutputSocket<?> output(
+    protected Sink sink(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {

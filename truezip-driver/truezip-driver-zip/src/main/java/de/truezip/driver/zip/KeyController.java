@@ -86,7 +86,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 entry = ((FsCovariantEntry<?>) entry).getEntry();
             final FsCovariantEntry<FsArchiveEntry>
                     special = new FsCovariantEntry<>(ROOT_PATH);
-            special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
+            special.putEntry(SPECIAL, driver.entry(ROOT_PATH, SPECIAL, entry));
             return special;
         }
     }

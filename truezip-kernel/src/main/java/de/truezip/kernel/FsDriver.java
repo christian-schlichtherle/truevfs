@@ -34,12 +34,12 @@ public abstract class FsDriver {
      * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
-     * @see    FsCompositeDriver#newController
+     * @see    FsCompositeDriver#controller
      */
     public abstract FsController<?>
-    newController(  FsManager manager,
-                    FsModel model,
-                    @Nullable FsController<?> parent);
+    controller( FsManager manager,
+                FsModel model,
+                @Nullable FsController<?> parent);
 
     /**
      * Returns {@code true} iff this file system driver implements a federated

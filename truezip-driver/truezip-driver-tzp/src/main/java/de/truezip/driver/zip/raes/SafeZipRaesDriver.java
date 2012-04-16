@@ -23,8 +23,8 @@ import javax.annotation.concurrent.Immutable;
  * of the archive and <em>after</em> inflation (decompression) of an
  * entry's data its CRC-32 value still matches!
  * This should hold true even though CRC-32 is not at all a good cryptographic
- * hash function because of its frequent collisions, its linear output and
- * small output size.
+ * hash function because of its frequent collisions, its linear sink and
+ * small sink size.
  * It's the ZIP inflation algorithm which actually comes to our rescue!
  * <p>
  * Subclasses must be thread-safe and should be immutable!

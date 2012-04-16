@@ -13,6 +13,7 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.util.BitField;
@@ -200,8 +201,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * If this method returns {@code true} and the check fails, then an
      * {@link IOException} gets thrown.
      * 
-     * @param input the origin of the entry.
      * @param entry the entry to test.
+     * @param input the origin of the entry.
      * @return {@code entry.isEncrypted()}.
      */
     protected boolean check(
@@ -210,14 +211,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         return entry.isEncrypted();
     }
 
-    protected boolean rdc(
+    final boolean rdc(
             @WillNotClose ZipInputService input,
             ZipDriverEntry local,
             ZipDriverEntry peer) {
         return rdc(local, peer);
     }
 
-    protected boolean rdc(
+    final boolean rdc(
             @WillNotClose ZipOutputService output,
             ZipDriverEntry local,
             ZipDriverEntry peer) {
@@ -333,13 +334,13 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    protected final ZipInputService newInputService(
+    protected final ZipInputService input(
             final FsModel model,
-            final InputSocket<?> input)
+            final Source source)
     throws IOException {
         if (null == model)
             throw new NullPointerException();
-        final ZipInputService zis = newZipInputService(model, input);
+        final ZipInputService zis = zipInput(model, source);
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
@@ -353,7 +354,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @CreatesObligation
-    protected ZipInputService newZipInputService(
+    protected ZipInputService zipInput(
             FsModel model,
             Source source)
     throws IOException {
@@ -362,28 +363,28 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    public OutputService<ZipDriverEntry> newOutputService(
+    public OutputService<ZipDriverEntry> output(
             final FsModel model,
             final FsController<?> parent,
             final FsEntryName entry,
             final BitField<FsAccessOption> options,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final OptionOutputSocket oos = output(parent, entry, options);
+        final OptionOutputSocket oos = sink(parent, entry, options);
         final ZipInputService zis = (ZipInputService) input;
         if (null != zis)
             zis.setAppendee(oos.getOptions().get(GROW));
-        return newOutputService(model, oos, zis);
+        return output(model, oos, zis);
     }
 
     @Override
     @CreatesObligation
-    protected OutputService<ZipDriverEntry> newOutputService(
+    protected OutputService<ZipDriverEntry> output(
             FsModel model,
-            OutputSocket<?> output,
+            Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final OptionOutputSocket oos = (OptionOutputSocket) output;
+        final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(
                 getIOPool(), new ZipOutputService(model, oos, zis, this));
@@ -400,14 +401,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * </ol>
      * <p>
      * The resulting output socket is then wrapped in a private nested class
-     * for an upcast in {@link #newOutputService}.
-     * Thus, when overriding this method, {@link #newOutputService} should getIOPool
+     * for an upcast in {@link #output}.
+     * Thus, when overriding this method, {@link #output} should getIOPool
      * overridden, too.
      * Otherwise, a class cast exception will getIOPool thrown in
-     * {@link #newOutputService}.
+     * {@link #output}.
      */
     @Override
-    protected OptionOutputSocket output(
+    protected OptionOutputSocket sink(
             final FsController<?> controller,
             final FsEntryName name,
             BitField<FsAccessOption> options) {
@@ -422,7 +423,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    public ZipDriverEntry newEntry(
+    public ZipDriverEntry entry(
             String name,
             final Type type,
             final BitField<FsAccessOption> mknod,
@@ -430,9 +431,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         name = normalize(name, type);
         final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {
-            entry = newEntry(name, (ZipEntry) template);
+            entry = entry(name, (ZipEntry) template);
         } else {
-            entry = newEntry(name);
+            entry = entry(name);
             if (null != template) {
                 entry.setTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
@@ -462,7 +463,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @return {@code new ZipDriverEntry(name)}
      */
     @Override
-    public ZipDriverEntry newEntry(String name) {
+    public ZipDriverEntry entry(String name) {
         return new ZipDriverEntry(name);
     }
 
@@ -474,7 +475,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @param  template the entry template.
      * @return {@code new ZipDriverEntry(name, template)}
      */
-    public ZipDriverEntry newEntry(String name, ZipEntry template) {
+    public ZipDriverEntry entry(String name, ZipEntry template) {
         return new ZipDriverEntry(name, template);
     }
 }

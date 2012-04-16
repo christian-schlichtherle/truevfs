@@ -64,7 +64,7 @@ implements InputService<TarDriverEntry> {
                     initialCapacity(TarOutputService.OVERHEAD_SIZE));
 
     /**
-     * Extracts the entire TAR input stream into a temporary directory in order
+     * Extracts the entire TAR source stream into a temporary directory in order
      * to allow subsequent random access to its entries.
      */
     @CreatesObligation
@@ -107,7 +107,7 @@ implements InputService<TarDriverEntry> {
             TarDriverEntry entry = entries.get(name);
             if (null != entry)
                 entry.release();
-            entry = driver.newEntry(name, tinEntry);
+            entry = driver.entry(name, tinEntry);
             if (!tinEntry.isDirectory()) {
                 final IOBuffer<?> temp = pool.allocate();
                 entry.setTemp(temp);
@@ -187,8 +187,8 @@ implements InputService<TarDriverEntry> {
     }
 
     /**
-     * Fills {@code buf} with data from the given input stream and
-     * returns an input stream from which you can still read all data,
+     * Fills {@code buf} with data from the given source stream and
+     * returns an source stream from which you can still read all data,
      * including the data in buf.
      *
      * @param  in The stream to read from. May <em>not</em> be {@code null}.

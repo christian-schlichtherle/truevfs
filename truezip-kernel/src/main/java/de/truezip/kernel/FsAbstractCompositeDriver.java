@@ -9,7 +9,7 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract composite driver.
- * This class provides an implementation of {@link #newController} which uses
+ * This class provides an implementation of {@link #controller} which uses
  * the file system driver map returned by {@link #getDrivers()} to lookup the
  * appropriate driver for the scheme of any given mount point.
  * 
@@ -21,7 +21,7 @@ implements FsCompositeDriver, FsDriverProvider {
 
     @Override
     public final FsController<?>
-    newController(  final FsManager manager,
+    controller(  final FsManager manager,
                     final FsModel model,
                     final FsController<?> parent) {
         assert null == parent
@@ -32,6 +32,6 @@ implements FsCompositeDriver, FsDriverProvider {
         if (null == driver)
             throw new ServiceConfigurationError(scheme
                     + " (Unknown file system scheme! May be the class path doesn't contain the respective driver module or it isn't set up correctly?)");
-        return driver.newController(manager, model, parent);
+        return driver.controller(manager, model, parent);
     }
 }

@@ -7,6 +7,8 @@ package de.truezip.kernel.mock;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.Sink;
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Maps;
 import java.io.IOException;
@@ -58,12 +60,11 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    protected InputService<MockArchiveDriverEntry> newInputService(
+    protected InputService<MockArchiveDriverEntry> input(
             final FsModel model,
-            final InputSocket<?> input)
+            final Source input)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
-        input.localTarget(); // don't care for the result
         final MockArchive c = containers.get(mp);
         if (null == c)
             throw new NoSuchFileException(mp.toString());
@@ -71,13 +72,12 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    protected OutputService<MockArchiveDriverEntry> newOutputService(
+    protected OutputService<MockArchiveDriverEntry> output(
             final FsModel model,
-            final OutputSocket<?> output,
+            final Sink output,
             final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
-        output.localTarget(); // don't care for the result
         final MockArchive n = MockArchive.create(config);
         MockArchive o = containers.get(mp);
         if (null == o)
@@ -87,7 +87,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    public MockArchiveDriverEntry newEntry(
+    public MockArchiveDriverEntry entry(
             String name,
             Type type,
             BitField<FsAccessOption> mknod,

@@ -18,5 +18,5 @@ public interface ZipEntryFactory<E extends ZipEntry> extends ZipParameters {
      * @param  name the entry name.
      * @return A new ZIP entry with the given {@code name}.
      */
-    E newEntry(String name);
+    E entry(String name);
 }

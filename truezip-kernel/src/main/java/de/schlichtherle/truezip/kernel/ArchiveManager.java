@@ -55,7 +55,7 @@ final class ArchiveManager extends FsManager {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
             final FsModel model = new FsModel(mountPoint, null);
-            return driver.newController(this, model, null);
+            return driver.controller(this, model, null);
         }
         FsController<?> controller = getTarget(schedulers.get(mountPoint));
         if (null == controller) {
@@ -63,7 +63,7 @@ final class ArchiveManager extends FsManager {
                 parent = getController(mountPoint.getParent(), null, driver);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
-            model.setController(controller = driver.newController(this, model, parent));
+            model.setController(controller = driver.controller(this, model, parent));
         }
         return controller;
     }

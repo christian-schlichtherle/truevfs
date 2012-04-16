@@ -11,6 +11,8 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.Sink;
+import de.truezip.kernel.io.Source;
 import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
@@ -69,21 +71,21 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    protected InputService<TarDriverEntry> newInputService(
+    protected InputService<TarDriverEntry> input(
             final FsModel model,
-            final InputSocket<?> input)
+            final Source source)
     throws IOException {
-        return new TarInputService(model, input, this);
+        return new TarInputService(model, source, this);
     }
 
     @Override
-    protected OutputService<TarDriverEntry> newOutputService(
+    protected OutputService<TarDriverEntry> output(
             final FsModel model,
-            final OutputSocket<?> output,
+            final Sink sink,
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
         return new MultiplexingOutputService<>(
-                getIOPool(), new TarOutputService(model, output, this));
+                getIOPool(), new TarOutputService(model, sink, this));
     }
 
     /**
@@ -91,7 +93,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected InputSocket<?> input(
+    protected Source source(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
@@ -103,7 +105,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected OutputSocket<?> output(
+    protected Sink sink(
             FsController<?> controller,
             FsEntryName name,
             BitField<FsAccessOption> options) {
@@ -111,7 +113,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    public TarDriverEntry newEntry(
+    public TarDriverEntry entry(
             String name,
             final Type type,
             final BitField<FsAccessOption> mknod,
@@ -119,9 +121,9 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
         name = normalize(name, type);
         final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {
-            entry = newEntry(name, (TarArchiveEntry) template);
+            entry = entry(name, (TarArchiveEntry) template);
         } else {
-            entry = newEntry(name);
+            entry = entry(name);
             if (null != template) {
                 entry.setModTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
@@ -130,11 +132,11 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
         return entry;
     }
 
-    public TarDriverEntry newEntry(String name) {
+    public TarDriverEntry entry(String name) {
         return new TarDriverEntry(name);
     }
 
-    public TarDriverEntry newEntry(String name, TarArchiveEntry template) {
+    public TarDriverEntry entry(String name, TarArchiveEntry template) {
         return new TarDriverEntry(name, template);
     }
 }

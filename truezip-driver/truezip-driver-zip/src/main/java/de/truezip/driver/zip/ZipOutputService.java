@@ -32,8 +32,8 @@ import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An output service for writing ZIP files.
- * This output service can only write one entry concurrently.
+ * An sink service for writing ZIP files.
+ * This sink service can only write one entry concurrently.
  * 
  * @see    ZipInputService
  * @author Christian Schlichtherle
@@ -240,10 +240,10 @@ implements OutputService<ZipDriverEntry> {
     } // DirectoryTemplate
 
     /**
-     * Returns whether this output archive is busy writing an archive entry
+     * Returns whether this sink archive is busy writing an archive entry
      * or not.
      * 
-     * @return Whether this output archive is busy writing an archive entry
+     * @return Whether this sink archive is busy writing an archive entry
      *         or not.
      */
     @Override
@@ -265,8 +265,8 @@ implements OutputService<ZipDriverEntry> {
             try {
                 final InputStream in = is.stream();
                 try {
-                    // If the output ZIP file differs in length from the
-                    // input ZIP file then pad the output to the next four
+                    // If the sink ZIP file differs in length from the
+                    // input ZIP file then pad the sink to the next four
                     // byte boundary before appending the postamble.
                     // This might be required for self extracting files on
                     // some platforms, e.g. Windows x86.
@@ -304,12 +304,12 @@ implements OutputService<ZipDriverEntry> {
     }
 
     /**
-     * This entry output stream writes directly to this output service.
-     * It can only be used if this output service is not currently busy with
+     * This entry sink stream writes directly to this sink service.
+     * It can only be used if this sink service is not currently busy with
      * writing another entry and the entry holds enough information to write
      * the entry header.
      * These preconditions are checked by
-     * {@link #output(ZipDriverEntry)}.
+     * {@link #sink(ZipDriverEntry)}.
      */
     private final class EntryOutputStream extends DecoratingOutputStream {
         EntryOutputStream(final ZipDriverEntry local, final boolean rdc)
@@ -326,10 +326,10 @@ implements OutputService<ZipDriverEntry> {
     } // EntryOutputStream
 
     /**
-     * This entry output stream writes the ZIP archive entry to an
+     * This entry sink stream writes the ZIP archive entry to an
      * {@linkplain IOBuffer I/O buffer}.
      * When the stream gets closed, the I/O buffer is then copied to this
-     * output service and finally deleted.
+     * sink service and finally deleted.
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream

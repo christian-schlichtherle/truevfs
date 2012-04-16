@@ -21,7 +21,7 @@ public final class FileDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    newController(  final FsManager manager,
+    controller(  final FsManager manager,
                     final FsModel model,
                     final @CheckForNull FsController<?> parent) {
         assert null == parent;

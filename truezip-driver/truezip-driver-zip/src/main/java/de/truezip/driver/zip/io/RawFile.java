@@ -374,7 +374,7 @@ implements Closeable, Iterable<E> {
             final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
             if (utf8)
                 charset = UTF8;
-            final E entry = param.newEntry(decode(name.array()));
+            final E entry = param.entry(decode(name.array()));
             try {
                 // central file header signature   4 bytes  (0x02014b50)
                 cfh.position(4);
@@ -509,7 +509,7 @@ implements Closeable, Iterable<E> {
             // See appendix D of PKWARE's ZIP File Format Specification.
             if (0 != (gpbf & GPBF_UTF8))
                 charset = UTF8;
-            final E entry = param.newEntry(decode(PowerBuffer
+            final E entry = param.entry(decode(PowerBuffer
                     .allocate(nameLen)
                     .load(channel)
                     .array()));
