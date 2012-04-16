@@ -195,9 +195,9 @@ extends FileSystemArchiveController<E> {
                 // could be a FileController and on Windows this property changes
                 // to TRUE once a file is opened for reading!
                 final boolean ro = !parent.isWritable(name);
-                final FsModel m = getModel();
+                final FsModel model = getModel();
                 final InputService<E> is = driver
-                        .input(m, parent, name, MOUNT_OPTIONS);
+                        .input(model, parent, name, MOUNT_OPTIONS);
                 final InputArchive<E> ia = new InputArchive<>(is);
                 fs = newPopulatedFileSystem(driver, is, pe, ro);
                 setInputArchive(ia);
@@ -234,10 +234,10 @@ extends FileSystemArchiveController<E> {
             return oa;
         final InputArchive<E> ia = getInputArchive();
         final InputService<E> is = null == ia ? null : ia.getDriverProduct();
-        final FsModel m = getModel();
+        final FsModel model = getModel();
         options = options.and(ACCESS_PREFERENCES_MASK).set(CACHE);
         final OutputService<E> os = driver
-                .output(m, parent, name, options, is);
+                .output(model, parent, name, options, is);
         oa = new OutputArchive<>(os);
         setOutputArchive(oa);
         return oa;
