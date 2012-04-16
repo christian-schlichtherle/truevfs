@@ -5,7 +5,6 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.FsAccessOption;
-import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
 import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
