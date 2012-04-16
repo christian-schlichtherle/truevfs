@@ -14,6 +14,7 @@ import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.io.Streams;
+import de.truezip.kernel.util.ExceptionBuilder;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -32,9 +33,8 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
 /**
  * Presents a {@link TarArchiveInputStream} as a randomly accessible archive.
  * <p>
- * <b>Warning:</b> 
- * The constructor of this class extracts each entry in the archive to a
- * temporary file.
+ * Note that the constructor of this class extracts each entry in the archive
+ * to a temporary file!
  * This may be very time and space consuming for large archives, but is
  * the fastest implementation for subsequent random access, since there
  * is no way the archive driver could predict the client application's
@@ -63,10 +63,6 @@ implements InputService<TarDriverEntry> {
             entries = new LinkedHashMap<>(
                     initialCapacity(TarOutputService.OVERHEAD_SIZE));
 
-    /**
-     * Extracts the entire TAR source stream into a temporary directory in order
-     * to allow subsequent random access to its entries.
-     */
     @CreatesObligation
     public TarInputService(
             final FsModel model,
@@ -103,7 +99,7 @@ implements InputService<TarDriverEntry> {
         final IOPool<?> pool = driver.getIOPool();
         for (   TarArchiveEntry tinEntry;
                 null != (tinEntry = tin.getNextTarEntry()); ) {
-            final String name = getName(tinEntry);
+            final String name = name(tinEntry);
             TarDriverEntry entry = entries.get(name);
             if (null != entry)
                 entry.release();
@@ -149,7 +145,7 @@ implements InputService<TarDriverEntry> {
      * @return the fixed name of the given TAR entry.
      * @see <a href="http://java.net/jira/browse/TRUEZIP-62">Issue TRUEZIP-62</a>
      */
-    private static String getName(ArchiveEntry entry) {
+    private static String name(ArchiveEntry entry) {
         final String name = entry.getName();
         return entry.isDirectory() && !name.endsWith(SEPARATOR) ? name + SEPARATOR_CHAR : name;
     }
@@ -160,10 +156,15 @@ implements InputService<TarDriverEntry> {
      * for the first record only.
      * This method is required because the {@code TarArchiveInputStream}
      * unfortunately does not do any validation!
+     * 
+     * @param  in the stream to read from.
+     * @return A stream which holds all the data {@code in} did.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      */
     private static TarArchiveInputStream
     newValidatedTarInputStream(final InputStream in)
-    throws IOException {
+    throws EOFException, IOException {
         final byte[] buf = new byte[DEFAULT_RCDSIZE];
         final InputStream vin = readAhead(in, buf);
         // If the record is the null record, the TAR file is empty and we're
@@ -191,13 +192,14 @@ implements InputService<TarDriverEntry> {
      * returns an source stream from which you can still read all data,
      * including the data in buf.
      *
-     * @param  in The stream to read from. May <em>not</em> be {@code null}.
+     * @param  in The stream to read from.
      * @param  buf The buffer to fill entirely with data.
      * @return A stream which holds all the data {@code in} did.
-     * @throws IOException If {@code buf} couldn't get filled entirely.
+     * @throws EOFException on premature end-of-file.
+     * @throws IOException on any I/O error.
      */
     private static InputStream readAhead(final InputStream in, final byte[] buf)
-    throws IOException {
+    throws EOFException, IOException {
         if (in.markSupported()) {
             in.mark(buf.length);
             new DataInputStream(in).readFully(buf);
@@ -266,10 +268,9 @@ implements InputService<TarDriverEntry> {
     }
 
     private void close0() throws IOException {
-        final SuppressedExceptionBuilder<IOException>
-                builder = new SuppressedExceptionBuilder<>();
-        Collection<TarDriverEntry> values = entries.values();
-        for (final Iterator<TarDriverEntry> i = values.iterator();
+        final ExceptionBuilder<IOException, IOException>
+                    builder = new SuppressedExceptionBuilder<>();
+        for (final Iterator<TarDriverEntry> i = entries.values().iterator();
                 i.hasNext();
                 i.remove()) {
             try {
