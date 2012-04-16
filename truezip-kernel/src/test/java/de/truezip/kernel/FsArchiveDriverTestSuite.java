@@ -160,23 +160,32 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test
-    public void testRoundTripPersistence() throws IOException {
-        output();
-        input();
+    public void testEmptyRoundTripPersistence() throws IOException {
+        roundTripPersistence(0);
     }
 
-    private void output() throws IOException {
+    @Test
+    public void testStandardRoundTripPersistence() throws IOException {
+        roundTripPersistence(getNumEntries());
+    }
+
+    private void roundTripPersistence(int numEntries) throws IOException {
+        output(numEntries);
+        input(numEntries);
+    }
+
+    private void output(final int numEntries) throws IOException {
         final OutputService<E> service = getArchiveDriver()
                 .output(model, parent, entry, NONE, null);
         try {
-            final Closeable[] streams = new Closeable[getNumEntries()];
+            final Closeable[] streams = new Closeable[numEntries];
             try {
                 for (int i = 0; i < streams.length; i++)
                     streams[i] = output(service, i);
             } finally {
                 close(streams);
             }
-            check(service);
+            check(service, numEntries);
         } finally {
             final IOException expected = new IOException();
             trigger(TestCloseable.class, expected);
@@ -220,12 +229,12 @@ extends FsArchiveDriverTestBase<D> {
         return out;
     }
 
-    private void input() throws IOException {
+    private void input(final int numEntries) throws IOException {
         final InputService<E> service = getArchiveDriver()
                 .input(model, parent, entry, NONE);
         try {
-            check(service);
-            final Closeable[] streams = new Closeable[getNumEntries()];
+            check(service, numEntries);
+            final Closeable[] streams = new Closeable[numEntries];
             try {
                 for (int i = 0; i < streams.length; i++) {
                     input(service, i).close(); // first attempt
@@ -322,8 +331,8 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private <E extends FsArchiveEntry> void check(
-            final Container<E> container) {
-        final int numEntries = getNumEntries();
+            final Container<E> container,
+            final int numEntries) {
         assertEquals(numEntries, container.size());
         final Iterator<E> it = container.iterator();
         for (int i = 0; i < numEntries; i++) {
