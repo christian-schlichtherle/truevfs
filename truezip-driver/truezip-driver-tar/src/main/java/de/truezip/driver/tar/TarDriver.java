@@ -84,8 +84,8 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             final Sink sink,
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
-        return new MultiplexingOutputService<>(
-                getIOPool(), new TarOutputService(model, sink, this));
+        return new MultiplexingOutputService<>(getIOPool(),
+                new TarOutputService(model, sink, this));
     }
 
     /**
