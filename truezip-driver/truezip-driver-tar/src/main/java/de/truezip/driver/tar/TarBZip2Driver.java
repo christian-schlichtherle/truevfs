@@ -12,7 +12,6 @@ import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.MultiplexingOutputService;
 import de.truezip.kernel.cio.OutputService;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.io.*;
 import de.truezip.kernel.util.BitField;
 import java.io.*;
@@ -110,8 +109,8 @@ public class TarBZip2Driver extends TarDriver {
             }
         } // Sink
 
-        return new MultiplexingOutputService<>(
-                getIOPool(), new TarOutputService(model, new Sink(), this));
+        return new MultiplexingOutputService<>(getIOPool(),
+                new TarOutputService(model, new Sink(), this));
     }
 
     /**
