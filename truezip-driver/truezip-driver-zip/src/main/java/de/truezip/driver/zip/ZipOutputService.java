@@ -131,12 +131,12 @@ implements OutputService<ZipDriverEntry> {
 
     @Override
     public Iterator<ZipDriverEntry> iterator() {
-        final ZipDriverEntry tempEntry = this.bufferedEntry;
-        if (null == tempEntry)
+        final ZipDriverEntry bufferedEntry = this.bufferedEntry;
+        if (null == bufferedEntry)
             return super.iterator();
         return new JointIterator<>(
                 super.iterator(),
-                Collections.singletonList(tempEntry).iterator());
+                Collections.singletonList(bufferedEntry).iterator());
     }
 
     @Override
