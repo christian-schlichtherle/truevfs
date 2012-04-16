@@ -39,10 +39,10 @@ public interface FsCompositeDriver {
      *         point and parent file system controller.
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         can get found for the scheme of the given mount point.
-     * @see    FsDriver#newController
+     * @see    FsDriver#controller
      */
     FsController<?>
-    newController(  FsManager manager,
-                    FsModel model,
-                    @Nullable FsController<?> parent);
+    controller( FsManager manager,
+                FsModel model,
+                @Nullable FsController<?> parent);
 }

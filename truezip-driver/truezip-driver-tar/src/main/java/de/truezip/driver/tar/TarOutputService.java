@@ -40,7 +40,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * If the size of an entry is known in advance it's directly written to the
  * underlying {@code TarArchiveOutputStream} instead.
  * <p>
- * This output archive can only write one entry concurrently.
+ * This sink archive can only write one entry concurrently.
  *
  * @see    TarInputService
  * @author Christian Schlichtherle
@@ -168,7 +168,7 @@ implements OutputService<TarDriverEntry> {
     } // DirectoryTemplate
 
     /**
-     * Returns whether this output archive is busy writing an archive entry
+     * Returns whether this sink archive is busy writing an archive entry
      * or not.
      */
     private boolean isBusy() {
@@ -181,11 +181,11 @@ implements OutputService<TarDriverEntry> {
     }
 
     /**
-     * This entry output stream writes directly to our subclass.
-     * It can only be used if this output stream is not currently busy
+     * This entry sink stream writes directly to our subclass.
+     * It can only be used if this sink stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #output(TarDriverEntry)}.
+     * These preconditions are checked by {@link #sink(TarDriverEntry)}.
      */
     @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
@@ -212,9 +212,9 @@ implements OutputService<TarDriverEntry> {
     } // EntryOutputStream
 
     /**
-     * This entry output stream writes the entry to a temporary file.
+     * This entry sink stream writes the entry to a temporary file.
      * When the stream is closed, the temporary file is then copied to this
-     * output stream and finally deleted.
+     * sink stream and finally deleted.
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream

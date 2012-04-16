@@ -135,7 +135,7 @@ implements Iterable<FsCovariantEntry<E>> {
         // Allocate some extra capacity to create missing parent directories.
         final EntryTable<E> master = new EntryTable<>(
                 initialCapacity(archive.size() + OVERHEAD_SIZE));
-        // Load entries from input archive.
+        // Load entries from source archive.
         final List<String> paths = new ArrayList<>(archive.size());
         final PathNormalizer normalizer = new PathNormalizer(SEPARATOR_CHAR);
         for (final E entry : archive) {
@@ -150,7 +150,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 paths.add(path);
         }
         // Setup root file system entry, potentially replacing its previous
-        // mapping from the input archive.
+        // mapping from the source archive.
         master.add(ROOT_PATH, newEntry(
                 ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, rootTemplate));
         this.master = master;
@@ -310,11 +310,11 @@ implements Iterable<FsCovariantEntry<E>> {
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        return driver.newEntry(name, type, mknod, template);
+        return driver.entry(name, type, mknod, template);
     }
 
     /**
-     * Like {@link #newEntry newEntry(name, type, mknod, template)},
+     * Like {@link #entry entry(name, type, mknod, template)},
      * but ensures that the given entry name can get encoded by the driver's
      * character set.
      *
@@ -337,7 +337,7 @@ implements Iterable<FsCovariantEntry<E>> {
         if (!encoder.canEncode(name))
             throw new CharConversionException(name +
                     " (not encodable with " + driver.getCharset() + ")");
-        return driver.newEntry(name, type, mknod, template);
+        return driver.entry(name, type, mknod, template);
     }
 
     /**

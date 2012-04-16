@@ -18,7 +18,7 @@ import static org.junit.Assert.assertSame;
 public final class WinZipAesIT extends ZipTestSuite {
 
     @Override
-    public ZipEntry newEntry(String name) {
+    public ZipEntry entry(String name) {
         final ZipEntry entry = new ZipEntry(name);
         entry.setEncrypted(true);
         return entry;

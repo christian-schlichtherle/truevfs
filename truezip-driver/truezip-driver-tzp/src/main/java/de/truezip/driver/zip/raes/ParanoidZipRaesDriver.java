@@ -11,8 +11,8 @@ import de.truezip.driver.zip.raes.crypto.RaesOutputStream;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.OutputService;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.io.AbstractSink;
+import de.truezip.kernel.io.Sink;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
@@ -29,7 +29,7 @@ import javax.annotation.concurrent.Immutable;
  * Note that the CRC-32 value of the plain text ZIP file is never checked
  * because this is made redundant by the MAC verification.
  * <p>
- * In addition, this driver limits the number of concurrent entry output
+ * In addition, this driver limits the number of concurrent entry sink
  * streams to one, so that writing unencrypted temporary files is inhibited.
  * <p>
  * Subclasses must be thread-safe and should be immutable!
@@ -50,20 +50,20 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      * <p>
      * The implementation in the class {@link ParanoidZipRaesDriver} returns a
      * new {@link ZipOutputService}.
-     * This restricts the number of concurrent output entry streams to one in
+     * This restricts the number of concurrent sink entry streams to one in
      * order to inhibit writing unencrypted temporary files for buffering the
      * written entries.
      */
     @Override
-    protected final OutputService<ZipDriverEntry> newOutputService(
+    protected final OutputService<ZipDriverEntry> output(
             final FsModel model,
-            final OutputSocket<?> output,
+            final Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
             public OutputStream stream() throws IOException {
-                return RaesOutputStream.create(raesParameters(model), output);
+                return RaesOutputStream.create(raesParameters(model), sink);
             }
         } // Sink
 

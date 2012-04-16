@@ -121,42 +121,42 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newInputService(null, parent, entry, NONE);
+        getArchiveDriver().input(null, parent, entry, NONE);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().newInputService(model, null, entry, NONE);
+        getArchiveDriver().input(model, null, entry, NONE);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullEntryName() throws IOException {
-        getArchiveDriver().newInputService(model, parent, null, NONE);
+        getArchiveDriver().input(model, parent, null, NONE);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().newInputService(model, parent, entry, null);
+        getArchiveDriver().input(model, parent, entry, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newOutputService(null, parent, entry, NONE, null);
+        getArchiveDriver().output(null, parent, entry, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().newOutputService(model, null, entry, NONE, null);
+        getArchiveDriver().output(model, null, entry, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullEntryName() throws IOException {
-        getArchiveDriver().newOutputService(model, parent, null, NONE, null);
+        getArchiveDriver().output(model, parent, null, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().newOutputService(model, parent, entry, null, null);
+        getArchiveDriver().output(model, parent, entry, null, null);
     }
 
     @Test
@@ -167,7 +167,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void output() throws IOException {
         final OutputService<E> service = getArchiveDriver()
-                .newOutputService(model, parent, entry, NONE, null);
+                .output(model, parent, entry, NONE, null);
         try {
             final Closeable[] streams = new Closeable[getNumEntries()];
             try {
@@ -222,7 +222,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void input() throws IOException {
         final InputService<E> service = getArchiveDriver()
-                .newInputService(model, parent, entry, NONE);
+                .input(model, parent, entry, NONE);
         try {
             check(service);
             final Closeable[] streams = new Closeable[getNumEntries()];
@@ -357,7 +357,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private E newEntry(final String name) throws CharConversionException {
-        final E e = getArchiveDriver().newEntry(name, Entry.Type.FILE, null);
+        final E e = getArchiveDriver().entry(name, Entry.Type.FILE, null);
         assertNotNull(e);
         assertEquals(name, e.getName());
         assertSame(FILE, e.getType());

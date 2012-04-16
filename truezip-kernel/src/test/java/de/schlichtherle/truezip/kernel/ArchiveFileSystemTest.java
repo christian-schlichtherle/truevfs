@@ -124,7 +124,7 @@ public final class ArchiveFileSystemTest {
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
-            final MockArchiveDriverEntry ae = driver.newEntry(aen, type, null);
+            final MockArchiveDriverEntry ae = driver.entry(aen, type, null);
             assertEquals(aen, ae.getName());
             archive   .newOutputService()
                         .output(ae)

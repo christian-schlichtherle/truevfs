@@ -6,6 +6,7 @@ package de.truezip.driver.zip;
 
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.Sink;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
@@ -38,12 +39,12 @@ import javax.annotation.concurrent.Immutable;
 public class OdfDriver extends JarDriver {
 
     @Override
-    protected OutputService<ZipDriverEntry> newOutputService(
+    protected OutputService<ZipDriverEntry> output(
             final FsModel model,
-            final OutputSocket<?> output,
+            final Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final OptionOutputSocket oos = (OptionOutputSocket) output;
+        final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
         final ZipOutputService zos = new ZipOutputService(model, oos, zis, this);
         final IOPool<?> pool = getIOPool();

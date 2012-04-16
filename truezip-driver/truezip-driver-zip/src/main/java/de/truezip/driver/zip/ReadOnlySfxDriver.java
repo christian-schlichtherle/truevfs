@@ -56,7 +56,7 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    public final OutputService<ZipDriverEntry> newOutputService(
+    public final OutputService<ZipDriverEntry> output(
             FsModel model,
             FsController<?> parent,
             FsEntryName entry,

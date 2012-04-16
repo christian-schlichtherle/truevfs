@@ -13,10 +13,14 @@ import static de.truezip.kernel.FsAccessOption.*;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.*;
+import de.truezip.kernel.cio.InputService;
+import de.truezip.kernel.cio.MultiplexingOutputService;
+import de.truezip.kernel.cio.OutputService;
 import de.truezip.kernel.io.AbstractSink;
 import de.truezip.kernel.io.AbstractSource;
+import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.param.AesPbeParameters;
@@ -93,7 +97,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected final boolean check(ZipDriverEntry entry, ZipInputService input) {
         // Optimization: If the cipher text alias the encrypted ZIP file is
         // smaller than the authentication trigger, then its entire cipher text
-        // has already been authenticated by {@link ZipRaesDriver#newZipInputService}.
+        // has already been authenticated by {@link ZipRaesDriver#zipInput}.
         // Hence, checking the CRC-32 value of the entry is redundant.
         return input.length() > getAuthenticationTrigger();
     }
@@ -128,7 +132,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * implementation.
      */
     @Override
-    protected ZipInputService newZipInputService(
+    protected ZipInputService zipInput(
             final FsModel model,
             final Source source)
     throws IOException {
@@ -156,15 +160,15 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     @Override
-    protected OutputService<ZipDriverEntry> newOutputService(
+    protected OutputService<ZipDriverEntry> output(
             final FsModel model,
-            final OutputSocket<?> output,
+            final Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
         final class Sink extends AbstractSink {
             @Override
             public OutputStream stream() throws IOException {
-                return RaesOutputStream.create(raesParameters(model), output);
+                return RaesOutputStream.create(raesParameters(model), sink);
             }
         } // Sink
 
@@ -179,7 +183,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     @Override
     protected final OptionOutputSocket
-    output(
+    sink(
             final FsController<?> controller,
             final FsEntryName name,
             BitField<FsAccessOption> options) {
@@ -197,7 +201,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * {@code STORED} source entry.
      * This feature strengthens the security level of the authentication
      * process and inhibits the use of an unencrypted temporary I/O entry
-     * (usually a temporary file) in case the output is not copied from a file
+     * (usually a temporary file) in case the sink is not copied from a file
      * system entry as its input.
      * <p>
      * Furthermore, the method {@link ZipDriverEntry#clearEncryption()} is
@@ -206,13 +210,13 @@ public abstract class ZipRaesDriver extends JarDriver {
      * of the resulting archive file and unecessarily heat the CPU.
      */
     @Override
-    public ZipDriverEntry newEntry(
+    public ZipDriverEntry entry(
             final String path,
             final Type type,
             final BitField<FsAccessOption> mknod,
             final Entry template) {
         final ZipDriverEntry entry
-                = super.newEntry(path, type, mknod.set(COMPRESS), template);
+                = super.entry(path, type, mknod.set(COMPRESS), template);
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
         // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true
         // OR template is an instance of ZipEntry
