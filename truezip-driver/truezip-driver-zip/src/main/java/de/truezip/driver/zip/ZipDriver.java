@@ -386,8 +386,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     throws IOException {
         final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
-        return new MultiplexingOutputService<>(
-                getIOPool(), new ZipOutputService(model, oos, zis, this));
+        return new MultiplexingOutputService<>(getIOPool(),
+                new ZipOutputService(model, oos, zis, this));
     }
 
     /**
