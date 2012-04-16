@@ -119,18 +119,6 @@ public abstract class ZipRaesDriver extends JarDriver {
         return new ZipRaesKeyController<>(controller, this);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in {@link ZipRaesDriver} calls
-     * {@link #raesParameters}, with which it initializes a new
-     * {@link RaesReadOnlyChannel}.
-     * Next, if the gross file length of the archive is smaller than or equal
-     * to the authentication trigger, the MAC authentication on the cipher
-     * text is performed.
-     * Finally, the {@link RaesReadOnlyChannel} is passed on to the super class
-     * implementation.
-     */
     @Override
     protected ZipInputService zipInput(
             final FsModel model,
@@ -144,6 +132,7 @@ public abstract class ZipRaesDriver extends JarDriver {
                 try {
                     if (channel.size() <= getAuthenticationTrigger())
                         channel.authenticate();
+                    return channel;
                 } catch (final Throwable ex) {
                     try {
                         channel.close();
@@ -152,7 +141,6 @@ public abstract class ZipRaesDriver extends JarDriver {
                     }
                     throw ex;
                 }
-                return channel;
             }
         } // Source
 
@@ -173,8 +161,8 @@ public abstract class ZipRaesDriver extends JarDriver {
         } // Sink
 
         final ZipInputService zis = (ZipInputService) input;
-        return new MultiplexingOutputService<>(
-                getIOPool(), new ZipOutputService(model, new Sink(), zis, this));
+        return new MultiplexingOutputService<>(getIOPool(),
+                new ZipOutputService(model, new Sink(), zis, this));
     }
 
     /**
