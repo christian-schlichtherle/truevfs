@@ -74,7 +74,7 @@ public final class Cat {
             uri = uri.isAbsolute() ? uri : new File(resource).toURI();
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager
-                    .getController(     path.getMountPoint(), driver)
+                    .controller(     path.getMountPoint(), driver)
                     .input(    path.getEntryName(),
                                         BitField.noneOf(FsAccessOption.class));
             Throwable ex = null;

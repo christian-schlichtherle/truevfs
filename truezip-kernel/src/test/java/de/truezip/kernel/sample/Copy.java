@@ -70,7 +70,7 @@ public final class Copy {
             srcUri = srcUri.isAbsolute() ? srcUri : new File(src).toURI();
             FsPath srcPath = FsPath.create(srcUri, FsUriModifier.CANONICALIZE);
             InputSocket<?> srcSocket = manager
-                    .getController(     srcPath.getMountPoint(), driver)
+                    .controller(     srcPath.getMountPoint(), driver)
                     .input(    srcPath.getEntryName(),
                                         BitField.noneOf(FsAccessOption.class));
             // Resolve the destination socket. Again, we need an absolute URI.
@@ -78,7 +78,7 @@ public final class Copy {
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
             FsPath dstPath = FsPath.create(dstUri, FsUriModifier.CANONICALIZE);
             OutputSocket<?> dstSocket = manager
-                    .getController(     dstPath.getMountPoint(), driver)
+                    .controller(     dstPath.getMountPoint(), driver)
                     .output(   dstPath.getEntryName(),
                                         BitField.of(FsAccessOption.CREATE_PARENTS,
                                                     FsAccessOption.EXCLUSIVE),

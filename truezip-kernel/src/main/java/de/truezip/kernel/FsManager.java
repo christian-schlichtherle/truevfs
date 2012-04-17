@@ -35,7 +35,7 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * @return A thread-safe file system controller for the given mount point.
      */
     public abstract FsController<?>
-    getController(FsMountPoint mountPoint, FsCompositeDriver driver);
+    controller(FsMountPoint mountPoint, FsCompositeDriver driver);
 
     /**
      * Returns a new archive file system controller.
@@ -47,9 +47,7 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * @return A new archive file system controller.
      */
     public abstract <E extends FsArchiveEntry> FsController<?>
-    newController(  FsArchiveDriver<E> driver,
-                    FsModel model,
-                    FsController<?> parent);
+    controller(FsArchiveDriver<E> driver, FsModel model, FsController<?> parent);
 
     /**
      * Returns the number of federated file systems managed by this instance.

@@ -27,7 +27,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * If any exception occurs within the shutdown hook, its stacktrace is printed
  * to standard error because logging doesn't work in a shutdown hook.
  *
- * @see    #getController(FsMountPoint, FsCompositeDriver)
+ * @see    #controller(FsMountPoint, FsCompositeDriver)
  * @see    #sync
  * @author Christian Schlichtherle
  */
@@ -51,9 +51,9 @@ final class FailSafeManager extends FsDecoratingManager<FsManager> {
      */
     @Override
     public FsController<?>
-    getController(  final FsMountPoint mountPoint,
+    controller(  final FsMountPoint mountPoint,
                     final FsCompositeDriver driver) {
-        FsController<?> controller = manager.getController(mountPoint, driver);
+        FsController<?> controller = manager.controller(mountPoint, driver);
         if (null == this.shutdownHook) { // DCL does work with volatile fields since JSE 5!
             synchronized (this) {
                 ShutdownHook shutdown = this.shutdownHook;

@@ -278,7 +278,7 @@ final class TBIO {
         return  TConfig
                 .get()
                 .getFsManager()
-                .getController( path.getMountPoint(), getDetector(src))
+                .controller( path.getMountPoint(), getDetector(src))
                 .input(path.getEntryName(), options);
     }
 
@@ -309,7 +309,7 @@ final class TBIO {
         return  TConfig
                 .get()
                 .getFsManager()
-                .getController(     path.getMountPoint(), getDetector(dst))
+                .controller(     path.getMountPoint(), getDetector(dst))
                 .output(   path.getEntryName(),
                                     options.clear(CREATE_PARENTS),
                                     template);

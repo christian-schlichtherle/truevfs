@@ -116,7 +116,7 @@ extends FsDriver {
             FsModel model,
             @Nonnull FsController<?> parent) {
         assert parent.getModel().equals(model.getParent());
-        return manager.newController(this, model, parent);
+        return manager.controller(this, model, parent);
     }
 
     /**
