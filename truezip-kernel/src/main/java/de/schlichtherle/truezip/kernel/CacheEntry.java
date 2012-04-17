@@ -179,17 +179,14 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
     }
 
     /**
-     * {@linkplain #flush() Flushes} and finally {@linkplain #release() releases}
+     * {@linkplain #flush() Flushes} and {@linkplain #release() releases}
      * the cached entry data.
      */
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        try {
-            flush();
-        } finally {
-            release();
-        }
+        flush();
+        release();
     }
 
     private InputBufferPool getInputBufferPool() {
