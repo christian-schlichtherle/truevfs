@@ -172,8 +172,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            manager.stop(this);
             in.close();
+            manager.stop(this);
         }
     } // ResourceInputStream
 
@@ -188,8 +188,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            manager.stop(this);
             out.close();
+            manager.stop(this);
         }
     } // ResourceOutputStream
 
@@ -204,8 +204,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            manager.stop(this);
             channel.close();
+            manager.stop(this);
         }
     } // ResourceSeekableChannel
 }
