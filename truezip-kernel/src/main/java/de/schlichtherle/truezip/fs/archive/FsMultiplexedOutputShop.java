@@ -153,7 +153,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     @DischargesObligation
     public void close() throws IOException {
         if (isBusy())
-            throw new IOException("The output service is busy with writing a stream!");
+            throw new IOException("The output service is still busy with writing a stream!");
         storeBuffers();
         assert buffers.isEmpty();
         delegate.close();
