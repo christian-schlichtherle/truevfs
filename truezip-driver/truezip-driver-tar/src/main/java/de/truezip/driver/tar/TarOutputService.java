@@ -59,7 +59,6 @@ implements OutputService<TarDriverEntry> {
     private final Map<String, TarDriverEntry>
             entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
-    private final OutputStream out;
     private final TarArchiveOutputStream tos;
     private final TarDriver driver;
     private boolean busy;
@@ -74,7 +73,7 @@ implements OutputService<TarDriverEntry> {
             throw new NullPointerException();
         if (null == (this.driver = driver))
             throw new NullPointerException();
-        final OutputStream out = this.out = sink.stream();
+        final OutputStream out = sink.stream();
         try {
             final TarArchiveOutputStream
                     tos = this.tos = new TarArchiveOutputStream(out);
