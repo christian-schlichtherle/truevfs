@@ -196,9 +196,9 @@ implements Container<MockArchiveDriverEntry> {
                             if (closed)
                                 return;
                             out.close();
-                            busy = false;
                             copyProperties();
                             closed = true;
+                            busy = false;
                         }
                     } // Stream
 
