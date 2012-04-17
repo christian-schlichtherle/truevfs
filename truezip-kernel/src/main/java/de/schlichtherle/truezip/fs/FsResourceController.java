@@ -291,8 +291,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
             delegate.close();
+            getAccountant().stopAccountingFor(this);
         }
     } // ResourceReadOnlyFile
 
@@ -307,8 +307,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
             delegate.close();
+            getAccountant().stopAccountingFor(this);
         }
     } // ResourceSeekableByteChannel
 
@@ -323,8 +323,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
             delegate.close();
+            getAccountant().stopAccountingFor(this);
         }
     } // ResourceInputStream
 
@@ -339,8 +339,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            getAccountant().stopAccountingFor(this);
             delegate.close();
+            getAccountant().stopAccountingFor(this);
         }
     } // ResourceOutputStream
 }
