@@ -221,10 +221,10 @@ extends FileSystemArchiveController<E> {
      * Ensures that {@link #outputArchive} does not return {@code null}.
      * This method will use
      * <code>{@link #getContext()}.{@link FsOperationContext#getOutputOptions()}</code>
-     * to obtain the sink options to use for writing the entry in the parent
+     * to obtain the output options to use for writing the entry in the parent
      * file system.
      * 
-     * @return The sink archive.
+     * @return The output archive.
      */
     @CreatesObligation
     OutputArchive<E> makeOutputArchive(BitField<FsAccessOption> options)
@@ -356,14 +356,14 @@ extends FileSystemArchiveController<E> {
         }
 
         // If the entry name addresses the file system root, then pass the test
-        // because the root entry is not present in the source or sink archive
+        // because the root entry is not present in the input or output archive
         // anyway.
         if (name.isRoot())
             return;
 
         String aen; // archive entry name
 
-        // Check if the entry is already written to the sink archive.
+        // Check if the entry is already written to the output archive.
         {
             final OutputArchive<E> oa = getOutputArchive();
             if (null != oa) {
@@ -379,8 +379,8 @@ extends FileSystemArchiveController<E> {
         if (READ != intention)
             return;
 
-        // Check if the entry is present in the source archive.
-        final E iae; // source archive entry
+        // Check if the entry is present in the input archive.
+        final E iae; // input archive entry
         {
             final InputArchive<E> ia = getInputArchive();
             if (null != ia) {
@@ -412,7 +412,7 @@ extends FileSystemArchiveController<E> {
 
     /**
      * Synchronizes all entries in the (virtual) archive file system with the
-     * (temporary) sink archive file.
+     * (temporary) output archive file.
      *
      * @param  builder the strategy for assembling sync exceptions.
      */
@@ -457,11 +457,11 @@ extends FileSystemArchiveController<E> {
             for (final E ae : fse.getEntries()) {
                 final String aen = ae.getName();
                 if (null != os.entry(aen))
-                    continue; // entry has already been sink
+                    continue; // entry has already been output
                 try {
                     if (DIRECTORY == ae.getType()) {
-                        if (!fse.isRoot()) // never sink the root directory!
-                            if (UNKNOWN != ae.getTime(Access.WRITE)) // never write a ghost directory!
+                        if (!fse.isRoot()) // never output the root directory!
+                            if (UNKNOWN != ae.getTime(Access.WRITE)) // never output a ghost directory!
                                 os.output(ae).stream().close();
                     } else if (null != is.entry(aen)) {
                         IOSocket.copy(  is.input(aen),
@@ -470,7 +470,7 @@ extends FileSystemArchiveController<E> {
                         // The file system entry is a newly created
                         // non-directory entry which hasn't received any
                         // content yet, e.g. as a result of mknod()
-                        // => sink an empty file system entry.
+                        // => output an empty file system entry.
                         for (final Size size : ALL_SIZE_SET)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
@@ -487,14 +487,14 @@ extends FileSystemArchiveController<E> {
     }
 
     /**
-     * Discards the file system, closes the source archive and finally the
-     * sink archive.
+     * Discards the file system, closes the input archive and finally the
+     * output archive.
      * Note that this order is critical: The parent file system controller is
      * expected to replace the entry for the target archive file with the
-     * sink archive when it gets closed, so this must be done last.
+     * output archive when it gets closed, so this must be done last.
      * Using a finally block ensures that this is done even in the unlikely
-     * event of an exception when closing the source archive.
-     * Note that in this case closing the sink archive is likely to fail and
+     * event of an exception when closing the input archive.
+     * Note that in this case closing the output archive is likely to fail and
      * override the IOException thrown by this method, too.
      *
      * @param builder the strategy for assembling sync exceptions.
@@ -529,7 +529,7 @@ extends FileSystemArchiveController<E> {
     }
 
     /**
-     * A dummy source archive to substitute for {@code null} when copying.
+     * A dummy input archive to substitute for {@code null} when copying.
      * 
      * @param <E> The type of the entries.
      */
@@ -580,7 +580,7 @@ extends FileSystemArchiveController<E> {
         }
 
         /**
-         * Publishes the product of the archive driver this source archive is
+         * Publishes the product of the archive driver this input archive is
          * decorating.
          */
         InputService<E> getDriverProduct() {
@@ -604,7 +604,7 @@ extends FileSystemArchiveController<E> {
         }
     } // OutputArchive
 
-    /** An archive file system listener which makes the sink archive. */
+    /** An archive file system listener which makes the output archive. */
     private final class TouchListener
     implements ArchiveFileSystemTouchListener<E> {
         @Override
