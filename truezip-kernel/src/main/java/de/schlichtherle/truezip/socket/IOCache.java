@@ -147,17 +147,14 @@ public final class IOCache implements Flushable, Closeable {
     }
 
     /**
-     * {@linkplain #flush() Flushes} and finally {@linkplain #clear() clears}
+     * {@linkplain #flush() Flushes} and {@linkplain #clear() clears}
      * the cached entry data.
      */
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        try {
-            flush();
-        } finally {
-            clear();
-        }
+        flush();
+        clear();
     }
 
     public @Nullable Entry getEntry() {
