@@ -213,12 +213,13 @@ extends LockModelController {
         }
 
         ArchiveFileSystemOperation<E> mknod() throws IOException {
+            final ArchiveFileSystemOperation<E> mknod = this.mknod;
             if (null != mknod)
                 return mknod;
             checkSync(name, WRITE, options);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return mknod = autoMount(
+            return this.mknod = autoMount(
                         !name.isRoot() && options.get(CREATE_PARENTS),
                         options)
                     .mknod(name, FILE, options, template);
@@ -250,6 +251,7 @@ extends LockModelController {
                 } catch (final IOException ex) {
                     // When appending, there is no need for the entry to be
                     // readable, so we can safely ignore this - fall through!
+                    assert null == in;
                 }
             }
             Throwable ex = null;
