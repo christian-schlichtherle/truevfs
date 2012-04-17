@@ -40,7 +40,7 @@ public abstract class FsManagerTestSuite {
     public void testGetControllerWithNull() {
         for (final Type type : BitField.allOf(Type.class)) {
             try {
-                newManager(type).getController(null, null);
+                newManager(type).controller(null, null);
                 fail();
             } catch (NullPointerException expected) {
             }
@@ -68,7 +68,7 @@ public abstract class FsManagerTestSuite {
                 final FsMountPoint mountPoint
                         = FsMountPoint.create(URI.create(param));
                 final FsController<?> controller
-                        = manager.getController(mountPoint, driver);
+                        = manager.controller(mountPoint, driver);
                 if (null != parent && null != parent.getParent())
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
@@ -102,7 +102,7 @@ public abstract class FsManagerTestSuite {
                 final FsMountPoint mountPoint
                         = FsMountPoint.create(URI.create(param));
                 final FsController<?> controller
-                        = manager.getController(mountPoint, driver);
+                        = manager.controller(mountPoint, driver);
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;

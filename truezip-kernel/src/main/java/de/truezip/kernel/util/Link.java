@@ -81,7 +81,7 @@ public interface Link<T> {
         };
 
         /** Returns a new typed link to the given nullable target. */
-        public <T> Link<T> newLink(T target) {
+        public <T> Link<T> link(T target) {
             return newLink(target, null);
         }
 

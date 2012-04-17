@@ -10,7 +10,7 @@ import de.truezip.kernel.util.Link;
 import de.truezip.kernel.util.Link.Type;
 import static de.truezip.kernel.util.Link.Type.STRONG;
 import static de.truezip.kernel.util.Link.Type.WEAK;
-import static de.truezip.kernel.util.Links.getTarget;
+import static de.truezip.kernel.util.Links.target;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -42,25 +42,25 @@ final class ArchiveManager extends FsManager {
 
     @Override
     public synchronized FsController<?>
-    getController(  FsMountPoint mountPoint,
+    controller(  FsMountPoint mountPoint,
                     FsCompositeDriver driver) {
-        return getController(mountPoint, null, driver);
+        return controller(mountPoint, null, driver);
     }
 
     private FsController<?>
-    getController(  final FsMountPoint mountPoint,
-                    @CheckForNull FsController<?> parent,
-                    final FsCompositeDriver driver) {
+    controller( final FsMountPoint mountPoint,
+                @CheckForNull FsController<?> parent,
+                final FsCompositeDriver driver) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
             final FsModel model = new FsModel(mountPoint, null);
             return driver.controller(this, model, null);
         }
-        FsController<?> controller = getTarget(schedulers.get(mountPoint));
+        FsController<?> controller = target(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
-                parent = getController(mountPoint.getParent(), null, driver);
+                parent = controller(mountPoint.getParent(), null, driver);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
             model.setController(controller = driver.controller(this, model, parent));
@@ -70,7 +70,7 @@ final class ArchiveManager extends FsManager {
 
     @Override
     public final <E extends FsArchiveEntry> FsController<?>
-    newController(  final FsArchiveDriver<E> driver,
+    controller(  final FsArchiveDriver<E> driver,
                     final FsModel model,
                     final FsController<?> parent) {
         assert !(model instanceof LockModel);
@@ -102,7 +102,7 @@ final class ArchiveManager extends FsManager {
         final Set<FsController<?>>
                 snapshot = new TreeSet<>(FsControllerComparator.REVERSE);
         for (final Link<FsController<?>> link : schedulers.values()) {
-            final FsController<?> controller = getTarget(link);
+            final FsController<?> controller = target(link);
             if (null != controller)
                 snapshot.add(controller);
         }
@@ -154,7 +154,7 @@ final class ArchiveManager extends FsManager {
             synchronized (ArchiveManager.this) {
                 schedulers.put(getMountPoint(), (Link<FsController<?>>)
                         (mandatory ? STRONG : optionalScheduleType)
-                            .newLink(controller));
+                            .link(controller));
             }
         }
     } // ScheduledModel
