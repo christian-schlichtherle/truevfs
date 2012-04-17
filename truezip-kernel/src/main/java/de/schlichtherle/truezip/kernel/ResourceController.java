@@ -13,7 +13,6 @@ import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
