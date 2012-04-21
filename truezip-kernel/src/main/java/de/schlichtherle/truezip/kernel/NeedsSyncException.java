@@ -18,7 +18,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+@SuppressWarnings("serial") // serializing a control flow exception is nonsense!
 final class NeedsSyncException extends ControlFlowException {
 
     private static final @Nullable NeedsSyncException
@@ -28,5 +28,7 @@ final class NeedsSyncException extends ControlFlowException {
         return TRACEABLE ? new NeedsSyncException() : SINGLETON;
     }
 
-    private NeedsSyncException() { }
+    private NeedsSyncException() {
+        super(null);
+    }
 }

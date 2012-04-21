@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+@SuppressWarnings("serial") // serializing a control flow exception is nonsense!
 class FalsePositiveException extends ControlFlowException {
 
     FalsePositiveException(IOException cause) {
