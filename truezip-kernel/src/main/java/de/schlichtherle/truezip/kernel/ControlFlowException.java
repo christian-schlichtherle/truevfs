@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.*;
-import javax.annotation.concurrent.Immutable;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates a condition which requires non-local control flow within a
@@ -65,8 +65,8 @@ import javax.annotation.concurrent.Immutable;
  * @see    FsDecoratingController
  * @author Christian Schlichtherle
  */
-@Immutable
-@SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
+@ThreadSafe
+@SuppressWarnings("serial") // serializing a control flow exception is nonsense!
 abstract class ControlFlowException extends RuntimeException {
 
     /**
