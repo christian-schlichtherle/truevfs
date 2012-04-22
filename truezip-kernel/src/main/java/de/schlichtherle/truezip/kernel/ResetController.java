@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsEntryName;
-import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsSyncOptions.RESET;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
@@ -35,26 +35,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     public void unlink( final FsEntryName name,
                         final BitField<FsAccessOption> options)
     throws IOException {
-        boolean checkRoot = true;
-        try {
-            controller.unlink(name, options);
-        } catch (final FalsePositiveException ex) {
-            throw ex;
-        } catch (final IOException ex) {
-            checkRoot = false;
-            throw ex;
-        } finally {
-            if (checkRoot && name.isRoot()) {
-                // Either the virtual root directory has been successfully
-                // removed or it's a false positive archive file.
-                // In either case the selective cache needs to get cleared now
-                // without flushing it.
-                // For a false positive archive file, the only effect will be
-                // that the mount state gets reset so that the file system can
-                // get subsequently mounted if the target archive file has been
-                // modified to be a true archive file meanwhile.
-                controller.sync(RESET);
-            }
+        controller.unlink(name, options);
+        if (name.isRoot()) {
+            // The virtual root directory has been successfully removed.
+            // Now the selective entry cache needs to get released without
+            // flushing it.
+            controller.sync(RESET);
         }
     }
 }
