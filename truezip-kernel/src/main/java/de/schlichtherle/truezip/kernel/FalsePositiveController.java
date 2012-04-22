@@ -418,8 +418,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 controller.unlink(name, options);
                 if (name.isRoot()) {
                     assert controller == FalsePositiveController.this.controller;
-                    // We have successfully removed the virtual root directory
-                    // of a federated file system, i.e. an archive file.
+                    // The virtual root directory has been successfully removed.
                     // Now unlink the target archive file from the parent file
                     // system.
                     // Note that this makes an unlink operation NOT atomic
