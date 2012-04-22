@@ -92,7 +92,7 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
      * 
      * @param  channel the channel.
      * @return {@code this}.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
     public PowerBuffer load(ReadableByteChannel channel)
