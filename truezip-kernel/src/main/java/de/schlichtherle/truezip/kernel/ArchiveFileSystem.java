@@ -14,16 +14,15 @@ import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
-import de.truezip.kernel.util.PathNormalizer;
-import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
-import static de.truezip.kernel.util.Paths.isRoot;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Link;
 import static de.truezip.kernel.util.Maps.OVERHEAD_SIZE;
 import static de.truezip.kernel.util.Maps.initialCapacity;
+import de.truezip.kernel.util.PathNormalizer;
+import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
+import static de.truezip.kernel.util.Paths.isRoot;
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.nio.charset.CharsetEncoder;
 import java.nio.file.*;
 import java.util.*;
 import javax.annotation.CheckForNull;
@@ -49,9 +48,6 @@ implements Iterable<FsCovariantEntry<E>> {
     private final PathSplitter splitter = new PathSplitter();
     private final FsArchiveDriver<E> driver;
     private final EntryTable<E> master;
-
-    private final ThreadLocalCharsetEncoder
-            encoder = new ThreadLocalCharsetEncoder();
 
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
@@ -185,8 +181,8 @@ implements Iterable<FsCovariantEntry<E>> {
         final String memberName = splitter.getMemberName();
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
-            parent = master.add(parentPath, newEntry(
-                    parentPath, DIRECTORY, FsAccessOptions.NONE, null));
+            parent = master.add(parentPath,
+                    newEntry(parentPath, DIRECTORY, FsAccessOptions.NONE, null));
         parent.add(memberName);
         fix(parentPath);
     }
@@ -315,7 +311,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     /**
      * Like {@link #entry entry(name, type, mknod, template)},
-     * but ensures that the given entry name can get encoded by the driver's
+     * but checks that the given entry name can get encoded by the driver's
      * character set.
      *
      * @see    #mknod
@@ -326,18 +322,14 @@ implements Iterable<FsCovariantEntry<E>> {
      * @throws CharConversionException If the entry name contains characters
      *         which cannot get encoded.
      */
-    private E newCheckedEntry(
+    private E newEntryChecked(
             final String name,
             final Type type,
             final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template)
     throws CharConversionException {
-        assert null != type;
-        assert !isRoot(name) || DIRECTORY == type;
-        if (!encoder.canEncode(name))
-            throw new CharConversionException(name +
-                    " (not encodable with " + driver.getCharset() + ")");
-        return driver.entry(name, type, mknod, template);
+        driver.checkEncodable(name);
+        return newEntry(name, type, mknod, template);
     }
 
     /**
@@ -446,14 +438,14 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements[0] = new SegmentLink<>(null, parentEntry);
                 newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
-                        newCheckedEntry(entryName, entryType, options, template));
+                        newEntryChecked(entryName, entryType, options, template));
                 elements[1] = new SegmentLink<>(memberName, newEntry);
             } else if (options.get(CREATE_PARENTS)) {
                 elements = newSegmentLinks(
                         level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
-                        newCheckedEntry(entryName, entryType, options, template));
+                        newEntryChecked(entryName, entryType, options, template));
                 elements[elements.length - level]
                         = new SegmentLink<>(memberName, newEntry);
             } else {
@@ -635,22 +627,6 @@ implements Iterable<FsCovariantEntry<E>> {
         if (!isReadOnly())
             throw new FileSystemException(name.toString(), null,
                 "Cannot set read-only state!");
-    }
-
-    /**
-     * A thread local encoder for fast and convenient checking that a given
-     * entry name is encodable with the driver's character set.
-     */
-    private final class ThreadLocalCharsetEncoder
-    extends ThreadLocal<CharsetEncoder> {
-        @Override
-        protected CharsetEncoder initialValue() {
-            return driver.getCharset().newEncoder();
-        }
-
-        boolean canEncode(CharSequence cs) {
-            return get().canEncode(cs);
-        }
     }
 
     /**

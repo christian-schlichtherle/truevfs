@@ -80,19 +80,23 @@ final class LockManagement {
                 lock.unlock();
             }
         } else {
-            while (true) {
-                try {
-                    lock.lock();
-                    util.locking = true;
+            try {
+                while (true) {
                     try {
-                        return operation.call();
-                    } finally {
-                        util.locking = false;
-                        lock.unlock();
+                        lock.lock();
+                        util.locking = true;
+                        try {
+                            return operation.call();
+                        } finally {
+                            util.locking = false;
+                            lock.unlock();
+                        }
+                    } catch (NeedsLockRetryException ex) {
+                        util.pause();
                     }
-                } catch (NeedsLockRetryException ex) {
-                    util.pause();
                 }
+            } finally {
+                LockManagement.util.remove();
             }
         }
     }
