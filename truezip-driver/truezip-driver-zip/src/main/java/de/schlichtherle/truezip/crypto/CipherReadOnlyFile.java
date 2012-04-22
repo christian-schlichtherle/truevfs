@@ -70,9 +70,7 @@ public abstract class CipherReadOnlyFile extends DecoratingReadOnlyFile {
 
     /**
      * The buffer for the encrypted file data.
-     * Note that this buffer contains encrypted data only.
-     * The actual size of the window is a multiple of the cipher's block size
-     * and may be slightly smaller than {@link #MAX_WINDOW_LEN}.
+     * The size of the buffer is a multiple of the cipher's block size.
      */
     private byte[] buffer;
 
