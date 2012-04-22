@@ -150,7 +150,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
         controller.mknod(name, type, options, template);
         final EntryCache cache = caches.remove(name);
         if (null != cache)
-            cache.clear();
+            cache.release();
     }
 
     @Override
@@ -161,7 +161,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
         controller.unlink(name, options);
         final EntryCache cache = caches.remove(name);
         if (null != cache)
-            cache.clear();
+            cache.release();
     }
 
     @Override
@@ -218,8 +218,8 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
         if (0 >= caches.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
-        boolean clear = !flush || options.get(CLEAR_CACHE);
-        assert flush || clear;
+        boolean release = !flush || options.get(CLEAR_CACHE);
+        assert flush || release;
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         for (   final Iterator<EntryCache> i = caches.values().iterator();
                 i.hasNext(); ) {
@@ -228,20 +228,20 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 if (flush) {
                     try {
                         cache.flush();
-                    } catch (final IOException ex2) {
-                        throw builder.fail(new FsSyncException(getModel(), ex2));
+                    } catch (final IOException ex) {
+                        throw builder.fail(new FsSyncException(getModel(), ex));
                     }
                 }
-            } catch (final Throwable ex2) {
-                clear = false;
-                throw ex2;
+            } catch (final Throwable ex) {
+                release = false;
+                throw ex;
             } finally {
-                if (clear) {
+                if (release) {
                     i.remove();
                     try {
-                        cache.clear();
-                    } catch (final IOException ex2) {
-                        builder.warn(new FsSyncWarningException(getModel(), ex2));
+                        cache.release();
+                    } catch (final IOException ex) {
+                        builder.warn(new FsSyncWarningException(getModel(), ex));
                     }
                 }
             }
@@ -273,7 +273,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             cache.flush();
         }
 
-        void clear() throws IOException {
+        void release() throws IOException {
             cache.release();
         }
 
