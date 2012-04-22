@@ -37,8 +37,13 @@ public enum DateTimeConverter {
      */
     JAR {
         @Override
-        TimeZone newTimeZone() {
-            return TimeZone.getDefault();
+        GregorianCalendar getThreadLocalCalendar() {
+            GregorianCalendar cal = calendar.get();
+            if (null != cal)
+                return cal;
+            cal = new GregorianCalendar();
+            calendar.set(cal);
+            return cal;
         }
 
         @Override
@@ -62,14 +67,20 @@ public enum DateTimeConverter {
      */
     ZIP {
         @Override
-        TimeZone newTimeZone() {
+        GregorianCalendar getThreadLocalCalendar() {
+            GregorianCalendar cal = calendar.get();
+            if (null != cal)
+                return cal;
             TimeZone tz = TimeZone.getDefault();
             tz = new SimpleTimeZone(
                     // See http://java.net/jira/browse/TRUEZIP-191 .
                     tz.getOffset(System.currentTimeMillis()),
                     tz.getID());
             assert !tz.useDaylightTime();
-            return tz;
+            cal = new GregorianCalendar(tz);
+            assert cal.isLenient();
+            calendar.set(cal);
+            return cal;
         }
 
         @Override
@@ -77,6 +88,9 @@ public enum DateTimeConverter {
             return true;
         }
     };
+
+    final ThreadLocal<GregorianCalendar>
+            calendar = new ThreadLocal<GregorianCalendar>();
 
     /**
      * Smallest supported DOS date/time value in a ZIP file,
@@ -97,23 +111,6 @@ public enum DateTimeConverter {
             | (58 >> 1);
 
     /**
-     * A thread local lenient gregorian calendar for date/time
-     * conversion which has its timezone set to the return value of
-     * {@link #newTimeZone()}.
-     */
-    private final ThreadLocal<GregorianCalendar>
-            calendar = new ThreadLocalGregorianCalendar();
-
-    /**
-     * Returns a new timezone to use for date/time conversion.
-     * All returned instances must have the same
-     * {@link TimeZone#hasSameRules(TimeZone) rules}.
-     *
-     * @return A new timezone for date/time conversion - never {@code null}.
-     */
-    abstract TimeZone newTimeZone();
-
-    /**
      * Returns whether the given Java time should be rounded up or down to the
      * next two second interval when converting it to a DOS date/time.
      *
@@ -125,14 +122,12 @@ public enum DateTimeConverter {
 
     /**
      * Returns a thread local lenient gregorian calendar for date/time
-     * conversion which has its timezone set to the return value of
-     * {@link #newTimeZone()}.
+     * conversion which has its timezone set according to the conventions of
+     * the represented archive format.
      *
      * @return A thread local lenient gregorian calendar.
      */
-    private GregorianCalendar getGregorianCalendar() {
-        return calendar.get();
-    }
+    abstract GregorianCalendar getThreadLocalCalendar();
 
     /**
      * Converts a Java time value to a DOS date/time value.
@@ -144,10 +139,6 @@ public enum DateTimeConverter {
      * <p>
      * The return value is rounded up or down to even seconds,
      * depending on {@link #roundUp}.
-     * <p>
-     * This method uses a lenient {@link GregorianCalendar} for the date/time
-     * conversion which has its timezone set to the return value of
-     * {@link #newTimeZone()}.
      *
      * @param  jtime The number of milliseconds since midnight, January 1st,
      *         1970 AD UTC (called <i>the epoch</i> alias Java time).
@@ -156,12 +147,11 @@ public enum DateTimeConverter {
      *         and is in between {@link #MIN_DOS_TIME} and {@link #MAX_DOS_TIME}.
      * @throws IllegalArgumentException If {@code jTime} is negative.
      * @see    #toJavaTime(long)
-     * @see    #newTimeZone()
      */
     final long toDosTime(final long jtime) {
         if (jtime < 0)
             throw new IllegalArgumentException("Negative Java time: " + jtime);
-        final GregorianCalendar cal = getGregorianCalendar();
+        final GregorianCalendar cal = getThreadLocalCalendar();
         cal.setTimeInMillis(roundUp(jtime) ? jtime + 1999 : jtime);
         long dtime = cal.get(Calendar.YEAR) - 1980;
         if (dtime < 0)
@@ -199,17 +189,12 @@ public enum DateTimeConverter {
      * {@code dTime}.
      * This is because of the limited resolution of two seconds for DOS
      * data/time values.
-     * <p>
-     * This method uses a lenient {@link GregorianCalendar} for the date/time
-     * conversion which has its timezone set to the return value of
-     * {@link #newTimeZone()}.
      *
      * @param  dtime The DOS date/time value.
      * @return The number of milliseconds since midnight, January 1st,
      *         1970 AD UTC (called <i>epoch</i> alias <i>Java time</i>)
      *         and is in between {@link #MIN_DOS_TIME} and {@link #MAX_DOS_TIME}.
      * @see    #toDosTime(long)
-     * @see    #newTimeZone()
      */
     final long toJavaTime(long dtime) {
         if (dtime < MIN_DOS_TIME)
@@ -217,7 +202,7 @@ public enum DateTimeConverter {
         if (MAX_DOS_TIME < dtime)
             dtime = MAX_DOS_TIME;
         final int time = (int) dtime;
-        final GregorianCalendar cal = getGregorianCalendar();
+        final GregorianCalendar cal = getThreadLocalCalendar();
         cal.set(Calendar.ERA, GregorianCalendar.AD);
         cal.set(Calendar.YEAR, 1980 + ((time >> 25) & 0x7f));
         cal.set(Calendar.MONTH, ((time >> 21) & 0x0f) - 1);
@@ -231,15 +216,4 @@ public enum DateTimeConverter {
         cal.set(Calendar.MILLISECOND, 0);
         return cal.getTimeInMillis();
     }
-
-    /** @see #getGregorianCalendar() */
-    private final class ThreadLocalGregorianCalendar
-    extends ThreadLocal<GregorianCalendar> {
-        @Override
-        protected GregorianCalendar initialValue() {
-            final GregorianCalendar cal = new GregorianCalendar(newTimeZone());
-            assert cal.isLenient();
-            return cal;
-        }
-    };
 }

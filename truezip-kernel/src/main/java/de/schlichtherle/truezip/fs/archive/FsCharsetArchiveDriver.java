@@ -85,25 +85,18 @@ extends FsArchiveDriver<E> {
     @Override
     protected final void assertEncodable(String name)
     throws CharConversionException {
-        if (!encoder.canEncode(name))
+        CharsetEncoder enc = encoder.get();
+        if (null == enc) {
+            enc = getCharset().newEncoder();
+            encoder.set(enc);
+        }
+        if (!enc.canEncode(name))
             throw new CharConversionException(name +
-                    " (cannot encode all characters to " + getCharset() + ")");
+                    " (entry name not encodable with " + getCharset() + ")");
     }
 
-    private final ThreadLocalCharsetEncoder
-            encoder = new ThreadLocalCharsetEncoder();
-
-    private final class ThreadLocalCharsetEncoder
-    extends ThreadLocal<CharsetEncoder> {
-        @Override
-        protected CharsetEncoder initialValue() {
-            return getCharset().newEncoder();
-        }
-
-        boolean canEncode(CharSequence cs) {
-            return get().canEncode(cs);
-        }
-    }
+    private final ThreadLocal<CharsetEncoder>
+            encoder = new ThreadLocal<CharsetEncoder>();
 
     /**
      * Returns a string representation of this object for debugging and logging
