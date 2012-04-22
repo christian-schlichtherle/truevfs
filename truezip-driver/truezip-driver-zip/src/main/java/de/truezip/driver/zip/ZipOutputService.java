@@ -32,8 +32,8 @@ import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An sink service for writing ZIP files.
- * This sink service can only write one entry concurrently.
+ * An output service for writing ZIP files.
+ * This output service can only write one entry concurrently.
  * 
  * @see    ZipInputService
  * @author Christian Schlichtherle
@@ -189,7 +189,7 @@ implements OutputService<ZipDriverEntry> {
         boolean rdc = false;
         if (UNKNOWN == local.getTime())
             local.setTime(System.currentTimeMillis());
-        if (peer != null) {
+        if (null != peer) {
             if (UNKNOWN == local.getSize())
                 local.setSize(peer.getSize(DATA));
             if (peer instanceof ZipDriverEntry) {
@@ -240,10 +240,10 @@ implements OutputService<ZipDriverEntry> {
     } // DirectoryTemplate
 
     /**
-     * Returns whether this sink archive is busy writing an archive entry
+     * Returns whether this ZIP output service is busy writing an archive entry
      * or not.
      * 
-     * @return Whether this sink archive is busy writing an archive entry
+     * @return Whether this ZIP output service is busy writing an archive entry
      *         or not.
      */
     @Override
@@ -304,14 +304,18 @@ implements OutputService<ZipDriverEntry> {
     }
 
     /**
-     * This entry sink stream writes directly to this sink service.
-     * It can only be used if this sink service is not currently busy with
+     * This entry output stream writes directly to this ZIP output service.
+     * It can only be used if this output service is not currently busy with
      * writing another entry and the entry holds enough information to write
      * the entry header.
      * These preconditions are checked by
-     * {@link #sink(ZipDriverEntry)}.
+     * {@link #output(ZipDriverEntry)}.
      */
+    @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
+        boolean closed;
+
+        @CreatesObligation
         EntryOutputStream(final ZipDriverEntry local, final boolean rdc)
         throws IOException {
             super(ZipOutputService.this);
@@ -321,7 +325,10 @@ implements OutputService<ZipDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
+            if (closed)
+                return;
             closeEntry();
+            closed = true;
         }
     } // EntryOutputStream
 
