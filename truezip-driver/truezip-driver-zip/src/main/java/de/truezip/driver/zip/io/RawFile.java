@@ -936,13 +936,13 @@ implements Closeable, Iterable<E> {
      *         This should be set to {@code false} if and only if the
      *         application is going to copy entries from an input ZIP file to
      *         an output ZIP file.
-     * @return A stream to load the entry data from or {@code null} if the
+     * @return A stream to read the entry data from or {@code null} if the
      *         entry does not exist.
      * @throws ZipAuthenticationException If the entry is encrypted and
      *         checking the MAC fails.
      * @throws ZipException If this file is not compatible to the ZIP File
      *         Format Specification.
-     * @throws IOException If the entry cannot get load from this ZipFile.
+     * @throws IOException If the entry cannot get read from this ZipFile.
      */
     @CreatesObligation
     protected @Nullable InputStream getInputStream(
@@ -1102,9 +1102,7 @@ implements Closeable, Iterable<E> {
         boolean closed;
 
         @CreatesObligation
-        EntryReadOnlyChannel(
-                final long start,
-                final long size)
+        EntryReadOnlyChannel(final long start, final long size)
         throws IOException {
             super(new IntervalReadOnlyChannel(channel(), start, size));
             RawFile.this.open++;
@@ -1112,12 +1110,12 @@ implements Closeable, Iterable<E> {
 
         @Override
         public void close() throws IOException {
-            if (this.closed)
+            if (closed)
                 return;
             // Never close the channel!
             //super.close();
-            this.closed = true;
             RawFile.this.open--;
+            closed = true;
         }
     } // EntryReadOnlyChannel
 
