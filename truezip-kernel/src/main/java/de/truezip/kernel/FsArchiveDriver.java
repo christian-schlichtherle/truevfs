@@ -17,8 +17,10 @@ import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.CharConversionException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
@@ -39,20 +41,6 @@ public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 
     /**
-     * Returns the character set to use for encoding character based meta data
-     * such as entry names or file comments to binary data when writing
-     * an archive file.
-     * Depending on the archive file format, this may get used for decoding
-     * binary data when reading an archive file, too.
-     * Subsequent calls must return the same object.
-     *
-     * @return The character set to use for encoding character based meta data
-     *         such as entry names or file comments to binary data when writing
-     *         an archive file.
-     */
-    public abstract Charset getCharset();
-
-    /**
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link FsArchiveDriver} always returns
@@ -64,12 +52,50 @@ extends FsDriver {
     }
 
     /**
-     * Returns the pool to use for allocating I/O buffers.
+     * Returns the character set to use for encoding character based meta data
+     * such as entry names or file comments to binary data when writing
+     * an archive file.
+     * Depending on the archive file format, this may get used for decoding
+     * binary data when reading an archive file, too.
      * <p>
-     * Multiple invocations may return different I/O buffer pools, so callers
-     * should cache the result.
+     * This is an immutable property - multiple calls must return the same
+     * object.
      *
-     * @return The pool to use for allocating I/O buffers.
+     * @return The character set to use for encoding character based meta data
+     *         such as entry names or file comments to binary data when writing
+     *         an archive file.
+     */
+    public abstract Charset getCharset();
+
+    /**
+     * Ensures that the given entry name can get encoded by this driver's
+     * {@linkplain #getCharset() character set}.
+     *
+     * @param  name an entry name.
+     * @throws CharConversionException If the entry name contains characters
+     *         which cannot get encoded.
+     */
+    public final void checkEncodable(final String name)
+    throws CharConversionException {
+        CharsetEncoder enc = encoder.get();
+        if (null == enc) {
+            enc = getCharset().newEncoder();
+            encoder.set(enc);
+        }
+        if (!enc.canEncode(name))
+            throw new CharConversionException(name +
+                    " (entry name not encodable with " + getCharset() + ")");
+    }
+
+    private final ThreadLocal<CharsetEncoder> encoder = new ThreadLocal<>();
+
+    /**
+     * Returns the pool to use for allocating temporary I/O buffers.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * object.
+     *
+     * @return The pool to use for allocating temporary I/O buffers.
      */
     public abstract IOPool<?> getIOPool();
 
@@ -175,7 +201,7 @@ extends FsDriver {
     }
 
     /**
-     * Creates a new source service for reading archive entries for the given
+     * Creates a new input service for reading archive entries for the given
      * {@code model} from the target archive file referenced by {@code source}.
      * 
      * @param  model the file system model.
@@ -193,7 +219,7 @@ extends FsDriver {
 
     /**
      * This method gets called by an archive controller in order to create a
-     * new sink service for its target archive file.
+     * new output service for its target archive file.
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #sink}
@@ -213,7 +239,7 @@ extends FsDriver {
      *         This parameter is guaranteed to be the product of this driver's
      *         factory method
      *         {@link #input(FsModel, FsController, FsEntryName, BitField)}.
-     * @return A new sink service for writing the target archive file.
+     * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
      */
@@ -266,7 +292,7 @@ extends FsDriver {
      *         driver.
      * @param  name the entry name.
      * @param  options the options to use.
-     * @return An source socket for reading an artifact of this driver.
+     * @return A source for reading an artifact of this driver.
      * @see    #input(FsModel, FsController, FsEntryName, BitField) 
      */
     protected Source source(
@@ -290,7 +316,7 @@ extends FsDriver {
      *         driver.
      * @param  name the entry name.
      * @param  options the options to use.
-     * @return An sink socket for writing an artifact of this driver.
+     * @return A sink for writing an artifact of this driver.
      * @see    #output(FsModel, FsController, FsEntryName, BitField, InputService) 
      */
     protected Sink sink(

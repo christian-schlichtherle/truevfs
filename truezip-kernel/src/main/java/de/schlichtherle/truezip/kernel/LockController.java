@@ -333,8 +333,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        // MUST not initialize within IOOperation => would always be true!
-        final BitField<FsSyncOption> sync = isLocking()
+        final boolean locking = isLocking(); // do NOT initialize within Sync!
+        final BitField<FsSyncOption> sync = locking
                 ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
                 : options;
 
@@ -353,9 +353,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 } catch (final FsSyncWarningException ex) {
                     throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
                 } catch (final FsSyncException ex) {
-                    if (sync != options // OK, see contract for BitField.and()!
-                            && ex.getCause() instanceof FsResourceOpenException)
-                        throw NeedsLockRetryException.get();
+                    if (sync != options) { // OK, see contract for BitField.and()!
+                        assert locking;
+                        if (ex.getCause() instanceof FsResourceOpenException)
+                            throw NeedsLockRetryException.get();
+                    }
                     throw ex;
                 }
                 return null;
