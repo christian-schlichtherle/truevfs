@@ -18,7 +18,9 @@ public interface FsDriverProvider {
     /**
      * Returns an immutable map of file system schemes to drivers.
      * Neither the keys nor the values of the returned map may be {@code null}.
-     * This is an immutable property - multiple calls must return the same value.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * object.
      *
      * @return A dedicated immutable map of file system schemes to drivers.
      */
