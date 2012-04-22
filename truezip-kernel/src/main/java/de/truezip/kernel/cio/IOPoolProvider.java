@@ -14,11 +14,12 @@ package de.truezip.kernel.cio;
 public interface IOPoolProvider {
 
     /**
-     * Returns the I/O buffer pool to use for allocating temporary I/O buffers.
+     * Returns the pool to use for allocating temporary I/O buffers.
+     * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
      *
-     * @return The I/O buffer pool to use for allocating temporary I/O buffers.
+     * @return The pool to use for allocating temporary I/O buffers.
      */
     IOPool<?> getIOPool();
 }
