@@ -19,9 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -50,12 +48,7 @@ final class ResourceManager {
     private static final int INITIAL_CAPACITY = Maps.initialCapacity(
             Runtime.getRuntime().availableProcessors() * 10);
 
-    /**
-     * The pool of all accounted closeable resources.
-     * The weak hash map allows the garbage collector to pick up a closeable
-     * resource if there are no more references to it.
-     */
-    @GuardedBy("lock")
+    /** The pool of all accounted closeable resources. */
     private static final ConcurrentMap<Closeable, Account> accounts
             = new ConcurrentHashMap<>(INITIAL_CAPACITY, 0.75f, INITIAL_CAPACITY);
 
@@ -83,9 +76,8 @@ final class ResourceManager {
      * 
      * @param resource the closeable resource to start accounting for.
      */
-    void start(final @WillCloseWhenClosed Closeable resource) {
-        if (null == accounts.get(resource))
-            accounts.putIfAbsent(resource, new Account());
+    void start(final @WillNotClose Closeable resource) {
+        accounts.put(resource, new Account());
     }
 
     /**
@@ -180,7 +172,7 @@ final class ResourceManager {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
         for (final Account account : accounts.values())
-            if (account.getAccountant() == this
+            if (account.getManager() == this
                     && account.owner == currentThread)
                 n++;
         return n;
@@ -201,7 +193,7 @@ final class ResourceManager {
     int totalResources() {
         int n = 0;
         for (final Account account : accounts.values())
-            if (account.getAccountant() == this)
+            if (account.getManager() == this)
                 n++;
         return n;
     }
@@ -224,7 +216,7 @@ final class ResourceManager {
                     i.hasNext(); ) {
                 final Entry<Closeable, Account> entry = i.next();
                 final Account account = entry.getValue();
-                if (account.getAccountant() != this)
+                if (account.getManager() != this)
                     continue;
                 i.remove();
                 try {
@@ -247,7 +239,7 @@ final class ResourceManager {
     private final class Account {
         final Thread owner = Thread.currentThread();
 
-        ResourceManager getAccountant() {
+        ResourceManager getManager() {
             return ResourceManager.this;
         }
     } // Account
