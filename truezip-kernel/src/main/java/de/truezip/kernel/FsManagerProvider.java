@@ -6,10 +6,8 @@ package de.truezip.kernel;
 
 /**
  * A provider for the singleton file system manager.
- * <p>
- * Implementations must be thread-safe.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface FsManagerProvider {
 

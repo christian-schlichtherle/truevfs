@@ -8,8 +8,6 @@ import java.util.Map;
 
 /**
  * A provider for an immutable map of file system schemes to drivers.
- * <p>
- * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  */
