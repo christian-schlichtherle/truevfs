@@ -99,7 +99,7 @@ public class ZipFile extends RawFile<ZipEntry> {
      *         large postambles.
      * @throws ZipException if the file data is not compatible with the ZIP
      *         File Format Specification.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
@@ -159,7 +159,7 @@ public class ZipFile extends RawFile<ZipEntry> {
      *         large postambles.
      * @throws ZipException if the channel data is not compatible with the ZIP
      *         File Format Specification.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
