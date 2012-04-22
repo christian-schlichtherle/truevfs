@@ -4,8 +4,6 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.driver.zip.io.DateTimeConverter;
-
 /**
  * @author Christian Schlichtherle
  */
