@@ -63,22 +63,6 @@ public final class TFileSystem extends FileSystem {
         return true;
     }
 
-    /**
-     * Equivalent to
-     * {@link TConfig#isLenient TConfig.get().isLenient()}.
-     */
-    public static boolean isLenient() {
-        return TConfig.get().isLenient();
-    }
-
-    /**
-     * Equivalent to
-     * {@link TConfig#setLenient TConfig.get().setLenient(lenient)}.
-     */
-    public static void setLenient(boolean lenient) {
-        TConfig.get().setLenient(lenient);
-    }
-
     private FsController<?> getController() {
         return controller;
     }
@@ -113,7 +97,7 @@ public final class TFileSystem extends FileSystem {
      * @see    #sync(BitField)
      */
     @Override
-    public void close() throws FsSyncException {
+    public void close() throws FsSyncWarningException, FsSyncException {
         sync(UMOUNT);
     }
 
@@ -139,7 +123,8 @@ public final class TFileSystem extends FileSystem {
      *         This implies some loss of data!
      */
     @SuppressWarnings("deprecation")
-    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
+    public void sync(BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
         TVFS.sync(getMountPoint(), options);
     }
 
@@ -249,6 +234,7 @@ public final class TFileSystem extends FileSystem {
                         .output(name, o, null)
                         .channel();
             } catch (final IOException ex) {
+                // TODO: Filter FileAlreadyExistsException.
                 if (o.get(EXCLUSIVE) && null != controller.entry(name))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
@@ -454,8 +440,7 @@ public final class TFileSystem extends FileSystem {
                                 final FileTime createTime)
         throws IOException {
             final FsController<?> controller = getController();
-            final Map<Access, Long> times = new EnumMap<Access, Long>(
-                    Access.class);
+            final Map<Access, Long> times = new EnumMap<>(Access.class);
             if (null != lastModifiedTime)
                 times.put(WRITE, lastModifiedTime.toMillis());
             if (null != lastAccessTime)
