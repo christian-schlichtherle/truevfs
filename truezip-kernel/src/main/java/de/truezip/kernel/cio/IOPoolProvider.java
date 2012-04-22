@@ -6,8 +6,6 @@ package de.truezip.kernel.cio;
 
 /**
  * A provider for an I/O buffer pool.
- * <p>
- * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  */
