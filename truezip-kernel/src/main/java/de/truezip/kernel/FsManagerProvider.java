@@ -15,7 +15,9 @@ public interface FsManagerProvider {
 
     /**
      * Returns the singleton file system manager.
-     * This is an immutable property - multiple calls must return the same value.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * object.
      *
      * @return The file system manager.
      */
