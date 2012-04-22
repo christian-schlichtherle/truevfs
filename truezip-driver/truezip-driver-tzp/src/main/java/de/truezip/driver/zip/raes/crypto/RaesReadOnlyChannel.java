@@ -68,7 +68,7 @@ public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @throws RaesParametersException If no RAES parameter can be found which
      *         match the type of RAES file in the given channel.
      * @throws RaesException If the file is not RAES compatible.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
@@ -105,7 +105,7 @@ public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
      * @throws RaesParametersException If no RAES parameter can be found which
      *         match the type of RAES file in the given channel.
      * @throws RaesException If the source data is not RAES compatible.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
