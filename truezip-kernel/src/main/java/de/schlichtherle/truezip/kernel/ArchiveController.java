@@ -323,7 +323,7 @@ extends LockModelController {
             final BitField<FsAccessOption> options,
             final Entry template)
     throws IOException {
-        if (name.isRoot()) { // TODO: Is this case differentiation required?
+        if (name.isRoot()) { // TODO: Is this case differentiation still required?
             try {
                 autoMount(options); // detect false positives!
             } catch (final FalsePositiveException ex) {
