@@ -19,29 +19,6 @@ import javax.annotation.concurrent.Immutable;
 public abstract class FsDriver {
 
     /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
-     * <p>
-     * When called, you may assert the following precondition:
-     * <pre>{@code
-     * assert null == parent
-     *         ? null == model.getParent()
-     *         : parent.getModel().equals(model.getParent())
-     * }</pre>
-     *
-     * @param  manager the file system manager for the new controller.
-     * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
-     * @see    FsCompositeDriver#controller
-     */
-    public abstract FsController<?>
-    controller( FsManager manager,
-                FsModel model,
-                @Nullable FsController<?> parent);
-
-    /**
      * Returns {@code true} iff this file system driver implements a federated
      * file system type, i.e. if the type of file system must be a member of a
      * parent file system.
@@ -66,6 +43,29 @@ public abstract class FsDriver {
     public int getPriority() {
         return 0;
     }
+
+    /**
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
+     * <p>
+     * When called, you may assert the following precondition:
+     * <pre>{@code
+     * assert null == parent
+     *         ? null == model.getParent()
+     *         : parent.getModel().equals(model.getParent())
+     * }</pre>
+     *
+     * @param  manager the file system manager for the new controller.
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
+     * @see    FsCompositeDriver#controller
+     */
+    public abstract FsController<?>
+    controller( FsManager manager,
+                FsModel model,
+                @Nullable FsController<?> parent);
 
     /**
      * Returns a string representation of this object for debugging and logging
