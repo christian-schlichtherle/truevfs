@@ -119,7 +119,7 @@ implements Closeable, Iterable<E> {
      * @param  param the parameters for reading the ZIP file.
      * @throws ZipException if the source data is not compatible to the ZIP
      *         File Format Specification.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
@@ -488,7 +488,7 @@ implements Closeable, Iterable<E> {
      * 
      * @return {@code this}
      * @throws ZipException if an invalid entry is found.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
     public RawFile<E> recoverLostEntries()
