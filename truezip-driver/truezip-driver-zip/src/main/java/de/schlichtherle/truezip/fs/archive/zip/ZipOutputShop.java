@@ -228,10 +228,10 @@ implements OutputShop<ZipDriverEntry> {
     } // DirectoryTemplate
 
     /**
-     * Returns whether this output archive is busy writing an archive entry
+     * Returns whether this ZIP output shop is busy writing an archive entry
      * or not.
      * 
-     * @return Whether this output archive is busy writing an archive entry
+     * @return Whether this ZIP output shop is busy writing an archive entry
      *         or not.
      */
     @Override
@@ -281,7 +281,11 @@ implements OutputShop<ZipDriverEntry> {
      * These preconditions are checked by
      * {@link #getOutputSocket(ZipDriverEntry)}.
      */
+    @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
+        boolean closed;
+
+        @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final ZipDriverEntry entry, final boolean process)
         throws IOException {
@@ -292,7 +296,10 @@ implements OutputShop<ZipDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
+            if (closed)
+                return;
             closeEntry();
+            closed = true;
         }
     } // EntryOutputStream
 
