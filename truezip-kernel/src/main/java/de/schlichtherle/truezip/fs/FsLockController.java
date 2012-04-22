@@ -158,19 +158,23 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 lock.unlock();
             }
         } else {
-            while (true) {
-                try {
-                    lock.lock();
-                    thread.locking = true;
+            try {
+                while (true) {
                     try {
-                        return operation.call();
-                    } finally {
-                        thread.locking = false;
-                        lock.unlock();
+                        lock.lock();
+                        thread.locking = true;
+                        try {
+                            return operation.call();
+                        } finally {
+                            thread.locking = false;
+                            lock.unlock();
+                        }
+                    } catch (FsNeedsLockRetryException ex) {
+                        thread.pause();
                     }
-                } catch (FsNeedsLockRetryException ex) {
-                    thread.pause();
                 }
+            } finally {
+                threadUtil.remove();
             }
         }
     }
@@ -360,8 +364,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        // MUST not initialize within IOOperation => would always be true!
-        final BitField<FsSyncOption> sync = threadUtil.get().locking
+        final boolean locking = threadUtil.get().locking; // do NOT initialize within Sync!
+        final BitField<FsSyncOption> sync = locking
                 ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
                 : options;
 
@@ -380,9 +384,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 } catch (final FsSyncWarningException ex) {
                     throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
                 } catch (final FsSyncException ex) {
-                    if (sync != options // OK, see contract for BitField.and()!
-                            && ex.getCause() instanceof FsResourceOpenException)
-                        throw FsNeedsLockRetryException.get(getModel());
+                    if (sync != options) { // OK, see contract for BitField.and()!
+                        assert locking;
+                        if (ex.getCause() instanceof FsResourceOpenException)
+                            throw FsNeedsLockRetryException.get(getModel());
+                    }
                     throw ex;
                 }
                 return null;

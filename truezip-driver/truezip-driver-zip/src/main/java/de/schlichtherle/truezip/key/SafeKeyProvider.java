@@ -33,7 +33,7 @@ implements KeyProvider<K> {
 
     private volatile @CheckForNull K key;
 
-    private final ThreadLocal<Long> invalidated = new ThreadLocalLong();
+    private final ThreadLocal<Long> invalidated = new ThreadLocal<Long>();
 
     /**
      * Constructs a new safe key provider.
@@ -89,7 +89,8 @@ implements KeyProvider<K> {
         try {
             retrieveReadKey(invalid);
         } finally {
-            enforceSuspensionPenalty();
+            final Long invalidated = this.invalidated.get();
+            SuspensionPenalty.enforce(null == invalidated ? 0 : invalidated);
         }
         return getNonNullKey();
     }
@@ -126,16 +127,4 @@ implements KeyProvider<K> {
         if (null != oldKey)
             oldKey.reset();
     }
-
-    private void enforceSuspensionPenalty() {
-        // TODO: This makes this class untestable!
-        SuspensionPenalty.enforce(invalidated.get());
-    }
-
-    private static final class ThreadLocalLong extends ThreadLocal<Long> {
-        @Override
-        public Long initialValue() {
-            return 0L;
-        }
-    } // ThreadLocalLong
 }

@@ -8,7 +8,6 @@ import static de.schlichtherle.truezip.zip.DateTimeConverter.MAX_DOS_TIME;
 import static de.schlichtherle.truezip.zip.DateTimeConverter.MIN_DOS_TIME;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
@@ -16,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public abstract class DateTimeConverterTestSuite {
 
@@ -26,7 +25,7 @@ public abstract class DateTimeConverterTestSuite {
     @Before
     public void setUp() {
         instance = getInstance();
-        GregorianCalendar calendar = new GregorianCalendar(instance.newTimeZone());
+        GregorianCalendar calendar = instance.getThreadLocalCalendar();
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.set(1980, Calendar.JANUARY, 1, 0, 0, 0);
         minJavaTime = calendar.getTimeInMillis();
@@ -37,13 +36,10 @@ public abstract class DateTimeConverterTestSuite {
     abstract DateTimeConverter getInstance();
 
     @Test
-    public final void testNewTimeZone() {
-        final TimeZone tz1 = instance.newTimeZone();
-        assertNotNull(tz1);
-        final TimeZone tz2 = instance.newTimeZone();
-        assertNotNull(tz1);
-        assertNotSame(tz1, tz2);
-        assertTrue(tz1.hasSameRules(tz2));
+    public final void testGetThreadLocalCalendar() {
+        final GregorianCalendar cal1 = instance.getThreadLocalCalendar();
+        final GregorianCalendar cal2 = instance.getThreadLocalCalendar();
+        assertSame(cal1, cal2);
     }
 
     @Test
