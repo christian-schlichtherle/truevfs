@@ -16,15 +16,15 @@ import javax.annotation.concurrent.Immutable;
  * constraints defined in
  * <a href="http://www.ietf.org/rfc/rfc2396.txt""><i>RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</i></a>.
  * 
- * <a name="serialization"/><h3>Serialization</h3>
+ * <h3><a name="serialization"/>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see     FsPath
- * @see     FsMountPoint
- * @see     FsEntryName
- * @author  Christian Schlichtherle
+ * @see    FsPath
+ * @see    FsMountPoint
+ * @see    FsEntryName
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class FsScheme implements Serializable, Comparable<FsScheme> {
