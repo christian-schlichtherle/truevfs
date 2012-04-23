@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.FsEntry;
 import static de.truezip.kernel.FsUriModifier.NULL;
 import static de.truezip.kernel.FsUriModifier.PostFix.ENTRY_NAME;
 import de.truezip.kernel.util.QuotedUriSyntaxException;
@@ -18,7 +17,7 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Addresses a file system entry relative to its {@link FsMountPoint mount point}.
  * 
- * <a name="specification"/><h3>Specification</h3>
+ * <h3><a name="specification"/>Specification</h3>
  * <p>
  * An entry name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
@@ -38,7 +37,7 @@ import javax.annotation.concurrent.Immutable;
  * <li>The URI must not define a fragment component.
  * </ol>
  * 
- * <a name="examples"/><h3>Examples</h3>
+ * <h3><a name="examples"/>Examples</h3>
  * <p>
  * Examples for valid entry name URIs are:
  * <ul>
@@ -114,21 +113,21 @@ import javax.annotation.concurrent.Immutable;
  * </tbody>
  * </table>
  * 
- * <a name="identities"/><h3>Identities</h3>
+ * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any entry name {@code e}, it's generally true that
  * {@code new FsEntryName(e.toUri()).equals(e)}.
  * 
- * <a name="serialization"/><h3>Serialization</h3>
+ * <h3><a name="serialization"/>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see     FsPath
- * @see     FsMountPoint
- * @see     FsScheme
- * @see     FsEntry#getName()
- * @author  Christian Schlichtherle
+ * @see    FsPath
+ * @see    FsMountPoint
+ * @see    FsScheme
+ * @see    FsEntry#getName()
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class FsEntryName

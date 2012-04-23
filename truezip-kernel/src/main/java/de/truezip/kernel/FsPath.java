@@ -22,7 +22,7 @@ import javax.annotation.concurrent.Immutable;
  * into a file system {@link #getMountPoint() mount point} and
  * {@link #getEntryName() entry name}.
  * 
- * <a name="specification"/><h3>Specification</h3>
+ * <h3><a name="specification"/>Specification</h3>
  * <p>
  * A path adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
@@ -51,7 +51,7 @@ import javax.annotation.concurrent.Immutable;
  * build a close subset of the syntax allowed by a
  * {@link java.net.JarURLConnection}.
  * 
- * <a name="examples"/><h3>Examples</h3>
+ * <h3><a name="examples"/>Examples</h3>
  * <p>
  * Examples for valid path URIs are:
  * <table border=1 cellpadding=5 summary="">
@@ -114,7 +114,7 @@ import javax.annotation.concurrent.Immutable;
  * </tbody>
  * </table>
  * 
- * <a name="identities"/><h3>Identities</h3>
+ * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any path {@code p}, it's generally true that
  * {@code new FsPath(p.toUri()).equals(p)}.
@@ -122,15 +122,15 @@ import javax.annotation.concurrent.Immutable;
  * Furthermore, it's generally true that
  * {@code new FsPath(p.getMountPoint(), p.getEntryName()).equals(p)}.
  * 
- * <a name="serialization"/><h3>Serialization</h3>
+ * <h3><a name="serialization"/>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see     FsMountPoint
- * @see     FsEntryName
- * @see     FsScheme
- * @author  Christian Schlichtherle
+ * @see    FsMountPoint
+ * @see    FsEntryName
+ * @see    FsScheme
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class FsPath implements Serializable, Comparable<FsPath> {

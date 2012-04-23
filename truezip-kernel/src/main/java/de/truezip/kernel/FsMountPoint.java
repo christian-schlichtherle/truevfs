@@ -18,7 +18,7 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Addresses a file system mount point.
  * 
- * <a name="specification"/><h3>Specification</h3>
+ * <h3><a name="specification"/>Specification</h3>
  * <p>
  * A mount point adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
@@ -41,7 +41,7 @@ import javax.annotation.concurrent.Immutable;
  *     to {@code null} in this case.
  * </ol>
  * 
- * <a name="examples"/><h3>Examples</h3>
+ * <h3><a name="examples"/>Examples</h3>
  * <p>
  * Examples for valid mount point URIs are:
  * <table border=1 cellpadding=5 summary="">
@@ -110,7 +110,7 @@ import javax.annotation.concurrent.Immutable;
  * </tbody>
  * </table>
  * 
- * <a name="identities"/><h3>Identities</h3>
+ * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any mount point {@code m}, it's generally true that
  * {@code new FsMountPoint(m.toUri()).equals(m)}.
@@ -118,15 +118,15 @@ import javax.annotation.concurrent.Immutable;
  * For any mount point {@code m} with an opaque URI, it's generally true that
  * {@code new FsMountPoint(m.getScheme(), m.getPath()).equals(m)}.
  * 
- * <a name="serialization"/><h3>Serialization</h3>
+ * <h3><a name="serialization"/>Serialization</h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see     FsPath
- * @see     FsEntryName
- * @see     FsScheme
- * @author  Christian Schlichtherle
+ * @see    FsPath
+ * @see    FsEntryName
+ * @see    FsScheme
+ * @author Christian Schlichtherle
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
