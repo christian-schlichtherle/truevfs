@@ -5,7 +5,6 @@
 package de.truezip.driver.zip.io;
 
 import de.truezip.driver.zip.crypto.CtrBlockCipher;
-import org.bouncycastle.crypto.DataLengthException;
 import org.bouncycastle.crypto.engines.AESFastEngine;
 
 /**
@@ -30,34 +29,12 @@ final class WinZipAesCipher extends CtrBlockCipher {
     }
 
     @Override
-    public int processBlock(
-            final byte[] in,
-            int inOff,
-            final byte[] out,
-            int outOff)
-    throws DataLengthException, IllegalStateException {
-        incCounter();
-        this.cipher.processBlock(this.cipherIn, 0, this.cipherOut, 0);
-
-        // XOR the cipherOut with the plaintext producing the cipher text.
-        final int blockSize = this.blockSize;
-        {
-            int i = blockSize;
-            inOff += i;
-            outOff += i;
-            while (i > 0)
-                out[--outOff] = (byte) (in[--inOff] ^ this.cipherOut[--i]);
-        }
-
-        return blockSize;
-    }
-
-    private void incCounter() {
+    protected void incCounter() {
         final int blockSize = this.blockSize;
         long blockCounter = ++this.blockCounter; // pre-increment the block counter!
         for (int i = 0; i < blockSize; i++) { // little endian order!
             blockCounter += IV[i] & 0xff;
-            this.cipherIn[i] = (byte) blockCounter;
+            cipherIn[i] = (byte) blockCounter;
             blockCounter >>>= 8;
         }
     }

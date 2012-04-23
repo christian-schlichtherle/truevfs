@@ -31,7 +31,7 @@ public class CtrBlockCipher implements SeekableBlockCipher {
     protected final byte[] cipherOut;
 
     /**
-     * Constructs a new big endian SIC seekable block cipher mode.
+     * Constructs a new CTR block cipher.
      *
      * @param cipher The underlying block cipher to use.
      */
@@ -43,48 +43,39 @@ public class CtrBlockCipher implements SeekableBlockCipher {
         this.cipherOut = new byte[blockSize];
     }
 
-    /**
-     * Returns the underlying block cipher which we are decorating.
-     *
-     * @return The underlying block cipher which we are decorating.
-     */
-    public BlockCipher getUnderlyingCipher() {
-        return this.cipher;
-    }
-
     @Override
     public void init(
-            boolean forEncryption, // not used for CTR mode
-            CipherParameters params) {
-        ParametersWithIV ivParams = (ParametersWithIV) params;
-        byte[] iv = ivParams.getIV();
+            final boolean forEncryption, // not used for CTR mode
+            final CipherParameters params) {
+        final ParametersWithIV ivParams = (ParametersWithIV) params;
+        final byte[] iv = ivParams.getIV();
         System.arraycopy(iv, 0, IV, 0, IV.length);
         reset();
-        this.cipher.init(true, ivParams.getParameters());
+        cipher.init(true, ivParams.getParameters());
     }
 
     @Override
     public String getAlgorithmName() {
         // Must add "/SIC" in order to make decorating BufferedBlockCipher work
         // correctly.
-        return this.cipher.getAlgorithmName() + "/SIC";
+        return cipher.getAlgorithmName() + "/SIC";
     }
 
     @Override
     public int getBlockSize() {
-        assert this.blockSize == this.cipher.getBlockSize();
-        return this.blockSize;
+        assert blockSize == cipher.getBlockSize();
+        return blockSize;
     }
 
     @Override
-    public int processBlock(
+    public final int processBlock(
             final byte[] in,
             int inOff,
             final byte[] out,
             int outOff)
     throws DataLengthException, IllegalStateException {
         incCounter();
-        this.cipher.processBlock(this.cipherIn, 0, this.cipherOut, 0);
+        cipher.processBlock(cipherIn, 0, cipherOut, 0);
 
         // XOR the cipherOut with the plaintext producing the cipher text.
         final int blockSize = this.blockSize;
@@ -93,18 +84,18 @@ public class CtrBlockCipher implements SeekableBlockCipher {
             inOff += i;
             outOff += i;
             while (i > 0)
-                out[--outOff] = (byte) (in[--inOff] ^ this.cipherOut[--i]);
+                out[--outOff] = (byte) (in[--inOff] ^ cipherOut[--i]);
         }
 
         return blockSize;
     }
 
-    private void incCounter() {
+    protected void incCounter() {
         final int blockSize = this.blockSize;
         long blockCounter = this.blockCounter++; // post-increment the block counter!
         for (int i = blockSize; --i >= 0; ) { // big endian order!
             blockCounter += IV[i] & 0xff;
-            this.cipherIn[i] = (byte) blockCounter;
+            cipherIn[i] = (byte) blockCounter;
             blockCounter >>>= 8;
         }
     }
@@ -121,7 +112,7 @@ public class CtrBlockCipher implements SeekableBlockCipher {
 
     @Override
     public void reset() {
-        this.cipher.reset();
-        this.blockCounter = 0;
+        cipher.reset();
+        blockCounter = 0;
     }
 }
