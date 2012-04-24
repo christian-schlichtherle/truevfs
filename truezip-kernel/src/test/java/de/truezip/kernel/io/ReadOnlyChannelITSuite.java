@@ -5,7 +5,6 @@
 package de.truezip.kernel.io;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import static java.lang.Math.max;
 import java.nio.ByteBuffer;
 import java.nio.channels.NonWritableChannelException;
@@ -59,9 +58,7 @@ public abstract class ReadOnlyChannelITSuite {
     public void setUp() throws IOException {
         temp = createTempFile(TEMP_FILE_PREFIX, null);
         try {
-            try (final OutputStream out = newOutputStream(temp)) {
-                out.write(DATA);
-            }
+            write(temp, DATA);
             assert DATA.length == size(temp);
             rchannel = newByteChannel(temp);
             tchannel = newChannel(temp);
