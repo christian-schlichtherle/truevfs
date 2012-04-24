@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.TestConfig;
-import de.truezip.kernel.FsArchiveDriver;
 import edu.umd.cs.findbugs.annotations.OverrideMustInvoke;
 import edu.umd.cs.findbugs.annotations.When;
 import java.io.IOException;
