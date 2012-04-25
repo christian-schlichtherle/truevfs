@@ -93,7 +93,7 @@ system space.
 
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
 
-        <!-- maven-antrun-plugin -->
+        <!-- maven-antrun-plugin && maven-failsafe-plugin -->
         <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
 
         <!-- maven-surefire-plugin && maven-failsafe-plugin -->
