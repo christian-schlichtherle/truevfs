@@ -86,7 +86,7 @@ public final class ServiceLocator {
         final ClassLoader l2 = Thread.currentThread().getContextClassLoader();
         return l1 == l2
                 ? ServiceLoader.load(service, l1).iterator()
-                : new JointIterator<S>( ServiceLoader.load(service, l1).iterator(),
+                : new JointIterator<>( ServiceLoader.load(service, l1).iterator(),
                                         ServiceLoader.load(service, l2).iterator());
     }
 
@@ -128,11 +128,7 @@ public final class ServiceLocator {
             return null;
         try {
             return def.cast(getClass(name).newInstance());
-        } catch (final ClassCastException ex) {
-            throw new ServiceConfigurationError(ex.toString(), ex);
-        } catch (final InstantiationException ex) {
-            throw new ServiceConfigurationError(ex.toString(), ex);
-        } catch (final IllegalAccessException ex) {
+        } catch (final ClassCastException | InstantiationException | IllegalAccessException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
         }
     }
@@ -174,7 +170,7 @@ public final class ServiceLocator {
         try {
             return l1 == l2
                     ? l1.getResources(name)
-                    : new JointEnumeration<URL>(l1.getResources(name),
+                    : new JointEnumeration<>(l1.getResources(name),
                                                 l2.getResources(name));
         } catch (final IOException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
@@ -223,9 +219,7 @@ public final class ServiceLocator {
         try {
             if (object instanceof Class<?> && !type.equals(Class.class))
                 object = ((Class<?>) object).newInstance();
-        } catch (final InstantiationException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (final IllegalAccessException ex) {
+        } catch (final InstantiationException | IllegalAccessException ex) {
             throw new IllegalArgumentException(ex);
         }
         try {
