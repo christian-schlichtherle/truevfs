@@ -93,6 +93,9 @@ system space.
 
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
 
+        <!-- maven-antrun-plugin -->
+        <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
+
         <!-- maven-surefire-plugin && maven-failsafe-plugin -->
         <!-- The server VM is expected to be less tolerant against
              multithreading bugs when running the tests.
@@ -267,6 +270,9 @@ system space.
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                </plugin>
+                <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
@@ -289,6 +295,7 @@ system space.
                             <de.truezip.kernel.isolateFsManager>false</de.truezip.kernel.isolateFsManager>
                             <de.truezip.driver.zip.io.forceZip64Ext>false</de.truezip.driver.zip.io.forceZip64Ext>
                             <de.schlichtherle.truezip.kernel.ControlFlowException.traceable>true</de.schlichtherle.truezip.kernel.ControlFlowException.traceable>
+                            <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
@@ -364,4 +371,31 @@ system space.
             <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
         </site>
     </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>integration-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-it-directory</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <mkdir dir="${java.io.tmpdir.it}"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
