@@ -36,9 +36,9 @@ extends AbstractExceptionBuilder<X, X> {
      * current assembly or shall suppress the current assembly and take its
      * place.
      * The comparator will get called like this:
-     * {@code comparator.compare(assembly, input)} where {@code assembly}
-     * is the current assembly and {@code input} is the input exception to add
-     * to the assembly.
+     * {@code comparator.compare(input, assembly)} where {@code input}
+     * is the input exception to add and {@code assembly} is the current
+     * assembly.
      * 
      * @param comparator the comparator used for prioritizing the exceptions in
      *        the assembly.
@@ -54,19 +54,19 @@ extends AbstractExceptionBuilder<X, X> {
         exceptions.add(input);
         return null == assembly
                 ? input
-                : comparator.compare(assembly, input) >= 0 ? assembly : input;
+                : comparator.compare(input, assembly) > 0 ? input : assembly;
     }
 
     @Override
-    protected final X post(final X assembly) {
+    protected final X post(final X selection) {
         for (   final Iterator<X> i = exceptions.iterator();
                 i.hasNext();
                 i.remove()) {
             final X exception = i.next();
-            if (exception != assembly)
-                assembly.addSuppressed(exception);
+            if (selection != exception)
+                selection.addSuppressed(exception);
         }
         assert exceptions.isEmpty();
-        return assembly;
+        return selection;
     }
 }
