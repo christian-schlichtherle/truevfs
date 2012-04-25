@@ -4,9 +4,9 @@
  */
 package de.truezip.driver.http;
 
+import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,6 +40,6 @@ public class HttpOutputSocket extends OutputSocket<HttpEntry> {
 
     @Override
     public OutputStream stream() throws IOException {
-        return entry.getOutputStream();
+        return entry.newOutputStream();
     }
 }

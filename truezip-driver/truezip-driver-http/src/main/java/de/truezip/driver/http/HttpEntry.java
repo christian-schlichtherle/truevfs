@@ -73,7 +73,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         return null == header ? null : header.getValue();
     }
 
-    protected InputStream getInputStream() throws IOException {
+    protected InputStream newInputStream() throws IOException {
         final HttpResponse response = executeGet();
         final HttpEntity entity = response.getEntity();
         if (null == entity)
@@ -81,7 +81,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         return entity.getContent();
     }
 
-    protected OutputStream getOutputStream() throws IOException {
+    protected OutputStream newOutputStream() throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
@@ -134,8 +134,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
             final String field = getHeaderField("last-modified");
             if (null != field)
                 return Date.parse(field);
-        } catch (IllegalArgumentException ex) {
-        } catch (IOException ex) {
+        } catch (IllegalArgumentException | IOException ex) {
         }
         return UNKNOWN;
     }

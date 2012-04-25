@@ -7,14 +7,13 @@ package de.truezip.driver.http;
 import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
-import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -43,33 +42,28 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
 
     @Override
     public InputStream stream() throws IOException {
-        return entry.getInputStream();
+        return entry.newInputStream();
     }
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        final IOBuffer<?> temp;
-        final InputStream in = entry.getInputStream();
+        final class HttpSource extends AbstractSource {
+            @Override
+            public InputStream stream() throws IOException {
+                return entry.newInputStream();
+            }
+        } // HttpSource
+
+        final IOBuffer<?> temp = entry.getPool().allocate();
         try {
-            temp = entry.getPool().allocate();
+            Streams.copy(new HttpSource(), temp.output());
+        } catch (final Throwable ex) {
             try {
-                try (final OutputStream out = temp.output().stream()) {
-                    Streams.cat(in, out);
-                }
-            } catch (final Throwable ex) {
-                try {
-                    temp.release();
-                } catch (final IOException ex2) {
-                    ex.addSuppressed(ex2);
-                }
-                throw ex;
+                temp.release();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
             }
-        } finally {
-            try {
-                in.close();
-            } catch (final IOException ex) {
-                throw new InputException(ex);
-            }
+            throw ex;
         }
 
         final class TempReadOnlyChannel extends DecoratingReadOnlyChannel {
