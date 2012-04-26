@@ -43,7 +43,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      */
     @Override
     protected final PromptingKeyProvider<K> newKeyProvider() {
-        return new PromptingKeyProvider<K>(this);
+        return new PromptingKeyProvider<>(this);
     }
 
     @Override
