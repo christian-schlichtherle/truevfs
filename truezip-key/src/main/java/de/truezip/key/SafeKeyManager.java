@@ -22,7 +22,7 @@ public abstract class SafeKeyManager<   K extends SafeKey<K>,
                                         P extends SafeKeyProvider<K>>
 extends KeyManager<K> {
 
-    private final Map<URI, P> providers = new HashMap<URI, P>();
+    private final Map<URI, P> providers = new HashMap<>();
 
     /** Constructs a new safe key manager. */
     protected SafeKeyManager() { }
