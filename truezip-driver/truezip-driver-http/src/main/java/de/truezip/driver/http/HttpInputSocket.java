@@ -47,16 +47,16 @@ public class HttpInputSocket extends InputSocket<HttpEntry> {
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        final class HttpSource extends AbstractSource {
+        final class Source extends AbstractSource {
             @Override
             public InputStream stream() throws IOException {
                 return entry.newInputStream();
             }
-        } // HttpSource
+        } // Source
 
         final IOBuffer<?> temp = entry.getPool().allocate();
         try {
-            Streams.copy(new HttpSource(), temp.output());
+            Streams.copy(new Source(), temp.output());
         } catch (final Throwable ex) {
             try {
                 temp.release();
