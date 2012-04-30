@@ -409,6 +409,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             throws IOException {
                 controller.unlink(resolved, options); // repeatable for root entry
                 if (resolved.isRoot()) {
+                    assert controller == FalsePositiveArchiveController.this.controller;
                     // Unlink target archive file from parent file system.
                     // This operation isn't lock protected, so it's not atomic!
                     getParent().unlink(parent(resolved), options);

@@ -131,8 +131,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             // Spend some effort on closing streams which have already been
             // garbage collected in order to compensates for a disadvantage of
             // the NeedsLockRetryException:
-            // An FsArchiveDriver may try to close a file system entry but fail
-            // to do so because of a NeedsLockRetryException which is
+            // An FsArchiveDriver may try to close() a file system entry but
+            // fail to do so because of a NeedsLockRetryException which is
             // impossible to resolve in a driver.
             // The TarDriver family is known to be affected by this.
             System.runFinalization();
