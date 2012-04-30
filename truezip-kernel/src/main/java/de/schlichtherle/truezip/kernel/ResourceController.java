@@ -32,7 +32,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class ResourceController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
-    private static final int WAIT_TIMEOUT_MILLIS = 100;
+    private static final int
+            WAIT_TIMEOUT_MILLIS = LockingStrategy.ACQUIRE_TIMEOUT_MILLIS;
 
     private final ResourceManager manager;
 
