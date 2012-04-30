@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockingStrategy.TIMED_LOCK;
+import static de.schlichtherle.truezip.kernel.LockingStrategy.DEAD_LOCK;
 import de.truezip.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
@@ -33,7 +33,7 @@ class LockOutputService<E extends Entry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     /** The lock on which this object synchronizes. */
-    private final Lock lock = new ReentrantLock(true);
+    private final Lock lock = new ReentrantLock();
 
     /**
      * Constructs a new lock output service.
@@ -56,7 +56,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
         } // Close
 
-        TIMED_LOCK.apply(lock, new Close());
+        DEAD_LOCK.apply(lock, new Close());
     }
 
     @Override
@@ -69,7 +69,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
         } // Entry
 
-        return TIMED_LOCK.apply(lock, new Entry());
+        return DEAD_LOCK.apply(lock, new Entry());
     }
 
     @Override
@@ -82,7 +82,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
         } // Size
 
-        return TIMED_LOCK.apply(lock, new Size());
+        return DEAD_LOCK.apply(lock, new Size());
     }
 
     @Override
@@ -112,7 +112,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     }
                 } // Stream
 
-                return new LockOutputStream(TIMED_LOCK.apply(lock, new Stream()));
+                return new LockOutputStream(DEAD_LOCK.apply(lock, new Stream()));
             }
 
             @Override
@@ -125,7 +125,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     }
                 } // Channel
 
-                return new LockSeekableChannel(TIMED_LOCK.apply(lock, new Channel()));
+                return new LockSeekableChannel(DEAD_LOCK.apply(lock, new Channel()));
             }
         } // Output
 
@@ -141,7 +141,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
         } // Close
 
-        TIMED_LOCK.apply(lock, new Close());
+        DEAD_LOCK.apply(lock, new Close());
     }
 
     private final class LockOutputStream

@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockingStrategy.TIMED_LOCK;
+import static de.schlichtherle.truezip.kernel.LockingStrategy.DEAD_LOCK;
 import de.truezip.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
@@ -33,7 +33,7 @@ class LockInputService<E extends Entry>
 extends DecoratingInputService<E, InputService<E>> {
 
     /** The lock on which this object synchronizes. */
-    private final Lock lock = new ReentrantLock(true);
+    private final Lock lock = new ReentrantLock();
 
     /**
      * Constructs a new lock input service.
@@ -56,7 +56,7 @@ extends DecoratingInputService<E, InputService<E>> {
             }
         } // Close
 
-        TIMED_LOCK.apply(lock, new Close());
+        DEAD_LOCK.apply(lock, new Close());
     }
 
     @Override
@@ -69,7 +69,7 @@ extends DecoratingInputService<E, InputService<E>> {
             }
         } // Entry
 
-        return TIMED_LOCK.apply(lock, new Entry());
+        return DEAD_LOCK.apply(lock, new Entry());
     }
 
     @Override
@@ -82,7 +82,7 @@ extends DecoratingInputService<E, InputService<E>> {
             }
         } // Size
 
-        return TIMED_LOCK.apply(lock, new Size());
+        return DEAD_LOCK.apply(lock, new Size());
     }
 
     @Override
@@ -107,7 +107,7 @@ extends DecoratingInputService<E, InputService<E>> {
                     }
                 } // GetLocalTarget
 
-                return TIMED_LOCK.apply(lock, new LocalTarget());
+                return DEAD_LOCK.apply(lock, new LocalTarget());
             }
 
             @Override
@@ -120,7 +120,7 @@ extends DecoratingInputService<E, InputService<E>> {
                     }
                 } // Stream
 
-                return new LockInputStream(TIMED_LOCK.apply(lock, new Stream()));
+                return new LockInputStream(DEAD_LOCK.apply(lock, new Stream()));
             }
 
             @Override
@@ -133,7 +133,7 @@ extends DecoratingInputService<E, InputService<E>> {
                     }
                 } // Channel
 
-                return new LockSeekableChannel(TIMED_LOCK.apply(lock, new Channel()));
+                return new LockSeekableChannel(DEAD_LOCK.apply(lock, new Channel()));
             }
         } // Input
 
@@ -149,7 +149,7 @@ extends DecoratingInputService<E, InputService<E>> {
             }
         } // Close
 
-        TIMED_LOCK.apply(lock, new Close());
+        DEAD_LOCK.apply(lock, new Close());
     }
 
     private final class LockInputStream
