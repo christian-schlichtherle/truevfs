@@ -11,7 +11,6 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.*;
-import de.truezip.kernel.util.ExceptionBuilder;
 import de.truezip.kernel.util.Maps;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
@@ -252,19 +251,19 @@ implements OutputService<TarDriverEntry> {
         void storeBuffer() throws IOException {
             final IOBuffer<?> buffer = this.buffer;
             try (final InputStream in = buffer.input().stream()) {
-                final TarArchiveOutputStream tos = TarOutputService.this.tos;
-                tos.putArchiveEntry(local);
-                final ExceptionBuilder<IOException, IOException>
+                final TarArchiveOutputStream taos = TarOutputService.this.tos;
+                taos.putArchiveEntry(local);
+                final SuppressedExceptionBuilder<IOException>
                         builder = new SuppressedExceptionBuilder<>();
                 try {
-                    Streams.cat(in, tos);
+                    Streams.cat(in, taos);
                 } catch (final InputException ex) { // NOT IOException!
                     builder.warn(ex);
                 }
                 try {
-                    tos.closeArchiveEntry();
+                    taos.closeArchiveEntry();
                 } catch (final IOException ex) {
-                    throw builder.fail(ex);
+                    builder.warn(ex);
                 }
                 builder.check();
             }
