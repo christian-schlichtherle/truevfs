@@ -367,7 +367,7 @@ implements OutputService<ZipDriverEntry> {
             try (final InputStream in = buffer.input().stream()) {
                 final ZipOutputService zos = ZipOutputService.this;
                 zos.putNextEntry(local, true);
-                final ExceptionBuilder<IOException, IOException>
+                final SuppressedExceptionBuilder<IOException>
                         builder = new SuppressedExceptionBuilder<>();
                 try {
                     Streams.cat(in, zos);
@@ -377,7 +377,7 @@ implements OutputService<ZipDriverEntry> {
                 try {
                     zos.closeEntry();
                 } catch (final IOException ex) {
-                    throw builder.fail(ex);
+                    builder.warn(ex);
                 }
                 builder.check();
             }

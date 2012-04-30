@@ -72,7 +72,7 @@ implements InputService<TarDriverEntry> {
         this.driver = Objects.requireNonNull(driver);
         try (final InputStream in = source.stream()) {
             try {
-                unpack(newValidatedTarInputStream(in));
+                unpack(newValidatedTarArchiveInputStream(in));
             } catch (final Throwable ex) {
                 try {
                     close0();
@@ -133,7 +133,7 @@ implements InputService<TarDriverEntry> {
      * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
-    private TarArchiveInputStream newValidatedTarInputStream(
+    private TarArchiveInputStream newValidatedTarArchiveInputStream(
             final @WillNotClose InputStream in)
     throws EOFException, IOException {
         final byte[] buf = new byte[DEFAULT_RCDSIZE];
@@ -152,7 +152,7 @@ implements InputService<TarDriverEntry> {
             final long actual = TarUtils.computeCheckSum(buf);
             if (expected != actual)
                 throw new TarException(
-                        "Invalid initial record in TAR file: Expected / actual checksum := "
+                        "Invalid initial record in TAR file: Expected / actual checksum : "
                         + expected + " / " + actual + "!");
         }
         return new TarArchiveInputStream(   vin,
