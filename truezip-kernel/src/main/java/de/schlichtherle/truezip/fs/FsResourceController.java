@@ -31,7 +31,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Accounts input and output resources returned by its decorated controller.
  * 
- * @see    FsResourceAccountant
+ * @see    FsResourceManager
  * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
@@ -43,7 +43,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
-    private @CheckForNull FsResourceAccountant accountant;
+    private @CheckForNull FsResourceManager accountant;
 
     /**
      * Constructs a new file system resource controller.
@@ -54,10 +54,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         super(controller);
     }
 
-    private FsResourceAccountant getAccountant() {
+    private FsResourceManager getAccountant() {
         assert isWriteLockedByCurrentThread();
-        final FsResourceAccountant a = accountant;
-        return null != a ? a : (accountant = new FsResourceAccountant(writeLock()));
+        final FsResourceManager a = accountant;
+        return null != a ? a : (accountant = new FsResourceManager(writeLock()));
     }
 
     @Override
@@ -88,7 +88,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * Waits for all entry input and output resources to close or forces
      * them to close, dependending on the {@code options}.
      * Mind that this method deliberately handles entry input and output
-     * streams equally because {@link FsResourceAccountant#waitForeignResources}
+     * streams equally because {@link FsResourceManager#waitForeignResources}
      * WILL NOT WORK if any two resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
@@ -105,7 +105,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // HC SUNT DRACONES!
-        final FsResourceAccountant a = accountant;
+        final FsResourceManager a = accountant;
         if (null == a)
             return;
         final boolean force = options.get(FORCE_CLOSE_INPUT)
@@ -118,6 +118,16 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
                 || options.get(WAIT_CLOSE_OUTPUT);
+        if (!wait) {
+            // Spend some effort on closing streams which have already been
+            // garbage collected in order to compensates for a disadvantage of
+            // the FsNeedsLockRetryException:
+            // An FsArchiveDriver may try to close() a file system entry but
+            // fail to do so because of a FsNeedsLockRetryException which is
+            // impossible to resolve in a driver.
+            // The TarDriver family is known to be affected by this.
+            System.runFinalization();
+        }
         final int total = a.waitForeignResources(
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
         if (0 == total)
@@ -142,7 +152,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      */
     private <X extends IOException> void
     closeAll(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    throws IOException {
         final class IOExceptionHandler
         implements ExceptionHandler<IOException, X> {
             @Override
@@ -157,7 +167,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
         } // IOExceptionHandler
 
-        final FsResourceAccountant acc = accountant;
+        final FsResourceManager acc = accountant;
         if (null != acc)
             acc.closeAllResources(new IOExceptionHandler());
     }

@@ -181,9 +181,11 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     }
 
     /** This entry output stream writes directly to this output shop. */
+    @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
+        @CreatesObligation
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
@@ -194,23 +196,12 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
-                    = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
             if (!closed) {
-                try {
-                    delegate.close();
-                    closed = true;
-                    busy = false;
-                } catch (final IOException ex) {
-                    builder.warn(ex);
-                }
+                delegate.close();
+                closed = true;
+                busy = false;
             }
-            try {
-                storeBuffers();
-            } catch (final IOException ex) {
-                builder.warn(ex);
-            }
-            builder.check();
+            storeBuffers();
         }
     } // EntryOutputStream
 

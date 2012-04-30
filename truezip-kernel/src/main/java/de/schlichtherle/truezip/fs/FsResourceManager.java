@@ -29,7 +29,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * threads.
  * <p>
  * For synchronization, each accountant uses a lock which has to be provided
- * to its {@link #FsResourceAccountant constructor}.
+ * to its {@link #FsResourceManager constructor}.
  * In order to start accounting for a closeable resource,
  * call {@link #startAccountingFor(Closeable)}.
  * In order to stop accounting for a closeable resource,
@@ -40,7 +40,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class FsResourceAccountant {
+final class FsResourceManager {
 
     /**
      * The initial capacity for the hash map accounts for the number of
@@ -75,7 +75,7 @@ final class FsResourceAccountant {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    FsResourceAccountant(final Lock lock) {
+    FsResourceManager(final Lock lock) {
         this.condition = (this.lock = lock).newCondition();
     }
 
@@ -215,10 +215,10 @@ final class FsResourceAccountant {
      * for closeable resources again unless the caller also locks the lock
      * provided to the constructor - use with care!
      */
-    <X extends Exception>
+    <X extends IOException>
     void closeAllResources(
             final ExceptionHandler<? super IOException, X> handler)
-    throws X {
+    throws IOException {
         assert null != handler;
 
         lock.lock();
@@ -230,16 +230,25 @@ final class FsResourceAccountant {
                 final Account account = entry.getValue();
                 if (account.getAccountant() != this)
                     continue;
-                i.remove();
+                final Closeable closeable = entry.getKey();
                 try {
-                    // This should trigger another attempt to remove the
-                    // closeable from the map, but this should cause no
-                    // ConcurrentModificationException because the closeable
-                    // has already been removed.
-                    entry.getKey().close();
-                } catch (IOException ex) {
+                    // This should trigger an attempt to remove the closeable
+                    // from the map, but it can cause no
+                    // ConcurrentModificationException because we are using a
+                    // ConcurrentHashMap.
+                    closeable.close(); // could throw an IOException or a RuntimeException, e.g. a NeedsLockRetryException!
+                } catch (final FsControllerException ex) {
+                    assert ex instanceof FsNeedsLockRetryException : ex;
+                    throw ex;
+                } catch (final IOException ex) {
                     handler.warn(ex); // may throw an exception!
                 }
+                assert !accounts.containsKey(closeable)
+                        : "closeable.close() did not call stop(this) on this resource manager!";
+                // This is actually redundant.
+                // In either case, it must NOT get done before a successful
+                // close()!
+                i.remove();
             }
         } finally {
             condition.signalAll();
@@ -250,8 +259,8 @@ final class FsResourceAccountant {
     private final class Account {
         final Thread owner = Thread.currentThread();
 
-        FsResourceAccountant getAccountant() {
-            return FsResourceAccountant.this;
+        FsResourceManager getAccountant() {
+            return FsResourceManager.this;
         }
     } // Account
 }

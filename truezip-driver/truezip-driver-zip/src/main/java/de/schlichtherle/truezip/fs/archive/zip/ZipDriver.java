@@ -23,6 +23,7 @@ import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -467,7 +468,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         try {
             return newInputShop(model, rof);
         } catch (final IOException ex) {
-            rof.close();
+            try {
+                rof.close();
+            } catch (final IOException ex2) {
+                if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
@@ -570,7 +575,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         try {
             return newOutputShop(model, out, source);
         } catch (final IOException ex) {
-            out.close();
+            try {
+                out.close();
+            } catch (final IOException ex2) {
+                if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }
