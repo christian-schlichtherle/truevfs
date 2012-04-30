@@ -63,10 +63,22 @@ enum LockingStrategy {
                 throw NeedsLockRetryException.get();
             }
         }
+    },
+
+    DEAD_LOCK {
+        /**
+         * Acquires the given lock using {@link Lock#lock()}.
+         * 
+         * @param  lock the lock to acquire.
+         */
+        @Override
+        void acquire(Lock lock) {
+            lock.lock();
+        }
     };
 
     private static final int ARBITRATE_MAX_MILLIS = 100;
-    private static final int ACQUIRE_TIMEOUT_MILLIS = 10 * ARBITRATE_MAX_MILLIS;
+    static final int ACQUIRE_TIMEOUT_MILLIS = ARBITRATE_MAX_MILLIS;
 
     private static final ThreadLocal<Account> accounts = new ThreadLocalAccount();
 
@@ -147,7 +159,7 @@ enum LockingStrategy {
      * 
      * @return Wether or not the current thread is holding any locks.
      */
-    boolean isLocking() {
+    static boolean isLocking() {
         return accounts.get().locking;
     }
 
