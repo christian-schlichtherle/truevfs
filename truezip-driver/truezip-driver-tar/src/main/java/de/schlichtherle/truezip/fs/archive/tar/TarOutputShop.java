@@ -8,11 +8,13 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import static de.schlichtherle.truezip.fs.archive.tar.TarDriver.DEFAULT_BLKSIZE;
+import static de.schlichtherle.truezip.fs.archive.tar.TarDriver.DEFAULT_RCDSIZE;
 import de.schlichtherle.truezip.io.*;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -30,7 +32,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
- * An implementation of {@link OutputShop} to write TAR archives.
+ * An output service for writing TAR files.
+ * This output service can only write one entry concurrently.
  * <p>
  * Because the TAR file format needs to know each entry's length in advance,
  * entries from an unknown source are actually written to temp files and copied
@@ -41,10 +44,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * <p>
  * If the size of an entry is known in advance it's directly written to the
  * underlying {@code TarArchiveOutputStream} instead.
- * <p>
- * This output archive can only write one entry concurrently.
- * Archive drivers may wrap this class in a {@link FsMultiplexedOutputShop}
- * to overcome this limitation.
  *
  * @see    TarInputShop
  * @author Christian Schlichtherle
@@ -67,15 +66,13 @@ implements OutputShop<TarDriverEntry> {
             = new LinkedHashMap<String, TarDriverEntry>(
                     initialCapacity(OVERHEAD_SIZE));
 
-    private final OutputStream delegate;
     private final IOPool<?> pool;
     private boolean busy;
 
     @CreatesObligation
     public TarOutputShop(   final TarDriver driver,
                             final @WillCloseWhenClosed OutputStream out) {
-        super(out);
-        this.delegate = out;
+        super(out, DEFAULT_BLKSIZE, DEFAULT_RCDSIZE, driver.getEncoding());
         super.setLongFileMode(LONGFILE_GNU);
         this.pool = driver.getPool();
     }
@@ -219,7 +216,7 @@ implements OutputShop<TarDriverEntry> {
                 try {
                     buffer.release();
                 } catch (final IOException ex2) {
-                    ex.addSuppressed(ex2);
+                    if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
                 }
                 throw ex;
             }
@@ -242,9 +239,9 @@ implements OutputShop<TarDriverEntry> {
         void storeBuffer() throws IOException {
             final IOPool.Entry<?> buffer = this.buffer;
             final InputStream in = buffer.getInputSocket().newInputStream();
+            final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                    = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
             try {
-                final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
-                        = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
                 final TarArchiveOutputStream taos = TarOutputShop.this;
                 taos.putArchiveEntry(local);
                 try {
@@ -258,9 +255,16 @@ implements OutputShop<TarDriverEntry> {
                     builder.warn(ex2);
                 }
                 builder.check();
+            } catch (final IOException ex) {
+                builder.warn(ex);
             } finally {
-                in.close();
+                try {
+                    in.close();
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                }
             }
+            builder.check();
             buffer.release();
         }
     } // BufferedEntryOutputStream

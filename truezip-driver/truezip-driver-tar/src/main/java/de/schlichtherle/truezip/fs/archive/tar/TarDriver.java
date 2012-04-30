@@ -14,6 +14,7 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -41,6 +42,12 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 @Immutable
 public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
 
+    /** Default record size */
+    static final int DEFAULT_RCDSIZE = 512;
+
+    /** Default block size */
+    static final int DEFAULT_BLKSIZE = DEFAULT_RCDSIZE * 20;
+
     /**
      * The character set for entry names and comments, which is the default
      * character set.
@@ -60,6 +67,15 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             throw new NullPointerException();
     }
 
+    final String getEncoding() {
+        return getCharset().name();
+    }
+
+    @Override
+    protected final IOPool<?> getPool() {
+        return ioPool;
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -71,11 +87,6 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
     @Override
     public boolean getRedundantContentSupport() {
         return true;
-    }
-
-    @Override
-    protected final IOPool<?> getPool() {
-        return ioPool;
     }
 
     /**
@@ -191,7 +202,11 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (final IOException ex) {
-            out.close();
+            try {
+                out.close();
+            } catch (final IOException ex2) {
+                if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+            }
             throw ex;
         }
     }

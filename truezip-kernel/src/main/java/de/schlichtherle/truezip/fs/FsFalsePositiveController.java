@@ -117,7 +117,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return null != parent ? parent : (this.parent = delegate.getParent());
     }
 
-    FsEntryName resolveParent(FsEntryName name) {
+    FsEntryName parent(FsEntryName name) {
         return getPath().resolve(name).getEntryName();
     }
 
@@ -479,31 +479,26 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 controller.unlink(name, options);
                 if (name.isRoot()) {
                     assert controller == delegate;
-                    // We have successfully removed the virtual root directory
-                    // of a federated file system, i.e. an archive file.
-                    // Now unlink the target archive file from the parent file
-                    // system.
-                    // Note that this makes an unlink operation NOT atomic
-                    // because the lock for the parent file system is not
-                    // acquired!
-                    getParent().unlink(resolveParent(name), options);
+                    // Unlink target archive file from parent file system.
+                    // This operation isn't lock protected, so it's not atomic!
+                    getParent().unlink(parent(name), options);
                 }
                 return null;
             }
         } // Unlink
 
-        if (name.isRoot())
-            unlinkRoot(new Unlink());
-        else
-            call(new Unlink(), name);
-    }
-
-    private void unlinkRoot(final IOOperation<Void> operation)
-    throws IOException {
-        try {
-            (state = new TryChild()).call(operation, ROOT);
-        } catch (final FsFalsePositiveException ex) {
-            new UseParent(ex).call(operation, ROOT);
+        final IOOperation<Void> operation = new Unlink();
+        if (name.isRoot()) {
+            // HC SUNT DRACONES!
+            final State tryChild = new TryChild();
+            try {
+                tryChild.call(operation, ROOT);
+            } catch (final FsFalsePositiveException ex) {
+                new UseParent(ex).call(operation, ROOT);
+            }
+            this.state = tryChild;
+        } else {
+            call(operation, name);
         }
     }
 
@@ -512,16 +507,18 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
+        // HC SUNT DRACONES!
         try {
             delegate.sync(options, handler);
-        } catch (FsFalsePositiveException ex) {
-            throw new AssertionError(ex);
+        } catch (final FsFalsePositiveException ex) {
+            assert state instanceof TryChild;
+            throw new FsSyncException(getModel(), ex.getCause());
         }
         state = new TryChild();
     }
 
-    private interface IOOperation<T> {
-        @Nullable T call(FsController<?> controller, FsEntryName name)
+    private interface IOOperation<V> {
+        @Nullable V call(FsController<?> controller, FsEntryName name)
         throws IOException;
     } // IOOperation
 
@@ -533,7 +530,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Immutable
     private final class TryChild implements State {
         @Override
-        public <T> T call(  final IOOperation<T> operation,
+        public <V> V call(  final IOOperation<V> operation,
                             final FsEntryName name)
         throws IOException {
             return operation.call(delegate, name);
@@ -549,15 +546,15 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public <T> T call(  final IOOperation<T> operation,
+        public <V> V call(  final IOOperation<V> operation,
                             final FsEntryName name)
         throws IOException {
             try {
-                return operation.call(getParent(), resolveParent(name));
+                return operation.call(getParent(), parent(name));
             } catch (final FsControllerException ex) {
                 assert !(ex instanceof FsFalsePositiveException);
                 throw ex;
-            } catch (final IOException ignored) {
+            } catch (final IOException suppressed) {
                 throw originalCause;
             }
         }

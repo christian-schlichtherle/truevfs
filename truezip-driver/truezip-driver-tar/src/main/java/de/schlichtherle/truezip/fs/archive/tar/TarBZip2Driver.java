@@ -99,12 +99,12 @@ public class TarBZip2Driver extends TarDriver {
 
     private static final class BZip2CompressorOutputStream
     extends org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream {
-        final OutputStream delegate;
+        final OutputStream out;
 
         BZip2CompressorOutputStream(final OutputStream out, final int level)
         throws IOException {
             super(out, level);
-            this.delegate = out;
+            this.out = out;
         }
 
         @Override
@@ -114,7 +114,7 @@ public class TarBZip2Driver extends TarDriver {
             // failed with an IOException.
             // See http://java.net/jira/browse/TRUEZIP-234
             super.close();
-            delegate.close();
+            out.close();
         }
     } // BZip2CompressorOutputStream
 }

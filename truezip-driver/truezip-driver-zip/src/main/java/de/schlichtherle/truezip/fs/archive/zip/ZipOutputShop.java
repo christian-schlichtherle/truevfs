@@ -13,6 +13,7 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
+import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.JointIterator;
 import de.schlichtherle.truezip.zip.RawZipOutputStream;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
@@ -245,12 +246,13 @@ implements OutputShop<ZipDriverEntry> {
     @Override
     public void close() throws IOException {
         super.finish();
-        final IOPool.Entry<?> pa = this.postamble;
-        if (null != pa) {
+        final IOPool.Entry<?> postamble = this.postamble;
+        if (null != postamble) {
             this.postamble = null;
-            final InputSocket<?> is = pa.getInputSocket();
+            final InputSocket<?> input = postamble.getInputSocket();
+            IOException ex = null;
             try {
-                final InputStream in = is.newInputStream();
+                final InputStream in = input.newInputStream();
                 try {
                     // If the output ZIP file differs in length from the
                     // input ZIP file then pad the output to the next four
@@ -258,18 +260,36 @@ implements OutputShop<ZipDriverEntry> {
                     // This might be required for self extracting files on
                     // some platforms, e.g. Windows x86.
                     final long ol = length();
-                    final long ipl = is.getLocalTarget().getSize(DATA);
+                    final long ipl = input.getLocalTarget().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
 
                     Streams.cat(in, this);
+                } catch (final IOException ex2) {
+                    ex = ex2;
+                    throw ex2;
                 } finally {
-                    in.close();
+                    try {
+                        in.close();
+                    } catch (final IOException ex2) {
+                        if (null == ex)
+                            throw ex2;
+                        if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+                    }
                 }
+            } catch (final IOException ex2) {
+                ex = ex2;
+                throw ex2;
             } finally {
-                pa.release();
+                try {
+                    postamble.release();
+                } catch (final IOException ex2) {
+                    if (null == ex)
+                        throw ex2;
+                    if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+                }
             }
-        }
+       }
         super.close();
     }
 
@@ -328,7 +348,11 @@ implements OutputShop<ZipDriverEntry> {
                         buffer.getOutputSocket().newOutputStream(),
                         new CRC32());
             } catch (final IOException ex) {
-                buffer.release();
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+                }
                 throw ex;
             }
             bufferedEntry = local;
@@ -359,9 +383,9 @@ implements OutputShop<ZipDriverEntry> {
         void storeBuffer() throws IOException {
             final IOPool.Entry<?> buffer = this.buffer;
             final InputStream in = buffer.getInputSocket().newInputStream();
+            final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
+                    = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
             try {
-                final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
-                        = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
                 final ZipOutputShop zos = ZipOutputShop.this;
                 zos.putNextEntry(local);
                 try {
@@ -375,9 +399,16 @@ implements OutputShop<ZipDriverEntry> {
                     builder.warn(ex2);
                 }
                 builder.check();
+            } catch (final IOException ex) {
+                builder.warn(ex);
             } finally {
-                in.close();
+                try {
+                    in.close();
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                }
             }
+            builder.check();
             buffer.release();
         }
     } // BufferedEntryOutputStream

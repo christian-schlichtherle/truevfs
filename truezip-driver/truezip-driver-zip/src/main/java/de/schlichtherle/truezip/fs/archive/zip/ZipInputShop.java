@@ -9,12 +9,14 @@ import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
+import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.zip.RawZipFile;
 import de.schlichtherle.truezip.zip.ZipCryptoParameters;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -42,10 +44,16 @@ implements InputShop<ZipDriverEntry> {
             final @WillCloseWhenClosed ReadOnlyFile rof)
     throws IOException {
         super(rof, driver);
-        if (null == model)
-            throw new NullPointerException();
         this.driver = driver;
-        this.model = model;
+        if (null == (this.model = model)) {
+            final NullPointerException ex = new NullPointerException();
+            try {
+                super.close();
+            } catch (final Throwable ex2) {
+                if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
     }
 
     /**
@@ -106,6 +114,8 @@ implements InputShop<ZipDriverEntry> {
                 final ZipDriverEntry entry = getEntry(name);
                 if (null == entry)
                     throw new FileNotFoundException(name + " (entry not found)");
+                if (entry.isDirectory())
+                    throw new FileNotFoundException(name + " (cannot read directory entries)");
                 return entry;
             }
 
