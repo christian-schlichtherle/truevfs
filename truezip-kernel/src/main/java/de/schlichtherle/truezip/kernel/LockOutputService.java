@@ -21,7 +21,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Decorates another output service to allow concurrent access which is
- * synchronized by a {@link Lock} object provided to its constructor.
+ * synchronized by a private {@link Lock} object.
  *
  * @param  <E> the type of the entries in the decorated output service.
  * @see    LockInputService
