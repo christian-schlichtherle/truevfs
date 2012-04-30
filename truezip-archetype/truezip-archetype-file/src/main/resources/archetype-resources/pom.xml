@@ -16,9 +16,8 @@
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <truezip.version>
-            LATEST <!-- TODO: Enter version number to enhance build stability! -->
-        </truezip.version>
+        <scala.version>${scala-version}</scala.version> <!-- reserved for future use -->
+        <truezip.version>${truezip-version}</truezip.version>
     </properties>
 
     <dependencies>
