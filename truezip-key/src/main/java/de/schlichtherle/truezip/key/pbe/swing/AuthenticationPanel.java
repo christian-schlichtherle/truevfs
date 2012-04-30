@@ -62,9 +62,6 @@ final class AuthenticationPanel extends JPanel {
      *         {@code null}.
      */
     public void setPasswdPanel(JPanel passwdPanel) {
-        if (passwdPanel == null)
-            throw new NullPointerException();
-
         passwdPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         final String title = resources.getString("tab.passwd");
         if (title.equals(tabs.getTitleAt(AUTH_PASSWD)))

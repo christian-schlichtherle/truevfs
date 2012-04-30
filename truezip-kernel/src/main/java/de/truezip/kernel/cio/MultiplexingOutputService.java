@@ -12,15 +12,14 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.util.ExceptionBuilder;
 import de.truezip.kernel.util.JointIterator;
+import de.truezip.kernel.util.PriorityExceptionBuilder;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -65,8 +64,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             final IOPool<?> pool,
             final @WillCloseWhenClosed OutputService<E> output) {
         super(output);
-        if (null == (this.pool = pool))
-            throw new NullPointerException();
+        this.pool = Objects.requireNonNull(pool);
     }
 
     @Override
@@ -111,8 +109,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     public OutputSocket<E> output(final E local) {
-        if (null == local)
-            throw new NullPointerException();
+        Objects.requireNonNull(local);
 
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
@@ -160,32 +157,40 @@ extends DecoratingOutputService<E, OutputService<E>> {
         if (isBusy())
             return;
 
-        IOException ex = null;
+        final ExceptionBuilder<IOException, IOException> builder
+                = new PriorityExceptionBuilder<>(IOExceptionComparator.INSTANCE);
         for (   final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
                 i.hasNext(); ) {
             final BufferedEntryOutputStream out = i.next();
             try {
                 if (out.storeBuffer())
                     i.remove();
-            } catch (final InputException ex2) {
-                if (null != ex)
-                    ex.addSuppressed(ex2);
-                else
-                    ex = ex2;
-            } catch (final IOException ex2) {
-                if (null != ex)
-                    ex2.addSuppressed(ex);
-                throw ex2;
+            } catch (final InputException ex) {
+                builder.warn(ex);
+            } catch (final IOException ex) {
+                throw builder.fail(ex);
             }
         }
-        if (null != ex)
-            throw ex;
+        builder.check();
     }
 
+    private static final class IOExceptionComparator
+    implements Comparator<IOException> {
+        static final IOExceptionComparator INSTANCE = new IOExceptionComparator();
+
+        @Override
+        public int compare(IOException o1, IOException o2) {
+            return    (o1 instanceof InputException ? 0 : 1)
+                    - (o2 instanceof InputException ? 0 : 1);
+        }
+    } // IOExceptionComparator
+
     /** This entry output stream writes directly to this output service. */
+    @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
+        @CreatesObligation
         EntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
             super(output.stream());
@@ -195,23 +200,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            final ExceptionBuilder<IOException, IOException>
-                    builder = new SuppressedExceptionBuilder<>();
             if (!closed) {
-                try {
-                    out.close();
-                    closed = true;
-                    busy = false;
-                } catch (final IOException ex) {
-                    builder.warn(ex);
-                }
+                out.close();
+                closed = true;
+                busy = false;
             }
-            try {
-                storeBuffers();
-            } catch (final IOException ex) {
-                builder.warn(ex);
-            }
-            builder.check();
+            storeBuffers();
         }
     } // EntryOutputStream
 
@@ -254,7 +248,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
-                } catch (final IOException ex2) {
+                } catch (final Throwable ex2) {
                     ex.addSuppressed(ex2);
                 }
                 throw ex;

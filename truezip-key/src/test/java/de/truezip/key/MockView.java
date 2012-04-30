@@ -8,6 +8,7 @@ import static de.truezip.key.MockView.Action.ENTER;
 import de.truezip.key.PromptingKeyProvider.Controller;
 import de.truezip.key.PromptingKeyProvider.View;
 import java.net.URI;
+import java.util.Objects;
 import java.util.Random;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -31,9 +32,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
     }
 
     public void setAction(final Action action) {
-        if (null == action)
-            throw new NullPointerException();
-        this.action = action;
+        this.action = Objects.requireNonNull(action);
     }
 
     public @CheckForNull URI getResource() {

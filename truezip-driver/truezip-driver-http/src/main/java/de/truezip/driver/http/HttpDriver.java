@@ -11,6 +11,7 @@ import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.FsModel;
 import java.io.IOException;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import org.apache.http.HttpResponse;
@@ -35,9 +36,7 @@ public class HttpDriver extends FsDriver {
     private volatile @CheckForNull HttpClient client;
 
     public HttpDriver(final IOPoolProvider provider) {
-        if (null == provider)
-            throw new NullPointerException();
-        this.provider = provider;
+        this.provider = Objects.requireNonNull(provider);
     }
 
     final IOPool<?> getPool() {
@@ -92,7 +91,7 @@ public class HttpDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    controller(  final FsManager manager,
+    newController(  final FsManager manager,
                     final FsModel model,
                     final @CheckForNull FsController<?> parent) {
         assert null == parent;

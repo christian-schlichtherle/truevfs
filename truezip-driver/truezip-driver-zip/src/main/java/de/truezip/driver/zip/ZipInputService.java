@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.driver.zip.io.RawFile;
+import de.truezip.driver.zip.io.RawZipFile;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.Entry;
@@ -15,6 +15,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
+import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -25,7 +26,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public final class ZipInputService
-extends RawFile<ZipDriverEntry>
+extends RawZipFile<ZipDriverEntry>
 implements InputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
@@ -45,7 +46,7 @@ implements InputService<ZipDriverEntry> {
             final NullPointerException ex = new NullPointerException();
             try {
                 super.close();
-            } catch (final IOException ex2) {
+            } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -95,8 +96,7 @@ implements InputService<ZipDriverEntry> {
 
     @Override
     public InputSocket<ZipDriverEntry> input(final String name) {
-        if (null == name)
-            throw new NullPointerException();
+        Objects.requireNonNull(name);
 
         final class Input extends InputSocket<ZipDriverEntry> {
             @Override

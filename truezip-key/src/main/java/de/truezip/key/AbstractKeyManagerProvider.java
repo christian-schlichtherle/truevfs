@@ -63,7 +63,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final <K> KeyManager<K> getKeyManager(final Class<K> type) {
+    public final <K> KeyManager<K> keyManager(final Class<K> type) {
         final KeyManager<?> manager = getKeyManagers().get(type);
         if (null == manager)
             throw new ServiceConfigurationError("No key manager available for " + type + ".");
@@ -73,7 +73,9 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
     /**
      * Returns an immutable map of secret key classes to key managers.
      * Neither the keys nor the values of the returned map may be {@code null}.
-     * This is an immutable property - multiple calls must return the same value.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * object.
      * 
      * @return an unmodifiable map of secret key classes to key managers.
      */

@@ -25,7 +25,5 @@ final class NeedsWriteLockException extends ControlFlowException {
         return TRACEABLE ? new NeedsWriteLockException() : SINGLETON;
     }
 
-    private NeedsWriteLockException() {
-        super(null);
-    }
+    private NeedsWriteLockException() { }
 }

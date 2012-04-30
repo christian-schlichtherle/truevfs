@@ -7,6 +7,7 @@ package de.truezip.extension.jmxjul;
 import de.truezip.kernel.cio.DecoratingOutputSocket;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.OutputSocket;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -23,7 +24,6 @@ extends DecoratingOutputSocket<E> {
             final OutputSocket<? extends E> socket,
             final InstrumentingDirector<?> director) {
         super(socket);
-        if (null == (this.director = director))
-            throw new NullPointerException();
+        this.director = Objects.requireNonNull(director);
     }
 }

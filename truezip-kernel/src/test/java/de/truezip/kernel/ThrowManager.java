@@ -8,6 +8,7 @@ import static de.truezip.kernel.util.Throwables.wrap;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -39,9 +40,8 @@ public final class ThrowManager {
     }
 
     public Throwable trigger(final Class<?> from, final Throwable toThrow) {
-        if (null == from)
-            throw new NullPointerException();
-        wrap(toThrow); // test if wrappable
+        Objects.requireNonNull(from);
+        wrap(toThrow); // test
         // DON'T put wrap(toThrow)! We want the stack trace of the call to
         // check(*), not of the call to this method!
         return throwables.put(from, toThrow);

@@ -6,6 +6,7 @@ package de.truezip.extension.jmxjul;
 
 import de.truezip.kernel.FsDecoratingModel;
 import de.truezip.kernel.FsModel;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -20,7 +21,6 @@ public abstract class InstrumentingModel extends FsDecoratingModel<FsModel> {
     protected InstrumentingModel(   final FsModel model,
                                     final InstrumentingDirector<?> director) {
         super(model);
-        if (null == (this.director = director))
-            throw new NullPointerException();
+        this.director = Objects.requireNonNull(director);
     }
 }

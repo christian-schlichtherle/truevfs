@@ -5,6 +5,7 @@
 package de.truezip.extension.jmxjul;
 
 import de.truezip.kernel.*;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -18,8 +19,7 @@ public class InstrumentingManager extends FsDecoratingManager<FsManager> {
     public InstrumentingManager(final FsManager manager,
                                 final InstrumentingDirector<?> director) {
         super(manager);
-        if (null == (this.director = director))
-            throw new NullPointerException();
+        this.director = Objects.requireNonNull(director);
     }
 
     @Override

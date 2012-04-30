@@ -36,7 +36,7 @@ extends Closeable, Container<E> {
     /**
      * Returns an output socket for writing to the given entry.
      *
-     * @param  entry the entry, which will be the
+     * @param  entry the entry, which must be the
      *         {@linkplain OutputSocket#localTarget local target} of the
      *         returned output socket.
      * @return An output socket for writing to the given entry.

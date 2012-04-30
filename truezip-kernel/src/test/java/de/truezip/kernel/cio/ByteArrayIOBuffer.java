@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -71,8 +72,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
     private ByteArrayIOBuffer(  final String name,
                                 final @CheckForNull byte[] data,
                                 final int initialCapacity) {
-        if (null == (this.name = name))
-            throw new NullPointerException();
+        this.name = Objects.requireNonNull(name);
         setData(data);
         setInitialCapacity(initialCapacity);
     }

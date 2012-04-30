@@ -6,6 +6,7 @@ package de.truezip.file.swing;
 
 import de.truezip.file.TFile;
 import java.awt.Component;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.swing.Icon;
@@ -26,9 +27,7 @@ final class TFileTreeCellRenderer extends DefaultTreeCellRenderer {
     private final TFileTree fileTree;
 
     TFileTreeCellRenderer(final TFileTree fileTree) {
-        if (null == fileTree)
-            throw new NullPointerException();
-        this.fileTree = fileTree;
+        this.fileTree = Objects.requireNonNull(fileTree);
     }
 
     /**

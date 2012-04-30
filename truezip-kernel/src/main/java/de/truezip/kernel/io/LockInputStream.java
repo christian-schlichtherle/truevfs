@@ -7,6 +7,7 @@ package de.truezip.kernel.io;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.GuardedBy;
@@ -26,16 +27,14 @@ public class LockInputStream extends DecoratingInputStream {
     private final Lock lock;
 
     protected LockInputStream(final Lock lock) {
-        if (null == (this.lock = lock))
-            throw new NullPointerException();
+        this.lock = Objects.requireNonNull(lock);
     }
 
     public LockInputStream(
             final Lock lock,
             final @WillCloseWhenClosed InputStream in) {
         this(lock);
-        if (null == (this.in = in))
-            throw new NullPointerException();
+        this.in = Objects.requireNonNull(in);
     }
 
     @Override

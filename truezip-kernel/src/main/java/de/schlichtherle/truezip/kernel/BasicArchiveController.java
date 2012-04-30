@@ -24,6 +24,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
@@ -51,19 +52,19 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-abstract class ArchiveController<E extends FsArchiveEntry>
+abstract class BasicArchiveController<E extends FsArchiveEntry>
 extends LockModelController {
 
     private static final Logger logger = Logger.getLogger(
-            ArchiveController.class.getName(),
-            ArchiveController.class.getName());
+            BasicArchiveController.class.getName(),
+            BasicArchiveController.class.getName());
 
     /**
      * Constructs a new basic archive controller.
      *
      * @param model the non-{@code null} archive model.
      */
-    ArchiveController(final LockModel model) {
+    BasicArchiveController(final LockModel model) {
         super(model);
         if (null == model.getParent())
             throw new IllegalArgumentException();
@@ -151,41 +152,36 @@ extends LockModelController {
     @NotThreadSafe
     private final class Input extends DelegatingInputSocket<FsArchiveEntry> {
         final FsEntryName name;
-        @CheckForNull FsArchiveEntry localTarget;
         final BitField<FsAccessOption> options;
 
         Input(final FsEntryName name, final BitField<FsAccessOption> options) {
-            if (null == (this.name = name))
-                throw new NullPointerException();
-            if (null == (this.options = options))
-                throw new NullPointerException();
+            this.name = Objects.requireNonNull(name);
+            this.options = Objects.requireNonNull(options);
         }
 
         @Override
         public FsArchiveEntry localTarget() throws IOException {
-            if (null != localTarget)
-                return localTarget;
             peerTarget(); // may sync() if in same target archive file!
             checkSync(name, READ, options);
             final FsCovariantEntry<E> fse = autoMount(options).entry(name);
             if (null == fse)
                 throw new NoSuchFileException(name.toString());
-            return localTarget = fse.getEntry();
+            return fse.getEntry();
         }
 
         @Override
-        protected InputSocket<? extends FsArchiveEntry> getSocket()
+        protected InputSocket<E> getSocket()
         throws IOException {
-            localTarget = null;
             final FsArchiveEntry ae = localTarget();
-            if (FILE != ae.getType())
+            final Type type = ae.getType();
+            if (FILE != type)
                 throw new FileSystemException(name.toString(), null,
-                        "Not a file entry!");
+                        "Expected a FILE entry, but is a " + type + " entry!");
             return input(ae.getName());
         }
     } // Input
 
-    abstract InputSocket<? extends E> input(String name);
+    abstract InputSocket<E> input(String name);
 
     @Override
     public final OutputSocket<?> output(
@@ -200,28 +196,21 @@ extends LockModelController {
         final FsEntryName name;
         final BitField<FsAccessOption> options;
         final @CheckForNull Entry template;
-        @CheckForNull ArchiveFileSystemOperation<E> mknod;
 
         Output( final FsEntryName name,
                 final BitField<FsAccessOption> options,
                 final @CheckForNull Entry template) {
-            if (null == (this.name = name))
-                throw new NullPointerException();
-            if (null == (this.options = options))
-                throw new NullPointerException();
+            this.name = Objects.requireNonNull(name);
+            this.options = Objects.requireNonNull(options);
             this.template = template;
         }
 
         ArchiveFileSystemOperation<E> mknod() throws IOException {
-            final ArchiveFileSystemOperation<E> mknod = this.mknod;
-            if (null != mknod)
-                return mknod;
             checkSync(name, WRITE, options);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return this.mknod = autoMount(
-                        !name.isRoot() && options.get(CREATE_PARENTS),
-                        options)
+            return autoMount(   !name.isRoot() && options.get(CREATE_PARENTS),
+                                options)
                     .mknod(name, FILE, options, template);
         }
 
@@ -241,21 +230,9 @@ extends LockModelController {
         @Override
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE") // false positive
         public OutputStream stream() throws IOException {
-            mknod = null;
             final ArchiveFileSystemOperation<E> mknod = mknod();
             final E ae = mknod.getTarget().getEntry();
-            InputStream in = null;
-            if (options.get(APPEND)) {
-                try {
-                    in = new Input(name, options).stream();
-                } catch (final IOException ex) {
-                    // When appending, there is no need for the entry to be
-                    // readable, so we can safely ignore this - fall through!
-                    assert null == in;
-                }
-            }
-            Throwable ex = null;
-            try {
+            try (final InputStream in = append()) {
                 final OutputSocket<? extends E> os = output(ae, options);
                 if (null == in) // do NOT bind when appending!
                     os.bind(this);
@@ -267,25 +244,25 @@ extends LockModelController {
                 } catch (final Throwable ex2) {
                     try {
                         out.close();
-                    } catch (final IOException ex3) {
+                    } catch (final Throwable ex3) {
                         ex2.addSuppressed(ex3);
                     }
                     throw ex2;
                 }
                 return out;
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
+            }
+        }
+
+        @CheckForNull InputStream append() {
+            if (options.get(APPEND)) {
                 try {
-                    if (null != in)
-                        in.close();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
+                    return new Input(name, options).stream();
+                } catch (IOException ignored) {
+                    // When appending, there is no need for the entry to be
+                    // readable, so we can safely ignore this - fall through!
                 }
             }
+            return null;
         }
     } // Output
 
@@ -312,9 +289,7 @@ extends LockModelController {
         }
     } // ProxyEntry
 
-    abstract OutputSocket<? extends E> output(
-            E entry,
-            BitField<FsAccessOption> options);
+    abstract OutputSocket<E> output(E entry, BitField<FsAccessOption> options);
 
     @Override
     public final void mknod(
@@ -326,7 +301,7 @@ extends LockModelController {
         if (name.isRoot()) { // TODO: Is this case differentiation still required?
             try {
                 autoMount(options); // detect false positives!
-            } catch (final FalsePositiveException ex) {
+            } catch (final FalsePositiveArchiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
                 autoMount(true, options);

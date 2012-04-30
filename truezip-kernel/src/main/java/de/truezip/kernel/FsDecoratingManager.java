@@ -39,9 +39,9 @@ extends FsManager {
 
     @Override
     public <E extends FsArchiveEntry> FsController<?>
-    controller(FsArchiveDriver<E> driver, FsModel model, FsController<?> parent) {
+    newController(FsArchiveDriver<E> driver, FsModel model, FsController<?> parent) {
         assert false : "This method should never get called on this class!";
-        return manager.controller(driver, model, parent);
+        return manager.newController(driver, model, parent);
     }
 
     @Override

@@ -104,7 +104,8 @@ extends ConfiguredClientTestBase<D> {
         final TFile inner = new TFile(outer.getParentFile(),
                 "inner" + getExtension() + "/" + outer.getName());
         // This particular sequence has been selected because of its increased
-        // likeliness to fail in case the cache sync logic is not correct.
+        // likeliness to fail in case the sync logic of the selective entry
+        // cache is not correct.
         create(inner);
         check(inner);
         inner.mv(outer);

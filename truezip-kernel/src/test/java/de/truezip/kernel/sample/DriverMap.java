@@ -30,10 +30,8 @@ public final class DriverMap implements Runnable {
     private final FsDriverProvider provider;
 
     public DriverMap(final PrintStream out, final FsDriverProvider provider) {
-        if (null == out || null == provider)
-            throw new NullPointerException();
-        this.out = out;
-        this.provider = provider;
+        this.out = Objects.requireNonNull(out);
+        this.provider = Objects.requireNonNull(provider);
     }
 
     public static void main(String[] args) throws Exception {

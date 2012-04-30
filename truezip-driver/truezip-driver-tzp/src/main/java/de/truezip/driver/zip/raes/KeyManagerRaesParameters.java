@@ -15,6 +15,7 @@ import de.truezip.key.UnknownKeyException;
 import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.param.AesPbeParameters;
 import java.net.URI;
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -45,7 +46,7 @@ implements RaesParametersProvider {
     public KeyManagerRaesParameters(
             final KeyManagerProvider provider,
             final URI raes) {
-        this(provider.getKeyManager(AesPbeParameters.class), raes);
+        this(provider.keyManager(AesPbeParameters.class), raes);
     }
 
     /**
@@ -57,10 +58,8 @@ implements RaesParametersProvider {
     public KeyManagerRaesParameters(
             final KeyManager<AesPbeParameters> manager,
             final URI raes) {
-        if (null == (this.manager = manager))
-            throw new NullPointerException();
-        if (null == (this.raes = raes))
-            throw new NullPointerException();
+        this.manager = Objects.requireNonNull(manager);
+        this.raes = Objects.requireNonNull(raes);
     }
 
     /**

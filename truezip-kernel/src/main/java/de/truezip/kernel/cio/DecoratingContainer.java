@@ -5,6 +5,7 @@
 package de.truezip.kernel.cio;
 
 import java.util.Iterator;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
@@ -26,8 +27,7 @@ implements Container<E> {
     protected DecoratingContainer() { }
 
     protected DecoratingContainer(final C container) {
-        if (null == (this.container = container))
-            throw new NullPointerException();
+        this.container = Objects.requireNonNull(container);
     }
 
     @Override

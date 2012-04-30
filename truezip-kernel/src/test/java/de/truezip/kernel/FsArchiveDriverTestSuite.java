@@ -26,6 +26,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
@@ -121,42 +122,42 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().input(null, parent, entry, NONE);
+        getArchiveDriver().newInput(null, parent, entry, NONE);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().input(model, null, entry, NONE);
+        getArchiveDriver().newInput(model, null, entry, NONE);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullEntryName() throws IOException {
-        getArchiveDriver().input(model, parent, null, NONE);
+        getArchiveDriver().newInput(model, parent, null, NONE);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().input(model, parent, entry, null);
+        getArchiveDriver().newInput(model, parent, entry, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().output(null, parent, entry, NONE, null);
+        getArchiveDriver().newOutput(null, parent, entry, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().output(model, null, entry, NONE, null);
+        getArchiveDriver().newOutput(model, null, entry, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullEntryName() throws IOException {
-        getArchiveDriver().output(model, parent, null, NONE, null);
+        getArchiveDriver().newOutput(model, parent, null, NONE, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().output(model, parent, entry, null, null);
+        getArchiveDriver().newOutput(model, parent, entry, null, null);
     }
 
     @Test
@@ -176,7 +177,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void output(final int numEntries) throws IOException {
         final OutputService<E> service = getArchiveDriver()
-                .output(model, parent, entry, NONE, null);
+                .newOutput(model, parent, entry, NONE, null);
         try {
             final Closeable[] streams = new Closeable[numEntries];
             try {
@@ -231,7 +232,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void input(final int numEntries) throws IOException {
         final InputService<E> service = getArchiveDriver()
-                .input(model, parent, entry, NONE);
+                .newInput(model, parent, entry, NONE);
         try {
             check(service, numEntries);
             final Closeable[] streams = new Closeable[numEntries];
@@ -366,7 +367,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private E newEntry(final String name) throws CharConversionException {
-        final E e = getArchiveDriver().entry(name, Entry.Type.FILE, null);
+        final E e = getArchiveDriver().newEntry(name, Entry.Type.FILE, null);
         assertNotNull(e);
         assertEquals(name, e.getName());
         assertSame(FILE, e.getType());
@@ -444,10 +445,8 @@ extends FsArchiveDriverTestBase<D> {
         public InputSocket<?> input(
                 final FsEntryName name,
                 final BitField<FsAccessOption> options) {
-            if (null == name)
-                throw new NullPointerException();
-            if (null == options)
-                throw new NullPointerException();
+            Objects.requireNonNull(name);
+            Objects.requireNonNull(options);
 
             final class Input extends DecoratingInputSocket<Entry> {
                 Input() {
@@ -477,10 +476,8 @@ extends FsArchiveDriverTestBase<D> {
                 final FsEntryName name,
                 final BitField<FsAccessOption> options,
                 final Entry template) {
-            if (null == name)
-                throw new NullPointerException();
-            if (null == options)
-                throw new NullPointerException();
+            Objects.requireNonNull(name);
+            Objects.requireNonNull(options);
 
             final class Output extends DecoratingOutputSocket<Entry> {
                 Output() {

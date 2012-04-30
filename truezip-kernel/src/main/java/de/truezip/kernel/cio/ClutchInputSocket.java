@@ -10,8 +10,8 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An input socket which obtains its socket lazily and {@link #reset()}s it
- * upon any {@link Throwable}.
+ * An input socket which obtains its delegate socket lazily and
+ * {@link #reset()}s it upon any {@link Throwable}.
  *
  * @see    ClutchOutputSocket
  * @param  <E> the type of the {@link #localTarget() local target}.
@@ -24,17 +24,16 @@ extends DecoratingInputSocket<E> {
     @Override
     protected final InputSocket<? extends E> getSocket() throws IOException {
         final InputSocket<? extends E> socket = this.socket;
-        return null != socket ? socket : (this.socket = getLazyDelegate());
+        return null != socket ? socket : (this.socket = socket());
     };
 
     /**
-     * Returns the socket socket for lazy initialization.
+     * Returns the input socket for lazy initialization.
      * 
-     * @return the socket socket for lazy initialization.
+     * @return the input socket for lazy initialization.
      * @throws IOException on any I/O error. 
      */
-    protected abstract InputSocket<? extends E> getLazyDelegate()
-    throws IOException;
+    protected abstract InputSocket<? extends E> socket() throws IOException;
 
     @Override
     public E localTarget() throws IOException {

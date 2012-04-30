@@ -16,8 +16,8 @@ public interface KeyManagerProvider {
     /**
      * Returns the key manager for the given secret key class.
      * <p>
-     * This is an immutable indexed property - multiple calls must return the
-     * same object for the same secret key class.
+     * This is a pure function - multiple calls must return the same value for
+     * the same parameter.
      *
      * @param  <K> the type of the secret keys.
      * @param  type the class for the secret key type.
@@ -25,5 +25,5 @@ public interface KeyManagerProvider {
      * @throws ServiceConfigurationError if no appropriate key manager is
      *         available.
      */
-    <K> KeyManager<K> getKeyManager(Class<K> type);
+    <K> KeyManager<K> keyManager(Class<K> type);
 }

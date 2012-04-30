@@ -6,6 +6,7 @@ package de.truezip.key;
 
 import de.truezip.key.PromptingKeyProvider.View;
 import java.net.URI;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -28,8 +29,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      * @param view the view instance for prompting for keys.
      */
     public PromptingKeyManager(final View<K> view) {
-        if (null == (this.view = view))
-            throw new NullPointerException();
+        this.view = Objects.requireNonNull(view);
     }
 
     final View<K> getView() {

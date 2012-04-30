@@ -35,6 +35,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.TooManyListenersException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -43,15 +44,25 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Manages I/O to the entry which represents the target archive file in its
- * parent file system and resolves archive entry collisions by performing a
- * full update of the target archive file.
+ * parent file system, detects archive entry collisions and implements a sync
+ * of the target archive file.
+ * <p>
+ * This controller is an emitter for {@link ControlFlowException}s:
+ * for example when
+ * {@linkplain FalsePositiveArchiveException detecting a false positive archive file}, or
+ * {@linkplain NeedsWriteLockException requiring a write lock} or
+ * {@linkplain NeedsSyncException requiring a sync}.
  *
  * @param  <E> the type of the archive entries.
+ * @see    FalsePositiveArchiveException
+ * @see    NeedsWriteLockException
+ * @see    NeedsSyncException
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class TargetArchiveController<E extends FsArchiveEntry>
-extends FileSystemArchiveController<E> {
+extends FileSystemArchiveController<E>
+implements ArchiveFileSystemTouchListener<E> {
 
     private static final BitField<FsAccessOption>
             MOUNT_OPTIONS = BitField.of(FsAccessOption.CACHE);
@@ -76,27 +87,21 @@ extends FileSystemArchiveController<E> {
      */
     private @CheckForNull OutputArchive<E> outputArchive;
 
-    private final ArchiveFileSystemTouchListener<E>
-            touchListener = new TouchListener();
-
     /**
-     * Constructs a new default archive file system controller.
+     * Constructs a new target archive controller.
      * 
      * @param model the file system model.
      * @param parent the parent file system
      * @param driver the archive driver.
      */
     TargetArchiveController(
+            final FsArchiveDriver<E> driver,
             final LockModel model,
-            final FsController<?> parent,
-            final FsArchiveDriver<E> driver) {
+            final FsController<?> parent) {
         super(model);
-        if (null == driver)
-            throw new NullPointerException();
-        if (model.getParent() != parent.getModel())
+        this.driver = Objects.requireNonNull(driver);
+        if (model.getParent() != (this.parent = parent).getModel())
             throw new IllegalArgumentException("Parent/member mismatch!");
-        this.driver = driver;
-        this.parent = parent;
         this.name = getMountPoint().getPath().getEntryName();
         assert invariants();
     }
@@ -126,9 +131,9 @@ extends FileSystemArchiveController<E> {
 
     private void setInputArchive(final @CheckForNull InputArchive<E> ia) {
         assert null == ia || null == this.inputArchive;
-        this.inputArchive = ia;
         if (null != ia)
             setTouched(true);
+        this.inputArchive = ia;
     }
 
     @Nullable OutputArchive<E> getOutputArchive() throws NeedsSyncException {
@@ -140,9 +145,9 @@ extends FileSystemArchiveController<E> {
 
     private void setOutputArchive(final @CheckForNull OutputArchive<E> oa) {
         assert null == oa || null == this.outputArchive;
-        this.outputArchive = oa;
         if (null != oa)
             setTouched(true);
+        this.outputArchive = oa;
     }
 
     @Override
@@ -170,10 +175,15 @@ extends FileSystemArchiveController<E> {
         final FsEntry pe; // parent entry
         try {
             pe = parent.entry(name);
+        } catch (final FalsePositiveArchiveException ex) {
+            throw new AssertionError(ex);
+        } catch (final ControlFlowException ex) {
+            assert ex instanceof NeedsLockRetryException : ex;
+            throw ex;
         } catch (final IOException inaccessibleEntry) {
             if (autoCreate)
                 throw inaccessibleEntry;
-            throw new FalsePositiveException(inaccessibleEntry);
+            throw new FalsePositiveArchiveException(inaccessibleEntry);
         }
 
         // Obtain file system by creating or loading it from the parent entry.
@@ -182,39 +192,57 @@ extends FileSystemArchiveController<E> {
             if (autoCreate) {
                 // This may fail e.g. if the container file is an RAES
                 // encrypted ZIP file and the user cancels password prompting.
-                makeOutputArchive(options);
+                outputArchive(options);
                 fs = newEmptyFileSystem(driver);
             } else {
-                throw new FalsePositiveException(
-                        new NoSuchFileException(name.toString(), null,
-                            "Missing parent file entry!"));
+                throw new FalsePositiveArchiveException(
+                        new NoSuchFileException(name.toString()));
             }
         } else {
+            final InputService<E> is;
+            final boolean ro;
             try {
                 // readOnly must be set first because the parent archive controller
                 // could be a FileController and on Windows this property changes
                 // to TRUE once a file is opened for reading!
-                final boolean ro = !parent.isWritable(name);
-                final FsModel model = getModel();
-                final InputService<E> is = driver
-                        .input(model, parent, name, MOUNT_OPTIONS);
-                final InputArchive<E> ia = new InputArchive<>(is);
-                fs = newPopulatedFileSystem(driver, is, pe, ro);
-                setInputArchive(ia);
+                ro = !parent.isWritable(name);
+                is = driver.newInput(getModel(), parent, name, MOUNT_OPTIONS);
+            } catch (final FalsePositiveArchiveException ex) {
+                throw new AssertionError(ex);
+            } catch (final ControlFlowException ex) {
+                assert ex instanceof NeedsLockRetryException : ex;
+                throw ex;
             } catch (final IOException ex) {
                 throw pe.isType(SPECIAL)
-                        ? new FalsePositiveException(ex)
-                        : new PersistentFalsePositiveException(ex);
+                        ? new FalsePositiveArchiveException(ex)
+                        : new PersistentFalsePositiveArchiveException(ex);
             }
+            final InputArchive<E> ia = new InputArchive<>(is);
+            fs = newPopulatedFileSystem(driver, is, pe, ro);
+            setInputArchive(ia);
         }
 
         // Register file system.
         try {
-            fs.addFsArchiveFileSystemTouchListener(touchListener);
+            fs.addArchiveFileSystemTouchListener(this);
         } catch (final TooManyListenersException ex) {
             throw new AssertionError(ex);
         }
         setFileSystem(fs);
+    }
+
+    @Override
+    public void preTouch(   ArchiveFileSystemEvent<? extends E> event,
+                            BitField<FsAccessOption> options)
+    throws IOException {
+        assert event.getSource() == getFileSystem();
+        outputArchive(options);
+    }
+
+    @Override
+    public void postTouch(  ArchiveFileSystemEvent<? extends E> event,
+                            BitField<FsAccessOption> options) {
+        assert event.getSource() == getFileSystem();
     }
 
     /**
@@ -227,28 +255,37 @@ extends FileSystemArchiveController<E> {
      * @return The output archive.
      */
     @CreatesObligation
-    OutputArchive<E> makeOutputArchive(BitField<FsAccessOption> options)
+    OutputArchive<E> outputArchive(BitField<FsAccessOption> options)
     throws IOException {
         OutputArchive<E> oa = getOutputArchive();
-        if (null != oa)
+        if (null != oa) {
+            assert isTouched();
             return oa;
+        }
         final InputArchive<E> ia = getInputArchive();
         final InputService<E> is = null == ia ? null : ia.getDriverProduct();
         final FsModel model = getModel();
         options = options.and(ACCESS_PREFERENCES_MASK).set(CACHE);
-        final OutputService<E> os = driver
-                .output(model, parent, name, options, is);
+        final OutputService<E> os;
+        try {
+            os = driver.newOutput(model, parent, name, options, is);
+        } catch (final FalsePositiveArchiveException ex) {
+            throw new AssertionError(ex);
+        } catch (final ControlFlowException ex) {
+            assert ex instanceof NeedsLockRetryException : ex;
+            throw ex;
+        }
         oa = new OutputArchive<>(os);
         setOutputArchive(oa);
+        assert isTouched();
         return oa;
     }
 
     @Override
-    InputSocket<? extends E> input(final String name) {
+    InputSocket<E> input(final String name) {
         class Input extends ClutchInputSocket<E> {
             @Override
-            protected InputSocket<? extends E> getLazyDelegate()
-            throws IOException {
+            protected InputSocket<E> socket() throws IOException {
                 return getInputArchive().input(name);
             }
 
@@ -256,7 +293,7 @@ extends FileSystemArchiveController<E> {
             public E localTarget() throws IOException {
                 try {
                     return super.localTarget();
-                } catch (InputClosedException ignored) {
+                } catch (InputClosedException discarded) {
                     throw NeedsSyncException.get();
                 }
             }
@@ -265,7 +302,7 @@ extends FileSystemArchiveController<E> {
             public InputStream stream() throws IOException {
                 try {
                     return super.stream();
-                } catch (InputClosedException ignored) {
+                } catch (InputClosedException discarded) {
                     throw NeedsSyncException.get();
                 }
             }
@@ -274,7 +311,7 @@ extends FileSystemArchiveController<E> {
             public SeekableByteChannel channel() throws IOException {
                 try {
                     return super.channel();
-                } catch (InputClosedException ignored) {
+                } catch (InputClosedException discarded) {
                     throw NeedsSyncException.get();
                 }
             }
@@ -284,30 +321,25 @@ extends FileSystemArchiveController<E> {
     }
 
     @Override
-    OutputSocket<? extends E> output(
+    OutputSocket<E> output(
             final E entry,
             final BitField<FsAccessOption> options) {
         final class Output extends ClutchOutputSocket<E> {
             @Override
-            protected OutputSocket<? extends E> getLazyDelegate()
-            throws IOException {
-                return makeOutputArchive(options).output(entry);
+            protected OutputSocket<E> socket() throws IOException {
+                return outputArchive(options).output(entry);
             }
 
             @Override
             public E localTarget() throws IOException {
-                try {
-                    return super.localTarget();
-                } catch (OutputClosedException ignored) {
-                    throw NeedsSyncException.get();
-                }
+                return entry;
             }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
                 try {
                     return super.channel();
-                } catch (OutputClosedException ignored) {
+                } catch (OutputClosedException discarded) {
                     throw NeedsSyncException.get();
                 }
             }
@@ -316,7 +348,7 @@ extends FileSystemArchiveController<E> {
             public OutputStream stream() throws IOException {
                 try {
                     return super.stream();
-                } catch (OutputClosedException ignored) {
+                } catch (OutputClosedException discarded) {
                     throw NeedsSyncException.get();
                 }
             }
@@ -507,6 +539,9 @@ extends FileSystemArchiveController<E> {
         if (null != ia) {
             try {
                 ia.close();
+            } catch (final ControlFlowException ex) {
+                assert ex instanceof NeedsLockRetryException : ex;
+                throw ex;
             } catch (final IOException ex) {
                 builder.warn(new FsSyncWarningException(getModel(), ex));
             }
@@ -516,6 +551,9 @@ extends FileSystemArchiveController<E> {
         if (null != oa) {
             try {
                 oa.close();
+            } catch (final ControlFlowException ex) {
+                assert ex instanceof NeedsLockRetryException : ex;
+                throw ex;
             } catch (final IOException ex) {
                 builder.warn(new FsSyncException(getModel(), ex));
             }
@@ -603,24 +641,4 @@ extends FileSystemArchiveController<E> {
             return (DisconnectingOutputService<E>) container;
         }
     } // OutputArchive
-
-    /** An archive file system listener which makes the output archive. */
-    private final class TouchListener
-    implements ArchiveFileSystemTouchListener<E> {
-        @Override
-        public void beforeTouch(ArchiveFileSystemEvent<? extends E> event,
-                                BitField<FsAccessOption> options)
-        throws IOException {
-            assert event.getSource() == getFileSystem();
-            makeOutputArchive(options);
-            assert isTouched();
-        }
-
-        @Override
-        public void afterTouch( ArchiveFileSystemEvent<? extends E> event,
-                                BitField<FsAccessOption> options) {
-            assert event.getSource() == getFileSystem();
-            assert isTouched();
-        }
-    } // TouchListener
 }

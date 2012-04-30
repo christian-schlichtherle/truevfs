@@ -11,6 +11,7 @@ import java.awt.LayoutManager;
 import java.awt.Window;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.util.Objects;
 import javax.swing.JPanel;
 
 /**
@@ -118,9 +119,7 @@ public class EnhancedPanel extends JPanel  {
      *        listener {@code n} times.
      */
     public void addPanelListener(final PanelListener listener) {
-        if (null == listener)
-            throw new NullPointerException();
-        listenerList.add(PanelListener.class, listener);
+        listenerList.add(PanelListener.class, Objects.requireNonNull(listener));
     }
 
     /**
@@ -132,9 +131,7 @@ public class EnhancedPanel extends JPanel  {
      *        multiple times, it is removed from the list only once.
      */
     public void removePanelListener(final PanelListener listener) {
-        if (null == listener)
-            throw new NullPointerException();
-        listenerList.remove(PanelListener.class, listener);
+        listenerList.remove(PanelListener.class, Objects.requireNonNull(listener));
     }
 
     /**

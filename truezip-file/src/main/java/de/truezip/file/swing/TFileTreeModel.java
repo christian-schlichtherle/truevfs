@@ -73,11 +73,9 @@ public final class TFileTreeModel implements TreeModel {
             final Comparator<? super TFile> comparator) {
         if (null != root && 0 != comparator.compare(root, root))
             throw new IllegalArgumentException();
-        if (null == comparator)
-            throw new NullPointerException();
         this.root = root;
         this.filter = filter;
-        this.comparator = comparator;
+        this.comparator = Objects.requireNonNull(comparator);
     }
 
     @Override
@@ -334,9 +332,7 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      */
     public void nodeInsertedOrStructureChanged(final TFile node) {
-        if (node == null)
-            throw new NullPointerException();
-        if (cache.containsKey(node))
+        if (cache.containsKey(Objects.requireNonNull(node)))
             structureChanged(node);
         else
             nodeInserted(node);
@@ -419,9 +415,7 @@ public final class TFileTreeModel implements TreeModel {
      * on all listeners of this {@code TreeModel}.
      */
     public void structureChanged(final TFile node) {
-        if (node == null)
-            throw new NullPointerException();
-        forget(node, true);
+        forget(Objects.requireNonNull(node), true);
         fireTreeStructureChanged(
                 new TreeModelEvent(this, newTreePath(node), null, null));
     }

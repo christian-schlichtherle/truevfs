@@ -21,18 +21,20 @@ import javax.annotation.concurrent.Immutable;
 abstract class LockModelController
 extends FsModelController<LockModel>  {
 
-    /**
-     * Constructs a new file system controller for the given file system lock
-     * model.
-     * 
-     * @param model the file system lock model.
-     */
     LockModelController(LockModel model) {
         super(model);
     }
 
+    //
+    // These methods are an exact copy of DecoratingLockModelController.*
+    //
+
     ReadLock readLock() {
         return getModel().readLock();
+    }
+
+    final boolean isReadLockedByCurrentThread() {
+        return getModel().isReadLockedByCurrentThread();
     }
 
     WriteLock writeLock() {

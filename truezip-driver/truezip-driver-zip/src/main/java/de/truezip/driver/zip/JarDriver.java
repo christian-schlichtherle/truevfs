@@ -59,7 +59,7 @@ public class JarDriver extends ZipDriver {
      * @return {@code new JarDriverEntry(name)}
      */
     @Override
-    public JarDriverEntry entry(String name) {
+    public JarDriverEntry newEntry(String name) {
         return new JarDriverEntry(name);
     }
 
@@ -71,7 +71,7 @@ public class JarDriver extends ZipDriver {
      * @return {@code new JarDriverEntry(name, template)}
      */
     @Override
-    public JarDriverEntry entry(String name, ZipEntry template) {
+    public JarDriverEntry newEntry(String name, ZipEntry template) {
         return new JarDriverEntry(name, template);
     }
 }

@@ -39,7 +39,7 @@ implements ZipFileParameters<ZipEntry> {
     }
 
     @Override
-    public ZipEntry entry(String name) {
+    public ZipEntry newEntry(String name) {
         return new ZipEntry(name);
     }
 }

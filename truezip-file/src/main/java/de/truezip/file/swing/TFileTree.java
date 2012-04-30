@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
@@ -99,9 +100,7 @@ public final class TFileTree extends JTree {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
     public void setModel(TreeModel model) {
-        if (null == model)
-            throw new NullPointerException();
-        super.setModel((TFileTreeModel) model);
+        super.setModel((TFileTreeModel) Objects.requireNonNull(model));
     }
 
     @Override
@@ -326,8 +325,7 @@ public final class TFileTree extends JTree {
      *
      */
     public void refresh(final TFile node) {
-        if (node == null)
-            throw new NullPointerException();
+        Objects.requireNonNull(node);
 
         final TFileTreeModel ftm = getModel();
         final TreePath path = ftm.newTreePath(node);

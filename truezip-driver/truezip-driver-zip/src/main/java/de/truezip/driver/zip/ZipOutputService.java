@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip;
 
-import de.truezip.driver.zip.io.RawOutputStream;
+import de.truezip.driver.zip.io.RawZipOutputStream;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import de.truezip.kernel.FsModel;
@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
@@ -40,7 +41,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public final class ZipOutputService
-extends RawOutputStream<ZipDriverEntry>
+extends RawZipOutputStream<ZipDriverEntry>
 implements OutputService<ZipDriverEntry> {
 
     private final FsModel model;
@@ -61,28 +62,14 @@ implements OutputService<ZipDriverEntry> {
                 driver);
         this.driver = driver;
         try {
-            if (null == (this.model = model))
-                throw new NullPointerException();
+            this.model = Objects.requireNonNull(model);
             if (null != source) {
                 if (!source.isAppendee()) {
                     // Retain comment and preamble of input ZIP archive.
                     super.setComment(source.getComment());
                     if (0 < source.getPreambleLength()) {
-                        final InputStream in = source.getPreambleInputStream();
-                        Throwable ex = null;
-                        try {
+                        try (final InputStream in = source.getPreambleInputStream()) {
                             Streams.cat(in, source.offsetsConsiderPreamble() ? this : out);
-                        } catch (final Throwable ex2) {
-                            ex = ex2;
-                            throw ex2;
-                        } finally {
-                            try {
-                                in.close();
-                            } catch (final IOException ex2) {
-                                if (null == ex)
-                                    throw ex2;
-                                ex.addSuppressed(ex2);
-                            }
                         }
                     }
                 }
@@ -96,7 +83,7 @@ implements OutputService<ZipDriverEntry> {
         } catch (final Throwable ex) {
             try {
                 super.close();
-            } catch (final IOException ex2) {
+            } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -150,8 +137,7 @@ implements OutputService<ZipDriverEntry> {
 
     @Override
     public OutputSocket<ZipDriverEntry> output(final ZipDriverEntry local) { // local target
-        if (null == local)
-            throw new NullPointerException();
+        Objects.requireNonNull(local);
 
         final class Output extends OutputSocket<ZipDriverEntry> {
             @Override
@@ -257,43 +243,31 @@ implements OutputService<ZipDriverEntry> {
     @Override
     public void close() throws IOException {
         super.finish();
-        final IOBuffer<?> pa = this.postamble;
-        if (null != pa) {
+        final IOBuffer<?> postamble = this.postamble;
+        if (null != postamble) {
             this.postamble = null;
-            final InputSocket<?> is = pa.input();
+            final InputSocket<?> input = postamble.input();
             Throwable ex = null;
             try {
-                final InputStream in = is.stream();
-                try {
-                    // If the sink ZIP file differs in length from the
-                    // input ZIP file then pad the sink to the next four
+                try (final InputStream in = input.stream()) {
+                    // If the output ZIP file differs in length from the
+                    // input ZIP file then pad the output to the next four
                     // byte boundary before appending the postamble.
                     // This might be required for self extracting files on
                     // some platforms, e.g. Windows x86.
                     final long ol = length();
-                    final long ipl = is.localTarget().getSize(DATA);
+                    final long ipl = input.localTarget().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
                     Streams.cat(in, this);
-                } catch (final Throwable ex2) {
-                    ex = ex2;
-                    throw ex2;
-                } finally {
-                    try {
-                        in.close();
-                    } catch (final IOException ex2) {
-                        if (null == ex)
-                            throw ex2;
-                        ex.addSuppressed(ex2);
-                    }
                 }
             } catch (final Throwable ex2) {
                 ex = ex2;
                 throw ex2;
             } finally {
                 try {
-                    pa.release();
-                } catch (final IOException ex2) {
+                    postamble.release();
+                } catch (final Throwable ex2) {
                     if (null == ex)
                         throw ex2;
                     ex.addSuppressed(ex2);
@@ -333,10 +307,10 @@ implements OutputService<ZipDriverEntry> {
     } // EntryOutputStream
 
     /**
-     * This entry sink stream writes the ZIP archive entry to an
+     * This entry output stream writes the ZIP archive entry to an
      * {@linkplain IOBuffer I/O buffer}.
      * When the stream gets closed, the I/O buffer is then copied to this
-     * sink service and finally deleted.
+     * output service and finally deleted.
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream
@@ -358,7 +332,7 @@ implements OutputService<ZipDriverEntry> {
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
-                } catch (final IOException ex2) {
+                } catch (final Throwable ex2) {
                     ex.addSuppressed(ex2);
                 }
                 throw ex;
@@ -390,35 +364,22 @@ implements OutputService<ZipDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IOBuffer<?> buffer = this.buffer;
-            final InputStream in = buffer.input().stream();
-            Throwable ex = null;
-            try {
-                final ExceptionBuilder<IOException, IOException>
-                        builder = new SuppressedExceptionBuilder<>();
+            try (final InputStream in = buffer.input().stream()) {
                 final ZipOutputService zos = ZipOutputService.this;
                 zos.putNextEntry(local, true);
+                final ExceptionBuilder<IOException, IOException>
+                        builder = new SuppressedExceptionBuilder<>();
                 try {
                     Streams.cat(in, zos);
-                } catch (final InputException ex2) { // NOT IOException!
-                    builder.warn(ex2);
+                } catch (final InputException ex) { // NOT IOException!
+                    builder.warn(ex);
                 }
                 try {
                     zos.closeEntry();
-                } catch (final IOException ex2) {
-                    builder.warn(ex2);
+                } catch (final IOException ex) {
+                    throw builder.fail(ex);
                 }
                 builder.check();
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
-                try {
-                    in.close();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
-                }
             }
             buffer.release();
         }

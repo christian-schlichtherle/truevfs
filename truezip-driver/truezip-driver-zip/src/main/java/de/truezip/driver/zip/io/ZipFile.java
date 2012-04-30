@@ -45,7 +45,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class ZipFile extends RawFile<ZipEntry> {
+public class ZipFile extends RawZipFile<ZipEntry> {
 
     /** The lock on which this object synchronizes. */
     protected final Lock lock = new ReentrantLock();

@@ -36,6 +36,12 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 @Immutable
 public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
+    /** Default record size */
+    static final int DEFAULT_RCDSIZE = 512;
+
+    /** Default block size */
+    static final int DEFAULT_BLKSIZE = DEFAULT_RCDSIZE * 20;
+
     /**
      * The character set for entry names and comments, which is the default
      * character set.
@@ -52,9 +58,8 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
         return TAR_CHARSET;
     }
 
-    @Override
-    public IOPool<?> getIOPool() {
-        return IOPoolLocator.SINGLETON.getIOPool();
+    final String getEncoding() {
+        return getCharset().name();
     }
 
     /**
@@ -71,7 +76,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    protected InputService<TarDriverEntry> input(
+    protected InputService<TarDriverEntry> newInput(
             final FsModel model,
             final Source source)
     throws IOException {
@@ -79,7 +84,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    protected OutputService<TarDriverEntry> output(
+    protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
             final Sink sink,
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
@@ -113,7 +118,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     @Override
-    public TarDriverEntry entry(
+    public TarDriverEntry newEntry(
             String name,
             final Type type,
             final BitField<FsAccessOption> mknod,
@@ -121,9 +126,9 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
         name = normalize(name, type);
         final TarDriverEntry entry;
         if (template instanceof TarArchiveEntry) {
-            entry = entry(name, (TarArchiveEntry) template);
+            entry = newEntry(name, (TarArchiveEntry) template);
         } else {
-            entry = entry(name);
+            entry = newEntry(name);
             if (null != template) {
                 entry.setModTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
@@ -132,11 +137,11 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
         return entry;
     }
 
-    public TarDriverEntry entry(String name) {
+    public TarDriverEntry newEntry(String name) {
         return new TarDriverEntry(name);
     }
 
-    public TarDriverEntry entry(String name, TarArchiveEntry template) {
+    public TarDriverEntry newEntry(String name, TarArchiveEntry template) {
         return new TarDriverEntry(name, template);
     }
 }

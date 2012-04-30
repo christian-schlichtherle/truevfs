@@ -204,21 +204,24 @@ implements Iterable<FsCovariantEntry<E>> {
      * Marks this (virtual) archive file system as touched and notifies the
      * listener if and only if the touch status is changing.
      *
-     * @throws IOException If the listener's beforeTouch implementation vetoed
+     * @throws IOException If the listener's preTouch implementation vetoed
      *         the operation for any reason.
      */
-    private void touch(final BitField<FsAccessOption> options) throws IOException {
+    private void touch(final BitField<FsAccessOption> options)
+    throws IOException {
         if (touched)
             return;
-        // Order is important here because of veto exceptions!
-        final ArchiveFileSystemEvent<E>
-                e = new ArchiveFileSystemEvent<>(this);
         final ArchiveFileSystemTouchListener<? super E> tl = touchListener;
-        if (null != tl)
-            tl.beforeTouch(e, options);
-        touched = true;
-        if (null != tl)
-            tl.afterTouch(e, options);
+        if (null != tl) {
+            final ArchiveFileSystemEvent<E>
+                    e = new ArchiveFileSystemEvent<>(this);
+            // HC SUNT DRACONES!
+            tl.preTouch(e, options);
+            touched = true;
+            tl.postTouch(e, options);
+        } else {
+            touched = true;
+        }
     }
 
     /**
@@ -228,7 +231,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     @SuppressWarnings("unchecked")
     final ArchiveFileSystemTouchListener<? super E>[]
-    getFsArchiveFileSystemTouchListeners() {
+    getArchiveFileSystemTouchListeners() {
         return null == touchListener
                 ? new ArchiveFileSystemTouchListener[0]
                 : new ArchiveFileSystemTouchListener[] { touchListener };
@@ -238,15 +241,14 @@ implements Iterable<FsCovariantEntry<E>> {
      * Adds the given listener to the set of archive file system listeners.
      *
      * @param  listener the listener for archive file system events.
+     * @throws TooManyListenersException if a listener has already been added.
      */
-    final void addFsArchiveFileSystemTouchListener(
+    final void addArchiveFileSystemTouchListener(
             final ArchiveFileSystemTouchListener<? super E> listener)
     throws TooManyListenersException {
-        if (null == listener)
-            throw new NullPointerException();
         if (null != touchListener)
             throw new TooManyListenersException();
-        touchListener = listener;
+        touchListener = Objects.requireNonNull(listener);
     }
 
     /**
@@ -254,10 +256,8 @@ implements Iterable<FsCovariantEntry<E>> {
      *
      * @param  listener the listener for archive file system events.
      */
-    final void removeFsArchiveFileSystemTouchListener(
-            final ArchiveFileSystemTouchListener<? super E> listener) {
-        if (null == listener)
-            throw new NullPointerException();
+    final void removeArchiveFileSystemTouchListener(
+            final @CheckForNull ArchiveFileSystemTouchListener<? super E> listener) {
         if (touchListener == listener)
             touchListener = null;
     }
@@ -306,7 +306,7 @@ implements Iterable<FsCovariantEntry<E>> {
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        return driver.entry(name, type, mknod, template);
+        return driver.newEntry(name, type, mknod, template);
     }
 
     /**
@@ -364,8 +364,7 @@ implements Iterable<FsCovariantEntry<E>> {
             final BitField<FsAccessOption> options,
             @CheckForNull Entry template)
     throws IOException {
-        if (null == type)
-            throw new NullPointerException();
+        Objects.requireNonNull(type);
         if (FILE != type && DIRECTORY != type) // TODO: Add support for other types.
             throw new FileSystemException(name.toString(), null,
                     "Can only create file or directory entries, but not a " + typeName(type) + " entry!");
@@ -387,7 +386,10 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     private static String typeName(final FsCovariantEntry<?> entry) {
-        return entry.getTypes().toString().toLowerCase(Locale.ENGLISH);
+        final Set<Type> types = entry.getTypes();
+        return 1 == types.size()
+                ? typeName(types.iterator().next())
+                : types.toString().toLowerCase(Locale.ENGLISH);
     }
 
     private static String typeName(final Type type) {
@@ -542,8 +544,11 @@ implements Iterable<FsCovariantEntry<E>> {
             if (0 != size)
                 throw new DirectoryNotEmptyException(name.toString());
         }
-        if (name.isRoot())
+        if (name.isRoot()) {
+            // Removing the root entry MUST get silently ignored in order to
+            // make the controller logic work, even when facing ControlFlow
             return;
+        }
 
         // Notify listener and modify.
         touch(options);

@@ -73,7 +73,7 @@ import javax.annotation.Nullable;
  * thread-safe.
  * Note that some factory methods declare this as a MUST requirement for their
  * generated file system controllers, for example
- * {@link FsDriver#controller} and {@link FsCompositeDriver#controller}.
+ * {@link FsDriver#newController} and {@link FsCompositeDriver#newController}.
  * <li>
  * All file system operations SHOULD be <i>durable</i>, that is their side
  * effect on the stored data SHOULD be permanent in the parent file system or
@@ -206,8 +206,8 @@ public abstract class FsController<M extends FsModel> {
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
      */
-    public boolean setTime(
-            final FsEntryName name,
+    public boolean
+    setTime(final FsEntryName name,
             final Map<Access, Long> times,
             final BitField<FsAccessOption> options)
     throws IOException {
@@ -237,8 +237,8 @@ public abstract class FsController<M extends FsModel> {
      *         types in {@code types} succeeded.
      * @throws IOException on any I/O error.
      */
-    public abstract boolean setTime(
-            FsEntryName name,
+    public abstract boolean
+    setTime(FsEntryName name,
             BitField<Access> types,
             long value,
             BitField<FsAccessOption> options)

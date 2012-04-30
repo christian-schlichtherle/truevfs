@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
@@ -41,7 +42,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-public class ZipOutputStream extends RawOutputStream<ZipEntry> {
+public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
 
     /**
      * The default character set used for entry names and comments in ZIP files.
@@ -99,9 +100,7 @@ public class ZipOutputStream extends RawOutputStream<ZipEntry> {
             @WillCloseWhenClosed OutputStream out,
             ZipFile appendee)
     throws IOException {
-        super(new OneTimeSink(out), appendee, DEFAULT_PARAM);
-        if (null == appendee)
-            throw new NullPointerException();
+        super(new OneTimeSink(out), Objects.requireNonNull(appendee), DEFAULT_PARAM);
     }
 
     /**

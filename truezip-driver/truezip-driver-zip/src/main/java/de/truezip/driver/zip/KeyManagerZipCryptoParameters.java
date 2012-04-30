@@ -14,6 +14,7 @@ import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.param.AesPbeParameters;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToBytes;
@@ -54,12 +55,9 @@ implements ZipParametersProvider, ZipCryptoParameters {
             final ZipDriver driver,
             final FsModel model,
             final Charset charset) {
-        if (null == (this.driver = driver))
-            throw new NullPointerException();
-        if (null == (this.model = model))
-            throw new NullPointerException();
-        if (null == (this.charset = charset))
-            throw new NullPointerException();
+        this.driver = Objects.requireNonNull(driver);
+        this.model = Objects.requireNonNull(model);
+        this.charset = Objects.requireNonNull(charset);
     }
 
     /**
@@ -113,11 +111,11 @@ implements ZipParametersProvider, ZipCryptoParameters {
     }
 
     private <K> KeyManager<K> keyManager(Class<K> type) {
-        return driver.getKeyManagerProvider().getKeyManager(type);
+        return driver.getKeyManagerProvider().keyManager(type);
     }
 
     private URI resourceUri(String name) {
-        return driver.resourceUri(model, name);
+        return driver.fileSystemUri(model, name);
     }
 
     /**

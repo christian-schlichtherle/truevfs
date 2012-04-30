@@ -47,15 +47,15 @@ final class ArchiveManager extends FsManager {
         return controller(mountPoint, null, driver);
     }
 
-    private FsController<?>
-    controller( final FsMountPoint mountPoint,
-                @CheckForNull FsController<?> parent,
-                final FsCompositeDriver driver) {
+    private FsController<?> controller(
+            final FsMountPoint mountPoint,
+            @CheckForNull FsController<?> parent,
+            final FsCompositeDriver driver) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
             final FsModel model = new FsModel(mountPoint, null);
-            return driver.controller(this, model, null);
+            return driver.newController(this, model, null);
         }
         FsController<?> controller = target(schedulers.get(mountPoint));
         if (null == controller) {
@@ -63,29 +63,48 @@ final class ArchiveManager extends FsManager {
                 parent = controller(mountPoint.getParent(), null, driver);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
-            model.setController(controller = driver.controller(this, model, parent));
+            model.setController(controller = driver.newController(this, model, parent));
         }
         return controller;
     }
 
     @Override
-    public final <E extends FsArchiveEntry> FsController<?>
-    controller(  final FsArchiveDriver<E> driver,
-                    final FsModel model,
-                    final FsController<?> parent) {
+    public final <E extends FsArchiveEntry> FsController<?> newController(
+            final FsArchiveDriver<E> driver,
+            final FsModel model,
+            final FsController<?> parent) {
         assert !(model instanceof LockModel);
         final LockModel lmodel = new LockModel(model);
         // HC SUNT DRACONES!
-        return  new FalsePositiveController(
-                    new FinalizeController(
-                        driver.decorate(
-                            new SyncController(
-                                new LockController(
-                                    new ResetController(
-                                        new CacheController(driver.getIOPool(),
-                                            new ResourceController(
-                                                new TargetArchiveController<>(
-                                                        lmodel, parent, driver)))))))));
+        // The FalsePositiveArchiveController decorates the driver's
+        // controller(s) so that the decorated controller (chain) does not need
+        // to resolve operations on false positive archive files.
+        // The driver's controllers decorate the FinalizeController so that
+        // the former do not need to be concerned with most aspects of
+        // implementing a virtual file system, other than passing on a
+        // FalsePositiveException or a NeedsLockRetryException.
+        // The FinalizeController decorates the LockController because even the
+        // finalizer thread needs to acquire a file system lock when closing
+        // streams or channels.
+        // The LockController decorates the SyncController so that
+        // the decorated controller (chain) doesn't need to be thread safe.
+        // The SyncController decorates the CacheController because the
+        // selective entry cache needs to get flushed on a NeedsSyncException.
+        // The CacheController decorates the ResourceController because the
+        // cache entries terminate streams and channels and shall not stop the
+        // decorated controller (chain) from getting synced.
+        // The ResourceController decorates the TargetArchiveController so that
+        // trying to sync the file system while any stream or channel to the
+        // latter is open gets detected and properly dealt with.
+        return  new FalsePositiveArchiveController(
+                    driver.decorate(
+                        new FinalizeController(
+                            new LockController(
+                                new SyncController(
+                                    new CacheController(driver.getIOPool(),
+                                        new ResourceController(
+                                            new TargetArchiveController<>(
+                                                driver, lmodel, parent))))))));
     }
 
     @Override

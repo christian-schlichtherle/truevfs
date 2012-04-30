@@ -25,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
@@ -81,15 +82,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         return ZIP_CHARSET;
     }
 
-    @Override
-    public IOPool<?> getIOPool() {
-        return IOPoolLocator.SINGLETON.getIOPool();
-    }
-
     /**
      * Returns the provider for key managers for accessing protected resources
      * (encryption).
-     * When overriding this method, repeated calls must return the same object.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * object.
      * 
      * @return {@link KeyManagerLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
@@ -128,9 +126,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * A template method which derives the URI which represents the mount point
-     * of the given file system model as the base resource URI for looking up
-     * {@link KeyProvider}s.
+     * A template method for resolving the resource URI which is required to
+     * look up the {@link KeyProvider} for the mount point of the file system
+     * with the given model.
      * <p>
      * The implementation in the class {@link ZipDriver} returns the
      * expression {@code model.getMountPoint().toHierarchicalUri()}
@@ -146,8 +144,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * A template method which derives the resource URI for looking up a
-     * {@link KeyProvider} from the given file system model and entry name.
+     * A template method for resolving the resource URI which is required to
+     * look up the {@link KeyProvider} for the entry with the given name in the
+     * file system with the given model.
      * <p>
      * The implementation in the class {@code ZipDriver} ignores the given
      * entry name and just returns the expression {@code mountPointUri(model)}
@@ -160,7 +159,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @param  name the entry name.
      * @return The URI for looking up a {@link KeyProvider}.
      */
-    public URI resourceUri(FsModel model, String name) {
+    public URI fileSystemUri(FsModel model, String name) {
         //return mountPointUri(model).resolve("/" + name);
         return mountPointUri(model);
     }
@@ -334,13 +333,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    protected final ZipInputService input(
+    protected final ZipInputService newInput(
             final FsModel model,
             final Source source)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        final ZipInputService zis = zipInput(model, source);
+        final ZipInputService zis = zipInput(Objects.requireNonNull(model), source);
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
@@ -363,7 +360,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    public OutputService<ZipDriverEntry> output(
+    public OutputService<ZipDriverEntry> newOutput(
             final FsModel model,
             final FsController<?> parent,
             final FsEntryName entry,
@@ -374,12 +371,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         final ZipInputService zis = (ZipInputService) input;
         if (null != zis)
             zis.setAppendee(oos.getOptions().get(GROW));
-        return output(model, oos, zis);
+        return newOutput(model, oos, zis);
     }
 
     @Override
     @CreatesObligation
-    protected OutputService<ZipDriverEntry> output(
+    protected OutputService<ZipDriverEntry> newOutput(
             FsModel model,
             Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
@@ -401,11 +398,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * </ol>
      * <p>
      * The resulting output socket is then wrapped in a private nested class
-     * for an upcast in {@link #output}.
-     * Thus, when overriding this method, {@link #output} should getIOPool
+     * for an upcast in {@link #newOutput}.
+     * Thus, when overriding this method, {@link #newOutput} should get
      * overridden, too.
      * Otherwise, a class cast exception will getIOPool thrown in
-     * {@link #output}.
+     * {@link #newOutput}.
      */
     @Override
     protected OptionOutputSocket sink(
@@ -423,7 +420,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @Override
-    public ZipDriverEntry entry(
+    public ZipDriverEntry newEntry(
             String name,
             final Type type,
             final BitField<FsAccessOption> mknod,
@@ -431,9 +428,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         name = normalize(name, type);
         final ZipDriverEntry entry;
         if (template instanceof ZipEntry) {
-            entry = entry(name, (ZipEntry) template);
+            entry = newEntry(name, (ZipEntry) template);
         } else {
-            entry = entry(name);
+            entry = newEntry(name);
             if (null != template) {
                 entry.setTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
@@ -463,7 +460,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @return {@code new ZipDriverEntry(name)}
      */
     @Override
-    public ZipDriverEntry entry(String name) {
+    public ZipDriverEntry newEntry(String name) {
         return new ZipDriverEntry(name);
     }
 
@@ -475,7 +472,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * @param  template the entry template.
      * @return {@code new ZipDriverEntry(name, template)}
      */
-    public ZipDriverEntry entry(String name, ZipEntry template) {
+    public ZipDriverEntry newEntry(String name, ZipEntry template) {
         return new ZipDriverEntry(name, template);
     }
 }

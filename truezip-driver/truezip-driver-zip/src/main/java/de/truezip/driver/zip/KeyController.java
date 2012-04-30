@@ -11,9 +11,11 @@ import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.KeyManager;
 import java.io.IOException;
+import java.net.URI;
+import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * This file system controller decorates another file system controller in
@@ -23,7 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @param  <D> the type of the ZIP driver.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 public abstract class KeyController<
         M extends FsModel,
         D extends ZipDriver>
@@ -45,9 +47,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             final FsController<? extends M> controller,
             final D driver) {
         super(controller);
-        if (null == driver)
-            throw new NullPointerException();
-        this.driver = driver;
+        this.driver = Objects.requireNonNull(driver);
     }
 
     protected abstract Class<?> getKeyType();
@@ -58,12 +58,20 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         final KeyManager<?> manager = this.manager;
         return null != manager
                 ? manager
-                : (this.manager = driver.getKeyManagerProvider().getKeyManager(getKeyType()));
+                : (this.manager = driver.getKeyManagerProvider().keyManager(getKeyType()));
+    }
+
+    private @CheckForNull IOException findKeyException(Throwable ex) {
+        final Class<? extends IOException> clazz = getKeyExceptionType();
+        do {
+            if (clazz.isInstance(ex))
+                return clazz.cast(ex);
+        } while (null != (ex = ex.getCause()));
+        return null;
     }
 
     @Override
-    public final FsEntry entry(final FsEntryName name)
-    throws IOException {
+    public final FsEntry entry(final FsEntryName name) throws IOException {
         try {
             return controller.entry(name);
         } catch (final Throwable ex) {
@@ -86,7 +94,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 entry = ((FsCovariantEntry<?>) entry).getEntry();
             final FsCovariantEntry<FsArchiveEntry>
                     special = new FsCovariantEntry<>(ROOT_PATH);
-            special.putEntry(SPECIAL, driver.entry(ROOT_PATH, SPECIAL, entry));
+            special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
             return special;
         }
     }
@@ -110,25 +118,18 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 throw keyEx;
             throw ex;
         }
-        if (name.isRoot()) {
+        final FsModel model = getModel();
+        final URI mpu = driver.mountPointUri(model);
+        final URI fsu = driver.fileSystemUri(model, name.toString());
+        if (!fsu.equals(mpu) || name.isRoot()) {
             try {
-                getKeyManager().delete(
-                        driver.resourceUri(getModel(), name.toString()));
-            } catch (final ServiceConfigurationError ignore) {
+                getKeyManager().delete(fsu);
+            } catch (ServiceConfigurationError ignore) {
                 // The operation succeeded without a key manager.
                 // This can only mean that the target archive file doesn't
-                // require any keys, so we can and should ignore this exception.
+                // require any keys, so we should ignore this exception.
             }
         }
-    }
-
-    private @CheckForNull IOException findKeyException(Throwable ex) {
-        final Class<? extends IOException> clazz = getKeyExceptionType();
-        do {
-            if (clazz.isInstance(ex))
-                return clazz.cast(ex);
-        } while (null != (ex = ex.getCause()));
-        return null;
     }
 
     @Override
@@ -142,10 +143,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
         try {
             getKeyManager().unlock(driver.mountPointUri(getModel()));
-        } catch (final ServiceConfigurationError ignore) {
+        } catch (ServiceConfigurationError ignore) {
             // The operation succeeded without a key manager.
             // This can only mean that the target archive file doesn't
-            // require any keys, so we can and should ignore this exception.
+            // require any keys, so we should ignore this exception.
         }
         builder.check();
     }

@@ -8,6 +8,7 @@ import de.truezip.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -55,11 +56,8 @@ public final class CipherOutputStream extends DecoratingOutputStream {
     public CipherOutputStream(
             final BufferedBlockCipher cipher,
             final @WillCloseWhenClosed OutputStream out) {
-        super(out);
-        if (null == out)
-            throw new NullPointerException();
-        if (null == (this.cipher = cipher))
-            throw new NullPointerException();
+        super(Objects.requireNonNull(out));
+        this.cipher = Objects.requireNonNull(cipher);
     }
 
     /**

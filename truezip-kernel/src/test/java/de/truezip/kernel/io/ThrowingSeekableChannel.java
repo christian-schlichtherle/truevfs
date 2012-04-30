@@ -33,11 +33,9 @@ public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
 
     @CreatesObligation
     public ThrowingSeekableChannel(
-            final @WillCloseWhenClosed SeekableByteChannel sbc,
+            final @WillCloseWhenClosed SeekableByteChannel channel,
             final @CheckForNull ThrowManager control) {
-        super(sbc);
-        if (null == sbc)
-            throw new NullPointerException();
+        super(channel);
         this.control = null != control
                 ? control
                 : TestConfig.get().getThrowControl();

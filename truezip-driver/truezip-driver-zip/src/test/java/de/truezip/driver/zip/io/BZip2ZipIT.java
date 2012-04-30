@@ -11,7 +11,7 @@ import static de.truezip.driver.zip.io.ZipEntry.BZIP2;
  */
 public final class BZip2ZipIT extends ZipTestSuite {
     @Override
-    public ZipEntry entry(final String name) {
+    public ZipEntry newEntry(final String name) {
         final ZipEntry entry = new ZipEntry(name);
         entry.setMethod(BZIP2);
         return entry;

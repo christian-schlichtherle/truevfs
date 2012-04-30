@@ -6,6 +6,7 @@ package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.schlichtherle.truezip.key.swing.EnhancedPanel;
 import de.truezip.key.param.KeyStrength;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.ComboBoxModel;
@@ -97,8 +98,7 @@ final class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
      * @param keyStrength the new value of the property {@code keyStrength}.
      */
     public void setKeyStrength(final S keyStrength) {
-        if (null == keyStrength)
-            throw new NullPointerException();
+        Objects.requireNonNull(keyStrength);
         this.keyStrength.setSelectedItem(keyStrength);
     }
 

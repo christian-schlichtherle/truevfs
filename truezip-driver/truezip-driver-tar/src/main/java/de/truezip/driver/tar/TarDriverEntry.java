@@ -38,7 +38,7 @@ implements FsArchiveEntry, Releasable<IOException> {
     public TarDriverEntry(final String name) {
         super(name, true);
         // Fix super class constructor.
-        super.setUserName(System.getProperty("user.name", ""));
+        super.setUserName(System.getProperty("user.name", "TrueZIP"));
     }
 
     protected TarDriverEntry(
@@ -54,6 +54,8 @@ implements FsArchiveEntry, Releasable<IOException> {
         super.setGroupId(template.getGroupId());
         super.setGroupName(template.getGroupName());
         super.setLinkName(template.getLinkName());
+        super.setDevMajor(template.getDevMajor());
+        super.setDevMinor(template.getDevMinor());
     }
 
     private boolean isInit(final int mask) {

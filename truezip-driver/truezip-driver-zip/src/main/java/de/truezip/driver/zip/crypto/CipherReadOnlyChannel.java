@@ -11,6 +11,7 @@ import java.io.IOException;
 import static java.lang.Math.min;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Objects;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.bouncycastle.crypto.Mac;
@@ -89,11 +90,8 @@ public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
             final SeekableBlockCipher cipher,
             final @WillCloseWhenClosed SeekableByteChannel channel,
             int bufferSize) {
-        super(channel);
-        if (null == channel)
-            throw new NullPointerException();
-        if (null == (this.cipher = cipher))
-            throw new NullPointerException();
+        super(Objects.requireNonNull(channel));
+        this.cipher = Objects.requireNonNull(cipher);
         final int blockSize = cipher.getBlockSize();
         block = new byte[blockSize];
         if (bufferSize < blockSize)

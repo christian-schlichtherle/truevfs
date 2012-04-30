@@ -21,10 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Inflater;
@@ -55,12 +52,12 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  * archives.
  *
  * @param  <E> the type of the ZIP entries.
- * @see    RawOutputStream
+ * @see    RawZipOutputStream
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 @CleanupObligation
-public abstract class RawFile<E extends ZipEntry>
+public abstract class RawZipFile<E extends ZipEntry>
 implements Closeable, Iterable<E> {
 
     private static final int LFH_FILE_NAME_LENGTH_POS =
@@ -124,7 +121,7 @@ implements Closeable, Iterable<E> {
      * @see    #recoverLostEntries()
      */
     @CreatesObligation
-    protected RawFile(
+    protected RawZipFile(
             final Source source,
             final ZipFileParameters<E> param)
     throws ZipException, EOFException, IOException {
@@ -152,7 +149,7 @@ implements Closeable, Iterable<E> {
         } catch (final Throwable ex) {
             try {
                 channel.close();
-            } catch (final IOException ex2) {
+            } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -374,7 +371,7 @@ implements Closeable, Iterable<E> {
             final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
             if (utf8)
                 charset = UTF8;
-            final E entry = param.entry(decode(name.array()));
+            final E entry = param.newEntry(decode(name.array()));
             try {
                 // central file header signature   4 bytes  (0x02014b50)
                 cfh.position(4);
@@ -491,7 +488,7 @@ implements Closeable, Iterable<E> {
      * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
-    public RawFile<E> recoverLostEntries()
+    public RawZipFile<E> recoverLostEntries()
     throws ZipException, EOFException, IOException {
         final SeekableByteChannel
                 channel = new SafeBufferedReadOnlyChannel(channel(), length);
@@ -509,7 +506,7 @@ implements Closeable, Iterable<E> {
             // See appendix D of PKWARE's ZIP File Format Specification.
             if (0 != (gpbf & GPBF_UTF8))
                 charset = UTF8;
-            final E entry = param.entry(decode(PowerBuffer
+            final E entry = param.newEntry(decode(PowerBuffer
                     .allocate(nameLen)
                     .load(channel)
                     .array()));
@@ -591,9 +588,7 @@ implements Closeable, Iterable<E> {
                                 + method
                                 + " is not supported)");
                 }
-                final CheckedInputStream cin = new CheckedInputStream(in, new CRC32());
-                Throwable ex = null;
-                try {
+                try (final CheckedInputStream cin = new CheckedInputStream(in, new CRC32())) {
                     entry.setRawSize(cin.skip(Long.MAX_VALUE));
                     if (null != field && field.getVendorVersion() == VV_AE_2)
                         entry.setRawCrc(0);
@@ -612,17 +607,6 @@ implements Closeable, Iterable<E> {
                             break;
                         default:
                             throw new AssertionError();
-                    }
-                } catch (final Throwable ex2) {
-                    ex = ex2;
-                    throw ex2;
-                } finally {
-                    try {
-                        cin.close();
-                    } catch (final IOException ex2) {
-                        if (null == ex)
-                            throw ex2;
-                        ex.addSuppressed(ex2);
                     }
                 }
                 if (null != field)
@@ -951,8 +935,7 @@ implements Closeable, Iterable<E> {
             final boolean process)
     throws ZipException, IOException {
         final SeekableByteChannel channel = channel();
-        if (null == name)
-            throw new NullPointerException();
+        Objects.requireNonNull(name);
         final ZipEntry entry = entries.get(name);
         if (null == entry)
             return null;
@@ -1052,7 +1035,7 @@ implements Closeable, Iterable<E> {
         } catch (final Throwable ex) {
             try {
                 echannel.close();
-            } catch (final IOException ex2) {
+            } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -1085,10 +1068,10 @@ implements Closeable, Iterable<E> {
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        try (final SeekableByteChannel channel = this.channel) {
-            if (null == channel)
-                return;
-        }
+        final SeekableByteChannel channel = this.channel;
+        if (null == channel)
+            return;
+        channel.close();
         this.channel = null;
     }
 
@@ -1105,7 +1088,7 @@ implements Closeable, Iterable<E> {
         EntryReadOnlyChannel(final long start, final long size)
         throws IOException {
             super(new IntervalReadOnlyChannel(channel(), start, size));
-            RawFile.this.open++;
+            RawZipFile.this.open++;
         }
 
         @Override
@@ -1114,7 +1097,7 @@ implements Closeable, Iterable<E> {
                 return;
             // Never close the channel!
             //super.close();
-            RawFile.this.open--;
+            RawZipFile.this.open--;
             closed = true;
         }
     } // EntryReadOnlyChannel

@@ -60,10 +60,10 @@ public abstract class FsDriver {
      * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
      *         point and parent file system controller.
-     * @see    FsCompositeDriver#controller
+     * @see    FsCompositeDriver#newController
      */
     public abstract FsController<?>
-    controller( FsManager manager,
+    newController( FsManager manager,
                 FsModel model,
                 @Nullable FsController<?> parent);
 

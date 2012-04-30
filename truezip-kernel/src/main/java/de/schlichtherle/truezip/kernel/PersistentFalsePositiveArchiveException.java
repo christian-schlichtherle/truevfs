@@ -13,18 +13,18 @@ import javax.annotation.concurrent.Immutable;
  * {@linkplain FsController#sync(de.truezip.kernel.util.BitField) synced}
  * again.
  * <p>
- * This exception type is reserved for use by a
- * {@link FsController file system controller} in order to reroute file system
- * operations to the parent file system of a false positive federated (archive)
- * file system.
+ * This exception type is reserved for non-local control flow in
+ * {@linkplain FsDecoratingController file system controller chains} in order
+ * to reroute file system operations to the parent file system of a false
+ * positive federated (archive) file system.
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-final class PersistentFalsePositiveException extends FalsePositiveException {
+final class PersistentFalsePositiveArchiveException extends FalsePositiveArchiveException {
 
-    PersistentFalsePositiveException(IOException cause) {
+    PersistentFalsePositiveArchiveException(IOException cause) {
         super(cause);
     }
 }

@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.GuardedBy;
@@ -26,16 +27,14 @@ public class LockSeekableChannel extends DecoratingSeekableChannel {
     private final Lock lock;
 
     protected LockSeekableChannel(final Lock lock) {
-        if (null == (this.lock = lock))
-            throw new NullPointerException();
+        this.lock = Objects.requireNonNull(lock);
     }
 
     public LockSeekableChannel(
             final Lock lock,
             final @WillCloseWhenClosed SeekableByteChannel channel) {
         this(lock);
-        if (null == (this.channel = channel))
-            throw new NullPointerException();
+        this.channel = Objects.requireNonNull(channel);
     }
 
     @Override
