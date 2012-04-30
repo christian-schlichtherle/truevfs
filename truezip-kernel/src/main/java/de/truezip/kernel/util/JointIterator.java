@@ -6,6 +6,7 @@ package de.truezip.kernel.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -28,10 +29,8 @@ public final class JointIterator<E> implements Iterator<E> {
     public JointIterator(
             final Iterator<? extends E> i1,
             final Iterator<? extends E> i2) {
-        if (i1 == null || i2 == null)
-            throw new NullPointerException();
-        this.i1 = i1;
-        this.i2 = i2;
+        this.i1 = Objects.requireNonNull(i1);
+        this.i2 = Objects.requireNonNull(i2);
     }
 
     /**

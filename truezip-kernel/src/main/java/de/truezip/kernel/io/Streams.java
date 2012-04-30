@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.Deque;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
@@ -84,7 +85,7 @@ public final class Streams {
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} thrown by the <em>output stream</em>.
      */
-    public static void copy(final Source source, final Sink sink) 
+    public static void copy(final Source source, final Sink sink)
     throws InputException, IOException {
         final InputStream in;
         try {
@@ -94,20 +95,8 @@ public final class Streams {
         }
         Throwable ex = null;
         try {
-            final OutputStream out = sink.stream();
-            try {
+            try (final OutputStream out = sink.stream()) {
                 cat(in, out);
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
-                try {
-                    out.close();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
-                }
             }
         } catch (final Throwable ex2) {
             ex = ex2;
@@ -120,6 +109,10 @@ public final class Streams {
                 if (null == ex)
                     throw ex3;
                 ex.addSuppressed(ex3);
+            } catch (final Throwable ex2) {
+                if (null == ex)
+                    throw ex2;
+                ex.addSuppressed(ex2);
             }
         }
     }
@@ -151,8 +144,8 @@ public final class Streams {
     public static void cat( final @WillNotClose InputStream in,
                             final @WillNotClose OutputStream out)
     throws InputException, IOException {
-        if (null == in || null == out)
-            throw new NullPointerException();
+        Objects.requireNonNull(in);
+        Objects.requireNonNull(out);
 
         // We will use a FIFO to exchange byte buffers between a pooled reader
         // thread and the current writer thread.

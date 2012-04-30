@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.util;
 
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -57,9 +58,7 @@ implements ExceptionBuilder<I, O> {
      */
     @Override
     public final O fail(I input) {
-        if (null == input)
-            throw new NullPointerException();
-        final O assembly = update(input, this.assembly);
+        final O assembly = update(Objects.requireNonNull(input), this.assembly);
         this.assembly = null;
         return post(assembly);
     }
@@ -74,9 +73,7 @@ implements ExceptionBuilder<I, O> {
      */
     @Override
     public final void warn(I input) {
-        if (null == input)
-            throw new NullPointerException();
-        this.assembly = update(input, this.assembly);
+        this.assembly = update(Objects.requireNonNull(input), this.assembly);
     }
 
     /**

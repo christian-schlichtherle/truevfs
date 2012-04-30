@@ -60,7 +60,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    protected InputService<MockArchiveDriverEntry> input(
+    protected InputService<MockArchiveDriverEntry> newInput(
             final FsModel model,
             final Source input)
     throws IOException {
@@ -72,7 +72,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    protected OutputService<MockArchiveDriverEntry> output(
+    protected OutputService<MockArchiveDriverEntry> newOutput(
             final FsModel model,
             final Sink output,
             final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input)
@@ -87,7 +87,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    public MockArchiveDriverEntry entry(
+    public MockArchiveDriverEntry newEntry(
             String name,
             Type type,
             BitField<FsAccessOption> mknod,

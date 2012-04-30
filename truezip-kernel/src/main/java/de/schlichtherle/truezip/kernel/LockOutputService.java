@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockManagement.locked;
+import static de.schlichtherle.truezip.kernel.LockingStrategy.TIMED_LOCK;
 import de.truezip.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
@@ -24,7 +24,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * synchronized by a {@link Lock} object provided to its constructor.
  *
  * @param  <E> the type of the entries in the decorated output service.
- * @see    FsLockInputService
+ * @see    LockInputService
  * @see    LockManagement
  * @author Christian Schlichtherle
  */
@@ -33,7 +33,7 @@ class LockOutputService<E extends Entry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     /** The lock on which this object synchronizes. */
-    private final Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock(true);
 
     /**
      * Constructs a new lock output service.
@@ -56,29 +56,33 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
         } // Close
 
-        locked(new Close(), lock);
+        TIMED_LOCK.apply(lock, new Close());
     }
 
     @Override
     @GuardedBy("lock")
-    public @CheckForNull E entry(String name) {
-        lock.lock();
-        try {
-            return container.entry(name);
-        } finally {
-            lock.unlock();
-        }
+    public @CheckForNull E entry(final String name) {
+        final class Entry implements Operation<E, RuntimeException> {
+            @Override
+            public E call() {
+                return container.entry(name);
+            }
+        } // Entry
+
+        return TIMED_LOCK.apply(lock, new Entry());
     }
 
     @Override
     @GuardedBy("lock")
     public int size() {
-        lock.lock();
-        try {
-            return container.size();
-        } finally {
-            lock.unlock();
-        }
+        final class Size implements Operation<Integer, RuntimeException> {
+            @Override
+            public Integer call() {
+                return container.size();
+            }
+        } // Size
+
+        return TIMED_LOCK.apply(lock, new Size());
     }
 
     @Override
@@ -94,16 +98,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
 
             @Override
-            @GuardedBy("lock")
             public E localTarget() throws IOException {
-                final class GetLocalTarget implements IOOperation<E> {
-                    @Override
-                    public E call() throws IOException {
-                        return entry;
-                    }
-                } // GetLocalTarget
-
-                return locked(new GetLocalTarget(), lock);
+                return entry;
             }
 
             @Override
@@ -116,7 +112,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     }
                 } // Stream
 
-                return new LockOutputStream(locked(new Stream(), lock));
+                return new LockOutputStream(TIMED_LOCK.apply(lock, new Stream()));
             }
 
             @Override
@@ -129,7 +125,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     }
                 } // Channel
 
-                return new LockSeekableChannel(locked(new Channel(), lock));
+                return new LockSeekableChannel(TIMED_LOCK.apply(lock, new Channel()));
             }
         } // Output
 
@@ -145,7 +141,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
         } // Close
 
-        locked(new Close(), lock);
+        TIMED_LOCK.apply(lock, new Close());
     }
 
     private final class LockOutputStream

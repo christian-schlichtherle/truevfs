@@ -20,6 +20,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import static java.nio.file.Files.newByteChannel;
 import java.nio.file.Path;
+import java.util.Objects;
         
 /**
  * Tests compression and encryption of data.
@@ -104,8 +105,7 @@ public final class RaesZipIT extends ZipTestSuite {
     protected ZipFile newZipFile(
             final Path file, final Charset charset)
     throws IOException {
-        if (null == charset)
-            throw new NullPointerException();
+        Objects.requireNonNull(charset);
         new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
         final RaesReadOnlyChannel rroc = newRaesReadOnlyChannel(file);
         try {
@@ -143,17 +143,18 @@ public final class RaesZipIT extends ZipTestSuite {
 
     @Override
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    protected ZipFile newZipFile(final SeekableByteChannel sbc, final Charset cs)
+    protected ZipFile newZipFile(
+            final SeekableByteChannel channel,
+            final Charset charset)
     throws IOException {
-        if (null == cs)
-            throw new NullPointerException();
-        new String(new byte[0], cs); // may throw UnsupportedEncodingExceoption!
+        Objects.requireNonNull(charset);
+        new String(new byte[0], charset); // may throw UnsupportedEncodingExceoption!
         final RaesReadOnlyChannel rroc = RaesReadOnlyChannel.create(
-                raesParameters, new OneTimeSource(sbc));
+                raesParameters, new OneTimeSource(channel));
         try {
             if (rroc.size() < AUTHENTICATION_TRIGGER) // heuristic
                 rroc.authenticate();
-            return new ZipFile(rroc, cs);
+            return new ZipFile(rroc, charset);
         } catch (final Throwable ex) {
             try {
                 rroc.close();

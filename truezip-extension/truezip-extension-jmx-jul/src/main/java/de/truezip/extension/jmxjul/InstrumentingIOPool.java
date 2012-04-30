@@ -6,6 +6,7 @@ package de.truezip.extension.jmxjul;
 
 import de.truezip.kernel.cio.*;
 import java.io.IOException;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -20,10 +21,8 @@ public class InstrumentingIOPool<B extends IOBuffer<B>> implements IOPool<B> {
 
     public InstrumentingIOPool( final IOPool<B> pool,
                                 final InstrumentingDirector<?> director) {
-        if (null == (this.pool = pool))
-            throw new NullPointerException();
-        if (null == (this.director = director))
-            throw new NullPointerException();
+        this.pool = Objects.requireNonNull(pool);
+        this.director = Objects.requireNonNull(director);
     }
 
     @Override

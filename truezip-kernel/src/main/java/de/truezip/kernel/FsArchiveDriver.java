@@ -14,6 +14,7 @@ import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.OutputService;
 import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Source;
+import de.truezip.kernel.sl.IOPoolLocator;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -94,10 +95,15 @@ extends FsDriver {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} calls the
+     * equally named method on the {@link IOPoolLocator#SINGLETON}.
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    public abstract IOPool<?> getIOPool();
+    public IOPool<?> getIOPool() {
+        return IOPoolLocator.SINGLETON.getIOPool();
+    }
 
     /**
      * Returns {@code true} if and only if the archive files produced by this
@@ -105,6 +111,9 @@ extends FsDriver {
      * If the return value is {@code true}, then an archive file may contain
      * redundant archive entry contents, but only the last contents written
      * should get used when reading the archive file.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * value.
      * 
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
@@ -121,6 +130,9 @@ extends FsDriver {
      * should get used when reading the archive file.
      * This usually implies the existence of a central directory in the
      * resulting archive file.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * value.
      * 
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
@@ -137,12 +149,12 @@ extends FsDriver {
      * {@code model.getParent().equals(parent.getModel())} is {@code true}.
      */
     @Override
-    public final FsController<?> controller(
+    public final FsController<?> newController(
             FsManager manager,
             FsModel model,
             @Nonnull FsController<?> parent) {
         assert parent.getModel().equals(model.getParent());
-        return manager.controller(this, model, parent);
+        return manager.newController(this, model, parent);
     }
 
     /**
@@ -154,6 +166,8 @@ extends FsDriver {
      * 
      * @param  <M> the file system model used by the given controller.
      * @param  controller the file system controller to decorate or return.
+     *         Note that this controller may throw {@link RuntimeException}s
+     *         for non-local control flow!
      * @return The decorated file system controller or simply
      *         {@code controller}.
      */
@@ -168,7 +182,7 @@ extends FsDriver {
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #source}
-     * and {@link #input(FsModel, Source)}.
+     * and {@link #newInput(FsModel, Source)}.
      * 
      * @param  model the file system model for the target archive file.
      * @param  parent the controller for the parent file system with the target
@@ -191,13 +205,13 @@ extends FsDriver {
      *         get cached.
      */
     @CreatesObligation
-    public InputService<E> input(
+    public InputService<E> newInput(
             FsModel model,
             FsController<?> parent,
             FsEntryName entry,
             BitField<FsAccessOption> options)
     throws IOException {
-        return input(model, source(parent, entry, options));
+        return newInput(model, source(parent, entry, options));
     }
 
     /**
@@ -209,10 +223,10 @@ extends FsDriver {
      * @return A new input service.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #input(FsModel, FsController, FsEntryName, BitField) 
+     * @see    #newInput(FsModel, FsController, FsEntryName, BitField) 
      */
     @CreatesObligation
-    protected abstract InputService<E> input(
+    protected abstract InputService<E> newInput(
             FsModel model,
             Source source)
     throws IOException;
@@ -223,7 +237,7 @@ extends FsDriver {
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #sink}
-     * and {@link #output(FsModel, Sink, InputService)}.
+     * and {@link #newOutput(FsModel, Sink, InputService)}.
      * 
      * @param  model the file system model for the target archive file.
      * @param  parent the controller for the parent file system with the target
@@ -238,20 +252,20 @@ extends FsDriver {
      *         get updated.
      *         This parameter is guaranteed to be the product of this driver's
      *         factory method
-     *         {@link #input(FsModel, FsController, FsEntryName, BitField)}.
+     *         {@link #newInput(FsModel, FsController, FsEntryName, BitField)}.
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public OutputService<E> output(
+    public OutputService<E> newOutput(
             FsModel model,
             FsController<?> parent,
             FsEntryName entry,
             BitField<FsAccessOption> options,
             @CheckForNull @WillNotClose InputService<E> input)
     throws IOException {
-        return output(model, sink(parent, entry, options), input);
+        return newOutput(model, sink(parent, entry, options), input);
     }
 
     /**
@@ -266,14 +280,14 @@ extends FsDriver {
      *         get updated.
      *         This parameter is guaranteed to be the product of this driver's
      *         factory method
-     *         {@link #input(FsModel, FsController, FsEntryName, BitField)}.
+     *         {@link #newInput(FsModel, FsController, FsEntryName, BitField)}.
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #output(FsModel, FsController, FsEntryName, BitField, InputService) 
+     * @see    #newOutput(FsModel, FsController, FsEntryName, BitField, InputService) 
      */
     @CreatesObligation
-    protected abstract OutputService<E> output(
+    protected abstract OutputService<E> newOutput(
             FsModel model,
             Sink sink,
             @CheckForNull @WillNotClose InputService<E> input)
@@ -293,7 +307,7 @@ extends FsDriver {
      * @param  name the entry name.
      * @param  options the options to use.
      * @return A source for reading an artifact of this driver.
-     * @see    #input(FsModel, FsController, FsEntryName, BitField) 
+     * @see    #newInput(FsModel, FsController, FsEntryName, BitField) 
      */
     protected Source source(
             FsController<?> controller,
@@ -317,7 +331,7 @@ extends FsDriver {
      * @param  name the entry name.
      * @param  options the options to use.
      * @return A sink for writing an artifact of this driver.
-     * @see    #output(FsModel, FsController, FsEntryName, BitField, InputService) 
+     * @see    #newOutput(FsModel, FsController, FsEntryName, BitField, InputService) 
      */
     protected Sink sink(
             FsController<?> controller,
@@ -327,7 +341,7 @@ extends FsDriver {
     }
 
     /**
-     * Equivalent to {@link #entry(String, Entry.Type, BitField, Entry)
+     * Equivalent to {@link #newEntry(String, Entry.Type, BitField, Entry)
      * entry(name, type, FsAccessOptions.NONE, template)}.
      * 
      * @param  name the entry name.
@@ -337,8 +351,8 @@ extends FsDriver {
      *         exception of its name and type.
      * @return A new entry for the given name.
      */
-    public final E entry(String name, Type type, @CheckForNull Entry template) {
-        return entry(name, type, FsAccessOptions.NONE, template);
+    public final E newEntry(String name, Type type, @CheckForNull Entry template) {
+        return newEntry(name, type, FsAccessOptions.NONE, template);
     }
 
     /**
@@ -354,8 +368,9 @@ extends FsDriver {
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
      * @return A new entry for the given name.
+     * @see    #newEntry(String, Entry.Type, Entry)
      */
-    public abstract E entry(
+    public abstract E newEntry(
             String name,
             Type type,
             BitField<FsAccessOption> mknod,
@@ -371,7 +386,7 @@ extends FsDriver {
      * @param  type an entry type.
      * @return The normalized entry name.
      */
-    protected static String normalize(String name, Type type) {
+    public static String normalize(final String name, final Type type) {
         return DIRECTORY == type
                 ? name.endsWith(SEPARATOR) ? name : name + SEPARATOR_CHAR
                 : cutTrailingSeparators(name, SEPARATOR_CHAR);

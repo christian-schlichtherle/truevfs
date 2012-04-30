@@ -6,6 +6,7 @@ package de.truezip.kernel.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -38,8 +39,7 @@ public abstract class FilteringIterator<T> implements Iterator<T> {
      * @param iterator the iterator to filter.
      */
     protected FilteringIterator(final Iterator<T> iterator) {
-        if (null == (this.it = iterator))
-            throw new NullPointerException();
+        this.it = Objects.requireNonNull(iterator);
     }
 
     /**

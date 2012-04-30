@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.*;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Objects;
 
 /**
  * A drop-in replacement which adapts a {@link ByteBuffer} to provide
@@ -45,9 +46,7 @@ public final class PowerBuffer implements Comparable<PowerBuffer> {
     }
 
     public static PowerBuffer wrap(ByteBuffer buffer) {
-        if (null == buffer)
-            throw new NullPointerException();
-        return new PowerBuffer(buffer);
+        return new PowerBuffer(Objects.requireNonNull(buffer));
     }
 
     //

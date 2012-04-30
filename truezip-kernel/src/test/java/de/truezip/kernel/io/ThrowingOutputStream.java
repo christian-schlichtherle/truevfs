@@ -9,6 +9,7 @@ import de.truezip.kernel.ThrowManager;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -34,8 +35,6 @@ public final class ThrowingOutputStream extends DecoratingOutputStream {
     public ThrowingOutputStream(final @WillCloseWhenClosed OutputStream out,
                                 final @CheckForNull ThrowManager control) {
         super(out);
-        if (null == out)
-            throw new NullPointerException();
         this.control = null != control
                 ? control
                 : TestConfig.get().getThrowControl();

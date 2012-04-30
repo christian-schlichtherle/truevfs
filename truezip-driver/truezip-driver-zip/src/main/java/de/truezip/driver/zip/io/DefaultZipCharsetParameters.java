@@ -5,6 +5,7 @@
 package de.truezip.driver.zip.io;
 
 import java.nio.charset.Charset;
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -18,9 +19,7 @@ class DefaultZipCharsetParameters implements ZipCharsetParameters {
     private final Charset charset;
 
     DefaultZipCharsetParameters(final Charset charset) {
-        if (null == charset)
-            throw new NullPointerException();
-        this.charset = charset;
+        this.charset = Objects.requireNonNull(charset);
     }
 
     @Override

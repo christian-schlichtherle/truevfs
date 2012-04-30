@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.cio;
 
+import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -23,8 +24,7 @@ implements Entry {
     protected DecoratingEntry() { }
 
     protected DecoratingEntry(final E entry) {
-        if (null == (this.entry = entry))
-            throw new NullPointerException();
+        this.entry = Objects.requireNonNull(entry);
     }
 
     @Override

@@ -13,6 +13,7 @@ import de.truezip.kernel.FsModel;
 import de.truezip.kernel.FsEntryName;
 import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -29,9 +30,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final FsController<?> controller,
             final D director) {
         super(controller);
-        if (null == director)
-            throw new NullPointerException();
-        this.director = director;
+        this.director = Objects.requireNonNull(director);
     }
 
     @Override

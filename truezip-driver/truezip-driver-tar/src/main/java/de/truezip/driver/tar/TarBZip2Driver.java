@@ -50,7 +50,7 @@ public class TarBZip2Driver extends TarDriver {
      * Returns the compression level to use when writing a BZIP2 sink stream.
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
-     * {@link BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
+     * {@link org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
      * 
      * @return The compression level to use when writing a BZIP2 sink stream.
      */
@@ -59,7 +59,7 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected InputService<TarDriverEntry> input(
+    protected InputService<TarDriverEntry> newInput(
             final FsModel model,
             final Source source)
     throws IOException {
@@ -73,7 +73,7 @@ public class TarBZip2Driver extends TarDriver {
                 } catch (final Throwable ex) {
                     try {
                         in.close();
-                    } catch (final IOException ex2) {
+                    } catch (final Throwable ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;
@@ -85,7 +85,7 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected OutputService<TarDriverEntry> output(
+    protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
             final Sink sink,
             final InputService<TarDriverEntry> input)
@@ -101,7 +101,7 @@ public class TarBZip2Driver extends TarDriver {
                 } catch (final Throwable ex) {
                     try {
                         out.close();
-                    } catch (final IOException ex2) {
+                    } catch (final Throwable ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;

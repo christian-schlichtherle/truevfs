@@ -8,6 +8,7 @@ import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.FsArchiveEntry;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -16,13 +17,19 @@ import javax.annotation.concurrent.NotThreadSafe;
  * This abstract archive controller controls the mount state transition.
  * It is up to the sub class to implement the actual mounting/unmounting
  * strategy.
+ * <p>
+ * Note that all {@link FsController} API methods may throw a
+ * {@link ControlFlowException}, for example when
+ * {@linkplain FalsePositiveException detecting a false positive archive file}, or
+ * {@linkplain NeedsWriteLockException requiring a write lock} or
+ * {@linkplain NeedsSyncException requiring a sync}.
  *
  * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 abstract class FileSystemArchiveController<E extends FsArchiveEntry>
-extends ArchiveController<E> {
+extends BasicArchiveController<E> {
 
     /** The mount state of the archive file system. */
     private MountState<E> mountState = new ResetFileSystem();
@@ -112,9 +119,7 @@ extends ArchiveController<E> {
         private final ArchiveFileSystem<E> fileSystem;
 
         MountedFileSystem(final ArchiveFileSystem<E> fileSystem) {
-            if (null == fileSystem)
-                throw new NullPointerException();
-            this.fileSystem = fileSystem;
+            this.fileSystem = Objects.requireNonNull(fileSystem);
         }
 
         @Override

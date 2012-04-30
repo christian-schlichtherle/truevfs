@@ -4,6 +4,8 @@
  */
 package de.truezip.kernel;
 
+import java.util.Objects;
+
 /**
  * An abstract file system controller which implements the {@link #getModel()}
  * method.
@@ -22,8 +24,7 @@ extends FsController<M>  {
      * @param model the file system model.
      */
     protected FsModelController(final M model) {
-        if (null == (this.model = model))
-            throw new NullPointerException();
+        this.model = Objects.requireNonNull(model);
     }
 
     @Override

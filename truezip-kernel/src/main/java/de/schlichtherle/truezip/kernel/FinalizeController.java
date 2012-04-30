@@ -20,15 +20,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Finalizes unclosed resources returned by its decorated controller.
  * 
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 final class FinalizeController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
@@ -38,11 +38,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     private static final IOException OK = new IOException((Throwable) null);
 
-    /**
-     * Constructs a new file system finalize controller.
-     *
-     * @param controller the decorated file system controller.
-     */
     FinalizeController(FsController<?> controller) {
         super(controller);
     }
@@ -116,6 +111,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
     }
 
+    @NotThreadSafe
     private static final class FinalizeInputStream
     extends DecoratingInputStream {
         volatile IOException close; // accessed by finalizer thread!
@@ -147,6 +143,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
     } // FinalizeInputStream
 
+    @NotThreadSafe
     private static final class FinalizeOutputStream
     extends DecoratingOutputStream {
         volatile IOException close; // accessed by finalizer thread!
@@ -178,6 +175,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
     } // FinalizeOutputStream
 
+    @NotThreadSafe
     private static final class FinalizeSeekableChannel
     extends DecoratingSeekableChannel {
         volatile IOException close; // accessed by finalizer thread!

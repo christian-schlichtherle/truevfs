@@ -13,6 +13,7 @@ import de.truezip.kernel.cio.OutputSocket;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -45,8 +46,7 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
 
     @Override
     public OutputSocket<ZipDriverEntry> output(final ZipDriverEntry entry) {
-        if (null == entry)
-            throw new NullPointerException();
+        Objects.requireNonNull(entry);
 
         final class Output extends DecoratingOutputSocket<ZipDriverEntry> {
             Output() {

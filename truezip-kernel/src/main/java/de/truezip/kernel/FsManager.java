@@ -47,7 +47,7 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * @return A new archive file system controller.
      */
     public abstract <E extends FsArchiveEntry> FsController<?>
-    controller(FsArchiveDriver<E> driver, FsModel model, FsController<?> parent);
+    newController(FsArchiveDriver<E> driver, FsModel model, FsController<?> parent);
 
     /**
      * Returns the number of federated file systems managed by this instance.

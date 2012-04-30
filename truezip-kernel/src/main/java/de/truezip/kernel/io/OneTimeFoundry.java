@@ -7,6 +7,7 @@ package de.truezip.kernel.io;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.Channel;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 
 /**
@@ -21,13 +22,11 @@ public abstract class OneTimeFoundry<S extends Closeable, C extends Channel> {
     private @CheckForNull C channel;
 
     OneTimeFoundry(final S stream) {
-        if (null == (this.stream = stream))
-            throw new NullPointerException();
+        this.stream = Objects.requireNonNull(stream);
     }
 
     OneTimeFoundry(final C channel) {
-        if (null == (this.channel = channel))
-            throw new NullPointerException();
+        this.channel = Objects.requireNonNull(channel);
     }
 
     public S stream() throws IOException {

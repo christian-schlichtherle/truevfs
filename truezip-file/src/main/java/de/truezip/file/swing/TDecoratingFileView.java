@@ -5,6 +5,7 @@
 package de.truezip.file.swing;
 
 import java.io.File;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileView;
@@ -22,12 +23,10 @@ public abstract class TDecoratingFileView extends FileView {
     /**
      * Constructs a new decorating file view.
      *
-     * @param fileView The file view to decorate.
+     * @param fv The file view to decorate.
      */
-    protected TDecoratingFileView(final FileView fileView) {
-        if (null == fileView)
-            throw new NullPointerException();
-        this.fv = fileView;
+    protected TDecoratingFileView(final FileView fv) {
+        this.fv = Objects.requireNonNull(fv);
     }
 
     @Override

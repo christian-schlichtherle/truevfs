@@ -4,9 +4,8 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockManagement.isLocking;
-import static de.schlichtherle.truezip.kernel.LockManagement.locked;
-import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
+import static de.schlichtherle.truezip.kernel.LockingStrategy.FAST_LOCK;
+import static de.schlichtherle.truezip.kernel.LockingStrategy.TIMED_LOCK;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
@@ -31,27 +30,35 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Provides read/write locking for multi-threaded access by its clients.
+ * <p>
+ * This controller is a barrier for {@link NeedsWriteLockException}s:
+ * Whenever the decorated controller chain throws a
+ * {@code NeedsWriteLockException},
+ * the read lock gets released before the write lock gets acquired and the
+ * operation gets retried.
+ * <p>
+ * This controller is also an emitter and a barrier for
+ * {@link NeedsLockRetryException}s:
+ * If a lock can't get immediately acquired, then a
+ * {@code NeedsLockRetryException} gets thrown.
+ * This will unwind the stack of federated file systems until the 
+ * {@code LockController} for the first visited file system is found.
+ * This controller will then pause the current thread for a small random amount
+ * of milliseconds before retrying the operation.
  * 
  * @see    LockModel
- * @see    NeedsWriteLockException
  * @see    LockManagement
+ * @see    NeedsWriteLockException
+ * @see    NeedsLockRetryException
  * @author Christian Schlichtherle
  */
 @Immutable
 final class LockController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
-    private static final BitField<FsSyncOption>
-            NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not();
-
     private final ReadLock readLock;
     private final WriteLock writeLock;
 
-    /**
-     * Constructs a new file system lock controller.
-     *
-     * @param controller the decorated file system controller.
-     */
     LockController(FsController<? extends LockModel> controller) {
         super(controller);
         this.readLock = getModel().readLock();
@@ -68,28 +75,37 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         return this.writeLock;
     }
 
-    <T, X extends Exception> T readOrWriteLocked(Operation<T, X> operation)
+    <T, X extends Exception> T fastWriteLocked(Operation<T, X> operation)
+    throws X {
+        assert !isReadLockedByCurrentThread()
+                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
+        return FAST_LOCK.apply(writeLock(), operation);
+    }
+
+    <T, X extends Exception> T timedReadOrWriteLocked(Operation<T, X> operation)
     throws X {
         try {
-            return readLocked(operation);
-        } catch (NeedsWriteLockException ex) {
-            return writeLocked(operation);
+            return timedReadLocked(operation);
+        } catch (NeedsWriteLockException discard) {
+            return timedWriteLocked(operation);
         }
     }
 
-    <T, X extends Exception> T readLocked(Operation<T, X> operation) throws X {
-        return locked(operation, readLock());
+    <T, X extends Exception> T timedReadLocked(Operation<T, X> operation)
+    throws X {
+        return TIMED_LOCK.apply(readLock(), operation);
     }
 
-    <T, X extends Exception> T writeLocked(Operation<T, X> operation) throws X {
-        assert !getModel().isReadLockedByCurrentThread()
+    <T, X extends Exception> T timedWriteLocked(Operation<T, X> operation)
+    throws X {
+        assert !isReadLockedByCurrentThread()
                 : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
-        return locked(operation, writeLock());
+        return TIMED_LOCK.apply(writeLock(), operation);
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
-        return readOrWriteLocked(new IsReadOnly());
+        return timedReadOrWriteLocked(new IsReadOnly());
     }
 
     private final class IsReadOnly implements IOOperation<Boolean> {
@@ -108,7 +124,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // GetEntry
 
-        return readOrWriteLocked(new GetEntry());
+        return timedReadOrWriteLocked(new GetEntry());
     }
 
     @Override
@@ -120,7 +136,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // IsReadable
 
-        return readOrWriteLocked(new IsReadable());
+        return timedReadOrWriteLocked(new IsReadable());
     }
     
     @Override
@@ -132,7 +148,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // IsWritable
 
-        return readOrWriteLocked(new IsWritable());
+        return timedReadOrWriteLocked(new IsWritable());
     }
 
     @Override
@@ -144,7 +160,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // IsExecutable
 
-        return readOrWriteLocked(new IsExecutable());
+        return timedReadOrWriteLocked(new IsExecutable());
     }
 
     @Override
@@ -157,7 +173,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // SetReadOnly
 
-        writeLocked(new SetReadOnly());
+        timedWriteLocked(new SetReadOnly());
     }
 
     @Override
@@ -173,7 +189,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // SetTime
 
-        return writeLocked(new SetTime());
+        return timedWriteLocked(new SetTime());
     }
 
     @Override
@@ -190,7 +206,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // SetTime
 
-        return writeLocked(new SetTime());
+        return timedWriteLocked(new SetTime());
     }
 
     @Override
@@ -205,7 +221,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public Entry localTarget() throws IOException {
-                return writeLocked(new GetLocalTarget());
+                return fastWriteLocked(new GetLocalTarget());
             }
 
             final class GetLocalTarget implements IOOperation<Entry> {
@@ -217,7 +233,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public InputStream stream() throws IOException {
-                return writeLocked(new NewStream());
+                return timedWriteLocked(new NewStream());
             }
 
             final class NewStream implements IOOperation<InputStream> {
@@ -229,7 +245,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return writeLocked(new NewChannel());
+                return timedWriteLocked(new NewChannel());
             }
 
             final class NewChannel implements IOOperation<SeekableByteChannel> {
@@ -257,7 +273,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public Entry localTarget() throws IOException {
-                return writeLocked(new GetLocalTarget());
+                return fastWriteLocked(new GetLocalTarget());
             }
 
             final class GetLocalTarget implements IOOperation<Entry> {
@@ -269,7 +285,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public OutputStream stream() throws IOException {
-                return writeLocked(new NewStream());
+                return timedWriteLocked(new NewStream());
             }
 
             final class NewStream implements IOOperation<OutputStream> {
@@ -281,7 +297,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return writeLocked(new NewChannel());
+                return timedWriteLocked(new NewChannel());
             }
 
             final class NewChannel implements IOOperation<SeekableByteChannel> {
@@ -311,7 +327,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // Mknod
 
-        writeLocked(new Mknod());
+        timedWriteLocked(new Mknod());
     }
 
     @Override
@@ -327,44 +343,21 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // Unlink
 
-        writeLocked(new Unlink());
+        timedWriteLocked(new Unlink());
     }
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        final boolean locking = isLocking(); // do NOT initialize within Sync!
-        final BitField<FsSyncOption> sync = locking
-                ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
-                : options;
-
         final class Sync implements Operation<Void, FsSyncException> {
             @Override
             public Void call() throws FsSyncWarningException, FsSyncException {
-                // Prevent potential dead locks by performing a timed wait for
-                // open I/O resources if the current thread is already holding
-                // a file system lock.
-                // Note that a sync in a parent file system is a rare event
-                // so that this should not create performance problems, even
-                // when accessing deeply nested archive files, e.g. for the
-                // integration tests.
-                try {
-                    controller.sync(sync);
-                } catch (final FsSyncWarningException ex) {
-                    throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
-                } catch (final FsSyncException ex) {
-                    if (sync != options) { // OK, see contract for BitField.and()!
-                        assert locking;
-                        if (ex.getCause() instanceof FsResourceOpenException)
-                            throw NeedsLockRetryException.get();
-                    }
-                    throw ex;
-                }
+                controller.sync(options);
                 return null;
             }
         } // Sync
 
-        writeLocked(new Sync());
+        timedWriteLocked(new Sync());
     }
 
     void close(final Closeable closeable) throws IOException {
@@ -376,7 +369,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // Close
 
-        writeLocked(new Close());
+        timedWriteLocked(new Close());
     }
 
     private final class LockInputStream

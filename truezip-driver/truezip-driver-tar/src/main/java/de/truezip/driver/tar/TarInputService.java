@@ -4,10 +4,13 @@
  */
 package de.truezip.driver.tar;
 
-import de.truezip.kernel.FsEntryName;
-import static de.truezip.kernel.FsEntryName.SEPARATOR;
-import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
+import static de.truezip.driver.tar.TarDriver.DEFAULT_BLKSIZE;
+import static de.truezip.driver.tar.TarDriver.DEFAULT_RCDSIZE;
+import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.cio.Entry.Type;
+import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
+import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.InputService;
@@ -23,15 +26,15 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.NoSuchFileException;
 import java.util.*;
 import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
-import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import static org.apache.commons.compress.archivers.tar.TarConstants.*;
 import org.apache.commons.compress.archivers.tar.TarUtils;
 
 /**
- * Presents a {@link TarArchiveInputStream} as a randomly accessible archive.
+ * An input service for reading TAR files.
  * <p>
  * Note that the constructor of this class extracts each entry in the archive
  * to a temporary file!
@@ -47,12 +50,6 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
 public final class TarInputService
 implements InputService<TarDriverEntry> {
 
-    /** Default record size */
-    private static final int DEFAULT_RCDSIZE = 512;
-
-    /** Default block size */
-    public static final int DEFAULT_BLKSIZE = 20 * DEFAULT_RCDSIZE * 20;
-
     private static final byte[] NULL_RECORD = new byte[DEFAULT_RCDSIZE];
 
     private static final int CHECKSUM_OFFSET
@@ -63,39 +60,33 @@ implements InputService<TarDriverEntry> {
             entries = new LinkedHashMap<>(
                     initialCapacity(TarOutputService.OVERHEAD_SIZE));
 
+    private final TarDriver driver;
+
     @CreatesObligation
     public TarInputService(
             final FsModel model,
             final Source source,
             final TarDriver driver)
-    throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        final InputStream in = source.stream();
-        Throwable ex = null;
-        try {
-            unpack(newValidatedTarInputStream(in), driver);
-        } catch (final Throwable ex2) {
-            ex = ex2;
+    throws EOFException, IOException {
+        Objects.requireNonNull(model);
+        this.driver = Objects.requireNonNull(driver);
+        try (final InputStream in = source.stream()) {
             try {
-                close0();
-            } catch (final IOException ex3) {
-                ex2.addSuppressed(ex3);
-            }
-            throw ex2;
-        } finally {
-            try {
-                in.close();
-            } catch (final IOException ex2) {
-                if (null == ex)
-                    throw ex2;
-                ex.addSuppressed(ex2);
+                unpack(newValidatedTarInputStream(in));
+            } catch (final Throwable ex) {
+                try {
+                    close0();
+                } catch (final Throwable ex2) {
+                    ex.addSuppressed(ex2);
+                }
+                throw ex;
             }
         }
     }
 
-    private void unpack(final TarArchiveInputStream tin,
-                        final TarDriver driver) throws IOException {
+    private void unpack(final @WillNotClose TarArchiveInputStream tin)
+    throws IOException {
+        final TarDriver driver = this.driver;
         final IOPool<?> pool = driver.getIOPool();
         for (   TarArchiveEntry tinEntry;
                 null != (tinEntry = tin.getNextTarEntry()); ) {
@@ -103,31 +94,18 @@ implements InputService<TarDriverEntry> {
             TarDriverEntry entry = entries.get(name);
             if (null != entry)
                 entry.release();
-            entry = driver.entry(name, tinEntry);
+            entry = driver.newEntry(name, tinEntry);
             if (!tinEntry.isDirectory()) {
                 final IOBuffer<?> temp = pool.allocate();
                 entry.setTemp(temp);
                 try {
-                    Throwable ex = null;
-                    final OutputStream out = temp.output().stream();
-                    try {
+                    try (final OutputStream out = temp.output().stream()) {
                         Streams.cat(tin, out);
-                    } catch (final Throwable ex2) {
-                        ex = ex2;
-                        throw ex2;
-                    } finally {
-                        try {
-                            out.close();
-                        } catch (final IOException ex2) {
-                            if (null == ex)
-                                throw ex2;
-                            ex.addSuppressed(ex2);
-                        }
                     }
                 } catch (final Throwable ex) {
                     try {
                         temp.release();
-                    } catch (final IOException ex2) {
+                    } catch (final Throwable ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;
@@ -137,17 +115,10 @@ implements InputService<TarDriverEntry> {
         }
     }
 
-    /**
-     * Returns the fixed name of the given TAR entry, ensuring that it ends
-     * with a {@link FsEntryName#SEPARATOR} if it's a directory.
-     *
-     * @param entry the TAR entry.
-     * @return the fixed name of the given TAR entry.
-     * @see <a href="http://java.net/jira/browse/TRUEZIP-62">Issue TRUEZIP-62</a>
-     */
-    private static String name(ArchiveEntry entry) {
+    private static String name(final TarArchiveEntry entry) {
         final String name = entry.getName();
-        return entry.isDirectory() && !name.endsWith(SEPARATOR) ? name + SEPARATOR_CHAR : name;
+        final Type type = entry.isDirectory() ? DIRECTORY : FILE;
+        return FsArchiveDriver.normalize(name, type);
     }
 
     /**
@@ -159,11 +130,11 @@ implements InputService<TarDriverEntry> {
      * 
      * @param  in the stream to read from.
      * @return A stream which holds all the data {@code in} did.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
-    private static TarArchiveInputStream
-    newValidatedTarInputStream(final InputStream in)
+    private TarArchiveInputStream newValidatedTarInputStream(
+            final @WillNotClose InputStream in)
     throws EOFException, IOException {
         final byte[] buf = new byte[DEFAULT_RCDSIZE];
         final InputStream vin = readAhead(in, buf);
@@ -174,31 +145,36 @@ implements InputService<TarDriverEntry> {
             try {
                 expected = TarUtils.parseOctal(buf, CHECKSUM_OFFSET, 8);
             } catch (final IllegalArgumentException ex) {
-                throw new TarException("Illegal initial record in TAR file!", ex);
+                throw new TarException("Invalid initial record in TAR file!", ex);
             }
             for (int i = 0; i < 8; i++)
                 buf[CHECKSUM_OFFSET + i] = ' ';
             final long actual = TarUtils.computeCheckSum(buf);
             if (expected != actual)
                 throw new TarException(
-                        "Illegal initial record in TAR file: Expected / actual checksum := "
+                        "Invalid initial record in TAR file: Expected / actual checksum := "
                         + expected + " / " + actual + "!");
         }
-        return new TarArchiveInputStream(vin, DEFAULT_BLKSIZE, DEFAULT_RCDSIZE);
+        return new TarArchiveInputStream(   vin,
+                                            DEFAULT_BLKSIZE,
+                                            DEFAULT_RCDSIZE,
+                                            driver.getEncoding());
     }
 
     /**
-     * Fills {@code buf} with data from the given source stream and
-     * returns an source stream from which you can still read all data,
+     * Fills {@code buf} with data from the given input stream and
+     * returns an input stream from which you can still read all data,
      * including the data in buf.
      *
      * @param  in The stream to read from.
      * @param  buf The buffer to fill entirely with data.
      * @return A stream which holds all the data {@code in} did.
-     * @throws EOFException on premature end-of-file.
+     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
-    private static InputStream readAhead(final InputStream in, final byte[] buf)
+    private static InputStream readAhead(
+            final @WillNotClose InputStream in,
+            final byte[] buf)
     throws EOFException, IOException {
         if (in.markSupported()) {
             in.mark(buf.length);
@@ -231,8 +207,8 @@ implements InputService<TarDriverEntry> {
 
     @Override
     public InputSocket<TarDriverEntry> input(final String name) {
-        if (null == name)
-            throw new NullPointerException();
+        Objects.requireNonNull(name);
+
         final class Input extends InputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry localTarget() throws IOException {

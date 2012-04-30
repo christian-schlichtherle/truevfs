@@ -23,7 +23,7 @@ public class ConcurrencyUtils {
     public static TaskJoiner runConcurrent(
             final int numThreads,
             final TaskFactory factory) {
-        final List<Future<?>> results = new ArrayList<Future<?>>(numThreads);
+        final List<Future<?>> results = new ArrayList<>(numThreads);
         final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try {
             for (int threadNum = 0; threadNum < numThreads; threadNum++)
@@ -42,17 +42,17 @@ public class ConcurrencyUtils {
 
             @Override
             public void join() throws InterruptedException, ExecutionException {
-                ExecutionException failure = null;
+                final ExceptionBuilder<ExecutionException, ExecutionException>
+                        builder = new SuppressedExceptionBuilder<>();
                 for (final Future<?> result : results) {
                     try {
                         result.get(); // check exception from task
-                    } catch (ExecutionException failed) {
-                        failure = failed;
+                    } catch (ExecutionException ex) {
+                        builder.warn(ex);
                     } catch (CancellationException cancelled) {
                     }
                 }
-                if (null != failure)
-                    throw failure;
+                builder.check();
             }
         } // TaskJoinerImpl
 

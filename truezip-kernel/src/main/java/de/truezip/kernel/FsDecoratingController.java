@@ -26,18 +26,14 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class FsDecoratingController<
         M extends FsModel,
         C extends FsController<? extends M>>
-extends FsController<M> {
+extends FsModelController<M> {
 
-    /** The nullable decorated file system controller. */
-    protected @Nullable C controller;
+    /** The decorated file system controller. */
+    protected final C controller;
 
     protected FsDecoratingController(final C controller) {
+        super(controller.getModel());
         this.controller = controller;
-    }
-
-    @Override
-    public M getModel() {
-        return controller.getModel();
     }
 
     @Override
@@ -51,7 +47,7 @@ extends FsController<M> {
     }
 
     @Override
-    public FsEntry entry(FsEntryName name)
+    public @Nullable FsEntry entry(FsEntryName name)
     throws IOException {
         return controller.entry(name);
     }
@@ -77,8 +73,8 @@ extends FsController<M> {
     }
 
     @Override
-    public boolean setTime(
-            FsEntryName name,
+    public boolean
+    setTime(FsEntryName name,
             Map<Access, Long> times,
             BitField<FsAccessOption> options)
     throws IOException {
@@ -86,8 +82,8 @@ extends FsController<M> {
     }
 
     @Override
-    public boolean setTime(
-            FsEntryName name,
+    public boolean
+    setTime(FsEntryName name,
             BitField<Access> types,
             long value,
             BitField<FsAccessOption> options)
@@ -97,16 +93,16 @@ extends FsController<M> {
 
     @Override
     public InputSocket<?>
-    input( FsEntryName name,
-                    BitField<FsAccessOption> options) {
+    input(  FsEntryName name,
+            BitField<FsAccessOption> options) {
         return controller.input(name, options);
     }
 
     @Override
     public OutputSocket<?>
-    output(    FsEntryName name,
-                        BitField<FsAccessOption> options,
-                        Entry template) {
+    output( FsEntryName name,
+            BitField<FsAccessOption> options,
+            Entry template) {
         return controller.output(name, options, template);
     }
 

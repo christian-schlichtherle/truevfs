@@ -4,6 +4,8 @@
  */
 package de.truezip.driver.tar;
 
+import static de.truezip.driver.tar.TarDriver.DEFAULT_BLKSIZE;
+import static de.truezip.driver.tar.TarDriver.DEFAULT_RCDSIZE;
 import de.truezip.kernel.FsModel;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
@@ -19,16 +21,14 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
- * An implementation of {@link OutputService} to write TAR archives.
+ * An output service for writing TAR files.
+ * This output service can only write one entry concurrently.
  * <p>
  * Because the TAR file format needs to know each entry's length in advance,
  * entries from an unknown source are actually written to temp files and copied
@@ -39,8 +39,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
  * <p>
  * If the size of an entry is known in advance it's directly written to the
  * underlying {@code TarArchiveOutputStream} instead.
- * <p>
- * This sink archive can only write one entry concurrently.
  *
  * @see    TarInputService
  * @author Christian Schlichtherle
@@ -69,19 +67,18 @@ implements OutputService<TarDriverEntry> {
             final Sink sink,
             final TarDriver driver)
     throws IOException {
-        if (null == model)
-            throw new NullPointerException();
-        if (null == (this.driver = driver))
-            throw new NullPointerException();
+        Objects.requireNonNull(model);
+        this.driver = Objects.requireNonNull(driver);
         final OutputStream out = sink.stream();
         try {
             final TarArchiveOutputStream
-                    tos = this.tos = new TarArchiveOutputStream(out);
+                    tos = this.tos = new TarArchiveOutputStream(out,
+                        DEFAULT_BLKSIZE, DEFAULT_RCDSIZE, driver.getEncoding());
             tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         } catch (final Throwable ex) {
             try {
                 out.close();
-            } catch (final IOException ex2) {
+            } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -109,8 +106,7 @@ implements OutputService<TarDriverEntry> {
 
     @Override
     public OutputSocket<TarDriverEntry> output(final TarDriverEntry local) {
-        if (null == local)
-            throw new NullPointerException();
+        Objects.requireNonNull(local);
 
         final class Output extends OutputSocket<TarDriverEntry> {
             @Override
@@ -167,7 +163,7 @@ implements OutputService<TarDriverEntry> {
     } // DirectoryTemplate
 
     /**
-     * Returns whether this sink archive is busy writing an archive entry
+     * Returns whether this output archive is busy writing an archive entry
      * or not.
      */
     private boolean isBusy() {
@@ -180,11 +176,11 @@ implements OutputService<TarDriverEntry> {
     }
 
     /**
-     * This entry sink stream writes directly to our subclass.
-     * It can only be used if this sink stream is not currently busy
+     * This entry output stream writes directly to the subclass.
+     * It can only be used if this output stream is not currently busy
      * writing another entry and the entry holds enough information to
      * write the entry header.
-     * These preconditions are checked by {@link #sink(TarDriverEntry)}.
+     * These preconditions are checked by {@link #output(TarDriverEntry)}.
      */
     @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
@@ -211,9 +207,9 @@ implements OutputService<TarDriverEntry> {
     } // EntryOutputStream
 
     /**
-     * This entry sink stream writes the entry to a temporary file.
+     * This entry output stream writes the entry to an I/O buffer.
      * When the stream is closed, the temporary file is then copied to this
-     * sink stream and finally deleted.
+     * output stream and finally deleted.
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream
@@ -232,7 +228,7 @@ implements OutputService<TarDriverEntry> {
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
-                } catch (final IOException ex2) {
+                } catch (final Throwable ex2) {
                     ex.addSuppressed(ex2);
                 }
                 throw ex;
@@ -255,35 +251,22 @@ implements OutputService<TarDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IOBuffer<?> buffer = this.buffer;
-            final InputStream in = buffer.input().stream();
-            Throwable ex = null;
-            try {
-                final ExceptionBuilder<IOException, IOException>
-                        builder = new SuppressedExceptionBuilder<>();
+            try (final InputStream in = buffer.input().stream()) {
                 final TarArchiveOutputStream tos = TarOutputService.this.tos;
                 tos.putArchiveEntry(local);
+                final ExceptionBuilder<IOException, IOException>
+                        builder = new SuppressedExceptionBuilder<>();
                 try {
                     Streams.cat(in, tos);
-                } catch (final InputException ex2) { // NOT IOException!
-                    builder.warn(ex2);
+                } catch (final InputException ex) { // NOT IOException!
+                    builder.warn(ex);
                 }
                 try {
                     tos.closeArchiveEntry();
-                } catch (final IOException ex2) {
-                    builder.warn(ex2);
+                } catch (final IOException ex) {
+                    throw builder.fail(ex);
                 }
                 builder.check();
-            } catch (final Throwable ex2) {
-                ex = ex2;
-                throw ex2;
-            } finally {
-                try {
-                    in.close();
-                } catch (final IOException ex2) {
-                    if (null == ex)
-                        throw ex2;
-                    ex.addSuppressed(ex2);
-                }
             }
             buffer.release();
         }

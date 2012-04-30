@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockManagement.WAIT_TIMEOUT_MILLIS;
 import static de.truezip.kernel.FsSyncOption.FORCE_CLOSE_IO;
 import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;
@@ -20,6 +19,7 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
@@ -28,17 +28,14 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    ResourceManager
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
+@Immutable
 final class ResourceController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
+    private static final int WAIT_TIMEOUT_MILLIS = 100;
+
     private final ResourceManager manager;
 
-    /**
-     * Constructs a new file system resource controller.
-     *
-     * @param controller the decorated file system controller.
-     */
     ResourceController(FsController<? extends LockModel> controller) {
         super(controller);
         this.manager = new ResourceManager(writeLock());
@@ -98,6 +95,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
+
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         waitIdle(options, builder);
         closeAll(builder);
@@ -109,41 +107,40 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         builder.check();
     }
 
-    /**
-     * Waits for all entry input and output resources to close or forces
-     * them to close, dependending on the {@code options}.
-     * Mind that this method deliberately handles entry input and output
-     * streams equally because {@link ResourceManager#waitForeignResources}
-     * WILL NOT WORK if any two resource accountants share the same lock!
-     *
-     * @param  options a bit field of synchronization options.
-     * @param  builder the exception handling strategy.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
-     */
     private void waitIdle(  final BitField<FsSyncOption> options,
                             final FsSyncExceptionBuilder builder)
     throws FsSyncException {
+        try {
+            waitIdle(options);
+        } catch (final FsResourceOpenException ex) {
+            if (!options.get(FORCE_CLOSE_IO))
+                throw builder.fail(new FsSyncException(getModel(), ex));
+            builder.warn(new FsSyncWarningException(getModel(), ex));
+        }
+    }
+
+    private void waitIdle(final BitField<FsSyncOption> options)
+    throws FsResourceOpenException {
         // HC SUNT DRACONES!
         final ResourceManager manager = this.manager;
-        final boolean force = options.get(FORCE_CLOSE_IO);
         final int local = manager.localResources();
-        final IOException ex;
-        if (0 != local && !force) {
-            ex = new FsResourceOpenException(manager.totalResources(), local);
-            throw builder.fail(new FsSyncException(getModel(), ex));
-        }
+        if (0 != local && !options.get(FORCE_CLOSE_IO))
+            throw new FsResourceOpenException(manager.totalResources(), local);
         final boolean wait = options.get(WAIT_CLOSE_IO);
-        final int total = manager.waitForeignResources(
+        if (!wait) {
+            // Spend some effort on closing streams which have already been
+            // garbage collected in order to compensates for a disadvantage of
+            // the NeedsLockRetryException:
+            // An FsArchiveDriver may try to close a file system entry but fail
+            // to do so because of a NeedsLockRetryException which is
+            // impossible to resolve in a driver.
+            // The TarDriver family is known to be affected by this.
+            System.runFinalization();
+        }
+        final int total = manager.waitOtherThreads(
                 wait ? 0 : WAIT_TIMEOUT_MILLIS);
-        if (0 == total)
-            return;
-        ex = new FsResourceOpenException(total, local);
-        if (!force)
-            throw builder.fail(new FsSyncException(getModel(), ex));
-        builder.warn(new FsSyncWarningException(getModel(), ex));
+        if (0 != total)
+            throw new FsResourceOpenException(total, local);
     }
 
     /**
@@ -153,7 +150,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      * @param  builder the exception handling strategy.
      */
     private void closeAll(final FsSyncExceptionBuilder builder) {
-        final ResourceManager manager = this.manager;
         try {
             manager.closeAllResources();
         } catch (final IOException ex) {

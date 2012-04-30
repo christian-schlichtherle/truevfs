@@ -6,7 +6,6 @@ package de.truezip.key;
 
 import java.net.URI;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**

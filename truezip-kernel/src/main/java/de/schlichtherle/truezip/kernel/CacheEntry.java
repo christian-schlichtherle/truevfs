@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -75,8 +76,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
             final IOPool<?> pool) {
         assert null != strategy;
         this.strategy = strategy;
-        if (null == (this.pool = pool))
-            throw new NullPointerException();
+        this.pool = Objects.requireNonNull(pool);
     }
 
     /**
@@ -93,9 +93,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * @return {@code this}
      */
     public CacheEntry configure(final InputSocket<?> input) {
-        if (null == input)
-            throw new NullPointerException();
-        this.input = input;
+        this.input = Objects.requireNonNull(input);
         return this;
     }
 
@@ -113,9 +111,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * @return {@code this}
      */
     public CacheEntry configure(final OutputSocket<?> output) {
-        if (null == output)
-            throw new NullPointerException();
-        this.output = output;
+        this.output = Objects.requireNonNull(output);
         return this;
     }
 
@@ -339,7 +335,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
                 } catch (final Throwable ex) {
                     try {
                         buffer.release();
-                    } catch (final IOException ex2) {
+                    } catch (final Throwable ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;

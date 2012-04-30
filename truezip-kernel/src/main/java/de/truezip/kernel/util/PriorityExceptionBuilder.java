@@ -4,10 +4,7 @@
  */
 package de.truezip.kernel.util;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -44,8 +41,7 @@ extends AbstractExceptionBuilder<X, X> {
      *        the assembly.
      */
     public PriorityExceptionBuilder(final Comparator<? super X> comparator) {
-        if (null == (this.comparator = comparator))
-            throw new NullPointerException();
+        this.comparator = Objects.requireNonNull(comparator);
         exceptions = new LinkedList<>();
     }
 

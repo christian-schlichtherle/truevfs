@@ -19,10 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.NoSuchFileException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -115,10 +112,8 @@ implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
-        public InputSocket<MockArchiveDriverEntry> input(
-                final String name) {
-            if (null == name)
-                throw new NullPointerException();
+        public InputSocket<MockArchiveDriverEntry> input(final String name) {
+            Objects.requireNonNull(name);
 
             final class Input extends InputSocket<MockArchiveDriverEntry> {
                 @Override
@@ -170,8 +165,7 @@ implements Container<MockArchiveDriverEntry> {
         @Override
         public OutputSocket<MockArchiveDriverEntry> output(
                 final MockArchiveDriverEntry entry) {
-            if (null == entry)
-                throw new NullPointerException();
+            Objects.requireNonNull(entry);
 
             final class Output extends OutputSocket<MockArchiveDriverEntry> {
                 @Override

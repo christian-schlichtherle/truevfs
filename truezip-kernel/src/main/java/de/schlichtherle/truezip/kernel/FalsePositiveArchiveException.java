@@ -4,25 +4,26 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.FsDecoratingController;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates that a file system is a false positive file system.
  * <p>
- * This exception type is reserved for use by
- * {@link FsController file system controllers} in order to reroute file system
- * operations to the parent file system of a false positive federated (archive)
- * file system.
+ * This exception type is reserved for non-local control flow in
+ * {@linkplain FsDecoratingController file system controller chains} in order
+ * to reroute file system operations to the parent file system of a false
+ * positive federated (archive) file system.
  *
- * @see    FsFalsePositiveController
+ * @see    FalsePositiveController
  * @author Christian Schlichtherle
  */
 @Immutable
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-class FalsePositiveException extends ControlFlowException {
+class FalsePositiveArchiveException extends ControlFlowException {
 
-    FalsePositiveException(IOException cause) {
+    FalsePositiveArchiveException(IOException cause) {
         super(cause);
     }
 

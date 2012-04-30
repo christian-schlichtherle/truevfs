@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsDecoratingController;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.concurrent.Immutable;
@@ -20,19 +21,22 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 abstract class DecoratingLockModelController<
         C extends FsController<? extends LockModel>>
-extends SyncDecoratingController<LockModel, C>  {
+extends FsDecoratingController<LockModel, C>  {
 
-    /**
-     * Constructs a new decorating file system controller.
-     * 
-     * @param controller the decorated file system controller.
-     */
     DecoratingLockModelController(C controller) {
         super(controller);
     }
 
+    //
+    // These methods are an exact copy of LockModelController.*
+    //
+
     ReadLock readLock() {
         return getModel().readLock();
+    }
+
+    final boolean isReadLockedByCurrentThread() {
+        return getModel().isReadLockedByCurrentThread();
     }
 
     WriteLock writeLock() {

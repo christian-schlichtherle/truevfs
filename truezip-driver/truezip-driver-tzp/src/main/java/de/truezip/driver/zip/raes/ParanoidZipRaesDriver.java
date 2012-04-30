@@ -55,7 +55,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      * written entries.
      */
     @Override
-    protected final OutputService<ZipDriverEntry> output(
+    protected final OutputService<ZipDriverEntry> newOutput(
             final FsModel model,
             final Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)

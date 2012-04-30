@@ -7,6 +7,7 @@ package de.truezip.kernel.io;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.GuardedBy;
@@ -26,16 +27,14 @@ public class LockOutputStream extends DecoratingOutputStream {
     private final Lock lock;
 
     protected LockOutputStream(final Lock lock) {
-        if (null == (this.lock = lock))
-            throw new NullPointerException();
+        this.lock = Objects.requireNonNull(lock);
     }
 
     public LockOutputStream(
             final Lock lock,
             final @WillCloseWhenClosed OutputStream out) {
         this(lock);
-        if (null == (this.out = out))
-            throw new NullPointerException();
+        this.out = Objects.requireNonNull(out);
     }
 
     @Override

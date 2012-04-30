@@ -25,7 +25,5 @@ final class NeedsLockRetryException extends ControlFlowException {
         return TRACEABLE ? new NeedsLockRetryException() : SINGLETON;
     }
 
-    private NeedsLockRetryException() {
-        super(null);
-    }
+    private NeedsLockRetryException() { }
 }

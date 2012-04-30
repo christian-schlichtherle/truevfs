@@ -18,7 +18,7 @@ public final class MockDriver extends FsDriver {
 
     @Override
     public FsController<?>
-    controller(  FsManager manager,
+    newController(  FsManager manager,
                     FsModel model,
                     FsController<?> parent) {
         assert null == parent

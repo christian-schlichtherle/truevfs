@@ -11,7 +11,7 @@ import static de.truezip.driver.zip.io.ZipEntry.DEFLATED;
  */
 public final class DeflatedZipIT extends ZipTestSuite {
     @Override
-    public ZipEntry entry(String name) {
+    public ZipEntry newEntry(String name) {
         ZipEntry entry = new ZipEntry(name);
         entry.setMethod(DEFLATED);
         return entry;

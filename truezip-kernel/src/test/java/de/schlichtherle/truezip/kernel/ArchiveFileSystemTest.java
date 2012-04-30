@@ -44,33 +44,26 @@ public final class ArchiveFileSystemTest {
                     new MockArchiveDriver());
 
         try {
-            fs.addFsArchiveFileSystemTouchListener(null);
+            fs.addArchiveFileSystemTouchListener(null);
         } catch (NullPointerException expected) {
         }
-        assertThat(fs.getFsArchiveFileSystemTouchListeners(), notNullValue());
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(0));
+        assertThat(fs.getArchiveFileSystemTouchListeners(), notNullValue());
+        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(0));
 
         final Listener listener1 = new Listener(fs);
-        fs.addFsArchiveFileSystemTouchListener(listener1);
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
+        fs.addArchiveFileSystemTouchListener(listener1);
+        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(1));
 
         try {
-            fs.addFsArchiveFileSystemTouchListener(new Listener(fs));
+            fs.addArchiveFileSystemTouchListener(new Listener(fs));
             fail();
         } catch (TooManyListenersException expected) {
         }
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
+        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(1));
 
-        try {
-            fs.removeFsArchiveFileSystemTouchListener(null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
-
-        fs.removeFsArchiveFileSystemTouchListener(listener1);
-        fs.removeFsArchiveFileSystemTouchListener(listener1);
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(0));
+        fs.removeArchiveFileSystemTouchListener(listener1);
+        fs.removeArchiveFileSystemTouchListener(listener1);
+        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(0));
     }
 
     private static class Listener
@@ -82,13 +75,13 @@ public final class ArchiveFileSystemTest {
         }
 
         @Override
-        public void beforeTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
+        public void preTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
         }
 
         @Override
-        public void afterTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
+        public void postTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
         }
@@ -124,7 +117,7 @@ public final class ArchiveFileSystemTest {
         for (final String[] params : paramss) {
             final String aen = params[0];
             final Type type = aen.endsWith(SEPARATOR) ? DIRECTORY : FILE;
-            final MockArchiveDriverEntry ae = driver.entry(aen, type, null);
+            final MockArchiveDriverEntry ae = driver.newEntry(aen, type, null);
             assertEquals(aen, ae.getName());
             archive   .newOutputService()
                         .output(ae)

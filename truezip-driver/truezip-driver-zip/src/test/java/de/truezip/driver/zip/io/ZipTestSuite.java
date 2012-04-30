@@ -90,7 +90,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     }
 
     @Override
-    public ZipEntry entry(String name) {
+    public ZipEntry newEntry(String name) {
         return new ZipEntry(name);
     }
 
@@ -272,7 +272,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     @Test
     public final void testGetInputStream() throws IOException {
         try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
-            zos.putNextEntry(entry("foo"));
+            zos.putNextEntry(newEntry("foo"));
         }
 
         try (final ZipFile zf = newZipFile(file)) {
@@ -284,7 +284,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
     @Test
     public final void testWriteAndReadSingleBytes() throws IOException {
         try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
-            zos.putNextEntry(entry("file"));
+            zos.putNextEntry(newEntry("file"));
             for (int i = 0; i < data.length; i++)
                 zos.write(data[i]);
         }
@@ -371,7 +371,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
             for (int i = 0; i < nEntries; i++) {
                 String name = i + ".txt";
-                zos.putNextEntry(entry(name));
+                zos.putNextEntry(newEntry(name));
                 zos.write(data);
                 assertTrue(set.add(name));
             }
@@ -392,7 +392,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         // Create test ZIP file.
         final String name = "entry";
         try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
-            zos.putNextEntry(entry(name));
+            zos.putNextEntry(newEntry(name));
             zos.write(data);
         }
 
@@ -431,7 +431,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
             // Create test ZIP file.
             final String name = "entry";
             try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
-                zos.putNextEntry(entry(name));
+                zos.putNextEntry(newEntry(name));
                 zos.write(data);
             }
 
@@ -547,7 +547,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         try {
             for (int i = 0; i < len; i++) {
                 final String name = off + i + ".txt";
-                zos.putNextEntry(entry(name));
+                zos.putNextEntry(newEntry(name));
                 zos.write(data);
             }
         } finally {

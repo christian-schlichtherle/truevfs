@@ -4,17 +4,15 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsEntry;
-import de.truezip.kernel.FsModel;
-import de.truezip.kernel.FsEntryName;
+import static de.truezip.kernel.FsSyncOptions.RESET;
+import static de.truezip.kernel.FsSyncOptions.SYNC;
+import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingInputStream;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.DecoratingSeekableChannel;
-import de.truezip.kernel.FsAccessOption;
 import de.truezip.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
@@ -25,28 +23,59 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Performs a {@link FsController#sync(BitField) sync} operation on the
- * file system if and only if any decorated file system controller throws an
- * {@link NeedsSyncException}.
+ * Performs a {@link FsController#sync(BitField) sync} operation if required.
+ * <p>
+ * This controller is a barrier for {@link NeedsSyncException}s:
+ * Whenever the decorated controller chain throws a {@code NeedsSyncException},
+ * the file system gets {@link #sync(NeedsSyncException) synced} before the
+ * operation gets retried.
  * 
  * @see    NeedsSyncException
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 final class SyncController
-extends SyncDecoratingController<FsModel, FsController<?>> {
+extends DecoratingLockModelController<FsController<? extends LockModel>> {
+
+    SyncController(FsController<? extends LockModel> controller) {
+        super(controller);
+    }
 
     /**
-     * Constructs a new file system sync controller.
-     *
-     * @param controller the decorated file system controller.
+     * Syncs this controller.
+     * 
+     * @param  trigger the triggering exception.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream gets forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
      */
-    SyncController(FsController<?> controller) {
-        super(controller);
+    final void sync(final NeedsSyncException trigger)
+    throws FsSyncWarningException, FsSyncException {
+        checkWriteLockedByCurrentThread();
+        try {
+            sync(SYNC);
+        } catch (final FsSyncException ex) {
+            ex.addSuppressed(trigger);
+            throw ex;
+        }
+    }
+
+    void close(final Closeable closeable) throws IOException {
+        while (true) {
+            try {
+                closeable.close();
+                return;
+            } catch (NeedsSyncException ex) {
+                sync(ex);
+            }
+        }
     }
 
     @Override
@@ -173,8 +202,7 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             public InputStream stream() throws IOException {
                 while (true) {
                     try {
-                        return new SyncInputStream(
-                                getBoundSocket().stream());
+                        return new SyncInputStream(getBoundSocket().stream());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -185,8 +213,7 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             public SeekableByteChannel channel() throws IOException {
                 while (true) {
                     try {
-                        return new SyncSeekableChannel(
-                                getBoundSocket().channel());
+                        return new SyncSeekableChannel(getBoundSocket().channel());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -224,8 +251,7 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             public SeekableByteChannel channel() throws IOException {
                 while (true) {
                     try {
-                        return new SyncSeekableChannel(
-                                getBoundSocket().channel());
+                        return new SyncSeekableChannel(getBoundSocket().channel());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -236,8 +262,7 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             public OutputStream stream() throws IOException {
                 while (true) {
                     try {
-                        return new SyncOutputStream(
-                                getBoundSocket().stream());
+                        return new SyncOutputStream(getBoundSocket().stream());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -270,20 +295,16 @@ extends SyncDecoratingController<FsModel, FsController<?>> {
             final FsEntryName name,
             final BitField<FsAccessOption> options)
     throws IOException {
-        while (true) {
-            try {
-                controller.unlink(name, options);
-                return;
-            } catch (NeedsSyncException ex) {
-                sync(ex);
-            }
-        }
-    }
+        // HC SUNT DRACONES!
+        assert isWriteLockedByCurrentThread();
 
-    void close(final Closeable closeable) throws IOException {
         while (true) {
             try {
-                closeable.close();
+                controller.unlink(name, options); // repeatable for root entry
+                if (name.isRoot()) {
+                    // Make the file system controller chain discardable.
+                    controller.sync(RESET);
+                }
                 return;
             } catch (NeedsSyncException ex) {
                 sync(ex);

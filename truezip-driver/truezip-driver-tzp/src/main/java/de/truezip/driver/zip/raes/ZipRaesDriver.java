@@ -66,7 +66,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     protected RaesParameters raesParameters(FsModel model) {
         return new KeyManagerRaesParameters(
-                getKeyManagerProvider().getKeyManager(AesPbeParameters.class),
+                getKeyManagerProvider().keyManager(AesPbeParameters.class),
                 mountPointUri(model));
     }
 
@@ -148,7 +148,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     @Override
-    protected OutputService<ZipDriverEntry> output(
+    protected OutputService<ZipDriverEntry> newOutput(
             final FsModel model,
             final Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
@@ -198,13 +198,13 @@ public abstract class ZipRaesDriver extends JarDriver {
      * of the resulting archive file and unecessarily heat the CPU.
      */
     @Override
-    public ZipDriverEntry entry(
+    public ZipDriverEntry newEntry(
             final String path,
             final Type type,
             final BitField<FsAccessOption> mknod,
             final Entry template) {
         final ZipDriverEntry entry
-                = super.entry(path, type, mknod.set(COMPRESS), template);
+                = super.newEntry(path, type, mknod.set(COMPRESS), template);
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
         // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true
         // OR template is an instance of ZipEntry

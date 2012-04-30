@@ -7,6 +7,7 @@ package de.truezip.samples.file;
 import de.schlichtherle.truezip.key.pbe.swing.feedback.HurlingWindowFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.feedback.InvalidKeyFeedback;
 import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,8 +44,7 @@ public class ApplicationTest {
 
         @Override
         protected int runChecked(String[] args) throws Exception {
-            if (null == args)
-                throw new NullPointerException();
+            Objects.requireNonNull(args);
             return 0;
         }
     } // TestApplication

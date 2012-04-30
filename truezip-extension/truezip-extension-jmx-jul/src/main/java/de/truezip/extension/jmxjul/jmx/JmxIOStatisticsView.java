@@ -8,6 +8,7 @@ import de.truezip.kernel.FsManager;
 import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Objects;
 import javax.management.*;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -60,8 +61,7 @@ implements JmxIOStatisticsMXBean {
     }
 
     private static synchronized ObjectName getObjectName(final JmxIOStatistics model, final String type) {
-        if (null == type)
-            throw new NullPointerException();
+        Objects.requireNonNull(type);
         final long time = model.getTimeCreatedMillis();
         @SuppressWarnings("UseOfObsoleteCollectionType")
         final java.util.Hashtable<String, String>

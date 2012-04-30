@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.key.swing;
 
 import java.awt.AWTEvent;
+import java.util.Objects;
 
 /**
  * Fired when the ancestor window of an {@link EnhancedPanel} is shown or
@@ -64,8 +65,7 @@ public class PanelEvent extends AWTEvent {
      */
     @Override
     public void setSource(Object source) {
-        if (null == source)
-            throw new NullPointerException();
+        Objects.requireNonNull(source);
         super.setSource((EnhancedPanel) source);
     }
 

@@ -25,6 +25,7 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
@@ -70,7 +71,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 final class CacheController
-extends DecoratingLockModelController<SyncDecoratingController<? extends LockModel, ?>> {
+extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private static final Logger logger = Logger.getLogger(
             CacheController.class.getName(),
@@ -81,24 +82,23 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     private final Map<FsEntryName, EntryCache> caches = new HashMap<>();
 
     /**
-     * Constructs a new file system cache controller.
+     * Constructs a new cache controller.
      *
-     * @param controller the decorated file system controller.
      * @param pool the pool of I/O buffers to hold the cached entry contents.
+     * @param controller the decorated file system controller.
      */
     CacheController(
             final IOPool<?> pool,
-            final SyncDecoratingController<? extends LockModel, ?> controller) {
+            final FsController<? extends LockModel> controller) {
         super(controller);
-        if (null == (this.pool = pool))
-            throw new NullPointerException();
+        this.pool = Objects.requireNonNull(pool);
     }
 
     @Override
     public InputSocket<?> input(
             final FsEntryName name,
             final BitField<FsAccessOption> options) {
-        /** This class requires ON-DEMAND LOOKUP of its in! */
+        /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
         final class Input extends DelegatingInputSocket<Entry> {
             @Override
             protected InputSocket<?> getSocket() {
@@ -107,6 +107,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
                         return controller.input(name, options);
+                    //checkWriteLockedByCurrentThread();
                     cache = new EntryCache(name);
                 }
                 return cache.input(options);
@@ -122,7 +123,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             final FsEntryName name,
             final BitField<FsAccessOption> options,
             final @CheckForNull Entry template) {
-        /** This class requires ON-DEMAND LOOKUP of its in! */
+        /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
         final class Output extends DelegatingOutputSocket<Entry> {
             @Override
             protected OutputSocket<?> getSocket() {
@@ -131,6 +132,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
                         return controller.output(name, options, template);
+                    //checkWriteLockedByCurrentThread();
                     cache = new EntryCache(name);
                 }
                 return cache.output(options, template);
@@ -167,6 +169,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
+        assert isWriteLockedByCurrentThread();
         NeedsSyncException preSyncEx;
         do {
             preSyncEx = null;
@@ -187,10 +190,6 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 // locks and is now retrying the operation but lost the race
                 // for the file system write lock against this thread which has
                 // now detected the invalid state.
-                
-                // TODO: This is not the only possible scenario, so this
-                // assertion may fail!
-                //assert null != getParent().getParent() : invalidState;
 
                 // In an attempt to recover from this invalid state, the
                 // current thread could just step back in order to give the
@@ -214,7 +213,6 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
     private void preSync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        assert isWriteLockedByCurrentThread();
         if (0 >= caches.size())
             return;
         final boolean flush = !options.get(ABORT_CHANGES);
@@ -278,12 +276,11 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
         }
 
         void register() {
-            assert isWriteLockedByCurrentThread();
             caches.put(name, this);
         }
 
         /**
-         * This class requires LAZY INITIALIZATION of its channel and
+         * This class requires LAZY INITIALIZATION of its channel AND
          * automatic decoupling on exceptions!
          */
         @NotThreadSafe
@@ -295,12 +292,13 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             }
 
             @Override
-            protected InputSocket<? extends Entry> getLazyDelegate() {
+            protected InputSocket<? extends Entry> socket() {
                 return controller.input(name, options);
             }
 
             @Override
             public InputStream stream() throws IOException {
+                assert isWriteLockedByCurrentThread();
                 return new Stream();
             }
 
@@ -314,6 +312,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 @Override
                 @DischargesObligation
                 public void close() throws IOException {
+                    assert isWriteLockedByCurrentThread();
                     in.close();
                     register();
                 }
@@ -341,7 +340,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             }
 
             @Override
-            protected OutputSocket<? extends Entry> getLazyDelegate() {
+            protected OutputSocket<? extends Entry> socket() {
                 return cache.configure( controller.output(
                                             name,
                                             options.clear(EXCLUSIVE),
@@ -351,14 +350,14 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             @Override
             public Entry localTarget() throws IOException {
-                // Note that the super class implementation MUST get
-                // bypassed because the channel MUST get kept even upon an
-                // exception!
+                // Bypass the super class implementation to keep the
+                // channel even upon an exception!
                 return getBoundSocket().localTarget();
             }
 
             @Override
             public OutputStream stream() throws IOException {
+                assert isWriteLockedByCurrentThread();
                 preOutput();
                 return new Stream();
             }
@@ -366,9 +365,8 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             final class Stream extends DecoratingOutputStream {
                 @CreatesObligation
                 Stream() throws IOException {
-                    // Note that the super class implementation MUST get
-                    // bypassed because the channel MUST get kept even upon an
-                    // exception!
+                    // Bypass the super class implementation to keep the
+                    // channel even upon an exception!
                     //super(Output.super.stream());
                     super(getBoundSocket().stream());
                     register();
@@ -377,6 +375,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 @Override
                 @DischargesObligation
                 public void close() throws IOException {
+                    assert isWriteLockedByCurrentThread();
                     out.close();
                     postOutput();
                 }
@@ -384,6 +383,7 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
 
             @Override
             public SeekableByteChannel channel() throws IOException {
+                assert isWriteLockedByCurrentThread();
                 preOutput();
                 return new Channel();
             }
@@ -391,10 +391,9 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
             final class Channel extends DecoratingSeekableChannel {
                 @CreatesObligation
                 Channel() throws IOException {
-                    // Note that the super class implementation MUST get
-                    // bypassed because the channel MUST get kept even upon an
-                    // exception!
-                    //super(Nio2Output.super.channel());
+                    // Bypass the super class implementation to keep the
+                    // channel even upon an exception!
+                    //super(Output.super.channel());
                     super(getBoundSocket().channel());
                     register();
                 }
@@ -402,88 +401,20 @@ extends DecoratingLockModelController<SyncDecoratingController<? extends LockMod
                 @Override
                 @DischargesObligation
                 public void close() throws IOException {
+                    assert isWriteLockedByCurrentThread();
                     channel.close();
                     postOutput();
                 }
             } // Channel
 
             void preOutput() throws IOException {
-                mknod(options, template);
+                controller.mknod(name, FILE, options, template);
             }
 
             void postOutput() throws IOException {
-                mknod(  options.clear(EXCLUSIVE),
+                controller.mknod(name, FILE, options.clear(EXCLUSIVE),
                         null != template ? template : cache);
                 register();
-            }
-
-            void mknod( final BitField<FsAccessOption> options,
-                        final @CheckForNull Entry template)
-            throws IOException {
-                while (true) {
-                    try {
-                        controller.mknod(name, FILE, options, template);
-                        break;
-                    } catch (final NeedsSyncException mknodEx) {
-                        // In this context, this exception means that the entry
-                        // has already been written to the output archive for
-                        // the target archive file.
-
-                        // Even if we were asked to create the entry
-                        // EXCLUSIVEly, first we must try to get the cache in
-                        // sync() with the virtual file system again and retry
-                        // the mknod().
-                        try {
-                            controller.sync(mknodEx);
-                            continue; // sync() succeeded, now repeat mknod()
-                        } catch (final FsSyncException syncEx) {
-                            // sync() failed, maybe just because the current
-                            // thread has already acquired some open I/O
-                            // resources for the same target archive file, e.g.
-                            // an input stream for a copy operation and this
-                            // is an artifact of an attempt to acquire the
-                            // output stream for a child file system.
-                            if (!(syncEx.getCause() instanceof FsResourceOpenException)) {
-                                // Too bad, sync() failed because of more
-                                // serious issue than just some open resources.
-                                // Let's rethrow the sync exception.
-                                throw syncEx;
-                            }
-
-                            // OK, we couldn't sync() because the current
-                            // thread has acquired open I/O resources for the
-                            // same target archive file.
-                            // Normally, we would be expected to rethrow the
-                            // mknod exception to trigger another sync(), but
-                            // this would fail for the same reason und create
-                            // an endless loop, so we can't do this.
-                            //throw mknodEx;
-
-                            // Dito for mapping the exception.
-                            //throw FsNeedsLockRetryException.get(getModel());
-
-                            if (options.get(EXCLUSIVE)) {
-                                // We've been asked not to tolerate the
-                                // original event but we can't just rethrow the
-                                // mknod exception, so let's rethrow the sync
-                                // exception instead.
-                                throw syncEx;
-                            }
-
-                            // Finally, the mknod failed because the entry
-                            // has already been output to the target archive
-                            // file - so what?!
-                            // This should mark only a volatile issue because
-                            // the next sync() will sort it out once all the
-                            // I/O resources have been closed.
-                            // Let's log the sync exception - mind that it has
-                            // the mknod exception as its predecessor - and
-                            // continue anyway...
-                            logger.log(Level.FINE, "ignoring", syncEx);
-                            break;
-                        }
-                    }
-                }
             }
         } // Output
     } // EntryCache

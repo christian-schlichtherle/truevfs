@@ -4,7 +4,10 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.*;
+import de.truezip.kernel.FsCompositeDriver;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsManager;
+import de.truezip.kernel.FsMountPoint;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -62,7 +65,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * }
  * }</pre>
  * 
- * @see    FsDecoratingController
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -82,22 +84,11 @@ abstract class ControlFlowException extends RuntimeException {
     static final boolean TRACEABLE = Boolean
             .getBoolean(ControlFlowException.class.getName() + ".traceable");
 
-    ControlFlowException() { }
-
-    ControlFlowException(Throwable cause) {
-        super(cause);
+    ControlFlowException() {
+        super(null, null, TRACEABLE, TRACEABLE);
     }
 
-    /**
-     * Fills in an empty stack trace for optimum performance.
-     * <em>Warning:</em> This method is called from the constructors in the
-     * super class {@code Throwable}!
-     * 
-     * @return {@code this}
-     * @see <a href="http://blogs.oracle.com/jrose/entry/longjumps_considered_inexpensive">Longjumps Considered Inexpensive</a>
-     */
-    @Override
-    public Throwable fillInStackTrace() {
-        return TRACEABLE ? super.fillInStackTrace() : this;
+    ControlFlowException(final Throwable cause) {
+        super(null, cause, TRACEABLE, TRACEABLE);
     }
 }

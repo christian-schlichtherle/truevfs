@@ -59,7 +59,7 @@ final class ResourceManager {
      * Constructs a new resource accountant with the given lock.
      * You MUST MAKE SURE not to use two instances of this class which share
      * the same lock!
-     * Otherwise {@link #waitForeignResources} will not work as designed!
+     * Otherwise {@link #waitOtherThreads} will not work as designed!
      * 
      * @param lock the lock to use for accounting resources.
      *             Though not required by the use in this class, this
@@ -125,7 +125,7 @@ final class ResourceManager {
      * @return The number of closeable resources which have been accounted for
      *         by <em>all</em> threads.
      */
-    int waitForeignResources(final long timeout) {
+    int waitOtherThreads(final long timeout) {
         lock.lock();
         try {
             try {
@@ -218,16 +218,25 @@ final class ResourceManager {
                 final Account account = entry.getValue();
                 if (account.getManager() != this)
                     continue;
-                i.remove();
+                final Closeable closeable = entry.getKey();
                 try {
-                    // This should trigger another attempt to remove the
-                    // closeable from the map, but this should cause no
-                    // ConcurrentModificationException because the closeable
-                    // has already been removed.
-                    entry.getKey().close();
+                    // This should trigger an attempt to remove the closeable
+                    // from the map, but it can cause no
+                    // ConcurrentModificationException because we are using a
+                    // ConcurrentHashMap.
+                    closeable.close(); // could throw an IOException or a RuntimeException, e.g. a NeedsLockRetryException!
+                } catch (final ControlFlowException ex) {
+                    assert ex instanceof NeedsLockRetryException : ex;
+                    throw ex;
                 } catch (final IOException ex) {
-                    builder.warn(ex); // may throw an exception!
+                    builder.warn(ex); // could throw an IOException!
                 }
+                assert !accounts.containsKey(closeable)
+                        : "closeable.close() did not call stop(this) on this resource manager!";
+                // This is actually redundant.
+                // In either case, it must NOT get done before a successful
+                // close()!
+                i.remove();
             }
             builder.check();
         } finally {

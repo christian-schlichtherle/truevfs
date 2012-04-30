@@ -7,6 +7,7 @@ package de.truezip.key;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -36,9 +37,7 @@ extends KeyManager<K> {
 
     @Override
     public synchronized P make(final URI resource) {
-        if (null == resource)
-            throw new NullPointerException();
-        P provider = providers.get(resource);
+        P provider = providers.get(Objects.requireNonNull(resource));
         if (null == provider)
             providers.put(resource, provider = newKeyProvider());
         return provider;
@@ -46,17 +45,13 @@ extends KeyManager<K> {
 
     @Override
     public synchronized @CheckForNull P get(final URI resource) {
-        if (null == resource)
-            throw new NullPointerException();
-        return providers.get(resource);
+        return providers.get(Objects.requireNonNull(resource));
     }
 
     @Override
-    public synchronized @CheckForNull P move(  final URI oldResource,
-                                            final URI newResource) {
-        if (null == newResource)
-            throw new NullPointerException();
-        if (oldResource.equals(newResource))
+    public synchronized @CheckForNull P move(   final URI oldResource,
+                                                final URI newResource) {
+        if (oldResource.equals(Objects.requireNonNull(newResource)))
             throw new IllegalArgumentException();
         final P provider = providers.remove(oldResource);
         if (null != provider)
@@ -73,9 +68,7 @@ extends KeyManager<K> {
      */
     @Override
     public synchronized @CheckForNull P delete(final URI resource) {
-        if (null == resource)
-            throw new NullPointerException();
-        final P provider = providers.remove(resource);
+        final P provider = providers.remove(Objects.requireNonNull(resource));
         if (null != provider)
             provider.setKey(null);
         return provider;

@@ -4,6 +4,7 @@
  */
 package de.truezip.kernel.util;
 
+import java.util.Objects;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +25,7 @@ public abstract class ExceptionBuilderTestSuite<
     protected B builder;
 
     protected ExceptionBuilderTestSuite(final Class<O> clazz) {
-        if (null == (this.clazz = clazz))
-            throw new NullPointerException();        
+        this.clazz = Objects.requireNonNull(clazz);
     }
 
     protected abstract B newBuilder();
@@ -34,8 +34,7 @@ public abstract class ExceptionBuilderTestSuite<
 
     @Before
     public void setUp() {
-        if (null == (builder = newBuilder()))
-            throw new NullPointerException();
+        builder = Objects.requireNonNull(newBuilder());
     }
 
     @Test

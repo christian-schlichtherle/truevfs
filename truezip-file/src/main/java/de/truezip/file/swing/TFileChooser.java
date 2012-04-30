@@ -8,6 +8,7 @@ import de.truezip.file.TFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.swing.JFileChooser;
@@ -66,9 +67,8 @@ public final class TFileChooser extends JFileChooser {
      */
     @Override
     public void setFileSystemView(FileSystemView fileSystemView) {
-        if (null == fileSystemView)
-            throw new NullPointerException();
-        super.setFileSystemView((TFileSystemView) fileSystemView);
+        super.setFileSystemView(
+                (TFileSystemView) Objects.requireNonNull(fileSystemView));
     }
 
     @Override

@@ -6,6 +6,7 @@ package de.truezip.file.swing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.filechooser.FileSystemView;
 
@@ -25,8 +26,7 @@ public abstract class TDecoratingFileSystemView extends FileSystemView {
      * @param fsv the file system view to decorate.
      */
     protected TDecoratingFileSystemView(final FileSystemView fsv) {
-        if (null == (this.fsv = fsv))
-            throw new NullPointerException();
+        this.fsv = Objects.requireNonNull(fsv);
     }
 
     @Override

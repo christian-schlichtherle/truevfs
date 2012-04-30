@@ -15,6 +15,7 @@ import de.truezip.kernel.cio.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -275,9 +276,7 @@ public final class CacheEntryTest {
         private final Entry entry;
 
         BrokenInputSocket(Entry entry) {
-            if (null == entry)
-                throw new NullPointerException();
-            this.entry = entry;
+            this.entry = Objects.requireNonNull(entry);
         }
 
         @Override
@@ -304,9 +303,7 @@ public final class CacheEntryTest {
         private final Entry entry;
 
         BrokenOutputSocket(Entry entry) {
-            if (null == entry)
-                throw new NullPointerException();
-            this.entry = entry;
+            this.entry = Objects.requireNonNull(entry);
         }
 
         @Override

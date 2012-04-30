@@ -62,7 +62,7 @@ public class TarGZipDriver extends TarDriver {
     }
 
     @Override
-    protected InputService<TarDriverEntry> input(
+    protected InputService<TarDriverEntry> newInput(
             final FsModel model,
             final Source source)
     throws IOException {
@@ -75,7 +75,7 @@ public class TarGZipDriver extends TarDriver {
                 } catch(final Throwable ex) {
                     try {
                         in.close();
-                    } catch (final IOException ex2) {
+                    } catch (final Throwable ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;
@@ -87,7 +87,7 @@ public class TarGZipDriver extends TarDriver {
     }
 
     @Override
-    protected OutputService<TarDriverEntry> output(
+    protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
             final Sink sink,
             final InputService<TarDriverEntry> input)
@@ -101,7 +101,7 @@ public class TarGZipDriver extends TarDriver {
                 } catch(final Throwable ex) {
                     try {
                         out.close();
-                    } catch (final IOException ex2) {
+                    } catch (final Throwable ex2) {
                         ex.addSuppressed(ex2);
                     }
                     throw ex;

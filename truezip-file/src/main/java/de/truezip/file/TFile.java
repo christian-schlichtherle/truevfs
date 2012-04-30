@@ -1716,7 +1716,7 @@ public final class TFile extends File {
         // http://java.net/jira/browse/TRUEZIP-136 .
         if (null != innerArchive) {
             try {
-                FsEntry entry = innerArchive.getController()
+                final FsEntry entry = innerArchive.getController()
                         .entry(getInnerFsEntryName());
                 return null != entry;
             } catch (IOException ex) {
@@ -1743,7 +1743,7 @@ public final class TFile extends File {
     public boolean isFile() {
         if (null != innerArchive) {
             try {
-                FsEntry entry = innerArchive.getController()
+                final FsEntry entry = innerArchive.getController()
                         .entry(getInnerFsEntryName());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
@@ -1772,7 +1772,7 @@ public final class TFile extends File {
     public boolean isDirectory() {
         if (null != innerArchive) {
             try {
-                FsEntry entry = innerArchive.getController()
+                final FsEntry entry = innerArchive.getController()
                         .entry(getInnerFsEntryName());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
@@ -1863,7 +1863,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController().entry(getInnerFsEntryName());
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 return 0;
             }
             if (null == entry)
@@ -1891,7 +1891,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController().entry(getInnerFsEntryName());
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 return 0;
             }
             if (null == entry)
@@ -2621,8 +2621,7 @@ public final class TFile extends File {
      */
     public static void cp(final @WillClose InputStream in, final File dst)
     throws IOException {
-        if (null == in)
-            throw new NullPointerException();
+        Objects.requireNonNull(in);
 
         @WillClose TFileOutputStream out = null;
         try {
@@ -2697,8 +2696,7 @@ public final class TFile extends File {
      */
     public static void cp(final File src, final @WillClose OutputStream out)
     throws IOException {
-        if (null == out)
-            throw new NullPointerException();
+        Objects.requireNonNull(out);
 
         @WillClose TFileInputStream in = null;
         try {
@@ -3162,8 +3160,7 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public void input(final @WillNotClose InputStream in) throws IOException {
-        if (null == in)
-            throw new NullPointerException();
+        Objects.requireNonNull(in);
 
         try {
             final @WillClose TFileOutputStream out = new TFileOutputStream(this);
@@ -3231,8 +3228,7 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     public void output(final @WillNotClose OutputStream out) throws IOException {
-        if (null == out)
-            throw new NullPointerException();
+        Objects.requireNonNull(out);
 
         final @WillClose TFileInputStream in = new TFileInputStream(this);
         try {

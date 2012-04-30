@@ -86,9 +86,7 @@ public class CanonicalStringSet extends AbstractSet<String> {
      */
     public CanonicalStringSet(  final Canonicalizer canonicalizer,
                                 final char separator) {
-        if (null == canonicalizer)
-            throw new NullPointerException();
-        this.canonicalizer = canonicalizer;
+        this.canonicalizer = Objects.requireNonNull(canonicalizer);
         this.separator = separator;
     }
 

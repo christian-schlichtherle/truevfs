@@ -14,13 +14,15 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A file system model which supports multiple concurrent reader threads.
  *
- * @see    FsLockController
+ * @see    LockController
+ * @see    NeedsWriteLockException
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 final class LockModel extends FsDecoratingModel<FsModel> {
 
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    /** The lock on which the file system controllers shall synchronize. */
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
 
     LockModel(FsModel model) {
         super(model);

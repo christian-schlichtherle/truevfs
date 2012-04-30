@@ -16,6 +16,7 @@ import de.truezip.kernel.util.Resource;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -337,9 +338,7 @@ public final class TConfig extends Resource<RuntimeException> {
      * @param manager The file system manager.
      */
     void setManager(final FsManager manager) {
-        if (null == manager)
-            throw new NullPointerException();
-        this.manager = manager;
+        this.manager = Objects.requireNonNull(manager);
     }
 
     /**
@@ -429,9 +428,7 @@ public final class TConfig extends Resource<RuntimeException> {
      * @see   #getArchiveDetector()
      */
     public void setArchiveDetector(final TArchiveDetector detector) {
-        if (null == detector)
-            throw new NullPointerException();
-        this.detector = detector;
+        this.detector = Objects.requireNonNull(detector);
     }
 
     /**

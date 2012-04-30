@@ -8,6 +8,7 @@ import de.truezip.kernel.FsCompositeDriver;
 import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.FsModel;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -21,19 +22,17 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
 
     public InstrumentingCompositeDriver(final FsCompositeDriver driver,
                                         final InstrumentingDirector<?> director) {
-        if (null == (this.driver = driver))
-            throw new NullPointerException();
-        if (null == (this.director = director))
-            throw new NullPointerException();
+        this.driver = Objects.requireNonNull(driver);
+        this.director = Objects.requireNonNull(director);
     }
 
     @Override
-    public FsController<?> controller(   final FsManager manager,
+    public FsController<?> newController(   final FsManager manager,
                                             final FsModel model,
                                             final FsController<?> parent) {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
-        return director.instrument(driver.controller(manager, director.instrument(model, this), parent), this);
+        return director.instrument(driver.newController(manager, director.instrument(model, this), parent), this);
     }
 }

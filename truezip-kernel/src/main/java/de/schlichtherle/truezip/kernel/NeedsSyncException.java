@@ -28,7 +28,5 @@ final class NeedsSyncException extends ControlFlowException {
         return TRACEABLE ? new NeedsSyncException() : SINGLETON;
     }
 
-    private NeedsSyncException() {
-        super(null);
-    }
+    private NeedsSyncException() { }
 }

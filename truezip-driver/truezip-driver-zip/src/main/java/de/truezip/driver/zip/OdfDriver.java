@@ -39,7 +39,7 @@ import javax.annotation.concurrent.Immutable;
 public class OdfDriver extends JarDriver {
 
     @Override
-    protected OutputService<ZipDriverEntry> output(
+    protected OutputService<ZipDriverEntry> newOutput(
             final FsModel model,
             final Sink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
