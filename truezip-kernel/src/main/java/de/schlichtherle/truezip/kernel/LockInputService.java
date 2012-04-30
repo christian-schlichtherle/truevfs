@@ -21,7 +21,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Decorates another input service to allow concurrent access which is
- * synchronized by a {@link Lock} object provided to its constructor.
+ * synchronized by a private {@link Lock} object.
  *
  * @param  <E> the type of the entries in the decorated input service.
  * @see    LockOutputService
@@ -51,9 +51,9 @@ extends DecoratingInputService<E, InputService<E>> {
         final class Close implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                container.close();
+            container.close();
                 return null;
-            }
+        }
         } // Close
 
         DEAD_LOCK.apply(lock, new Close());
@@ -65,8 +65,8 @@ extends DecoratingInputService<E, InputService<E>> {
         final class Entry implements Operation<E, RuntimeException> {
             @Override
             public E call() {
-                return container.entry(name);
-            }
+            return container.entry(name);
+        }
         } // Entry
 
         return DEAD_LOCK.apply(lock, new Entry());
@@ -78,8 +78,8 @@ extends DecoratingInputService<E, InputService<E>> {
         final class Size implements Operation<Integer, RuntimeException> {
             @Override
             public Integer call() {
-                return container.size();
-            }
+            return container.size();
+        }
         } // Size
 
         return DEAD_LOCK.apply(lock, new Size());
@@ -103,8 +103,8 @@ extends DecoratingInputService<E, InputService<E>> {
                 final class LocalTarget implements IOOperation<E> {
                     @Override
                     public E call() throws IOException {
-                        return getBoundSocket().localTarget();
-                    }
+                    return getBoundSocket().localTarget();
+                }
                 } // GetLocalTarget
 
                 return DEAD_LOCK.apply(lock, new LocalTarget());
@@ -117,7 +117,7 @@ extends DecoratingInputService<E, InputService<E>> {
                     @Override
                     public InputStream call() throws IOException {
                         return getBoundSocket().stream();
-                    }
+                }
                 } // Stream
 
                 return new LockInputStream(DEAD_LOCK.apply(lock, new Stream()));
@@ -130,7 +130,7 @@ extends DecoratingInputService<E, InputService<E>> {
                     @Override
                     public SeekableByteChannel call() throws IOException {
                         return getBoundSocket().channel();
-                    }
+                }
                 } // Channel
 
                 return new LockSeekableChannel(DEAD_LOCK.apply(lock, new Channel()));
@@ -144,9 +144,9 @@ extends DecoratingInputService<E, InputService<E>> {
         final class Close implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                closeable.close();
+            closeable.close();
                 return null;
-            }
+        }
         } // Close
 
         DEAD_LOCK.apply(lock, new Close());
@@ -176,5 +176,5 @@ extends DecoratingInputService<E, InputService<E>> {
         public void close() throws IOException {
             close(channel);
         }
-    } // LockSeekableChannel*/
+    } // LockSeekableChannel
 }
