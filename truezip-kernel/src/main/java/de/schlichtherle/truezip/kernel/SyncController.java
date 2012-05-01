@@ -295,11 +295,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final FsEntryName name,
             final BitField<FsAccessOption> options)
     throws IOException {
-        // HC SUNT DRACONES!
         assert isWriteLockedByCurrentThread();
 
         while (true) {
             try {
+                // HC SUNT DRACONES!
                 controller.unlink(name, options); // repeatable for root entry
                 if (name.isRoot()) {
                     // Make the file system controller chain discardable.

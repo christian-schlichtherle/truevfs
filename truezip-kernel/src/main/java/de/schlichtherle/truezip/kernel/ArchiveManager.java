@@ -76,16 +76,17 @@ final class ArchiveManager extends FsManager {
         assert !(model instanceof LockModel);
         final LockModel lmodel = new LockModel(model);
         // HC SUNT DRACONES!
-        // The FalsePositiveArchiveController decorates the driver's
-        // controller(s) so that the decorated controller (chain) does not need
-        // to resolve operations on false positive archive files.
-        // The driver's controllers decorate the FinalizeController so that
-        // the former do not need to be concerned with most aspects of
-        // implementing a virtual file system, other than passing on a
+        // The FalsePositiveArchiveController decorates the FinalizeController
+        // so that the decorated controller (chain) does not need to resolve
+        // operations on false positive archive files.
+        // The FinalizeController decorates the driver's controllers so that
+        // each and every resource which may get opened by the decorated
+        // controller (chain) is ensured to get closed.
+        // The driver's controllers decorate the LockController because the
+        // former shall not get guarded by the file system locks but should
+        // otherwise not need to be concerned with most other aspects of
+        // implementing a virtual file system - other than passing on a
         // FalsePositiveException or a NeedsLockRetryException.
-        // The FinalizeController decorates the LockController because even the
-        // finalizer thread needs to acquire a file system lock when closing
-        // streams or channels.
         // The LockController decorates the SyncController so that
         // the decorated controller (chain) doesn't need to be thread safe.
         // The SyncController decorates the CacheController because the
@@ -97,8 +98,8 @@ final class ArchiveManager extends FsManager {
         // trying to sync the file system while any stream or channel to the
         // latter is open gets detected and properly dealt with.
         return  new FalsePositiveArchiveController(
-                    driver.decorate(
-                        new FinalizeController(
+                    new FinalizeController(
+                        driver.decorate(
                             new LockController(
                                 new SyncController(
                                     new CacheController(driver.getIOPool(),
