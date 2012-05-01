@@ -25,8 +25,7 @@ extends KeyManagerService {
     public ConsolePromptingAesPbeKeyManagerService() {
         this.managers = newMap(new Object[][] {{
             AesPbeParameters.class,
-            new ConsolePromptingKeyManager<AesPbeParameters>(
-                new ConsoleAesPbeParametersView())
+            new ConsolePromptingKeyManager<>(new ConsoleAesPbeParametersView())
         }});
     }
 
@@ -34,5 +33,11 @@ extends KeyManagerService {
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Map<Class<?>, KeyManager<?>> getKeyManagers() {
         return managers;
+    }
+
+    /** @return -150 */
+    @Override
+    public int getPriority() {
+        return -150;
     }
 }

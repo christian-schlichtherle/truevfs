@@ -18,4 +18,25 @@ import de.truezip.kernel.sl.FsDriverLocator;
  * @author Christian Schlichtherle
  */
 public abstract class FsDriverService extends FsAbstractDriverProvider {
+
+    /**
+     * Returns a priority to help the file system driver service locator.
+     * The greater number wins!
+     * The default value should be zero.
+     * 
+     * @return A priority to help the file system driver service locator.
+     */
+    public abstract int getPriority();
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return String.format("%s[priority=%d, drivers=%s]",
+                getClass().getName(),
+                getPriority(),
+                getDrivers());
+    }
 }

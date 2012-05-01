@@ -398,10 +398,9 @@ extends FsDriver {
      */
     @Override
     public String toString() {
-        return String.format("%s[charset=%s, federated=%b, priority=%d]",
+        return String.format("%s[federated=%b, charset=%s]",
                 getClass().getName(),
-                getCharset(),
                 isFederated(),
-                getPriority());
+                getCharset());
     }
 }

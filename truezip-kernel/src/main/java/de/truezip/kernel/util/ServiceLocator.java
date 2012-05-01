@@ -10,7 +10,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
@@ -38,12 +37,6 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public final class ServiceLocator {
-
-    static {
-        Logger  .getLogger( ServiceLocator.class.getName(),
-                            ServiceLocator.class.getName())
-                .config("banner");
-    }
 
     private final ClassLoader l1;
 

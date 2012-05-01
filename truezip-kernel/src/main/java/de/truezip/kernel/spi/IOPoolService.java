@@ -21,13 +21,11 @@ public abstract class IOPoolService implements IOPoolProvider {
     /**
      * Returns a priority to help the I/O pool service locator.
      * The greater number wins!
+     * The default value should be zero.
      * 
-     * @return {@code 0}, as by the implementation in the class
-     *         {@link IOPoolService}.
+     * @return A priority to help the I/O pool service locator.
      */
-    public int getPriority() {
-        return 0;
-    }
+    public abstract int getPriority();
 
     /**
      * Returns a string representation of this object for debugging and logging

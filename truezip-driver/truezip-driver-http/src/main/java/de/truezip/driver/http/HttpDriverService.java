@@ -46,4 +46,10 @@ public final class HttpDriverService extends FsDriverService {
     public Map<FsScheme, FsDriver> getDrivers() {
         return drivers;
     }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() {
+        return -100;
+    }
 }

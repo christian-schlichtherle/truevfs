@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.key.pbe.swing;
 import de.truezip.key.KeyManager;
 import de.truezip.key.param.AesPbeParameters;
 import de.truezip.key.spi.KeyManagerService;
+import java.awt.GraphicsEnvironment;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 
@@ -25,7 +26,7 @@ extends KeyManagerService {
     public SwingPromptingAesPbeKeyManagerService() {
         this.managers = newMap(new Object[][] {{
             AesPbeParameters.class,
-            new SwingPromptingKeyManager<AesPbeParameters>(new SwingAesPbeParametersView())
+            new SwingPromptingKeyManager<>(new SwingAesPbeParametersView())
         }});
     }
 
@@ -33,5 +34,11 @@ extends KeyManagerService {
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Map<Class<?>, KeyManager<?>> getKeyManagers() {
         return managers;
+    }
+
+    /** @return -200 iff the graphics environment is headless, -100 otherwise */
+    @Override
+    public int getPriority() {
+        return GraphicsEnvironment.isHeadless() ? -200 : -100;
     }
 }

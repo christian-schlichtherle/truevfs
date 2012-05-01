@@ -26,7 +26,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * of a {@link TArchiveDetector}.
  * <p>
  * Note that this class has no dependencies on other classes in this package,
- * so it could getDrivers published as a member of the package
+ * so it could get published as a member of the package
  * {@code de.truezip.file} instead if required.
  * 
  * @author Christian Schlichtherle
@@ -63,7 +63,7 @@ final class TPathScanner {
      * component.
      * A scheme component gets ignored.
      * If an authority component or an absolute path is present, the authority
-     * and path components of {@code parent} getDrivers discarded.
+     * and path components of {@code parent} get discarded.
      * An authority component gets copied to the result.
      * A path component gets normalized and scanned for prospective archive
      * files using the {@link TArchiveDetector} provided to the constructor and
@@ -142,7 +142,7 @@ final class TPathScanner {
                 ppu = new UriBuilder(ppu).path(pup + SEPARATOR_CHAR).getUri();
             mp = new FsPath(new FsMountPoint(ppu), men);
         }
-        final FsScheme s = detector.getScheme(men.toString());
+        final FsScheme s = detector.scheme(men.toString());
         if (null != s)
             mp = new FsPath(new FsMountPoint(s, mp), ROOT);
         return mp;

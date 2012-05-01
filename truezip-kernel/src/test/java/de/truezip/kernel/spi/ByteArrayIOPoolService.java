@@ -34,6 +34,11 @@ public final class ByteArrayIOPoolService extends IOPoolService {
     }
 
     @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
     public IOPool<?> getIOPool() {
         return pool;
     }

@@ -65,9 +65,8 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @return The RAES parameters for the given file system model.
      */
     protected RaesParameters raesParameters(FsModel model) {
-        return new KeyManagerRaesParameters(
-                getKeyManagerProvider().keyManager(AesPbeParameters.class),
-                mountPointUri(model));
+        return new KeyManagerRaesParameters(getKeyManagerProvider(),
+                                            mountPointUri(model));
     }
 
     /**

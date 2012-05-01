@@ -6,6 +6,7 @@ package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.spi.FsManagerService;
+import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -13,6 +14,12 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public final class FailSafeManagerService extends FsManagerService {
+
+    static {
+        Logger  .getLogger( FailSafeManagerService.class.getName(),
+                            FailSafeManagerService.class.getName())
+                .config("banner");
+    }
 
     private final FsManager
             manager = new FailSafeManager(new ArchiveManager());
@@ -22,9 +29,9 @@ public final class FailSafeManagerService extends FsManagerService {
         return manager;
     }
 
-    /** @return -10 */
+    /** @return -100 */
     @Override
     public int getPriority() {
-        return -10;
+        return -100;
     }
 }

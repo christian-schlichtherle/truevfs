@@ -49,52 +49,50 @@ public final class KeyManagerLocator extends AbstractKeyManagerProvider {
             final Iterator<KeyManagerService>
                     i = new ServiceLocator(KeyManagerLocator.class.getClassLoader())
                         .getServices(KeyManagerService.class);
-            final Map<Class<?>, KeyManager<?>>
-                    sorted = new TreeMap<Class<?>, KeyManager<?>>(
-                        ClassComparator.INSTANCE);
             if (!i.hasNext())
                 logger.log(WARNING, "null", KeyManagerService.class);
+            final Collection<KeyManagerService> services = new LinkedList<>();
             while (i.hasNext()) {
                 KeyManagerService service = i.next();
                 logger.log(CONFIG, "located", service);
+                services.add(service);
+            }
+            final KeyManagerService[] prioritized
+                    = services.toArray(new KeyManagerService[services.size()]);
+            Arrays.sort(prioritized, new Comparator<KeyManagerService>() {
+                @Override
+                public int compare(KeyManagerService o1, KeyManagerService o2) {
+                    return o1.getPriority() - o2.getPriority();
+                }
+            });
+            final Map<Class<?>, KeyManager<?>> sorted = new TreeMap<>(
+                    new Comparator<Class<?>>() {
+                        @Override
+                        public int compare(Class<?> o1, Class<?> o2) {
+                            return o1.getName().compareTo(o2.getName());
+                        }
+                    });
+            for (final KeyManagerService service : prioritized) {
                 for (final Map.Entry<Class<?>, KeyManager<?>> entry
                         : service.getKeyManagers().entrySet()) {
                     final Class<?> type = entry.getKey();
-                    final KeyManager<?> newManager = entry.getValue();
-                    if (null != type && null != newManager) {
-                        final KeyManager<?> oldManager = sorted.put(type, newManager);
-                        if (null != oldManager) {
-                            final int op = oldManager.getPriority();
-                            final int np = newManager.getPriority();
-                            if (np < op)
-                                sorted.put(type, oldManager);
-                            else if (op == np)
-                                logger.log(WARNING, "collision",
-                                        new Object[] { op, type, oldManager, newManager });
-                        }
-                    }
+                    final KeyManager<?> manager = entry.getValue();
+                    if (null != type)
+                        if (null != manager)
+                            sorted.put(type, manager);
+                        else
+                            sorted.remove(type);
                 }
             }
-            final Map<Class<?>, KeyManager<?>>
-                    fast = new LinkedHashMap<Class<?>, KeyManager<?>>(
-                        initialCapacity(sorted.size()));
+            final Map<Class<?>, KeyManager<?>> fast
+                    = new LinkedHashMap<>(initialCapacity(sorted.size()));
             for (final Map.Entry<Class<?>, KeyManager<?>> entry : sorted.entrySet()) {
                 final Class<?> type = entry.getKey();
                 final KeyManager<?> manager = entry.getValue();
-                logger.log(CONFIG, "mapping",
-                        new Object[] { type, manager });
+                logger.log(CONFIG, "mapping", new Object[] { type, manager });
                 fast.put(type, manager);
             }
             MANAGERS = Collections.unmodifiableMap(fast);
         }
-    } // class Boot
-
-    private static final class ClassComparator implements Comparator<Class<?>> {
-        static final ClassComparator INSTANCE = new ClassComparator();
-
-        @Override
-        public int compare(Class<?> o1, Class<?> o2) {
-            return o1.getName().compareTo(o2.getName());
-        }
-    } // ClassComparator
+    } // Boot
 }

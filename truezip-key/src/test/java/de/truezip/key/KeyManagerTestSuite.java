@@ -5,6 +5,7 @@
 package de.truezip.key;
 
 import java.net.URI;
+import java.util.Objects;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,7 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
 
     @Before
     public void setUp() {
-        manager = newKeyManager();
+        manager = Objects.requireNonNull(newKeyManager());
     }
 
     protected abstract M newKeyManager();

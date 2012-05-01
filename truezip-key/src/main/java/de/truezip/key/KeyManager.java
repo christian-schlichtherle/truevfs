@@ -82,13 +82,11 @@ public abstract class KeyManager<K> {
     public abstract void unlock(URI resource);
 
     /**
-     * Returns a priority to help the key manager service locator.
-     * The greater number wins!
-     * 
-     * @return {@code 0}, as by the implementation in the class
-     *         {@link KeyManager}.
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
      */
-    public int getPriority() {
-        return 0;
+    @Override
+    public String toString() {
+        return String.format("%s", getClass().getName());
     }
 }

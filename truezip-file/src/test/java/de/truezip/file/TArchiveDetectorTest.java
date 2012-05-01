@@ -343,7 +343,7 @@ public final class TArchiveDetectorTest {
             final TArchiveDetector... detectors) {
         for (TArchiveDetector detector : detectors) {
             try {
-                detector.getScheme(null);
+                detector.scheme(null);
                 fail("Expected NullPointerException!");
             } catch (NullPointerException expected) {
             }
@@ -367,7 +367,7 @@ public final class TArchiveDetectorTest {
         final String lpath = path.toLowerCase(Locale.ENGLISH);
         final String upath = path.toUpperCase(Locale.ENGLISH);
 
-        assertThat(detector.getScheme(lpath), equalTo(scheme));
-        assertThat(detector.getScheme(upath), equalTo(scheme));
+        assertThat(detector.scheme(lpath), equalTo(scheme));
+        assertThat(detector.scheme(upath), equalTo(scheme));
     }
 }
