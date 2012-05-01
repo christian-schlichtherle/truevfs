@@ -104,14 +104,14 @@ import javax.swing.filechooser.FileSystemView;
  * {@linkplain TArchiveDetector#equals equivalent} {@link TArchiveDetector}
  * objects for archive file detection in these directory trees.
  * This is required in order to make sure that the virtual file system state
- * which is managed by the TrueZIP Kernel does not getDrivers bypassed.
+ * which is managed by the TrueZIP Kernel does not get bypassed.
  * Otherwise, file system operations on archive files would yield inconsistent
  * results and may even cause <strong>loss of data</strong>!
  * <p>
  * By default, all file objects use {@link TArchiveDetector#ALL} in order to
  * detect all supported archive types (see {@link TConfig} for other options).
  * This is fine because it's fail-safe and performs reasonably well when
- * copying archive files (e.g. ZIP entries won't getDrivers recompressed thanks to
+ * copying archive files (e.g. ZIP entries won't get recompressed thanks to
  * <a href="#RDC">RDC</a>).
  * 
  * <a name="verbatimCopy"><h4>Making Verbatim Copies of Directory Trees</h4></a>
@@ -1480,7 +1480,7 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().toHierarchicalUri().equals(new TFile("FILE").toFsPath().toHierarchicalUri())}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
-     * @param that the object to getDrivers compared with this object
+     * @param that the object to get compared with this object
      * @see   #hashCode()
      * @see   #compareTo(File)
      */
@@ -1513,7 +1513,7 @@ public final class TFile extends File {
      * {@code new TFile("file").toFsPath().toHierarchicalUri().compareTo(new TFile("FILE").toFsPath().toHierarchicalUri()) == 0}
      * is false because {@link FsPath#equals(Object)} is case sensitive.
      *
-     * @param that the file object to getDrivers compared with this object
+     * @param that the file object to get compared with this object
      * @see   #equals(Object)
      */
     @Override
@@ -1665,7 +1665,7 @@ public final class TFile extends File {
      * <ul>
      * <li>The super class implementation of this method always uses the
      *     {@link java.nio.file.FileSystems#getDefault() default file system provider}.</li>
-     * <li>{@link java.nio.file.Paths#getDrivers(String, String[])} always uses the
+     * <li>{@link java.nio.file.Paths#get(String, String[])} always uses the
      *     default file system provider, too.</li>
      * </ul>
      *     Using {@link URI}s is no alternative, too, because the various URI
@@ -1688,7 +1688,7 @@ public final class TFile extends File {
      * <p>
      * <ul>
      * <li>Associated with the default file system provider:
-     *     {@link java.nio.file.Paths#getDrivers(String, String[]) Paths.getDrivers(file.getPath())}.</li>
+     *     {@link java.nio.file.Paths#get(String, String[]) Paths.get(file.getPath())}.</li>
      * <li>Associated with a TrueZIP file system provider:
      *     {@code new de.truezip.path.TPath(file)}.
      *     This requires the TrueZIP Path module to be present on the compile
