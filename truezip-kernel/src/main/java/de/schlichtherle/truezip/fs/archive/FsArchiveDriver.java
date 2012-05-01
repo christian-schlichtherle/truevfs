@@ -151,15 +151,14 @@ extends FsDriver {
                 ? (FsLockModel) model
                 : new FsLockModel(model);
         // HC SUNT DRACONES!
-        return  new FsSyncController<FsLockModel>(
-                    new FsLockController(
-                        new FsResetController(
-                            new FsCacheController(
-                                new FsResourceController(
-                                    new FsContextController(
-                                        new FsTargetArchiveController<E>(
-                                            lockModel, parent, this))),
-                                getPool()))));
+        return  new FsLockController(
+                    new FsSyncController<FsLockModel>(
+                        new FsCacheController(
+                            new FsResourceController(
+                                new FsContextController(
+                                    new FsTargetArchiveController<E>(
+                                        lockModel, parent, this))),
+                            getPool())));
     }
 
     /**

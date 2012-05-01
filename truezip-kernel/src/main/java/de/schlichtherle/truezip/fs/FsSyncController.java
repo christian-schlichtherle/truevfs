@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.RESET;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -219,7 +220,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     throws IOException {
         while (true) {
             try {
+                // HC SUNT DRACONES!
                 delegate.unlink(name, options);
+                if (name.isRoot()) {
+                    // Make the file system controller chain discardable.
+                    delegate.sync(RESET);
+                }
                 return;
             } catch (FsNeedsSyncException ex) {
                 sync(ex);
