@@ -20,7 +20,7 @@ public interface FsDriverProvider {
      * This is an immutable property - multiple calls must return the same
      * object.
      *
-     * @return A dedicated immutable map of file system schemes to drivers.
+     * @return An immutable map of file system schemes to drivers.
      */
     Map<FsScheme, FsDriver> getDrivers();
 }

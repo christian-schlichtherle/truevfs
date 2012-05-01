@@ -6,10 +6,7 @@ package de.truezip.key;
 
 import de.truezip.kernel.util.Maps;
 import de.truezip.kernel.util.ServiceLocator;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceConfigurationError;
+import java.util.*;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -32,9 +29,8 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      *
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
-     *         {@link Class secret key class}, a
-     *         {@link String fully qualified name of a secret key class},
-     *         or {@code null}.
+     *         {@link Class secret key class}, or a
+     *         {@link String fully qualified name of a secret key class}.
      *         The second element of each inner array must either be a
      *         {@link KeyManager key manager instance}, a
      *         {@link Class key manager class}, a
@@ -51,12 +47,10 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
         final Map<Class<?>, KeyManager<?>> managers = new HashMap<>(
                 Maps.initialCapacity(config.length));
         for (final Object[] param : config) {
-            final Class<?> type = ServiceLocator.promote(param[0], Class.class);
-            final KeyManager<?> newManager = ServiceLocator.promote(param[1], KeyManager.class);
-            final KeyManager<?> oldManager = managers.put(type, newManager);
-            if (null != oldManager && null != newManager && oldManager.getPriority() > newManager.getPriority()) {
-                managers.put(type, oldManager);
-            }
+            final Class<?> type = Objects.requireNonNull(
+                    ServiceLocator.promote(param[0], Class.class));
+            final KeyManager<?> manager = ServiceLocator.promote(param[1], KeyManager.class);
+            managers.put(type, manager);
         }
         return Collections.unmodifiableMap(managers);
     }
@@ -77,7 +71,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      * This is an immutable property - multiple calls must return the same
      * object.
      * 
-     * @return an unmodifiable map of secret key classes to key managers.
+     * @return an immutable map of secret key classes to key managers.
      */
     public abstract Map<Class<?>, KeyManager<?>> getKeyManagers();
 

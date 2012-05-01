@@ -37,7 +37,7 @@ import javax.swing.filechooser.FileSystemView;
  * A replacement for the class {@link File} which provides transparent
  * read/write access to archive files and their entries as if they were
  * (virtual) directories and files.
- * Because this class actually extends the class {@link File} it can getDrivers used
+ * Because this class actually extends the class {@link File} it can get used
  * polymorphically with the class {@link FileSystemView} or any other class
  * which depends on the class {@link File}.
  *
@@ -847,7 +847,7 @@ public final class TFile extends File {
                 }
             }
 
-            final boolean isArchive = null != detector.getScheme(path);
+            final boolean isArchive = null != detector.scheme(path);
             if (0 < enclEntryNameBuf.length()) {
                 if (isArchive) {
                     enclArchive = new TFile(path, detector); // use the same detector for the parent directory
@@ -1288,7 +1288,7 @@ public final class TFile extends File {
      * archive file, or {@code null} otherwise.
      * <p>
      * TODO: Consider making this public in order to enable applications to
-     * getDrivers access to archive entry properties.
+     * get access to archive entry properties.
      * 
      * @return A file system controller if and only if the path denotes an
      *         archive file, or {@code null} otherwise.
@@ -1299,7 +1299,7 @@ public final class TFile extends File {
             return controller;
         final File file = this.file;
         final String path = Paths.normalize(file.getPath(), separatorChar);
-        final FsScheme scheme = detector.getScheme(path);
+        final FsScheme scheme = detector.scheme(path);
         // See http://java.net/jira/browse/TRUEZIP-154 .
         if (null == scheme)
             throw new ServiceConfigurationError(
@@ -1641,7 +1641,7 @@ public final class TFile extends File {
         final FsController<?> controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
-        return detector.getScheme(file.getPath());
+        return detector.scheme(file.getPath());
     }
 
     /**
@@ -1671,7 +1671,7 @@ public final class TFile extends File {
      *     Using {@link URI}s is no alternative, too, because the various URI
      *     schemes provided by the method {@link #toURI()} cannot be made
      *     compatible with the singular URI scheme provided by the method
-     *     {@link java.nio.file.spi.FileSystemProvider#getScheme()} of any
+     *     {@link java.nio.file.spi.FileSystemProvider#scheme()} of any
      *     NIO.2 {@link java.nio.file.spi.FileSystemProvider} implementation.
      * </li>
      * <li>Behavior: A typical {@code Path} implementation is <em>greedy</em>,
@@ -2226,12 +2226,12 @@ public final class TFile extends File {
      * Example:
      * {@code new TFile("archive.zip").mkdir();}
      * <p>
-     * Alternatively, archive files getDrivers created automatically by simply
+     * Alternatively, archive files get created automatically by simply
      * creating their entries.
      * Example:
      * {@code new TFileOutputStream("archive.zip/README");}
      * This assumes the default configuration where
-     * {@link TConfig#isLenient TConfig.getDrivers().isLenient()} is true.
+     * {@link TConfig#isLenient TConfig.get().isLenient()} is true.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
@@ -2257,7 +2257,7 @@ public final class TFile extends File {
      * exists in the (federated) file system.
      * 
      * @param  recursive whether or not any missing ancestor directories shall
-     *         getDrivers created if required.
+     *         get created if required.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
@@ -3319,7 +3319,7 @@ public final class TFile extends File {
      * entry contents and meta data, including central directories may be
      * physically present in the archive file, even if all its entries have
      * been deleted.
-     * This operation could then getDrivers used to remove any redundant artifacts
+     * This operation could then get used to remove any redundant artifacts
      * again.
      * <p>
      * Mind that this operation has no means to detect if there is actually any

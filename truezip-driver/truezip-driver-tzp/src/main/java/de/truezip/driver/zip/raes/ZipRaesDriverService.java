@@ -84,4 +84,10 @@ public final class ZipRaesDriverService extends FsDriverService {
     public Map<FsScheme, FsDriver> getDrivers() {
         return DRIVERS;
     }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() {
+        return -100;
+    }
 }

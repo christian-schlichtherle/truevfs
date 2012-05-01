@@ -29,4 +29,10 @@ public final class CompositeIOPoolService extends IOPoolService {
     public IOPool<?> getIOPool() {
         return pool;
     }
+
+    /** @return 100 */
+    @Override
+    public int getPriority() {
+        return 100;
+    }
 }

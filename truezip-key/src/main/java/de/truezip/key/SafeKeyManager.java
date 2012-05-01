@@ -73,15 +73,4 @@ extends KeyManager<K> {
             provider.setKey(null);
         return provider;
     }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s[priority=%d]",
-                getClass().getName(),
-                getPriority());
-    }
 }

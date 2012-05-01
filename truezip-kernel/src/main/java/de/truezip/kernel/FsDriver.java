@@ -34,17 +34,6 @@ public abstract class FsDriver {
     }
 
     /**
-     * Returns a priority to help the file system driver service locator.
-     * The greater number wins!
-     * 
-     * @return {@code 0}, as by the implementation in the class
-     *         {@link FsDriver}.
-     */
-    public int getPriority() {
-        return 0;
-    }
-
-    /**
      * Returns a new thread-safe file system controller for the mount point of
      * the given file system model and parent file system controller.
      * <p>
@@ -73,9 +62,8 @@ public abstract class FsDriver {
      */
     @Override
     public String toString() {
-        return String.format("%s[federated=%b, priority=%d]",
+        return String.format("%s[federated=%b]",
                 getClass().getName(),
-                isFederated(),
-                getPriority());
+                isFederated());
     }
 }

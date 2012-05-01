@@ -4,11 +4,7 @@
  */
 package de.truezip.file;
 
-import de.truezip.kernel.FsAbstractCompositeDriver;
-import de.truezip.kernel.FsAbstractDriverProvider;
-import de.truezip.kernel.FsDriver;
-import de.truezip.kernel.FsDriverProvider;
-import de.truezip.kernel.FsScheme;
+import de.truezip.kernel.*;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.util.ExtensionSet;
 import static de.truezip.kernel.util.Maps.initialCapacity;
@@ -38,7 +34,7 @@ import javax.annotation.concurrent.Immutable;
  *     files.
  * <li>Constructors which decorate a given file system driver provider with a
  *     given map of file system schemes to file system drivers.
- *     This can getDrivers used to specify custom archive file name extensions or
+ *     This can get used to specify custom archive file name extensions or
  *     archive drivers.
  *     For example, the file name extension list {@code "foo|bar"} could be used
  *     to detect a custom variant of the JAR file format (you need to provide
@@ -59,7 +55,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * This instance never recognizes any archive files in a path.
-     * This can getDrivers used as the end of a chain of
+     * This can get used as the end of a chain of
      * {@code TArchiveDetector} instances or if archive files
      * shall be treated like regular files rather than (virtual) directories.
      */
@@ -191,7 +187,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can getDrivers converted to a set of file name extensions by calling
+     *         can get converted to a set of file name extensions by calling
      *         {@link ExtensionSet#ExtensionSet(String) new ExtensionSet(o.toString())}
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
@@ -279,9 +275,9 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         prospective archive file or {@code null} if no archive file name
      *         extension has been detected.
      */
-    public @CheckForNull FsScheme getScheme(String path) {
-        // An archive file name extension may contain a dot (e.g. "tar.gz"), so we
-        // can't just look for the last dot in the file name and look up the
+    public @CheckForNull FsScheme scheme(String path) {
+        // An archive file name extension may contain a dot (e.g. "tar.gz"), so
+        // we can't just look for the last dot in the file name and look up the
         // remainder in the key set of the archive driver map.
         // Likewise, a file name may contain additional dots, so we can't just
         // look for the first dot in it and look up the remainder ...

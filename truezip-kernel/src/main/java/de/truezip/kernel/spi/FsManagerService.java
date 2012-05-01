@@ -6,6 +6,7 @@ package de.truezip.kernel.spi;
 
 import de.truezip.kernel.FsManagerProvider;
 import de.truezip.kernel.sl.FsManagerLocator;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract locatable service for a file system manager.
@@ -16,18 +17,17 @@ import de.truezip.kernel.sl.FsManagerLocator;
  *
  * @author Christian Schlichtherle
  */
+@Immutable
 public abstract class FsManagerService implements FsManagerProvider {
 
     /**
      * Returns a priority to help the file system manager service locator.
      * The greater number wins!
+     * The default value should be zero.
      * 
-     * @return {@code 0}, as by the implementation in the class
-     *         {@link FsManagerService}.
+     * @return A priority to help the file system manager service locator.
      */
-    public int getPriority() {
-        return 0;
-    }
+    public abstract int getPriority();
 
     /**
      * Returns a string representation of this object for debugging and logging

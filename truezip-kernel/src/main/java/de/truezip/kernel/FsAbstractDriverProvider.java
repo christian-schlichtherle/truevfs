@@ -29,8 +29,8 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
      *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can getDrivers converted to a set of file name extensions by calling
-     *         <code> new {@link ExtensionSet#ExtensionSet(String) ExtensionSet}(o.toString())</code>
+     *         is convertable to a set of file name extensions by calling
+     *         <code>new {@link ExtensionSet#ExtensionSet(String) ExtensionSet}(o.toString())</code>
      *         or a {@link Collection collection} of these.
      *         The second element of each inner array must either be a
      *         {@link FsDriver file system driver instance}, a
@@ -49,22 +49,17 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
                 Maps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = toSchemes(param[0]);
-            final FsDriver newDriver = ServiceLocator.promote(param[1], FsDriver.class);
-            if (schemes.isEmpty()) {
-                throw new IllegalArgumentException("No file system schemes for " + newDriver);
-            }
-            for (final FsScheme scheme : schemes) {
-                final FsDriver oldDriver = drivers.put(scheme, newDriver);
-                if (null != oldDriver && null != newDriver && oldDriver.getPriority() > newDriver.getPriority()) {
-                    drivers.put(scheme, oldDriver);
-                }
-            }
+            if (schemes.isEmpty())
+                throw new IllegalArgumentException("No file system schemes!");
+            final FsDriver driver = ServiceLocator.promote(param[1], FsDriver.class);
+            for (final FsScheme scheme : schemes)
+                drivers.put(scheme, driver);
         }
         return Collections.unmodifiableMap(drivers);
     }
 
     private static Collection<FsScheme> toSchemes(final Object o) {
-        final Collection<FsScheme> set = new TreeSet<FsScheme>();
+        final Collection<FsScheme> set = new TreeSet<>();
         try {
             if (o instanceof Collection<?>)
                 for (final Object p : (Collection<?>) o)

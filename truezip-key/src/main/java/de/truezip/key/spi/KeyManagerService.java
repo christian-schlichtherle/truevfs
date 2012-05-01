@@ -19,4 +19,25 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public abstract class KeyManagerService extends AbstractKeyManagerProvider {
+
+    /**
+     * Returns a priority to help the key manager service locator.
+     * The greater number wins!
+     * The default value should be zero.
+     * 
+     * @return A priority to help the key manager service locator.
+     */
+    public abstract int getPriority();
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return String.format("%s[priority=%d, keyManagers=%s]",
+                getClass().getName(),
+                getPriority(),
+                getKeyManagers());
+    }
 }

@@ -6,7 +6,6 @@ package de.schlichtherle.truezip.key.pbe.swing;
 
 import de.truezip.key.PromptingKeyManager;
 import de.truezip.key.param.SafePbeParameters;
-import java.awt.GraphicsEnvironment;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -18,10 +17,5 @@ extends PromptingKeyManager<P> {
 
     SwingPromptingKeyManager(SwingSafePbeParametersView<P, ?> view) {
         super(view);
-    }
-
-    @Override
-    public int getPriority() {
-        return GraphicsEnvironment.isHeadless() ? -10 : 10;
     }
 }

@@ -95,9 +95,8 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      */
     @Override
     public String toString() {
-        return String.format("%s[view=%s, priority=%d]",
+        return String.format("%s[view=%s]",
                 getClass().getName(),
-                getView(),
-                getPriority());
+                getView());
     }
 }
