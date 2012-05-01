@@ -10,7 +10,7 @@
     name="project">
     <requiredProperties>
         <requiredProperty key="truezip-version">
-            <defaultValue>LATEST</defaultValue>
+            <defaultValue>${project.version}</defaultValue>
         </requiredProperty>
         <requiredProperty key="scala-version">
             <defaultValue>2.9.2</defaultValue>
