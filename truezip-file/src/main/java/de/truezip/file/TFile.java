@@ -15,10 +15,10 @@ import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
-import de.truezip.kernel.util.Paths;
-import de.truezip.kernel.util.PathSplitter;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
+import de.truezip.kernel.util.PathSplitter;
+import de.truezip.kernel.util.Paths;
 import de.truezip.kernel.util.UriBuilder;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -101,7 +101,7 @@ import javax.swing.filechooser.FileSystemView;
  * <p>
  * When traversing directory trees, e.g. when searching, copying or moving
  * them, it's important that all file objects use
- * {@linkplain TArchiveDetector#equals equivalent} {@link TArchiveDetector}
+ * {@linkplain TArchiveDetector#equals consistent} {@link TArchiveDetector}
  * objects for archive file detection in these directory trees.
  * This is required in order to make sure that the virtual file system state
  * which is managed by the TrueZIP Kernel does not get bypassed.
@@ -2874,7 +2874,14 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, getArchiveDetector(), getArchiveDetector())}.
+     * Recursively copies the file or directory {@code src}
+     * to the file or directory {@code dst}.
+     * <p>
+     * This version calls {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, srcDetector, dstDetector)},
+     * where {@code srcDetector} is {@code this.getArchiveDetector} and
+     * {@code dstDetector} is {@code dst.getArchiveDetector()} if and only if
+     * {@code dst} is an instance of this class or {@link TArchiveDetector#NULL}
+     * otherwise.
      * 
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
@@ -2885,33 +2892,13 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public TFile cp_r(File dst) throws IOException {
-        TBIO.cp_r(false, this, dst, detector, detector);
+    public TFile cp_r(final File dst) throws IOException {
+        final TArchiveDetector srcDetector = detector;
+        final TArchiveDetector dstDetector = dst instanceof TFile
+                ? ((TFile) dst).detector
+                : TArchiveDetector.NULL;
+        TBIO.cp_r(false, this, dst, srcDetector, dstDetector);
         return this;
-    }
-
-    /**
-     * Equivalent to {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)}.
-     * 
-     * @param  src the source file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  detector the archive detector to use for detecting any
-     *         archive files <em>within</em> the source and destination
-     *         directory tree.
-     * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
-     */
-    public static void cp_r(File src, File dst,
-                            TArchiveDetector detector)
-    throws IOException {
-        TBIO.cp_r(false, src, dst, detector, detector);
     }
 
     /**
@@ -2985,7 +2972,15 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, getArchiveDetector(), getArchiveDetector())}.
+     * Recursively copies the file or directory {@code src} to the file or
+     * directory {@code dst} and attempts to copy all attributes of each
+     * source file to the destination file, too.
+     * <p>
+     * This version calls {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, srcDetector, dstDetector)},
+     * where {@code srcDetector} is {@code this.getArchiveDetector} and
+     * {@code dstDetector} is {@code dst.getArchiveDetector()} if and only if
+     * {@code dst} is an instance of this class or {@link TArchiveDetector#NULL}
+     * otherwise.
      * 
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
@@ -2996,32 +2991,13 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public TFile cp_rp(File dst) throws IOException {
-        TBIO.cp_r(true, this, dst, detector, detector);
+    public TFile cp_rp(final File dst) throws IOException {
+        final TArchiveDetector srcDetector = detector;
+        final TArchiveDetector dstDetector = dst instanceof TFile
+                ? ((TFile) dst).detector
+                : TArchiveDetector.NULL;
+        TBIO.cp_r(true, this, dst, srcDetector, dstDetector);
         return this;
-    }
-
-    /**
-     * Equivalent to {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)}.
-     * 
-     * @param  src the source file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  detector the archive detector to use for detecting any
-     *         archive files <em>within</em> the source and destination
-     *         directory tree.
-     * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
-     */
-    public static void cp_rp(File src, File dst, TArchiveDetector detector)
-    throws IOException {
-        TBIO.cp_r(true, src, dst, detector, detector);
     }
 
     /**
