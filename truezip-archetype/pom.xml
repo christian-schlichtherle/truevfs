@@ -23,6 +23,15 @@
         <module>truezip-archetype-path</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-samples</artifactId>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
     <build>
         <extensions>
             <extension>

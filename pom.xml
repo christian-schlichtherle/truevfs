@@ -15,7 +15,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>3</version>
+        <version>4</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -231,6 +231,11 @@ system space.
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-samples</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
