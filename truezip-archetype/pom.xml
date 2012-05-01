@@ -22,6 +22,15 @@
         <module>truezip-archetype-file</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-samples</artifactId>
+            <scope>test</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>jse7-modules</id>

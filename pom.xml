@@ -12,7 +12,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>3</version>
+        <version>4</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -86,11 +86,16 @@ system space.
              the integration tests with it. -->
         <maven.enforcer.requireJavaVersion>1.6</maven.enforcer.requireJavaVersion>
 
+        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
+
         <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
         <maven.compiler.source>1.6</maven.compiler.source>
         <maven.compiler.target>1.6</maven.compiler.target>
 
         <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
+
+        <!-- maven-antrun-plugin && maven-failsafe-plugin -->
+        <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
 
         <!-- maven-surefire-plugin && maven-failsafe-plugin -->
         <!-- The server VM is expected to be less tolerant against
@@ -104,7 +109,7 @@ system space.
              See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
              See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
              -->
-        <argLine>-server -Xms650m -Xmx650m -XX:+UseParallelGC -XX:+UseBiasedLocking</argLine>
+        <argLine>-server -Xms650m -Xmx650m -XX:+UseBiasedLocking</argLine>
         <parallel>both</parallel>
 
         <!-- maven-javadoc-plugin -->
@@ -138,18 +143,6 @@ system space.
         <module>truezip-samples</module>
         <module>truezip-swing</module>
     </modules>
-
-    <profiles>
-        <profile>
-            <id>jse7-modules</id>
-            <activation>
-                <jdk>[1.7,)</jdk>
-            </activation>
-            <modules>
-                <module>truezip-path</module>
-            </modules>
-        </profile>
-    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -228,6 +221,11 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-samples</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truezip-swing</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -276,6 +274,9 @@ system space.
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                </plugin>
+                <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
@@ -298,6 +299,7 @@ system space.
                             <de.schlichtherle.truezip.file.ConfiguredClientTestBase.isolateFsManager>false</de.schlichtherle.truezip.file.ConfiguredClientTestBase.isolateFsManager>
                             <de.schlichtherle.truezip.zip.forceZip64Ext>false</de.schlichtherle.truezip.zip.forceZip64Ext>
                             <de.schlichtherle.truezip.fs.FsControllerException.traceable>true</de.schlichtherle.truezip.fs.FsControllerException.traceable>
+                            <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
@@ -310,7 +312,6 @@ system space.
                             <link>http://commons.apache.org/compress/apidocs/</link>
                             <link>http://findbugs.sourceforge.net/api/</link>
                         </links>
-                        <show>private</show>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -374,4 +375,40 @@ system space.
             <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
         </site>
     </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>jse7-modules</id>
+            <activation>
+                <jdk>[1.7,)</jdk>
+            </activation>
+            <modules>
+                <module>truezip-path</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>integration-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-it-directory</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <mkdir dir="${java.io.tmpdir.it}"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
