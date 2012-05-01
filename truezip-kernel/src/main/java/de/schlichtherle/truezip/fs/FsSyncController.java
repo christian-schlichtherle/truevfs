@@ -223,7 +223,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                 // HC SUNT DRACONES!
                 delegate.unlink(name, options);
                 if (name.isRoot()) {
-                    // Make the file system controller chain discardable.
+                    // Make the file system controller chain eligible for GC.
                     delegate.sync(RESET);
                 }
                 return;
