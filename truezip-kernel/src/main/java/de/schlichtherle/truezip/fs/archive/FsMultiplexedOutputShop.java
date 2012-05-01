@@ -14,6 +14,7 @@ import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import de.schlichtherle.truezip.socket.*;
+import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -231,7 +232,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             final IOPool.Entry<?> buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
-                InputProxy() { super(buffer.getInputSocket()); }
+                InputProxy() {
+                    super(buffer.getInputSocket());
+                }
 
                 @Override
                 public Entry getLocalTarget() {
@@ -242,7 +245,11 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                 this.input = new InputProxy();
                 this.delegate = buffer.getOutputSocket().newOutputStream();
             } catch (final IOException ex) {
-                buffer.release();
+                try {
+                    buffer.release();
+                } catch (final IOException ex2) {
+                    if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+                }
                 throw ex;
             }
             buffers.put(local.getName(), this);
@@ -283,12 +290,12 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         }
 
         void updateProperties(final E local, final Entry peer) {
-            // Never copy any but the DATA size!
-            if (UNKNOWN == local.getSize(DATA))
-                local.setSize(DATA, peer.getSize(DATA));
             for (final Access type : ALL_ACCESS_SET)
                 if (UNKNOWN == local.getTime(type))
                     local.setTime(type, peer.getTime(type));
+            // Never copy any but the DATA size!
+            if (UNKNOWN == local.getSize(DATA))
+                local.setSize(DATA, peer.getSize(DATA));
         }
 
         void discardBuffer() throws IOException {
