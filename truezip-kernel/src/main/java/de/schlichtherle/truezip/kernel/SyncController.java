@@ -302,7 +302,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 // HC SUNT DRACONES!
                 controller.unlink(name, options); // repeatable for root entry
                 if (name.isRoot()) {
-                    // Make the file system controller chain discardable.
+                    // Make the file system controller chain eligible for GC.
                     controller.sync(RESET);
                 }
                 return;
