@@ -238,7 +238,7 @@ public final class TFileSystem extends FileSystem {
                         .channel();
             } catch (final IOException ex) {
                 // TODO: Filter FileAlreadyExistsException.
-                if (o.get(EXCLUSIVE) && null != controller.entry(name))
+                if (o.get(EXCLUSIVE) && null != controller.stat(name))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
                 throw ex;
@@ -343,11 +343,11 @@ public final class TFileSystem extends FileSystem {
         try {
             controller.mknod(
                     name,
-                    DIRECTORY,
                     path.getAccessPreferences(),
+                    DIRECTORY,
                     null);
         } catch (IOException ex) {
-            if (null != controller.entry(name))
+            if (null != controller.stat(name))
                 throw (IOException) new FileAlreadyExistsException(path.toString())
                         .initCause(ex);
             throw ex;
@@ -359,7 +359,7 @@ public final class TFileSystem extends FileSystem {
     }
 
     FsEntry entry(TPath path) throws IOException {
-        return getController().entry(path.getEntryName());
+        return getController().stat(path.getEntryName());
     }
 
     InputSocket<?> input(   TPath path,
@@ -452,8 +452,8 @@ public final class TFileSystem extends FileSystem {
                 times.put(CREATE, createTime.toMillis());
             controller.setTime(
                     path.getEntryName(),
-                    times,
-                    path.getAccessPreferences());
+                    path.getAccessPreferences(),
+                    times);
         }
     } // FsEntryAttributeView
 
@@ -462,7 +462,7 @@ public final class TFileSystem extends FileSystem {
         private final FsEntry entry;
 
         FsEntryAttributes(final TPath path) throws IOException {
-            if (null == (entry = getController().entry(path.getEntryName())))
+            if (null == (entry = getController().stat(path.getEntryName())))
                 throw new NoSuchFileException(path.toString());
         }
 

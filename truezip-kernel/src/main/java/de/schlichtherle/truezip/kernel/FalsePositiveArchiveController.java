@@ -131,7 +131,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     } // IsReadOnly
     
     @Override
-    public @Nullable FsEntry entry(final FsEntryName name) throws IOException {
+    public @Nullable FsEntry stat(final FsEntryName name) throws IOException {
         return call(new GetEntry(), name);
     }
 
@@ -140,7 +140,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         public @Nullable FsEntry call(  final FsController<?> controller,
                                         final FsEntryName resolved)
         throws IOException {
-            return controller.entry(resolved);
+            return controller.stat(resolved);
         }
     } // GetEntry
 
@@ -180,16 +180,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final Map<Access, Long> times,
-            final BitField<FsAccessOption> options)
+            final FsEntryName name, final BitField<FsAccessOption> options, final Map<Access, Long> times)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName resolved)
             throws IOException {
-                return controller.setTime(resolved, times, options);
+                return controller.setTime(resolved, options, times);
             }
         } // SetTime
 
@@ -198,17 +196,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final BitField<Access> types,
-            final long value,
-            final BitField<FsAccessOption> options)
+            final FsEntryName name, final BitField<FsAccessOption> options, final BitField<Access> types, final long value)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName resolved)
             throws IOException {
-                return controller.setTime(resolved, types, value, options);
+                return controller.setTime(resolved, options, types, value);
             }
         } // SetTime
 
@@ -356,17 +351,15 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public void mknod(
-            final FsEntryName name,
-            final Type type,
-            final BitField<FsAccessOption> options,
-            final @CheckForNull Entry template)
+            final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    final Entry template)
     throws IOException {
         final class Mknod implements IOOperation<Void> {
             @Override
             public Void call(final FsController<?> controller,
                              final FsEntryName resolved)
             throws IOException {
-                controller.mknod(resolved, type, options, template);
+                controller.mknod(resolved, options, type, template);
                 return null;
             }
         } // Mknod

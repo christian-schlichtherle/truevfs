@@ -120,11 +120,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     } // IsReadOnly
     
     @Override
-    public FsEntry entry(final FsEntryName name) throws IOException {
+    public FsEntry stat(final FsEntryName name) throws IOException {
         final class GetEntry implements IOOperation<FsEntry> {
             @Override
             public FsEntry call() throws IOException {
-                return controller.entry(name);
+                return controller.stat(name);
             }
         } // GetEntry
 
@@ -163,14 +163,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final Map<Access, Long> times,
-            final BitField<FsAccessOption> options)
+            final FsEntryName name, final BitField<FsAccessOption> options, final Map<Access, Long> times)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call() throws IOException {
-                return controller.setTime(name, times, options);
+                return controller.setTime(name, options, times);
             }
         } // SetTime
 
@@ -179,15 +177,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final BitField<Access> types,
-            final long value,
-            final BitField<FsAccessOption> options)
+            final FsEntryName name, final BitField<FsAccessOption> options, final BitField<Access> types, final long value)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call() throws IOException {
-                return controller.setTime(name, types, value, options);
+                return controller.setTime(name, options, types, value);
             }
         } // SetTime
 
@@ -299,15 +294,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public void
-    mknod(  final FsEntryName name,
-            final Type type,
-            final BitField<FsAccessOption> options,
-            final Entry template)
+    mknod(  final FsEntryName name, final BitField<FsAccessOption> options, final Type type, final Entry template)
     throws IOException {
         final class Mknod implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                controller.mknod(name, type, options, template);
+                controller.mknod(name, options, type, template);
                 return null;
             }
         } // Mknod

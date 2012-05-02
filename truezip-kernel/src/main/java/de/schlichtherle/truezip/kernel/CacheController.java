@@ -144,13 +144,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public void mknod(  final FsEntryName name,
-                        final Type type,
-                        final BitField<FsAccessOption> options,
-                        final @CheckForNull Entry template)
+    public void mknod(  final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    final Entry template)
     throws IOException {
         assert isWriteLockedByCurrentThread();
-        controller.mknod(name, type, options, template);
+        controller.mknod(name, options, type, template);
         final EntryCache cache = caches.remove(name);
         if (null != cache)
             cache.release();
@@ -423,7 +421,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             throws IOException {
                 while (true) {
                     try {
-                        controller.mknod(name, FILE, options, template);
+                        controller.mknod(name, options, FILE, template);
                         break;
                     } catch (final NeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry

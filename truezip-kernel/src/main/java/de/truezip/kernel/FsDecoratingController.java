@@ -47,9 +47,9 @@ extends FsModelController<M> {
     }
 
     @Override
-    public @Nullable FsEntry entry(FsEntryName name)
+    public @Nullable FsEntry stat(FsEntryName name)
     throws IOException {
-        return controller.entry(name);
+        return controller.stat(name);
     }
 
     @Override
@@ -67,51 +67,53 @@ extends FsModelController<M> {
     }
 
     @Override
-    public boolean
-    setTime(FsEntryName name,
-            Map<Access, Long> times,
-            BitField<FsAccessOption> options)
+    public boolean setTime(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
+            Map<Access, Long> times)
     throws IOException {
-        return controller.setTime(name, times, options);
+        return controller.setTime(name, options, times);
     }
 
     @Override
-    public boolean
-    setTime(FsEntryName name,
+    public boolean setTime(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
             BitField<Access> types,
-            long value,
-            BitField<FsAccessOption> options)
+            long value)
     throws IOException {
-        return controller.setTime(name, types, value, options);
+        return controller.setTime(name, options, types, value);
     }
 
     @Override
-    public InputSocket<?>
-    input(  FsEntryName name,
+    public InputSocket<?> input(
+            FsEntryName name,
             BitField<FsAccessOption> options) {
         return controller.input(name, options);
     }
 
     @Override
-    public OutputSocket<?>
-    output( FsEntryName name,
+    public OutputSocket<?> output(
+            FsEntryName name,
             BitField<FsAccessOption> options,
             Entry template) {
         return controller.output(name, options, template);
     }
 
     @Override
-    public void
-    mknod(  FsEntryName name,
-            Type type,
+    public void mknod(
+            FsEntryName name,
             BitField<FsAccessOption> options,
+            Type type,
             Entry template)
     throws IOException {
-        controller.mknod(name, type, options, template);
+        controller.mknod(name, options, type, template);
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
+    public void unlink(
+            FsEntryName name,
+            BitField<FsAccessOption> options)
     throws IOException {
         controller.unlink(name, options);
     }
