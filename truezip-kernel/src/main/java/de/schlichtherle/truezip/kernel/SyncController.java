@@ -328,8 +328,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         // when accessing deeply nested archive files, e.g. for the
         // integration tests.
         final BitField<FsSyncOption> sync = recLocking
-                ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
+                ? options.and(NOT_WAIT_CLOSE_IO)
                 : options;
+        assert sync == options == sync.equals(options) : "Broken contract in BitField.and()!";
         try {
             controller.sync(sync);
         } catch (final FsSyncWarningException ex) {
