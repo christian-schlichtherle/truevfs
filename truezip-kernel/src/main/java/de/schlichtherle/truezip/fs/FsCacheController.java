@@ -10,6 +10,7 @@ import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -486,14 +487,26 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // has already been written to the output archive for
                         // the target archive file.
 
+                        // Pass on the exception if there is no means to
+                        // resolve the issue locally, that is if we were asked
+                        // to create the entry exclusively or this is a
+                        // non-recursive file system operation.
+                        final BitField<FsSyncOption> modified;
+                        if (options.get(EXCLUSIVE)
+                                || SYNC == (modified = FsSyncController.modify(SYNC)))
+                            throw mknodEx;
+
+                        // Try to resolve the issue locally.
                         // Even if we were asked to create the entry
                         // EXCLUSIVEly, first we must try to get the cache in
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            delegate.sync(mknodEx);
+                            delegate.sync(modified);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
+                            syncEx.addSuppressed(mknodEx);
+
                             // sync() failed, maybe just because the current
                             // thread has already acquired some open I/O
                             // resources for the same target archive file, e.g.
@@ -501,7 +514,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // is an artifact of an attempt to acquire the
                             // output stream for a child file system.
                             if (!(syncEx.getCause() instanceof FsResourceOpenException)) {
-                                // Too bad, sync() failed because of more
+                                // Too bad, sync() failed because of a more
                                 // serious issue than just some open resources.
                                 // Let's rethrow the sync exception.
                                 throw syncEx;
@@ -519,14 +532,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // Dito for mapping the exception.
                             //throw FsNeedsLockRetryException.get(getModel());
 
-                            if (options.get(EXCLUSIVE)) {
-                                // We've been asked not to tolerate the
-                                // original event but we can't just rethrow the
-                                // mknod exception, so let's rethrow the sync
-                                // exception instead.
-                                throw syncEx;
-                            }
-
                             // Finally, the mknod failed because the entry
                             // has already been output to the target archive
                             // file - so what?!
@@ -534,8 +539,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // the next sync() will sort it out once all the
                             // I/O resources have been closed.
                             // Let's log the sync exception - mind that it has
-                            // the mknod exception as its predecessor - and
-                            // continue anyway...
+                            // suppressed the mknod exception - and continue
+                            // anyway...
                             logger.log(Level.FINE, "ignoring", syncEx);
                             break;
                         }

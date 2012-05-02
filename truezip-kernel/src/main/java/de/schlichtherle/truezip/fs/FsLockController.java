@@ -57,10 +57,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
-    private static final ThreadLocal<ThreadUtil> threadUtil = (JSE7.AVAILABLE
-            ? ThreadLocalUtilFactory.NEW
-            : ThreadLocalUtilFactory.OLD
-                ).newThreadLocalUtil();
+    private static final ThreadLocal<Account> accounts = (JSE7.AVAILABLE
+            ? ThreadLocalAccountFactory.NEW
+            : ThreadLocalAccountFactory.OLD
+                ).newThreadLocalAccount();
 
     private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
             = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT).not();
@@ -148,13 +148,15 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      */
     private <T> T locked(final IOOperation<T> operation, final Lock lock)
     throws IOException {
-        final ThreadUtil thread = threadUtil.get();
-        if (thread.locking) {
+        final Account account = accounts.get();
+        if (0 < account.lockCount) {
             if (!lock.tryLock())
                 throw FsNeedsLockRetryException.get(getModel());
+            account.lockCount++;
             try {
                 return operation.call();
             } finally {
+                account.lockCount--;
                 lock.unlock();
             }
         } else {
@@ -162,21 +164,25 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 while (true) {
                     try {
                         lock.lock();
-                        thread.locking = true;
+                        account.lockCount++;
                         try {
                             return operation.call();
                         } finally {
-                            thread.locking = false;
+                            account.lockCount--;
                             lock.unlock();
                         }
                     } catch (FsNeedsLockRetryException ex) {
-                        thread.pause();
+                        account.pause();
                     }
                 }
             } finally {
-                threadUtil.remove();
+                accounts.remove();
             }
         }
+    }
+
+    static int getLockCount() {
+        return accounts.get().lockCount;
     }
 
     @Override
@@ -364,33 +370,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        final boolean locking = threadUtil.get().locking; // do NOT initialize within Sync!
-        final BitField<FsSyncOption> sync = locking
-                ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
-                : options;
-
         final class Sync implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                // Prevent potential dead locks by performing a timed wait for
-                // open I/O resources if the current thread is already holding
-                // a file system lock.
-                // Note that a sync in a parent file system is a rare event
-                // so that this should not create performance problems, even
-                // when accessing deeply nested archive files, e.g. for the
-                // integration tests.
-                try {
-                    delegate.sync(sync, handler);
-                } catch (final FsSyncWarningException ex) {
-                    throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
-                } catch (final FsSyncException ex) {
-                    if (sync != options) { // OK, see contract for BitField.and()!
-                        assert locking;
-                        if (ex.getCause() instanceof FsResourceOpenException)
-                            throw FsNeedsLockRetryException.get(getModel());
-                    }
-                    throw ex;
-                }
+                delegate.sync(options, handler);
                 return null;
             }
         } // Sync
@@ -648,11 +631,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     } // LockOutputStream
 
     @NotThreadSafe
-    private static final class ThreadUtil {
-        boolean locking;
+    private static final class Account {
+        int lockCount;
         final Random rnd;
 
-        ThreadUtil(Random rnd) { this.rnd = rnd; }
+        Account(Random rnd) { this.rnd = rnd; }
 
         /**
          * Delays the current thread for a random time interval between one and
@@ -665,14 +648,14 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     } // ThreadUtil
 
     @Immutable
-    private enum ThreadLocalUtilFactory {
+    private enum ThreadLocalAccountFactory {
         NEW {
             @Override
-            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
-                return new ThreadLocal<ThreadUtil>() {
+            ThreadLocal<Account> newThreadLocalAccount() {
+                return new ThreadLocal<Account>() {
                     @Override
-                    public ThreadUtil initialValue() {
-                        return new ThreadUtil(ThreadLocalRandom.current());
+                    public Account initialValue() {
+                        return new Account(ThreadLocalRandom.current());
                     }
                 };
             }
@@ -680,16 +663,16 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         OLD {
             @Override
-            ThreadLocal<ThreadUtil> newThreadLocalUtil() {
-                return new ThreadLocal<ThreadUtil>() {
+            ThreadLocal<Account> newThreadLocalAccount() {
+                return new ThreadLocal<Account>() {
                     @Override
-                    public ThreadUtil initialValue() {
-                        return new ThreadUtil(new Random());
+                    public Account initialValue() {
+                        return new Account(new Random());
                     }
                 };
             }
         };
 
-        abstract ThreadLocal<ThreadUtil> newThreadLocalUtil();
+        abstract ThreadLocal<Account> newThreadLocalAccount();
     } // ThreadLocalToolFactory
 }
