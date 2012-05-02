@@ -356,34 +356,39 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         timedWriteLocked(new Unlink());
     }
 
+    /**
+     * Modify the sync options so that no dead lock can appear due to waiting
+     * for I/O resources in a recursive file system operation.
+     * 
+     * @param options the sync options
+     * @return the potentially modifed sync options.
+     */
+    static BitField<FsSyncOption> modify(final BitField<FsSyncOption> options) {
+        final boolean isRecursive = 1 < LockingStrategy.getLockCount();
+        final BitField<FsSyncOption> result = isRecursive
+                ? options.and(NOT_WAIT_CLOSE_IO)
+                : options;
+        assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
+        assert result == options || isRecursive;
+        return result;
+    }
+
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        final boolean locking = LockingStrategy.isLocking(); // do NOT initialize within Sync!
-        final BitField<FsSyncOption> sync = locking
-                ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
-                : options;
+        final BitField<FsSyncOption> modified = modify(options);
 
         final class Sync implements Operation<Void, FsSyncException> {
             @Override
             public Void call() throws FsSyncWarningException, FsSyncException {
-                // Prevent potential dead locks by performing a timed wait for
-                // open I/O resources if the current thread is already holding
-                // a file system lock.
-                // Note that a sync in a parent file system is a rare event
-                // so that this should not create performance problems, even
-                // when accessing deeply nested archive files, e.g. for the
-                // integration tests.
                 try {
-                    controller.sync(sync);
+                    controller.sync(modified);
                 } catch (final FsSyncWarningException ex) {
                     throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
                 } catch (final FsSyncException ex) {
-                    if (sync != options) { // OK, see contract for BitField.and()!
-                        assert locking;
+                    if (modified != options)
                         if (ex.getCause() instanceof FsResourceOpenException)
                             throw NeedsLockRetryException.get();
-                    }
                     throw ex;
                 }
                 return null;

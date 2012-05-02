@@ -6,7 +6,8 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.CacheEntry.Strategy.WRITE_BACK;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
-import static de.truezip.kernel.FsSyncOption.*;
+import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Type;
@@ -429,13 +430,19 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                         // has already been written to the output archive for
                         // the target archive file.
 
+                        // Pass on the exception if this is a non-recursive
+                        // file system operation.
+                        final BitField<FsSyncOption> modified = LockController.modify(SYNC);
+                        if (modified == SYNC)
+                            throw mknodEx;
+
+                        // Try to resolve the issue.
                         // Even if we were asked to create the entry
                         // EXCLUSIVEly, first we must try to get the cache in
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            final boolean locking = 1 < LockingStrategy.getLockCount();
-                            controller.sync(locking ? SYNC.and(BitField.of(WAIT_CLOSE_IO).not()) : SYNC);
+                            controller.sync(modified);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             syncEx.addSuppressed(mknodEx);
