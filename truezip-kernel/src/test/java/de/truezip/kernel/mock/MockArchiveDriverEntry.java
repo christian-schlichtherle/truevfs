@@ -24,6 +24,8 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             sizes = new EnumMap<>(Size.class);
     private final EnumMap<Access, Long>
             times = new EnumMap<>(Access.class);
+    private final Boolean[][] permissions
+            = new Boolean[PosixEntity.values().length][Access.values().length];
     private @CheckForNull IOBuffer<?> buffer;
 
     public MockArchiveDriverEntry(final String name, final Type type) {
@@ -49,6 +51,10 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
                 if (UNKNOWN != value)
                     times.put(access, value);
             }
+            for (final PosixEntity entity : ALL_POSIX_ENTITY_SET)
+                for (final Access access : ALL_ACCESS_SET)
+                    permissions[entity.ordinal()][access.ordinal()]
+                            = template.isPermitted(entity, access);
         }
     }
 
@@ -89,6 +95,13 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
     public boolean setTime(final Access type, final long value) {
         times.put(type, value);
         return true;
+    }
+
+    @Override
+    public Boolean isPermitted(Entity entity, Access access) {
+        if (!(entity instanceof PosixEntity))
+            return null;
+        return permissions[((PosixEntity) entity).ordinal()][access.ordinal()];
     }
 
     /**

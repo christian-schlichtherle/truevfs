@@ -109,7 +109,7 @@ public final class ArchiveFileSystemTest {
             { "..\\bar9", null }, // dito from Windows
         };
 
-        // Populate and check container.
+        // Populate and checkAccess container.
         final TestConfig config = TestConfig.get();
         config.setNumEntries(paramss.length);
         final MockArchive archive = MockArchive.create(config);

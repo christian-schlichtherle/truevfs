@@ -4,8 +4,7 @@
  */
 package de.truezip.kernel.cio;
 
-import static de.truezip.kernel.cio.Entry.Access.READ;
-import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Access.*;
 import de.truezip.kernel.io.ByteBufferChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -155,6 +154,11 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
     public final long getTime(Access type) {
         final Long time = times.get(type);
         return null != time ? time : UNKNOWN;
+    }
+
+    @Override
+    public Boolean isPermitted(Entity entity, Access access) {
+        return true;
     }
 
     @Override

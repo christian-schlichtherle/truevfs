@@ -94,23 +94,15 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
+    public void checkAccess(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final BitField<Access> types)
+    throws IOException {
         checkAllExceptions(this);
         assert null != name;
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
-        checkAllExceptions(this);
-        assert null != name;
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
-        checkAllExceptions(this);
-        assert null != name;
+        assert null != options;
+        assert null != types;
         throw new UnsupportedOperationException();
     }
 

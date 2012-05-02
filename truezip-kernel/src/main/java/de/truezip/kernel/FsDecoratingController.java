@@ -53,18 +53,12 @@ extends FsModelController<M> {
     }
 
     @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
-        return controller.isReadable(name);
-    }
-
-    @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
-        return controller.isWritable(name);
-    }
-
-    @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
-        return controller.isExecutable(name);
+    public void checkAccess(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
+            BitField<Access> types)
+    throws IOException {
+        controller.checkAccess(name, options, types);
     }
 
     @Override

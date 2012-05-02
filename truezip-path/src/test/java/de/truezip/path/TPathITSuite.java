@@ -1115,7 +1115,7 @@ extends ConfiguredClientTestBase<D> {
             assertRenameTo(archive2a, archive1b);
             assertRenameTo(archive1b, archive1a);
         }
-        
+
         assertRenameTo(archive, temp);
         assertRenameTo(temp, archive);
         delete(archive3);

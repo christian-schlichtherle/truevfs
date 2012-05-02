@@ -7,6 +7,7 @@ package de.truezip.driver.zip;
 import static de.truezip.kernel.FsEntryName.ROOT;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Type.SPECIAL;
 import de.truezip.kernel.util.BitField;
 import de.truezip.key.KeyManager;
@@ -91,12 +92,35 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             // The entry is inaccessible for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
-            while (entry instanceof FsCovariantEntry<?>)
+            if (entry instanceof FsCovariantEntry<?>)
                 entry = ((FsCovariantEntry<?>) entry).getEntry();
             final FsCovariantEntry<FsArchiveEntry>
                     special = new FsCovariantEntry<>(ROOT_PATH);
             special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
             return special;
+        }
+    }
+
+    @Override
+    public void checkAccess(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final BitField<Access> types)
+    throws IOException {
+        try {
+            controller.checkAccess(name, options, types);
+            return;
+        } catch (final Throwable ex) {
+            if (!name.isRoot() || null == findKeyException(ex))
+                throw ex;
+            getParent().checkAccess(
+                    getModel()
+                        .getMountPoint()
+                        .getPath()
+                        .resolve(name)
+                        .getEntryName(),
+                    options,
+                    types);
         }
     }
 

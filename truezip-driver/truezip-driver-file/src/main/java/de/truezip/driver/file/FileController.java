@@ -14,13 +14,13 @@ import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -62,27 +62,38 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public FileEntry entry(FsEntryName name) throws IOException {
-        FileEntry entry = new FileEntry(target, name);
+    public FileEntry entry(final FsEntryName name) throws IOException {
+        final FileEntry entry = new FileEntry(target, name);
         return exists(entry.getPath()) ? entry : null;
     }
 
     @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
-        Path file = target.resolve(name.getPath());
-        return Files.isReadable(file);
+    public void checkAccess(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final BitField<Access> types)
+    throws IOException {
+        final Path file = target.resolve(name.getPath());
+        final AccessMode[] modes = modes(types);
+        file.getFileSystem().provider().checkAccess(file, modes);
     }
 
-    @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
-        Path file = target.resolve(name.getPath());
-        return Files.isWritable(file);
-    }
-
-    @Override
-    public boolean isExecutable(FsEntryName name) throws IOException {
-        Path file = target.resolve(name.getPath());
-        return Files.isExecutable(file);
+    private static AccessMode[] modes(final BitField<Access> types) {
+        final EnumSet<AccessMode> modes = EnumSet.noneOf(AccessMode.class);
+        for (final Access type : types) {
+            switch (type) {
+            case READ:
+                modes.add(AccessMode.READ);
+                break;
+            case WRITE:
+                modes.add(AccessMode.WRITE);
+                break;
+            case EXECUTE:
+                modes.add(AccessMode.EXECUTE);
+                break;
+            }
+        }
+        return modes.toArray(new AccessMode[modes.size()]);
     }
 
     @Override

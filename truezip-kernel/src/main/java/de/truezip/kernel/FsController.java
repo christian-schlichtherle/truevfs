@@ -123,59 +123,35 @@ public abstract class FsController<M extends FsModel> {
     throws IOException;
 
     /**
-     * Returns the file system entry for the given name or {@code null} if it
-     * doesn't exist.
+     * Returns the file system entry for the given {@code name} or {@code null}
+     * if it doesn't exist.
      * Modifying the returned entry does not show any effect on the file system
-     * and may result in an {@link UnsupportedOperationException}.
+     * and should result in an {@link UnsupportedOperationException}.
      * 
      * @param  name the name of the file system entry.
      * @return A file system entry or {@code null} if no file system entry
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    public abstract @Nullable FsEntry entry(FsEntryName name)
+    // TODO: Rename to stat()!
+    public abstract @CheckForNull FsEntry entry(FsEntryName name)
     throws IOException;
 
     /**
-     * Returns {@code false} if the named file system entry is not readable.
+     * Checks if the file system entry for the given {@code name} exists when
+     * constrained by the given access {@code options} and permits the given
+     * access {@code types}.
      * 
      * @param  name the name of the file system entry.
-     * @return {@code false} if the named file system entry is not readable.
+     * @param  options the file system access options.
+     * @param  types the types of the desired access.
      * @throws IOException on any I/O error.
      */
-    // TODO: Consider using a Boolean return value in order to use null to
-    // indicate that this property is not supported
-    // - see http://java.net/jira/browse/TRUEZIP-224 .
-    public abstract boolean isReadable(FsEntryName name) throws IOException;
-
-    /**
-     * Returns {@code false} if the named file system entry is not writable.
-     * 
-     * @param  name the name of the file system entry.
-     * @return {@code false} if the named file system entry is not writable.
-     * @throws IOException on any I/O error.
-     */
-    // TODO: Consider using a Boolean return value in order to use null to
-    // indicate that this property is not supported
-    // - see http://java.net/jira/browse/TRUEZIP-224 .
-    public abstract boolean isWritable(FsEntryName name) throws IOException;
-
-    /**
-     * Returns {@code false} if the named file system entry is not executable.
-     * <p>
-     * The implementation in the class {@link FsController} always returns
-     * {@code false}.
-     * 
-     * @param  name the name of the file system entry.
-     * @return {@code false} if the named file system entry is not executable.
-     * @throws IOException on any I/O error.
-     */
-    // TODO: Consider using a Boolean return value in order to use null to
-    // indicate that this property is not supported
-    // - see http://java.net/jira/browse/TRUEZIP-224 .
-    public boolean isExecutable(FsEntryName name) throws IOException {
-        return false;
-    }
+    public abstract void checkAccess(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
+            BitField<Access> types)
+    throws IOException;
 
     /**
      * Sets the named file system entry as read-only.

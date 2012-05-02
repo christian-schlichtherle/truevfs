@@ -14,9 +14,8 @@ public interface MutableEntry extends Entry {
     /**
      * Sets the size of the given type for this archive entry.
      *
-     * @param  type the size type.
-     * @param  value the size of the given size type for this archive entry in
-     * bytes or
+     * @param  type the type of the size.
+     * @param  value the value of the size in bytes or
      * {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
      * @return {@code false} if and only if setting a size for the given type
      * is unsupported.
@@ -29,10 +28,9 @@ public interface MutableEntry extends Entry {
     /**
      * Sets the last access time of the given type for this archive entry.
      *
-     * @param  type the access type.
-     * @param  value the last time of the given access type for this archive
-     * entry in milliseconds since the epoch or
-     * {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
+     * @param  type the type of the access time.
+     * @param  value the value of the access time in milliseconds since the
+     * epoch or {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
      * @return {@code false} if and only if setting a time for the given type
      * is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.

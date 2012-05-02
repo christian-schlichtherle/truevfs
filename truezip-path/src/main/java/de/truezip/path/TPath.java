@@ -958,10 +958,12 @@ public final class TPath implements Path {
         return getFileSystem().entry(this);
     }
 
+    // TODO: Remove options parameter!
     InputSocket<?> input(BitField<FsAccessOption> options) {
         return getFileSystem().input(this, options);
     }
 
+    // TODO: Remove options parameter!
     OutputSocket<?> output( BitField<FsAccessOption> options,
                             @CheckForNull Entry template) {
         return getFileSystem().output(this, options, template);

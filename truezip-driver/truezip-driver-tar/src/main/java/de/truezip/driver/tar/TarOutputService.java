@@ -159,6 +159,11 @@ implements OutputService<TarDriverEntry> {
         public long getTime(Access type) {
             return UNKNOWN;
         }
+
+        @Override
+        public Boolean isPermitted(Entity entity, Access access) {
+            return null;
+        }
     } // DirectoryTemplate
 
     /**

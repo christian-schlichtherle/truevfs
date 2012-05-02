@@ -8,6 +8,7 @@ import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Container;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
+import static de.truezip.kernel.cio.Entry.Access.READ;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
@@ -28,6 +29,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class ReadOnlyArchiveFileSystem<E extends FsArchiveEntry>
 extends ArchiveFileSystem<E> {
 
+    private static final BitField<Access> READ_ONLY = BitField.of(READ);
+
     ReadOnlyArchiveFileSystem(final @WillNotClose Container<E> archive,
                                 final FsArchiveDriver<E> driver,
                                 final @CheckForNull Entry rootTemplate) {
@@ -43,6 +46,14 @@ extends ArchiveFileSystem<E> {
     @Override
     boolean isReadOnly() {
         return true;
+    }
+
+    @Override
+    void checkAccess(FsEntryName name, BitField<Access> types)
+    throws IOException {
+        if (!types.isEmpty() && !READ_ONLY.equals(types))
+            throw new FsReadOnlyFileSystemException();
+        super.checkAccess(name, types);
     }
 
     @Override

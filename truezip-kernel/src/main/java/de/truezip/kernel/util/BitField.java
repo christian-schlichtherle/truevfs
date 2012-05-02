@@ -102,6 +102,7 @@ implements Iterable<E>, Serializable {
         return new BitField<>(bits);
     }
 
+    /** @deprecated Required for XMLEncoder/XMLDecoder - do <em>not</em> use! */
     public static <E extends Enum<E>> BitField<E>
     of(final Class<E> elementType, final String list) {
         final EnumSet<E> bits = EnumSet.noneOf(elementType);

@@ -132,6 +132,12 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         return null == buffer ? UNKNOWN : buffer.getTime(type);
     }
 
+    @Override
+    public Boolean isPermitted(Entity entity, Access access) {
+        final Buffer buffer = this.buffer;
+        return null == buffer ? null : buffer.isPermitted(entity, access);
+    }
+
     /**
      * Returns an input socket for reading the cached entry data.
      *
@@ -424,6 +430,11 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         @Override
         public long getTime(Access type) {
             return data.getTime(type);
+        }
+
+        @Override
+        public Boolean isPermitted(Entity entity, Access access) {
+            return data.isPermitted(entity, access);
         }
 
         @Override

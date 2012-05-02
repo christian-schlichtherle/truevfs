@@ -186,7 +186,7 @@ implements Cloneable {
      * @return {@code true} if there is an entry mapped for the given type.
      */
     @Override
-    public boolean isType(Type type) {
+    public boolean isType(final Type type) {
         return map.containsKey(type);
     }
 
@@ -212,6 +212,11 @@ implements Cloneable {
     @Override
     public long getTime(Access type) {
         return map.get(key).getTime(type);
+    }
+
+    @Override
+    public Boolean isPermitted(Entity entity, Access access) {
+        return map.get(key).isPermitted(entity, access);
     }
 
     /**
