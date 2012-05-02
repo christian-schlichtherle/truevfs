@@ -71,17 +71,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
     }
 
-    void close(final Closeable closeable) throws IOException {
-        while (true) {
-            try {
-                closeable.close();
-                return;
-            } catch (NeedsSyncException ex) {
-                sync(ex);
-            }
-        }
-    }
-
     @Override
     public boolean isReadOnly() throws IOException {
         while (true) {
@@ -299,8 +288,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final FsEntryName name,
             final BitField<FsAccessOption> options)
     throws IOException {
-        assert isWriteLockedByCurrentThread();
-
         while (true) {
             try {
                 // HC SUNT DRACONES!
@@ -347,6 +334,17 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
         assert result == options || isRecursive;
         return result;
+    }
+
+    void close(final Closeable closeable) throws IOException {
+        while (true) {
+            try {
+                closeable.close();
+                return;
+            } catch (NeedsSyncException ex) {
+                sync(ex);
+            }
+        }
     }
 
     private final class SyncInputStream
