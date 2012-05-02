@@ -325,10 +325,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         } catch (final FsSyncWarningException ex) {
             throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
         } catch (final FsSyncException ex) {
-            if (modified != options) { // OK, see contract for BitField.and()!
+            if (modified != options)
                 if (ex.getCause() instanceof FsResourceOpenException)
                     throw NeedsLockRetryException.get();
-            }
             throw ex;
         }
     }
