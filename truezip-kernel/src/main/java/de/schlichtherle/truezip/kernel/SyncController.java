@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import static de.truezip.kernel.FsSyncOptions.RESET;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
 import de.truezip.kernel.*;
@@ -40,6 +41,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 @Immutable
 final class SyncController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
+
+    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
+            = BitField.of(WAIT_CLOSE_IO).not();
 
     SyncController(FsController<? extends LockModel> controller) {
         super(controller);
@@ -309,6 +313,35 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
+        }
+    }
+
+    @Override
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
+        final boolean recLocking = 1 < LockingStrategy.getLockCount();
+        // Prevent potential dead locks by performing a timed wait for
+        // open I/O resources if the current thread is already holding
+        // a file system lock.
+        // Note that a sync in a parent file system is a rare event
+        // so that this should not create performance problems, even
+        // when accessing deeply nested archive files, e.g. for the
+        // integration tests.
+        final BitField<FsSyncOption> sync = recLocking
+                ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
+                : options;
+        try {
+            controller.sync(sync);
+        } catch (final FsSyncWarningException ex) {
+            throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
+        } catch (final FsSyncException ex) {
+            if (sync != options) { // OK, see contract for BitField.and()!
+                assert recLocking;
+                // HC SUNT DRACONES!
+                if (ex.getCause() instanceof FsResourceOpenException)
+                    throw NeedsLockRetryException.get();
+            }
+            throw ex;
         }
     }
 
