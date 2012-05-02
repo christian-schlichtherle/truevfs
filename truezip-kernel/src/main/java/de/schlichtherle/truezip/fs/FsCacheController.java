@@ -505,7 +505,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             delegate.sync(modified);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
-                            syncEx.addSuppressed(mknodEx);
+                            if (JSE7.AVAILABLE) syncEx.addSuppressed(mknodEx);
 
                             // sync() failed, maybe just because the current
                             // thread has already acquired some open I/O
