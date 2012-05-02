@@ -6,13 +6,16 @@ package de.truezip.key;
 
 import de.truezip.kernel.util.Maps;
 import de.truezip.kernel.util.ServiceLocator;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * An abstract key manager provider.
- * <p>
- * Implementations must be thread-safe.
+ * An abstract provider for an immutable map of secret key classes to nullable
+ * key managers.
  *
  * @author Christian Schlichtherle
  */
@@ -24,8 +27,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      * constructed from the given configuration.
      * This method is intended to be used by implementations of this class
      * for convenient creation of the map to return by their
-     * {@link #getKeyManagers()}
-     * method.
+     * {@link #getKeyManagers()} method.
      *
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
@@ -57,21 +59,18 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final <K> KeyManager<K> keyManager(final Class<K> type) {
-        final KeyManager<?> manager = getKeyManagers().get(type);
-        if (null == manager)
-            throw new ServiceConfigurationError("No key manager available for " + type + ".");
-        return (KeyManager<K>) manager;
+    public final @CheckForNull <K> KeyManager<K> keyManager(final Class<K> type) {
+        return (KeyManager<K>) getKeyManagers().get(type);
     }
 
     /**
-     * Returns an immutable map of secret key classes to key managers.
-     * Neither the keys nor the values of the returned map may be {@code null}.
+     * Returns an immutable map of secret key classes to nullable key managers.
+     * Only the values of the returned map may be {@code null}.
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
      * 
-     * @return an immutable map of secret key classes to key managers.
+     * @return An immutable map of secret key classes to nullable key managers.
      */
     public abstract Map<Class<?>, KeyManager<?>> getKeyManagers();
 
@@ -81,7 +80,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      */
     @Override
     public String toString() {
-        return String.format("%s[map=%s]",
+        return String.format("%s[keyManagers=%s]",
                 getClass().getName(),
                 getKeyManagers());
     }

@@ -4,7 +4,7 @@
  */
 package de.truezip.key;
 
-import java.util.ServiceConfigurationError;
+import javax.annotation.CheckForNull;
 
 /**
  * A provider for key managers for secret key classes.
@@ -14,16 +14,14 @@ import java.util.ServiceConfigurationError;
 public interface KeyManagerProvider {
 
     /**
-     * Returns the key manager for the given secret key class.
+     * Returns the nullable key manager for the given secret key class.
      * <p>
      * This is a pure function - multiple calls must return the same value for
      * the same parameter.
      *
      * @param  <K> the type of the secret keys.
      * @param  type the class for the secret key type.
-     * @return the key manager for the given secret key class.
-     * @throws ServiceConfigurationError if no appropriate key manager is
-     *         available.
+     * @return the nullable key manager for the given secret key class.
      */
-    <K> KeyManager<K> keyManager(Class<K> type);
+    @CheckForNull <K> KeyManager<K> keyManager(Class<K> type);
 }

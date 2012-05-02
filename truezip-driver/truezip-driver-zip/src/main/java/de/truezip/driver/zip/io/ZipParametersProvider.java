@@ -19,6 +19,7 @@ public interface ZipParametersProvider extends ZipParameters {
      * Returns {@link ZipParameters} of the given {@code type}
      * or {@code null} if not available.
      *
+     * @param  <P> the type of the ZIP parameters.
      * @param  type the {@link ZipParameters} interface class which's
      *         implementation is required.
      * @return {@link ZipParameters} of the given {@code type}

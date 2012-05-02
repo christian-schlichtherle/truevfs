@@ -16,6 +16,7 @@ import de.truezip.key.param.AesKeyStrength;
 import de.truezip.key.param.AesPbeParameters;
 import java.net.URI;
 import java.util.Objects;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -56,7 +57,7 @@ implements RaesParametersProvider {
      * @param  raes the resource URI of the RAES file.
      */
     public KeyManagerRaesParameters(
-            final KeyManager<AesPbeParameters> manager,
+            final @CheckForNull KeyManager<AesPbeParameters> manager,
             final URI raes) {
         this.manager = Objects.requireNonNull(manager);
         this.raes = Objects.requireNonNull(raes);
