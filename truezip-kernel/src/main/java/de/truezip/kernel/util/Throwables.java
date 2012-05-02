@@ -23,7 +23,7 @@ public class Throwables {
      * possible.
      * 
      * @param  <T> the compile time type of the throwable to return.
-     * @param  t the throwable to wrap in a new instance of the same class.
+     * @param  ex the throwable to wrap in a new instance of the same class.
      * @return a new instance of the same class as the throwable {@code t}
      *         with its {@linkplain Throwable#getCause() cause} initialized to
      *         {@code t} or, if the instantiation fails for some reason,
@@ -33,15 +33,15 @@ public class Throwables {
      *         exception type.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Throwable> T wrap(final T t) {
+    public static <T extends Throwable> T wrap(final T ex) {
         try {
-            return (T) t.getClass()
+            return (T) ex.getClass()
                         .getConstructor(String.class)
-                        .newInstance(t.toString())
-                        .initCause(t);
-        } catch (final NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            t.addSuppressed(ex);
-            return t;
+                        .newInstance(ex.toString())
+                        .initCause(ex);
+        } catch (final NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex2) {
+            ex.addSuppressed(ex2);
+            return ex;
         }
     }
 
