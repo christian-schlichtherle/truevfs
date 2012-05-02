@@ -7,7 +7,6 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -354,23 +353,6 @@ public abstract class FsController<M extends FsModel> {
     public abstract void
     unlink(FsEntryName name, BitField<FsOutputOption> options)
     throws IOException;
-
-    final void
-    sync(final FsNeedsSyncException trigger)
-    throws IOException {
-        final FsSyncWarningException fuse
-                = new FsSyncWarningException(getModel(), trigger);
-        final FsSyncExceptionBuilder ied = new FsSyncExceptionBuilder();
-        try {
-            ied.warn(fuse);     // charge fuse
-            sync(SYNC, ied);    // charge load
-            ied.check();        // pull trigger
-            throw new AssertionError("Expected an instance of the " + FsSyncException.class);
-        } catch (final FsSyncWarningException damage) {
-            if (damage != fuse) // check for dud
-                throw damage;
-        }
-    }
 
     /**
      * Commits all unsynchronized changes to the contents of this file system

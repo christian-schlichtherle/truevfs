@@ -7,7 +7,10 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_INPUT;
+import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_OUTPUT;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.RESET;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -18,6 +21,7 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -37,26 +41,45 @@ import javax.swing.Icon;
  * file system if and only if any decorated file system controller throws an
  * {@link FsNeedsSyncException}.
  * 
- * @param  <M> the type of the file system model.
  * @see    FsNeedsSyncException
  * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsSyncController<M extends FsModel>
-extends FsDecoratingController<M, FsController<? extends M>> {
+public final class FsSyncController
+extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
+
+    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
+            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT).not();
 
     /**
      * Constructs a new file system sync controller.
      *
      * @param controller the decorated file system controller.
      */
-    public FsSyncController(FsController<? extends M> controller) {
+    public FsSyncController(FsController<? extends FsLockModel> controller) {
         super(controller);
+    }
+
+    void sync(final FsNeedsSyncException trigger)
+    throws IOException {
+        checkWriteLockedByCurrentThread();
+        final FsSyncWarningException fuse
+                = new FsSyncWarningException(getModel(), trigger);
+        final FsSyncExceptionBuilder ied = new FsSyncExceptionBuilder();
+        try {
+            ied.warn(fuse);     // charge fuse
+            sync(SYNC, ied);    // charge load
+            ied.check();        // pull trigger
+            throw new AssertionError("Expected an instance of the " + FsSyncException.class);
+        } catch (final FsSyncWarningException damage) {
+            if (damage != fuse) // check for dud
+                throw damage;
+        }
     }
 
     @Override
@@ -233,6 +256,41 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         }
     }
 
+    @Override
+    public <X extends IOException> void
+    sync(   final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super FsSyncException, X> handler)
+    throws IOException {
+        final BitField<FsSyncOption> modified = modify(options);
+        try {
+            delegate.sync(modified);
+        } catch (final FsSyncWarningException ex) {
+            throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
+        } catch (final FsSyncException ex) {
+            if (modified != options)
+                if (ex.getCause() instanceof FsResourceOpenException)
+                    throw FsNeedsLockRetryException.get(getModel());
+            throw ex;
+        }
+    }
+
+    /**
+     * Modify the sync options so that no dead lock can appear due to waiting
+     * for I/O resources in a recursive file system operation.
+     * 
+     * @param  options the sync options
+     * @return the potentially modified sync options.
+     */
+    static BitField<FsSyncOption> modify(final BitField<FsSyncOption> options) {
+        final boolean isRecursive = 1 < FsLockController.getLockCount();
+        final BitField<FsSyncOption> result = isRecursive
+                ? options.and(NOT_WAIT_CLOSE_IO)
+                : options;
+        assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
+        assert result == options || isRecursive;
+        return result;
+    }
+
     void close(final Closeable closeable) throws IOException {
         while (true) {
             try {
@@ -249,7 +307,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         NIO2() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsSyncController<?> controller,
+                    FsSyncController controller,
                     FsEntryName name,
                     BitField<FsInputOption> options) {
                 return controller.new Nio2Input(name, options);
@@ -257,7 +315,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsSyncController<?> controller,
+                    FsSyncController controller,
                     FsEntryName name,
                     BitField<FsOutputOption> options,
                     @CheckForNull Entry template) {
@@ -268,7 +326,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         OIO() {
             @Override
             InputSocket<?> newInputSocket(
-                    FsSyncController<?> controller,
+                    FsSyncController controller,
                     FsEntryName name,
                     BitField<FsInputOption> options) {
                 return controller.new Input(name, options);
@@ -276,7 +334,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
             @Override
             OutputSocket<?> newOutputSocket(
-                    FsSyncController<?> controller,
+                    FsSyncController controller,
                     FsEntryName name,
                     BitField<FsOutputOption> options,
                     @CheckForNull Entry template) {
@@ -285,12 +343,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         };
 
         abstract InputSocket<?> newInputSocket(
-                FsSyncController<?> controller,
+                FsSyncController controller,
                 FsEntryName name,
                 BitField<FsInputOption> options);
         
         abstract OutputSocket<?> newOutputSocket(
-                FsSyncController<?> controller,
+                FsSyncController controller,
                 FsEntryName name,
                 BitField<FsOutputOption> options,
                 @CheckForNull Entry template);

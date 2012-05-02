@@ -152,7 +152,7 @@ extends FsDriver {
                 : new FsLockModel(model);
         // HC SUNT DRACONES!
         return  new FsLockController(
-                    new FsSyncController<FsLockModel>(
+                    new FsSyncController(
                         new FsCacheController(
                             new FsResourceController(
                                 new FsContextController(
