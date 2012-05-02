@@ -376,11 +376,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        final BitField<FsSyncOption> modified = modify(options);
-
         final class Sync implements Operation<Void, FsSyncException> {
             @Override
             public Void call() throws FsSyncWarningException, FsSyncException {
+                final BitField<FsSyncOption> modified = modify(options);
                 try {
                     controller.sync(modified);
                 } catch (final FsSyncWarningException ex) {
