@@ -6,8 +6,8 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.CacheEntry.Strategy.WRITE_BACK;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
-import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
-import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
+import static de.truezip.kernel.FsSyncOption.*;
+import static de.truezip.kernel.FsSyncOptions.SYNC;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
@@ -408,13 +408,91 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             } // Channel
 
             void preOutput() throws IOException {
-                controller.mknod(name, FILE, options, template);
+                mknod(options, template);
             }
 
             void postOutput() throws IOException {
-                controller.mknod(name, FILE, options.clear(EXCLUSIVE),
+                mknod(  options.clear(EXCLUSIVE),
                         null != template ? template : cache);
                 register();
+            }
+
+            void mknod( final BitField<FsAccessOption> options,
+                        final @CheckForNull Entry template)
+            throws IOException {
+                while (true) {
+                    try {
+                        controller.mknod(name, FILE, options, template);
+                        break;
+                    } catch (final NeedsSyncException mknodEx) {
+                        // In this context, this exception means that the entry
+                        // has already been written to the output archive for
+                        // the target archive file.
+
+                        // Pass on the exception if this is a non-recursive
+                        // file system operation.
+                        final BitField<FsSyncOption> modified = SyncController.modify(SYNC);
+                        if (modified == SYNC)
+                            throw mknodEx;
+
+                        // Try to resolve the issue.
+                        // Even if we were asked to create the entry
+                        // EXCLUSIVEly, first we must try to get the cache in
+                        // sync() with the virtual file system again and retry
+                        // the mknod().
+                        try {
+                            controller.sync(modified);
+                            continue; // sync() succeeded, now repeat mknod()
+                        } catch (final FsSyncException syncEx) {
+                            syncEx.addSuppressed(mknodEx);
+
+                            // sync() failed, maybe just because the current
+                            // thread has already acquired some open I/O
+                            // resources for the same target archive file, e.g.
+                            // an input stream for a copy operation and this
+                            // is an artifact of an attempt to acquire the
+                            // output stream for a child file system.
+                            if (!(syncEx.getCause() instanceof FsResourceOpenException)) {
+                                // Too bad, sync() failed because of a more
+                                // serious issue than just some open resources.
+                                // Let's rethrow the sync exception.
+                                throw syncEx;
+                            }
+
+                            // OK, we couldn't sync() because the current
+                            // thread has acquired open I/O resources for the
+                            // same target archive file.
+                            // Normally, we would be expected to rethrow the
+                            // mknod exception to trigger another sync(), but
+                            // this would fail for the same reason und create
+                            // an endless loop, so we can't do this.
+                            //throw mknodEx;
+
+                            // Dito for mapping the exception.
+                            //throw FsNeedsLockRetryException.get(getModel());
+
+                            if (options.get(EXCLUSIVE)) {
+                                // We've been asked not to tolerate the
+                                // original event but we can't just rethrow the
+                                // mknod exception, so let's rethrow the sync
+                                // exception instead.
+                                throw syncEx;
+                            }
+
+                            // Finally, the mknod failed because the entry
+                            // has already been output to the target archive
+                            // file - so what?!
+                            // This should mark only a volatile issue because
+                            // the next sync() will sort it out once all the
+                            // I/O resources have been closed.
+                            // Let's log the sync exception - mind that it has
+                            // suppressed the mknod exception - and continue
+                            // anyway...
+                            logger.log(Level.FINE, "ignoring", syncEx);
+                            break;
+                        }
+                    }
+                }
             }
         } // Output
     } // EntryCache

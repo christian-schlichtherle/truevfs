@@ -316,29 +316,33 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
     }
 
+    /**
+     * Modify the sync options so that no dead lock can appear due to waiting
+     * for I/O resources in a recursive file system operation.
+     * 
+     * @param options the sync options
+     * @return the potentially modifed sync options.
+     */
+    static BitField<FsSyncOption> modify(final BitField<FsSyncOption> options) {
+        final boolean isRecursive = 1 < LockingStrategy.getLockCount();
+        final BitField<FsSyncOption> result = isRecursive
+                ? options.and(NOT_WAIT_CLOSE_IO)
+                : options;
+        assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
+        assert result == options || isRecursive;
+        return result;
+    }
+
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        final boolean recLocking = 1 < LockingStrategy.getLockCount();
-        // Prevent potential dead locks by performing a timed wait for
-        // open I/O resources if the current thread is already holding
-        // a file system lock.
-        // Note that a sync in a parent file system is a rare event
-        // so that this should not create performance problems, even
-        // when accessing deeply nested archive files, e.g. for the
-        // integration tests.
-        final BitField<FsSyncOption> sync = recLocking
-                ? options.and(NOT_WAIT_CLOSE_IO)
-                : options;
-        assert sync == options == sync.equals(options) : "Broken contract in BitField.and()!";
+        final BitField<FsSyncOption> modified = modify(options);
         try {
-            controller.sync(sync);
+            controller.sync(modified);
         } catch (final FsSyncWarningException ex) {
             throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
         } catch (final FsSyncException ex) {
-            if (sync != options) { // OK, see contract for BitField.and()!
-                assert recLocking;
-                // HC SUNT DRACONES!
+            if (modified != options) { // OK, see contract for BitField.and()!
                 if (ex.getCause() instanceof FsResourceOpenException)
                     throw NeedsLockRetryException.get();
             }
