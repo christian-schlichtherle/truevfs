@@ -430,13 +430,16 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                         // has already been written to the output archive for
                         // the target archive file.
 
-                        // Pass on the exception if this is a non-recursive
-                        // file system operation.
-                        final BitField<FsSyncOption> modified = LockController.modify(SYNC);
-                        if (modified == SYNC)
+                        // Pass on the exception if there is no means to
+                        // resolve the issue locally, that is if we were asked
+                        // to create the entry exclusively or this is a
+                        // non-recursive file system operation.
+                        final BitField<FsSyncOption> modified;
+                        if (options.get(EXCLUSIVE)
+                                || SYNC == (modified = LockController.modify(SYNC)))
                             throw mknodEx;
 
-                        // Try to resolve the issue.
+                        // Try to resolve the issue locally.
                         // Even if we were asked to create the entry
                         // EXCLUSIVEly, first we must try to get the cache in
                         // sync() with the virtual file system again and retry
@@ -471,14 +474,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
                             // Dito for mapping the exception.
                             //throw FsNeedsLockRetryException.get(getModel());
-
-                            if (options.get(EXCLUSIVE)) {
-                                // We've been asked not to tolerate the
-                                // original event but we can't just rethrow the
-                                // mknod exception, so let's rethrow the sync
-                                // exception instead.
-                                throw syncEx;
-                            }
 
                             // Finally, the mknod failed because the entry
                             // has already been output to the target archive
