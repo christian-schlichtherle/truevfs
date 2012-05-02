@@ -123,12 +123,14 @@ enum LockingStrategy {
             final Operation<V, X> operation)
     throws X {
         final Account account = accounts.get();
-        if (account.locking) {
+        if (0 < account.lockCount) {
             while (true) {
                 acquire(lock);
+                account.lockCount++;
                 try {
                     return operation.call();
                 } finally {
+                    account.lockCount--;
                     lock.unlock();
                 }
             }
@@ -137,11 +139,11 @@ enum LockingStrategy {
                 while (true) {
                     try {
                         lock.lock();
-                        account.locking = true;
+                        account.lockCount++;
                         try {
                             return operation.call();
                         } finally {
-                            account.locking = false;
+                            account.lockCount--;
                             lock.unlock();
                         }
                     } catch (NeedsLockRetryException ex) {
@@ -154,15 +156,10 @@ enum LockingStrategy {
         }
     }
 
-    /**
-     * Returns wether or not the current thread is holding any locks.
-     * 
-     * @return Wether or not the current thread is holding any locks.
-     */
-    static boolean isLocking() {
-        return accounts.get().locking;
+    static int getLockCount() {
+        return accounts.get().lockCount;
     }
-
+    
     /**
      * Acquires the given lock.
      * 
@@ -181,7 +178,7 @@ enum LockingStrategy {
 
     @NotThreadSafe
     private static final class Account {
-        boolean locking;
+        int lockCount;
         final Random rnd;
 
         Account(final Random rnd) { this.rnd = rnd; }

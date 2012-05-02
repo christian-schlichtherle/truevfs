@@ -353,33 +353,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        final boolean locking = LockingStrategy.isLocking(); // do NOT initialize within Sync!
-        final BitField<FsSyncOption> sync = locking
-                ? options.and(NOT_WAIT_CLOSE_IO) // may be == options!
-                : options;
-
         final class Sync implements Operation<Void, FsSyncException> {
             @Override
             public Void call() throws FsSyncWarningException, FsSyncException {
-                // Prevent potential dead locks by performing a timed wait for
-                // open I/O resources if the current thread is already holding
-                // a file system lock.
-                // Note that a sync in a parent file system is a rare event
-                // so that this should not create performance problems, even
-                // when accessing deeply nested archive files, e.g. for the
-                // integration tests.
-                try {
-                    controller.sync(sync);
-                } catch (final FsSyncWarningException ex) {
-                    throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
-                } catch (final FsSyncException ex) {
-                    if (sync != options) { // OK, see contract for BitField.and()!
-                        assert locking;
-                        if (ex.getCause() instanceof FsResourceOpenException)
-                            throw NeedsLockRetryException.get();
-                    }
-                    throw ex;
-                }
+                controller.sync(options);
                 return null;
             }
         } // Sync
