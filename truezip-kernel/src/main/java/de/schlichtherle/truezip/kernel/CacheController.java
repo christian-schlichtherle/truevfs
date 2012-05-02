@@ -6,7 +6,8 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.CacheEntry.Strategy.WRITE_BACK;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
-import static de.truezip.kernel.FsSyncOption.*;
+import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Type;
