@@ -91,6 +91,4 @@ public enum FsAccessOption {
      * to the caller.
      */
     ENCRYPT,
-
-    
 }
