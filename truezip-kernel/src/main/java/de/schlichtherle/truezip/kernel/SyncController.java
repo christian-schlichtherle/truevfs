@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import static de.truezip.kernel.FsSyncOptions.RESET;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
 import de.truezip.kernel.*;
@@ -40,6 +41,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 @Immutable
 final class SyncController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
+
+    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
+            = BitField.of(WAIT_CLOSE_IO).not();
 
     SyncController(FsController<? extends LockModel> controller) {
         super(controller);
@@ -310,6 +314,39 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 sync(ex);
             }
         }
+    }
+
+    @Override
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
+        final BitField<FsSyncOption> modified = modify(options);
+        try {
+            controller.sync(modified);
+        } catch (final FsSyncWarningException ex) {
+            throw ex; // may be FORCE_CLOSE_(IN|OUT)PUT was set, too?
+        } catch (final FsSyncException ex) {
+            if (modified != options)
+                if (ex.getCause() instanceof FsResourceOpenException)
+                    throw NeedsLockRetryException.get();
+            throw ex;
+        }
+    }
+
+    /**
+     * Modify the sync options so that no dead lock can appear due to waiting
+     * for I/O resources in a recursive file system operation.
+     * 
+     * @param  options the sync options
+     * @return the potentially modified sync options.
+     */
+    static BitField<FsSyncOption> modify(final BitField<FsSyncOption> options) {
+        final boolean isRecursive = 1 < LockingStrategy.getLockCount();
+        final BitField<FsSyncOption> result = isRecursive
+                ? options.and(NOT_WAIT_CLOSE_IO)
+                : options;
+        assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
+        assert result == options || isRecursive;
+        return result;
     }
 
     private final class SyncInputStream
