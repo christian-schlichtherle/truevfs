@@ -23,22 +23,22 @@ public class Throwables {
      * possible.
      * 
      * @param  <T> the compile time type of the throwable to return.
-     * @param  t the throwable to wrap in a new instance of the same class.
+     * @param  ex the throwable to wrap in a new instance of the same class.
      * @return a new instance of the same class as the throwable {@code t}
      *         with its {@linkplain Throwable#getCause() cause} initialized to
      *         {@code t} or simply {@code t} if the wrapping fails due to
      *         another exception.
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Throwable> T wrap(final T t) {
+    public static <T extends Throwable> T wrap(final T ex) {
         try {
-            return (T) t.getClass()
+            return (T) ex.getClass()
                         .getConstructor(String.class)
-                        .newInstance(t.toString())
-                        .initCause(t);
-        } catch (final Throwable ex) {
-            //t.addSuppressed(ex); // JSE 7 might not be available at runtime!
-            return t;
+                        .newInstance(ex.toString())
+                        .initCause(ex);
+        } catch (final Throwable ex2) {
+            if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+            return ex;
         }
     }
 
