@@ -100,8 +100,8 @@ final class ArchiveManager extends FsManager {
         return  new FalsePositiveArchiveController(
                     new FinalizeController(
                         driver.decorate(
-                            new LockController(
-                                new SyncController(
+                            new SyncController(
+                                new LockController(
                                     new CacheController(driver.getIOPool(),
                                         new ResourceController(
                                             new TargetArchiveController<>(

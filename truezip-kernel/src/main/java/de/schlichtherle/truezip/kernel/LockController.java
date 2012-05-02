@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.kernel;
 import static de.schlichtherle.truezip.kernel.LockingStrategy.FAST_LOCK;
 import static de.schlichtherle.truezip.kernel.LockingStrategy.TIMED_LOCK;
 import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
+import static de.truezip.kernel.FsSyncOptions.RESET;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
@@ -342,7 +343,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         final class Unlink implements IOOperation<Void> {
             @Override
             public Void call() throws IOException {
-                controller.unlink(name, options);
+                // HC SUNT DRACONES!
+                controller.unlink(name, options); // repeatable for root entry
+                if (name.isRoot()) {
+                    // Make the file system controller chain eligible for GC.
+                    controller.sync(RESET);
+                }
                 return null;
             }
         } // Unlink

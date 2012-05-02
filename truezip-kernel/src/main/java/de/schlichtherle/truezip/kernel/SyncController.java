@@ -39,9 +39,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @Immutable
 final class SyncController
-extends DecoratingLockModelController<FsController<? extends LockModel>> {
+extends FsDecoratingController<FsModel, FsController<?>> {
 
-    SyncController(FsController<? extends LockModel> controller) {
+    SyncController(FsController<?> controller) {
         super(controller);
     }
 
@@ -58,7 +58,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      */
     final void sync(final NeedsSyncException trigger)
     throws FsSyncWarningException, FsSyncException {
-        checkWriteLockedByCurrentThread();
         try {
             sync(SYNC);
         } catch (final FsSyncException ex) {
@@ -295,16 +294,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final FsEntryName name,
             final BitField<FsAccessOption> options)
     throws IOException {
-        assert isWriteLockedByCurrentThread();
-
         while (true) {
             try {
-                // HC SUNT DRACONES!
-                controller.unlink(name, options); // repeatable for root entry
-                if (name.isRoot()) {
-                    // Make the file system controller chain eligible for GC.
-                    controller.sync(RESET);
-                }
+                controller.unlink(name, options);
                 return;
             } catch (NeedsSyncException ex) {
                 sync(ex);
