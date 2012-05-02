@@ -15,6 +15,7 @@ import de.truezip.key.param.AesPbeParameters;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.ServiceConfigurationError;
 import javax.annotation.concurrent.ThreadSafe;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToBytes;
@@ -111,7 +112,10 @@ implements ZipParametersProvider, ZipCryptoParameters {
     }
 
     private <K> KeyManager<K> keyManager(Class<K> type) {
-        return driver.getKeyManagerProvider().keyManager(type);
+        final KeyManager<K> km = driver.getKeyManagerProvider().keyManager(type);
+        if (null == km)
+            throw new ServiceConfigurationError("No key manager available for " + type + ".");
+        return km;
     }
 
     private URI resourceUri(String name) {

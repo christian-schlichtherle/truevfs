@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.key.pbe.console;
 import de.truezip.key.PromptingKeyManager;
 import de.truezip.key.PromptingKeyManagerTestSuite;
 import de.truezip.key.param.AesPbeParameters;
+import javax.annotation.CheckForNull;
 
 /**
  * @author Christian Schlichtherle
@@ -15,7 +16,7 @@ public class ConsolePromptingAesPbeKeyManagerServiceTest
 extends PromptingKeyManagerTestSuite {
 
     @Override
-    protected PromptingKeyManager<?> newKeyManager() {
+    protected @CheckForNull PromptingKeyManager<?> newKeyManager() {
         return (PromptingKeyManager<?>) new ConsolePromptingAesPbeKeyManagerService()
                 .keyManager(AesPbeParameters.class);
     }
