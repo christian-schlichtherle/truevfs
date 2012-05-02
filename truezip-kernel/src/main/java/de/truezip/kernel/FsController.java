@@ -133,8 +133,7 @@ public abstract class FsController<M extends FsModel> {
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    // TODO: Rename to stat()!
-    public abstract @CheckForNull FsEntry entry(FsEntryName name)
+    public abstract @CheckForNull FsEntry stat(FsEntryName name)
     throws IOException;
 
     /**
@@ -143,7 +142,7 @@ public abstract class FsController<M extends FsModel> {
      * access {@code types}.
      * 
      * @param  name the name of the file system entry.
-     * @param  options the file system access options.
+     * @param  options the options for accessing the file system entry.
      * @param  types the types of the desired access.
      * @throws IOException on any I/O error.
      */
@@ -173,27 +172,26 @@ public abstract class FsController<M extends FsModel> {
      * Whether or not this is an atomic operation is specific to the
      * implementation.
      * 
-     * @param  name the file system entry name.
+     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      * @param  times the access times.
-     * @param  options the file system access options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code times} succeeded.
      * @throws IOException on any I/O error.
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
      */
-    public boolean
-    setTime(final FsEntryName name,
-            final Map<Access, Long> times,
-            final BitField<FsAccessOption> options)
+    public boolean setTime(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final Map<Access, Long> times)
     throws IOException {
         boolean ok = true;
         for (Map.Entry<Access, Long> time : times.entrySet())
-            ok &= setTime(
-                    name,
-                    BitField.of(time.getKey()),
-                    time.getValue(),
-                    options);
+            ok &= setTime(  name,
+                            options,
+                            BitField.of(time.getKey()),
+                            time.getValue());
         return ok;
     }
 
@@ -205,27 +203,27 @@ public abstract class FsController<M extends FsModel> {
      * Whether or not this is an atomic operation is specific to the
      * implementation.
      * 
-     * @param  name the file system entry name.
+     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      * @param  types the access types.
      * @param  value the last access time.
-     * @param  options the file system access options.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code types} succeeded.
      * @throws IOException on any I/O error.
      */
-    public abstract boolean
-    setTime(FsEntryName name,
+    public abstract boolean setTime(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
             BitField<Access> types,
-            long value,
-            BitField<FsAccessOption> options)
+            long value)
     throws IOException;
 
     /**
      * Returns an input socket for reading the contents of the file system
      * entry addressed by the given name from the file system.
      *
-     * @param  name the file system entry name.
-     * @param  options the input options.
+     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      * @return An {@code InputSocket}.
      */
     public abstract InputSocket<?>
@@ -236,8 +234,8 @@ public abstract class FsController<M extends FsModel> {
      * Returns an output socket for writing the contents of the entry addressed
      * by the given name to the file system.
      *
-     * @param  name the file system entry name.
-     * @param  options the file system access options.
+     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
      *         parent directories will be created and linked into the file
      *         system with its last modification time set to the system's
@@ -256,13 +254,13 @@ public abstract class FsController<M extends FsModel> {
      * Creates or replaces and finally links a chain of one or more entries
      * for the given entry {@code name} into the file system.
      *
-     * @param  name the file system entry name.
-     * @param  type the file system entry type.
-     * @param  options the file system access options.
+     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
      *         parent directories will be created and linked into the file
      *         system with its last modification time set to the system's
      *         current time.
+     * @param  type the file system entry type.
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
      *         this entry as possible - with the exception of its name and type.
@@ -281,10 +279,10 @@ public abstract class FsController<M extends FsModel> {
      *             {@code false}.
      *         </ul>
      */
-    public abstract void
-    mknod(  FsEntryName name,
-            Type type,
+    public abstract void mknod(
+            FsEntryName name,
             BitField<FsAccessOption> options,
+            Type type,
             @CheckForNull Entry template)
     throws IOException;
 
@@ -292,12 +290,13 @@ public abstract class FsController<M extends FsModel> {
      * Removes the named file system entry from the file system.
      * If the named file system entry is a directory, it must be empty.
      * 
-     * @param  name the file system entry name.
-     * @param  options access options for this operation.
+     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      * @throws IOException on any I/O error.
      */
-    public abstract void
-    unlink(FsEntryName name, BitField<FsAccessOption> options)
+    public abstract void unlink(
+            FsEntryName name,
+            BitField<FsAccessOption> options)
     throws IOException;
 
     /**
@@ -312,7 +311,7 @@ public abstract class FsController<M extends FsModel> {
      * parent file system, then nothing happens.
      * Otherwise, the state of this file system controller is reset.
      *
-     * @param  options a bit field of synchronization options.
+     * @param  options the options for synchronizing the file system.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been

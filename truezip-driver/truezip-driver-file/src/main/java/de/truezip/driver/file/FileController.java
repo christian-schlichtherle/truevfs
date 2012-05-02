@@ -62,7 +62,7 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public FileEntry entry(final FsEntryName name) throws IOException {
+    public FileEntry stat(final FsEntryName name) throws IOException {
         final FileEntry entry = new FileEntry(target, name);
         return exists(entry.getPath()) ? entry : null;
     }
@@ -111,9 +111,7 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final Map<Access, Long> times,
-            BitField<FsAccessOption> options)
+            final FsEntryName name, BitField<FsAccessOption> options, final Map<Access, Long> times)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final Map<Access, Long> t = new EnumMap<>(times);
@@ -126,9 +124,7 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final BitField<Access> types,
-            final long value, BitField<FsAccessOption> options)
+            final FsEntryName name, BitField<FsAccessOption> options, final BitField<Access> types, final long value)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final FileTime time = FileTime.fromMillis(value);
@@ -155,10 +151,8 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public void mknod(  final FsEntryName name,
-                        final Type type,
-                        final BitField<FsAccessOption> options,
-                        final @CheckForNull Entry template)
+    public void mknod(  final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    final Entry template)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         switch (type) {

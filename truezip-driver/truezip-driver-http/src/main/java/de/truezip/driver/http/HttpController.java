@@ -70,7 +70,7 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public HttpEntry entry(FsEntryName name) throws IOException {
+    public HttpEntry stat(FsEntryName name) throws IOException {
         HttpEntry entry = newEntry(name);
         return entry.isType(FILE) ? entry : null;
     }
@@ -92,10 +92,7 @@ public class HttpController extends FsModelController<FsModel>  {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            BitField<Access> types,
-            long value,
-            BitField<FsAccessOption> options)
+            FsEntryName name, BitField<FsAccessOption> options, BitField<Access> types, long value)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
@@ -116,10 +113,8 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public void mknod(  final FsEntryName name,
-                        final Type type,
-                        final BitField<FsAccessOption> options,
-                        final @CheckForNull Entry template)
+    public void mknod(  final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    final Entry template)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }

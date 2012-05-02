@@ -83,11 +83,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public FsEntry entry(final FsEntryName name)
+    public FsEntry stat(final FsEntryName name)
     throws IOException {
         while (true) {
             try {
-                return controller.entry(name);
+                return controller.stat(name);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
@@ -124,13 +124,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final Map<Access, Long> times,
-            final BitField<FsAccessOption> options)
+            final FsEntryName name, final BitField<FsAccessOption> options, final Map<Access, Long> times)
     throws IOException {
         while (true) {
             try {
-                return controller.setTime(name, times, options);
+                return controller.setTime(name, options, times);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
@@ -139,14 +137,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name,
-            final BitField<Access> types,
-            final long value,
-            final BitField<FsAccessOption> options)
+            final FsEntryName name, final BitField<FsAccessOption> options, final BitField<Access> types, final long value)
     throws IOException {
         while (true) {
             try {
-                return controller.setTime(name, types, value, options);
+                return controller.setTime(name, options, types, value);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
@@ -251,14 +246,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public void mknod(
-            final FsEntryName name,
-            final Type type,
-            final BitField<FsAccessOption> options,
-            final @CheckForNull Entry template)
+            final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    final Entry template)
     throws IOException {
         while (true) {
             try {
-                controller.mknod(name, type, options, template);
+                controller.mknod(name, options, type, template);
                 return;
             } catch (NeedsSyncException ex) {
                 sync(ex);

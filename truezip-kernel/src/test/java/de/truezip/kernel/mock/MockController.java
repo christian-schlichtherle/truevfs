@@ -87,7 +87,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public FsEntry entry(FsEntryName name) throws IOException {
+    public FsEntry stat(FsEntryName name) throws IOException {
         checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
@@ -115,9 +115,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            Map<Access, Long> times,
-            BitField<FsAccessOption> options)
+            FsEntryName name, BitField<FsAccessOption> options, Map<Access, Long> times)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -128,10 +126,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public boolean setTime(
-            FsEntryName name,
-            BitField<Access> types,
-            long value,
-            BitField<FsAccessOption> options)
+            FsEntryName name, BitField<FsAccessOption> options, BitField<Access> types, long value)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -222,10 +217,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public void mknod(  FsEntryName name,
-                        Type type,
-                        BitField<FsAccessOption> options,
-                        Entry template)
+    public void mknod(  FsEntryName name, BitField<FsAccessOption> options, Type type, Entry template)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;

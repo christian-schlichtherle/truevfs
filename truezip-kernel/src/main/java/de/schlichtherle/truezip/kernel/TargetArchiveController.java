@@ -14,7 +14,8 @@ import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.*;
 import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
 import de.truezip.kernel.cio.Entry.Access;
-import static de.truezip.kernel.cio.Entry.Access.*;
+import static de.truezip.kernel.cio.Entry.Access.READ;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
@@ -175,7 +176,7 @@ implements ArchiveFileSystemTouchListener<E> {
         // Check parent file system entry.
         final FsEntry pe; // parent entry
         try {
-            pe = parent.entry(name);
+            pe = parent.stat(name);
         } catch (final FalsePositiveArchiveException ex) {
             throw new AssertionError(ex);
         } catch (final ControlFlowException ex) {
@@ -372,9 +373,10 @@ implements ArchiveFileSystemTouchListener<E> {
     }
 
     @Override
-    void checkSync(   final FsEntryName name,
-                      final @CheckForNull Access intention,
-                      final BitField<FsAccessOption> options)
+    void checkSync(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final @CheckForNull Access intention)
     throws NeedsSyncException {
         // HC SUNT DRACONES!
 

@@ -98,13 +98,13 @@ extends LockModelController {
     }
 
     @Override
-    public final FsEntry entry(FsEntryName name)
+    public final FsEntry stat(FsEntryName name)
     throws IOException {
         return autoMount(NONE).entry(name);
     }
 
     @Override
-    public void checkAccess(
+    public final void checkAccess(
             FsEntryName name,
             BitField<FsAccessOption> options,
             BitField<Access> types)
@@ -118,21 +118,22 @@ extends LockModelController {
     }
 
     @Override
-    public final boolean setTime(   FsEntryName name,
-                                    Map<Access, Long> times,
-                                    BitField<FsAccessOption> options)
+    public final boolean setTime(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
+            Map<Access, Long> times)
     throws IOException {
-        checkSync(name, null, options);
+        checkSync(name, options, null);
         return autoMount(options).setTime(name, times, options);
     }
 
     @Override
-    public final boolean setTime(   FsEntryName name,
-                                    BitField<Access> types,
-                                    long value,
-                                    BitField<FsAccessOption> options)
+    public final boolean setTime(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
+            BitField<Access> types, long value)
     throws IOException {
-        checkSync(name, null, options);
+        checkSync(name, options, null);
         return autoMount(options).setTime(name, types, value, options);
     }
 
@@ -156,7 +157,7 @@ extends LockModelController {
         @Override
         public FsArchiveEntry localTarget() throws IOException {
             peerTarget(); // may sync() if in same target archive file!
-            checkSync(name, READ, options);
+            checkSync(name, options, READ);
             final FsCovariantEntry<E> fse = autoMount(options).entry(name);
             if (null == fse)
                 throw new NoSuchFileException(name.toString());
@@ -200,7 +201,7 @@ extends LockModelController {
         }
 
         ArchiveFileSystemOperation<E> mknod() throws IOException {
-            checkSync(name, WRITE, options);
+            checkSync(name, options, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
             return autoMount(   !name.isRoot() && options.get(CREATE_PARENTS),
@@ -293,8 +294,8 @@ extends LockModelController {
     @Override
     public final void mknod(
             final FsEntryName name,
-            final Type type,
             final BitField<FsAccessOption> options,
+            final Type type,
             final Entry template)
     throws IOException {
         if (name.isRoot()) { // TODO: Is this case differentiation still required?
@@ -309,7 +310,7 @@ extends LockModelController {
             throw new FileAlreadyExistsException(name.toString(), null,
                     "Cannot replace a directory entry!");
         } else {
-            checkSync(name, null, options);
+            checkSync(name, options, null);
             autoMount(options.get(CREATE_PARENTS), options)
                     .mknod(name, type, options, template)
                     .commit();
@@ -317,10 +318,11 @@ extends LockModelController {
     }
 
     @Override
-    public void unlink( final FsEntryName name,
-                        final BitField<FsAccessOption> options)
+    public void unlink(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options)
     throws IOException {
-        checkSync(name, null, options);
+        checkSync(name, options, null);
         final ArchiveFileSystem<E> fs = autoMount(options);
         fs.unlink(name, options);
         if (name.isRoot()) {
@@ -338,7 +340,8 @@ extends LockModelController {
      * {@link FsController#sync(BitField, ExceptionHandler) sync} operation in
      * advance.
      *
-     * @param  name the file system entry name.
+     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      * @param  intention the intended I/O operation on the archive entry.
      *         If {@code null}, then only an update to the archive entry meta
      *         data (i.e. a pure virtual file system operation with no I/O)
@@ -346,8 +349,9 @@ extends LockModelController {
      * @throws NeedsSyncException If a sync operation is required before the
      *         intended access could succeed.
      */
-    abstract void checkSync(    FsEntryName name,
-                                @CheckForNull Access intention,
-                                BitField<FsAccessOption> options)
+    abstract void checkSync(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
+            @CheckForNull Access intention)
     throws NeedsSyncException;
 }
