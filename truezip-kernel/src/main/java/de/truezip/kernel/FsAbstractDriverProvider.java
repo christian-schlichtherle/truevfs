@@ -9,22 +9,23 @@ import de.truezip.kernel.util.Maps;
 import de.truezip.kernel.util.ServiceLocator;
 import java.net.URISyntaxException;
 import java.util.*;
+import javax.annotation.concurrent.Immutable;
 
 /**
- * An abstract provider for a map of file system schemes to file system drivers.
- * <p>
- * Implementations must be thread-safe.
+ * An abstract provider for an immutable map of file system schemes to file
+ * system drivers.
  *
  * @author Christian Schlichtherle
  */
+@Immutable
 public abstract class FsAbstractDriverProvider implements FsDriverProvider {
 
     /**
      * A static factory method for an unmodifiable driver map which is
      * constructed from the given configuration.
      * This method is intended to be used by implementations of this class
-     * for convenient creation of the map to return by their {@link #getDrivers()}
-     * method.
+     * for convenient creation of the map to return by their
+     * {@link #getDrivers()} method.
      *
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
@@ -85,7 +86,7 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
      */
     @Override
     public String toString() {
-        return String.format("%s[map=%s]",
+        return String.format("%s[drivers=%s]",
                 getClass().getName(),
                 getDrivers());
     }
