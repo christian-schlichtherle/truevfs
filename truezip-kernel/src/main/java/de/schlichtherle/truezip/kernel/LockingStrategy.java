@@ -124,15 +124,13 @@ enum LockingStrategy {
     throws X {
         final Account account = accounts.get();
         if (0 < account.lockCount) {
-            while (true) {
-                acquire(lock);
-                account.lockCount++;
-                try {
-                    return operation.call();
-                } finally {
-                    account.lockCount--;
-                    lock.unlock();
-                }
+            acquire(lock);
+            account.lockCount++;
+            try {
+                return operation.call();
+            } finally {
+                account.lockCount--;
+                lock.unlock();
             }
         } else {
             try {
@@ -159,7 +157,7 @@ enum LockingStrategy {
     static int getLockCount() {
         return accounts.get().lockCount;
     }
-    
+
     /**
      * Acquires the given lock.
      * 
