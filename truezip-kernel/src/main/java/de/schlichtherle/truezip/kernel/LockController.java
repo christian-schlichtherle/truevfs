@@ -132,39 +132,20 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public boolean isReadable(final FsEntryName name) throws IOException {
-        final class IsReadable implements IOOperation<Boolean> {
+    public void checkAccess(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final BitField<Access> types)
+    throws IOException {
+        final class CheckAccess implements IOOperation<Void> {
             @Override
-            public Boolean call() throws IOException {
-                return controller.isReadable(name);
+            public Void call() throws IOException {
+                controller.checkAccess(name, options, types);
+                return null;
             }
-        } // IsReadable
+        } // CheckAccess
 
-        return timedReadOrWriteLocked(new IsReadable());
-    }
-    
-    @Override
-    public boolean isWritable(final FsEntryName name) throws IOException {
-        final class IsWritable implements IOOperation<Boolean> {
-            @Override
-            public Boolean call() throws IOException {
-                return controller.isWritable(name);
-            }
-        } // IsWritable
-
-        return timedReadOrWriteLocked(new IsWritable());
-    }
-
-    @Override
-    public boolean isExecutable(final FsEntryName name) throws IOException {
-        final class IsExecutable implements IOOperation<Boolean> {
-            @Override
-            public Boolean call() throws IOException {
-                return controller.isExecutable(name);
-            }
-        } // IsExecutable
-
-        return timedReadOrWriteLocked(new IsExecutable());
+        timedReadOrWriteLocked(new CheckAccess());
     }
 
     @Override

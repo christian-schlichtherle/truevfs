@@ -163,14 +163,41 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public boolean equals(Object that) {
-        return super.equals(that); // make FindBugs happy!
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode(); // make FindBugs happy!
+    public Boolean isPermitted(Entity entity, Access access) {
+        if (!(entity instanceof PosixEntity))
+            return null;
+        switch ((PosixEntity) entity) {
+        case USER:
+            switch (access) {
+            case READ:
+                return 0 != (getMode() & 00400); // TUREAD    00400     /* Read by owner         */
+            case WRITE:
+                return 0 != (getMode() & 00200); // TUWRITE   00200     /* Write by owner special */
+            case EXECUTE:
+                return 0 != (getMode() & 00100); // TUEXEC    00100     /* Execute/search by owner */
+            }
+            break;
+        case GROUP:
+            switch (access) {
+            case READ:
+                return 0 != (getMode() & 00040); // TGREAD    00040     /* Read by group         */
+            case WRITE:
+                return 0 != (getMode() & 00020); // TGWRITE   00020     /* Write by group        */
+            case EXECUTE:
+                return 0 != (getMode() & 00010); // TGEXEC    00010     /* Execute/search by group */
+            }
+            break;
+        case OTHER:
+            switch (access) {
+            case READ:
+                return 0 != (getMode() & 00004); // TOREAD    00004     /* Read by other         */
+            case WRITE:
+                return 0 != (getMode() & 00002); // TOWRITE   00002     /* Write by other        */
+            case EXECUTE:
+                return 0 != (getMode() & 00001); // TOEXEC    00001     /* Execute/search by other */
+            }
+        }
+        return null;
     }
 
     /**

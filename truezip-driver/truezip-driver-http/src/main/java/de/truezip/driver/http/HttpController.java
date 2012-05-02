@@ -5,19 +5,15 @@
 package de.truezip.driver.http;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
-import de.truezip.kernel.FsPath;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
+import static de.truezip.kernel.cio.Entry.Access.READ;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.IOPool;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
-import de.truezip.kernel.FsAccessOption;
-import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
@@ -30,6 +26,8 @@ import org.apache.http.HttpResponse;
  */
 @Immutable
 public class HttpController extends FsModelController<FsModel>  {
+
+    private static final BitField<Access> READ_ONLY = BitField.of(READ);
 
     private final HttpDriver driver;
 
@@ -78,13 +76,14 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public boolean isReadable(FsEntryName name) throws IOException {
-        return null != entry(name);
-    }
-
-    @Override
-    public boolean isWritable(FsEntryName name) throws IOException {
-        return false;
+    public void checkAccess(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final BitField<Access> types)
+    throws IOException {
+        if (!types.isEmpty() && !READ_ONLY.equals(types))
+            throw new FsReadOnlyFileSystemException();
+        executeHead(newEntry(name));
     }
 
     @Override

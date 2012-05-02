@@ -14,8 +14,7 @@ import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.*;
 import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
 import de.truezip.kernel.cio.Entry.Access;
-import static de.truezip.kernel.cio.Entry.Access.READ;
-import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Access.*;
 import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
@@ -66,6 +65,8 @@ implements ArchiveFileSystemTouchListener<E> {
 
     private static final BitField<FsAccessOption>
             MOUNT_OPTIONS = BitField.of(FsAccessOption.CACHE);
+
+    private static final BitField<Access> WRITE_ACCESS = BitField.of(WRITE);
 
     private final FsArchiveDriver<E> driver;
     
@@ -199,13 +200,12 @@ implements ArchiveFileSystemTouchListener<E> {
                         new NoSuchFileException(name.toString()));
             }
         } else {
+            // ro must be init first because the parent archive
+            // controller could be a FileController and on Windows this
+            // property changes to TRUE once a file is opened for reading!
+            final boolean ro = isReadOnlyTarget();
             final InputService<E> is;
-            final boolean ro;
             try {
-                // readOnly must be set first because the parent archive controller
-                // could be a FileController and on Windows this property changes
-                // to TRUE once a file is opened for reading!
-                ro = !parent.isWritable(name);
                 is = driver.newInput(getModel(), parent, name, MOUNT_OPTIONS);
             } catch (final FalsePositiveArchiveException ex) {
                 throw new AssertionError(ex);
@@ -229,6 +229,20 @@ implements ArchiveFileSystemTouchListener<E> {
             throw new AssertionError(ex);
         }
         setFileSystem(fs);
+    }
+
+    private boolean isReadOnlyTarget() {
+        try {
+            parent.checkAccess(name, MOUNT_OPTIONS, WRITE_ACCESS);
+            return false;
+        } catch (final FalsePositiveArchiveException ex) {
+            throw new AssertionError(ex);
+        } catch (final ControlFlowException ex) {
+            assert ex instanceof NeedsLockRetryException : ex;
+            throw ex;
+        } catch (final IOException ex) {
+            return true;
+        }
     }
 
     @Override
@@ -493,7 +507,7 @@ implements ArchiveFileSystemTouchListener<E> {
                 try {
                     if (DIRECTORY == ae.getType()) {
                         if (!fse.isRoot()) // never output the root directory!
-                            if (UNKNOWN != ae.getTime(Access.WRITE)) // never output a ghost directory!
+                            if (UNKNOWN != ae.getTime(WRITE)) // never output a ghost directory!
                                 os.output(ae).stream().close();
                     } else if (null != is.entry(aen)) {
                         IOSocket.copy(  is.input(aen),

@@ -42,6 +42,11 @@ implements Entry {
         return entry.getTime(type);
     }
 
+    @Override
+    public Boolean isPermitted(Entity entity, Access access) {
+        return entry.isPermitted(entity, access);
+    }
+
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.

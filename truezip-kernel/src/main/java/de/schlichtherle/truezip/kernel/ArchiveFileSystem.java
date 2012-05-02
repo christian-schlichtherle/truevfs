@@ -10,7 +10,7 @@ import static de.truezip.kernel.FsEntryName.*;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Container;
 import de.truezip.kernel.cio.Entry;
-import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
@@ -150,7 +150,7 @@ implements Iterable<FsCovariantEntry<E>> {
         master.add(ROOT_PATH, newEntry(
                 ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, rootTemplate));
         this.master = master;
-        // Now perform a file system check to create missing parent directories
+        // Now perform a file system checkAccess to create missing parent directories
         // and populate directories with their members - this must be done
         // separately!
         for (final String path : paths)
@@ -287,6 +287,12 @@ implements Iterable<FsCovariantEntry<E>> {
     final FsCovariantEntry<E> entry(final FsEntryName name) {
         final FsCovariantEntry<E> entry = master.get(name.getPath());
         return null == entry ? null : entry.clone(driver);
+    }
+
+    void checkAccess(FsEntryName name, BitField<Access> types)
+    throws IOException {
+        if (null == master.get(name.getPath()))
+            throw new NoSuchFileException(name.toString());
     }
 
     /**
@@ -579,6 +585,13 @@ implements Iterable<FsCovariantEntry<E>> {
             pae.setTime(WRITE, System.currentTimeMillis());
     }
 
+    void setReadOnly(FsEntryName name)
+    throws IOException {
+        if (!isReadOnly())
+            throw new FileSystemException(name.toString(), null,
+                "Cannot set read-only state!");
+    }
+
     boolean setTime(
             final FsEntryName name,
             final BitField<Access> types,
@@ -617,21 +630,6 @@ implements Iterable<FsCovariantEntry<E>> {
             ok &= 0 <= value && ae.setTime(time.getKey(), value);
         }
         return ok;
-    }
-
-    boolean isWritable(FsEntryName name) {
-        return !isReadOnly();
-    }
-
-    boolean isExecutable(FsEntryName name) {
-        return false;
-    }
-
-    void setReadOnly(FsEntryName name)
-    throws IOException {
-        if (!isReadOnly())
-            throw new FileSystemException(name.toString(), null,
-                "Cannot set read-only state!");
     }
 
     /**

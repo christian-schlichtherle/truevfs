@@ -5,6 +5,7 @@
 package de.truezip.driver.http;
 
 import de.truezip.kernel.*;
+import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
@@ -18,6 +19,8 @@ import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -93,11 +96,11 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     @Override
     public Set<Type> getTypes() {
         try {
-            if (null != executeHead())
-                return FILE_TYPE_SET;
+            executeHead();
+            return FILE_TYPE_SET;
         } catch (IOException ex) {
+            return Collections.emptySet();
         }
-        return Collections.emptySet();
     }
 
     @Override
@@ -105,11 +108,11 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         if (FILE != type)
             return false;
         try {
-            if (null != executeHead())
-                return true;
+            executeHead();
+            return true;
         } catch (IOException ex) {
+            return false;
         }
-        return false;
     }
 
     @Override
@@ -137,6 +140,18 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         } catch (IllegalArgumentException | IOException ex) {
         }
         return UNKNOWN;
+    }
+
+    @Override
+    public Boolean isPermitted(Entity entity, Access access) {
+        if (READ != access)
+            return null;
+        try {
+            executeHead();
+            return true;
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     @Override

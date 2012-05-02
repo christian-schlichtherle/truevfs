@@ -145,47 +145,24 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     } // GetEntry
 
     @Override
-    public boolean isReadable(final FsEntryName name) throws IOException {
-        return call(new IsReadable(), name);
+    public void checkAccess(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final BitField<Access> types)
+    throws IOException {
+        final class CheckAccess implements IOOperation<Void> {
+            @Override
+            public Void call(   final FsController<?> controller,
+                                final FsEntryName resolved)
+            throws IOException {
+                controller.checkAccess(resolved, options, types);
+                return null;
+            }
+        } // CheckAccess
+
+        call(new CheckAccess(), name);
     }
 
-    private static final class IsReadable implements IOOperation<Boolean> {
-        @Override
-        public Boolean call(final FsController<?> controller,
-                            final FsEntryName resolved)
-        throws IOException {
-            return controller.isReadable(resolved);
-        }
-    } // IsReadable
-    
-    @Override
-    public boolean isWritable(final FsEntryName name) throws IOException {
-        return call(new IsWritable(), name);
-    }
-
-    private static final class IsWritable implements IOOperation<Boolean> {
-        @Override
-        public Boolean call(final FsController<?> controller,
-                            final FsEntryName resolved)
-        throws IOException {
-            return controller.isWritable(resolved);
-        }
-    } // IsWritable
-
-    @Override
-    public boolean isExecutable(final FsEntryName name) throws IOException {
-        return call(new IsExecutable(), name);
-    }
-
-    private static final class IsExecutable implements IOOperation<Boolean> {
-        @Override
-        public Boolean call(final FsController<?> controller,
-                            final FsEntryName resolved)
-        throws IOException {
-            return controller.isExecutable(resolved);
-        }
-    } // IsWritable
-    
     @Override
     public void setReadOnly(final FsEntryName name) throws IOException {
         call(new SetReadOnly(), name);

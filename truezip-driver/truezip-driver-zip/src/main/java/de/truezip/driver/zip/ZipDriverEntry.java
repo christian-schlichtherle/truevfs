@@ -86,6 +86,11 @@ public class ZipDriverEntry extends ZipEntry implements FsArchiveEntry {
         return true;
     }
 
+    @Override
+    public Boolean isPermitted(Entity entity, Access access) {
+        return null;
+    }
+
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.

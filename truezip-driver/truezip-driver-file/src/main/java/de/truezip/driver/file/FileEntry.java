@@ -10,6 +10,7 @@ import de.truezip.kernel.FsEntry;
 import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.cio.Entry;
+import static de.truezip.kernel.cio.Entry.PosixEntity.*;
 import de.truezip.kernel.cio.IOBuffer;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
@@ -17,11 +18,12 @@ import de.truezip.kernel.util.BitField;
 import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
-import static java.nio.file.Files.newDirectoryStream;
-import static java.nio.file.Files.readAttributes;
+import static java.nio.file.Files.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import static java.nio.file.attribute.PosixFilePermission.*;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -147,17 +149,60 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
         try {
             final BasicFileAttributes attr = readBasicFileAttributes();
             switch (type) {
-                case WRITE:
-                    return attr.lastModifiedTime().toMillis();
-                case READ:
-                    return attr.lastAccessTime().toMillis();
                 case CREATE:
                     return attr.creationTime().toMillis();
+                case READ:
+                    return attr.lastAccessTime().toMillis();
+                case WRITE:
+                    return attr.lastModifiedTime().toMillis();
             }
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
         }
         return UNKNOWN;
+    }
+
+    @Override
+    public Boolean isPermitted(final Entity entity, final Access access) {
+        if (!(entity instanceof PosixEntity))
+            return null;
+        try {
+            final Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
+            switch ((PosixEntity) entity) {
+            case USER:
+                switch (access) {
+                    case READ:
+                        return permissions.contains(OWNER_READ);
+                    case WRITE:
+                        return permissions.contains(OWNER_WRITE);
+                    case EXECUTE:
+                        return permissions.contains(OWNER_EXECUTE);
+                }
+                break;
+            case GROUP:
+                switch (access) {
+                    case READ:
+                        return permissions.contains(GROUP_READ);
+                    case WRITE:
+                        return permissions.contains(GROUP_WRITE);
+                    case EXECUTE:
+                        return permissions.contains(GROUP_EXECUTE);
+                }
+                break;
+            case OTHER:
+                switch (access) {
+                    case READ:
+                        return permissions.contains(OTHERS_READ);
+                    case WRITE:
+                        return permissions.contains(OTHERS_WRITE);
+                    case EXECUTE:
+                        return permissions.contains(OTHERS_EXECUTE);
+                }
+            }
+        } catch (UnsupportedOperationException | IOException ignore) {
+            // Unsupported, doesn't exist or inaccessible. In either case...
+        }
+        return null;
     }
 
     @Override

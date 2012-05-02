@@ -11,6 +11,7 @@ import static de.truezip.kernel.FsEntryName.SEPARATOR_CHAR;
 import de.truezip.kernel.*;
 import static de.truezip.kernel.FsUriModifier.CANONICALIZE;
 import de.truezip.kernel.cio.Entry.Access;
+import static de.truezip.kernel.cio.Entry.Access.*;
 import de.truezip.kernel.cio.Entry.Size;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
@@ -359,6 +360,10 @@ public final class TFile extends File {
                 new TreeSet<>(Arrays.asList(listRoots())));
 
     private static final File CURRENT_DIRECTORY = new File(".");
+
+    private static final BitField<Access> READ_ACCESS = BitField.of(READ);
+    private static final BitField<Access> WRITE_ACCESS = BitField.of(WRITE);
+    private static final BitField<Access> EXECUTE_ACCESS = BitField.of(EXECUTE);
 
     /**
      * The delegate file is used to implement the behaviour of the file system
@@ -1786,8 +1791,11 @@ public final class TFile extends File {
     public boolean canRead() {
         if (null != innerArchive) {
             try {
-                return innerArchive.getController()
-                        .isReadable(getInnerFsEntryName());
+                innerArchive.getController().checkAccess(
+                        getInnerFsEntryName(),
+                        TConfig.get().getAccessPreferences(),
+                        READ_ACCESS);
+                return true;
             } catch (IOException ex) {
                 return false;
             }
@@ -1799,8 +1807,11 @@ public final class TFile extends File {
     public boolean canWrite() {
         if (null != innerArchive) {
             try {
-                return innerArchive.getController()
-                        .isWritable(getInnerFsEntryName());
+                innerArchive.getController().checkAccess(
+                        getInnerFsEntryName(),
+                        TConfig.get().getAccessPreferences(),
+                        WRITE_ACCESS);
+                return true;
             } catch (IOException ex) {
                 return false;
             }
@@ -1812,8 +1823,11 @@ public final class TFile extends File {
     public boolean canExecute() {
         if (null != innerArchive) {
             try {
-                return innerArchive.getController()
-                        .isExecutable(getInnerFsEntryName());
+                innerArchive.getController().checkAccess(
+                        getInnerFsEntryName(),
+                        TConfig.get().getAccessPreferences(),
+                        EXECUTE_ACCESS);
+                return true;
             } catch (IOException ex) {
                 return false;
             }

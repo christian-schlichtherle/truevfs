@@ -46,7 +46,7 @@ public final class TarDriverService extends FsDriverService {
             drivers = newMap(new Object[][] {
                 { "tar", new TarDriver() },
                 { "tar.gz|tgz", new TarGZipDriver() },
-                { "tar.bz2|tb2|tbz", new TarBZip2Driver() },
+                { "tar.bz2|tb2|tbz|tbz2", new TarBZip2Driver() },
             });
 
     @Override

@@ -95,32 +95,15 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public boolean isReadable(final FsEntryName name) throws IOException {
+    public void checkAccess(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options,
+            final BitField<Access> types)
+    throws IOException {
         while (true) {
             try {
-                return controller.isReadable(name);
-            } catch (NeedsSyncException ex) {
-                sync(ex);
-            }
-        }
-    }
-
-    @Override
-    public boolean isWritable(final FsEntryName name) throws IOException {
-        while (true) {
-            try {
-                return controller.isWritable(name);
-            } catch (NeedsSyncException ex) {
-                sync(ex);
-            }
-        }
-    }
-
-    @Override
-    public boolean isExecutable(final FsEntryName name) throws IOException {
-        while (true) {
-            try {
-                return controller.isExecutable(name);
+                controller.checkAccess(name, options, types);
+                return;
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }

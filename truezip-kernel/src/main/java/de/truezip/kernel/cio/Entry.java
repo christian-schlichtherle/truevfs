@@ -84,7 +84,7 @@ public interface Entry {
          * A special file is a byte or block oriented interface to an arbitrary
          * I/O device, e.g. a hard disk or a network service.
          */
-        SPECIAL
+        SPECIAL,
     }
 
     /** An unmodifiable set of just {@link Type#FILE}. */
@@ -102,7 +102,7 @@ public interface Entry {
     @SuppressWarnings("PublicInnerClass")
     enum Size {
         DATA,
-        STORAGE
+        STORAGE,
     }
 
     /** An unmodifiable set of all enums in {@link Size}. */
@@ -121,14 +121,10 @@ public interface Entry {
     /** Defines the type of access information for an entry. */
     @SuppressWarnings("PublicInnerClass")
     enum Access {
-        /** Last modification. */
-        WRITE,
-
-        /** Last access. */
-        READ,
-
-        /** Creation. */
         CREATE,
+        READ,
+        WRITE,
+        EXECUTE,
     }
 
     /** An unmodifiable set of all enums in {@link Access}. */
@@ -143,4 +139,31 @@ public interface Entry {
      *         specified or the type is unsupported.
      */
     long getTime(Access type);
+
+    /** Defines access entities. */
+    @SuppressWarnings({"MarkerInterface", "PublicInnerClass"})
+    interface Entity {
+    } // Entity
+
+    /** Defines access entities for POSIX systems. */
+    @SuppressWarnings("PublicInnerClass")
+    enum PosixEntity implements Entity {
+        USER,
+        GROUP,
+        OTHER,
+    } // Entity
+
+    /** An unmodifiable set of all enums in {@link PosixEntity}. */
+    Set<PosixEntity> ALL_POSIX_ENTITY_SET = Collections.unmodifiableSet(EnumSet.allOf(PosixEntity.class));
+
+    /**
+     * Returns {@code true} if and only if the given {@code entity} is
+     * permitted the given {@code access} to this entry.
+     * 
+     * @param  entity the entity which desires access.
+     * @param  access the desired access.
+     * @return {@code true} if and only if the given {@code entity} is
+     *         permitted the given {@code access} to this entry.
+     */
+    Boolean isPermitted(Entity entity, Access access);    
 }

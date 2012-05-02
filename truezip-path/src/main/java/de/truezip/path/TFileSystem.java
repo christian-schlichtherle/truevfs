@@ -42,9 +42,12 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public final class TFileSystem extends FileSystem {
 
+    private static final BitField<Access> READ_ACCESS = BitField.of(READ);
+    private static final BitField<Access> WRITE_ACCESS = BitField.of(WRITE);
+    private static final BitField<Access> EXECUTE_ACCESS = BitField.of(EXECUTE);
+
     private final FsController<?> controller;
     private final TFileSystemProvider provider;
-
 
     @SuppressWarnings("deprecation")
     TFileSystem(final TPath path) {
@@ -373,27 +376,27 @@ public final class TFileSystem extends FileSystem {
     void checkAccess(final TPath path, final AccessMode... modes)
     throws IOException {
         final FsEntryName name = path.getEntryName();
-        final FsController<?> controller = getController();
-        if (null == controller.entry(name))
-            throw new NoSuchFileException(path.toString());
-        for (final AccessMode m : modes) {
-            switch (m) {
-                case READ:
-                    if (!controller.isReadable(name))
-                        throw new AccessDeniedException(path.toString());
-                    break;
-                case WRITE:
-                    if (!controller.isWritable(name))
-                        throw new AccessDeniedException(path.toString());
-                    break;
-                case EXECUTE:
-                    if (!controller.isExecutable(name))
-                        throw new AccessDeniedException(path.toString());
-                    break;
-                default:
-                    throw new UnsupportedOperationException();
+        final BitField<FsAccessOption> options = path.getAccessPreferences();
+        final BitField<Access> types = types(modes);
+        getController().checkAccess(name, options, types);
+    }
+
+    private static BitField<Access> types(final AccessMode... modes) {
+        final EnumSet<Access> access = EnumSet.noneOf(Access.class);
+        for (final AccessMode mode : modes) {
+            switch (mode) {
+            case READ:
+                access.add(READ);
+                break;
+            case WRITE:
+                access.add(WRITE);
+                break;
+            case EXECUTE:
+                access.add(EXECUTE);
+                break;
             }
         }
+        return BitField.copyOf(access);
     }
 
     @Nullable

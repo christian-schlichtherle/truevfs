@@ -104,18 +104,12 @@ extends LockModelController {
     }
 
     @Override
-    public final boolean isReadable(FsEntryName name) throws IOException {
-        return autoMount(NONE).entry(name) != null;
-    }
-
-    @Override
-    public final boolean isWritable(FsEntryName name) throws IOException {
-        return autoMount(NONE).isWritable(name);
-    }
-
-    @Override
-    public final boolean isExecutable(FsEntryName name) throws IOException {
-        return autoMount(NONE).isExecutable(name);
+    public void checkAccess(
+            FsEntryName name,
+            BitField<FsAccessOption> options,
+            BitField<Access> types)
+    throws IOException {
+        autoMount(NONE).checkAccess(name, types);
     }
 
     @Override
@@ -286,6 +280,11 @@ extends LockModelController {
         @Override
         public boolean setTime(Access type, long value) {
             return entry.setTime(type, value);
+        }
+
+        @Override
+        public Boolean isPermitted(Entity entity, Access access) {
+            return entry.isPermitted(entity, access);
         }
     } // ProxyEntry
 
