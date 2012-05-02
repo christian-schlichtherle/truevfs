@@ -316,23 +316,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
     }
 
-    /**
-     * Modify the sync options so that no dead lock can appear due to waiting
-     * for I/O resources in a recursive file system operation.
-     * 
-     * @param options the sync options
-     * @return the potentially modifed sync options.
-     */
-    static BitField<FsSyncOption> modify(final BitField<FsSyncOption> options) {
-        final boolean isRecursive = 1 < LockingStrategy.getLockCount();
-        final BitField<FsSyncOption> result = isRecursive
-                ? options.and(NOT_WAIT_CLOSE_IO)
-                : options;
-        assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
-        assert result == options || isRecursive;
-        return result;
-    }
-
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
@@ -348,6 +331,23 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
             throw ex;
         }
+    }
+
+    /**
+     * Modify the sync options so that no dead lock can appear due to waiting
+     * for I/O resources in a recursive file system operation.
+     * 
+     * @param  options the sync options
+     * @return the potentially modified sync options.
+     */
+    static BitField<FsSyncOption> modify(final BitField<FsSyncOption> options) {
+        final boolean isRecursive = 1 < LockingStrategy.getLockCount();
+        final BitField<FsSyncOption> result = isRecursive
+                ? options.and(NOT_WAIT_CLOSE_IO)
+                : options;
+        assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
+        assert result == options || isRecursive;
+        return result;
     }
 
     private final class SyncInputStream
