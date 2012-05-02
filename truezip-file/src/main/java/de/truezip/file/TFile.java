@@ -361,6 +361,7 @@ public final class TFile extends File {
 
     private static final File CURRENT_DIRECTORY = new File(".");
 
+    private static final BitField<Access> NO_ACCESS = BitField.noneOf(Access.class);
     private static final BitField<Access> READ_ACCESS = BitField.of(READ);
     private static final BitField<Access> WRITE_ACCESS = BitField.of(WRITE);
     private static final BitField<Access> EXECUTE_ACCESS = BitField.of(EXECUTE);
@@ -1721,9 +1722,11 @@ public final class TFile extends File {
         // http://java.net/jira/browse/TRUEZIP-136 .
         if (null != innerArchive) {
             try {
-                final FsEntry entry = innerArchive.getController()
-                        .entry(getInnerFsEntryName());
-                return null != entry;
+                innerArchive.getController().checkAccess(
+                        getInnerFsEntryName(),
+                        TConfig.get().getAccessPreferences(),
+                        NO_ACCESS);
+                return true;
             } catch (IOException ex) {
                 return false;
             }
