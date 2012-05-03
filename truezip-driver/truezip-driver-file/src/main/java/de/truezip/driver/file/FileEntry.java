@@ -163,14 +163,14 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
     }
 
     @Override
-    public Boolean isPermitted(final Entity entity, final Access access) {
+    public Boolean isPermitted(final Access type, final Entity entity) {
         if (!(entity instanceof PosixEntity))
             return null;
         try {
             final Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
             switch ((PosixEntity) entity) {
             case USER:
-                switch (access) {
+                switch (type) {
                     case READ:
                         return permissions.contains(OWNER_READ);
                     case WRITE:
@@ -180,7 +180,7 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
                 }
                 break;
             case GROUP:
-                switch (access) {
+                switch (type) {
                     case READ:
                         return permissions.contains(GROUP_READ);
                     case WRITE:
@@ -190,7 +190,7 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
                 }
                 break;
             case OTHER:
-                switch (access) {
+                switch (type) {
                     case READ:
                         return permissions.contains(OTHERS_READ);
                     case WRITE:

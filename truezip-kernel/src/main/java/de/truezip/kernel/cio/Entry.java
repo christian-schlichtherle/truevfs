@@ -109,12 +109,13 @@ public interface Entry {
     Set<Size> ALL_SIZE_SET = Collections.unmodifiableSet(EnumSet.allOf(Size.class));
 
     /**
-     * Returns the size of the given type for this entry.
+     * Returns the size of the given {@code type} for this entry in bytes or
+     * {@link #UNKNOWN} if not specified or the type is unsupported.
      * This method may not be meaningful for non-{@link Type#FILE} entries.
      *
-     * @param  type the type of the size to return.
-     * @return The size of the given size type for this entry in bytes,
-     *         or {@link #UNKNOWN} if not specified or the type is unsupported.
+     * @param  type the type of the size.
+     * @return The size of the given {@code type} for this entry in bytes or
+     *         {@link #UNKNOWN} if not specified or the type is unsupported.
      */
     long getSize(Size type);
 
@@ -131,10 +132,12 @@ public interface Entry {
     Set<Access> ALL_ACCESS_SET = Collections.unmodifiableSet(EnumSet.allOf(Access.class));
 
     /**
-     * Returns the time of the given access type for this entry.
+     * Returns the time of the given access {@code type} for this entry in
+     * milliseconds since the epoch or {@value #UNKNOWN} if not
+     * specified or the type is unsupported.
      *
-     * @param  type the type of the access time to return.
-     * @return The time of the given access type for this entry in
+     * @param  type the type of the access.
+     * @return The time of the given access {@code type} for this entry in
      *         milliseconds since the epoch or {@value #UNKNOWN} if not
      *         specified or the type is unsupported.
      */
@@ -157,13 +160,13 @@ public interface Entry {
     Set<PosixEntity> ALL_POSIX_ENTITY_SET = Collections.unmodifiableSet(EnumSet.allOf(PosixEntity.class));
 
     /**
-     * Returns {@code true} if and only if the given {@code entity} is
-     * permitted the given {@code access} to this entry.
+     * Returns {@code true} if and only if the given access {@code type} to
+     * this entry is permitted for the given {@code entity}.
      * 
+     * @param  type the type of the access.
      * @param  entity the entity which desires access.
-     * @param  access the desired access.
-     * @return {@code true} if and only if the given {@code entity} is
-     *         permitted the given {@code access} to this entry.
+     * @return {@code true} if and only if the given access {@code type} to
+     *         this entry is permitted for the given {@code entity}.
      */
-    Boolean isPermitted(Entity entity, Access access);    
+    Boolean isPermitted(Access type, Entity entity);    
 }

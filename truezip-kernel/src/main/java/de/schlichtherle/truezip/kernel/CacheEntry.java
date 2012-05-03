@@ -133,9 +133,9 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
     }
 
     @Override
-    public Boolean isPermitted(Entity entity, Access access) {
+    public Boolean isPermitted(Access type, Entity entity) {
         final Buffer buffer = this.buffer;
-        return null == buffer ? null : buffer.isPermitted(entity, access);
+        return null == buffer ? null : buffer.isPermitted(type, entity);
     }
 
     /**
@@ -433,8 +433,8 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         }
 
         @Override
-        public Boolean isPermitted(Entity entity, Access access) {
-            return data.isPermitted(entity, access);
+        public Boolean isPermitted(Access type, Entity entity) {
+            return data.isPermitted(type, entity);
         }
 
         @Override

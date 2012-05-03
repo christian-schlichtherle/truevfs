@@ -25,7 +25,7 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
     private final EnumMap<Access, Long>
             times = new EnumMap<>(Access.class);
     private final Boolean[][] permissions
-            = new Boolean[PosixEntity.values().length][Access.values().length];
+            = new Boolean[Access.values().length][PosixEntity.values().length];
     private @CheckForNull IOBuffer<?> buffer;
 
     public MockArchiveDriverEntry(final String name, final Type type) {
@@ -50,11 +50,10 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
                 final long value = template.getTime(access);
                 if (UNKNOWN != value)
                     times.put(access, value);
+                for (final PosixEntity entity : ALL_POSIX_ENTITY_SET)
+                    permissions[access.ordinal()][entity.ordinal()]
+                            = template.isPermitted(access, entity);
             }
-            for (final PosixEntity entity : ALL_POSIX_ENTITY_SET)
-                for (final Access access : ALL_ACCESS_SET)
-                    permissions[entity.ordinal()][access.ordinal()]
-                            = template.isPermitted(entity, access);
         }
     }
 
@@ -98,12 +97,20 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
     }
 
     @Override
-    public Boolean isPermitted(Entity entity, Access access) {
+    public Boolean isPermitted(Access type, Entity entity) {
         if (!(entity instanceof PosixEntity))
             return null;
-        return permissions[((PosixEntity) entity).ordinal()][access.ordinal()];
+        return permissions[type.ordinal()][((PosixEntity) entity).ordinal()];
     }
 
+    /*@Override
+    public boolean setPermitted(Access type, Entity entity, Boolean value) {
+        if (!(entity instanceof PosixEntity))
+            return false;
+        permissions[type.ordinal()][((PosixEntity) entity).ordinal()] = value;
+        return true;
+    }*/
+    
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.

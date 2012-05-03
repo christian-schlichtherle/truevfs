@@ -4,6 +4,8 @@
  */
 package de.truezip.kernel.cio;
 
+import javax.annotation.CheckForNull;
+
 /**
  * Represents a mutable entry in a container.
  *
@@ -12,30 +14,46 @@ package de.truezip.kernel.cio;
 public interface MutableEntry extends Entry {
 
     /**
-     * Sets the size of the given type for this archive entry.
+     * Sets the size of the given {@code type} for this entry.
      *
      * @param  type the type of the size.
-     * @param  value the value of the size in bytes or
-     * {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
-     * @return {@code false} if and only if setting a size for the given type
-     * is unsupported.
+     * @param  value the value of the size in bytes
+     *         or {@link #UNKNOWN} if not specified.
+     * @return {@code false} if and only if setting a size of the given
+     *         {@code type} is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
      * @throws IllegalArgumentException if {@code value} is negative and not
-     * {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
+     *         {@link #UNKNOWN}.
      */
     boolean setSize(Size type, long value);
 
     /**
-     * Sets the last access time of the given type for this archive entry.
+     * Sets the time of the given access {@code type} for this entry.
      *
-     * @param  type the type of the access time.
-     * @param  value the value of the access time in milliseconds since the
-     * epoch or {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
-     * @return {@code false} if and only if setting a time for the given type
-     * is unsupported.
+     * @param  type the type of the access.
+     * @param  value the value of the size in in milliseconds since the epoch
+     *         or {@link #UNKNOWN} if not specified.
+     * @return {@code false} if and only if setting a time of the given
+     *         {@code type} is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
      * @throws IllegalArgumentException if {@code value} is negative and not
-     * {@value de.truezip.kernel.cio.Entry#UNKNOWN}.
+     *         {@link #UNKNOWN}.
      */
     boolean setTime(Access type, long value);
+
+    /**
+     * Sets the permission for the given {@code entity} for the given access
+     * {@code type} to this entry.
+     * 
+     * @param  entity the entity which desires access.
+     * @param  type the type of the access.
+     * @param  value the value of the permission
+     *         or {@code null} if not specified.
+     * @return {@code false} if and only if setting a permission of the given
+     *         {@code type} for the given {@code entity} is unsupported.
+     */
+    /*boolean setPermitted(
+            Access type,
+            Entity entity,
+            @CheckForNull Boolean value);*/
 }
