@@ -8,6 +8,7 @@ import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
@@ -475,12 +476,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 register();
             }
 
-            void mknod( final BitField<FsOutputOption> options,
+            void mknod( BitField<FsOutputOption> mknodOpts,
                         final @CheckForNull Entry template)
             throws IOException {
                 while (true) {
                     try {
-                        delegate.mknod(name, FILE, options, template);
+                        delegate.mknod(name, FILE, mknodOpts, template);
                         break;
                     } catch (final FsNeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
@@ -491,9 +492,9 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // resolve the issue locally, that is if we were asked
                         // to create the entry exclusively or this is a
                         // non-recursive file system operation.
-                        final BitField<FsSyncOption> modified;
-                        if (options.get(EXCLUSIVE)
-                                || SYNC == (modified = FsSyncController.modify(SYNC)))
+                        final BitField<FsSyncOption> syncOpts;
+                        if (mknodOpts.get(EXCLUSIVE)
+                                || SYNC == (syncOpts = FsSyncController.modify(SYNC)))
                             throw mknodEx;
 
                         // Try to resolve the issue locally.
@@ -502,10 +503,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            delegate.sync(modified);
+                            delegate.sync(syncOpts);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
-                            if (JSE7.AVAILABLE) syncEx.addSuppressed(mknodEx);
+                            syncEx.addSuppressed(mknodEx);
 
                             // sync() failed, maybe just because the current
                             // thread has already acquired some open I/O
@@ -531,6 +532,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
                             // Dito for mapping the exception.
                             //throw FsNeedsLockRetryException.get(getModel());
+
+                            // Check if we can retry the mknod with GROW set.
+                            final BitField<FsOutputOption> oldMknodOpts = mknodOpts;
+                            mknodOpts = oldMknodOpts.set(GROW);
+                            if (oldMknodOpts != mknodOpts)
+                                continue;
 
                             // Finally, the mknod failed because the entry
                             // has already been output to the target archive
