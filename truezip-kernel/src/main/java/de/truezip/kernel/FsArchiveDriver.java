@@ -342,7 +342,7 @@ extends FsDriver {
 
     /**
      * Equivalent to {@link #newEntry(BitField, String, Entry.Type, Entry)
-     * entry(name, type, FsAccessOptions.NONE, template)}.
+     * entry(FsAccessOptions.NONE, name, type, template)}.
      * 
      * @param  name the entry name.
      * @param  type the entry type.
