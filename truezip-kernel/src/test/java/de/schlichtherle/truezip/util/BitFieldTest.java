@@ -10,7 +10,8 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.EnumSet;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.*;
@@ -102,6 +103,22 @@ public class BitFieldTest {
     }
 
     @Test
+    public void testIterator() {
+        final BitField<Dummy> bits = BitField.allOf(Dummy.class);
+        final Iterator<Dummy> it = bits.iterator();
+        final Dummy[] dummies = Dummy.values();
+        for (int i = 0; i < dummies.length; i++) {
+            assert it.hasNext();
+            assertThat(it.next(), sameInstance(dummies[i]));
+            try {
+                it.remove();
+                fail();
+            } catch (UnsupportedOperationException ex) {
+            }
+        }
+    }
+
+    @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
         final ExceptionListener listener = new ExceptionListener() {
             @Override
@@ -117,7 +134,7 @@ public class BitFieldTest {
             { ONE, TWO, THREE, },
         }) {
             final BitField<Dummy> original
-                    = BitField.copyOf(EnumSet.copyOf(java.util.Arrays.asList(params)));
+                    = BitField.copyOf(Arrays.asList(params));
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -156,5 +173,6 @@ public class BitFieldTest {
         }
     }
 
+    @SuppressWarnings("PackageVisibleInnerClass")
     enum Dummy { ONE, TWO, THREE }
 }
