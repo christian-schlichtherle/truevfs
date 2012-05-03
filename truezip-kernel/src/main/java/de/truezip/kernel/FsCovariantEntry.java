@@ -5,6 +5,7 @@
 package de.truezip.kernel;
 
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
+import de.truezip.kernel.util.BitField;
 import java.util.*;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -173,8 +174,8 @@ implements Cloneable {
      * vice versa.
      */
     @Override
-    public Set<Type> getTypes() {
-        return map.keySet();
+    public BitField<Type> getTypes() {
+        return BitField.copyOf(map.keySet());
     }
 
     /**

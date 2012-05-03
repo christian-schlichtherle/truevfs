@@ -30,12 +30,12 @@ public final class FsArchiveEntries {
         final Formatter f = new Formatter(s)
                 .format("%s[name=%s, type=%s",
                     e.getClass().getName(), e.getName(), e.getType());
-        for (Size type : ALL_SIZE_SET) {
+        for (Size type : ALL_SIZES) {
             final long size = e.getSize(type);
             if (UNKNOWN != size)
                 f.format(", size(%s)=%d", type, size);
         }
-        for (Access type : ALL_ACCESS_SET) {
+        for (Access type : ALL_ACCESS) {
             final long time = e.getTime(type);
             if (UNKNOWN != time)
                 f.format(", time(%s)=%tc", type, time);

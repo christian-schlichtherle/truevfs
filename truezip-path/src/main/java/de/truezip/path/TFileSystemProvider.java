@@ -330,7 +330,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (!srcEntry.isType(FILE))
             throw new FileNotFoundException(
                     src.toString() + " (expected FILE - is "
-                    + BitField.copyOf(srcEntry.getTypes()) + ")");
+                    + srcEntry.getTypes() + ")");
         if (null != dstEntry) {
             if (o.get(EXCLUSIVE))
                 throw new FileAlreadyExistsException(dst.toString());

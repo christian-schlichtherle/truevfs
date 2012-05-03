@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.NoSuchFileException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import javax.annotation.CheckForNull;
@@ -92,25 +91,18 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
-    public Set<Type> getTypes() {
+    public BitField<Type> getTypes() {
         try {
             executeHead();
-            return FILE_TYPE_SET;
+            return FILE_TYPE;
         } catch (IOException ex) {
-            return Collections.emptySet();
+            return NO_TYPES;
         }
     }
 
     @Override
     public boolean isType(final Type type) {
-        if (FILE != type)
-            return false;
-        try {
-            executeHead();
-            return true;
-        } catch (IOException ex) {
-            return false;
-        }
+        return type == FILE && getTypes().is(FILE);
     }
 
     @Override

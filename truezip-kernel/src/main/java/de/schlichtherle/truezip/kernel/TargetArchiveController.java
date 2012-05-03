@@ -522,7 +522,7 @@ implements ArchiveFileSystemTouchListener<E> {
                         // non-directory entry which hasn't received any
                         // content yet, e.g. as a result of mknod()
                         // => output an empty file system entry.
-                        for (final Size size : ALL_SIZE_SET)
+                        for (final Size size : ALL_SIZES)
                             ae.setSize(size, UNKNOWN);
                         ae.setSize(DATA, 0);
                         os.output(ae).stream().close();
