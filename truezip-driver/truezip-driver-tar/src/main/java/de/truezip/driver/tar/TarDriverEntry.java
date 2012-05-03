@@ -215,45 +215,45 @@ implements FsArchiveEntry, Releasable<IOException> {
             final Access type,
             final Entity entity,
             final Boolean value) {
-        if (!(entity instanceof PosixEntity))
+        if (null == value || !(entity instanceof PosixEntity))
             return false;
         switch ((PosixEntity) entity) {
         case USER:
             switch (type) {
             case READ:
-                super.setMode(super.getMode() | TUREAD);
+                super.setMode(value ? super.getMode() | TUREAD : super.getMode() & ~TUREAD);
                 return true;
             case WRITE:
-                super.setMode(super.getMode() | TUWRITE);
+                super.setMode(value ? super.getMode() | TUWRITE : super.getMode() & ~TUWRITE);
                 return true;
             case EXECUTE:
-                super.setMode(super.getMode() | TUEXEC);
+                super.setMode(value ? super.getMode() | TUEXEC : super.getMode() & ~TUEXEC);
                 return true;
             }
             break;
         case GROUP:
             switch (type) {
             case READ:
-                super.setMode(super.getMode() | TGREAD);
+                super.setMode(value ? super.getMode() | TGREAD : super.getMode() & ~TGREAD);
                 return true;
             case WRITE:
-                super.setMode(super.getMode() | TGWRITE);
+                super.setMode(value ? super.getMode() | TGWRITE : super.getMode() & ~TGWRITE);
                 return true;
             case EXECUTE:
-                super.setMode(super.getMode() | TGEXEC);
+                super.setMode(value ? super.getMode() | TGEXEC : super.getMode() & ~TGEXEC);
                 return true;
             }
             break;
         case OTHER:
             switch (type) {
             case READ:
-                super.setMode(super.getMode() | TOREAD);
+                super.setMode(value ? super.getMode() | TOREAD : super.getMode() & ~TOREAD);
                 return true;
             case WRITE:
-                super.setMode(super.getMode() | TOWRITE);
+                super.setMode(value ? super.getMode() | TOWRITE : super.getMode() & ~TOWRITE);
                 return true;
             case EXECUTE:
-                super.setMode(super.getMode() | TOEXEC);
+                super.setMode(value ? super.getMode() | TOEXEC : super.getMode() & ~TOEXEC);
                 return true;
             }
         }
