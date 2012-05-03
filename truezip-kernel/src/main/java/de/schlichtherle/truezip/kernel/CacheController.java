@@ -6,6 +6,7 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.CacheEntry.Strategy.WRITE_BACK;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import static de.truezip.kernel.FsAccessOption.GROW;
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
@@ -412,12 +413,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 register();
             }
 
-            void mknod( final BitField<FsAccessOption> options,
+            void mknod( BitField<FsAccessOption> mknodOpts,
                         final @CheckForNull Entry template)
             throws IOException {
                 while (true) {
                     try {
-                        controller.mknod(options, name, FILE, template);
+                        controller.mknod(mknodOpts, name, FILE, template);
                         break;
                     } catch (final NeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry
@@ -428,9 +429,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                         // resolve the issue locally, that is if we were asked
                         // to create the entry exclusively or this is a
                         // non-recursive file system operation.
-                        final BitField<FsSyncOption> modified;
-                        if (options.get(EXCLUSIVE)
-                                || SYNC == (modified = SyncController.modify(SYNC)))
+                        final BitField<FsSyncOption> syncOpts;
+                        if (mknodOpts.get(EXCLUSIVE)
+                                || SYNC == (syncOpts = SyncController.modify(SYNC)))
                             throw mknodEx;
 
                         // Try to resolve the issue locally.
@@ -439,7 +440,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                         // sync() with the virtual file system again and retry
                         // the mknod().
                         try {
-                            controller.sync(modified);
+                            controller.sync(syncOpts);
                             continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             syncEx.addSuppressed(mknodEx);
@@ -468,6 +469,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
                             // Dito for mapping the exception.
                             //throw FsNeedsLockRetryException.get(getModel());
+
+                            // Check if we can retry the mknod with GROW set.
+                            final BitField<FsAccessOption> oldMknodOpts = mknodOpts;
+                            mknodOpts = oldMknodOpts.set(GROW);
+                            if (oldMknodOpts != mknodOpts)
+                                continue;
 
                             // Finally, the mknod failed because the entry
                             // has already been output to the target archive
