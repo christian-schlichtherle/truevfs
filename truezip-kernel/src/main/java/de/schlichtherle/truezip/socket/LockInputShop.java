@@ -9,6 +9,7 @@ import de.schlichtherle.truezip.io.LockInputStream;
 import de.schlichtherle.truezip.rof.LockReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -64,6 +65,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
     @Override
     @GuardedBy("lock")
+    @DischargesObligation
     public void close() throws IOException {
         lock.lock();
         try {
