@@ -225,7 +225,7 @@ implements OutputService<ZipDriverEntry> {
         }
 
         @Override
-        public Boolean isPermitted(Entity entity, Access access) {
+        public Boolean isPermitted(Access type, Entity entity) {
             return null;
         }
     } // DirectoryTemplate

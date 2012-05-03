@@ -43,8 +43,8 @@ implements Entry {
     }
 
     @Override
-    public Boolean isPermitted(Entity entity, Access access) {
-        return entry.isPermitted(entity, access);
+    public Boolean isPermitted(Access type, Entity entity) {
+        return entry.isPermitted(type, entity);
     }
 
     /**

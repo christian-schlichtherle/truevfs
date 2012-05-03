@@ -19,8 +19,6 @@ import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -143,8 +141,8 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
-    public Boolean isPermitted(Entity entity, Access access) {
-        if (READ != access)
+    public Boolean isPermitted(Access type, Entity entity) {
+        if (READ != type)
             return null;
         try {
             executeHead();

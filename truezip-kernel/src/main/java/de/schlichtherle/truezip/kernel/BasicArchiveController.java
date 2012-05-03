@@ -286,9 +286,14 @@ extends LockModelController {
         }
 
         @Override
-        public Boolean isPermitted(Entity entity, Access access) {
-            return entry.isPermitted(entity, access);
+        public Boolean isPermitted(Access type, Entity entity) {
+            return entry.isPermitted(type, entity);
         }
+
+        /*@Override
+        public boolean setPermitted(Access type, Entity entity, Boolean value) {
+            return false;
+        }*/
     } // ProxyEntry
 
     abstract OutputSocket<E> output(E entry, BitField<FsAccessOption> options);

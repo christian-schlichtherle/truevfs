@@ -215,8 +215,8 @@ implements Cloneable {
     }
 
     @Override
-    public Boolean isPermitted(Entity entity, Access access) {
-        return map.get(key).isPermitted(entity, access);
+    public Boolean isPermitted(Access type, Entity entity) {
+        return map.get(key).isPermitted(type, entity);
     }
 
     /**

@@ -163,12 +163,12 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public Boolean isPermitted(Entity entity, Access access) {
+    public Boolean isPermitted(Access type, Entity entity) {
         if (!(entity instanceof PosixEntity))
             return null;
         switch ((PosixEntity) entity) {
         case USER:
-            switch (access) {
+            switch (type) {
             case READ:
                 return 0 != (getMode() & 00400); // TUREAD    00400     /* Read by owner         */
             case WRITE:
@@ -178,7 +178,7 @@ implements FsArchiveEntry, Releasable<IOException> {
             }
             break;
         case GROUP:
-            switch (access) {
+            switch (type) {
             case READ:
                 return 0 != (getMode() & 00040); // TGREAD    00040     /* Read by group         */
             case WRITE:
@@ -188,7 +188,7 @@ implements FsArchiveEntry, Releasable<IOException> {
             }
             break;
         case OTHER:
-            switch (access) {
+            switch (type) {
             case READ:
                 return 0 != (getMode() & 00004); // TOREAD    00004     /* Read by other         */
             case WRITE:

@@ -4,7 +4,8 @@
  */
 package de.truezip.kernel.cio;
 
-import static de.truezip.kernel.cio.Entry.Access.*;
+import static de.truezip.kernel.cio.Entry.Access.READ;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import de.truezip.kernel.io.ByteBufferChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -157,7 +158,7 @@ public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
     }
 
     @Override
-    public Boolean isPermitted(Entity entity, Access access) {
+    public Boolean isPermitted(Access type, Entity entity) {
         return true;
     }
 
