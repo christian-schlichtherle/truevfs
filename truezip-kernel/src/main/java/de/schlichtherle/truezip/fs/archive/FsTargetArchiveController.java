@@ -388,6 +388,11 @@ extends FsFileSystemArchiveController<E> {
     throws FsNeedsSyncException {
         // HC SUNT DRACONES!
 
+        // If no file system exists, then pass the test.
+        final FsArchiveFileSystem<E> fs = getFileSystem();
+        if (null == fs)
+            return;
+
         // If GROWing and the driver supports the respective access method,
         // then pass the test.
         if (getContext().get(GROW)) {
@@ -402,18 +407,14 @@ extends FsFileSystemArchiveController<E> {
             }
         }
 
-        // If no file system exists or does not contain an entry with the given
-        // name, then pass the test.
-        final FsCovariantEntry<E> fse; // file system entry
-        {
-            final FsArchiveFileSystem<E> fs;
-            if (null == (fs = getFileSystem()) || null == (fse = fs.getEntry(name)))
-                return;
-        }
+        // If the file system does not contain an entry with the given name,
+        // then pass the test.
+        final FsCovariantEntry<E> fse = fs.getEntry(name);
+        if (null == fse)
+            return;
 
         // If the entry name addresses the file system root, then pass the test
-        // because the root entry is not present in the input or output archive
-        // anyway.
+        // because the root entry cannot get input or output anyway.
         if (name.isRoot())
             return;
 
