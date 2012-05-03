@@ -74,7 +74,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private ArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.driver = driver;
-        final E root = newEntry(FsAccessOptions.NONE, ROOT_PATH, DIRECTORY, null);
+        final E root = newEntry(ROOT_PATH, DIRECTORY, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -148,7 +148,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         // Setup root file system entry, potentially replacing its previous
         // mapping from the source archive.
-        master.add(ROOT_PATH, newEntry(NONE, ROOT_PATH, DIRECTORY, rootTemplate));
+        master.add(ROOT_PATH, newEntry(ROOT_PATH, DIRECTORY, rootTemplate));
         this.master = master;
         // Now perform a file system checkAccess to create missing parent directories
         // and populate directories with their members - this must be done
@@ -181,7 +181,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final String memberName = splitter.getMemberName();
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
-            parent = master.add(parentPath, newEntry(NONE, parentPath, DIRECTORY, null));
+            parent = master.add(parentPath, newEntry(parentPath, DIRECTORY, null));
         parent.add(memberName);
         fix(parentPath);
     }
@@ -307,14 +307,11 @@ implements Iterable<FsCovariantEntry<E>> {
      *         exception of its name and type.
      * @return A new entry for the given name.
      */
-    private E newEntry(
-            final BitField<FsAccessOption> options,
-            final String name,
-            final Type type,
-            final @CheckForNull Entry template) {
+    private E newEntry(final String name, final Type type, @CheckForNull
+    final Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        return driver.newEntry(options, name, type, template);
+        return driver.newEntry(NONE, name, type, template);
     }
 
     /**
@@ -322,7 +319,6 @@ implements Iterable<FsCovariantEntry<E>> {
      * but checks that the given entry name can get encoded by the driver's
      * character set.
      *
-     * @see    #options
      * @param  name the entry name.
      * @param  options a bit field of access options.
      * @param  type the entry type.
@@ -332,15 +328,18 @@ implements Iterable<FsCovariantEntry<E>> {
      * @return A new entry for the given name.
      * @throws CharConversionException If the entry name contains characters
      *         which cannot get encoded.
+     * @see    #mknod
      */
-    private E newEntryChecked(
+    private E newEntry(
             final BitField<FsAccessOption> options,
             final String name,
             final Type type,
             final @CheckForNull Entry template)
     throws CharConversionException {
+        assert null != type;
+        assert !isRoot(name);
         driver.checkEncodable(name);
-        return newEntry(options, name, type, template);
+        return driver.newEntry(options, name, type, template);
     }
 
     /**
@@ -451,14 +450,14 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements[0] = new SegmentLink<>(null, parentEntry);
                 newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(options, entryName, entryType, template));
+                        newEntry(options, entryName, entryType, template));
                 elements[1] = new SegmentLink<>(memberName, newEntry);
             } else if (options.get(CREATE_PARENTS)) {
                 elements = newSegmentLinks(
                         level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(options, entryName, entryType, template));
+                        newEntry(options, entryName, entryType, template));
                 elements[elements.length - level]
                         = new SegmentLink<>(memberName, newEntry);
             } else {
