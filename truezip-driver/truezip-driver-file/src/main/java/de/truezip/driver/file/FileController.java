@@ -62,7 +62,10 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public FileEntry stat(final FsEntryName name) throws IOException {
+    public FileEntry stat(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options)
+    throws IOException {
         final FileEntry entry = new FileEntry(target, name);
         return exists(entry.getPath()) ? entry : null;
     }

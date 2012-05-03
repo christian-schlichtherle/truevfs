@@ -70,7 +70,10 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public HttpEntry stat(FsEntryName name) throws IOException {
+    public HttpEntry stat(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options)
+    throws IOException {
         HttpEntry entry = newEntry(name);
         return entry.isType(FILE) ? entry : null;
     }

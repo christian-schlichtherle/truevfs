@@ -131,18 +131,21 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     } // IsReadOnly
     
     @Override
-    public @Nullable FsEntry stat(final FsEntryName name) throws IOException {
-        return call(new GetEntry(), name);
-    }
+    public @Nullable FsEntry stat(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options)
+    throws IOException {
+        final class Stat implements IOOperation<FsEntry> {
+            @Override
+            public @Nullable FsEntry call(  final FsController<?> controller,
+                                            final FsEntryName resolved)
+            throws IOException {
+                return controller.stat(resolved, options);
+            }
+        } // Stat
 
-    private static final class GetEntry implements IOOperation<FsEntry> {
-        @Override
-        public @Nullable FsEntry call(  final FsController<?> controller,
-                                        final FsEntryName resolved)
-        throws IOException {
-            return controller.stat(resolved);
-        }
-    } // GetEntry
+        return call(new Stat(), name);
+    }
 
     @Override
     public void checkAccess(

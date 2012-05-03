@@ -129,11 +129,14 @@ public abstract class FsController<M extends FsModel> {
      * and should result in an {@link UnsupportedOperationException}.
      * 
      * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system entry.
      * @return A file system entry or {@code null} if no file system entry
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    public abstract @CheckForNull FsEntry stat(FsEntryName name)
+    public abstract @CheckForNull FsEntry stat(
+            FsEntryName name,
+            BitField<FsAccessOption> options)
     throws IOException;
 
     /**

@@ -176,7 +176,7 @@ implements ArchiveFileSystemTouchListener<E> {
         // Check parent file system entry.
         final FsEntry pe; // parent entry
         try {
-            pe = parent.stat(name);
+            pe = parent.stat(name, options);
         } catch (final FalsePositiveArchiveException ex) {
             throw new AssertionError(ex);
         } catch (final ControlFlowException ex) {

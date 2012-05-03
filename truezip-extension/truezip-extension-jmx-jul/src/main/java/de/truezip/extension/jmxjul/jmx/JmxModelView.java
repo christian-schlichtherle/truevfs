@@ -4,14 +4,13 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
+import static de.truezip.kernel.FsAccessOptions.NONE;
+import de.truezip.kernel.*;
+import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.Size.STORAGE;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
-import de.truezip.kernel.*;
-import de.truezip.kernel.FsEntryName;
-import de.truezip.kernel.FsSyncOption;
-import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.sl.FsManagerLocator;
 import de.truezip.kernel.util.BitField;
@@ -211,7 +210,7 @@ implements JmxModelViewMXBean {
     public long getSizeOfData() {
         try {
             return getParentController()
-                    .stat(getParentEntryName())
+                    .stat(getParentEntryName(), NONE)
                     .getSize(DATA);
         } catch (IOException ex) {
             return UNKNOWN;
@@ -222,7 +221,7 @@ implements JmxModelViewMXBean {
     public long getSizeOfStorage() {
         try {
             return getParentController()
-                    .stat(getParentEntryName())
+                    .stat(getParentEntryName(), NONE)
                     .getSize(STORAGE);
         } catch (IOException ex) {
             return UNKNOWN;
@@ -234,7 +233,7 @@ implements JmxModelViewMXBean {
         final long time;
         try {
             time = getParentController()
-                        .stat(getParentEntryName())
+                        .stat(getParentEntryName(), NONE)
                         .getTime(WRITE);
         } catch (IOException ex) {
             return null;
@@ -247,7 +246,7 @@ implements JmxModelViewMXBean {
         final long time;
         try {
             time = getParentController()
-                        .stat(getParentEntryName())
+                        .stat(getParentEntryName(), NONE)
                         .getTime(READ);
         } catch (IOException ex) {
             return null;
@@ -260,7 +259,7 @@ implements JmxModelViewMXBean {
         final long time;
         try {
             time = getParentController()
-                        .stat(getParentEntryName())
+                        .stat(getParentEntryName(), NONE)
                         .getTime(CREATE);
         } catch (IOException ex) {
             return null;

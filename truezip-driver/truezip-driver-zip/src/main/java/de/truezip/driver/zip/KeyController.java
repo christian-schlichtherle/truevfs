@@ -73,9 +73,12 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     }
 
     @Override
-    public final FsEntry stat(final FsEntryName name) throws IOException {
+    public final FsEntry stat(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options)
+    throws IOException {
         try {
-            return controller.stat(name);
+            return controller.stat(name, options);
         } catch (final Throwable ex) {
             if (!name.isRoot() || null == findKeyException(ex))
                 throw ex;
@@ -84,7 +87,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
                         .getMountPoint()
                         .getPath()
                         .resolve(name)
-                        .getEntryName());
+                        .getEntryName(), options);
             // We're not holding any locks, so it's possible that someone else
             // has concurrently modified the parent file system.
             if (null == entry)
