@@ -323,8 +323,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        final FsEntry srcEntry = src.getEntry();
-        final FsEntry dstEntry = dst.getEntry();
+        final FsEntry srcEntry = src.stat();
+        final FsEntry dstEntry = dst.stat();
         if (null == srcEntry)
             throw new NoSuchFileException(src.toString());
         if (!srcEntry.isType(FILE))
