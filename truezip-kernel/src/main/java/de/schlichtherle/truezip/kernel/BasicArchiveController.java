@@ -217,7 +217,7 @@ extends LockModelController {
             if (options.get(APPEND)) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
-                // change the contents of the transferred data accordingly.
+                // switch to Raw Data Copy (RDC) mode.
                 // This would not work when APPENDing.
                 return new ProxyEntry(ae);
             }
@@ -290,10 +290,10 @@ extends LockModelController {
             return entry.isPermitted(type, entity);
         }
 
-        /*@Override
+        @Override
         public boolean setPermitted(Access type, Entity entity, Boolean value) {
-            return false;
-        }*/
+            return entry.setPermitted(type, entity, value);
+        }
     } // ProxyEntry
 
     abstract OutputSocket<E> output(E entry, BitField<FsAccessOption> options);

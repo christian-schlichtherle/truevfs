@@ -32,6 +32,16 @@ implements FsArchiveEntry, Releasable<IOException> {
     // Bit masks for initialized fields.
     private static final int SIZE = 1, MODTIME = 1 << 1;
 
+    private static final int TUREAD  = 0400; // Read by owner
+    private static final int TUWRITE = 0200; // Write by owner special
+    private static final int TUEXEC  = 0100; // Execute/search by owner
+    private static final int TGREAD  = 0040; // Read by group
+    private static final int TGWRITE = 0020; // Write by group
+    private static final int TGEXEC  = 0010; // Execute/search by group
+    private static final int TOREAD  = 0004; // Read by other
+    private static final int TOWRITE = 0002; // Write by other
+    private static final int TOEXEC  = 0001; // Execute/search by other
+
     private byte init; // bit flags for init state
     private @CheckForNull IOBuffer<?> temp;
 
@@ -163,41 +173,91 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public Boolean isPermitted(Access type, Entity entity) {
+    public Boolean isPermitted(final Access type, final Entity entity) {
         if (!(entity instanceof PosixEntity))
             return null;
         switch ((PosixEntity) entity) {
         case USER:
             switch (type) {
             case READ:
-                return 0 != (getMode() & 00400); // TUREAD    00400     /* Read by owner         */
+                return 0 != (super.getMode() & TUREAD);
             case WRITE:
-                return 0 != (getMode() & 00200); // TUWRITE   00200     /* Write by owner special */
+                return 0 != (super.getMode() & TUWRITE);
             case EXECUTE:
-                return 0 != (getMode() & 00100); // TUEXEC    00100     /* Execute/search by owner */
+                return 0 != (super.getMode() & TUEXEC);
             }
             break;
         case GROUP:
             switch (type) {
             case READ:
-                return 0 != (getMode() & 00040); // TGREAD    00040     /* Read by group         */
+                return 0 != (super.getMode() & TGREAD);
             case WRITE:
-                return 0 != (getMode() & 00020); // TGWRITE   00020     /* Write by group        */
+                return 0 != (super.getMode() & TGWRITE);
             case EXECUTE:
-                return 0 != (getMode() & 00010); // TGEXEC    00010     /* Execute/search by group */
+                return 0 != (super.getMode() & TGEXEC);
             }
             break;
         case OTHER:
             switch (type) {
             case READ:
-                return 0 != (getMode() & 00004); // TOREAD    00004     /* Read by other         */
+                return 0 != (super.getMode() & TOREAD);
             case WRITE:
-                return 0 != (getMode() & 00002); // TOWRITE   00002     /* Write by other        */
+                return 0 != (super.getMode() & TOWRITE);
             case EXECUTE:
-                return 0 != (getMode() & 00001); // TOEXEC    00001     /* Execute/search by other */
+                return 0 != (super.getMode() & TOEXEC);
             }
         }
         return null;
+    }
+
+    @Override
+    public boolean setPermitted(
+            final Access type,
+            final Entity entity,
+            final Boolean value) {
+        if (!(entity instanceof PosixEntity))
+            return false;
+        switch ((PosixEntity) entity) {
+        case USER:
+            switch (type) {
+            case READ:
+                super.setMode(super.getMode() | TUREAD);
+                return true;
+            case WRITE:
+                super.setMode(super.getMode() | TUWRITE);
+                return true;
+            case EXECUTE:
+                super.setMode(super.getMode() | TUEXEC);
+                return true;
+            }
+            break;
+        case GROUP:
+            switch (type) {
+            case READ:
+                super.setMode(super.getMode() | TGREAD);
+                return true;
+            case WRITE:
+                super.setMode(super.getMode() | TGWRITE);
+                return true;
+            case EXECUTE:
+                super.setMode(super.getMode() | TGEXEC);
+                return true;
+            }
+            break;
+        case OTHER:
+            switch (type) {
+            case READ:
+                super.setMode(super.getMode() | TOREAD);
+                return true;
+            case WRITE:
+                super.setMode(super.getMode() | TOWRITE);
+                return true;
+            case EXECUTE:
+                super.setMode(super.getMode() | TOEXEC);
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -52,8 +52,8 @@ public interface MutableEntry extends Entry {
      * @return {@code false} if and only if setting a permission of the given
      *         {@code type} for the given {@code entity} is unsupported.
      */
-    /*boolean setPermitted(
+    boolean setPermitted(
             Access type,
             Entity entity,
-            @CheckForNull Boolean value);*/
+            @CheckForNull Boolean value);
 }
