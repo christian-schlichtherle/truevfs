@@ -76,7 +76,7 @@ implements Iterable<FsCovariantEntry<E>> {
         this.driver = driver;
         final E root = newEntry(ROOT_PATH, DIRECTORY, null);
         final long time = System.currentTimeMillis();
-        for (final Access access : ALL_ACCESS_SET)
+        for (final Access access : ALL_ACCESS)
             root.setTime(access, time);
         final EntryTable<E> master = new EntryTable<>(
                 initialCapacity(OVERHEAD_SIZE));
@@ -396,8 +396,8 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     private static String typeName(final FsCovariantEntry<?> entry) {
-        final Set<Type> types = entry.getTypes();
-        return 1 == types.size()
+        final BitField<Type> types = entry.getTypes();
+        return 1 == types.cardinality()
                 ? typeName(types.iterator().next())
                 : types.toString().toLowerCase(Locale.ENGLISH);
     }
@@ -571,9 +571,9 @@ implements Iterable<FsCovariantEntry<E>> {
             // This signal will be ignored by drivers which do no support a
             // central directory (TAR).
             final E ae = ce.getEntry();
-            for (final Size type : ALL_SIZE_SET)
+            for (final Size type : ALL_SIZES)
                 ae.setSize(type, UNKNOWN);
-            for (final Access type : ALL_ACCESS_SET)
+            for (final Access type : ALL_ACCESS)
                 ae.setTime(type, UNKNOWN);
         }
         splitter.split(path);

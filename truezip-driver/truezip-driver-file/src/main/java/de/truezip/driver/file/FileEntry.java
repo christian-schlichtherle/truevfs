@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import static java.nio.file.attribute.PosixFilePermission.*;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.annotation.CheckForNull;
@@ -99,21 +98,21 @@ class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
     }
 
     @Override
-    public final Set<Type> getTypes() {
+    public final BitField<Type> getTypes() {
         try {
             final BasicFileAttributes attr = readBasicFileAttributes();
             if (attr.isRegularFile())
-                return FILE_TYPE_SET;
+                return FILE_TYPE;
             else if (attr.isDirectory())
-                return DIRECTORY_TYPE_SET;
+                return DIRECTORY_TYPE;
             else if (attr.isSymbolicLink())
-                return SYMLINK_TYPE_SET;
+                return SYMLINK_TYPE;
             else if (attr.isOther())
-                return SPECIAL_TYPE_SET;
+                return SPECIAL_TYPE;
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
         }
-        return Collections.emptySet();
+        return NO_TYPES;
     }
 
     @Override

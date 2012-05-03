@@ -6,8 +6,8 @@ package de.truezip.kernel.mock;
 
 import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.ThrowManager;
-import static de.truezip.kernel.cio.Entry.ALL_ACCESS_SET;
-import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
+import static de.truezip.kernel.cio.Entry.ALL_ACCESS;
+import static de.truezip.kernel.cio.Entry.ALL_SIZES;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.*;
@@ -220,9 +220,9 @@ implements Container<MockArchiveDriverEntry> {
                     } catch (final IOException ex) {
                         throw new AssertionError(ex);
                     }
-                    for (final Size type : ALL_SIZE_SET)
+                    for (final Size type : ALL_SIZES)
                         target.setSize(type, buffer.getSize(type));
-                    for (final Access type : ALL_ACCESS_SET)
+                    for (final Access type : ALL_ACCESS)
                         target.setTime(type, buffer.getTime(type));
                 }
             } // Output

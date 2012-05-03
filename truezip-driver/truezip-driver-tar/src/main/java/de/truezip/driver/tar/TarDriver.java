@@ -8,7 +8,11 @@ import static de.truezip.kernel.FsAccessOption.CACHE;
 import static de.truezip.kernel.FsAccessOption.COMPRESS;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry;
+import static de.truezip.kernel.cio.Entry.ALL_POSIX_ACCESS;
+import static de.truezip.kernel.cio.Entry.ALL_POSIX_ENTITIES;
+import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
+import de.truezip.kernel.cio.Entry.PosixEntity;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.cio.InputService;
@@ -121,7 +125,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     @Override
     public TarDriverEntry newEntry(
-            final BitField<FsAccessOption> mknod,
+            final BitField<FsAccessOption> options,
             String name,
             final Type type,
             final @CheckForNull Entry template) {
@@ -134,6 +138,9 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             if (null != template) {
                 entry.setModTime(template.getTime(WRITE));
                 entry.setSize(template.getSize(DATA));
+                for (final Access access : ALL_POSIX_ACCESS)
+                    for (final PosixEntity entity : ALL_POSIX_ENTITIES)
+                        entry.setPermitted(access, entity, template.isPermitted(access, entity));
             }
         }
         return entry;

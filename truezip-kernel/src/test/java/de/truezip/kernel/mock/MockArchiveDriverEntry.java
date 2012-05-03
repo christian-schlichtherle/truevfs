@@ -41,16 +41,16 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             final @CheckForNull Entry template) {
         this(name, type);
         if (null != template) {
-            for (final Size size : ALL_SIZE_SET) {
+            for (final Size size : ALL_SIZES) {
                 final long value = template.getSize(size);
                 if (UNKNOWN != value)
                     sizes.put(size, value);
             }
-            for (final Access access : ALL_ACCESS_SET) {
+            for (final Access access : ALL_ACCESS) {
                 final long value = template.getTime(access);
                 if (UNKNOWN != value)
                     times.put(access, value);
-                for (final PosixEntity entity : ALL_POSIX_ENTITY_SET)
+                for (final PosixEntity entity : ALL_POSIX_ENTITIES)
                     permissions[access.ordinal()][entity.ordinal()]
                             = template.isPermitted(access, entity);
             }

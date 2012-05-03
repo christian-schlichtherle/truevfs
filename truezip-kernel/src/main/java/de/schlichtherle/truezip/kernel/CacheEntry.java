@@ -132,10 +132,13 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         return null == buffer ? UNKNOWN : buffer.getTime(type);
     }
 
+    /**
+     * Returns {@code null} in order to block copying of access permissions
+     * of cache entries.
+     */
     @Override
     public Boolean isPermitted(Access type, Entity entity) {
-        final Buffer buffer = this.buffer;
-        return null == buffer ? null : buffer.isPermitted(type, entity);
+        return null;
     }
 
     /**

@@ -4,7 +4,7 @@
  */
 package de.truezip.kernel.cio;
 
-import static de.truezip.kernel.cio.Entry.ALL_ACCESS_SET;
+import static de.truezip.kernel.cio.Entry.ALL_ACCESS;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
@@ -291,7 +291,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         void updateProperties(final E local, final Entry peer) {
-            for (final Access type : ALL_ACCESS_SET)
+            for (final Access type : ALL_ACCESS)
                 if (UNKNOWN == local.getTime(type))
                     local.setTime(type, peer.getTime(type));
             // Never copy any but the DATA size!

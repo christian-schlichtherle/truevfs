@@ -4,10 +4,9 @@
  */
 package de.truezip.kernel.cio;
 
+import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Type.*;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+import de.truezip.kernel.util.BitField;
 
 /**
  * Represents an entry in a container.
@@ -18,7 +17,7 @@ import java.util.Set;
  * Some constants of this interface are unmodifiable sets of enums.
  * These are convenient to use for loops like this:
  * <pre><code>
- * for (Type type : ALL_TYPE_SET)
+ * for (Type type : ALL_TYPES)
  *     ...;
  * </code></pre>
  *
@@ -87,16 +86,19 @@ public interface Entry {
         SPECIAL,
     }
 
-    /** An unmodifiable set of just {@link Type#FILE}. */
-    Set<Type> FILE_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(FILE));
-    /** An unmodifiable set of just {@link Type#DIRECTORY}. */
-    Set<Type> DIRECTORY_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(DIRECTORY));
-    /** An unmodifiable set of just {@link Type#SYMLINK}. */
-    Set<Type> SYMLINK_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(SYMLINK));
-    /** An unmodifiable set of just {@link Type#SPECIAL}. */
-    Set<Type> SPECIAL_TYPE_SET = Collections.unmodifiableSet(EnumSet.of(SPECIAL));
-    /** An unmodifiable set of all enums in {@link Type}. */
-    Set<Type> ALL_TYPE_SET = Collections.unmodifiableSet(EnumSet.allOf(Type.class));
+    /** A bit field of no enums in {@link Type}. */
+    BitField<Type> NO_TYPES = BitField.noneOf(Type.class);
+    /** A bit field of all enums in {@link Type}. */
+    BitField<Type> ALL_TYPES = BitField.allOf(Type.class);
+
+    /** A bit field of just {@link Type#FILE}. */
+    BitField<Type> FILE_TYPE = BitField.of(FILE);
+    /** A bit field of just {@link Type#DIRECTORY}. */
+    BitField<Type> DIRECTORY_TYPE = BitField.of(DIRECTORY);
+    /** A bit field of just {@link Type#SYMLINK}. */
+    BitField<Type> SYMLINK_TYPE = BitField.of(SYMLINK);
+    /** A bit field of just {@link Type#SPECIAL}. */
+    BitField<Type> SPECIAL_TYPE = BitField.of(SPECIAL);
 
     /** Defines the type of size information for an entry. */
     @SuppressWarnings("PublicInnerClass")
@@ -105,9 +107,11 @@ public interface Entry {
         STORAGE,
     }
 
-    /** An unmodifiable set of all enums in {@link Size}. */
-    Set<Size> ALL_SIZE_SET = Collections.unmodifiableSet(EnumSet.allOf(Size.class));
-
+    /** A bit field of no enums in {@link Size}. */
+    BitField<Size> NO_SIZES = BitField.noneOf(Size.class);
+    /** A bit field of all enums in {@link Size}. */
+    BitField<Size> ALL_SIZES = BitField.allOf(Size.class);
+ 
     /**
      * Returns the size of the given {@code type} for this entry in bytes or
      * {@link #UNKNOWN} if not specified or the type is unsupported.
@@ -128,8 +132,16 @@ public interface Entry {
         EXECUTE,
     }
 
-    /** An unmodifiable set of all enums in {@link Access}. */
-    Set<Access> ALL_ACCESS_SET = Collections.unmodifiableSet(EnumSet.allOf(Access.class));
+    /** A bit field of no enums in {@link Access}. */
+    BitField<Access> NO_ACCESS = BitField.noneOf(Access.class);
+    /** A bit field of all enums in {@link Access}. */
+    BitField<Access> ALL_ACCESS = BitField.allOf(Access.class);
+
+    /**
+     * A bit field of the enums {@link Access#READ},
+     * {@link Access#WRITE} and {@link Access#EXECUTE}.
+     */
+    BitField<Access> ALL_POSIX_ACCESS = BitField.of(READ, WRITE, EXECUTE);
 
     /**
      * Returns the time of the given access {@code type} for this entry in
@@ -156,8 +168,10 @@ public interface Entry {
         OTHER,
     } // Entity
 
-    /** An unmodifiable set of all enums in {@link PosixEntity}. */
-    Set<PosixEntity> ALL_POSIX_ENTITY_SET = Collections.unmodifiableSet(EnumSet.allOf(PosixEntity.class));
+    /** A bit field of no enums in {@link PosixEntity}. */
+    BitField<PosixEntity> NO_POSIX_ENTITIES = BitField.noneOf(PosixEntity.class);
+    /** A bit field of all enums in {@link PosixEntity}. */
+    BitField<PosixEntity> ALL_POSIX_ENTITIES = BitField.allOf(PosixEntity.class);
 
     /**
      * Returns {@code true} if and only if the given access {@code type} to

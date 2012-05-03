@@ -29,21 +29,19 @@ public abstract class FsEntry implements Entry {
     public abstract String getName();
 
     /**
-     * Returns a set of types implemented by this entry.
-     * Whether or not modifying the returned set is supported and the effect
-     * on the file system is implementation specific.
+     * Returns a bit field of types implemented by this entry.
      * <p>
      * Some file system types allow an entry to implement multiple entry types.
      * For example, a ZIP or TAR file may contain a file entry with the name
      * {@code foo} and a directory entry with the name {@code foo/}.
-     * Yes, this is strange, but shit happens!
+     * Yes, this is strange, but sh*t happens!
      * In this case then, a virtual file system should collapse this into one
      * file system entry which returns {@code true} for both
      * {@code isType(FILE)} and {@code isType(DIRECTORY)}.
      * 
-     * @return A set of types implemented by this entry.
+     * @return A bit field of types implemented by this entry.
      */
-    public abstract Set<Type> getTypes();
+    public abstract BitField<Type> getTypes();
 
     /**
      * Returns {@code true} if and only if this file system entry implements
@@ -55,7 +53,7 @@ public abstract class FsEntry implements Entry {
      * @see    #getTypes()
      */
     public boolean isType(Type type) {
-        return getTypes().contains(type);
+        return getTypes().is(type);
     }
 
     /**
@@ -99,13 +97,13 @@ public abstract class FsEntry implements Entry {
     public String toString() {
         final StringBuilder s = new StringBuilder(256);
         final Formatter f = new Formatter(s).format("%s[name=%s, types=%s",
-                getClass().getName(), getName(), BitField.copyOf(getTypes()));
-        for (Size type : ALL_SIZE_SET) {
+                getClass().getName(), getName(), getTypes());
+        for (Size type : ALL_SIZES) {
             final long size = getSize(type);
             if (UNKNOWN != size)
                 f.format(", size(%s)=%d", type, size);
         }
-        for (Access type : ALL_ACCESS_SET) {
+        for (Access type : ALL_ACCESS) {
             final long time = getTime(type);
             if (UNKNOWN != time)
                 f.format(", time(%s)=%tc", type, time);
