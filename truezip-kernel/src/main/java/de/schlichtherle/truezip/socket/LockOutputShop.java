@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.socket;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.io.LockOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -62,6 +63,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
     @Override
     @GuardedBy("lock")
+    @DischargesObligation
     public void close() throws IOException {
         lock.lock();
         try {
