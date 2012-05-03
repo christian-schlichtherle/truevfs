@@ -97,8 +97,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public InputSocket<?> input(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options) {
+            final BitField<FsAccessOption> options, final FsEntryName name) {
         /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
         final class Input extends DelegatingInputSocket<Entry> {
             @Override
@@ -107,7 +106,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
-                        return controller.input(name, options);
+                        return controller.input(options, name);
                     //checkWriteLockedByCurrentThread();
                     cache = new EntryCache(name);
                 }
@@ -121,9 +120,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive!
     public OutputSocket<?> output(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final @CheckForNull Entry template) {
+            final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
+    final Entry template) {
         /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
         final class Output extends DelegatingOutputSocket<Entry> {
             @Override
@@ -132,7 +130,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(FsAccessOption.CACHE))
-                        return controller.output(name, options, template);
+                        return controller.output(options, name, template);
                     //checkWriteLockedByCurrentThread();
                     cache = new EntryCache(name);
                 }
@@ -144,22 +142,21 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public void mknod(  final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    public void mknod(  final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
         assert isWriteLockedByCurrentThread();
-        controller.mknod(name, options, type, template);
+        controller.mknod(options, name, type, template);
         final EntryCache cache = caches.remove(name);
         if (null != cache)
             cache.release();
     }
 
     @Override
-    public void unlink( final FsEntryName name,
-                        final BitField<FsAccessOption> options)
+    public void unlink( final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         assert isWriteLockedByCurrentThread();
-        controller.unlink(name, options);
+        controller.unlink(options, name);
         final EntryCache cache = caches.remove(name);
         if (null != cache)
             cache.release();
@@ -292,7 +289,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             protected InputSocket<? extends Entry> socket() {
-                return controller.input(name, options);
+                return controller.input(options, name);
             }
 
             @Override
@@ -341,8 +338,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             @Override
             protected OutputSocket<? extends Entry> socket() {
                 return cache.configure( controller.output(
-                                            name,
-                                            options.clear(EXCLUSIVE),
+                                            options.clear(EXCLUSIVE), name,
                                             template))
                             .output();
             }
@@ -421,7 +417,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             throws IOException {
                 while (true) {
                     try {
-                        controller.mknod(name, options, FILE, template);
+                        controller.mknod(options, name, FILE, template);
                         break;
                     } catch (final NeedsSyncException mknodEx) {
                         // In this context, this exception means that the entry

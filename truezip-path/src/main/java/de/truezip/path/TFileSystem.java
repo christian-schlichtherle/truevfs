@@ -228,18 +228,18 @@ public final class TFileSystem extends FileSystem {
             final BitField<FsAccessOption>
                     o = path.inputOptions(options).set(CACHE);
             return controller
-                    .input(name, o)
+                    .input(o, name)
                     .channel();
         } else {
             final BitField<FsAccessOption>
                     o = path.outputOptions(options).set(CACHE);
             try {
                 return controller
-                        .output(name, o, null)
+                        .output(o, name, null)
                         .channel();
             } catch (final IOException ex) {
                 // TODO: Filter FileAlreadyExistsException.
-                if (o.get(EXCLUSIVE) && null != controller.stat(name, o))
+                if (o.get(EXCLUSIVE) && null != controller.stat(o, name))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
                 throw ex;
@@ -251,8 +251,7 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         return getController()
                 .input(
-                    path.getEntryName(),
-                    path.inputOptions(options))
+                    path.inputOptions(options), path.getEntryName())
                 .stream();
     }
 
@@ -260,8 +259,7 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         return getController()
                 .output(
-                    path.getEntryName(),
-                    path.outputOptions(options),
+                    path.outputOptions(options), path.getEntryName(),
                     null)
                 .stream();
     }
@@ -344,12 +342,11 @@ public final class TFileSystem extends FileSystem {
         final BitField<FsAccessOption> options = path.getAccessPreferences();
         try {
             controller.mknod(
-                    name,
-                    options,
+                    options, name,
                     DIRECTORY,
                     null);
         } catch (IOException ex) {
-            if (null != controller.stat(name, options))
+            if (null != controller.stat(options, name))
                 throw (IOException) new FileAlreadyExistsException(path.toString())
                         .initCause(ex);
             throw ex;
@@ -357,23 +354,22 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        getController().unlink(path.getEntryName(), path.getAccessPreferences());
+        getController().unlink(path.getAccessPreferences(), path.getEntryName());
     }
 
     FsEntry stat(TPath path) throws IOException {
-        return getController().stat(path.getEntryName(),
-                                    path.getAccessPreferences());
+        return getController().stat(path.getAccessPreferences(), path.getEntryName());
     }
 
     InputSocket<?> input(   TPath path,
                             BitField<FsAccessOption> options) {
-        return getController().input(path.getEntryName(), options);
+        return getController().input(options, path.getEntryName());
     }
 
     OutputSocket<?> output( TPath path,
                             BitField<FsAccessOption> options,
                             @CheckForNull Entry template) {
-        return getController().output(path.getEntryName(), options, template);
+        return getController().output(options, path.getEntryName(), template);
     }
 
     void checkAccess(final TPath path, final AccessMode... modes)
@@ -381,7 +377,7 @@ public final class TFileSystem extends FileSystem {
         final FsEntryName name = path.getEntryName();
         final BitField<FsAccessOption> options = path.getAccessPreferences();
         final BitField<Access> types = types(modes);
-        getController().checkAccess(name, options, types);
+        getController().checkAccess(options, name, types);
     }
 
     private static BitField<Access> types(final AccessMode... modes) {
@@ -454,8 +450,7 @@ public final class TFileSystem extends FileSystem {
             if (null != createTime)
                 times.put(CREATE, createTime.toMillis());
             controller.setTime(
-                    path.getEntryName(),
-                    path.getAccessPreferences(),
+                    path.getAccessPreferences(), path.getEntryName(),
                     times);
         }
     } // FsEntryAttributeView
@@ -466,7 +461,7 @@ public final class TFileSystem extends FileSystem {
 
         FsEntryAttributes(final TPath path) throws IOException {
             if (null == (entry = getController()
-                    .stat(path.getEntryName(), path.getAccessPreferences())))
+                    .stat(path.getAccessPreferences(), path.getEntryName())))
                 throw new NoSuchFileException(path.toString());
         }
 

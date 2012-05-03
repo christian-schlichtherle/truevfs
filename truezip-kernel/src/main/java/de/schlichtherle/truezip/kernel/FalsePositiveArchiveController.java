@@ -132,15 +132,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     
     @Override
     public @Nullable FsEntry stat(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         final class Stat implements IOOperation<FsEntry> {
             @Override
             public @Nullable FsEntry call(  final FsController<?> controller,
                                             final FsEntryName resolved)
             throws IOException {
-                return controller.stat(resolved, options);
+                return controller.stat(options, resolved);
             }
         } // Stat
 
@@ -149,16 +148,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public void checkAccess(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
     throws IOException {
         final class CheckAccess implements IOOperation<Void> {
             @Override
             public Void call(   final FsController<?> controller,
                                 final FsEntryName resolved)
             throws IOException {
-                controller.checkAccess(resolved, options, types);
+                controller.checkAccess(options, resolved, types);
                 return null;
             }
         } // CheckAccess
@@ -183,14 +180,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     
     @Override
     public boolean setTime(
-            final FsEntryName name, final BitField<FsAccessOption> options, final Map<Access, Long> times)
+            final BitField<FsAccessOption> options, final FsEntryName name, final Map<Access, Long> times)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName resolved)
             throws IOException {
-                return controller.setTime(resolved, options, times);
+                return controller.setTime(options, resolved, times);
             }
         } // SetTime
 
@@ -199,14 +196,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name, final BitField<FsAccessOption> options, final BitField<Access> types, final long value)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types, final long value)
     throws IOException {
         final class SetTime implements IOOperation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName resolved)
             throws IOException {
-                return controller.setTime(resolved, options, types, value);
+                return controller.setTime(options, resolved, types, value);
             }
         } // SetTime
 
@@ -215,8 +212,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public InputSocket<?> input(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options) {
+            final BitField<FsAccessOption> options, final FsEntryName name) {
         @NotThreadSafe
         final class Input extends InputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
@@ -227,7 +223,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return (lastController == controller
                         ? socket
                         : (socket = (lastController = controller)
-                            .input(resolved, options)))
+                            .input(options, resolved)))
                         .bind(this);
             }
 
@@ -284,9 +280,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public OutputSocket<?> output(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final @CheckForNull Entry template) {
+            final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
+    final Entry template) {
         @NotThreadSafe
         final class Output extends OutputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
@@ -297,7 +292,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 return (lastController == controller
                         ? socket
                         : (socket = (lastController = controller)
-                            .output(resolved, options, template)))
+                            .output(options, resolved, template)))
                         .bind(this);
             }
 
@@ -354,7 +349,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public void mknod(
-            final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+            final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
         final class Mknod implements IOOperation<Void> {
@@ -362,7 +357,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             public Void call(final FsController<?> controller,
                              final FsEntryName resolved)
             throws IOException {
-                controller.mknod(resolved, options, type, template);
+                controller.mknod(options, resolved, type, template);
                 return null;
             }
         } // Mknod
@@ -372,20 +367,19 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public void unlink(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         final class Unlink implements IOOperation<Void> {
             @Override
             public Void call(final FsController<?> controller,
                              final FsEntryName resolved)
             throws IOException {
-                controller.unlink(resolved, options); // repeatable for root entry
+                controller.unlink(options, resolved); // repeatable for root entry
                 if (resolved.isRoot()) {
                     assert controller == FalsePositiveArchiveController.this.controller;
                     // Unlink target archive file from parent file system.
                     // This operation isn't lock protected, so it's not atomic!
-                    getParent().unlink(parent(resolved), options);
+                    getParent().unlink(options, parent(resolved));
                 }
                 return null;
             }

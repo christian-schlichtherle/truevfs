@@ -23,7 +23,6 @@ import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
-import de.truezip.key.param.AesPbeParameters;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -119,7 +118,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     @Override
-    protected ZipInputService zipInput(
+    protected ZipInputService newZipInput(
             final FsModel model,
             final Source source)
     throws IOException {
@@ -169,16 +168,15 @@ public abstract class ZipRaesDriver extends JarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected final OptionOutputSocket
-    sink(
+    protected final OptionOutputSocket sink(
+            BitField<FsAccessOption> options,
             final FsController<?> controller,
-            final FsEntryName name,
-            BitField<FsAccessOption> options) {
+            final FsEntryName name) {
         options = options.clear(GROW);
         // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
         // opportunity to apply its own preferences to sort out such a conflict.
         return new OptionOutputSocket(
-                controller.output(name, options.set(STORE), null),
+                controller.output(options.set(STORE), name, null),
                 options); // use modified options!
     }
 
@@ -198,12 +196,12 @@ public abstract class ZipRaesDriver extends JarDriver {
      */
     @Override
     public ZipDriverEntry newEntry(
+            final BitField<FsAccessOption> options,
             final String path,
             final Type type,
-            final BitField<FsAccessOption> mknod,
-            final Entry template) {
+            final @CheckForNull Entry template) {
         final ZipDriverEntry entry
-                = super.newEntry(path, type, mknod.set(COMPRESS), template);
+                = super.newEntry(options.set(COMPRESS), path, type, template);
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
         // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true
         // OR template is an instance of ZipEntry

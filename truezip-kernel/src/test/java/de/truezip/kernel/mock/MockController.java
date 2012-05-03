@@ -88,8 +88,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public FsEntry stat(
-            FsEntryName name,
-            BitField<FsAccessOption> options)
+            BitField<FsAccessOption> options, FsEntryName name)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -99,9 +98,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public void checkAccess(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -119,7 +116,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public boolean setTime(
-            FsEntryName name, BitField<FsAccessOption> options, Map<Access, Long> times)
+            BitField<FsAccessOption> options, FsEntryName name, Map<Access, Long> times)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -130,7 +127,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public boolean setTime(
-            FsEntryName name, BitField<FsAccessOption> options, BitField<Access> types, long value)
+            BitField<FsAccessOption> options, FsEntryName name, BitField<Access> types, long value)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -141,8 +138,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public InputSocket<?> input(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options) {
+            final BitField<FsAccessOption> options, final FsEntryName name) {
         checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
@@ -180,9 +176,7 @@ public class MockController extends FsModelController<FsModel> {
 
     @Override
     public OutputSocket<?> output(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final Entry template) {
+            final BitField<FsAccessOption> options, final FsEntryName name, final Entry template) {
         checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
@@ -221,7 +215,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public void mknod(  FsEntryName name, BitField<FsAccessOption> options, Type type, Entry template)
+    public void mknod(  BitField<FsAccessOption> options, FsEntryName name, Type type, Entry template)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -231,7 +225,7 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
+    public void unlink(BitField<FsAccessOption> options, FsEntryName name)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;

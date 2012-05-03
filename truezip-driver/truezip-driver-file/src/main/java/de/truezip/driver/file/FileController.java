@@ -63,8 +63,7 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public FileEntry stat(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         final FileEntry entry = new FileEntry(target, name);
         return exists(entry.getPath()) ? entry : null;
@@ -72,9 +71,7 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public void checkAccess(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final AccessMode[] modes = modes(types);
@@ -114,7 +111,7 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public boolean setTime(
-            final FsEntryName name, BitField<FsAccessOption> options, final Map<Access, Long> times)
+            BitField<FsAccessOption> options, final FsEntryName name, final Map<Access, Long> times)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final Map<Access, Long> t = new EnumMap<>(times);
@@ -127,7 +124,7 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public boolean setTime(
-            final FsEntryName name, BitField<FsAccessOption> options, final BitField<Access> types, final long value)
+            BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types, final long value)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final FileTime time = FileTime.fromMillis(value);
@@ -140,21 +137,19 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public InputSocket<?> input(
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
+            BitField<FsAccessOption> options, FsEntryName name) {
         return new FileEntry(target, name).input();
     }
 
     @Override
     public OutputSocket<?> output(
-            FsEntryName name,
-            BitField<FsAccessOption> options,
-            @CheckForNull Entry template) {
+            BitField<FsAccessOption> options, FsEntryName name, @CheckForNull
+    Entry template) {
         return new FileEntry(target, name).output(options, template);
     }
 
     @Override
-    public void mknod(  final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    public void mknod(  final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
         final Path file = target.resolve(name.getPath());
@@ -188,7 +183,7 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
+    public void unlink(BitField<FsAccessOption> options, FsEntryName name)
     throws IOException {
         Path file = target.resolve(name.getPath());
         delete(file);

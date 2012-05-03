@@ -71,8 +71,7 @@ public class HttpController extends FsModelController<FsModel>  {
 
     @Override
     public HttpEntry stat(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         HttpEntry entry = newEntry(name);
         return entry.isType(FILE) ? entry : null;
@@ -80,9 +79,7 @@ public class HttpController extends FsModelController<FsModel>  {
 
     @Override
     public void checkAccess(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
     throws IOException {
         if (!types.isEmpty() && !READ_ONLY.equals(types))
             throw new FsReadOnlyFileSystemException();
@@ -95,35 +92,33 @@ public class HttpController extends FsModelController<FsModel>  {
 
     @Override
     public boolean setTime(
-            FsEntryName name, BitField<FsAccessOption> options, BitField<Access> types, long value)
+            BitField<FsAccessOption> options, FsEntryName name, BitField<Access> types, long value)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
     public InputSocket<?> input(
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
+            BitField<FsAccessOption> options, FsEntryName name) {
         return newEntry(name).newInputSocket(options);
     }
 
     @Override
     public OutputSocket<?> output(
-            FsEntryName name,
-            BitField<FsAccessOption> options,
-            @CheckForNull Entry template) {
+            BitField<FsAccessOption> options, FsEntryName name, @CheckForNull
+    Entry template) {
         return newEntry(name).newOutputSocket(options, template);
     }
 
     @Override
-    public void mknod(  final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+    public void mknod(  final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
-    public void unlink(FsEntryName name, BitField<FsAccessOption> options)
+    public void unlink(BitField<FsAccessOption> options, FsEntryName name)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }

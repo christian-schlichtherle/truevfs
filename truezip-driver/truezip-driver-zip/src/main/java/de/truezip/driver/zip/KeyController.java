@@ -74,20 +74,19 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public final FsEntry stat(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         try {
-            return controller.stat(name, options);
+            return controller.stat(options, name);
         } catch (final Throwable ex) {
             if (!name.isRoot() || null == findKeyException(ex))
                 throw ex;
             Entry entry = getParent().stat(
-                    getModel()
-                        .getMountPoint()
-                        .getPath()
-                        .resolve(name)
-                        .getEntryName(), options);
+                    options, getModel()
+                                 .getMountPoint()
+                                 .getPath()
+                                 .resolve(name)
+                                 .getEntryName());
             // We're not holding any locks, so it's possible that someone else
             // has concurrently modified the parent file system.
             if (null == entry)
@@ -106,33 +105,29 @@ extends FsDecoratingController<M, FsController<? extends M>> {
 
     @Override
     public void checkAccess(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
     throws IOException {
         try {
-            controller.checkAccess(name, options, types);
+            controller.checkAccess(options, name, types);
             return;
         } catch (final Throwable ex) {
             if (!name.isRoot() || null == findKeyException(ex))
                 throw ex;
             getParent().checkAccess(
-                    getModel()
-                        .getMountPoint()
-                        .getPath()
-                        .resolve(name)
-                        .getEntryName(),
-                    options,
+                    options, getModel()
+                                 .getMountPoint()
+                                 .getPath()
+                                 .resolve(name)
+                                 .getEntryName(),
                     types);
         }
     }
 
     @Override
-    public final void unlink(   final FsEntryName name,
-                                final BitField<FsAccessOption> options)
+    public final void unlink(   final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         try {
-            controller.unlink(name, options);
+            controller.unlink(options, name);
         } catch (final Throwable ex) {
             // If the exception is caused by a key exception, then throw this
             // cause instead in order to avoid treating the target archive file

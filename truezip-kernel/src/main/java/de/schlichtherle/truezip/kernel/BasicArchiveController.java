@@ -73,23 +73,24 @@ extends LockModelController {
     /** Equivalent to {@link #autoMount(boolean) autoMount(false)}. */
     final ArchiveFileSystem<E> autoMount(BitField<FsAccessOption> options)
     throws IOException {
-        return autoMount(false, options);
+        return autoMount(options, false);
     }
 
     /**
      * Returns the (virtual) archive file system mounted from the target
-     * archive file. This method is reentrant with respect to any exceptions
-     * it may throw.
+     * archive file.
      *
+     * @param  options the options for accessing the file system entry.
      * @param  autoCreate If this is {@code true} and the archive file does not
      *         exist, then a new archive file system with only a virtual root
      *         directory is created with its last modification time set to the
      *         system's current time.
      * @return An archive file system.
+     * @throws IOException on any I/O error.
      */
     abstract ArchiveFileSystem<E> autoMount(
-            boolean autoCreate,
-            BitField<FsAccessOption> options)
+            BitField<FsAccessOption> options,
+            boolean autoCreate)
     throws IOException;
 
     @Override
@@ -99,19 +100,19 @@ extends LockModelController {
 
     @Override
     public final FsEntry stat(
-            FsEntryName name,
-            BitField<FsAccessOption> options)
+            BitField<FsAccessOption> options,
+            FsEntryName name)
     throws IOException {
-        return autoMount(NONE).entry(name);
+        return autoMount(options).entry(name);
     }
 
     @Override
     public final void checkAccess(
-            FsEntryName name,
             BitField<FsAccessOption> options,
+            FsEntryName name,
             BitField<Access> types)
     throws IOException {
-        autoMount(NONE).checkAccess(name, types);
+        autoMount(options).checkAccess(name, types);
     }
 
     @Override
@@ -121,45 +122,45 @@ extends LockModelController {
 
     @Override
     public final boolean setTime(
-            FsEntryName name,
             BitField<FsAccessOption> options,
+            FsEntryName name,
             Map<Access, Long> times)
     throws IOException {
-        checkSync(name, options, null);
+        checkSync(options, name, null);
         return autoMount(options).setTime(name, times, options);
     }
 
     @Override
     public final boolean setTime(
-            FsEntryName name,
             BitField<FsAccessOption> options,
+            FsEntryName name,
             BitField<Access> types, long value)
     throws IOException {
-        checkSync(name, options, null);
+        checkSync(options, name, null);
         return autoMount(options).setTime(name, types, value, options);
     }
 
     @Override
     public final InputSocket<?> input(
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
-        return new Input(name, options);
+            BitField<FsAccessOption> options,
+            FsEntryName name) {
+        return new Input(options, name);
     }
 
     @NotThreadSafe
     private final class Input extends DelegatingInputSocket<FsArchiveEntry> {
-        final FsEntryName name;
         final BitField<FsAccessOption> options;
+        final FsEntryName name;
 
-        Input(final FsEntryName name, final BitField<FsAccessOption> options) {
-            this.name = Objects.requireNonNull(name);
+        Input(final BitField<FsAccessOption> options, final FsEntryName name) {
             this.options = Objects.requireNonNull(options);
+            this.name = Objects.requireNonNull(name);
         }
 
         @Override
         public FsArchiveEntry localTarget() throws IOException {
             peerTarget(); // may sync() if in same target archive file!
-            checkSync(name, options, READ);
+            checkSync(options, name, READ);
             final FsCovariantEntry<E> fse = autoMount(options).entry(name);
             if (null == fse)
                 throw new NoSuchFileException(name.toString());
@@ -182,33 +183,33 @@ extends LockModelController {
 
     @Override
     public final OutputSocket<?> output(
-            FsEntryName name,
             BitField<FsAccessOption> options,
+            FsEntryName name,
             @CheckForNull Entry template) {
-        return new Output(name, options, template);
+        return new Output(options, name, template);
     }
 
     @NotThreadSafe
     private final class Output extends OutputSocket<FsArchiveEntry> {
-        final FsEntryName name;
         final BitField<FsAccessOption> options;
+        final FsEntryName name;
         final @CheckForNull Entry template;
 
-        Output( final FsEntryName name,
+        Output(
                 final BitField<FsAccessOption> options,
+                final FsEntryName name,
                 final @CheckForNull Entry template) {
-            this.name = Objects.requireNonNull(name);
             this.options = Objects.requireNonNull(options);
+            this.name = Objects.requireNonNull(name);
             this.template = template;
         }
 
         ArchiveFileSystemOperation<E> mknod() throws IOException {
-            checkSync(name, options, WRITE);
+            checkSync(options, name, WRITE);
             // Start creating or overwriting the archive entry.
             // This will fail if the entry already exists as a directory.
-            return autoMount(   !name.isRoot() && options.get(CREATE_PARENTS),
-                                options)
-                    .mknod(name, FILE, options, template);
+            return autoMount(options, !name.isRoot() && options.get(CREATE_PARENTS))
+                    .mknod(options, name, FILE, template);
         }
 
         @Override
@@ -230,7 +231,7 @@ extends LockModelController {
             final ArchiveFileSystemOperation<E> mknod = mknod();
             final E ae = mknod.getTarget().getEntry();
             try (final InputStream in = append()) {
-                final OutputSocket<? extends E> os = output(ae, options);
+                final OutputSocket<? extends E> os = output(options, ae);
                 if (null == in) // do NOT bind when appending!
                     os.bind(this);
                 final OutputStream out = os.stream();
@@ -253,7 +254,7 @@ extends LockModelController {
         @CheckForNull InputStream append() {
             if (options.get(APPEND)) {
                 try {
-                    return new Input(name, options).stream();
+                    return new Input(options, name).stream();
                 } catch (IOException ignored) {
                     // When appending, there is no need for the entry to be
                     // readable, so we can safely ignore this - fall through!
@@ -296,12 +297,12 @@ extends LockModelController {
         }
     } // ProxyEntry
 
-    abstract OutputSocket<E> output(E entry, BitField<FsAccessOption> options);
+    abstract OutputSocket<E> output(BitField<FsAccessOption> options, E entry);
 
     @Override
     public final void mknod(
-            final FsEntryName name,
             final BitField<FsAccessOption> options,
+            final FsEntryName name,
             final Type type,
             final Entry template)
     throws IOException {
@@ -311,25 +312,25 @@ extends LockModelController {
             } catch (final FalsePositiveArchiveException ex) {
                 if (DIRECTORY != type)
                     throw ex;
-                autoMount(true, options);
+                autoMount(options, true);
                 return;
             }
             throw new FileAlreadyExistsException(name.toString(), null,
                     "Cannot replace a directory entry!");
         } else {
-            checkSync(name, options, null);
-            autoMount(options.get(CREATE_PARENTS), options)
-                    .mknod(name, type, options, template)
+            checkSync(options, name, null);
+            autoMount(options, options.get(CREATE_PARENTS))
+                    .mknod(options, name, type, template)
                     .commit();
         }
     }
 
     @Override
     public void unlink(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options,
+            final FsEntryName name)
     throws IOException {
-        checkSync(name, options, null);
+        checkSync(options, name, null);
         final ArchiveFileSystem<E> fs = autoMount(options);
         fs.unlink(name, options);
         if (name.isRoot()) {
@@ -347,8 +348,8 @@ extends LockModelController {
      * {@link FsController#sync(BitField, ExceptionHandler) sync} operation in
      * advance.
      *
-     * @param  name the name of the file system entry.
      * @param  options the options for accessing the file system entry.
+     * @param  name the name of the file system entry.
      * @param  intention the intended I/O operation on the archive entry.
      *         If {@code null}, then only an update to the archive entry meta
      *         data (i.e. a pure virtual file system operation with no I/O)
@@ -357,8 +358,8 @@ extends LockModelController {
      *         intended access could succeed.
      */
     abstract void checkSync(
-            FsEntryName name,
             BitField<FsAccessOption> options,
+            FsEntryName name,
             @CheckForNull Access intention)
     throws NeedsSyncException;
 }

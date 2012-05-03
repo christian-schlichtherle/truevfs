@@ -119,10 +119,8 @@ public class TarGZipDriver extends TarDriver {
      */
     @Override
     protected Sink sink(
-            FsController<?> controller,
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
-        return controller.output(name, options.set(STORE), null);
+            BitField<FsAccessOption> options, FsController<?> controller, FsEntryName name) {
+        return controller.output(options.set(STORE), name, null);
     }
 
     /** Extends its super class to set the deflater level. */

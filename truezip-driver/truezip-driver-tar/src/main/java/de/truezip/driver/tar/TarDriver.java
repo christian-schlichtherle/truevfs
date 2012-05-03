@@ -101,10 +101,10 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      */
     @Override
     protected Source source(
+            BitField<FsAccessOption> options,
             FsController<?> controller,
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
-        return controller.input(name, options.clear(CACHE));
+            FsEntryName name) {
+        return controller.input(options.clear(CACHE), name);
     }
 
     /**
@@ -113,17 +113,17 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      */
     @Override
     protected Sink sink(
+            BitField<FsAccessOption> options,
             FsController<?> controller,
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
-        return controller.output(name, options.set(COMPRESS), null);
+            FsEntryName name) {
+        return controller.output(options.set(COMPRESS), name, null);
     }
 
     @Override
     public TarDriverEntry newEntry(
+            final BitField<FsAccessOption> mknod,
             String name,
             final Type type,
-            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template) {
         name = normalize(name, type);
         final TarDriverEntry entry;

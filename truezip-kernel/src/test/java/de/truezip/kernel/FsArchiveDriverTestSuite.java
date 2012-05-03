@@ -122,42 +122,42 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newInput(null, parent, entry, NONE);
+        getArchiveDriver().newInput(null, NONE, parent, entry);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().newInput(model, null, entry, NONE);
+        getArchiveDriver().newInput(model, NONE, null, entry);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullEntryName() throws IOException {
-        getArchiveDriver().newInput(model, parent, null, NONE);
+        getArchiveDriver().newInput(model, NONE, parent, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputServiceMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().newInput(model, parent, entry, null);
+        getArchiveDriver().newInput(model, null, parent, entry);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newOutput(null, parent, entry, NONE, null);
+        getArchiveDriver().newOutput(null, NONE, parent, entry, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().newOutput(model, null, entry, NONE, null);
+        getArchiveDriver().newOutput(model, NONE, null, entry, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullEntryName() throws IOException {
-        getArchiveDriver().newOutput(model, parent, null, NONE, null);
+        getArchiveDriver().newOutput(model, NONE, parent, null, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputServiceMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().newOutput(model, parent, entry, null, null);
+        getArchiveDriver().newOutput(model, null, parent, entry, null);
     }
 
     @Test
@@ -177,7 +177,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void output(final int numEntries) throws IOException {
         final OutputService<E> service = getArchiveDriver()
-                .newOutput(model, parent, entry, NONE, null);
+                .newOutput(model, NONE, parent, entry, null);
         try {
             final Closeable[] streams = new Closeable[numEntries];
             try {
@@ -232,7 +232,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void input(final int numEntries) throws IOException {
         final InputService<E> service = getArchiveDriver()
-                .newInput(model, parent, entry, NONE);
+                .newInput(model, NONE, parent, entry);
         try {
             check(service, numEntries);
             final Closeable[] streams = new Closeable[numEntries];
@@ -443,14 +443,13 @@ extends FsArchiveDriverTestBase<D> {
 
         @Override
         public InputSocket<?> input(
-                final FsEntryName name,
-                final BitField<FsAccessOption> options) {
+                final BitField<FsAccessOption> options, final FsEntryName name) {
             Objects.requireNonNull(name);
             Objects.requireNonNull(options);
 
             final class Input extends DecoratingInputSocket<Entry> {
                 Input() {
-                    super(ParentController.super.input(name, options));
+                    super(ParentController.super.input(options, name));
                 }
 
                 @Override
@@ -473,15 +472,13 @@ extends FsArchiveDriverTestBase<D> {
 
         @Override
         public OutputSocket<?> output(
-                final FsEntryName name,
-                final BitField<FsAccessOption> options,
-                final Entry template) {
+                final BitField<FsAccessOption> options, final FsEntryName name, final Entry template) {
             Objects.requireNonNull(name);
             Objects.requireNonNull(options);
 
             final class Output extends DecoratingOutputSocket<Entry> {
                 Output() {
-                    super(ParentController.super.output(name, options, template));
+                    super(ParentController.super.output(options, name, template));
                 }
 
                 @Override

@@ -1727,8 +1727,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getInnerFsEntryName(),
-                        getAccessPreferences(),
+                        getAccessPreferences(), getInnerFsEntryName(),
                         NO_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1756,7 +1755,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsEntry entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
@@ -1785,7 +1784,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsEntry entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
@@ -1799,8 +1798,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getInnerFsEntryName(),
-                        getAccessPreferences(),
+                        getAccessPreferences(), getInnerFsEntryName(),
                         READ_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1815,8 +1813,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getInnerFsEntryName(),
-                        getAccessPreferences(),
+                        getAccessPreferences(), getInnerFsEntryName(),
                         WRITE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1831,8 +1828,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getInnerFsEntryName(),
-                        getAccessPreferences(),
+                        getAccessPreferences(), getInnerFsEntryName(),
                         EXECUTE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1884,7 +1880,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1913,7 +1909,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1947,8 +1943,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().setTime(
-                        getInnerFsEntryName(),
-                        getAccessPreferences(),
+                        getAccessPreferences(), getInnerFsEntryName(),
                         WRITE_ACCESS,
                         time);
                 return true;
@@ -1981,7 +1976,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2014,7 +2009,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2097,7 +2092,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2170,7 +2165,7 @@ public final class TFile extends File {
             final FsEntry entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName(), getAccessPreferences());
+                        .stat(getAccessPreferences(), getInnerFsEntryName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2218,11 +2213,10 @@ public final class TFile extends File {
             final FsController<?> controller = innerArchive.getController();
             final FsEntryName entryName = getInnerFsEntryName();
             // This is not really atomic, but should be OK in this case.
-            if (null != controller.stat(entryName, getAccessPreferences()))
+            if (null != controller.stat(getAccessPreferences(), entryName))
                 return false;
             controller.mknod(
-                    entryName,
-                    getAccessPreferences().set(EXCLUSIVE),
+                    getAccessPreferences().set(EXCLUSIVE), entryName,
                     FILE,
                     null);
             return true;
@@ -2267,8 +2261,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().mknod(
-                        getInnerFsEntryName(),
-                        getAccessPreferences(),
+                        getAccessPreferences(), getInnerFsEntryName(),
                         DIRECTORY,
                         null);
                 return true;
@@ -2300,13 +2293,12 @@ public final class TFile extends File {
             final FsEntryName innerEntryName = getInnerFsEntryName();
             try {
                 controller.mknod(
-                        innerEntryName,
-                        getAccessPreferences(),
+                        getAccessPreferences(), innerEntryName,
                         DIRECTORY,
                         null);
             } catch (IOException ex) {
                 final FsEntry entry = controller
-                        .stat(innerEntryName, getAccessPreferences());
+                        .stat(getAccessPreferences(), innerEntryName);
                 if (null == entry || !entry.isType(DIRECTORY))
                     throw ex;
             }
@@ -2366,8 +2358,7 @@ public final class TFile extends File {
             TFile file = (TFile) node;
             if (null != file.innerArchive) {
                 file.innerArchive.getController().unlink(
-                        file.getInnerFsEntryName(),
-                        getAccessPreferences());
+                        getAccessPreferences(), file.getInnerFsEntryName());
                 return;
             }
             node = file.file;
