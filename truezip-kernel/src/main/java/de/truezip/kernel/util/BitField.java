@@ -88,8 +88,8 @@ implements Iterable<E>, Serializable {
     }
 
     /**
-     * Returns a bit field which contains the same bits as the given set of
-     * enums.
+     * Returns a bit field which contains the same bits as the given collection
+     * of enums.
      * <p>
      * This could be used like this:
      * <pre>{@code
@@ -99,7 +99,7 @@ implements Iterable<E>, Serializable {
      */
     public static <E extends Enum<E>> BitField<E>
     copyOf(Collection<E> bits) {
-        return new BitField<>(bits);
+        return new BitField<>(EnumSet.copyOf(bits));
     }
 
     /** @deprecated Required for XMLEncoder/XMLDecoder - do <em>not</em> use! */
@@ -132,13 +132,14 @@ implements Iterable<E>, Serializable {
 
     /**
      * Constructs a new bit field by sharing the given set of enums.
-     * Note that this constructor does NOT make a protective copy
+     * Note that this constructor does <em>not</em> make a protective copy
      * - use with care!
      *
      * @param bits the set of enums to share with this instance.
      */
-    private BitField(final Collection<E> bits) {
-        this.bits = EnumSet.copyOf(bits);
+    private BitField(final EnumSet<E> bits) {
+        assert null != bits;
+        this.bits = bits;
     }
 
     /**
@@ -165,7 +166,7 @@ implements Iterable<E>, Serializable {
 
     /** Equivalent to {@link #get(Enum) get(bit)}. */
     public boolean is(E bit) {
-        return get(bit);
+        return bits.contains(bit);
     }
 
     /**
@@ -225,9 +226,9 @@ implements Iterable<E>, Serializable {
 
     /**
      * Returns a new set of enums containing the same bits as this instance.
-     * The following boolean expression is always true for any
+     * The following boolean identity expression is always true for any
      * non-{@code null} bit field {@code bits}:
-     * {@code bits.equals(BitField.of(bits.toEnumSet()))}.
+     * {@code bits.equals(BitField.copyOf(bits.toEnumSet()))}.
      *
      * @return a new set of enums containing the same bits as this instance.
      */
