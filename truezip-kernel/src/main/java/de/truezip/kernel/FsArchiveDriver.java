@@ -185,12 +185,12 @@ extends FsDriver {
      * and {@link #newInput(FsModel, Source)}.
      * 
      * @param  model the file system model for the target archive file.
-     * @param  parent the controller for the parent file system with the target
-     *         archive file.
-     * @param  entry the entry name of the target archive file in the parent
+     * @param  options the options for accessing the target archive file in the
+     *         parent file system.
+     * @param  controller the controller for the parent file system with the
+     *         target archive file.
+     * @param  name the entry name of the target archive file in the parent
      *         file system.
-     * @param  options the options to use when accessing the target archive
-     *         file.
      * @return A new input service for reading the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
@@ -207,11 +207,11 @@ extends FsDriver {
     @CreatesObligation
     public InputService<E> newInput(
             FsModel model,
-            FsController<?> parent,
-            FsEntryName entry,
-            BitField<FsAccessOption> options)
+            BitField<FsAccessOption> options,
+            FsController<?> controller,
+            FsEntryName name)
     throws IOException {
-        return newInput(model, source(parent, entry, options));
+        return newInput(model, source(options, controller, name));
     }
 
     /**
@@ -223,7 +223,7 @@ extends FsDriver {
      * @return A new input service.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #newInput(FsModel, FsController, FsEntryName, BitField) 
+     * @see    #newInput(FsModel, BitField, FsController, FsEntryName) 
      */
     @CreatesObligation
     protected abstract InputService<E> newInput(
@@ -240,19 +240,19 @@ extends FsDriver {
      * and {@link #newOutput(FsModel, Sink, InputService)}.
      * 
      * @param  model the file system model for the target archive file.
-     * @param  parent the controller for the parent file system with the target
-     *         archive file.
-     * @param  entry the entry name of the target archive file in the parent
+     * @param  options the options for accessing the target archive file in the
+     *         parent file system.
+     * @param  controller the controller for the parent file system with the
+     *         target archive file.
+     * @param  name the entry name of the target archive file in the parent
      *         file system.
-     * @param  options the options to use when accessing the target archive
-     *         file.
      * @param  input the nullable {@link InputService} for the target archive
      *         file.
      *         If not {@code null}, then the target archive file is going to
      *         get updated.
      *         This parameter is guaranteed to be the product of this driver's
      *         factory method
-     *         {@link #newInput(FsModel, FsController, FsEntryName, BitField)}.
+     *         {@link #newInput(FsModel, BitField, FsController, FsEntryName)}.
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
@@ -260,12 +260,12 @@ extends FsDriver {
     @CreatesObligation
     public OutputService<E> newOutput(
             FsModel model,
-            FsController<?> parent,
-            FsEntryName entry,
             BitField<FsAccessOption> options,
+            FsController<?> controller,
+            FsEntryName name,
             @CheckForNull @WillNotClose InputService<E> input)
     throws IOException {
-        return newOutput(model, sink(parent, entry, options), input);
+        return newOutput(model, sink(options, controller, name), input);
     }
 
     /**
@@ -280,11 +280,11 @@ extends FsDriver {
      *         get updated.
      *         This parameter is guaranteed to be the product of this driver's
      *         factory method
-     *         {@link #newInput(FsModel, FsController, FsEntryName, BitField)}.
+     *         {@link #newInput(FsModel, BitField, FsController, FsEntryName)}.
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #newOutput(FsModel, FsController, FsEntryName, BitField, InputService) 
+     * @see    #newOutput(FsModel, BitField, FsController, FsEntryName, InputService) 
      */
     @CreatesObligation
     protected abstract OutputService<E> newOutput(
@@ -302,18 +302,18 @@ extends FsDriver {
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
      * 
+     * @param  options the options for accessing the file system entry.
      * @param  controller the controller to use for reading an artifact of this
      *         driver.
      * @param  name the entry name.
-     * @param  options the options to use.
      * @return A source for reading an artifact of this driver.
-     * @see    #newInput(FsModel, FsController, FsEntryName, BitField) 
+     * @see    #newInput(FsModel, BitField, FsController, FsEntryName) 
      */
     protected Source source(
+            BitField<FsAccessOption> options,
             FsController<?> controller,
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
-        return controller.input(name, options);
+            FsEntryName name) {
+        return controller.input(options, name);
     }
 
     /**
@@ -326,22 +326,22 @@ extends FsDriver {
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
      * 
+     * @param  options the options for accessing the file system entry.
      * @param  controller the controller to use for writing an artifact of this
      *         driver.
      * @param  name the entry name.
-     * @param  options the options to use.
      * @return A sink for writing an artifact of this driver.
-     * @see    #newOutput(FsModel, FsController, FsEntryName, BitField, InputService) 
+     * @see    #newOutput(FsModel, BitField, FsController, FsEntryName, InputService) 
      */
     protected Sink sink(
+            BitField<FsAccessOption> options,
             FsController<?> controller,
-            FsEntryName name,
-            BitField<FsAccessOption> options) {
-        return controller.output(name, options, null);
+            FsEntryName name) {
+        return controller.output(options, name, null);
     }
 
     /**
-     * Equivalent to {@link #newEntry(String, Entry.Type, BitField, Entry)
+     * Equivalent to {@link #newEntry(BitField, String, Entry.Type, Entry)
      * entry(name, type, FsAccessOptions.NONE, template)}.
      * 
      * @param  name the entry name.
@@ -352,7 +352,7 @@ extends FsDriver {
      * @return A new entry for the given name.
      */
     public final E newEntry(String name, Type type, @CheckForNull Entry template) {
-        return newEntry(name, type, FsAccessOptions.NONE, template);
+        return newEntry(FsAccessOptions.NONE, name, type, template);
     }
 
     /**
@@ -360,10 +360,10 @@ extends FsDriver {
      * The implementation may change this name in order to form a valid
      * {@link Entry#getName() entry name} for their particular requirements.
      *
+     * @param  options when called from {@link FsController#mknod}, this is its
+     *         {@code options} parameter, otherwise it's typically an empty set.
      * @param  name the entry name.
      * @param  type the entry type.
-     * @param  mknod when called from {@link FsController#mknod}, this is its
-     *         {@code options} parameter, otherwise it's typically an empty set.
      * @param  template if not {@code null}, then the new entry shall inherit
      *         as much properties from this entry as possible - with the
      *         exception of its name and type.
@@ -371,9 +371,9 @@ extends FsDriver {
      * @see    #newEntry(String, Entry.Type, Entry)
      */
     public abstract E newEntry(
+            BitField<FsAccessOption> options,
             String name,
             Type type,
-            BitField<FsAccessOption> mknod,
             @CheckForNull Entry template);
 
     /**

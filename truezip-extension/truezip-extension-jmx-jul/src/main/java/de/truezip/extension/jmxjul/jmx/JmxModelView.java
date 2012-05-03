@@ -210,7 +210,7 @@ implements JmxModelViewMXBean {
     public long getSizeOfData() {
         try {
             return getParentController()
-                    .stat(getParentEntryName(), NONE)
+                    .stat(NONE, getParentEntryName())
                     .getSize(DATA);
         } catch (IOException ex) {
             return UNKNOWN;
@@ -221,7 +221,7 @@ implements JmxModelViewMXBean {
     public long getSizeOfStorage() {
         try {
             return getParentController()
-                    .stat(getParentEntryName(), NONE)
+                    .stat(NONE, getParentEntryName())
                     .getSize(STORAGE);
         } catch (IOException ex) {
             return UNKNOWN;
@@ -233,7 +233,7 @@ implements JmxModelViewMXBean {
         final long time;
         try {
             time = getParentController()
-                        .stat(getParentEntryName(), NONE)
+                        .stat(NONE, getParentEntryName())
                         .getTime(WRITE);
         } catch (IOException ex) {
             return null;
@@ -246,7 +246,7 @@ implements JmxModelViewMXBean {
         final long time;
         try {
             time = getParentController()
-                        .stat(getParentEntryName(), NONE)
+                        .stat(NONE, getParentEntryName())
                         .getTime(READ);
         } catch (IOException ex) {
             return null;
@@ -259,7 +259,7 @@ implements JmxModelViewMXBean {
         final long time;
         try {
             time = getParentController()
-                        .stat(getParentEntryName(), NONE)
+                        .stat(NONE, getParentEntryName())
                         .getTime(CREATE);
         } catch (IOException ex) {
             return null;

@@ -43,10 +43,10 @@ extends BasicArchiveController<E> {
 
     @Override
     final ArchiveFileSystem<E> autoMount(
-            boolean autoCreate,
-            BitField<FsAccessOption> options)
+            BitField<FsAccessOption> options,
+            boolean autoCreate)
     throws IOException {
-        return mountState.autoMount(autoCreate, options);
+        return mountState.autoMount(options, autoCreate);
     }
 
     final @Nullable ArchiveFileSystem<E> getFileSystem() {
@@ -59,8 +59,6 @@ extends BasicArchiveController<E> {
 
     /**
      * Mounts the (virtual) archive file system from the target file.
-     * This method is called while the write lock to mount the file system
-     * for this controller is acquired.
      * <p>
      * Upon normal termination, this method is expected to have called
      * {@link #setFileSystem} to assign the fully initialized file system
@@ -68,21 +66,28 @@ extends BasicArchiveController<E> {
      * Other than this, the method must not have any side effects on the
      * state of this class or its super class.
      * It may, however, have side effects on the state of the sub class.
+     * <p>
+     * The implementation may safely assume that the write lock for the file
+     * system is acquired.
      *
-     * @param autoCreate If the archive file does not exist and this is
-     *        {@code true}, a new file system with only a virtual root
-     *        directory is created with its last modification time set to the
-     *        system's current time.
+     * @param  options the options for accessing the file system entry.
+     * @param  autoCreate If this is {@code true} and the archive file does not
+     *         exist, then a new archive file system with only a virtual root
+     *         directory is created with its last modification time set to the
+     *         system's current time.
+     * @throws IOException on any I/O error.
      */
-    abstract void mount(boolean autoCreate, BitField<FsAccessOption> options) throws IOException;
+    abstract void mount(
+            BitField<FsAccessOption> options,
+            boolean autoCreate)
+    throws IOException;
 
     /**
      * Represents the mount state of the archive file system.
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private interface MountState<E extends FsArchiveEntry> {
-        ArchiveFileSystem<E> autoMount( boolean autoCreate,
-                                        BitField<FsAccessOption> options)
+        ArchiveFileSystem<E> autoMount( BitField<FsAccessOption> options, boolean autoCreate)
         throws IOException;
 
         @Nullable ArchiveFileSystem<E> getFileSystem();
@@ -93,13 +98,13 @@ extends BasicArchiveController<E> {
     private final class ResetFileSystem implements MountState<E> {
         @Override
         public ArchiveFileSystem<E> autoMount(
-                final boolean autoCreate,
-                final BitField<FsAccessOption> options)
+                final BitField<FsAccessOption> options,
+                final boolean autoCreate)
         throws IOException {
             checkWriteLockedByCurrentThread();
-            mount(autoCreate, options);
+            mount(options, autoCreate);
             assert this != mountState;
-            return mountState.autoMount(autoCreate, options);
+            return mountState.autoMount(options, autoCreate);
         }
 
         @Override
@@ -124,8 +129,8 @@ extends BasicArchiveController<E> {
 
         @Override
         public ArchiveFileSystem<E> autoMount(
-                boolean autoCreate,
-                BitField<FsAccessOption> options) {
+                BitField<FsAccessOption> options,
+                boolean autoCreate) {
             return fileSystem;
         }
 

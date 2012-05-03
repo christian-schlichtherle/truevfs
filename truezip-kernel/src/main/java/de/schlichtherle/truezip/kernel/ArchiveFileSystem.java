@@ -6,11 +6,12 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
+import static de.truezip.kernel.FsAccessOptions.NONE;
 import static de.truezip.kernel.FsEntryName.*;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Container;
 import de.truezip.kernel.cio.Entry;
-import static de.truezip.kernel.cio.Entry.Access.*;
+import static de.truezip.kernel.cio.Entry.Access.WRITE;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
@@ -73,7 +74,7 @@ implements Iterable<FsCovariantEntry<E>> {
 
     private ArchiveFileSystem(final FsArchiveDriver<E> driver) {
         this.driver = driver;
-        final E root = newEntry(ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, null);
+        final E root = newEntry(FsAccessOptions.NONE, ROOT_PATH, DIRECTORY, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS_SET)
             root.setTime(access, time);
@@ -147,8 +148,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         // Setup root file system entry, potentially replacing its previous
         // mapping from the source archive.
-        master.add(ROOT_PATH, newEntry(
-                ROOT_PATH, DIRECTORY, FsAccessOptions.NONE, rootTemplate));
+        master.add(ROOT_PATH, newEntry(NONE, ROOT_PATH, DIRECTORY, rootTemplate));
         this.master = master;
         // Now perform a file system checkAccess to create missing parent directories
         // and populate directories with their members - this must be done
@@ -181,8 +181,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final String memberName = splitter.getMemberName();
         FsCovariantEntry<E> parent = master.get(parentPath);
         if (null == parent || !parent.isType(DIRECTORY))
-            parent = master.add(parentPath,
-                    newEntry(parentPath, DIRECTORY, FsAccessOptions.NONE, null));
+            parent = master.add(parentPath, newEntry(NONE, parentPath, DIRECTORY, null));
         parent.add(memberName);
         fix(parentPath);
     }
@@ -300,42 +299,48 @@ implements Iterable<FsCovariantEntry<E>> {
      * This is just a factory method and the returned file system entry is not
      * (yet) linked into this (virtual) archive file system.
      *
-     * @param  name the archive entry name.
-     * @param  type the type of the archive entry to create.
-     * @param  template the nullable template for the archive entry to create.
-     * @return A new archive entry.
+     * @param  name the entry name.
+     * @param  options a bit field of access options.
+     * @param  type the entry type.
+     * @param  template if not {@code null}, then the new entry shall inherit
+     *         as much properties from this entry as possible - with the
+     *         exception of its name and type.
+     * @return A new entry for the given name.
      */
     private E newEntry(
+            final BitField<FsAccessOption> options,
             final String name,
             final Type type,
-            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template) {
         assert null != type;
         assert !isRoot(name) || DIRECTORY == type;
-        return driver.newEntry(name, type, mknod, template);
+        return driver.newEntry(options, name, type, template);
     }
 
     /**
-     * Like {@link #entry entry(name, type, mknod, template)},
+     * Like {@link #entry entry(name, type, options, template)},
      * but checks that the given entry name can get encoded by the driver's
      * character set.
      *
-     * @see    #mknod
-     * @param  name the archive entry name.
-     * @param  type the type of the archive entry to create.
-     * @param  template the nullable template for the archive entry to create.
-     * @return A new archive entry.
+     * @see    #options
+     * @param  name the entry name.
+     * @param  options a bit field of access options.
+     * @param  type the entry type.
+     * @param  template if not {@code null}, then the new entry shall inherit
+     *         as much properties from this entry as possible - with the
+     *         exception of its name and type.
+     * @return A new entry for the given name.
      * @throws CharConversionException If the entry name contains characters
      *         which cannot get encoded.
      */
     private E newEntryChecked(
+            final BitField<FsAccessOption> options,
             final String name,
             final Type type,
-            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template)
     throws CharConversionException {
         driver.checkEncodable(name);
-        return newEntry(name, type, mknod, template);
+        return newEntry(options, name, type, template);
     }
 
     /**
@@ -365,9 +370,9 @@ implements Iterable<FsCovariantEntry<E>> {
      *         {@link ArchiveFileSystemOperation#commit} method.
      */
     ArchiveFileSystemOperation<E> mknod(
+            final BitField<FsAccessOption> options,
             final FsEntryName name,
             final Entry.Type type,
-            final BitField<FsAccessOption> options,
             @CheckForNull Entry template)
     throws IOException {
         Objects.requireNonNull(type);
@@ -386,7 +391,7 @@ implements Iterable<FsCovariantEntry<E>> {
             if (options.get(EXCLUSIVE))
                 throw new FileAlreadyExistsException(name.toString());
         }
-        while (template instanceof FsCovariantEntry<?>)
+        if (template instanceof FsCovariantEntry<?>)
             template = ((FsCovariantEntry<?>) template).getEntry(type);
         return new PathLink(path, type, options, template);
     }
@@ -446,14 +451,14 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements[0] = new SegmentLink<>(null, parentEntry);
                 newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(entryName, entryType, options, template));
+                        newEntryChecked(options, entryName, entryType, template));
                 elements[1] = new SegmentLink<>(memberName, newEntry);
             } else if (options.get(CREATE_PARENTS)) {
                 elements = newSegmentLinks(
                         level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<>(entryName);
                 newEntry.putEntry(entryType,
-                        newEntryChecked(entryName, entryType, options, template));
+                        newEntryChecked(options, entryName, entryType, template));
                 elements[elements.length - level]
                         = new SegmentLink<>(memberName, newEntry);
             } else {

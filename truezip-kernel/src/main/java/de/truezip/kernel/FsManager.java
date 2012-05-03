@@ -83,7 +83,7 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * As a side effect, this will reset the state of the respective file
      * system controllers.
      *
-     * @param  options a bit field of synchronization options.
+     * @param  options the options for synchronizing the file system.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective parent file system has been

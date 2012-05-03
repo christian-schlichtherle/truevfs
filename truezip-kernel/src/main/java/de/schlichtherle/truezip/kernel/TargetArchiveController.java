@@ -158,7 +158,7 @@ implements ArchiveFileSystemTouchListener<E> {
     }
 
     @Override
-    void mount(final boolean autoCreate, BitField<FsAccessOption> options)
+    void mount(BitField<FsAccessOption> options, final boolean autoCreate)
     throws IOException {
         try {
             mount0(autoCreate, options);
@@ -176,7 +176,7 @@ implements ArchiveFileSystemTouchListener<E> {
         // Check parent file system entry.
         final FsEntry pe; // parent entry
         try {
-            pe = parent.stat(name, options);
+            pe = parent.stat(options, name);
         } catch (final FalsePositiveArchiveException ex) {
             throw new AssertionError(ex);
         } catch (final ControlFlowException ex) {
@@ -207,7 +207,7 @@ implements ArchiveFileSystemTouchListener<E> {
             final boolean ro = isReadOnlyTarget();
             final InputService<E> is;
             try {
-                is = driver.newInput(getModel(), parent, name, MOUNT_OPTIONS);
+                is = driver.newInput(getModel(), MOUNT_OPTIONS, parent, name);
             } catch (final FalsePositiveArchiveException ex) {
                 throw new AssertionError(ex);
             } catch (final ControlFlowException ex) {
@@ -234,7 +234,7 @@ implements ArchiveFileSystemTouchListener<E> {
 
     private boolean isReadOnlyTarget() {
         try {
-            parent.checkAccess(name, MOUNT_OPTIONS, WRITE_ACCESS);
+            parent.checkAccess(MOUNT_OPTIONS, name, WRITE_ACCESS);
             return false;
         } catch (final FalsePositiveArchiveException ex) {
             throw new AssertionError(ex);
@@ -247,16 +247,18 @@ implements ArchiveFileSystemTouchListener<E> {
     }
 
     @Override
-    public void preTouch(   ArchiveFileSystemEvent<? extends E> event,
-                            BitField<FsAccessOption> options)
+    public void preTouch(
+            ArchiveFileSystemEvent<? extends E> event,
+            BitField<FsAccessOption> options)
     throws IOException {
         assert event.getSource() == getFileSystem();
         outputArchive(options);
     }
 
     @Override
-    public void postTouch(  ArchiveFileSystemEvent<? extends E> event,
-                            BitField<FsAccessOption> options) {
+    public void postTouch(
+            ArchiveFileSystemEvent<? extends E> event,
+            BitField<FsAccessOption> options) {
         assert event.getSource() == getFileSystem();
     }
 
@@ -283,7 +285,7 @@ implements ArchiveFileSystemTouchListener<E> {
         options = options.and(ACCESS_PREFERENCES_MASK).set(CACHE);
         final OutputService<E> os;
         try {
-            os = driver.newOutput(model, parent, name, options, is);
+            os = driver.newOutput(model, options, parent, name, is);
         } catch (final FalsePositiveArchiveException ex) {
             throw new AssertionError(ex);
         } catch (final ControlFlowException ex) {
@@ -337,8 +339,8 @@ implements ArchiveFileSystemTouchListener<E> {
 
     @Override
     OutputSocket<E> output(
-            final E entry,
-            final BitField<FsAccessOption> options) {
+            final BitField<FsAccessOption> options,
+            final E entry) {
         final class Output extends ClutchOutputSocket<E> {
             @Override
             protected OutputSocket<E> socket() throws IOException {
@@ -374,8 +376,8 @@ implements ArchiveFileSystemTouchListener<E> {
 
     @Override
     void checkSync(
-            final FsEntryName name,
             final BitField<FsAccessOption> options,
+            final FsEntryName name,
             final @CheckForNull Access intention)
     throws NeedsSyncException {
         // HC SUNT DRACONES!
@@ -462,9 +464,9 @@ implements ArchiveFileSystemTouchListener<E> {
      * Synchronizes all entries in the (virtual) archive file system with the
      * (temporary) output archive file.
      *
-     * @param  builder the strategy for assembling sync exceptions.
+     * @param  handler the strategy for assembling sync exceptions.
      */
-    private void copy(final FsSyncExceptionBuilder builder)
+    private void copy(final FsSyncExceptionBuilder handler)
     throws FsSyncException {
         // Skip (In|Out)putArchive for better performance.
         // This is safe because the FsResourceController has already shut down
@@ -491,14 +493,14 @@ implements ArchiveFileSystemTouchListener<E> {
             is = null != ia  ? ia.getClutch() : new DummyInputService<E>();
         }
 
-        copy(getFileSystem(), is, os, builder);
+        copy(handler, getFileSystem(), is, os);
     }
 
-    private <E extends FsArchiveEntry> void
-    copy(   final ArchiveFileSystem<E> fs,
+    private <E extends FsArchiveEntry> void copy(
+            final FsSyncExceptionBuilder handler,
+            final ArchiveFileSystem<E> fs,
             final InputService<E> is,
-            final OutputService<E> os,
-            final FsSyncExceptionBuilder builder)
+            final OutputService<E> os)
     throws FsSyncException {
         IOException warning = null;
         for (final FsCovariantEntry<E> fse : fs) {
@@ -526,9 +528,9 @@ implements ArchiveFileSystemTouchListener<E> {
                     }
                 } catch (final IOException ex) {
                     if (null != warning || !(ex instanceof InputException))
-                        throw builder.fail(new FsSyncException(getModel(), ex));
+                        throw handler.fail(new FsSyncException(getModel(), ex));
                     warning = ex;
-                    builder.warn(new FsSyncWarningException(getModel(), ex));
+                    handler.warn(new FsSyncWarningException(getModel(), ex));
                 }
             }
         }
@@ -545,11 +547,11 @@ implements ArchiveFileSystemTouchListener<E> {
      * Note that in this case closing the output archive is likely to fail and
      * override the IOException thrown by this method, too.
      *
-     * @param builder the strategy for assembling sync exceptions.
+     * @param handler the strategy for assembling sync exceptions.
      */
-    private void
-    close(  final BitField<FsSyncOption> options,
-            final FsSyncExceptionBuilder builder) {
+    private void close(
+            final BitField<FsSyncOption> options,
+            final FsSyncExceptionBuilder handler) {
         // HC SUNT DRACONES!
         final InputArchive<E> ia = inputArchive;
         if (null != ia) {
@@ -559,7 +561,7 @@ implements ArchiveFileSystemTouchListener<E> {
                 assert ex instanceof NeedsLockRetryException : ex;
                 throw ex;
             } catch (final IOException ex) {
-                builder.warn(new FsSyncWarningException(getModel(), ex));
+                handler.warn(new FsSyncWarningException(getModel(), ex));
             }
             setInputArchive(null);
         }
@@ -571,7 +573,7 @@ implements ArchiveFileSystemTouchListener<E> {
                 assert ex instanceof NeedsLockRetryException : ex;
                 throw ex;
             } catch (final IOException ex) {
-                builder.warn(new FsSyncException(getModel(), ex));
+                handler.warn(new FsSyncException(getModel(), ex));
             }
             setOutputArchive(null);
         }

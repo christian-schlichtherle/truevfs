@@ -58,9 +58,9 @@ public class ReadOnlySfxDriver extends ZipDriver {
     @Override
     public final OutputService<ZipDriverEntry> newOutput(
             FsModel model,
-            FsController<?> parent,
-            FsEntryName entry,
             BitField<FsAccessOption> options,
+            FsController<?> controller,
+            FsEntryName name,
             @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
         throw new FsReadOnlyFileSystemException();

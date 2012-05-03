@@ -339,7 +339,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             final FsModel model,
             final Source source)
     throws IOException {
-        final ZipInputService zis = zipInput(Objects.requireNonNull(model), source);
+        final ZipInputService zis = newZipInput(Objects.requireNonNull(model), source);
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
@@ -353,7 +353,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     @CreatesObligation
-    protected ZipInputService zipInput(
+    protected ZipInputService newZipInput(
             FsModel model,
             Source source)
     throws IOException {
@@ -364,12 +364,12 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     public OutputService<ZipDriverEntry> newOutput(
             final FsModel model,
-            final FsController<?> parent,
-            final FsEntryName entry,
             final BitField<FsAccessOption> options,
+            final FsController<?> controller,
+            final FsEntryName name,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final OptionOutputSocket oos = sink(parent, entry, options);
+        final OptionOutputSocket oos = sink(options, controller, name);
         final ZipInputService zis = (ZipInputService) input;
         if (null != zis)
             zis.setAppendee(oos.getOptions().get(GROW));
@@ -408,24 +408,24 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      */
     @Override
     protected OptionOutputSocket sink(
+            BitField<FsAccessOption> options,
             final FsController<?> controller,
-            final FsEntryName name,
-            BitField<FsAccessOption> options) {
+            final FsEntryName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);
         if (options.get(GROW))
             options = options.set(APPEND).clear(CACHE);
         return new OptionOutputSocket(
-                controller.output(name, options, null),
+                controller.output(options, name, null),
                 options);
     }
 
     @Override
     public ZipDriverEntry newEntry(
+            final BitField<FsAccessOption> options,
             String name,
             final Type type,
-            final BitField<FsAccessOption> mknod,
             final @CheckForNull Entry template) {
         name = normalize(name, type);
         final ZipDriverEntry entry;
@@ -438,9 +438,9 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
                 entry.setSize(template.getSize(DATA));
             }
         }
-        if (mknod.get(COMPRESS))
+        if (options.get(COMPRESS))
             entry.setMethod(DEFLATED);
-        else if (mknod.get(STORE))
+        else if (options.get(STORE))
             entry.setMethod(STORED);
         if (DIRECTORY != type) {
             if (UNKNOWN == entry.getMethod()) {
@@ -449,7 +449,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
                 if (STORED != method)
                     entry.setCompressedSize(UNKNOWN);
             }
-            if (mknod.get(ENCRYPT))
+            if (options.get(ENCRYPT))
                 entry.setEncrypted(true);
         }
         return entry;

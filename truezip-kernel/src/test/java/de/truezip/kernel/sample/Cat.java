@@ -75,8 +75,7 @@ public final class Cat {
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager
                     .controller(     path.getMountPoint(), driver)
-                    .input(    path.getEntryName(),
-                                        BitField.noneOf(FsAccessOption.class));
+                    .input(    BitField.noneOf(FsAccessOption.class), path.getEntryName());
             Throwable ex = null;
             try (InputStream in = socket.stream()) {
                 Streams.cat(in, System.out); // copy the data

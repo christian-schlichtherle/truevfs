@@ -71,17 +71,15 @@ public final class Copy {
             FsPath srcPath = FsPath.create(srcUri, FsUriModifier.CANONICALIZE);
             InputSocket<?> srcSocket = manager
                     .controller(     srcPath.getMountPoint(), driver)
-                    .input(    srcPath.getEntryName(),
-                                        BitField.noneOf(FsAccessOption.class));
+                    .input(    BitField.noneOf(FsAccessOption.class), srcPath.getEntryName());
             // Resolve the destination socket. Again, we need an absolute URI.
             URI dstUri = URI.create(dst);
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
             FsPath dstPath = FsPath.create(dstUri, FsUriModifier.CANONICALIZE);
             OutputSocket<?> dstSocket = manager
                     .controller(     dstPath.getMountPoint(), driver)
-                    .output(   dstPath.getEntryName(),
-                                        BitField.of(FsAccessOption.CREATE_PARENTS,
-                                                    FsAccessOption.EXCLUSIVE),
+                    .output(   BitField.of(FsAccessOption.CREATE_PARENTS,
+                                                    FsAccessOption.EXCLUSIVE), dstPath.getEntryName(),
                                         srcSocket.localTarget());
             IOSocket.copy(srcSocket, dstSocket); // copy the data
         } finally {

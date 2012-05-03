@@ -44,12 +44,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public InputSocket<?> input(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options) {
+            final BitField<FsAccessOption> options, final FsEntryName name) {
         @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
-                super(controller.input(name, options));
+                super(controller.input(options, name));
             }
 
             @Override
@@ -69,13 +68,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive
     public OutputSocket<?> output(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final @CheckForNull Entry template) {
+            final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
+    final Entry template) {
         @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {
             Output() {
-                super(controller.output(name, options, template));
+                super(controller.output(options, name, template));
             }
 
             @Override

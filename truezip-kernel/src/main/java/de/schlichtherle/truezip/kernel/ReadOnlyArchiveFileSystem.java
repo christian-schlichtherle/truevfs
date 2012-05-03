@@ -58,10 +58,7 @@ extends ArchiveFileSystem<E> {
 
     @Override
     ArchiveFileSystemOperation<E> mknod(
-            FsEntryName name,
-            Type type,
-            BitField<FsAccessOption> options,
-            Entry template)
+            BitField<FsAccessOption> options, FsEntryName name, Entry.Type type, Entry template)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }

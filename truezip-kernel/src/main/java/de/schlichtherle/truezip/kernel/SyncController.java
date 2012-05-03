@@ -83,11 +83,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public FsEntry stat(final FsEntryName name, BitField<FsAccessOption> options)
+    public FsEntry stat(BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         while (true) {
             try {
-                return controller.stat(name, options);
+                return controller.stat(options, name);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
@@ -96,13 +96,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public void checkAccess(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
     throws IOException {
         while (true) {
             try {
-                controller.checkAccess(name, options, types);
+                controller.checkAccess(options, name, types);
                 return;
             } catch (NeedsSyncException ex) {
                 sync(ex);
@@ -124,11 +122,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name, final BitField<FsAccessOption> options, final Map<Access, Long> times)
+            final BitField<FsAccessOption> options, final FsEntryName name, final Map<Access, Long> times)
     throws IOException {
         while (true) {
             try {
-                return controller.setTime(name, options, times);
+                return controller.setTime(options, name, times);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
@@ -137,11 +135,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public boolean setTime(
-            final FsEntryName name, final BitField<FsAccessOption> options, final BitField<Access> types, final long value)
+            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types, final long value)
     throws IOException {
         while (true) {
             try {
-                return controller.setTime(name, options, types, value);
+                return controller.setTime(options, name, types, value);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }
@@ -150,12 +148,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public InputSocket<?> input(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options) {
+            final BitField<FsAccessOption> options, final FsEntryName name) {
         @NotThreadSafe
         final class Input extends DecoratingInputSocket<Entry> {
             Input() {
-                super(controller.input(name, options));
+                super(controller.input(options, name));
             }
 
             @Override
@@ -198,13 +195,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public OutputSocket<?> output(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options,
-            final @CheckForNull Entry template) {
+            final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
+    final Entry template) {
         @NotThreadSafe
         final class Output extends DecoratingOutputSocket<Entry> {
             Output() {
-                super(controller.output(name, options, template));
+                super(controller.output(options, name, template));
             }
 
             @Override
@@ -246,12 +242,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public void mknod(
-            final FsEntryName name, final BitField<FsAccessOption> options, final Type type, @CheckForNull
+            final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
         while (true) {
             try {
-                controller.mknod(name, options, type, template);
+                controller.mknod(options, name, type, template);
                 return;
             } catch (NeedsSyncException ex) {
                 sync(ex);
@@ -261,13 +257,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public void unlink(
-            final FsEntryName name,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         while (true) {
             try {
                 // HC SUNT DRACONES!
-                controller.unlink(name, options); // repeatable for root entry
+                controller.unlink(options, name); // repeatable for root entry
                 if (name.isRoot()) {
                     // Make the file system controller chain eligible for GC.
                     controller.sync(RESET);
