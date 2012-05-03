@@ -103,13 +103,13 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
         return permissions[type.ordinal()][((PosixEntity) entity).ordinal()];
     }
 
-    /*@Override
+    @Override
     public boolean setPermitted(Access type, Entity entity, Boolean value) {
         if (!(entity instanceof PosixEntity))
             return false;
         permissions[type.ordinal()][((PosixEntity) entity).ordinal()] = value;
         return true;
-    }*/
+    }
     
     /**
      * Returns a string representation of this object for debugging and logging

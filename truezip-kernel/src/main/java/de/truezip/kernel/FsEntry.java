@@ -41,7 +41,7 @@ public abstract class FsEntry implements Entry {
      * file system entry which returns {@code true} for both
      * {@code isType(FILE)} and {@code isType(DIRECTORY)}.
      * 
-     * @return An unmodifiable set of types implemented by this entry.
+     * @return A set of types implemented by this entry.
      */
     public abstract Set<Type> getTypes();
 

@@ -168,11 +168,9 @@ implements Cloneable {
     }
 
     /**
-     * A set of the mapped types.
+     * Returns a set of the mapped types.
      * This is a bidirectional view: Any change is reflected in the map and
      * vice versa.
-     * 
-     * @return a set of the mapped types
      */
     @Override
     public Set<Type> getTypes() {
@@ -180,10 +178,8 @@ implements Cloneable {
     }
 
     /**
-     * Returns {@code true} if there is an entry mapped for the given type.
-     * 
-     * @param type the type to lookup.
-     * @return {@code true} if there is an entry mapped for the given type.
+     * Returns {@code true} if and only if there is an entry mapped for the
+     * given type.
      */
     @Override
     public boolean isType(final Type type) {
@@ -192,9 +188,6 @@ implements Cloneable {
 
     /**
      * Returns the size mapped for the {@link #getKey() key} property.
-     *
-     * @param type the size type to lookup.
-     * @return the size mapped for the {@link #getKey() key} property.
      */
     @Override
     public long getSize(Size type) {
@@ -205,15 +198,15 @@ implements Cloneable {
 
     /**
      * Returns the access time mapped for the {@link #getKey() key} property.
-     *
-     * @param type the access time type to lookup.
-     * @return the access time mapped for the {@link #getKey() key} property.
      */
     @Override
     public long getTime(Access type) {
         return map.get(key).getTime(type);
     }
 
+    /**
+     * Returns the permission mapped for the {@link #getKey() key} property.
+     */
     @Override
     public Boolean isPermitted(Access type, Entity entity) {
         return map.get(key).isPermitted(type, entity);
@@ -224,9 +217,6 @@ implements Cloneable {
      * only if there is no directory entry mapped.
      * This is a bidirectional view: Any change is reflected in the set and
      * vice versa.
-     * 
-     * @return A set of the members of this directory or {@code null} if and
-     *         only if there is no directory entry mapped.
      */
     @Override
     public @Nullable Set<String> getMembers() {

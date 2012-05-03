@@ -141,7 +141,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
     }
 
     @Override
-    public Boolean isPermitted(Access type, Entity entity) {
+    public Boolean isPermitted(final Access type, final Entity entity) {
         if (READ != type)
             return null;
         try {
