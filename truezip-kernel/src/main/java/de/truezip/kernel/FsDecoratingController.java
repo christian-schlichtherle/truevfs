@@ -47,9 +47,11 @@ extends FsModelController<M> {
     }
 
     @Override
-    public @Nullable FsEntry stat(FsEntryName name)
+    public @Nullable FsEntry stat(
+            FsEntryName name,
+            BitField<FsAccessOption> options)
     throws IOException {
-        return controller.stat(name);
+        return controller.stat(name, options);
     }
 
     @Override

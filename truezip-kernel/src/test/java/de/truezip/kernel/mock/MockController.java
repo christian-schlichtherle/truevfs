@@ -87,9 +87,13 @@ public class MockController extends FsModelController<FsModel> {
     }
 
     @Override
-    public FsEntry stat(FsEntryName name) throws IOException {
+    public FsEntry stat(
+            FsEntryName name,
+            BitField<FsAccessOption> options)
+    throws IOException {
         checkAllExceptions(this);
         assert null != name;
+        assert null != options;
         throw new UnsupportedOperationException();
     }
 

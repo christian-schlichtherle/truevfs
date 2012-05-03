@@ -83,11 +83,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public FsEntry stat(final FsEntryName name)
+    public FsEntry stat(final FsEntryName name, BitField<FsAccessOption> options)
     throws IOException {
         while (true) {
             try {
-                return controller.stat(name);
+                return controller.stat(name, options);
             } catch (NeedsSyncException ex) {
                 sync(ex);
             }

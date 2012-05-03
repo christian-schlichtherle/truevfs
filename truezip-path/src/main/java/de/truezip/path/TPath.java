@@ -985,28 +985,28 @@ public final class TPath implements Path {
         return getFileSystem().readAttributes(this, type, options);
     }
 
-    BitField<FsAccessOption> mapInput(final OpenOption... options) {
+    BitField<FsAccessOption> inputOptions(final OpenOption... options) {
         final HashSet<OpenOption> set = new HashSet<>(
                 initialCapacity(options.length));
         Collections.addAll(set, options);
-        return mapInput(set);
+        return inputOptions(set);
     }
 
-    BitField<FsAccessOption> mapInput(final Set<? extends OpenOption> options) {
+    BitField<FsAccessOption> inputOptions(final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
             return getAccessPreferences();
         throw new IllegalArgumentException(options.toString());
     }
 
-    BitField<FsAccessOption> mapOutput(final OpenOption... options) {
+    BitField<FsAccessOption> outputOptions(final OpenOption... options) {
         final HashSet<OpenOption> set = new HashSet<>(
                 initialCapacity(options.length));
         Collections.addAll(set, options);
-        return mapOutput(set);
+        return outputOptions(set);
     }
 
-    BitField<FsAccessOption> mapOutput(final Set<? extends OpenOption> options) {
+    BitField<FsAccessOption> outputOptions(final Set<? extends OpenOption> options) {
         final EnumSet<FsAccessOption> set = EnumSet.noneOf(FsAccessOption.class);
         for (final OpenOption option : options) {
             if (!(option instanceof StandardOpenOption))

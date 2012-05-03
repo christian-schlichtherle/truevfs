@@ -98,7 +98,9 @@ extends LockModelController {
     }
 
     @Override
-    public final FsEntry stat(FsEntryName name)
+    public final FsEntry stat(
+            FsEntryName name,
+            BitField<FsAccessOption> options)
     throws IOException {
         return autoMount(NONE).entry(name);
     }

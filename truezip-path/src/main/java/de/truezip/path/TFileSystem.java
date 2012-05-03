@@ -6,6 +6,7 @@ package de.truezip.path;
 
 import de.truezip.file.TConfig;
 import de.truezip.file.TVFS;
+import static de.truezip.kernel.FsAccessOption.CACHE;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
 import static de.truezip.kernel.FsEntryName.SEPARATOR;
 import static de.truezip.kernel.FsSyncOptions.UMOUNT;
@@ -225,20 +226,20 @@ public final class TFileSystem extends FileSystem {
         final FsController<?> controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
             final BitField<FsAccessOption>
-                    o = path.mapInput(options).set(FsAccessOption.CACHE);
+                    o = path.inputOptions(options).set(CACHE);
             return controller
                     .input(name, o)
                     .channel();
         } else {
             final BitField<FsAccessOption>
-                    o = path.mapOutput(options).set(FsAccessOption.CACHE);
+                    o = path.outputOptions(options).set(CACHE);
             try {
                 return controller
                         .output(name, o, null)
                         .channel();
             } catch (final IOException ex) {
                 // TODO: Filter FileAlreadyExistsException.
-                if (o.get(EXCLUSIVE) && null != controller.stat(name))
+                if (o.get(EXCLUSIVE) && null != controller.stat(name, o))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
                 throw ex;
@@ -251,7 +252,7 @@ public final class TFileSystem extends FileSystem {
         return getController()
                 .input(
                     path.getEntryName(),
-                    path.mapInput(options))
+                    path.inputOptions(options))
                 .stream();
     }
 
@@ -260,7 +261,7 @@ public final class TFileSystem extends FileSystem {
         return getController()
                 .output(
                     path.getEntryName(),
-                    path.mapOutput(options),
+                    path.outputOptions(options),
                     null)
                 .stream();
     }
@@ -340,14 +341,15 @@ public final class TFileSystem extends FileSystem {
             throw new UnsupportedOperationException();
         final FsController<?> controller = getController();
         final FsEntryName name = path.getEntryName();
+        final BitField<FsAccessOption> options = path.getAccessPreferences();
         try {
             controller.mknod(
                     name,
-                    path.getAccessPreferences(),
+                    options,
                     DIRECTORY,
                     null);
         } catch (IOException ex) {
-            if (null != controller.stat(name))
+            if (null != controller.stat(name, options))
                 throw (IOException) new FileAlreadyExistsException(path.toString())
                         .initCause(ex);
             throw ex;
@@ -359,7 +361,8 @@ public final class TFileSystem extends FileSystem {
     }
 
     FsEntry stat(TPath path) throws IOException {
-        return getController().stat(path.getEntryName());
+        return getController().stat(path.getEntryName(),
+                                    path.getAccessPreferences());
     }
 
     InputSocket<?> input(   TPath path,
@@ -462,7 +465,8 @@ public final class TFileSystem extends FileSystem {
         private final FsEntry entry;
 
         FsEntryAttributes(final TPath path) throws IOException {
-            if (null == (entry = getController().stat(path.getEntryName())))
+            if (null == (entry = getController()
+                    .stat(path.getEntryName(), path.getAccessPreferences())))
                 throw new NoSuchFileException(path.toString());
         }
 

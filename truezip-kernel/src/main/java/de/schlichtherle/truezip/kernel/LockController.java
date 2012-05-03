@@ -120,15 +120,18 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     } // IsReadOnly
     
     @Override
-    public FsEntry stat(final FsEntryName name) throws IOException {
-        final class GetEntry implements IOOperation<FsEntry> {
+    public FsEntry stat(
+            final FsEntryName name,
+            final BitField<FsAccessOption> options)
+    throws IOException {
+        final class Stat implements IOOperation<FsEntry> {
             @Override
             public FsEntry call() throws IOException {
-                return controller.stat(name);
+                return controller.stat(name, options);
             }
-        } // GetEntry
+        } // Stat
 
-        return timedReadOrWriteLocked(new GetEntry());
+        return timedReadOrWriteLocked(new Stat());
     }
 
     @Override

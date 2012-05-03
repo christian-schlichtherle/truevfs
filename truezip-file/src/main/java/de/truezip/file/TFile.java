@@ -1710,6 +1710,10 @@ public final class TFile extends File {
         throw new UnsupportedOperationException("Use a Path constructor or method instead!");
     }
 
+    private static BitField<FsAccessOption> getAccessPreferences() {
+        return TConfig.get().getAccessPreferences();
+    }
+
     /**
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
@@ -1724,7 +1728,7 @@ public final class TFile extends File {
             try {
                 innerArchive.getController().checkAccess(
                         getInnerFsEntryName(),
-                        TConfig.get().getAccessPreferences(),
+                        getAccessPreferences(),
                         NO_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1752,7 +1756,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsEntry entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName());
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
@@ -1781,7 +1785,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsEntry entry = innerArchive.getController()
-                        .stat(getInnerFsEntryName());
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
@@ -1796,7 +1800,7 @@ public final class TFile extends File {
             try {
                 innerArchive.getController().checkAccess(
                         getInnerFsEntryName(),
-                        TConfig.get().getAccessPreferences(),
+                        getAccessPreferences(),
                         READ_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1812,7 +1816,7 @@ public final class TFile extends File {
             try {
                 innerArchive.getController().checkAccess(
                         getInnerFsEntryName(),
-                        TConfig.get().getAccessPreferences(),
+                        getAccessPreferences(),
                         WRITE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1828,7 +1832,7 @@ public final class TFile extends File {
             try {
                 innerArchive.getController().checkAccess(
                         getInnerFsEntryName(),
-                        TConfig.get().getAccessPreferences(),
+                        getAccessPreferences(),
                         EXECUTE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1879,7 +1883,8 @@ public final class TFile extends File {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
-                entry = innerArchive.getController().stat(getInnerFsEntryName());
+                entry = innerArchive.getController()
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1907,7 +1912,8 @@ public final class TFile extends File {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
-                entry = innerArchive.getController().stat(getInnerFsEntryName());
+                entry = innerArchive.getController()
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1942,7 +1948,7 @@ public final class TFile extends File {
             try {
                 innerArchive.getController().setTime(
                         getInnerFsEntryName(),
-                        TConfig.get().getAccessPreferences(),
+                        getAccessPreferences(),
                         WRITE_ACCESS,
                         time);
                 return true;
@@ -1974,7 +1980,8 @@ public final class TFile extends File {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
-                entry = innerArchive.getController().stat(getInnerFsEntryName());
+                entry = innerArchive.getController()
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
             } catch (IOException ex) {
                 return null;
             }
@@ -2006,7 +2013,8 @@ public final class TFile extends File {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
-                entry = innerArchive.getController().stat(getInnerFsEntryName());
+                entry = innerArchive.getController()
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
             } catch (IOException ex) {
                 return null;
             }
@@ -2088,7 +2096,8 @@ public final class TFile extends File {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
-                entry = innerArchive.getController().stat(getInnerFsEntryName());
+                entry = innerArchive.getController()
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
             } catch (IOException ex) {
                 return null;
             }
@@ -2160,7 +2169,8 @@ public final class TFile extends File {
         if (null != innerArchive) {
             final FsEntry entry;
             try {
-                entry = innerArchive.getController().stat(getInnerFsEntryName());
+                entry = innerArchive.getController()
+                        .stat(getInnerFsEntryName(), getAccessPreferences());
             } catch (IOException ex) {
                 return null;
             }
@@ -2208,11 +2218,11 @@ public final class TFile extends File {
             final FsController<?> controller = innerArchive.getController();
             final FsEntryName entryName = getInnerFsEntryName();
             // This is not really atomic, but should be OK in this case.
-            if (null != controller.stat(entryName))
+            if (null != controller.stat(entryName, getAccessPreferences()))
                 return false;
             controller.mknod(
                     entryName,
-                    TConfig.get().getAccessPreferences().set(EXCLUSIVE),
+                    getAccessPreferences().set(EXCLUSIVE),
                     FILE,
                     null);
             return true;
@@ -2258,7 +2268,7 @@ public final class TFile extends File {
             try {
                 innerArchive.getController().mknod(
                         getInnerFsEntryName(),
-                        TConfig.get().getAccessPreferences(),
+                        getAccessPreferences(),
                         DIRECTORY,
                         null);
                 return true;
@@ -2291,11 +2301,12 @@ public final class TFile extends File {
             try {
                 controller.mknod(
                         innerEntryName,
-                        TConfig.get().getAccessPreferences(),
+                        getAccessPreferences(),
                         DIRECTORY,
                         null);
             } catch (IOException ex) {
-                final FsEntry entry = controller.stat(innerEntryName);
+                final FsEntry entry = controller
+                        .stat(innerEntryName, getAccessPreferences());
                 if (null == entry || !entry.isType(DIRECTORY))
                     throw ex;
             }
@@ -2356,7 +2367,7 @@ public final class TFile extends File {
             if (null != file.innerArchive) {
                 file.innerArchive.getController().unlink(
                         file.getInnerFsEntryName(),
-                        TConfig.get().getAccessPreferences());
+                        getAccessPreferences());
                 return;
             }
             node = file.file;
