@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockingStrategy.DEAD_LOCK;
 import de.truezip.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
@@ -48,41 +47,34 @@ extends DecoratingInputService<E, InputService<E>> {
     @GuardedBy("lock")
     @DischargesObligation
     public void close() throws IOException {
-        final class Close implements IOOperation<Void> {
-            @Override
-            public Void call() throws IOException {
+        lock.lock();
+        try {
             container.close();
-                return null;
+        } finally {
+            lock.unlock();
         }
-        } // Close
-
-        DEAD_LOCK.apply(lock, new Close());
     }
 
     @Override
     @GuardedBy("lock")
     public @CheckForNull E entry(final String name) {
-        final class Entry implements Operation<E, RuntimeException> {
-            @Override
-            public E call() {
+        lock.lock();
+        try {
             return container.entry(name);
+        } finally {
+            lock.unlock();
         }
-        } // Entry
-
-        return DEAD_LOCK.apply(lock, new Entry());
     }
 
     @Override
     @GuardedBy("lock")
     public int size() {
-        final class Size implements Operation<Integer, RuntimeException> {
-            @Override
-            public Integer call() {
+        lock.lock();
+        try {
             return container.size();
+        } finally {
+            lock.unlock();
         }
-        } // Size
-
-        return DEAD_LOCK.apply(lock, new Size());
     }
 
     @Override
@@ -100,40 +92,38 @@ extends DecoratingInputService<E, InputService<E>> {
             @Override
             @GuardedBy("lock")
             public E localTarget() throws IOException {
-                final class LocalTarget implements IOOperation<E> {
-                    @Override
-                    public E call() throws IOException {
+                lock.lock();
+                try {
                     return getBoundSocket().localTarget();
+                } finally {
+                    lock.unlock();
                 }
-                } // GetLocalTarget
-
-                return DEAD_LOCK.apply(lock, new LocalTarget());
             }
 
             @Override
             @GuardedBy("lock")
             public InputStream stream() throws IOException {
-                final class Stream implements IOOperation<InputStream> {
-                    @Override
-                    public InputStream call() throws IOException {
-                        return getBoundSocket().stream();
+                final InputStream in;
+                lock.lock();
+                try {
+                    in = getBoundSocket().stream();
+                } finally {
+                    lock.unlock();
                 }
-                } // Stream
-
-                return new LockInputStream(DEAD_LOCK.apply(lock, new Stream()));
+                return new LockInputStream(in);
             }
 
             @Override
             @GuardedBy("lock")
             public SeekableByteChannel channel() throws IOException {
-                final class Channel implements IOOperation<SeekableByteChannel> {
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return getBoundSocket().channel();
+                final SeekableByteChannel channel;
+                lock.lock();
+                try {
+                    channel = getBoundSocket().channel();
+                } finally {
+                    lock.unlock();
                 }
-                } // Channel
-
-                return new LockSeekableChannel(DEAD_LOCK.apply(lock, new Channel()));
+                return new LockSeekableChannel(channel);
             }
         } // Input
 
@@ -141,15 +131,12 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     void close(final Closeable closeable) throws IOException {
-        final class Close implements IOOperation<Void> {
-            @Override
-            public Void call() throws IOException {
+        lock.lock();
+        try {
             closeable.close();
-                return null;
+        } finally {
+            lock.unlock();
         }
-        } // Close
-
-        DEAD_LOCK.apply(lock, new Close());
     }
 
     private final class LockInputStream

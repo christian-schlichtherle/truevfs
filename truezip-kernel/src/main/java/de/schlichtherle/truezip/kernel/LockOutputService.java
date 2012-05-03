@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import static de.schlichtherle.truezip.kernel.LockingStrategy.DEAD_LOCK;
 import de.truezip.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
@@ -48,41 +47,34 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @GuardedBy("lock")
     @DischargesObligation
     public void close() throws IOException {
-        final class Close implements IOOperation<Void> {
-            @Override
-            public Void call() throws IOException {
-                container.close();
-                return null;
-            }
-        } // Close
-
-        DEAD_LOCK.apply(lock, new Close());
+        lock.lock();
+        try {
+            container.close();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     @GuardedBy("lock")
     public @CheckForNull E entry(final String name) {
-        final class Entry implements Operation<E, RuntimeException> {
-            @Override
-            public E call() {
-                return container.entry(name);
-            }
-        } // Entry
-
-        return DEAD_LOCK.apply(lock, new Entry());
+        lock.lock();
+        try {
+            return container.entry(name);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
     @GuardedBy("lock")
     public int size() {
-        final class Size implements Operation<Integer, RuntimeException> {
-            @Override
-            public Integer call() {
-                return container.size();
-            }
-        } // Size
-
-        return DEAD_LOCK.apply(lock, new Size());
+        lock.lock();
+        try {
+            return container.size();
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -105,27 +97,27 @@ extends DecoratingOutputService<E, OutputService<E>> {
             @Override
             @GuardedBy("lock")
             public OutputStream stream() throws IOException {
-                final class Stream implements IOOperation<OutputStream> {
-                    @Override
-                    public OutputStream call() throws IOException {
-                        return getBoundSocket().stream();
-                    }
-                } // Stream
-
-                return new LockOutputStream(DEAD_LOCK.apply(lock, new Stream()));
+                final OutputStream in;
+                lock.lock();
+                try {
+                    in = getBoundSocket().stream();
+                } finally {
+                    lock.unlock();
+                }
+                return new LockOutputStream(in);
             }
 
             @Override
             @GuardedBy("lock")
             public SeekableByteChannel channel() throws IOException {
-                final class Channel implements IOOperation<SeekableByteChannel> {
-                    @Override
-                    public SeekableByteChannel call() throws IOException {
-                        return getBoundSocket().channel();
-                    }
-                } // Channel
-
-                return new LockSeekableChannel(DEAD_LOCK.apply(lock, new Channel()));
+                final SeekableByteChannel channel;
+                lock.lock();
+                try {
+                    channel = getBoundSocket().channel();
+                } finally {
+                    lock.unlock();
+                }
+                return new LockSeekableChannel(channel);
             }
         } // Output
 
@@ -133,15 +125,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     void close(final Closeable closeable) throws IOException {
-        final class Close implements IOOperation<Void> {
-            @Override
-            public Void call() throws IOException {
-                closeable.close();
-                return null;
-            }
-        } // Close
-
-        DEAD_LOCK.apply(lock, new Close());
+        lock.lock();
+        try {
+            closeable.close();
+        } finally {
+            lock.unlock();
+        }
     }
 
     private final class LockOutputStream
