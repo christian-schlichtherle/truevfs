@@ -88,7 +88,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
     @Override
     public MockArchiveDriverEntry newEntry(
-            BitField<FsAccessOption> mknod,
+            BitField<FsAccessOption> options,
             String name,
             Type type,
             @CheckForNull Entry template) {
