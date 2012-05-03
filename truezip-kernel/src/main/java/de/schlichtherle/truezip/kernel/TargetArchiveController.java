@@ -12,7 +12,7 @@ import static de.truezip.kernel.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import de.truezip.kernel.*;
-import static de.truezip.kernel.cio.Entry.ALL_SIZE_SET;
+import static de.truezip.kernel.cio.Entry.ALL_SIZES;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
 import static de.truezip.kernel.cio.Entry.Access.WRITE;
@@ -382,6 +382,11 @@ implements ArchiveFileSystemTouchListener<E> {
     throws NeedsSyncException {
         // HC SUNT DRACONES!
 
+        // If no file system exists, then pass the test.
+        final ArchiveFileSystem<E> fs = getFileSystem();
+        if (null == fs)
+            return;
+
         // If GROWing and the driver supports the respective access method,
         // then pass the test.
         if (options.get(GROW)) {
@@ -396,18 +401,14 @@ implements ArchiveFileSystemTouchListener<E> {
             }
         }
 
-        // If no file system exists or does not contain an entry with the given
-        // name, then pass the test.
-        final FsCovariantEntry<E> fse; // file system entry
-        {
-            final ArchiveFileSystem<E> fs;
-            if (null == (fs = getFileSystem()) || null == (fse = fs.entry(name)))
-                return;
-        }
+        // If the file system does not contain an entry with the given name,
+        // then pass the test.
+        final FsCovariantEntry<E> fse = fs.entry(name);
+        if (null == fse)
+            return;
 
         // If the entry name addresses the file system root, then pass the test
-        // because the root entry is not present in the input or output archive
-        // anyway.
+        // because the root entry cannot get input or output anyway.
         if (name.isRoot())
             return;
 
