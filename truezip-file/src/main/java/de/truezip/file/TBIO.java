@@ -277,7 +277,7 @@ final class TBIO {
         return  TConfig
                 .get()
                 .getFsManager()
-                .controller( path.getMountPoint(), getDetector(src))
+                .controller(getDetector(src), path.getMountPoint())
                 .input(options, path.getEntryName());
     }
 
@@ -291,25 +291,24 @@ final class TBIO {
      * @return An output socket for the given file.
      */
     @SuppressWarnings("deprecation")
-    static OutputSocket<?>
-    output(final File dst,
-                    final BitField<FsAccessOption> options,
-                    final @CheckForNull Entry template) {
+    static OutputSocket<?> output(
+            final File dst,
+            final BitField<FsAccessOption> options,
+            final @CheckForNull Entry template) {
         if (dst instanceof TFile) {
             final TFile tdst = (TFile) dst;
             final TFile archive = tdst.getInnerArchive();
             if (null != archive)
-                return archive  .getController()
-                                .output(   options, tdst.getInnerFsEntryName(),
-                                                    template);
+                return archive
+                        .getController()
+                        .output(options, tdst.getInnerFsEntryName(), template);
         }
         final FsPath path = new FsPath(dst);
-        return  TConfig
+        return TConfig
                 .get()
                 .getFsManager()
-                .controller(     path.getMountPoint(), getDetector(dst))
-                .output(   options.clear(CREATE_PARENTS), path.getEntryName(),
-                                    template);
+                .controller(getDetector(dst), path.getMountPoint())
+                .output(options.clear(CREATE_PARENTS), path.getEntryName(), template);
     }
 
     private static TArchiveDetector getDetector(File file) {

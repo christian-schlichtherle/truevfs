@@ -47,8 +47,7 @@ public class FilteringManagerTest extends FsManagerTestSuite {
 
             final FsManager manager = new ArchiveManager(STRONG);
             for (final String param : params[1])
-                manager.controller(  FsMountPoint.create(URI.create(param)),
-                                        driver);
+                manager.controller(  driver, FsMountPoint.create(URI.create(param)));
             assertThat(manager.size(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();

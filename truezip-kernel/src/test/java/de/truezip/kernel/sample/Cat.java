@@ -74,7 +74,7 @@ public final class Cat {
             uri = uri.isAbsolute() ? uri : new File(resource).toURI();
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager
-                    .controller(     path.getMountPoint(), driver)
+                    .controller(     driver, path.getMountPoint())
                     .input(    BitField.noneOf(FsAccessOption.class), path.getEntryName());
             try (InputStream in = socket.stream()) {
                 Streams.cat(in, System.out); // copy the data

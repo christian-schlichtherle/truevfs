@@ -64,7 +64,7 @@ public abstract class FsManagerTestSuite {
                 final FsMountPoint mountPoint
                         = FsMountPoint.create(URI.create(param));
                 final FsController<?> controller
-                        = manager.controller(mountPoint, driver);
+                        = manager.controller(driver, mountPoint);
                 if (null != parent && null != parent.getParent())
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
@@ -98,7 +98,7 @@ public abstract class FsManagerTestSuite {
                 final FsMountPoint mountPoint
                         = FsMountPoint.create(URI.create(param));
                 final FsController<?> controller
-                        = manager.controller(mountPoint, driver);
+                        = manager.controller(driver, mountPoint);
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
                 member = controller;
