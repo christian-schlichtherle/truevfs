@@ -48,19 +48,20 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                 StandardOpenOption.CREATE,
             };
 
-    private final               FileEntry                entry;
-    private final               BitField<FsAccessOption> options;
-    private final @CheckForNull Entry                    template;
+    private final BitField<FsAccessOption> options;
+    private final FileEntry entry;
+    private final @CheckForNull Entry template;
 
-    FileOutputSocket(   final               FileEntry                entry,
-                        final               BitField<FsAccessOption> options,
-                        final @CheckForNull Entry                    template) {
+    FileOutputSocket(
+            final BitField<FsAccessOption> options,
+            final FileEntry entry,
+            final @CheckForNull Entry template) {
         assert null != entry;
         assert null != options;
         if (options.get(EXCLUSIVE) && options.get(APPEND))
             throw new IllegalArgumentException();
-        this.entry    = entry;
-        this.options  = options;
+        this.entry = entry;
+        this.options = options;
         this.template = template;
     }
 
@@ -125,7 +126,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         final Path entryFile = entry.getPath();
         if (temp != entry) {
             final Path tempFile = temp.getPath();
-            copyAttributes(tempFile);
+            updateProperties(tempFile);
             if (commit) {
                 try {
                     move(tempFile, entryFile, REPLACE_EXISTING);
@@ -136,18 +137,18 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     // Fast.
                     IOSocket.copy(  temp.input(),
                                     entry.output());
-                    copyAttributes(entryFile);
+                    updateProperties(entryFile);
                 }
                 release(temp, null);
             } else {
                 // Leave temp file for post-mortem analysis.
             }
         } else {
-            copyAttributes(entryFile);
+            updateProperties(entryFile);
         }
     }
 
-    private void copyAttributes(final Path file) throws IOException {
+    private void updateProperties(final Path file) throws IOException {
         final Entry template = this.template;
         if (null == template)
             return;

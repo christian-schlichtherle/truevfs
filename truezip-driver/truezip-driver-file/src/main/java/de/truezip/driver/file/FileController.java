@@ -137,14 +137,16 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public InputSocket<?> input(
-            BitField<FsAccessOption> options, FsEntryName name) {
+            BitField<FsAccessOption> options,
+            FsEntryName name) {
         return new FileEntry(target, name).input();
     }
 
     @Override
     public OutputSocket<?> output(
-            BitField<FsAccessOption> options, FsEntryName name, @CheckForNull
-    Entry template) {
+            BitField<FsAccessOption> options,
+            FsEntryName name,
+            @CheckForNull Entry template) {
         return new FileEntry(target, name).output(options, template);
     }
 
