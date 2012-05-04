@@ -4,10 +4,6 @@
  */
 package de.truezip.kernel;
 
-import de.truezip.kernel.FsCompositeDriver;
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsManager;
-import de.truezip.kernel.FsSimpleCompositeDriver;
 import de.truezip.kernel.mock.MockDriverService;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.Link.Type;
