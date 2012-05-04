@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author Christian Schlichtherle
  */
 public abstract class FsModelController<M extends FsModel>
-extends FsAbstractController<M>  {
+extends FsController<M>  {
 
     private final M model;
 
