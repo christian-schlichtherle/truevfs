@@ -12,7 +12,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
 /**
- * A link has a nullable {@link #getTarget() target} property.
+ * A link has a nullable {@link #get() target} property.
  * This interface is useful if a class is decorating or adapting another class
  * and access to the decorated or adapted object should be provided as part of
  * the public API of the decorating or adapting class.
@@ -31,19 +31,20 @@ public interface Link<T> {
      * 
      * @return The target of this link.
      */
-    @Nullable T getTarget();
+    @Nullable T get();
 
     /**
      * A factory for links which defines the terms and conditions for clearing
      * their target.
      */
+    @SuppressWarnings("PublicInnerClass")
     enum Type {
 
         /** This reference type never clears the target of a link. */
         STRONG {
             @Override
             <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
-                return new Strong<T>(target);
+                return new Strong<>(target);
             }
         },
 
@@ -54,7 +55,7 @@ public interface Link<T> {
         SOFT {
             @Override
             <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
-                return new Soft<T>(target, queue);
+                return new Soft<>(target, queue);
             }
         },
 
@@ -65,7 +66,7 @@ public interface Link<T> {
         WEAK {
             @Override
             <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
-                return new Weak<T>(target, queue);
+                return new Weak<>(target, queue);
             }
         },
 
@@ -76,12 +77,12 @@ public interface Link<T> {
         PHANTOM {
             @Override
             public <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
-                return new Phantom<T>(target, queue);
+                return new Phantom<>(target, queue);
             }
         };
 
         /** Returns a new typed link to the given nullable target. */
-        public <T> Link<T> link(T target) {
+        public <T> Link<T> newLink(T target) {
             return newLink(target, null);
         }
 
@@ -97,7 +98,7 @@ public interface Link<T> {
             }
 
             @Override
-            public T getTarget() {
+            public T get() {
                 return target;
             }
 
@@ -105,7 +106,7 @@ public interface Link<T> {
             public String toString() {
                 return String.format("%s[target=%s]",
                         getClass().getName(),
-                        getTarget());
+                        get());
             }
         }
 
@@ -117,7 +118,7 @@ public interface Link<T> {
             }
 
             @Override
-            public T getTarget() {
+            public T get() {
                 return super.get();
             }
 
@@ -125,7 +126,7 @@ public interface Link<T> {
             public String toString() {
                 return String.format("%s[target=%s]",
                         getClass().getName(),
-                        getTarget());
+                        get());
             }
         }
 
@@ -137,7 +138,7 @@ public interface Link<T> {
             }
 
             @Override
-            public T getTarget() {
+            public T get() {
                 return super.get();
             }
 
@@ -145,7 +146,7 @@ public interface Link<T> {
             public String toString() {
                 return String.format("%s[target=%s]",
                         getClass().getName(),
-                        getTarget());
+                        get());
             }
         }
 
@@ -157,7 +158,7 @@ public interface Link<T> {
             }
 
             @Override
-            public T getTarget() {
+            public T get() {
                 return super.get();
             }
 
@@ -165,7 +166,7 @@ public interface Link<T> {
             public String toString() {
                 return String.format("%s[target=%s]",
                         getClass().getName(),
-                        getTarget());
+                        get());
             }
         }
     }
