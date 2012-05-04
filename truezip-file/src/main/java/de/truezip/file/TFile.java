@@ -1331,7 +1331,7 @@ public final class TFile extends File {
 
     @SuppressWarnings("deprecation")
     private FsController<?> getController(FsMountPoint mountPoint) {
-        return TConfig.get().getFsManager().controller(mountPoint, detector);
+        return TConfig.get().getFsManager().controller(detector, mountPoint);
     }
 
     /**

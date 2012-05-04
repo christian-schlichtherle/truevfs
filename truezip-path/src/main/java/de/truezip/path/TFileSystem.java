@@ -43,10 +43,6 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public final class TFileSystem extends FileSystem {
 
-    private static final BitField<Access> READ_ACCESS = BitField.of(READ);
-    private static final BitField<Access> WRITE_ACCESS = BitField.of(WRITE);
-    private static final BitField<Access> EXECUTE_ACCESS = BitField.of(EXECUTE);
-
     private final FsController<?> controller;
     private final TFileSystemProvider provider;
 
@@ -54,8 +50,7 @@ public final class TFileSystem extends FileSystem {
     TFileSystem(final TPath path) {
         assert null != path;
         this.controller = TConfig.get().getFsManager().controller(
-                path.getMountPoint(),
-                path.getArchiveDetector());
+                path.getArchiveDetector(), path.getMountPoint());
         this.provider = TFileSystemProvider.get(path.getName());
 
         assert invariants();

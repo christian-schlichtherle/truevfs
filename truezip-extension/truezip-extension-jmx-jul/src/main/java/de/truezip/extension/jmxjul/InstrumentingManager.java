@@ -23,7 +23,7 @@ public class InstrumentingManager extends FsDecoratingManager<FsManager> {
     }
 
     @Override
-    public FsController<?> controller(FsMountPoint mountPoint, FsCompositeDriver driver) {
-        return director.instrument(manager.controller(mountPoint, director.instrument(driver, this)), this);
+    public FsController<?> controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
+        return director.instrument(manager.controller(director.instrument(driver, this), mountPoint), this);
     }
 }

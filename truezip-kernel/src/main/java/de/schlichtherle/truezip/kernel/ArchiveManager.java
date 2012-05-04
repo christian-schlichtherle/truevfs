@@ -46,14 +46,14 @@ final class ArchiveManager extends FsManager {
 
     @Override
     public synchronized FsController<?> controller(
-            FsMountPoint mountPoint,
-            FsCompositeDriver driver) {
-        return controller(mountPoint, driver, null);
+            FsCompositeDriver driver,
+            FsMountPoint mountPoint) {
+        return controller(driver, mountPoint, null);
     }
 
     private FsController<?> controller(
-            final FsMountPoint mountPoint,
             final FsCompositeDriver driver,
+            final FsMountPoint mountPoint,
             @CheckForNull FsController<?> parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
@@ -64,7 +64,7 @@ final class ArchiveManager extends FsManager {
         FsController<?> controller = target(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
-                parent = controller(mountPoint.getParent(), driver, null);
+                parent = controller(driver, mountPoint.getParent(), null);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
             model.setController(controller = driver.newController(this, model, parent));
@@ -73,8 +73,8 @@ final class ArchiveManager extends FsManager {
     }
 
     @Override
-    public final <E extends FsArchiveEntry> FsController<?> newController(
-            final FsArchiveDriver<E> driver,
+    public final FsController<?> newController(
+            final FsArchiveDriver<?> driver,
             final FsModel model,
             final FsController<?> parent) {
         assert !(model instanceof LockModel);

@@ -193,7 +193,7 @@ implements JmxModelViewMXBean {
         return null != parentController
                 ? parentController
                 : (this.parentController = FsManagerLocator.SINGLETON.getManager()
-                    .controller(model.getMountPoint(), DRIVER)
+                    .controller(DRIVER, model.getMountPoint())
                     .getParent());
     }
 
