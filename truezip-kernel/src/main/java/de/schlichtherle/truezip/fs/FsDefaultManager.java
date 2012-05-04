@@ -104,7 +104,7 @@ public final class FsDefaultManager extends FsManager {
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        FsSyncShutdownHook.SINGLETON.cancel();
+        FsSyncShutdownHook.cancel();
         super.sync(options, handler);
     }
 
@@ -144,7 +144,7 @@ public final class FsDefaultManager extends FsManager {
         public void setTouched(final boolean touched) {
             if (this.touched != touched) {
                 if (touched)
-                    FsSyncShutdownHook.SINGLETON.register(FsDefaultManager.this);
+                    FsSyncShutdownHook.register(FsDefaultManager.this);
                 schedule(touched);
                 this.touched = touched;
             }
