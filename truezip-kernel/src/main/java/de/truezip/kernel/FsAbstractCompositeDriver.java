@@ -5,6 +5,7 @@
 package de.truezip.kernel;
 
 import java.util.ServiceConfigurationError;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -20,10 +21,10 @@ public abstract class FsAbstractCompositeDriver
 implements FsCompositeDriver, FsDriverProvider {
 
     @Override
-    public final FsController<?>
-    newController(  final FsManager manager,
-                    final FsModel model,
-                    final FsController<?> parent) {
+    public final FsController<?> newController(
+            final FsManager manager,
+            final FsModel model,
+            final @CheckForNull FsController<?> parent) {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
