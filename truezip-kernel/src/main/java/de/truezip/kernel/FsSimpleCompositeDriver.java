@@ -19,8 +19,8 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
     private final Map<FsScheme, FsDriver> drivers;
 
     /**
-     * Constructs a new file system default driver which will query the given
-     * file system driver provider for an appropriate file system driver for
+     * Constructs a new simple composite driver which will query the given
+     * driver {@code provider} for an appropriate file system driver for
      * the scheme of a given mount point.
      */
     public FsSimpleCompositeDriver(final FsDriverProvider provider) {
