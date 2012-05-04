@@ -22,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 final class SyncShutdownHook {
 
-    private static final Runtime RUNTIME = Runtime.getRuntime();
+    private static final Runtime runtime = Runtime.getRuntime();
     private static final Hook hook = new Hook();
 
     /** You can't touch this - hammer time! */
@@ -43,7 +43,7 @@ final class SyncShutdownHook {
         if (hook.manager != manager) {
             synchronized (hook) {
                 if (hook.manager != manager) {
-                    RUNTIME.addShutdownHook(hook);
+                    runtime.addShutdownHook(hook);
                     hook.manager = manager;
                 }
             }
@@ -61,7 +61,7 @@ final class SyncShutdownHook {
             synchronized (hook) {
                 if (hook.manager != null) {
                     // Prevent memory leak in dynamic class loader environments.
-                    RUNTIME.removeShutdownHook(hook);
+                    runtime.removeShutdownHook(hook);
                     hook.manager = null;
                 }
             }
