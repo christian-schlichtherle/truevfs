@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.util.Link;
 import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
 import static de.truezip.kernel.FsAccessOptions.NONE;
@@ -16,7 +17,6 @@ import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.Link;
 import static de.truezip.kernel.util.Maps.OVERHEAD_SIZE;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import de.truezip.kernel.util.PathNormalizer;
@@ -496,8 +496,8 @@ implements Iterable<FsCovariantEntry<E>> {
         }
 
         @Override
-        public FsCovariantEntry<E> getTarget() {
-            return links[links.length - 1].getTarget();
+        public FsCovariantEntry<E> get() {
+            return links[links.length - 1].get();
         }
     } // class PathLink
 
@@ -526,7 +526,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
 
         @Override
-        public FsCovariantEntry<E> getTarget() {
+        public FsCovariantEntry<E> get() {
             return entry;
         }
     } // class SegmentLink

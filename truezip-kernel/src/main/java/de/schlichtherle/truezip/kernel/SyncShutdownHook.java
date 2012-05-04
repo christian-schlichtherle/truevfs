@@ -25,7 +25,7 @@ final class SyncShutdownHook {
     private static final Runtime runtime = Runtime.getRuntime();
     private static final Hook hook = new Hook();
 
-    /** You can't touch this - hammer time! */
+    /** Can't touch this - hammer time! */
     private SyncShutdownHook() { }
 
     /**
