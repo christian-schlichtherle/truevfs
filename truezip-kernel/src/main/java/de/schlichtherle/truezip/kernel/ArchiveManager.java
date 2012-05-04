@@ -186,7 +186,7 @@ final class ArchiveManager extends FsManager {
         void schedule(final boolean mandatory) {
             final FsMountPoint mountPoint = getMountPoint();
             final Link<FsController<?>> link = (Link<FsController<?>>)
-                    (mandatory ? STRONG : optionalScheduleType).link(controller);
+                    (mandatory ? STRONG : optionalScheduleType).newLink(controller);
             synchronized (ArchiveManager.this) {
                 schedulers.put(mountPoint, link);
             }

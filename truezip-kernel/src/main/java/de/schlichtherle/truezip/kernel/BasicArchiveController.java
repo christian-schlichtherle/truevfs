@@ -214,7 +214,7 @@ extends LockModelController {
 
         @Override
         public FsArchiveEntry localTarget() throws IOException {
-            final E ae = mknod().getTarget().getEntry();
+            final E ae = mknod().get().getEntry();
             if (options.get(APPEND)) {
                 // A proxy entry must get returned here in order to inhibit
                 // a peer target to recognize the type of this entry and
@@ -229,7 +229,7 @@ extends LockModelController {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE") // false positive
         public OutputStream stream() throws IOException {
             final ArchiveFileSystemOperation<E> mknod = mknod();
-            final E ae = mknod.getTarget().getEntry();
+            final E ae = mknod.get().getEntry();
             try (final InputStream in = append()) {
                 final OutputSocket<? extends E> os = output(options, ae);
                 if (null == in) // do NOT bind when appending!
