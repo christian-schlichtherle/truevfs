@@ -18,7 +18,7 @@ public interface MutableEntry extends Entry {
      *
      * @param  type the type of the size.
      * @param  value the value of the size in bytes
-     *         or {@link #UNKNOWN} if not specified.
+     *         or {@link #UNKNOWN} if not defined.
      * @return {@code false} if and only if setting a size of the given
      *         {@code type} is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
@@ -32,7 +32,7 @@ public interface MutableEntry extends Entry {
      *
      * @param  type the type of the access.
      * @param  value the value of the size in in milliseconds since the epoch
-     *         or {@link #UNKNOWN} if not specified.
+     *         or {@link #UNKNOWN} if not defined.
      * @return {@code false} if and only if setting a time of the given
      *         {@code type} is unsupported.
      * @throws NullPointerException if {@code type} is {@code null}.
@@ -48,7 +48,7 @@ public interface MutableEntry extends Entry {
      * @param  entity the entity which desires access.
      * @param  type the type of the access.
      * @param  value the value of the permission
-     *         or {@code null} if not specified.
+     *         or {@code null} if not defined.
      * @return {@code false} if and only if setting a permission of the given
      *         {@code type} for the given {@code entity} is unsupported.
      */
