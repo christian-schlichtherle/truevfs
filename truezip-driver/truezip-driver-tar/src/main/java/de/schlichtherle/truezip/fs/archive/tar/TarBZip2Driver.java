@@ -55,7 +55,7 @@ public class TarBZip2Driver extends TarDriver {
      * Returns the compression level to use when writing a BZIP2 output stream.
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
-     * {@link BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
+     * {@link org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
      * 
      * @return The compression level to use when writing a BZIP2 output stream.
      */
