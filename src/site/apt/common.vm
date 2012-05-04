@@ -25,28 +25,26 @@
     If your application has created or changed one or more archive files,
     then these changes need to get committed sometime.
     Even if your application has done read-only acess to the virtual file
-    system, some temporary files may have been created to speed up subsequent
-    access (this is driver dependent).
+    system, some temporary files may have been created to speed up random
+    access - this dependends on the driver implementation.
 
     If your application is only short-running, then there is actually nothing
-    to do about this because the TrueZIP Kernel initially registers a JVM
-    shutdown hook which will automatically commit all changes - even if the
-    application terminates due to a <<<Throwable>>>.
-    However, if your application is long running or needs more control over
-    this operation, then it should manually commit all changes to archive
-    files whenever this task has been completed.
-    Here's how to do this: 
+    to do because the TrueZIP Kernel automatically registers and de-registers
+    a JVM shutdown hook which will commit all changes when its run.
+    Note that shutdown hooks are run even if the application terminates due to
+    a <<<Throwable>>>.
+
+    However, if your application is long running or wants to handle any
+    exceptions, then you may want to manually call this operation
+    - here's how to do this: 
 
 +--+
 TVFS.umount();
 +--+
 
-    Note that once your application calls this method, the TrueZIP Kernel
-    deregisters the JVM shutdown hook in order to prevent a potential memory
-    leak if it's used in multi-classloader-environments, e.g. OSGI or JEE.
-    Once called, the TrueZIP Kernel may fail to register the JVM shutdown hook
-    again, so your application must repeat this call whenever it has finished
-    accessing the virtual file system!
+    As a side effect, once this operation succeeded, third parties
+    (e.g. other processes) can safely access the processed archive files until
+    the next time your application starts to operate on them again.
 
 ** Performance Considerations
 

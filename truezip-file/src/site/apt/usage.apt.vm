@@ -129,9 +129,8 @@ Using TrueZIP File*
 
     * <Automatic synchronization> happens when the JVM terminates (in a JVM
         shutdown hook) or when the application modifies an archive entry more
-        than once and the respective archive controller is implementing a
-        <full update> (which is the default <update strategy> unless
-        <<<FsOutputOption.GROW>>> has been set).
+        than once and <<<FsOutputOption.GROW>>> hasn't been set or isn't
+        supported by the respective archive driver.
 
     []
 

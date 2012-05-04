@@ -10,19 +10,20 @@ import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
 /**
+ * A service for the file system manager implementation in this package.
+ * 
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FailSafeManagerService extends FsManagerService {
+public final class ArchiveManagerService extends FsManagerService {
 
     static {
-        Logger  .getLogger( FailSafeManagerService.class.getName(),
-                            FailSafeManagerService.class.getName())
+        Logger  .getLogger( ArchiveManagerService.class.getName(),
+                            ArchiveManagerService.class.getName())
                 .config("banner");
     }
 
-    private final FsManager
-            manager = new FailSafeManager(new ArchiveManager());
+    private final FsManager manager = new ArchiveManager();
 
     @Override
     public FsManager getManager() {
