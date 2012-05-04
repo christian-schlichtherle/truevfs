@@ -5,13 +5,16 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Link.Type;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 import static de.schlichtherle.truezip.util.Links.getTarget;
+import java.io.IOException;
 import java.util.*;
 import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -25,32 +28,34 @@ public final class FsDefaultManager extends FsManager {
     /**
      * The map of all schedulers for composite file system controllers,
      * keyed by the mount point of their respective file system model.
-     * All access to this map must be externally synchronized!
      */
+    @GuardedBy("this")
     private final Map<FsMountPoint, Link<FsFalsePositiveController>> schedulers
             = new WeakHashMap<FsMountPoint, Link<FsFalsePositiveController>>();
 
     private final Type optionalScheduleType;
 
-    public FsDefaultManager() { this(WEAK); }
+    public FsDefaultManager() {
+        this(WEAK);
+    }
 
-    /** Provided for unit testing. */
+    /** Solely provided for unit testing. */
     FsDefaultManager(final Type optionalScheduleType) {
         assert null != optionalScheduleType;
         this.optionalScheduleType = optionalScheduleType;
     }
 
     @Override
-    public synchronized FsController<?>
-    getController(  FsMountPoint mountPoint,
-                    FsCompositeDriver driver) {
-        return getController(mountPoint, null, driver);
+    public synchronized FsController<?> getController(
+            FsMountPoint mountPoint,
+            FsCompositeDriver driver) {
+        return getController(mountPoint, driver, null);
     }
 
-    private FsController<?>
-    getController(  final FsMountPoint mountPoint,
-                    @CheckForNull FsController<?> parent,
-                    final FsCompositeDriver driver) {
+    private FsController<?> getController(
+            final FsMountPoint mountPoint,
+            final FsCompositeDriver driver,
+            @CheckForNull FsController<?> parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
@@ -61,7 +66,7 @@ public final class FsDefaultManager extends FsManager {
                 controller = getTarget(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
-                parent = getController(mountPoint.getParent(), null, driver);
+                parent = getController(mountPoint.getParent(), driver, null);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
             // HC SUNT DRACONES!
@@ -85,13 +90,22 @@ public final class FsDefaultManager extends FsManager {
 
     private synchronized Set<FsController<?>> getControllers() {
         final Set<FsController<?>> snapshot
-                = new TreeSet<FsController<?>>(FsControllerComparator.REVERSE);
+                = new TreeSet<FsController<?>>(ReverseControllerComparator.INSTANCE);
         for (final Link<FsFalsePositiveController> link : schedulers.values()) {
             final FsController<?> controller = getTarget(link);
             if (null != controller)
                 snapshot.add(controller);
         }
         return snapshot;
+    }
+
+    @Override
+    public <X extends IOException> void sync(
+            final BitField<FsSyncOption> options,
+            final ExceptionHandler<? super IOException, X> handler)
+    throws X {
+        FsSyncShutdownHook.SINGLETON.cancel();
+        super.sync(options, handler);
     }
 
     /**
@@ -128,17 +142,20 @@ public final class FsDefaultManager extends FsManager {
          */
         @Override
         public void setTouched(final boolean touched) {
-            if (touched == this.touched)
-                return;
-            this.touched = touched;
-            schedule(touched);
+            if (this.touched != touched) {
+                if (touched)
+                    FsSyncShutdownHook.SINGLETON.register(FsDefaultManager.this);
+                schedule(touched);
+                this.touched = touched;
+            }
         }
 
         void schedule(boolean mandatory) {
+            final FsMountPoint mountPoint = getMountPoint();
+            final Link<FsFalsePositiveController> link =
+                    (mandatory ? STRONG : optionalScheduleType).newLink(controller);
             synchronized (FsDefaultManager.this) {
-                schedulers.put(getMountPoint(),
-                        (mandatory ? STRONG : optionalScheduleType)
-                            .newLink(controller));
+                schedulers.put(mountPoint, link);
             }
         }
     } // ScheduledModel
@@ -147,16 +164,15 @@ public final class FsDefaultManager extends FsManager {
      * Orders file system controllers so that all file systems appear before
      * any of their parent file systems.
      */
-    private static final class FsControllerComparator
+    private static final class ReverseControllerComparator
     implements Comparator<FsController<?>> {
-        static final FsControllerComparator REVERSE
-                = new FsControllerComparator();
+        static final ReverseControllerComparator INSTANCE
+                = new ReverseControllerComparator();
 
         @Override
-        public int compare( final FsController<?> l,
-                            final FsController<?> r) {
-            return r.getModel().getMountPoint().toHierarchicalUri()
-                    .compareTo(l.getModel().getMountPoint().toHierarchicalUri());
+        public int compare(FsController<?> o1, FsController<?> o2) {
+            return o2.getModel().getMountPoint().toHierarchicalUri()
+                    .compareTo(o1.getModel().getMountPoint().toHierarchicalUri());
         }
-    } // FsControllerComparator
+    } // ReverseControllerComparator
 }

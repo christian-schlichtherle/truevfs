@@ -2597,8 +2597,7 @@ public final class TFile extends File {
         if (innerArchive != null) {
             // Support for this operation for archive files and entries has been
             // removed in TrueZIP 7 because using a shutdown hook uncautiously
-            // introduces a potential memory leak when using multiple class
-            // loaders to load TrueZIP.
+            // introduces a memory leak in dynamic class loader environments.
             throw new UnsupportedOperationException();
         }
         delegate.deleteOnExit();
