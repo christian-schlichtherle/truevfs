@@ -1,0 +1,59 @@
+## This file contains macros for common use within this directory.
+#macro(configuring $extension $file $modules_need $artifactId)
+* Configuring Archive Detection
+
+    You may wonder how TrueZIP gets configured to treat a file name with a
+    $extension extension as a $file file instead of a plain old file.
+    For now, let it suffice to say that TrueZIP follows the
+    convention-over-configuration principle as much as possible,
+    so there are reasonable defaults for everything in order to relieve you
+    from typical configuration tasks.
+
+    For the previous examples to work, the JARs of the driver $modules_need
+    to be present on the run time class path.
+    You can achieve this by adding the Maven artifactId $artifactId as a
+    dependency to the POM of your Maven build.
+
+    For more information about configuring the client APIs, please refer to the
+    article
+    {{{../truezip-file/configuration.html}Configuring TrueZIP File*}}.
+
+#end ## configuring
+#macro(cleaningUp)
+* Cleaning Up
+
+    If your application has created or changed one or more archive files,
+    then these changes need to get committed sometime.
+    Even if your application has done read-only acess to the virtual file
+    system, some temporary files may have been created to speed up random
+    access - this dependends on the driver implementation.
+
+    If your application is only short-running, then there is actually nothing
+    to do because the TrueZIP Kernel automatically registers and de-registers
+    a JVM shutdown hook which will commit all changes when its run.
+    Note that shutdown hooks are run even if the application terminates due to
+    a <<<Throwable>>>.
+
+    However, if your application is long running or wants to handle any
+    exceptions, then you may want to manually call this operation
+    - here's how to do this: 
+
++--+
+TVFS.umount();
++--+
+
+    As a side effect, once this operation succeeded, third parties
+    (e.g. other processes) can safely access the processed archive files until
+    the next time your application starts to operate on them again.
+
+** Performance Considerations
+
+    Take care not to call <<<TVFS.umount()>>> in a loop which updates the same
+    set of archive files because this would result in poor performance in the
+    order of <<<O(n*n)>>> instead of just <<<O(n)>>>, where <<<n>>> is the
+    total number of archive entries.
+
+    For more information, please refer to the Javadoc for
+    {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
+
+#end ## cleaningUp

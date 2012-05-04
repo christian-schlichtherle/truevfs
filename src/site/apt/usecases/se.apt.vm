@@ -1,0 +1,46 @@
+#parse("common.vm")
+#leadIn("Search Engine (SE)",
+  "Suppose you're writing the next generation SE which shall index all files in
+   the file system, including all file entries of all archive files.",
+  "false",
+  "Searching Archive Files")
+
+    See how easy listing the contents of the top level directory of an archive
+    file can be:
+
++--+
+TFile[] entries = new TFile("archive.zip").listFiles();
++--+
+
+    Because this is identical to the code for reading plain directories in the
+    file system, the required code size shrinks drastically.
+    Now you only need to apply recursion to traverse the directory tree of
+    any archive file.
+
+    Indexing the contents of any entry within an archive file works exactly the
+    same way as it would work for plain files in the file system by using the
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    class
+
++--+
+TFile entry = ...;
+Reader reader = new TFileReader(entry);
+try {
+    ...;
+} finally {
+    reader.close(); // ALWAYS close the resource here!
+}
++--+
+
+    You may be glad to know that this works recursively, too.
+    So <<<entry>>> may refer to a plain file, an entry in an archive file or an
+    entry in an archive file which is contained in another archive file and so
+    on.
+
+#configuring("<<<zip>>>",
+  "ZIP",
+  "module
+   {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+   needs",
+  "<<<truezip-driver-zip>>>")
+#cleaningUp()
