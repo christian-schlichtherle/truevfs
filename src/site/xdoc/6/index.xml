@@ -141,13 +141,13 @@
                     This works recursively, so an archive file may even be enclosed
                     in another archive file, like in
                     <code>&quot;outer.zip/inner.zip/readme&quot;</code>.</p>
-                <p>When required, TrueZIP updates archive files automatically.
-                    A JVM shutdown hook ensures that no updates get lost even if
-                    the JVM terminates due to an uncatched exception/throwable.
-                    Optionally, a client application could call
-                    <code>File.umount()</code> to flush all pending updates
-                    to the host file system, allowing it to catch any exceptions
-                    during the updating process.</p>
+                <p>When required, TrueZIP commits any changes to archive files
+                    automatically.
+                    A JVM shutdown hook ensures that no changes get lost even
+                    if the JVM terminates due to a throwable.
+                    Optionally, a client application may call this operation
+                    manually using <code>File.umount()</code>, e.g. in order to
+                    catch any exceptions from this operation.</p>
                 <p>TrueZIP features an <i>archive driver</i> interface in order
                     to support virtually any archive type.
                     TrueZIP 6 ships with archive drivers for ZIP, TAR and

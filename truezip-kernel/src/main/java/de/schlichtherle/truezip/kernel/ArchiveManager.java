@@ -13,6 +13,7 @@ import static de.truezip.kernel.util.Link.Type.WEAK;
 import static de.truezip.kernel.util.Links.target;
 import java.util.*;
 import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -26,31 +27,34 @@ final class ArchiveManager extends FsManager {
     /**
      * The map of all schedulers for composite file system controllers,
      * keyed by the mount point of their respective file system model.
-     * All access to this map must be externally synchronized!
      */
+    @GuardedBy("this")
     private final Map<FsMountPoint, Link<FsController<?>>>
             schedulers = new WeakHashMap<>();
 
     private final Type optionalScheduleType;
 
-    ArchiveManager() { this(WEAK); }
+    ArchiveManager() {
+        this(WEAK);
+    }
 
+    /** Solely provided for unit testing. */
     ArchiveManager(final Type optionalScheduleType) {
         assert null != optionalScheduleType;
         this.optionalScheduleType = optionalScheduleType;
     }
 
     @Override
-    public synchronized FsController<?>
-    controller(  FsMountPoint mountPoint,
-                    FsCompositeDriver driver) {
-        return controller(mountPoint, null, driver);
+    public synchronized FsController<?> controller(
+            FsMountPoint mountPoint,
+            FsCompositeDriver driver) {
+        return controller(mountPoint, driver, null);
     }
 
     private FsController<?> controller(
             final FsMountPoint mountPoint,
-            @CheckForNull FsController<?> parent,
-            final FsCompositeDriver driver) {
+            final FsCompositeDriver driver,
+            @CheckForNull FsController<?> parent) {
         if (null == mountPoint.getParent()) {
             if (null != parent)
                 throw new IllegalArgumentException("Parent/member mismatch!");
@@ -60,7 +64,7 @@ final class ArchiveManager extends FsManager {
         FsController<?> controller = target(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
-                parent = controller(mountPoint.getParent(), null, driver);
+                parent = controller(mountPoint.getParent(), driver, null);
             final ScheduledModel model = new ScheduledModel(
                     mountPoint, parent.getModel());
             model.setController(controller = driver.newController(this, model, parent));
@@ -120,13 +124,20 @@ final class ArchiveManager extends FsManager {
 
     private synchronized Set<FsController<?>> getControllers() {
         final Set<FsController<?>>
-                snapshot = new TreeSet<>(FsControllerComparator.REVERSE);
+                snapshot = new TreeSet<>(ReverseControllerComparator.INSTANCE);
         for (final Link<FsController<?>> link : schedulers.values()) {
             final FsController<?> controller = target(link);
             if (null != controller)
                 snapshot.add(controller);
         }
         return snapshot;
+    }
+
+    @Override
+    public void sync(BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
+        SyncShutdownHook.SINGLETON.cancel();
+        super.sync(options);
     }
 
     /**
@@ -163,18 +174,21 @@ final class ArchiveManager extends FsManager {
          */
         @Override
         public void setTouched(final boolean touched) {
-            if (touched == this.touched)
-                return;
-            this.touched = touched;
-            schedule(touched);
+            if (this.touched != touched) {
+                if (touched)
+                    SyncShutdownHook.SINGLETON.register(ArchiveManager.this);
+                schedule(touched);
+                this.touched = touched;
+            }
         }
 
         @SuppressWarnings("unchecked")
-        void schedule(boolean mandatory) {
+        void schedule(final boolean mandatory) {
+            final FsMountPoint mountPoint = getMountPoint();
+            final Link<FsController<?>> link = (Link<FsController<?>>)
+                    (mandatory ? STRONG : optionalScheduleType).link(controller);
             synchronized (ArchiveManager.this) {
-                schedulers.put(getMountPoint(), (Link<FsController<?>>)
-                        (mandatory ? STRONG : optionalScheduleType)
-                            .link(controller));
+                schedulers.put(mountPoint, link);
             }
         }
     } // ScheduledModel
@@ -183,16 +197,15 @@ final class ArchiveManager extends FsManager {
      * Orders file system controllers so that all file systems appear before
      * any of their parent file systems.
      */
-    private static final class FsControllerComparator
+    private static final class ReverseControllerComparator
     implements Comparator<FsController<?>> {
-        static final FsControllerComparator REVERSE
-                = new FsControllerComparator();
+        static final ReverseControllerComparator INSTANCE
+                = new ReverseControllerComparator();
 
         @Override
-        public int compare( final FsController<?> l,
-                            final FsController<?> r) {
-            return r.getModel().getMountPoint().toHierarchicalUri()
-                    .compareTo(l.getModel().getMountPoint().toHierarchicalUri());
+        public int compare(FsController<?> o1, FsController<?> o2) {
+            return o2.getModel().getMountPoint().toHierarchicalUri()
+                    .compareTo(o1.getModel().getMountPoint().toHierarchicalUri());
         }
-    } // FsControllerComparator
+    } // ReverseControllerComparator
 }
