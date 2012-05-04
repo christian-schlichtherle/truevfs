@@ -76,7 +76,6 @@ public final class Cat {
             InputSocket<?> socket = manager
                     .controller(     path.getMountPoint(), driver)
                     .input(    BitField.noneOf(FsAccessOption.class), path.getEntryName());
-            Throwable ex = null;
             try (InputStream in = socket.stream()) {
                 Streams.cat(in, System.out); // copy the data
             }
