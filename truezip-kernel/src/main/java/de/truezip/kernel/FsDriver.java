@@ -26,8 +26,8 @@ public abstract class FsDriver {
      * The implementation in the class {@link FsDriver} returns {@code false}.
      * 
      * @return {@code true} iff the type of the file system implemented by this
-     *         file system driver is federated, i.e. must be a member of a
-     *         parent file system.
+     *         file system driver is federated, that is it must be a member of
+     *         a parent file system.
      */
     public boolean isFederated() {
         return false;
@@ -51,10 +51,10 @@ public abstract class FsDriver {
      *         point and parent file system controller.
      * @see    FsCompositeDriver#newController
      */
-    public abstract FsController<?>
-    newController( FsManager manager,
-                FsModel model,
-                @Nullable FsController<?> parent);
+    public abstract FsController<?> newController(
+            FsManager manager,
+            FsModel model,
+            @Nullable FsController<?> parent);
 
     /**
      * Returns a string representation of this object for debugging and logging
