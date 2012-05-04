@@ -129,6 +129,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             }
 
             @Override
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
             public OutputStream newOutputStream() throws IOException {
                 final OutputSocket<? extends E> output = getBoundSocket();
                 return isBusy() ? new BufferedEntryOutputStream(output)

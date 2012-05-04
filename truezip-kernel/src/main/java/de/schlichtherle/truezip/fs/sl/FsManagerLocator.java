@@ -5,7 +5,6 @@
 package de.schlichtherle.truezip.fs.sl;
 
 import de.schlichtherle.truezip.fs.FsDefaultManager;
-import de.schlichtherle.truezip.fs.FsFailSafeManager;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsManagerProvider;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
@@ -32,10 +31,9 @@ import javax.annotation.concurrent.Immutable;
  * and instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the expression
- * {@code new FsFailSafeManager(new FsDefaultManager())} is used to create the
- * file system manager in this container.
+ * {@code new FsDefaultManager()} is used to create the file system manager in
+ * this container.
  *
- * @see    FsFailSafeManager
  * @see    FsDefaultManager
  * @see    FsManagerService
  * @author Christian Schlichtherle
@@ -84,7 +82,7 @@ public final class FsManagerLocator implements FsManagerProvider {
                 manager = service.get();
                 logger.log(CONFIG, "provided", manager);
             } else {
-                manager = new FsFailSafeManager(new FsDefaultManager());
+                manager = new FsDefaultManager();
                 logger.log(CONFIG, "default", manager);
             }
             MANAGER = manager;

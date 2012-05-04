@@ -43,7 +43,7 @@ public final class TVFS {
      * However, if the client application never calls this operation, then it
      * gets called by a shutdown hook.
      * The shutdown hook gets removed as soon as this operation gets called in
-     * order to leak no memory.
+     * order to leak no memory in dynamic class loader environments.
      * <p>
      * Calling this method is equivalent to
      * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
