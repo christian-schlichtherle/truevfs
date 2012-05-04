@@ -8,10 +8,10 @@ import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * Uses a given file system driver service to lookup the appropriate driver
+ * Uses a given file system driver provider to lookup the appropriate driver
  * for the scheme of a given mount point.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
