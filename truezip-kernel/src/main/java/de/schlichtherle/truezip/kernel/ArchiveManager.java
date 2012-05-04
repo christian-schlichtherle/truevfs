@@ -136,7 +136,7 @@ final class ArchiveManager extends FsManager {
     @Override
     public void sync(BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        SyncShutdownHook.cancel();
+        SyncShutdownHook.SINGLETON.cancel();
         super.sync(options);
     }
 
@@ -176,7 +176,7 @@ final class ArchiveManager extends FsManager {
         public void setTouched(final boolean touched) {
             if (this.touched != touched) {
                 if (touched)
-                    SyncShutdownHook.register(ArchiveManager.this);
+                    SyncShutdownHook.SINGLETON.register(ArchiveManager.this);
                 schedule(touched);
                 this.touched = touched;
             }

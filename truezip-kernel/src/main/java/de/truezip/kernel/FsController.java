@@ -16,11 +16,11 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
 /**
- * Provides read/write access to a file system.
- * Implementations of this interface are typically organized in a chain of
- * responsibility for file system federation and a decorator chain for
- * implementing different aspects of the management of the file system state,
- * e.g. lock management for concurrent access.
+ * An abstract class which provides read/write access to a file system.
+ * Objects of this class are typically organized in a chain of responsibility
+ * for file system federation and a decorator chain for implementing different
+ * aspects of the management of the file system state, e.g. locking concurrent
+ * access.
  * 
  * <h3>General Properties</h3>
  * <p>
@@ -94,14 +94,14 @@ import javax.annotation.Nullable;
  * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  * @author Christian Schlichtherle
  */
-public interface FsController<M extends FsModel> {
+public abstract class FsController<M extends FsModel> {
 
     /**
      * Returns the file system model.
      * 
      * @return The file system model.
      */
-    M getModel();
+    public abstract M getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
@@ -111,7 +111,7 @@ public interface FsController<M extends FsModel> {
      * 
      * @return The nullable controller for the parent file system.
      */
-    @Nullable FsController<?> getParent();
+    public abstract @Nullable FsController<?> getParent();
 
     /**
      * Returns {@code true} if and only if the file system is read-only.
@@ -119,7 +119,8 @@ public interface FsController<M extends FsModel> {
      * @return {@code true} if and only if the file system is read-only.
      * @throws IOException on any I/O error.
      */
-    boolean isReadOnly() throws IOException;
+    public abstract boolean isReadOnly()
+    throws IOException;
 
     /**
      * Returns the file system entry for the given {@code name} or {@code null}
@@ -133,7 +134,7 @@ public interface FsController<M extends FsModel> {
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    @CheckForNull FsEntry stat(
+    public abstract @CheckForNull FsEntry stat(
             BitField<FsAccessOption> options,
             FsEntryName name)
     throws IOException;
@@ -148,7 +149,7 @@ public interface FsController<M extends FsModel> {
      * @param  types the types of the desired access.
      * @throws IOException on any I/O error.
      */
-    void checkAccess(
+    public abstract void checkAccess(
             BitField<FsAccessOption> options,
             FsEntryName name,
             BitField<Access> types)
@@ -163,7 +164,8 @@ public interface FsController<M extends FsModel> {
      * @throws IOException on any I/O error or if this operation is not
      *         supported.
      */
-    void setReadOnly(FsEntryName name) throws IOException;
+    public abstract void setReadOnly(FsEntryName name)
+    throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given
@@ -182,11 +184,18 @@ public interface FsController<M extends FsModel> {
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
      */
-    boolean setTime(
-            BitField<FsAccessOption> options,
-            FsEntryName name,
-            Map<Access, Long> times)
-    throws IOException;
+    public boolean setTime(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final Map<Access, Long> times)
+    throws IOException {
+        boolean ok = true;
+        for (Map.Entry<Access, Long> time : times.entrySet())
+            ok &= setTime(  options, name,
+                            BitField.of(time.getKey()),
+                            time.getValue());
+        return ok;
+    }
 
     /**
      * Makes an attempt to set the last access time of all types in the given
@@ -204,7 +213,7 @@ public interface FsController<M extends FsModel> {
      *         types in {@code types} succeeded.
      * @throws IOException on any I/O error.
      */
-    boolean setTime(
+    public abstract boolean setTime(
             BitField<FsAccessOption> options,
             FsEntryName name,
             BitField<Access> types,
@@ -219,7 +228,7 @@ public interface FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @return An {@code InputSocket}.
      */
-    InputSocket<?> input(
+    public abstract InputSocket<?> input(
             BitField<FsAccessOption> options,
             FsEntryName name);
 
@@ -238,7 +247,7 @@ public interface FsController<M extends FsModel> {
      *         this entry as possible - with the exception of its name and type.
      * @return An {@code OutputSocket}.
      */
-    OutputSocket<?> output(
+    public abstract OutputSocket<?> output(
             BitField<FsAccessOption> options,
             FsEntryName name,
             @CheckForNull Entry template);
@@ -272,7 +281,7 @@ public interface FsController<M extends FsModel> {
      *             {@code false}.
      *         </ul>
      */
-    void mknod(
+    public abstract void mknod(
             BitField<FsAccessOption> options,
             FsEntryName name,
             Type type,
@@ -287,7 +296,7 @@ public interface FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @throws IOException on any I/O error.
      */
-    void unlink(
+    public abstract void unlink(
             BitField<FsAccessOption> options,
             FsEntryName name)
     throws IOException;
@@ -312,34 +321,37 @@ public interface FsController<M extends FsModel> {
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    void sync(final BitField<FsSyncOption> options)
+    public abstract void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException;
 
     /**
-     * Two file system controllers shall be considered equal if and only if
-     * they are identical.
+     * Two file system controllers are considered equal if and only if they
+     * are identical.
      * 
-     * @param  that the object to compare.
-     * @return {@code this == that}. 
+     * @param that the object to compare.
      */
     @Override
-    boolean equals(@CheckForNull Object that);
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(@CheckForNull Object that) {
+        return this == that;
+    }
 
     /**
      * Returns a hash code which is consistent with {@link #equals}.
-     * 
-     * @return A hash code which is consistent with {@link #equals}.
      */
     @Override
-    int hashCode();
+    public final int hashCode() {
+        return super.hashCode();
+    }
 
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
-     * 
-     * @return A string representation of this object for debugging and logging
-     *         purposes.
      */
     @Override
-    String toString();
+    public String toString() {
+        return String.format("%s[model=%s]",
+                getClass().getName(),
+                getModel());
+    }
 }
