@@ -3157,11 +3157,8 @@ public final class TFile extends File {
         Objects.requireNonNull(in);
 
         try {
-            final @WillClose TFileOutputStream out = new TFileOutputStream(this);
-            try {
+            try (TFileOutputStream out = new TFileOutputStream(this)) {
                 Streams.cat(in, out);
-            } finally {
-                out.close();
             }
         } catch (final IOException ex) {
             rm(this);
@@ -3224,11 +3221,8 @@ public final class TFile extends File {
     public void output(final @WillNotClose OutputStream out) throws IOException {
         Objects.requireNonNull(out);
 
-        final @WillClose TFileInputStream in = new TFileInputStream(this);
-        try {
+        try (TFileInputStream in = new TFileInputStream(this)) {
             Streams.cat(in, out);
-        } finally {
-            in.close();
         }
     }
 
