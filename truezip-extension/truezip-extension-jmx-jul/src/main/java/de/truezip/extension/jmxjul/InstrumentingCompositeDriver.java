@@ -9,10 +9,11 @@ import de.truezip.kernel.FsController;
 import de.truezip.kernel.FsManager;
 import de.truezip.kernel.FsModel;
 import java.util.Objects;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public class InstrumentingCompositeDriver implements FsCompositeDriver {
@@ -27,9 +28,10 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
     }
 
     @Override
-    public FsController<?> newController(   final FsManager manager,
-                                            final FsModel model,
-                                            final FsController<?> parent) {
+    public FsController<?> newController(
+            final FsManager manager,
+            final FsModel model,
+            final @CheckForNull FsController<?> parent) {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());

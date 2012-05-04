@@ -5,7 +5,7 @@
 package de.truezip.kernel;
 
 import java.util.ServiceConfigurationError;
-import javax.annotation.Nullable;
+import javax.annotation.CheckForNull;
 
 /**
  * Queries the scheme of the mount point of the given file system model in
@@ -41,8 +41,8 @@ public interface FsCompositeDriver {
      *         can get found for the scheme of the given mount point.
      * @see    FsDriver#newController
      */
-    FsController<?>
-    newController(  FsManager manager,
-                    FsModel model,
-                    @Nullable FsController<?> parent);
+    FsController<?> newController(
+            FsManager manager,
+            FsModel model,
+            @CheckForNull FsController<?> parent);
 }
