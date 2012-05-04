@@ -137,6 +137,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * of cache entries.
      */
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_BOOLEAN_RETURN_NULL")
     public Boolean isPermitted(Access type, Entity entity) {
         return null;
     }

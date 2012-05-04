@@ -7,6 +7,7 @@ package de.truezip.kernel.cio;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.Type.*;
 import de.truezip.kernel.util.BitField;
+import javax.annotation.CheckForNull;
 
 /**
  * Represents an entry in a container.
@@ -21,6 +22,7 @@ import de.truezip.kernel.util.BitField;
  *     ...;
  * </code></pre>
  *
+ * @see    MutableEntry
  * @author Christian Schlichtherle
  */
 public interface Entry {
@@ -114,12 +116,12 @@ public interface Entry {
  
     /**
      * Returns the size of the given {@code type} for this entry in bytes or
-     * {@link #UNKNOWN} if not specified or the type is unsupported.
+     * {@link #UNKNOWN} if not defined or the type is not supported.
      * This method may not be meaningful for non-{@link Type#FILE} entries.
      *
      * @param  type the type of the size.
      * @return The size of the given {@code type} for this entry in bytes or
-     *         {@link #UNKNOWN} if not specified or the type is unsupported.
+     *         {@link #UNKNOWN} if not defined or the type is not supported.
      */
     long getSize(Size type);
 
@@ -146,12 +148,12 @@ public interface Entry {
     /**
      * Returns the time of the given access {@code type} for this entry in
      * milliseconds since the epoch or {@value #UNKNOWN} if not
-     * specified or the type is unsupported.
+     * defined or the type is not supported.
      *
      * @param  type the type of the access.
      * @return The time of the given access {@code type} for this entry in
      *         milliseconds since the epoch or {@value #UNKNOWN} if not
-     *         specified or the type is unsupported.
+     *         defined or the type is not supported.
      */
     long getTime(Access type);
 
@@ -174,13 +176,16 @@ public interface Entry {
     BitField<PosixEntity> ALL_POSIX_ENTITIES = BitField.allOf(PosixEntity.class);
 
     /**
-     * Returns {@code true} if and only if the given access {@code type} to
-     * this entry is permitted for the given {@code entity}.
-     * 
+     * Returns {@code true} or {@code false} if the given access {@code type}
+     * to this entry for the given {@code entity} is respectively permitted or
+     * denied.
+     * Returns {@code null} if not defined or the access type or entity is
+     * not supported.
+     *
      * @param  type the type of the access.
      * @param  entity the entity which desires access.
      * @return {@code true} if and only if the given access {@code type} to
      *         this entry is permitted for the given {@code entity}.
      */
-    Boolean isPermitted(Access type, Entity entity);    
+    @CheckForNull Boolean isPermitted(Access type, Entity entity);    
 }
