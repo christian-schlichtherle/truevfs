@@ -20,58 +20,31 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class SyncShutdownHook extends Thread {
+final class SyncShutdownHook {
+
     private static final Runtime RUNTIME = Runtime.getRuntime();
-    static final SyncShutdownHook SINGLETON = new SyncShutdownHook();
+    private static final Hook hook = new Hook();
 
-    private volatile @CheckForNull FsManager manager;
-
-    private SyncShutdownHook() {
-        setPriority(Thread.MAX_PRIORITY);
-    }
-
-    /**
-     * {@linkplain FsManager#sync Synchronizes} any
-     * {@linkplain #register registered} file system manager.
-     * <p>
-     * If any exception occurs within the shutdown hook, its stacktrace gets
-     * printed to standard error because logging doesn't work in a shutdown
-     * hook.
-     * 
-     * @deprecated Do <em>not</em> call this method explicitly!
-     * @see #register
-     */
-    @Override
-    @SuppressWarnings(value = "CallToThreadDumpStack")
-    public void run() {
-        // HC SUNT DRACONES!
-        final FsManager manager = this.manager;
-        if (manager != null) {
-            try {
-                manager.sync(FsSyncOptions.UMOUNT);
-            } catch (final Throwable ex) {
-                // Logging doesn't work in a shutdown hook!
-                ex.printStackTrace();
-            }
-        }
-    }
+    /** You can't touch this - hammer time! */
+    private SyncShutdownHook() { }
 
     /**
      * Registers the given file system {@code manager} for
-     * {@linkplain FsManager#sync synchronization} when this shutdown hook is
+     * {@linkplain FsManager#sync synchronization} when the shutdown hook is
      * {@linkplain #run run}.
      * 
      * @param manager the file system manager to
-     *        {@linkplain FsManager#sync synchronize} when this shutdown hook
+     *        {@linkplain FsManager#sync synchronize} when the shutdown hook
      *        is {@linkplain #run run}.
      * @see   #cancel
      */
-    void register(final FsManager manager) {
-        if (this.manager != manager) {
-            synchronized (this) {
-                if (this.manager != manager) {
-                    RUNTIME.addShutdownHook(this);
-                    this.manager = manager;
+    static void register(final FsManager manager) {
+        final Hook hook = SyncShutdownHook.hook;
+        if (hook.manager != manager) {
+            synchronized (hook) {
+                if (hook.manager != manager) {
+                    RUNTIME.addShutdownHook(hook);
+                    hook.manager = manager;
                 }
             }
         }
@@ -82,13 +55,49 @@ final class SyncShutdownHook extends Thread {
      * 
      * @see #register
      */
-    void cancel() {
-        if (manager != null) {
-            synchronized (this) {
-                if (manager != null) {
+    static void cancel() {
+        final Hook hook = SyncShutdownHook.hook;
+        if (hook.manager != null) {
+            synchronized (hook) {
+                if (hook.manager != null) {
                     // Prevent memory leak in dynamic class loader environments.
-                    RUNTIME.removeShutdownHook(this);
-                    manager = null;
+                    RUNTIME.removeShutdownHook(hook);
+                    hook.manager = null;
+                }
+            }
+        }
+    }
+
+    private static final class Hook extends Thread {
+        volatile @CheckForNull FsManager manager;
+
+        private Hook() {
+            setPriority(Thread.MAX_PRIORITY);
+        }
+
+        /**
+         * {@linkplain FsManager#sync Synchronizes} any
+         * {@linkplain #register registered} file system manager.
+         * <p>
+         * If any exception occurs within the shutdown hook, its stacktrace gets
+         * printed to standard error because logging doesn't work in a shutdown
+         * hook.
+         * 
+         * @deprecated Do <em>not</em> call this method explicitly!
+         * @see #register
+         */
+        @Override
+        @SuppressWarnings(value = "CallToThreadDumpStack")
+        public void run() {
+            // HC SUNT DRACONES!
+            final FsManager manager = this.manager;
+            if (manager != null) {
+                this.manager = null; // MUST reset to void calls to cancel()!
+                try {
+                    manager.sync(FsSyncOptions.UMOUNT);
+                } catch (final Throwable ex) {
+                    // Logging doesn't work in a shutdown hook!
+                    ex.printStackTrace();
                 }
             }
         }
