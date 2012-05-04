@@ -14,9 +14,10 @@ import java.util.Map.Entry;
 import java.util.*;
 
 /**
- * Pretty-prints an HTML table of the map of a file system driver provider.
+ * Pretty-prints an HTML table of the driver map of a given file system driver
+ * provider.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class DriverMap implements Runnable {
 
