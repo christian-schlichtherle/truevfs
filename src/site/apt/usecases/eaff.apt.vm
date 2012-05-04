@@ -1,0 +1,123 @@
+#parse("common.vm")
+    -----------------------
+    Encrypted Application File Format
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Encrypted Application File Format
+
+* Motivation
+
+    Suppose you're writing a plug-in for the next generation application
+    which shall use an archive file format with a custom file extension
+    (extension) as a persistent container for some application data, e.g. a
+    text document, and you need to make sure that nobody can read or modify the
+    contents of the custom file format aside from authenticated parties.
+
+    Then, wouldn't it be nice if you wouldn't need to worry about how to read
+    or write archive files using cumbersome archive type specific APIs?
+    And wouldn't it be also nice if you wouldn't have to deal with complex
+    encryption, decryption and authentication code?
+    And wouldn't it be even nicer if you wouldn't have to write the user dialog
+    for password prompting?
+
+* Accessing Encrypted and Authenticated Application File Formats
+
+    Thanks to the
+    {{{../truezip-file/index.html}TrueZIP File*}}
+    module, here's your relief:
+    The
+    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    and
+    {{{../apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    classes can read and write entries within an encrypted and authenticated
+    archive file as if they were plain files in regular directories in the file
+    system.
+
+    First, you need to register your custom application file format extension
+    with an instance of an archive driver class like this:
+
++-------------------------------------------------+
+TConfig.get().setArchiveDetector(
+    new TArchiveDetector(
+        "fox|bax",
+        new SafeZipRaesDriver(IOPoolLocator.SINGLETON)));
++-------------------------------------------------+
+
+    Once this has been called, any new <<<TFile>>> object will recognize the
+    file extensions <<<fox>>> and <<<bax>>>, whereby case is ignored,
+    and assume the ZIP.RAES file format to read or write these files.
+
+    Note that TrueZIP automatically recognizes false positive archive files,
+    so it cannot get confused by files with arbitrary content which accidently
+    use the extension of your custom application file format.
+
+    Please also note the usage of the class
+    {{{../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+    for accessing the ZIP.RAES file format.
+    This is one of two available archive driver implementations for TrueZIP's
+    custom encrypted ZIP.RAES file format (or TZP for short).
+    The other one is the class
+    {{{../apidocs/de/truezip/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
+    A TZP file is a ZIP file with UTF-8 encoded entry names (like the JAR file
+    format) which is wrapped in a RAES file envelope.
+    RAES is TrueZIP's custom Random Access Encryption Specification which
+    supports SHA-256 authentication and AES-256 decryption in CTR block
+    mode for transparent, read/write access to its encrypted payload.
+    By using CTR mode, RAES supports transparent <random> read access to
+    its encrypted payload, which makes reading a TZP file pretty fast.
+
+    Note that the <<<SafeZipRaesDriver>>> uses the
+    {{{../truezip-key/apidocs/de/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
+    to get a secret key manager.
+    The reference implementation of its service provider interface in the
+    module {{{../truezip-key/index.html}TrueZIP Key}} will prompt the user for
+    entering the secret keys, either with a Swing GUI or - if the JVM is
+    running headless - on the console.
+    You can change this by following the instructions on the page about
+    {{{../truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
+
+    Now you can easily create or overwrite an entry in your custom application
+    file format like this:
+
++--+
+OutputStream out = new TFileOutputStream("file.fox/contents.xml");
+try {
+    ...;
+} finally {
+    out.close(); // ALWAYS close the resource here!
+}
++--+
+
+    Alternatively, you could use a 
+    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}.
+
+    This is how you could read the entry again:
+
++--+
+InputStream in = new TFileInputStream("file.fox/contents.xml");
+try {
+    ...;
+} finally {
+    in.close(); // ALWAYS close the resource here!
+}
++--+
+
+    Alternatively, you could use a 
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
+
+    And finally, to delete a virtual directory tree - in this case your custom
+    application file - you could use this:
+
++--+
+new TFile("file.fox").rm_r();
++--+
+
+    Note that calling the method <<<rm_r()>>> is required to recursively delete
+    the application file because the <<<TFile>>> object refers to a virtual
+    directory, which cannot get deleted using similar methods like
+    <<<delete()>>> or <<<rm()>>> unless it's empty.
+
+#cleaningUp()

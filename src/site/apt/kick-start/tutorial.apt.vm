@@ -1,0 +1,254 @@
+#parse("../common.vm")
+    -----------------------
+    Tutorial
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Tutorial
+
+    TrueZIP provides CRUD (Create, Read, Update, Delete) operations for archive
+    files while maintaining an easy-to-use file system API.
+    This enables you to treat archive files as if they were virtual directories
+    and archive entries as if they were virtual files within these virtual
+    directories.
+
+    The following tutorial assumes some preconditions:
+
+    * You need to have a basic knowledge of the traditional <<<java.io>>> API.
+      If not, please refer to
+      {{{http://docs.oracle.com/javase/tutorial/essential/io/}The Java Tutorials Lesson: Basic I/O}}
+      first.
+
+    * You want to use the TrueZIP File* API to access some archive files.
+      Of course, the same operations are available for the
+      {{{../truezip-path/index.html}TrueZIP Path}} API, too.
+      Note that you can actually use both client APIs concurrently because they
+      are just facades for the TrueZIP Kernel.
+
+    * You need to have a working application skeleton with the required TrueZIP
+      JARs as its dependencies.
+      If not, please refer to the section Kick-Starting on the
+      {{{./index.html#Kick-Starting}Getting Started}}
+      page first.
+
+    []
+
+* The package <<<de.truezip.file>>>
+
+    The entry point to the TrueZIP File* API is the package
+    {{{../apidocs/de/truezip/file/package-summary.html}<<<de.truezip.file>>>}}.
+    It contains the classes
+    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
+    {{{../apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}},
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}},
+    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
+    etc, or just <<<TFile*>>> for short.
+
+    Your starting point for almost all file system operations is an object of
+    the class <<<TFile>>>.
+    This class inherits from <<<java.io.File>>>, so you can use it with other
+    APIs for its super class.
+    The class
+    {{{../apidocs/de/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
+    uses this feature by subclassing <<<javax.swing.JFileChooser>>> so that you
+    can browse archive files with it, too.
+    Note however that you can't use a plain old <<<java.io.FileInputStream>>>,
+    <<<java.io.FileOutputStream>>> etc with a <<<TFile>>> object.
+
+    While <<<TFile>>> supports the traditional <<<File>>> API, it also provides
+    many additional methods to overcome the known limitations of its super
+    class, e.g. the additional methods throw an <<<java.io.IOException>>> on
+    failure instead of simply returning a boolean value - see below.
+
+* Create
+
+    Creating an archive file works exactly like creating any other directory,
+    so you could simply call
+    {{{../apidocs/de/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}
+    or
+    {{{../apidocs/de/truezip/file/TFile.html#mkdirs()}<<<TFile.mkdirs()>>>}}
+    in order to create an archive file or a member directory.
+
++--+
+File dir = new TFile("archive.zip/dir");
+dir.mkdirs(); // don't do this!
++--+
+
+    However, while this works as expected, it's actually sub-optimal:
+    Explicitly creating a directory within an archive file may create an
+    otherwise empty archive entry for the directory in the target archive file.
+    This wastes space in the resulting archive file and therefore is not
+    recommended.
+    Instead, you should simply directly create the file entries within an
+    archive file.
+
+    The following example shows how to create an archive entry with the class
+    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
+    without the need to create its containing archive file or the directory
+    within this archive file first:
+
++--+
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+Writer writer = new TFileWriter(entry);
+try {
+    writer.write("Hello world!\n");
+} finally {
+    writer.close();
+}
++--+
+
+    Note the use of a finally-block to ensure that the writer gets always
+    <<<close()>>>d.
+    This is vital for any I/O resource (not just within TrueZIP) in order to
+    ensure that any operating system resources get released as soon as possible,
+    even in the event of an <<<IOException>>> or any other <<<Throwable>>>, e.g.
+    an <<<OutOfMemoryError>>>.
+    Please also consider that the <<<close()>>> method may throw an
+    <<<IOException>>>, too.
+    <<It is an error to ignore this!>>
+    So please wrap the entire block in another try-catch block or else declare
+    the enclosing method to potentially throw an <<<IOException>>>.
+
+    Actually, it's a typical issue for long running Java applications to run
+    out of file descriptors because the programmers haven't ensured to properly
+    close their I/O resources.
+    So please make sure you always close your I/O resources in a finally-block.
+    In case you need some aid to check your code for this issue, I recommend to
+    use {{{http://findbugs.sourceforge.net}FindBugs}}.
+
+* Read
+
+    Reading an archive entry is as easy as writing it - just use a class like
+    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    and point it to the archive entry:
+    
++--+
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+Reader reader = new TFileReader(entry);
+try {
+    // Do the processing here
+    ...
+} finally {
+    reader.close();
+}
++--+
+
+    Note again the use of a finally-block to ensure that the reader gets always
+    <<<close()>>>d.
+
+    OK, this is trivial, but how do you find the archive entry to read in the
+    first place?
+    Remember that the <<<TFile>>> class extends <<<File>>>, so you can simply
+    use
+    {{{../apidocs/de/truezip/file/TFile.html#list()}<<<TFile.list()>>>}},
+    {{{../apidocs/de/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}
+    etc.
+
+    The following example prints the members of the previously created archive
+    file to the standard output:
+
++--+
+TFile archive = new TFile("archive.zip");
+for (String member : archive.list())
+  System.out.println(member);
++--+
+
+    Following the previous example, this would just print the string <<<dir>>>
+    to the standard output.
+    This is because <<<File.list()>>>, and hence <<<TFile.list()>>>, just list
+    the immediate members of a (virtual) directory.
+    You need to apply this method recursively to print an entire directory tree.
+
+* Update
+
+    Overwriting the contents of an archive entry works in exactly the same way
+    like creating it - just use a <<<TFileOutputStream>>> or a <<<TFileWriter>>>
+    and point it to the respective archive entry with the help of a <<<TFile>>>.
+
+    Of course a file system does not only store entry contents, but also some
+    meta data, e.g. the last modification time.
+    Just like with a real file system, you can easily update the last
+    modification time of an archive entry by calling
+    {{{../apidocs/de/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}.
+
++--+
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+entry.setLastModified(System.currentTimeMillis()); // sub-optimal!
++--+
+
+    However, there may be smarter ways to do this:
+    Most times you want to set the last modification of a file system entry its
+    because you are copying one file system entry to another and you want to
+    preserve some meta data, too.
+    In this case you should use the {{Bulk I/O Methods}} instead in order to
+    benefit from their superior performance.
+
+* Delete
+
+    You may be guessing it already, so let it suffice to say that deleting an
+    archive entry works in exactly the same way as with a regular file system
+    entry - just call
+    {{{../apidocs/de/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
+
++--+
+File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+boolean ok = entry.delete(); // sub-optimal!
++--+
+
+    One shortcoming of this method is that it just returns a boolean value to
+    indicate success or failure.
+    To overcome this, another method has been added which is aptly named
+    {{{../apidocs/de/truezip/file/TFile.html#rm()}<<<TFile.rm()>>>}}.
+
++--+
+new TFile("archive.zip/dir/HälloWörld.txt").rm();
++--+
+
+    This method returns <<<this>>> for fluent programming and throws an
+    <<<IOException>>> with the path name and a short description of what went
+    wrong as its message.
+
+* Bulk I/O Methods
+
+    TrueZIP is not just about accessing archive files:
+    The <<<TFile>>> class provides some very useful methods for standard tasks
+    like copying, moving or removing entire directory trees.
+    Here's how to create a TAR.GZ file from a ZIP file:
+
++--+
+new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
++--+
+
+    These methods are not only very convenient to use, they also provide
+    superior performance because they apply multithreading and in the case of
+    archive entries, use a feature called Raw Data Copying (RDC).
+    For example when copying arbitrary file system entries, one thread reads
+    the input entry while another thread writes the output entry.
+    When copying ZIP entries from one ZIP file to another, then thanks to RDC
+    the input entry does <not> get decompressed just in order to compress it
+    again to the output entry;
+    instead, the raw entry data gets copied from the input entry to the output
+    entry directly.
+
+    For more information about the available bulk I/O methods, please refer to
+    the section
+    {{{../apidocs/de/truezip/file/TFile.html#bulkIOMethods}Bulk I/O methods}}
+    of the <<<TFile>>> class Javadoc.
+    For now, let's just clean up behind us:
+
++--+
+new TFile("archive.zip").rm_r();    // remove recursively
+new TFile("archive.tar.gz").rm_r(); // dito
++--+
+
+#configuring("<<<tar.gz>>> or <<<zip>>>",
+  "TAR.GZ or ZIP",
+  "modules
+   {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
+   and
+   {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+   need",
+  "<<<truezip-driver-tar>>> and <<<truezip-driver-zip>>>")
+#cleaningUp()

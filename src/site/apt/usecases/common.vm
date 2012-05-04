@@ -1,0 +1,54 @@
+## This file contains macros for common use within this directory.
+#macro(leadIn $title $motivation $writing $heading)
+    -----------------------
+    $title
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+$title
+
+* Motivation
+
+    $motivation
+    Then you may need to support at least the following archive types:
+
+    * TAR.GZ
+
+    * TAR.BZ2
+
+    * ZIP
+
+    * JAR
+
+    * WAR
+
+    * EAR
+
+    * ...
+
+    []
+
+    You can easily figure that writing the code to read and write archive
+    files of all these types will be a cumbersome and tedious task because
+    each archive type typically comes with its own API to read and write
+    its archive files.
+  #set($tru="true")
+  #if($tru.equalsIgnoreCase($writing))
+    Furthermore, the algorithms required to manage the state transitions
+    required to support arbitrary modifications to an archive file in a
+    thread-safe manner are very complex.
+  #end
+
+* $heading
+
+    Thanks to the module
+    {{{../truezip-file/index.html}TrueZIP File*}},
+    here's your relief:
+    The
+    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+    class extends the <<<java.io.File>>> class in order to add the
+    required functionality.
+
+#end ## leadIn
+#parse("../common.vm")
