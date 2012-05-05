@@ -79,7 +79,7 @@ public final class ServiceLocator {
         final ClassLoader l2 = Thread.currentThread().getContextClassLoader();
         return l1 == l2
                 ? ServiceLoader.load(service, l1).iterator()
-                : new JointIterator<>( ServiceLoader.load(service, l1).iterator(),
+                : new JointIterator<>(  ServiceLoader.load(service, l1).iterator(),
                                         ServiceLoader.load(service, l2).iterator());
     }
 
@@ -138,7 +138,7 @@ public final class ServiceLocator {
         try {
             try {
                 return l1.loadClass(name);
-            } catch (ClassNotFoundException ex) {
+            } catch (final ClassNotFoundException ex) {
                 ClassLoader l2 = Thread.currentThread().getContextClassLoader();
                 if (l1 == l2)
                     throw ex; // there's no point in trying this twice.
