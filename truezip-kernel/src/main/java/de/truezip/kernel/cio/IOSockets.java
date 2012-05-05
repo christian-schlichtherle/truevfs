@@ -26,7 +26,7 @@ public final class IOSockets {
      * {@link OutputSocket#stream created} by the given {@code output}
      * socket.
      * <p>
-     * This is a high performance implementation which uses a pooled background
+     * This is a high performance implementation which uses a pooled daemon
      * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
      *
@@ -37,8 +37,7 @@ public final class IOSockets {
      * @throws IOException if copying the data fails because of an
      *         {@code IOException} thrown by the <em>output socket</em>.
      */
-    public static void copy(final InputSocket<?> input,
-                            final OutputSocket<?> output)
+    public static void copy(InputSocket<?> input, OutputSocket<?> output)
     throws InputException, IOException {
         // Call connect on output for early NPE check!
         Streams.copy(input, output.connect(input));

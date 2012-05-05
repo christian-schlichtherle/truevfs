@@ -32,8 +32,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * target.
  * Again, this operation may fail with an {@code IOException}.
  * <p>
- * I/O sockets are designed to {@linkplain #copy copy} the contents of their
- * I/O targets fast and easily by using multithreading.
+ * I/O sockets are designed to {@linkplain IOSockets#copy copy} the contents of
+ * their I/O targets fast and easily by using multithreading.
  * In addition, a socket may negotiate with its peer target in order to
  * agree upon the necessary processing when copying the entry data.
  * For example, this could get used by an implementation in order to avoid
@@ -68,9 +68,6 @@ public interface IOSocket<LT extends Entry, PT extends Entry> {
 
     /**
      * Resolves the nullable <i>peer target</i> for I/O operations.
-     * The peer target is {@code null} if and only if this socket is not
-     * {@linkplain #getPeerSocket connected} to another socket.
-     * <p>
      * The same considerations as for {@link #localTarget} apply here, too.
      *
      * @return The nullable peer target for I/O operations.

@@ -27,6 +27,15 @@ public interface InputSocket<E extends Entry>
 extends IOSocket<E, Entry>, Source {
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The peer target is {@code null} if and only if this socket is not
+     * {@linkplain #getPeerSocket connected} to another socket.
+     */
+    @Override
+    @CheckForNull Entry peerTarget() throws IOException;
+
+    /**
      * Returns the nullable peer socket to which this socket is connected for
      * copying.
      * 
