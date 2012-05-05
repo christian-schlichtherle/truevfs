@@ -33,17 +33,37 @@ implements FsController<M> {
         return ok;
     }
 
+    /**
+     * Two file system controllers are considered equal if and only if
+     * they are identical.
+     * 
+     * @param  that the object to compare.
+     * @return {@code this == that}. 
+     */
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public final boolean equals(@CheckForNull Object that) {
         return this == that;
     }
 
+    /**
+     * Returns a hash code which is consistent with {@link #equals}.
+     * 
+     * @return A hash code which is consistent with {@link #equals}.
+     * @see Object#hashCode
+     */
     @Override
     public final int hashCode() {
         return super.hashCode();
     }
 
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     * 
+     * @return A string representation of this object for debugging and logging
+     *         purposes.
+     */
     @Override
     public String toString() {
         return String.format("%s[model=%s]",

@@ -314,32 +314,4 @@ public interface FsController<M extends FsModel> {
      */
     void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException;
-
-    /**
-     * Two file system controllers shall be considered equal if and only if
-     * they are identical.
-     * 
-     * @param  that the object to compare.
-     * @return {@code this == that}. 
-     */
-    @Override
-    boolean equals(@CheckForNull Object that);
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     * 
-     * @return A hash code which is consistent with {@link #equals}.
-     */
-    @Override
-    int hashCode();
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     * 
-     * @return A string representation of this object for debugging and logging
-     *         purposes.
-     */
-    @Override
-    String toString();
 }
