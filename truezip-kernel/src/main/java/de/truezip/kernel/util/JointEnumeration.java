@@ -11,14 +11,15 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Concatenates two enumerations.
  *
- * @author  Christian Schlichtherle
+ * @param  <E> the type of the enumerated elements.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class JointEnumeration<E> implements Enumeration<E> {
+final class JointEnumeration<E> implements Enumeration<E> {
     private Enumeration<? extends E> e1;
     private final Enumeration<? extends E> e2;
 
-    public JointEnumeration(
+    JointEnumeration(
             final Enumeration<? extends E> e1,
             final Enumeration<? extends E> e2) {
         this.e1 = e1;
