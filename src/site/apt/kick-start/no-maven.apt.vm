@@ -1,10 +1,10 @@
     -----------------------
-    Using TrueZIP Without Maven
+    Getting started without Maven
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Using TrueZIP Without Maven
+Getting started without Maven
 
     If you do not want to use Maven then you can easily
     {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truezip%22%20AND%20v%3A%22${project.version}%22}<<download individual TrueZIP artifacts>>}}

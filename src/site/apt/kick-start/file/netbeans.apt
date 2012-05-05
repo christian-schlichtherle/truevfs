@@ -1,10 +1,10 @@
     -----------------------
-    Kick-Starting TrueZIP Applications With NetBeans
+    Getting started with NetBeans
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Kick-Starting TrueZIP Applications With NetBeans
+Getting started with NetBeans
 
     This guide shows how to kick-start a TrueZIP application in NetBeans
     with the help of a Maven archetype.
