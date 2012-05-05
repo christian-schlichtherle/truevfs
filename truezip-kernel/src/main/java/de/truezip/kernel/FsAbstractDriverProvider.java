@@ -67,14 +67,14 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
                     if (p instanceof FsScheme)
                         set.add((FsScheme) p);
                     else
-                        for (String q : new ExtensionSet(p.toString()))
+                        for (final String q : new ExtensionSet(p.toString()))
                             set.add(new FsScheme(q));
             else if (o instanceof FsScheme)
                 set.add((FsScheme) o);
             else
                 for (final String p : new ExtensionSet(o.toString()))
                     set.add(new FsScheme(p));
-        } catch (URISyntaxException ex) {
+        } catch (final URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
         return set;
