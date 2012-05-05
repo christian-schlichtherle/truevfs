@@ -4,7 +4,6 @@
  */
 package de.truezip.kernel.io;
 
-import de.truezip.kernel.util.ThreadGroups;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
