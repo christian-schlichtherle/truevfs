@@ -483,15 +483,15 @@ implements Iterable<FsCovariantEntry<E>> {
                 master.add(entryCE.getName(), entryAE);
                 if (master.get(parentCE.getName()).add(member)
                         && UNKNOWN != parentAE.getTime(WRITE)) // never touch ghosts!
-                    parentAE.setTime(WRITE, getCurrentTimeMillis());
+                    parentAE.setTime(WRITE, getTimeMillis());
                 parentCE = entryCE;
                 parentAE = entryAE;
             }
             if (UNKNOWN == parentAE.getTime(WRITE))
-                parentAE.setTime(WRITE, getCurrentTimeMillis());
+                parentAE.setTime(WRITE, getTimeMillis());
         }
 
-        private long getCurrentTimeMillis() {
+        private long getTimeMillis() {
             return UNKNOWN != time ? time : (time = System.currentTimeMillis());
         }
 
