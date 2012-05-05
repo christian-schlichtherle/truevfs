@@ -14,8 +14,8 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
  * However, this does not necessarily apply to the implementation of its
  * managed resources.
  *
- * @param  <R> The type of the resources managed by this pool.
- * @param  <X> The type of the exceptions thrown by this pool.
+ * @param  <R> the type of the resources managed by this pool.
+ * @param  <X> the type of the exceptions thrown by this pool.
  * @author Christian Schlichtherle
  */
 public interface Pool<R, X extends Exception> {

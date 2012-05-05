@@ -9,7 +9,7 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Static utility methods for maps.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class Maps {
