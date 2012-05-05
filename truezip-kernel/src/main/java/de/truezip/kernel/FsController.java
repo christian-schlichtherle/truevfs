@@ -229,9 +229,8 @@ public interface FsController<M extends FsModel> {
      *
      * @param  options the options for accessing the file system entry.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
-     *         parent directories shall get created and linked into the file
-     *         system with its last modification time set to the system's
-     *         current time.
+     *         parent directories shall get created with an undefined last
+     *         modification time.
      * @param  name the name of the file system entry.
      * @param  template if not {@code null}, then the file system entry
      *         at the end of the chain shall inherit as much properties from
@@ -249,9 +248,8 @@ public interface FsController<M extends FsModel> {
      *
      * @param  options the options for accessing the file system entry.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
-     *         parent directories shall get created and linked into the file
-     *         system with its last modification time set to the system's
-     *         current time.
+     *         parent directories shall get created with an undefined last
+     *         modification time.
      * @param  name the name of the file system entry.
      * @param  type the file system entry type.
      * @param  template if not {@code null}, then the file system entry
