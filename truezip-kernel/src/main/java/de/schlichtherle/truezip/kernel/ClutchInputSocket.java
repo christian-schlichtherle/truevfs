@@ -2,8 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.cio;
+package de.schlichtherle.truezip.kernel;
 
+import de.truezip.kernel.cio.DecoratingInputSocket;
+import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.InputSocket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
