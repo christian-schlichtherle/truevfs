@@ -307,7 +307,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         boolean storeBuffer() throws InputException, IOException {
             if (!closed || isBusy())
                 return false;
-            IOSocket.copy(input, output);
+            IOSockets.copy(input, output);
             buffer.release();
             return true;
         }

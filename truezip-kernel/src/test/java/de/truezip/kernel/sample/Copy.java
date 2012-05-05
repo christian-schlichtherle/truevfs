@@ -5,7 +5,8 @@
 package de.truezip.kernel.sample;
 
 import de.truezip.kernel.*;
-import de.truezip.kernel.cio.IOSocket;
+import static de.truezip.kernel.FsAccessOption.*;
+import de.truezip.kernel.cio.IOSockets;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.sl.FsDriverLocator;
@@ -70,18 +71,18 @@ public final class Copy {
             srcUri = srcUri.isAbsolute() ? srcUri : new File(src).toURI();
             FsPath srcPath = FsPath.create(srcUri, FsUriModifier.CANONICALIZE);
             InputSocket<?> srcSocket = manager
-                    .controller(     driver, srcPath.getMountPoint())
-                    .input(    BitField.noneOf(FsAccessOption.class), srcPath.getEntryName());
+                    .controller(driver, srcPath.getMountPoint())
+                    .input(FsAccessOptions.NONE, srcPath.getEntryName());
             // Resolve the destination socket. Again, we need an absolute URI.
             URI dstUri = URI.create(dst);
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
             FsPath dstPath = FsPath.create(dstUri, FsUriModifier.CANONICALIZE);
             OutputSocket<?> dstSocket = manager
-                    .controller(     driver, dstPath.getMountPoint())
-                    .output(   BitField.of(FsAccessOption.CREATE_PARENTS,
-                                                    FsAccessOption.EXCLUSIVE), dstPath.getEntryName(),
-                                        srcSocket.localTarget());
-            IOSocket.copy(srcSocket, dstSocket); // copy the data
+                    .controller(driver, dstPath.getMountPoint())
+                    .output(BitField.of(CREATE_PARENTS, EXCLUSIVE),
+                            dstPath.getEntryName(),
+                            srcSocket.localTarget());
+            IOSockets.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files

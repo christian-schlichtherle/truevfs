@@ -14,7 +14,7 @@ import de.truezip.kernel.FsMountPoint;
 import de.truezip.kernel.FsPath;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
-import de.truezip.kernel.cio.IOSocket;
+import de.truezip.kernel.cio.IOSockets;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
@@ -350,7 +350,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         final InputSocket<?> input = src.input(src.getAccessPreferences());
         final OutputSocket<?> output = dst.output(o,
                 preserve ? input.localTarget() : null);
-        IOSocket.copy(input, output);
+        IOSockets.copy(input, output);
     }
 
     @Override
