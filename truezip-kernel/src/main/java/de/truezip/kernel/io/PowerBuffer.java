@@ -12,8 +12,8 @@ import java.nio.channels.WritableByteChannel;
 import java.util.Objects;
 
 /**
- * A drop-in replacement which adapts a {@link ByteBuffer} to provide
- * additional methods for reading unsigned integers.
+ * A drop-in replacement which adapts a {@link ByteBuffer} to provide an
+ * enhanced API, e.g. for reading unsigned integers.
  * 
  * @author Christian Schlichtherle
  */
