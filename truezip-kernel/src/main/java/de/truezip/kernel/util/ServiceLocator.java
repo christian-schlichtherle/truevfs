@@ -51,10 +51,10 @@ public final class ServiceLocator {
     /**
      * Constructs a new service locator which uses the given class loader first
      * to locate classes, resources or services on the class path.
-     * If this is {@code null}, then the system class loader is used.
      *
      * @param loader the nullable class loader to locate classes, resources and
      *        services.
+     *        If this is {@code null}, then the system class loader is used.
      */
     public ServiceLocator(final @CheckForNull ClassLoader loader) {
         this.l1 = null != loader ? loader : ClassLoader.getSystemClassLoader();
