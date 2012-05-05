@@ -1,10 +1,10 @@
     -----------------------
-    Kick-Starting TrueZIP Applications With Eclipse
+    Getting started with Eclipse
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Kick-Starting TrueZIP Applications With Eclipse
+Getting started with Eclipse
 
     This guide shows how to kick-start a TrueZIP application in Eclipse
     with the help of a Maven archetype.
