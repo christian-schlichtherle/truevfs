@@ -10,10 +10,10 @@ import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An iterator which concatenates the elements of two other iterators.
+ * Concatenates two iterators.
  *
- * @param   <E> The type of the elements.
- * @author  Christian Schlichtherle
+ * @param  <E> the type of the iterated elements.
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class JointIterator<E> implements Iterator<E> {
@@ -24,7 +24,6 @@ public final class JointIterator<E> implements Iterator<E> {
      *
      * @param  i1 the first iterator.
      * @param  i2 the second iterator.
-     * @throws NullPointerException if any parameter is {@code null}.
      */
     public JointIterator(
             final Iterator<? extends E> i1,
@@ -38,7 +37,6 @@ public final class JointIterator<E> implements Iterator<E> {
      *
      * @param  i1 the first iterable.
      * @param  i2 the second iterable.
-     * @throws NullPointerException if any parameter is {@code null}.
      */
     public JointIterator(
             final Iterable<? extends E> i1,

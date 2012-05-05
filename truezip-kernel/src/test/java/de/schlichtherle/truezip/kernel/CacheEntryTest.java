@@ -62,7 +62,7 @@ public final class CacheEntryTest {
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(front.getData(), nullValue());
             try {
-                IOSocket.copy(cache.input(), front.output());
+                IOSockets.copy(cache.input(), front.output());
                 fail();
             } catch (IOException expected) {
             }
@@ -85,7 +85,7 @@ public final class CacheEntryTest {
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
-            IOSocket.copy(cache.input(), front.output());
+            IOSockets.copy(cache.input(), front.output());
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_READ));
             assertThat(new String(back.getData()), equalTo(MOCK_ENTRY_DATA_READ));
@@ -105,7 +105,7 @@ public final class CacheEntryTest {
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_READ.length()));
 
             try {
-                IOSocket.copy(front.input(), cache.output());
+                IOSockets.copy(front.input(), cache.output());
                 if (WRITE_THROUGH != strategy) {
                     assertThat( back.getCount(WRITE), is(0));
                     cache.flush();
@@ -129,7 +129,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            IOSocket.copy(front.input(), cache.output());
+            IOSockets.copy(front.input(), cache.output());
             if (WRITE_THROUGH != strategy) {
                 assertThat( back.getCount(WRITE), is(0));
                 cache.flush();
@@ -155,7 +155,7 @@ public final class CacheEntryTest {
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_WRITE.length()));
 
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
-            IOSocket.copy(cache.input(), front.output());
+            IOSockets.copy(cache.input(), front.output());
             assertThat(cache.getSize(DATA), is(not((long) UNKNOWN)));
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_WRITE));
@@ -175,7 +175,7 @@ public final class CacheEntryTest {
 
             front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             try {
-                IOSocket.copy(cache.input(), front.output());
+                IOSockets.copy(cache.input(), front.output());
                 fail();
             } catch (IOException excepted) {
             }
@@ -197,7 +197,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) UNKNOWN));
 
-            IOSocket.copy(cache.input(), front.output());
+            IOSockets.copy(cache.input(), front.output());
             assertThat(cache.getSize(DATA), is(not((long) UNKNOWN)));
             assertThat(pool.size(), is(1));
             assertThat(new String(front.getData()), equalTo(MOCK_ENTRY_DATA_READ));
@@ -219,7 +219,7 @@ public final class CacheEntryTest {
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_READ.length()));
 
             try {
-                IOSocket.copy(front.input(), cache.output());
+                IOSockets.copy(front.input(), cache.output());
                 if (WRITE_THROUGH != strategy) {
                     assertThat( back.getCount(WRITE), is(0));
                     cache.flush();
@@ -245,7 +245,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            IOSocket.copy(front.input(), cache.output());
+            IOSockets.copy(front.input(), cache.output());
             if (WRITE_THROUGH != strategy) {
                 assertThat( back.getCount(WRITE), is(0));
                 cache.flush();
@@ -272,7 +272,7 @@ public final class CacheEntryTest {
     }
 
     private static class BrokenInputSocket
-    extends InputSocket<Entry> {
+    extends AbstractInputSocket<Entry> {
         private final Entry entry;
 
         BrokenInputSocket(Entry entry) {
@@ -299,7 +299,7 @@ public final class CacheEntryTest {
     } // class BrokenInputSocket
 
     private static class BrokenOutputSocket
-    extends OutputSocket<Entry> {
+    extends AbstractOutputSocket<Entry> {
         private final Entry entry;
 
         BrokenOutputSocket(Entry entry) {

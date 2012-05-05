@@ -5,8 +5,8 @@
 package de.truezip.driver.http;
 
 import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.cio.AbstractOutputSocket;
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class HttpOutputSocket extends OutputSocket<HttpEntry> {
+public class HttpOutputSocket extends AbstractOutputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 

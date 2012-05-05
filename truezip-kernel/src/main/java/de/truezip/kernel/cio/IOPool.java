@@ -16,7 +16,7 @@ import java.io.IOException;
  * Implementations must be thread-safe.
  * However, this does not necessarily apply to its managed I/O buffers.
  *
- * @param  <B> the type parameter for the I/O buffers managed by this pool.
+ * @param  <B> the type of the I/O buffers managed by this pool.
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("MarkerInterface")

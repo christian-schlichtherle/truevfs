@@ -266,7 +266,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         abstract CacheEntry.OutputBufferPool newOutputBufferPool(CacheEntry cache);
     } // Strategy
 
-    private final class Input extends InputSocket<Entry> {
+    private final class Input extends AbstractInputSocket<Entry> {
         @CheckForNull Buffer buffer;
 
         InputSocket<? extends Entry> getSocket() throws IOException {
@@ -295,7 +295,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         }
     } // Input
 
-    private final class Output extends OutputSocket<Entry> {
+    private final class Output extends AbstractOutputSocket<Entry> {
         @CheckForNull Buffer buffer;
 
         OutputSocket<? extends Entry> getSocket() throws IOException {
@@ -452,11 +452,11 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         }
 
         void load(InputSocket<?> input) throws IOException {
-            IOSocket.copy(input, data.output());
+            IOSockets.copy(input, data.output());
         }
 
         void save(OutputSocket<?> output) throws IOException {
-            IOSocket.copy(data.input(), output);
+            IOSockets.copy(data.input(), output);
         }
 
         @Override
@@ -467,7 +467,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         }
 
         @NotThreadSafe
-        final class Input extends InputSocket<Buffer> {
+        final class Input extends AbstractInputSocket<Buffer> {
             final InputSocket<?> socket = data.input();
 
             InputSocket<?> getBoundSocket() {
@@ -529,7 +529,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         } // Input
 
         @NotThreadSafe
-        final class Output extends OutputSocket<Buffer> {
+        final class Output extends AbstractOutputSocket<Buffer> {
             final OutputSocket<?> socket = data.output();
 
             OutputSocket<?> getBoundSocket() {

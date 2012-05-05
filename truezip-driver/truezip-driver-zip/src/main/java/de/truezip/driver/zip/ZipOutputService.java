@@ -139,7 +139,7 @@ implements OutputService<ZipDriverEntry> {
     public OutputSocket<ZipDriverEntry> output(final ZipDriverEntry local) { // local target
         Objects.requireNonNull(local);
 
-        final class Output extends OutputSocket<ZipDriverEntry> {
+        final class Output extends AbstractOutputSocket<ZipDriverEntry> {
             @Override
             public ZipDriverEntry localTarget() {
                 return local;

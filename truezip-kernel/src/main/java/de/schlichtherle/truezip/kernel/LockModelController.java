@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
-import de.truezip.kernel.FsModelController;
+import de.truezip.kernel.FsAbstractController;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.concurrent.Immutable;
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 abstract class LockModelController
-extends FsModelController<LockModel>  {
+extends FsAbstractController<LockModel>  {
 
     LockModelController(LockModel model) {
         super(model);

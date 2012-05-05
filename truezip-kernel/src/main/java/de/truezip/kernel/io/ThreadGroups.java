@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.truezip.kernel.util;
+package de.truezip.kernel.io;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -12,7 +12,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class ThreadGroups {
+final class ThreadGroups {
 
     /* Can't touch this - hammer time! */
     private ThreadGroups() { }

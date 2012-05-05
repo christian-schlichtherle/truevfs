@@ -107,7 +107,7 @@ implements OutputService<TarDriverEntry> {
     public OutputSocket<TarDriverEntry> output(final TarDriverEntry local) {
         Objects.requireNonNull(local);
 
-        final class Output extends OutputSocket<TarDriverEntry> {
+        final class Output extends AbstractOutputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry localTarget() {
                 return local;

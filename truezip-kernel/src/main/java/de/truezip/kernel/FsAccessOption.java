@@ -33,7 +33,7 @@ public enum FsAccessOption {
 
     /**
      * Whether or not any missing parent directory entries shall get created
-     * automatically.
+     * automatically with an undefined last modification time.
      */
     CREATE_PARENTS,
 

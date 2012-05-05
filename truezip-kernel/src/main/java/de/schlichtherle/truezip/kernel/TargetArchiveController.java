@@ -515,8 +515,7 @@ implements ArchiveFileSystemTouchListener<E> {
                             if (UNKNOWN != ae.getTime(WRITE)) // never output a ghost directory!
                                 os.output(ae).stream().close();
                     } else if (null != is.entry(aen)) {
-                        IOSocket.copy(  is.input(aen),
-                                        os.output(ae));
+                        IOSockets.copy(is.input(aen), os.output(ae));
                     } else {
                         // The file system entry is a newly created
                         // non-directory entry which hasn't received any
