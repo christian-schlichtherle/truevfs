@@ -18,7 +18,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public abstract class DelegatingOutputSocket<E extends Entry>
-extends OutputSocket<E> {
+extends AbstractOutputSocket<E> {
 
     /**
      * Returns the delegate socket.

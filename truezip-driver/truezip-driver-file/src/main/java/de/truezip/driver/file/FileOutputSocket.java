@@ -6,11 +6,11 @@ package de.truezip.driver.file;
 
 import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOption.*;
+import de.truezip.kernel.cio.AbstractOutputSocket;
 import de.truezip.kernel.cio.Entry;
 import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
-import de.truezip.kernel.cio.IOSocket;
-import de.truezip.kernel.cio.OutputSocket;
+import de.truezip.kernel.cio.IOSockets;
 import de.truezip.kernel.util.BitField;
 import static de.truezip.kernel.util.Maps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -37,7 +37,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FileOutputSocket extends OutputSocket<FileEntry> {
+final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
 
     private static final int
             INITIAL_CAPACITY = initialCapacity(FsAccessOption.values().length);
@@ -101,7 +101,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     void append(final FileEntry temp) throws IOException {
         if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
-            IOSocket.copy(entry.input(), temp.output());
+            IOSockets.copy(entry.input(), temp.output());
     }
 
     Set<OpenOption> optionSet() {
@@ -135,8 +135,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
                     /*Files.copy(tempFile, entryFile,
                             StandardCopyOption.REPLACE_EXISTING);*/
                     // Fast.
-                    IOSocket.copy(  temp.input(),
-                                    entry.output());
+                    IOSockets.copy(temp.input(), entry.output());
                     updateProperties(entryFile);
                 }
                 release(temp, null);

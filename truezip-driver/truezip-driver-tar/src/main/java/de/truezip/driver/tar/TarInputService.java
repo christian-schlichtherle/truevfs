@@ -8,13 +8,10 @@ import static de.truezip.driver.tar.TarDriver.DEFAULT_BLKSIZE;
 import static de.truezip.driver.tar.TarDriver.DEFAULT_RCDSIZE;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
-import de.truezip.kernel.cio.IOBuffer;
-import de.truezip.kernel.cio.IOPool;
-import de.truezip.kernel.cio.InputService;
-import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.ExceptionBuilder;
@@ -209,7 +206,7 @@ implements InputService<TarDriverEntry> {
     public InputSocket<TarDriverEntry> input(final String name) {
         Objects.requireNonNull(name);
 
-        final class Input extends InputSocket<TarDriverEntry> {
+        final class Input extends AbstractInputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry localTarget() throws IOException {
                 final TarDriverEntry entry = entry(name);

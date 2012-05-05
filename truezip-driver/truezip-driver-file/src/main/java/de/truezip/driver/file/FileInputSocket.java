@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.file;
 
-import de.truezip.kernel.cio.InputSocket;
+import de.truezip.kernel.cio.AbstractInputSocket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FileInputSocket extends InputSocket<FileEntry> {
+final class FileInputSocket extends AbstractInputSocket<FileEntry> {
 
     private final FileEntry entry;
 

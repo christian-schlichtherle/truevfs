@@ -8,7 +8,7 @@ import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
 import de.truezip.kernel.FsPath;
 import de.truezip.kernel.cio.Entry;
-import de.truezip.kernel.cio.IOSocket;
+import de.truezip.kernel.cio.IOSockets;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
@@ -216,7 +216,7 @@ final class TBIO {
         final InputSocket<?> input = input(preferences, src);
         final OutputSocket<?> output = output(preferences, dst,
                 preserve ? input.localTarget() : null);
-        IOSocket.copy(input, output);
+        IOSockets.copy(input, output);
     }
 
     /**

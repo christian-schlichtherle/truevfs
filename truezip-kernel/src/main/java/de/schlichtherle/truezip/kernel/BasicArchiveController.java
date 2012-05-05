@@ -190,7 +190,7 @@ extends LockModelController {
     }
 
     @NotThreadSafe
-    private final class Output extends OutputSocket<FsArchiveEntry> {
+    private final class Output extends AbstractOutputSocket<FsArchiveEntry> {
         final BitField<FsAccessOption> options;
         final FsEntryName name;
         final @CheckForNull Entry template;

@@ -6,11 +6,9 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.truezip.kernel.FsEntryName.ROOT;
 import de.truezip.kernel.*;
-import de.truezip.kernel.cio.Entry;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
-import de.truezip.kernel.cio.InputSocket;
-import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -214,7 +212,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     public InputSocket<?> input(
             final BitField<FsAccessOption> options, final FsEntryName name) {
         @NotThreadSafe
-        final class Input extends InputSocket<Entry> {
+        final class Input extends AbstractInputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
             @Nullable InputSocket<?> socket;
 
@@ -283,7 +281,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
     final Entry template) {
         @NotThreadSafe
-        final class Output extends OutputSocket<Entry> {
+        final class Output extends AbstractOutputSocket<Entry> {
             @CheckForNull FsController<?> lastController;
             @Nullable OutputSocket<?> socket;
 

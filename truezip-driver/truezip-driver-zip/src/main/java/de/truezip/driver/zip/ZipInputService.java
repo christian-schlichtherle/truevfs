@@ -7,6 +7,7 @@ package de.truezip.driver.zip;
 import de.truezip.driver.zip.io.RawZipFile;
 import de.truezip.driver.zip.io.ZipCryptoParameters;
 import de.truezip.kernel.FsModel;
+import de.truezip.kernel.cio.AbstractInputSocket;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputService;
 import de.truezip.kernel.cio.InputSocket;
@@ -98,7 +99,7 @@ implements InputService<ZipDriverEntry> {
     public InputSocket<ZipDriverEntry> input(final String name) {
         Objects.requireNonNull(name);
 
-        final class Input extends InputSocket<ZipDriverEntry> {
+        final class Input extends AbstractInputSocket<ZipDriverEntry> {
             @Override
             public ZipDriverEntry localTarget() throws IOException {
                 final ZipDriverEntry entry = entry(name);

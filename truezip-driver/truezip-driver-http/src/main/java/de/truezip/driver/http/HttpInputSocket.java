@@ -5,8 +5,8 @@
 package de.truezip.driver.http;
 
 import de.truezip.kernel.FsAccessOption;
+import de.truezip.kernel.cio.AbstractInputSocket;
 import de.truezip.kernel.cio.IOBuffer;
-import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.io.AbstractSource;
 import de.truezip.kernel.io.DecoratingReadOnlyChannel;
 import de.truezip.kernel.io.Streams;
@@ -24,7 +24,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class HttpInputSocket extends InputSocket<HttpEntry> {
+public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 

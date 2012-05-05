@@ -4,8 +4,6 @@
  */
 package de.truezip.kernel.cio;
 
-import de.truezip.kernel.io.InputException;
-import de.truezip.kernel.io.Streams;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -48,10 +46,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class IOSocket<LT extends Entry, PT extends Entry> {
-
-    /** You cannot instantiate this class outside its package. */
-    IOSocket() { }
+public interface IOSocket<LT extends Entry, PT extends Entry> {
 
     /**
      * Resolves the <i>local target</i> for I/O operations.
@@ -67,84 +62,19 @@ public abstract class IOSocket<LT extends Entry, PT extends Entry> {
      * clients.
      *
      * @return The local target for I/O operations.
-     * @throws IOException On any I/O error. 
+     * @throws IOException on any I/O error. 
      */
-    public abstract LT localTarget() throws IOException;
+    LT localTarget() throws IOException;
 
     /**
      * Resolves the nullable <i>peer target</i> for I/O operations.
+     * The peer target is {@code null} if and only if this socket is not
+     * {@linkplain #getPeerSocket connected} to another socket.
      * <p>
      * The same considerations as for {@link #localTarget} apply here, too.
      *
      * @return The nullable peer target for I/O operations.
-     * @throws IOException On any I/O error. 
+     * @throws IOException on any I/O error. 
      */
-    public abstract @CheckForNull PT peerTarget() throws IOException;
-
-    /**
-     * Copies an input stream {@link InputSocket#stream created}
-     * by the given {@code input} socket to an output stream
-     * {@link OutputSocket#stream created} by the given {@code output}
-     * socket.
-     * <p>
-     * This is a high performance implementation which uses a pooled background
-     * thread to fill a FIFO of pooled buffers which is concurrently flushed by
-     * the current thread.
-     *
-     * @param  input an input socket for the input target.
-     * @param  output an output socket for the output target.
-     * @throws InputException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>input socket</em>.
-     * @throws IOException if copying the data fails because of an
-     *         {@code IOException} thrown by the <em>output socket</em>.
-     */
-    public static void copy(final InputSocket <?> input,
-                            final OutputSocket<?> output)
-    throws InputException, IOException {
-        // Call connect on output for early NPE check!
-        Streams.copy(input, output.connect(input));
-        // Disconnect for subsequent use, if any.
-        input.connect(null); // or output.connect(null)
-    }
-
-    /**
-     * Returns a string representing a connection of the local and peer
-     * targets.
-     */
-    @Override
-    public String toString() {
-        Object lt;
-        try {
-            lt = localTarget();
-        } catch (final IOException ex) {
-            lt = ex;
-        }
-        Object pt;
-        try {
-            pt = peerTarget();
-        } catch (final IOException ex) {
-            pt = ex;
-        }
-        return String.format("%s[localTarget=%s, peerTarget=%s]",
-                getClass().getName(), lt, pt);
-    }
-
-    /**
-     * Two sockets are considered equal if and only if they are identical.
-     * 
-     * @param that The object to test.
-     */
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(@CheckForNull Object that) {
-        return this == that;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     */
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
-    }
+    @CheckForNull PT peerTarget() throws IOException;
 }

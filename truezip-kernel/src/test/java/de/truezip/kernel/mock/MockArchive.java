@@ -115,7 +115,7 @@ implements Container<MockArchiveDriverEntry> {
         public InputSocket<MockArchiveDriverEntry> input(final String name) {
             Objects.requireNonNull(name);
 
-            final class Input extends InputSocket<MockArchiveDriverEntry> {
+            final class Input extends AbstractInputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry localTarget()
                 throws IOException {
@@ -167,7 +167,7 @@ implements Container<MockArchiveDriverEntry> {
                 final MockArchiveDriverEntry entry) {
             Objects.requireNonNull(entry);
 
-            final class Output extends OutputSocket<MockArchiveDriverEntry> {
+            final class Output extends AbstractOutputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry localTarget() {
                     return entry;
