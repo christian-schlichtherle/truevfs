@@ -28,7 +28,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class MockController extends FsModelController<FsModel> {
+public class MockController extends FsAbstractController<FsModel> {
 
     private final @Nullable FsController<?> parent;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
