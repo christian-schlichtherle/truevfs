@@ -277,7 +277,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         }
 
         /**
-         * This class requires LAZY INITIALIZATION of its channel AND
+         * This class requires LAZY INITIALIZATION of its channel, but NO
          * automatic decoupling on exceptions!
          */
         @NotThreadSafe
@@ -302,7 +302,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final class Stream extends DecoratingInputStream {
                 @CreatesObligation
                 Stream() throws IOException {
-                    super(Input.super.stream());
+                    // Bypass the super class implementation to keep the
+                    // channel even upon an exception!
+                    //super(Input.super.stream());
+                    super(getBoundSocket().stream());
                     assert getModel().isTouched();
                 }
 
