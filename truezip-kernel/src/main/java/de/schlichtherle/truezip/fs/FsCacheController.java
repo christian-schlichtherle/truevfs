@@ -325,7 +325,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
 
         /**
-         * This class requires LAZY INITIALIZATION of its delegate and
+         * This class requires LAZY INITIALIZATION of its delegate, but NO
          * automatic decoupling on exceptions!
          */
         @Immutable
@@ -360,7 +360,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @CreatesObligation
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
-                    super(Input.super.newInputStream());
+                    // Bypass the super class implementation to keep the
+                    // channel even upon an exception!
+                    //super(Input.super.newInputStream());
+                    super(getBoundSocket().newInputStream());
                     assert isTouched();
                 }
 
