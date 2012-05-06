@@ -436,14 +436,14 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private final class ParentController extends MockController {
-        ParentController( FsModel model,
-                        @CheckForNull FsController<?> parent) {
+        ParentController(FsModel model, @CheckForNull FsController<?> parent) {
             super(model, parent, getTestConfig());
         }
 
         @Override
         public InputSocket<?> input(
-                final BitField<FsAccessOption> options, final FsEntryName name) {
+                final BitField<FsAccessOption> options,
+                final FsEntryName name) {
             Objects.requireNonNull(name);
             Objects.requireNonNull(options);
 
@@ -472,7 +472,9 @@ extends FsArchiveDriverTestBase<D> {
 
         @Override
         public OutputSocket<?> output(
-                final BitField<FsAccessOption> options, final FsEntryName name, final Entry template) {
+                final BitField<FsAccessOption> options,
+                final FsEntryName name,
+                final @CheckForNull Entry template) {
             Objects.requireNonNull(name);
             Objects.requireNonNull(options);
 
