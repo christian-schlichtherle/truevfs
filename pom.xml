@@ -98,18 +98,6 @@ system space.
         <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
 
         <!-- maven-surefire-plugin && maven-failsafe-plugin -->
-        <!-- The server VM is expected to be less tolerant against
-             multithreading bugs when running the tests.
-             The server VM requires 650 MB to run the integration tests for
-             TAR.BZ2 archive files.
-             Setting -XX:+DisableExplicitGC would trigger an endless loop
-             because some tests check if the garbage collection and the
-             finalization kicked in to close() open I/O resources (streams,
-             channels etc).
-             See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
-             See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
-             -->
-        <argLine>-server -Xms650m -Xmx650m -XX:+UseBiasedLocking</argLine>
         <parallel>both</parallel>
 
         <!-- maven-javadoc-plugin -->
@@ -290,6 +278,19 @@ system space.
                     <configuration>
                         <!-- Consider 90% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
+                        <!-- The server VM is expected to be less tolerant
+                             against multithreading bugs when running the tests.
+                             The server VM requires 650 MB to run the
+                             integration tests for TAR.BZ2 archive files.
+                             Setting -XX:+DisableExplicitGC would trigger an
+                             endless loop because some tests check if the
+                             garbage collection and the finalization kicked
+                             in to close() open I/O resources (streams,
+                             channels etc).
+                             See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
+                             See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
+                             -->
+                        <argLine>-server -Xms650m -Xmx650m -XX:+UseBiasedLocking</argLine>
                         <systemPropertyVariables>
                             <!-- While running the tests with isolated
                                  file system managers yields better performance
