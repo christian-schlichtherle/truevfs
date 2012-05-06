@@ -15,11 +15,11 @@ Getting Started
     first TrueZIP application for the two client APIs TrueZIP&#160;File* or
     TrueZIP&#160;Path in about ten minutes by following these guides:
 
-    [[1]] {{{./file/eclipse.html}Kick-Starting TrueZIP Applications With Eclipse}}.
+    [[1]] {{{./file/eclipse.html}Getting started with Eclipse}}.
 
-    [[1]] {{{./file/netbeans.html}Kick-Starting TrueZIP Applications With NetBeans}}.
+    [[1]] {{{./file/netbeans.html}Getting started with NetBeans}}.
 
-    [[1]] {{{./file/shell.html}Kick-Starting TrueZIP Applications With a Shell}}.
+    [[1]] {{{./file/shell.html}Getting started with a shell}}.
 
     []
 
@@ -41,7 +41,7 @@ Getting Started
 
     If you do not want to use Maven then you can easily download the TrueZIP
     artifacts from Maven Central when following this guide:
-    {{{./no-maven.html}Using TrueZIP Without Maven}}.
+    {{{./no-maven.html}Getting started without Maven}}.
 
     If you are looking for more sample code and applications, then please
     {{{../source-repository.html}check out}} or
