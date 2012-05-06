@@ -1,0 +1,34 @@
+    ------------------------
+    6.2 / 5.1.8 Release News
+    ------------------------
+    Christian Schlichtherle
+    ------------------------
+
+{TrueZIP 6.2 and 5.1.8 have been released}
+
+    (August 7th, 2006)
+        
+    For TrueZIP 6.2, this is a maintenance and feature release. The primary focus has been
+    to optimize multithreading performance, fix minor bugs and enhance the Javadoc. Updating is
+    recommended for
+    multithreaded environments such as application servers.
+
+    The new feature in TrueZIP 6.2 is a really cool class which provides auto
+    completion of file names in an attached JComboBox. This provides users with a
+    very convenient way to browse their file system. Of course, this includes
+    support for browsing archive files. Subclassing <<<JComboBox>>>.or using a
+    particular <<<ComboBoxModel>>> is <not> required. Please refer to
+    the Javadoc for the class
+    <<<de.schlichtherle.io.swing.FileComboBoxBrowser>>> for more information.
+
+    For TrueZIP 5.1.8, this is a bug fix release. It also marks the End Of Life
+    for TrueZIP 5 as TrueZIP 7 has entered the design phase and maintenance of then
+    three releases takes too much resources.
+
+    For more information about the new releases, please refer to the...
+
+    * {{{../relnotes/release\-6_2.html}Release Notes for TrueZIP 6.2}}
+
+    * Release Notes for TrueZIP 5.1.8
+
+    []

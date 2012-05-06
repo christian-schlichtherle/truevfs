@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <prerequisites>
+        <maven>${maven.enforcer.requireMavenVersion}</maven>
+    </prerequisites>
+
+    <parent>
+        <groupId>de.schlichtherle</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>4</version>
+    </parent>
+
+    <groupId>de.schlichtherle.truezip</groupId>
+    <artifactId>truezip</artifactId>
+    <version>8-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>TrueZIP</name>
+    <description>
+TrueZIP is a Java based virtual file system (VFS) which enables
+client applications to perform CRUD (Create, Read, Update, Delete)
+operations on archive files as if they were virtual directories,
+even with nested archive files in multithreaded environments.
+
+As a library, TrueZIP provides simple, uniform, transparent,
+thread-safe, read/write access to archive files as if they were
+virtual directories in a file system path.
+
+As a framework, TrueZIP provides the interfaces and classes to
+write file system drivers which plug-in to its federated file
+system space.
+    </description>
+    <url>http://truezip.java.net</url>
+    <inceptionYear>2005</inceptionYear>
+    <licenses>
+        <license>
+            <name>Eclipse Public License, Version 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <mailingLists>
+        <mailingList>
+            <name>Announce Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20announce</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20announce</unsubscribe>
+            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
+        </mailingList>
+        <mailingList>
+            <name>Users Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20users</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20users</unsubscribe>
+            <post>users@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
+        </mailingList>
+        <mailingList>
+            <name>Developers Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20dev</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20dev</unsubscribe>
+            <post>dev@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
+        </mailingList>
+    </mailingLists>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://java.net/jira/browse/TRUEZIP</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
+        <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
+        <url>http://java.net/projects/truezip/sources/v7/show</url>
+    </scm>
+
+    <properties>
+        <!-- While using an older Maven version may work, this hasn't been
+             tested and is probably not producing exactly the same results. -->
+        <maven.enforcer.requireMavenVersion>3.0.4</maven.enforcer.requireMavenVersion>
+        <maven.enforcer.requireJavaVersion>1.7</maven.enforcer.requireJavaVersion>
+
+        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
+
+        <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+
+        <java.util.logging.config.file>logging.properties</java.util.logging.config.file>
+
+        <!-- maven-antrun-plugin && maven-failsafe-plugin -->
+        <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
+
+        <!-- maven-surefire-plugin && maven-failsafe-plugin -->
+        <parallel>both</parallel>
+
+        <!-- maven-javadoc-plugin -->
+        <google.analytics.accountId>UA-25500668-1</google.analytics.accountId>
+        <header>
+            <!-- Google Analytics -->
+            &lt;script type="text/javascript"&gt;
+                var _gaq = _gaq || [];
+                _gaq.push(['_setAccount', '${google.analytics.accountId}']);
+                _gaq.push(['_trackPageview']);
+                (function() {
+                    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                })();
+            &lt;/script&gt;
+            <!-- Header text -->
+            &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
+        </header>
+        <excludePackageNames>de.schlichtherle.truezip</excludePackageNames>
+
+        <!-- clirr-maven-plugin -->
+        <comparisonVersion>8.0</comparisonVersion>
+    </properties>
+
+    <modules>
+        <module>truezip-archetype</module>
+        <module>truezip-driver</module>
+        <module>truezip-extension</module>
+        <module>truezip-file</module>
+        <module>truezip-kernel</module>
+        <module>truezip-key</module>
+        <module>truezip-path</module>
+        <module>truezip-samples</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-file</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-tar</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-tzp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-zip</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-driver-zip</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-extension-jmx-jul</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-file</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-file</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-kernel</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-kernel</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-key</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-key</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-path</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-path</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truezip-samples</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk16</artifactId>
+                <version>1.46</version>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans</groupId>
+                <artifactId>jemmy</artifactId>
+                <version>2.2.7.5</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>2.0.0</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <de.schlichtherle.truezip.kernel.ControlFlowException.traceable>true</de.schlichtherle.truezip.kernel.ControlFlowException.traceable>
+                            <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <!-- Consider 90% blocking factor for I/O. -->
+                        <threadCount>10</threadCount>
+                        <!-- The server VM is expected to be less tolerant
+                             against multithreading bugs when running the tests.
+                             The server VM requires 650 MB to run the
+                             integration tests for TAR.BZ2 archive files.
+                             Setting -XX:+DisableExplicitGC would trigger an
+                             endless loop because some tests check if the
+                             garbage collection and the finalization kicked
+                             in to close() open I/O resources (streams,
+                             channels etc).
+                             See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
+                             See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
+                             -->
+                        <argLine>-server -Xms650m -Xmx650m -XX:+UseBiasedLocking</argLine>
+                        <systemPropertyVariables>
+                            <!-- While running the tests with isolated
+                                 file system managers yields better performance
+                                 it would also conceal any multithreading bugs
+                                 in the classes under test, so it's generally
+                                 discouraged. -->
+                            <de.truezip.kernel.isolateFsManager>false</de.truezip.kernel.isolateFsManager>
+                            <de.truezip.driver.zip.io.forceZip64Ext>false</de.truezip.driver.zip.io.forceZip64Ext>
+                            <de.schlichtherle.truezip.kernel.ControlFlowException.traceable>true</de.schlichtherle.truezip.kernel.ControlFlowException.traceable>
+                            <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
+                            <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <configuration>
+                        <links>
+                            <link>http://www.bouncycastle.org/docs/docs1.6/</link>
+                            <link>http://commons.apache.org/compress/apidocs/</link>
+                            <link>http://findbugs.sourceforge.net/api/</link>
+                        </links>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <configuration>
+                        <reportPlugins>
+                            <plugin>
+                                <artifactId>maven-project-info-reports-plugin</artifactId>
+                            </plugin>
+                            <plugin>
+                                <artifactId>maven-javadoc-plugin</artifactId>
+                                <configuration>
+                                    <links>
+                                        <link>http://www.bouncycastle.org/docs/docs1.6/</link>
+                                        <link>http://commons.apache.org/compress/apidocs/</link>
+                                        <link>http://findbugs.sourceforge.net/api/</link>
+                                    </links>
+                                </configuration>
+                                <reports>
+                                    <report>aggregate</report>
+                                    <report>javadoc</report>
+                                </reports>
+                            </plugin>
+                            <plugin>
+                                <artifactId>maven-jxr-plugin</artifactId>
+                                <reports>
+                                    <report>aggregate</report>
+                                    <report>jxr</report>
+                                </reports>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>findbugs-maven-plugin</artifactId>
+                                <configuration>
+                                    <effort>Max</effort>
+                                </configuration>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>jdepend-maven-plugin</artifactId>
+                            </plugin>
+                            <!--plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>clirr-maven-plugin</artifactId>
+                            </plugin-->
+                            <!--plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>cobertura-maven-plugin</artifactId>
+                            </plugin-->
+                        </reportPlugins>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <distributionManagement>
+        <site>
+            <id>truezip-website</id>
+            <name>TrueZIP Website</name>
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
+        </site>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>integration-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-it-directory</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <tasks>
+                                        <mkdir dir="${java.io.tmpdir.it}"/>
+                                    </tasks>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

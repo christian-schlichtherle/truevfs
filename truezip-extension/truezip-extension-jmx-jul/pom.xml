@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.schlichtherle.truezip</groupId>
+        <artifactId>truezip-extension</artifactId>
+        <version>8-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>truezip-extension-jmx-jul</artifactId>
+
+    <name>TrueZIP Extension JMX/JUL</name>
+    <description>
+        This module provides a file system manager and an I/O pool service
+        for managing and monitoring TrueZIP via JMX and java.util.logging.
+
+        Add the JAR artifact of this module to the run time class path to
+        make its file system manager and I/O pool service available for
+        service location in the client API modules.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truezip-driver-file</artifactId>
+        </dependency>
+    </dependencies>
+</project>

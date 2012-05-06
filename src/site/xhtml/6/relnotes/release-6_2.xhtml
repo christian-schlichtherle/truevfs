@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services
+  -
+  - All rights reserved. This program and the accompanying materials
+  - are made available under the terms of the Eclipse Public License v1.0
+  - which accompanies this distribution, and is available at
+  - http://www.eclipse.org/legal/epl-v10.html
+  -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>6.2 Release Notes</title>
+        <meta name="Author" content="Christian Schlichtherle"/>
+    </head>
+    <body>
+        <div id="content">
+            <h1>Release Notes for TrueZIP 6.2</h1>
+            <p class="subtitle">(August 7<sup>th</sup>, 2006)</p>
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#updates">List of Updates (Change Log)</a></li>
+            </ol>
+            <h2><a name="introduction">Introduction</a></h2>
+            <p>This is a maintenance and feature release. The primary focus has been
+                to optimize multithreading performance, fix minor bugs and enhance the Javadoc. Updating is
+                recommended for
+            multithreaded environments such as application servers.</p>
+            <h3><a name="Feedback">Feedback</a> for Swing based key prompting</h3>
+            <p>
+                Until this release, TrueZIP blocked the current thread and AWT's Event
+                Dispatching Thread for three seconds if a user entered a wrong key in the
+                default Swing based Key Manager implementation. This was intended to prevent
+                robots trying passwords systematically.
+            </p>
+            <p>
+                As of now, a new
+                <a href="apidocs/de/schlichtherle/key/passwd/swing/Feedback.html">
+                <code>Feedback</code></a> interface hierarchy has been introduced instead. The
+                <code>run()</code> method of this interface is called whenever a password dialog
+                is showing. Implementations are expected to start visible/audible feedback to
+                the user without blocking the current thread, which is AWT's Event Dispatching
+                Thread. So if the implementation wants to show an animation, it should use the
+                class <code>javax.swing.Timer</code>.
+            </p>
+            <p>
+                The default implementation for the <code>
+<a href="apidocs/de/schlichtherle/key/passwd/swing/InvalidOpenKeyFeedback.html">
+                InvalidOpenKeyFeedback</a></code> interface (named <code>
+<a href="apidocs/de/schlichtherle/key/passwd/swing/BasicInvalidOpenKeyFeedback.html">
+                BasicInvalidOpenKeyFeedback</a>)</code> just sounds a beep and disables the OK
+                button in the enclosing <code>JOptionPane</code> for three seconds, effectively
+                inhibiting the use of robots for automatic password trying again. If application
+                developers want to provide a sexier implementation, they should subclass <code>
+                BasicInvalidOpenKeyFeedback</code>, provide a public no-arguments constructor
+                and put the class name in the system property
+                de.schlichtherle.key.passwd.swing.InvalidOpenKeyFeedback.
+            </p>
+            <p>
+                An example is already provided with TrueZIP, but not enabled by default: The
+                class <code>de.schlichtherle.key.passwd.swing.QuakingWindowFeedback</code> will
+                show a nice earthquake effect on the password dialog box for a second. The idea
+                for this class has been taken from the great book &quot;Swing Hacks&quot; by Joshua
+                Marinacci &amp; Chris Adamson, though this implementation provides a bit more
+                realistic effect. If you would like to see it in action, use the <code>
+                <a href="index.html#nzip">nzip</a></code> utility main class like this:
+            </p>
+            <pre><code>java -cp &quot;truezip-6.jar;lcrypto-jdk14-130.jar&quot; nzip mkdir test.tzp
+java -cp &quot;truezip-6.jar;lcrypto-jdk14-130.jar&quot; nzip ll test.tzp</code></pre>
+            <p><b>Note:</b> On non-Windows platforms, substitute the &quot;<code>;</code>&quot; with a
+            &quot;<code>:</code>&quot;.</p>
+            <p>This will create an RAES encrypted ZIP file named &quot;test.tzp&quot; in your current
+                directory and then list its contents (which are empty, hence no output). To see
+            the earthquake effect, simply provide a wrong password on the second command.</p>
+            <h3><a name="Browsing">Browsing</a> files with a JComboBox</h3>
+            <p>Auto completion of file names is a much liked feature of any decent command
+                line shell (such as the <code>bash</code>). But why leave all the fun only for
+                command line shells? The class <code>de.schlichtherle.io.swing.FileComboBoxBrowser</code>
+                is here for your rescue: It provides users with a comfortable means to use
+            auto completion for file names in a regular JComboBox.</p>
+            <p>To use this class, do something like this:</p>
+            <pre><code>
+JComboBox box = new JComboBox();
+new FileComboBoxBrowser(box);
+box.setEditable(true);</code></pre>
+            <p>The second line is where the magic happens: It creates a new
+                FileComboBoxBrowser and attaches it to the previously created JComboBox. Now if
+                a user starts entering any character into the combo box, it will be interpreted
+                as the beginning of an absolute or relative path name. All possible completions
+                are then put into the popup window and shown. Then the user can use the arrow
+                keys on his keyboard to pick his favourite file or directory. This repeats until
+            the focus leaves the editing text component of the combo box.</p>
+            <p>As usual with TrueZIP, this component allows to browse archive files (e.g.
+            ZIP files), too.</p>
+            <p>Experiments have shown that this is a very powerfull feature: Using this
+                combo box is usually much faster than the JFileChooser. Of course, in a
+                professional client application you should offer both a JComboBoxBrowser and
+                TrueZIP's custom implementation of the JFileChooser in the class <code>de.schlichtherle.io.swing.JFileChooser</code>,
+                so that the user can pick files or directories (even within an archive file)
+            using either way.</p>
+            <table id="legend">
+                <thead>
+                    <tr>
+                        <th colspan="2">Legend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>New</th>
+                        <td>Introduces a new feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Fixed</th>
+                        <td>Introduces a bug fix of an existing feature.</td>
+                    </tr>
+                    <tr>
+                        <th>Enhanced</th>
+                        <td>
+                            Introduces the enhancement of an existing feature.
+                            This update is fully backwards compatible.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Changed</th>
+                        <td>
+                            Introduces the change of an existing feature.
+                            This update may cause
+                            <a href="releases.html#compatibility">
+                                backwards incompatibilities
+                            </a>.
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Deprecated</th>
+                        <td>Introduces the deprecation of an existing feature.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2><a name="updates">List of Updates (Change Log)</a></h2>
+            <p>
+                Following is an overview of all updates in this release
+                which affect the public API.
+                Please note that internal refactorings are not listed.
+                For a full list of updates, please refer to the CVS repository
+                and diff to the tag <code>TrueZIP-6_1</code>.
+            </p>
+            <ol>
+                <li><b>New/Enhanced:</b> The interaction between the RAES key authentication
+                    code and the KeyManager has been refined so that the GUI is not blocked for
+                    three seconds anymore if the user has provided a wrong key. Instead, a new
+                    <code>Feedback</code> interface hierarchy has been introduced to provide
+                advanced feature options. <a href="#Feedback">Read more...</a></li>
+                <li><b>New:</b> The class <code>de.schlichtherle.io.swing.FileComboBoxBrowser</code>
+                    has been introduced in order to provide users with a comfortable means to use
+                    auto completion for file names in a combo box. <a href="#Browsing">Read
+                more...</a></li>
+                <li><b>Enhanced:</b> The virtual file system now uses a custom read/write lock mechanism
+                    to enhance concurrency: Multiple threads may read an archive concurrently while
+                at most one thread may write/modify it at a time.</li>
+                <li><b>Fixed:</b> The constructor <code>de.schlichtherle.io.DefaultArchiveDetector(String)</code> did
+                    not throw an <code>IllegalArgumentException</code> when an unknown suffix was passed, as
+                opposed to the Javadoc.</li>
+                <li><b>Enhanced:</b> The class <code>de.schlichtherle.io.DefaultArchiveDetector</code> now logs
+                    at the <code>WARNING</code> level if the <code>DEFAULT</code> entry in a configuration file names an unknown archive
+                suffix.</li>
+                <li><b>Enhanced:</b> The methods <code>get/setParentWindow</code> in the class <code>de.schlichtherle.key.passwd.swing.PromptingKeyManager</code>
+                    have been changed in order to prevent memory leaks and return the active
+                    window as the default. In consequence, client applications do not normally
+                need to call <code>setParentWindow(Window)</code> at all anymore.</li>
+                <li>
+                    <b>Changed:</b> The class
+                    <code>de.schlichtherle.swing.event.PanelAdapter</code>
+                    has been made abstract in order to reflect its use case.
+                </li>
+            </ol>
+        </div>
+    </body>
+</html>

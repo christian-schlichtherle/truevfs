@@ -1,0 +1,72 @@
+    -----------------------
+    Getting started without Maven
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Getting started without Maven
+
+    If you do not want to use Maven then you can easily
+    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truezip%22%20AND%20v%3A%22${project.version}%22}<<download individual TrueZIP artifacts>>}}
+    from Maven Central.
+    You can also directly {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-jar-with-dependencies.jar}<<download the all-in-one JAR>>}}.
+
+    The all-in-one JAR saves you from grabbing the module JARs individually.
+    However, as the name implies, it includes all sample code which bloats the
+    code size of the application.
+    More importantly, this will also initially set up the TrueZIP File* API to
+    detect all canonical file extensions of all supported archive file types
+    in TrueZIP ${project.version} - see the table at the end of this page.
+    This may produce some unwanted side effects on an unintended access to an
+    archive file:
+
+    * The virtual file system of an archive file is automatically mounted.
+
+        * This may confuse the application because the archive file
+          unexpectedly behaves like a directory instead of a file.
+
+	* In case of TAR files, this can be considerably slow because this file
+          format doesn't provide a central directory and thus the driver will
+          unpack the entire TAR file into a temporary directory first.
+
+        * In case of a plain EXE file, an attempt is made to locate the central
+          directory of a self extracting ZIP file which will cause the entire
+          file to be read.
+
+    * A Swing or console based dialog prompts the user for a password to access
+      a RAES encrypted ZIP file.
+
+    []
+
+    To avoid these unwanted side effects, you should <always> configure the
+    TrueZIP File* API to detect exactly only the file suffixes of the archive
+    types required to access.
+    {{{../usecases/aff.html}Here}} is a sample available for this task.
+    For further information, please refer to the Javadoc for the class
+    {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+
+* Initial Setup
+
+    Following are the canonical archive file extensions which will be detected
+    by an application using the TrueZIP File* API according to the initial set
+    up of the all-in-one JAR <<<truezip-samples-${project.version}-jar-with-dependencies.jar>>>:
+
+*--*--*
+||Canonical File Extensions||File System Driver Class|
+*--+--+
+|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
+*--+--+
+|<<<exe>>>|{{{../apidocs/de/truezip/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
+*--+--+
+|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/de/truezip/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
+*--+--+
+|<<<tar>>>|{{{../apidocs/de/truezip/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
+*--+--+
+|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{../apidocs/de/truezip/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
+*--+--+
+|<<<tar.gz>>>, <<<tgz>>>|{{{../apidocs/de/truezip/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
+*--+--+
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
+*--+--+
+|<<<zip>>>|{{{../apidocs/de/truezip/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}|
+*--+--+
