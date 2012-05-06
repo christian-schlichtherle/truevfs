@@ -138,7 +138,8 @@ public class MockController extends FsAbstractController<FsModel> {
 
     @Override
     public InputSocket<?> input(
-            final BitField<FsAccessOption> options, final FsEntryName name) {
+            final BitField<FsAccessOption> options,
+            final FsEntryName name) {
         checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
@@ -176,7 +177,9 @@ public class MockController extends FsAbstractController<FsModel> {
 
     @Override
     public OutputSocket<?> output(
-            final BitField<FsAccessOption> options, final FsEntryName name, final Entry template) {
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final @CheckForNull Entry template) {
         checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
