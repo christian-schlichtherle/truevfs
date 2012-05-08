@@ -12,6 +12,7 @@ import static de.truezip.kernel.util.Link.Type.STRONG;
 import static de.truezip.kernel.util.Link.Type.WEAK;
 import static de.truezip.kernel.util.Links.target;
 import java.util.*;
+import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
@@ -23,6 +24,12 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 final class ArchiveManager extends FsManager {
+
+    static {
+        Logger  .getLogger( ArchiveManager.class.getName(),
+                            ArchiveManager.class.getName())
+                .config("banner");
+    }
 
     /**
      * The map of all schedulers for composite file system controllers,
