@@ -1,0 +1,46 @@
+    -----------------------
+    3.3 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 3.3 has been released}
+
+    (December 5th, 2005)
+
+    This is primarily a bug fix release. Upgrading is recommended for all users.
+
+    * The <<<de.schlichtherle.io.swing.JFileChooser>>> and
+    <<<de.schlichtherle.io.swing.FileSystemView>>> classes in the package
+    <<<de.schlichtherle.io.swing>>> have been fixed so that they work (almost)
+    correctly now.
+    Please note that there are still some minor issues left which unfortunately
+    cannot get fixed because they are caused by the <completely broken design
+    and implementation> of the <<<JFileChooser>>>, <<<FileSystemView>>> and
+    companion classes in the genuine Java API (caused by scattered
+    responsibilities for file properties and the implementation's heavy
+    dependency on the API private <<<ShellFolder>>> class).
+    However, I'm pretty confident that most users should hardly be able to
+    tell a difference now.
+
+    * TrueZIP's error handling has been further enhanced so that
+    it now fails more gracefully on some odd (and unlikely) events in the
+    native file system.
+
+    * Support for Apple's Java 1.5 Release 1 on Mac OS X has been
+    enhanced. Many, many thanks to Dr. Simon White from Catalysoft,
+    Cambridge, UK for spending many hours to tackle down this issue.
+
+    * A multithreading issue has been fixed which may have caused
+    NullPointerException(s) somewhere deep in the Java regex API.
+
+    * Last but not least, TrueZIP now provides basic support for
+    Java's logging API in its package private class
+    <<<de.schlichtherle.io.ZipController>>>.
+    If you ever wondered what happens under the hood of TrueZIP and when the
+    <<<update()>>> or <<<umount()>>> method of the class
+    <<<de.schlichtherle.io.File>>> is automatically called, it is recommended
+    to consult the file <<<logging.properties>>> in the source code
+    distribution and edit it in order to log important events within TrueZIP.
+
+    []

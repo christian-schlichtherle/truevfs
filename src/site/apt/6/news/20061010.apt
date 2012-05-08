@@ -1,0 +1,15 @@
+    -----------------------
+    6.3.1 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 6.3.1 has been released}
+
+    (October 10th, 2006)
+
+    This is a minor bug fix release. A single typing error has been fixed which
+    unfortunately rendered File.update/umount(File, ...) completely useless.
+    A unit test has been added for File.update(File) in particular to test this
+    in future.
+    My apologies to all affected users \- please upgrade.

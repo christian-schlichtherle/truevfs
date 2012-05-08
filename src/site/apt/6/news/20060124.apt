@@ -1,0 +1,16 @@
+    -----------------------
+    5.0.1 Release News
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+{TrueZIP 5.0.1 has been released}
+
+    (January 24th, 2006)
+
+    This is a minor bug fix release.
+
+    A regression bug has been fixed which caused the <<<nzip>>>
+    utility main class to identify ZIP and RAES encrypted ZIP files only
+    instead of all known ZIP compatible file types (i.e. EAR, JAR, WAR, ZIP
+    and RAES encrypted ZIP files).
