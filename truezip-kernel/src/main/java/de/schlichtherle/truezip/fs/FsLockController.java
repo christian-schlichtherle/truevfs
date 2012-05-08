@@ -7,8 +7,6 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
-import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_INPUT;
-import static de.schlichtherle.truezip.fs.FsSyncOption.WAIT_CLOSE_OUTPUT;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -61,9 +59,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             ? ThreadLocalAccountFactory.NEW
             : ThreadLocalAccountFactory.OLD
                 ).newThreadLocalAccount();
-
-    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
-            = BitField.of(WAIT_CLOSE_INPUT, WAIT_CLOSE_OUTPUT).not();
 
     private final ReadLock readLock;
     private final WriteLock writeLock;
