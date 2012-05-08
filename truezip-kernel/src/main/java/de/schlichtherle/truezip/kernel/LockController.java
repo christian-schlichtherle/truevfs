@@ -6,7 +6,6 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.LockingStrategy.FAST_LOCK;
 import static de.schlichtherle.truezip.kernel.LockingStrategy.TIMED_LOCK;
-import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
@@ -56,9 +55,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 @Immutable
 final class LockController
 extends DecoratingLockModelController<FsController<? extends LockModel>> {
-
-    private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO
-            = BitField.of(WAIT_CLOSE_IO).not();
 
     private final ReadLock readLock;
     private final WriteLock writeLock;
