@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -82,6 +83,11 @@ enum LockingStrategy {
 
     private static final ThreadLocal<Account> accounts = new ThreadLocalAccount();
 
+    @SuppressWarnings("PackageVisibleInnerClass")
+    interface Operation<V, X extends Exception> {
+        @Nullable V apply() throws X;
+    }
+
     /**
      * Holds the given lock while calling the given operation.
      * <p>
@@ -127,7 +133,7 @@ enum LockingStrategy {
             acquire(lock);
             account.lockCount++;
             try {
-                return operation.call();
+                return operation.apply();
             } finally {
                 account.lockCount--;
                 lock.unlock();
@@ -139,7 +145,7 @@ enum LockingStrategy {
                         lock.lock();
                         account.lockCount++;
                         try {
-                            return operation.call();
+                            return operation.apply();
                         } finally {
                             account.lockCount--;
                             lock.unlock();
