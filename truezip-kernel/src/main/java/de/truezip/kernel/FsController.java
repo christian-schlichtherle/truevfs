@@ -219,7 +219,7 @@ public interface FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @return An {@code InputSocket}.
      */
-    InputSocket<?> input(
+    InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
             FsEntryName name);
 
@@ -237,7 +237,7 @@ public interface FsController<M extends FsModel> {
      *         this entry as possible - with the exception of its name and type.
      * @return An {@code OutputSocket}.
      */
-    OutputSocket<?> output(
+    OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsEntryName name,
             @CheckForNull Entry template);

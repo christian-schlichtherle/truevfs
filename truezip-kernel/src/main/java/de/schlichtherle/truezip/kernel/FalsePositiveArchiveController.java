@@ -6,9 +6,9 @@ package de.schlichtherle.truezip.kernel;
 
 import static de.truezip.kernel.FsEntryName.ROOT;
 import de.truezip.kernel.*;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,21 +84,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         assert null != super.getParent();
     }
 
-    @Nullable <V> V call(   final IOOperation<V> operation,
-                            final FsEntryName name)
-    throws IOException {
-        final State state = this.state;
-        try {
-            return state.call(operation, name);
-        } catch (final PersistentFalsePositiveArchiveException ex) {
-            assert state instanceof TryChild;
-            return (this.state = new UseParent(ex)).call(operation, name);
-        } catch (final FalsePositiveArchiveException ex) {
-            assert state instanceof TryChild;
-            return new UseParent(ex).call(operation, name);
-        }
-    }
-
     @Override
     public FsController<?> getParent() {
         final FsController<?> parent = this.parent;
@@ -114,287 +99,321 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return null != path ? path : (this.path = getMountPoint().getPath());
     }
 
-    @Override
-    public boolean isReadOnly() throws IOException {
-        return call(new IsReadOnly(), ROOT);
+    private interface IOOperation<V> {
+        @Nullable V apply(FsController<?> controller, FsEntryName name)
+        throws IOException;
+    } // IOOperation
+
+    private interface State {
+        @Nullable <V> V apply(FsEntryName name, IOOperation<V> operation)
+        throws IOException;
+    } // State
+
+    @Immutable
+    private final class TryChild implements State {
+        @Override
+        public <V> V apply(FsEntryName name, IOOperation<V> operation)
+        throws IOException {
+            return operation.apply(controller, name);
+        }
+    } // TryChild
+
+    @Immutable
+    private final class UseParent implements State {
+        final IOException originalCause;
+
+        UseParent(final FalsePositiveArchiveException ex) {
+            this.originalCause = ex.getCause();
+        }
+
+        @Override
+        public <V> V apply(
+                final FsEntryName name,
+                final IOOperation<V> operation)
+        throws IOException {
+            try {
+                return operation.apply(getParent(), parent(name));
+            } catch (final FalsePositiveArchiveException ex) {
+                throw new AssertionError(ex);
+            } catch (final ControlFlowException ex) {
+                assert ex instanceof NeedsLockRetryException : ex;
+                throw ex;
+            } catch (final IOException ex) {
+                if (originalCause != ex)
+                    originalCause.addSuppressed(ex);
+                throw originalCause;
+            }
+        }
+    } // UseParent
+
+    @Nullable <V> V apply(
+            final FsEntryName name,
+            final IOOperation<V> operation)
+    throws IOException {
+        final State state = this.state;
+        try {
+            return state.apply(name, operation);
+        } catch (final PersistentFalsePositiveArchiveException ex) {
+            assert state instanceof TryChild;
+            return (this.state = new UseParent(ex)).apply(name, operation);
+        } catch (final FalsePositiveArchiveException ex) {
+            assert state instanceof TryChild;
+            return new UseParent(ex).apply(name, operation);
+        }
     }
 
-    private static final class IsReadOnly implements IOOperation<Boolean> {
-        @Override
-        public Boolean call(final FsController<?> controller,
-                            final FsEntryName resolved)
-        throws IOException {
-            return controller.isReadOnly();
+    @Override
+    public boolean isReadOnly() throws IOException {
+        class IsReadOnly implements IOOperation<Boolean> {
+            @Override
+            public Boolean apply(FsController<?> c, FsEntryName n)
+            throws IOException {
+                return c.isReadOnly();
+            }
         }
-    } // IsReadOnly
-    
+        return apply(ROOT, new IsReadOnly());
+    }
+
     @Override
     public @Nullable FsEntry stat(
-            final BitField<FsAccessOption> options, final FsEntryName name)
+            final BitField<FsAccessOption> options,
+            final FsEntryName name)
     throws IOException {
-        final class Stat implements IOOperation<FsEntry> {
+        class Stat implements IOOperation<FsEntry> {
             @Override
-            public @Nullable FsEntry call(  final FsController<?> controller,
-                                            final FsEntryName resolved)
+            public FsEntry apply(FsController<?> c, FsEntryName n)
             throws IOException {
-                return controller.stat(options, resolved);
+                return c.stat(options, n);
             }
-        } // Stat
-
-        return call(new Stat(), name);
+        }
+        return apply(name, new Stat());
     }
 
     @Override
     public void checkAccess(
-            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final BitField<Access> types)
     throws IOException {
-        final class CheckAccess implements IOOperation<Void> {
+        class CheckAccess implements IOOperation<Void> {
             @Override
-            public Void call(   final FsController<?> controller,
-                                final FsEntryName resolved)
+            public Void apply(FsController<?> c, FsEntryName n)
             throws IOException {
-                controller.checkAccess(options, resolved, types);
+                c.checkAccess(options, n, types);
                 return null;
             }
-        } // CheckAccess
-
-        call(new CheckAccess(), name);
+        }
+        apply(name, new CheckAccess());
     }
 
     @Override
     public void setReadOnly(final FsEntryName name) throws IOException {
-        call(new SetReadOnly(), name);
-    }
-
-    private static final class SetReadOnly implements IOOperation<Void> {
-        @Override
-        public Void call(   final FsController<?> controller,
-                            final FsEntryName resolved)
-        throws IOException {
-            controller.setReadOnly(resolved);
-            return null;
+        class SetReadOnly implements IOOperation<Void> {
+            @Override
+            public Void apply(FsController<?> c, FsEntryName n)
+            throws IOException {
+                c.setReadOnly(n);
+                return null;
+            }
         }
-    } // SetReadOnly
+        apply(name, new SetReadOnly());
+    }
     
     @Override
     public boolean setTime(
-            final BitField<FsAccessOption> options, final FsEntryName name, final Map<Access, Long> times)
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final Map<Access, Long> times)
     throws IOException {
-        final class SetTime implements IOOperation<Boolean> {
+        class SetTime implements IOOperation<Boolean> {
             @Override
-            public Boolean call(final FsController<?> controller,
-                                final FsEntryName resolved)
+            public Boolean apply(FsController<?> c, FsEntryName n)
             throws IOException {
-                return controller.setTime(options, resolved, times);
+                return c.setTime(options, n, times);
             }
-        } // SetTime
-
-        return call(new SetTime(), name);
+        }
+        return apply(name, new SetTime());
     }
 
     @Override
     public boolean setTime(
-            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types, final long value)
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final BitField<Access> types,
+            final long value)
     throws IOException {
-        final class SetTime implements IOOperation<Boolean> {
+        class SetTime implements IOOperation<Boolean> {
             @Override
-            public Boolean call(final FsController<?> controller,
-                                final FsEntryName resolved)
+            public Boolean apply(FsController<?> c, FsEntryName n)
             throws IOException {
-                return controller.setTime(options, resolved, types, value);
+                return c.setTime(options, n, types, value);
             }
-        } // SetTime
-
-        return call(new SetTime(), name);
+        }
+        return apply(name, new SetTime());
     }
 
     @Override
     public InputSocket<?> input(
-            final BitField<FsAccessOption> options, final FsEntryName name) {
+            final BitField<FsAccessOption> options,
+            final FsEntryName name) {
         @NotThreadSafe
-        final class Input extends AbstractInputSocket<Entry> {
-            @CheckForNull FsController<?> lastController;
+        class Input extends AbstractInputSocket<Entry> {
+            @CheckForNull FsController<?> last;
             @Nullable InputSocket<?> socket;
 
-            InputSocket<?> getBoundSocket(  final FsController<?> controller,
-                                            final FsEntryName resolved) {
-                return (lastController == controller
+            InputSocket<?> getBoundSocket(FsController<?> c, FsEntryName n) {
+                return (last == c
                         ? socket
-                        : (socket = (lastController = controller)
-                            .input(options, resolved)))
-                        .bind(this);
+                        : (socket = (last = c).input(options, n))).bind(this);
             }
 
             @Override
             public Entry localTarget() throws IOException {                
-                return call(new GetLocalTarget(), name);
-            }
-
-            final class GetLocalTarget implements IOOperation<Entry> {
-                @Override
-                public Entry call(
-                        final FsController<?> controller,
-                        final FsEntryName resolved)
-                throws IOException {
-                    return getBoundSocket(controller, resolved).localTarget();
+                class GetLocalTarget implements IOOperation<Entry> {
+                    @Override
+                    public Entry apply(FsController<?> c, FsEntryName n)
+                    throws IOException {
+                        return getBoundSocket(c, n).localTarget();
+                    }
                 }
-            } // GetLocalTarget
+                return apply(name, new GetLocalTarget());
+            }
 
             @Override
             public InputStream stream() throws IOException {
-                return call(new NewStream(), name);
-            }
-
-            final class NewStream implements IOOperation<InputStream> {
-                @Override
-                public InputStream call(
-                        final FsController<?> controller,
-                        final FsEntryName resolved)
-                throws IOException {
-                    return getBoundSocket(controller, resolved).stream();
+                class NewStream implements IOOperation<InputStream> {
+                    @Override
+                    public InputStream apply(FsController<?> c, FsEntryName n)
+                    throws IOException {
+                        return getBoundSocket(c, n).stream();
+                    }
                 }
-            } // NewStream
+                return apply(name, new NewStream());
+            }
 
             @Override
-            public SeekableByteChannel channel()
-            throws IOException {
-                return call(new NewChannel(), name);
+            public SeekableByteChannel channel() throws IOException {
+                class NewChannel implements IOOperation<SeekableByteChannel> {
+                    @Override
+                    public SeekableByteChannel apply(FsController<?> c, FsEntryName n)
+                    throws IOException {
+                        return getBoundSocket(c, n).channel();
+                    }
+                }
+                return apply(name, new NewChannel());
             }
 
-            final class NewChannel implements IOOperation<SeekableByteChannel> {
-                @Override
-                public SeekableByteChannel call(
-                        final FsController<?> controller,
-                        final FsEntryName resolved)
-                throws IOException {
-                    return getBoundSocket(controller, resolved).channel();
-                }
-            } // NewChannel
         } // Input
-
         return new Input();
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public OutputSocket<?> output(
-            final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
-    final Entry template) {
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final @CheckForNull Entry template) {
         @NotThreadSafe
-        final class Output extends AbstractOutputSocket<Entry> {
-            @CheckForNull FsController<?> lastController;
+        class Output extends AbstractOutputSocket<Entry> {
+            @CheckForNull FsController<?> last;
             @Nullable OutputSocket<?> socket;
 
-            OutputSocket<?> getBoundSocket( final FsController<?> controller,
-                                            final FsEntryName resolved) {
-                return (lastController == controller
+            OutputSocket<?> getBoundSocket(FsController<?> c, FsEntryName n) {
+                return (last == c
                         ? socket
-                        : (socket = (lastController = controller)
-                            .output(options, resolved, template)))
-                        .bind(this);
+                        : (socket = (last = c).output(options, n, template))).bind(this);
             }
 
             @Override
             public Entry localTarget() throws IOException {                
-                return call(new GetLocalTarget(), name);
-            }
-
-            final class GetLocalTarget implements IOOperation<Entry> {
-                @Override
-                public Entry call(
-                        final FsController<?> controller,
-                        final FsEntryName resolved)
-                throws IOException {
-                    return getBoundSocket(controller, resolved).localTarget();
+                class GetLocalTarget implements IOOperation<Entry> {
+                    @Override
+                    public Entry apply(FsController<?> c, FsEntryName n)
+                    throws IOException {
+                        return getBoundSocket(c, n).localTarget();
+                    }
                 }
-            } // GetLocalTarget
+                return apply(name, new GetLocalTarget());
+            }
 
             @Override
             public OutputStream stream() throws IOException {
-                return call(new NewStream(), name);
-            }
-
-            final class NewStream implements IOOperation<OutputStream> {
-                @Override
-                public OutputStream call(
-                        final FsController<?> controller,
-                        final FsEntryName resolved)
-                throws IOException {
-                    return getBoundSocket(controller, resolved).stream();
+                class NewStream implements IOOperation<OutputStream> {
+                    @Override
+                    public OutputStream apply(FsController<?> c, FsEntryName n)
+                    throws IOException {
+                        return getBoundSocket(c, n).stream();
+                    }
                 }
-            } // NewStream
+                return apply(name, new NewStream());
+            }
 
             @Override
-            public SeekableByteChannel channel()
-            throws IOException {
-                return call(new NewChannel(), name);
-            }
-
-            final class NewChannel implements IOOperation<SeekableByteChannel> {
-                @Override
-                public SeekableByteChannel call(
-                        final FsController<?> controller,
-                        final FsEntryName resolved)
-                throws IOException {
-                    return getBoundSocket(controller, resolved).channel();
+            public SeekableByteChannel channel() throws IOException {
+                class NewChannel implements IOOperation<SeekableByteChannel> {
+                    @Override
+                    public SeekableByteChannel apply(FsController<?> c, FsEntryName n)
+                    throws IOException {
+                        return getBoundSocket(c, n).channel();
+                    }
                 }
-            } // NewChannel
+                return apply(name, new NewChannel());
+            }
         } // Output
-
         return new Output();
     }
 
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public void mknod(
-            final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
-    final Entry template)
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final Type type,
+            final @CheckForNull Entry template)
     throws IOException {
-        final class Mknod implements IOOperation<Void> {
+        class Mknod implements IOOperation<Void> {
             @Override
-            public Void call(final FsController<?> controller,
-                             final FsEntryName resolved)
+            public Void apply(FsController<?> c, FsEntryName n)
             throws IOException {
-                controller.mknod(options, resolved, type, template);
+                c.mknod(options, n, type, template);
                 return null;
             }
-        } // Mknod
-
-        call(new Mknod(), name);
+        }
+        apply(name, new Mknod());
     }
 
     @Override
     public void unlink(
-            final BitField<FsAccessOption> options, final FsEntryName name)
+            final BitField<FsAccessOption> options,
+            final FsEntryName name)
     throws IOException {
-        final class Unlink implements IOOperation<Void> {
+        class Unlink implements IOOperation<Void> {
             @Override
-            public Void call(final FsController<?> controller,
-                             final FsEntryName resolved)
+            public Void apply(FsController<?> c, FsEntryName n)
             throws IOException {
-                controller.unlink(options, resolved); // repeatable for root entry
-                if (resolved.isRoot()) {
-                    assert controller == FalsePositiveArchiveController.this.controller;
+                c.unlink(options, n); // repeatable for root entry
+                if (n.isRoot()) {
+                    assert c == FalsePositiveArchiveController.this.controller;
                     // Unlink target archive file from parent file system.
                     // This operation isn't lock protected, so it's not atomic!
-                    getParent().unlink(options, parent(resolved));
+                    getParent().unlink(options, parent(n));
                 }
                 return null;
             }
-        } // Unlink
+        }
 
         final IOOperation<Void> operation = new Unlink();
         if (name.isRoot()) {
             // HC SUNT DRACONES!
             final State tryChild = new TryChild();
             try {
-                tryChild.call(operation, ROOT);
+                tryChild.apply(ROOT, operation);
             } catch (final FalsePositiveArchiveException ex) {
-                new UseParent(ex).call(operation, ROOT);
+                new UseParent(ex).apply(ROOT, operation);
             }
             this.state = tryChild;
         } else {
-            call(operation, name);
+            apply(name, operation);
         }
     }
 
@@ -410,51 +429,4 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
         state = new TryChild();
     }
-
-    private interface IOOperation<V> {
-        @Nullable V call(FsController<?> controller, FsEntryName resolved)
-        throws IOException;
-    } // IOOperation
-
-    private interface State {
-        @Nullable <V> V call(IOOperation<V> operation, FsEntryName name)
-        throws IOException;
-    } // State
-
-    @Immutable
-    private final class TryChild implements State {
-        @Override
-        public <V> V call(  final IOOperation<V> operation,
-                            final FsEntryName name)
-        throws IOException {
-            return operation.call(controller, name);
-        }
-    } // TryChild
-
-    @Immutable
-    private final class UseParent implements State {
-        final IOException originalCause;
-
-        UseParent(final FalsePositiveArchiveException ex) {
-            this.originalCause = ex.getCause();
-        }
-
-        @Override
-        public <V> V call(  final IOOperation<V> operation,
-                            final FsEntryName name)
-        throws IOException {
-            try {
-                return operation.call(getParent(), parent(name));
-            } catch (final FalsePositiveArchiveException ex) {
-                throw new AssertionError(ex);
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException : ex;
-                throw ex;
-            } catch (final IOException ex) {
-                if (originalCause != ex)
-                    originalCause.addSuppressed(ex);
-                throw originalCause;
-            }
-        }
-    } // UseParent
 }
