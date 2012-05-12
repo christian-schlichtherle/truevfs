@@ -52,22 +52,16 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     /**
      * Syncs this controller.
      * 
-     * @param  trigger the triggering exception.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         apply.
-     *         This implies that the respective parent file system has been
-     *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream gets forcibly closed.
-     * @throws FsSyncException if any error conditions apply.
+     * @param opEx the triggering exception from the file system operation.
      */
-    final void sync(final NeedsSyncException trigger)
+    final void sync(final NeedsSyncException opEx)
     throws FsSyncWarningException, FsSyncException {
         checkWriteLockedByCurrentThread();
         try {
             sync(SYNC);
-        } catch (final FsSyncException ex) {
-            ex.addSuppressed(trigger);
-            throw ex;
+        } catch (final FsSyncException syncEx) {
+            syncEx.addSuppressed(opEx);
+            throw syncEx;
         }
     }
 
@@ -346,8 +340,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class SyncSeekableChannel
     extends DecoratingSeekableChannel {
-        SyncSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
+        SyncSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+            super(channel);
         }
 
         @Override

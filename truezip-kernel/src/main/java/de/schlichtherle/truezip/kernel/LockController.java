@@ -246,7 +246,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final FsEntryName name,
             final @CheckForNull Entry template) {
         @NotThreadSafe
-        final class Output extends DecoratingOutputSocket<Entry> {
+        class Output extends DecoratingOutputSocket<Entry> {
             Output() {
                 super(controller.output(options, name, template));
             }
@@ -296,7 +296,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final Type type,
             final Entry template)
     throws IOException {
-        final class Mknod implements IOOperation<Void> {
+        class Mknod implements IOOperation<Void> {
             @Override
             public Void apply() throws IOException {
                 controller.mknod(options, name, type, template);
@@ -310,7 +310,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     public void unlink(
             final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
-        final class Unlink implements IOOperation<Void> {
+        class Unlink implements IOOperation<Void> {
             @Override
             public Void apply() throws IOException {
                 controller.unlink(options, name);
@@ -323,7 +323,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        final class Sync implements Operation<Void, FsSyncException> {
+        class Sync implements Operation<Void, FsSyncException> {
             @Override
             public Void apply() throws FsSyncWarningException, FsSyncException {
                 controller.sync(options);
@@ -334,7 +334,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     void close(final Closeable closeable) throws IOException {
-        final class Close implements IOOperation<Void> {
+        class Close implements IOOperation<Void> {
             @Override
             public Void apply() throws IOException {
                 closeable.close();
@@ -372,8 +372,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     private final class LockSeekableChannel
     extends DecoratingSeekableChannel {
-        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
-            super(sbc);
+        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+            super(channel);
         }
 
         @Override

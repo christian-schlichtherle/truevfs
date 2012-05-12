@@ -9,7 +9,6 @@ import de.truezip.kernel.cio.Container;
 import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.Entry.Access;
 import static de.truezip.kernel.cio.Entry.Access.READ;
-import de.truezip.kernel.cio.Entry.Type;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
 import java.util.Map;
@@ -31,9 +30,10 @@ extends ArchiveFileSystem<E> {
 
     private static final BitField<Access> READ_ONLY = BitField.of(READ);
 
-    ReadOnlyArchiveFileSystem(final @WillNotClose Container<E> archive,
-                                final FsArchiveDriver<E> driver,
-                                final @CheckForNull Entry rootTemplate) {
+    ReadOnlyArchiveFileSystem(
+            final FsArchiveDriver<E> driver,
+            final @WillNotClose Container<E> archive,
+            final @CheckForNull Entry rootTemplate) {
         super(driver, archive, rootTemplate);
     }
 
@@ -49,40 +49,47 @@ extends ArchiveFileSystem<E> {
     }
 
     @Override
-    void checkAccess(FsEntryName name, BitField<Access> types)
+    void checkAccess(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final BitField<Access> types)
     throws IOException {
         if (!types.isEmpty() && !READ_ONLY.equals(types))
             throw new FsReadOnlyFileSystemException();
-        super.checkAccess(name, types);
+        super.checkAccess(options, name, types);
+    }
+
+    @Override
+    boolean setTime(
+            BitField<FsAccessOption> options,
+            FsEntryName name,
+            Map<Access, Long> times)
+    throws IOException {
+        throw new FsReadOnlyFileSystemException();
+    }
+
+    @Override
+    boolean setTime(
+            BitField<FsAccessOption> options,
+            FsEntryName name,
+            BitField<Access> types,
+            long value)
+    throws IOException {
+        throw new FsReadOnlyFileSystemException();
     }
 
     @Override
     ArchiveFileSystemOperation<E> mknod(
-            BitField<FsAccessOption> options, FsEntryName name, Entry.Type type, Entry template)
+            BitField<FsAccessOption> options,
+            FsEntryName name,
+            Entry.Type type,
+            Entry template)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
-    void unlink(FsEntryName path,
-                BitField<FsAccessOption> options)
-    throws IOException {
-        throw new FsReadOnlyFileSystemException();
-    }
-
-    @Override
-    boolean setTime(FsEntryName path,
-                    BitField<Access> types,
-                    long value,
-                    BitField<FsAccessOption> options)
-    throws IOException {
-        throw new FsReadOnlyFileSystemException();
-    }
-
-    @Override
-    boolean setTime(FsEntryName path,
-                    Map<Access, Long> times,
-                    BitField<FsAccessOption> options)
+    void unlink(BitField<FsAccessOption> options, FsEntryName name)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }

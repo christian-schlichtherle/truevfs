@@ -73,15 +73,12 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     private ArchiveFileSystem(final FsArchiveDriver<E> driver) {
-        this.driver = driver;
+        this(driver, new EntryTable<E>(initialCapacity(OVERHEAD_SIZE)));
         final E root = newEntry(ROOT_PATH, DIRECTORY, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS)
             root.setTime(access, time);
-        final EntryTable<E> master = new EntryTable<>(
-                initialCapacity(OVERHEAD_SIZE));
         master.add(ROOT_PATH, root);
-        this.master = master;
         this.touched = true;
     }
 
@@ -121,25 +118,22 @@ implements Iterable<FsCovariantEntry<E>> {
                             @CheckForNull Entry rootTemplate,
                             boolean readOnly) {
         return readOnly
-            ? new ReadOnlyArchiveFileSystem<>(archive, driver, rootTemplate)
+            ? new ReadOnlyArchiveFileSystem<>(driver, archive, rootTemplate)
             : new ArchiveFileSystem<>(driver, archive, rootTemplate);
     }
 
     ArchiveFileSystem(final FsArchiveDriver<E> driver,
                         final @WillNotClose Container<E> archive,
                         final @CheckForNull Entry rootTemplate) {
-        this.driver = driver;
         // Allocate some extra capacity to create missing parent directories.
-        final EntryTable<E> master = new EntryTable<>(
-                initialCapacity(archive.size() + OVERHEAD_SIZE));
+        this(driver, new EntryTable<E>(initialCapacity(archive.size() + OVERHEAD_SIZE)));
         // Load entries from source archive.
         final List<String> paths = new ArrayList<>(archive.size());
         final PathNormalizer normalizer = new PathNormalizer(SEPARATOR_CHAR);
         for (final E entry : archive) {
             final String path = cutTrailingSeparators(
                 normalizer.normalize(
-                    // Fix illegal Windoze file name separators.
-                    entry.getName().replace('\\', SEPARATOR_CHAR)),
+                    entry.getName().replace('\\', SEPARATOR_CHAR)), // fix illegal Windoze file name separators
                 SEPARATOR_CHAR);
             master.add(path, entry);
             if (!path.startsWith(SEPARATOR)
@@ -149,41 +143,55 @@ implements Iterable<FsCovariantEntry<E>> {
         // Setup root file system entry, potentially replacing its previous
         // mapping from the source archive.
         master.add(ROOT_PATH, newEntry(ROOT_PATH, DIRECTORY, rootTemplate));
-        this.master = master;
-        // Now perform a file system checkAccess to create missing parent directories
+        // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this must be done
         // separately!
         for (final String path : paths)
             fix(path);
     }
 
+    private ArchiveFileSystem(
+            final FsArchiveDriver<E> driver,
+            final EntryTable<E> master) {
+        this.driver = driver;
+        this.master = master;
+    }
+
     /**
-     * Called from a constructor to fix the parent directories of the
-     * file system entry identified by {@code name}, ensuring that all
-     * parent directories of the file system entry exist and that they
-     * contain the respective base.
-     * If a parent directory does not exist, it is created using an
-     * unkown time as the last modification time - this is defined to be a
+     * Called from a constructor in order to fix the parent directories of the
+     * file system entry identified by {@code name}, ensuring that all parent
+     * directories of the file system entry exist and that they contain the
+     * respective member entry.
+     * If a parent directory does not exist, it is created using an unkown time
+     * as the last modification time - this is defined to be a
      * <i>ghost directory<i>.
-     * If a parent directory does exist, the respective base is added
+     * If a parent directory does exist, the respective member entry is added
      * (possibly yet again) and the process is continued.
      *
-     * @param name the archive file system entry name.
+     * @param name the entry name.
      */
     private void fix(final String name) {
         // When recursing into this method, it may be called with the root
         // directory as its parameter, so we may NOT skip the following test.
-        if (isRoot(name))
-            return; // never fix root or empty or absolute pathnames
+        if (!isRoot(name)) {
+            splitter.split(name);
+            final String parentPath = splitter.getParentPath();
+            final String memberName = splitter.getMemberName();
+            FsCovariantEntry<E> parent = master.get(parentPath);
+            if (null == parent || !parent.isType(DIRECTORY))
+                parent = master.add(parentPath, newEntry(parentPath, DIRECTORY, null));
+            parent.add(memberName);
+            fix(parentPath);
+        }
+    }
 
-        splitter.split(name);
-        final String parentPath = splitter.getParentPath();
-        final String memberName = splitter.getMemberName();
-        FsCovariantEntry<E> parent = master.get(parentPath);
-        if (null == parent || !parent.isType(DIRECTORY))
-            parent = master.add(parentPath, newEntry(parentPath, DIRECTORY, null));
-        parent.add(memberName);
-        fix(parentPath);
+    int size() {
+        return master.size();
+    }
+
+    @Override
+    public Iterator<FsCovariantEntry<E>> iterator() {
+        return master.iterator();
     }
 
     /**
@@ -200,78 +208,6 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * Marks this (virtual) archive file system as touched and notifies the
-     * listener if and only if the touch status is changing.
-     *
-     * @throws IOException If the listener's preTouch implementation vetoed
-     *         the operation for any reason.
-     */
-    private void touch(final BitField<FsAccessOption> options)
-    throws IOException {
-        if (touched)
-            return;
-        final ArchiveFileSystemTouchListener<? super E> tl = touchListener;
-        if (null != tl) {
-            final ArchiveFileSystemEvent<E>
-                    e = new ArchiveFileSystemEvent<>(this);
-            // HC SUNT DRACONES!
-            tl.preTouch(e, options);
-            touched = true;
-            tl.postTouch(e, options);
-        } else {
-            touched = true;
-        }
-    }
-
-    /**
-     * Returns a protective copy of the set of archive file system listeners.
-     *
-     * @return A clone of the set of archive file system listeners.
-     */
-    @SuppressWarnings("unchecked")
-    final ArchiveFileSystemTouchListener<? super E>[]
-    getArchiveFileSystemTouchListeners() {
-        return null == touchListener
-                ? new ArchiveFileSystemTouchListener[0]
-                : new ArchiveFileSystemTouchListener[] { touchListener };
-    }
-
-    /**
-     * Adds the given listener to the set of archive file system listeners.
-     *
-     * @param  listener the listener for archive file system events.
-     * @throws TooManyListenersException if a listener has already been added.
-     */
-    final void addArchiveFileSystemTouchListener(
-            final ArchiveFileSystemTouchListener<? super E> listener)
-    throws TooManyListenersException {
-        if (null != touchListener)
-            throw new TooManyListenersException();
-        touchListener = Objects.requireNonNull(listener);
-    }
-
-    /**
-     * Removes the given listener from the set of archive file system listeners.
-     *
-     * @param  listener the listener for archive file system events.
-     */
-    final void removeArchiveFileSystemTouchListener(
-            final @CheckForNull ArchiveFileSystemTouchListener<? super E> listener) {
-        if (touchListener == listener)
-            touchListener = null;
-    }
-
-    // TODO: Consider renaming to size().
-    int getSize() {
-        return master.getSize();
-    }
-
-    @Override
-    public Iterator<FsCovariantEntry<E>> iterator() {
-        return master.iterator();
-    }
-
-    /**
      * Returns a covariant file system entry or {@code null} if no file system
      * entry exists for the given name.
      * Modifying the returned object graph is either not supported (i.e. throws
@@ -283,63 +219,67 @@ implements Iterable<FsCovariantEntry<E>> {
      *         entry exists for the given name.
      */
     @Nullable
-    final FsCovariantEntry<E> entry(final FsEntryName name) {
+    final FsCovariantEntry<E> stat(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name) {
         final FsCovariantEntry<E> entry = master.get(name.getPath());
         return null == entry ? null : entry.clone(driver);
     }
 
-    void checkAccess(FsEntryName name, BitField<Access> types)
+    void checkAccess(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final BitField<Access> types)
     throws IOException {
         if (null == master.get(name.getPath()))
             throw new NoSuchFileException(name.toString());
     }
 
-    /**
-     * Returns a new archive entry.
-     * This is just a factory method and the returned file system entry is not
-     * (yet) linked into this (virtual) archive file system.
-     *
-     * @param  name the entry name.
-     * @param  options a bit field of access options.
-     * @param  type the entry type.
-     * @param  template if not {@code null}, then the new entry shall inherit
-     *         as much properties from this entry as possible - with the
-     *         exception of its name and type.
-     * @return A new entry for the given name.
-     */
-    private E newEntry(final String name, final Type type, @CheckForNull
-    final Entry template) {
-        assert null != type;
-        assert !isRoot(name) || DIRECTORY == type;
-        return driver.newEntry(NONE, name, type, template);
+    final void setReadOnly(FsEntryName name)
+    throws IOException {
+        if (!isReadOnly())
+            throw new FileSystemException(name.toString(), null,
+                "Cannot set read-only state!");
     }
 
-    /**
-     * Like {@link #entry entry(name, type, options, template)},
-     * but checks that the given entry name can get encoded by the driver's
-     * character set.
-     *
-     * @param  name the entry name.
-     * @param  options a bit field of access options.
-     * @param  type the entry type.
-     * @param  template if not {@code null}, then the new entry shall inherit
-     *         as much properties from this entry as possible - with the
-     *         exception of its name and type.
-     * @return A new entry for the given name.
-     * @throws CharConversionException If the entry name contains characters
-     *         which cannot get encoded.
-     * @see    #mknod
-     */
-    private E newEntry(
+    boolean setTime(
             final BitField<FsAccessOption> options,
-            final String name,
-            final Type type,
-            final @CheckForNull Entry template)
-    throws CharConversionException {
-        assert null != type;
-        assert !isRoot(name);
-        driver.checkEncodable(name);
-        return driver.newEntry(options, name, type, template);
+            final FsEntryName name,
+            final Map<Access, Long> times)
+    throws IOException {
+        final FsCovariantEntry<E> ce = master.get(name.getPath());
+        if (null == ce)
+            throw new NoSuchFileException(name.toString());
+        // HC SUNT DRACONES!
+        touch(options);
+        final E ae = ce.getEntry();
+        boolean ok = true;
+        for (final Map.Entry<Access, Long> time : times.entrySet()) {
+            final long value = time.getValue();
+            ok &= 0 <= value && ae.setTime(time.getKey(), value);
+        }
+        return ok;
+    }
+
+    boolean setTime(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final BitField<Access> types,
+            final long value)
+    throws IOException {
+        if (0 > value)
+            throw new IllegalArgumentException(name.toString()
+                    + " (negative access time)");
+        final FsCovariantEntry<E> ce = master.get(name.getPath());
+        if (null == ce)
+            throw new NoSuchFileException(name.toString());
+        // HC SUNT DRACONES!
+        touch(options);
+        final E ae = ce.getEntry();
+        boolean ok = true;
+        for (final Access type : types)
+            ok &= ae.setTime(type, value);
+        return ok;
     }
 
     /**
@@ -392,7 +332,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         if (template instanceof FsCovariantEntry<?>)
             template = ((FsCovariantEntry<?>) template).getEntry(type);
-        return new PathLink(path, type, options, template);
+        return new PathLink(options, path, type, template);
     }
 
     private static String typeName(final FsCovariantEntry<?> entry) {
@@ -419,10 +359,11 @@ implements Iterable<FsCovariantEntry<E>> {
         final SegmentLink<E>[] links;
         long time = UNKNOWN;
 
-        PathLink(   final String path,
-                    final Entry.Type type,
-                    final BitField<FsAccessOption> options,
-                    @CheckForNull final Entry template)
+        PathLink(
+                final BitField<FsAccessOption> options,
+                final String path,
+                final Entry.Type type,
+                final @CheckForNull Entry template)
         throws IOException {
             this.options = options;
             links = newSegmentLinks(1, path, type, template);
@@ -431,37 +372,34 @@ implements Iterable<FsCovariantEntry<E>> {
         @SuppressWarnings("unchecked")
         private SegmentLink<E>[] newSegmentLinks(
                 final int level,
-                final String entryName,
-                final Entry.Type entryType,
+                final String path,
+                final Entry.Type type,
                 @CheckForNull final Entry template)
         throws IOException {
-            splitter.split(entryName);
+            splitter.split(path);
             final String parentPath = splitter.getParentPath(); // could equal ROOT_PATH
             final String memberName = splitter.getMemberName();
             final SegmentLink<E>[] elements;
 
-            // Lookup parent entry, creating it where necessary and allowed.
+            // Lookup parent entry, creating it if necessary and allowed.
             final FsCovariantEntry<E> parentEntry = master.get(parentPath);
             final FsCovariantEntry<E> newEntry;
             if (null != parentEntry) {
                 if (!parentEntry.isType(DIRECTORY))
-                    throw new NotDirectoryException(entryName);
+                    throw new NotDirectoryException(path);
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<>(null, parentEntry);
-                newEntry = new FsCovariantEntry<>(entryName);
-                newEntry.putEntry(entryType,
-                        newEntry(options, entryName, entryType, template));
+                newEntry = new FsCovariantEntry<>(path);
+                newEntry.putEntry(type, newEntry(options, path, type, template));
                 elements[1] = new SegmentLink<>(memberName, newEntry);
             } else if (options.get(CREATE_PARENTS)) {
-                elements = newSegmentLinks(
-                        level + 1, parentPath, DIRECTORY, null);
-                newEntry = new FsCovariantEntry<>(entryName);
-                newEntry.putEntry(entryType,
-                        newEntry(options, entryName, entryType, template));
+                elements = newSegmentLinks(level + 1, parentPath, DIRECTORY, null);
+                newEntry = new FsCovariantEntry<>(path);
+                newEntry.putEntry(type, newEntry(options, path, type, template));
                 elements[elements.length - level]
                         = new SegmentLink<>(memberName, newEntry);
             } else {
-                throw new NoSuchFileException(entryName, null,
+                throw new NoSuchFileException(path, null,
                         "Missing parent directory entry!");
             }
             return elements;
@@ -472,17 +410,16 @@ implements Iterable<FsCovariantEntry<E>> {
             assert 2 <= links.length;
 
             touch(options);
-            final int l = links.length;
+            final int size = links.length;
             FsCovariantEntry<E> parentCE = links[0].entry;
             E parentAE = parentCE.getEntry(DIRECTORY);
-            for (int i = 1; i < l ; i++) {
+            for (int i = 1; i < size ; i++) {
                 final SegmentLink<E> link = links[i];
                 final FsCovariantEntry<E> entryCE = link.entry;
                 final E entryAE = entryCE.getEntry();
-                final String member = link.base;
                 master.add(entryCE.getName(), entryAE);
-                if (master.get(parentCE.getName()).add(member)
-                        && UNKNOWN != parentAE.getTime(WRITE)) // never touch ghosts!
+                if (master.get(parentCE.getName()).add(link.member)
+                        && UNKNOWN != parentAE.getTime(WRITE)) // never touch ghost directories!
                     parentAE.setTime(WRITE, getTimeMillis());
                 parentCE = entryCE;
                 parentAE = entryAE;
@@ -509,7 +446,7 @@ implements Iterable<FsCovariantEntry<E>> {
      */
     private static final class SegmentLink<E extends FsArchiveEntry>
     implements Link<FsCovariantEntry<E>> {
-        final @Nullable String base;
+        final @Nullable String member;
         final FsCovariantEntry<E> entry;
 
         /**
@@ -522,7 +459,7 @@ implements Iterable<FsCovariantEntry<E>> {
         SegmentLink(final @CheckForNull String base,
                     final FsCovariantEntry<E> entry) {
             this.entry = entry;
-            this.base = base;
+            this.member = base;
         }
 
         @Override
@@ -542,7 +479,7 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param  name the archive file system entry name.
      * @throws IOException on any I/O error.
      */
-    void unlink(final FsEntryName name, BitField<FsAccessOption> options)
+    void unlink(BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         // Test.
         final String path = name.getPath();
@@ -585,61 +522,141 @@ implements Iterable<FsCovariantEntry<E>> {
         assert ok : "The parent directory of \"" + name.toString()
                     + "\" does not contain this entry - archive file system is corrupted!";
         final E pae = pce.getEntry(DIRECTORY);
-        if (UNKNOWN != pae.getTime(WRITE)) // never touch ghosts!
+        if (UNKNOWN != pae.getTime(WRITE)) // never touch ghost directories!
             pae.setTime(WRITE, System.currentTimeMillis());
     }
 
-    void setReadOnly(FsEntryName name)
+    /**
+     * Marks this (virtual) archive file system as touched and notifies the
+     * listener if and only if the touch status is changing.
+     *
+     * @throws IOException If the listener's preTouch implementation vetoed
+     *         the operation for any reason.
+     */
+    private void touch(final BitField<FsAccessOption> options)
     throws IOException {
-        if (!isReadOnly())
-            throw new FileSystemException(name.toString(), null,
-                "Cannot set read-only state!");
-    }
-
-    boolean setTime(
-            final FsEntryName name,
-            final BitField<Access> types,
-            final long value,
-            final BitField<FsAccessOption> options)
-    throws IOException {
-        if (0 > value)
-            throw new IllegalArgumentException(name.toString()
-                    + " (negative access time)");
-        final FsCovariantEntry<E> ce = master.get(name.getPath());
-        if (null == ce)
-            throw new NoSuchFileException(name.toString());
-        // Order is important here!
-        touch(options);
-        final E ae = ce.getEntry();
-        boolean ok = true;
-        for (final Access type : types)
-            ok &= ae.setTime(type, value);
-        return ok;
-    }
-
-    boolean setTime(
-            final FsEntryName name,
-            final Map<Access, Long> times,
-            BitField<FsAccessOption> options)
-    throws IOException {
-        final FsCovariantEntry<E> ce = master.get(name.getPath());
-        if (null == ce)
-            throw new NoSuchFileException(name.toString());
-        // Order is important here!
-        touch(options);
-        final E ae = ce.getEntry();
-        boolean ok = true;
-        for (final Map.Entry<Access, Long> time : times.entrySet()) {
-            final long value = time.getValue();
-            ok &= 0 <= value && ae.setTime(time.getKey(), value);
+        if (!touched) {
+            final ArchiveFileSystemTouchListener<? super E> tl = touchListener;
+            if (null != tl) {
+                final ArchiveFileSystemEvent<E>
+                        e = new ArchiveFileSystemEvent<>(this);
+                // HC SUNT DRACONES!
+                tl.preTouch(options, e);
+                touched = true;
+                tl.postTouch(options, e);
+            } else {
+                touched = true;
+            }
         }
-        return ok;
     }
 
     /**
+     * Returns a new archive entry.
+     * This is just a factory method and the returned file system entry is not
+     * (yet) linked into this (virtual) archive file system.
+     *
+     * @param  name the entry name.
+     * @param  options a bit field of access options.
+     * @param  type the entry type.
+     * @param  template if not {@code null}, then the new entry shall inherit
+     *         as much properties from this entry as possible - with the
+     *         exception of its name and type.
+     * @return A new entry for the given name.
+     */
+    private E newEntry(final String name, final Type type, @CheckForNull
+    final Entry template) {
+        assert null != type;
+        assert !isRoot(name) || DIRECTORY == type;
+        return driver.newEntry(NONE, name, type, template);
+    }
+
+    /**
+     * Like {@link #entry entry(name, type, options, template)},
+     * but checks that the given entry name can get encoded by the driver's
+     * character set.
+     *
+     * @param  name the entry name.
+     * @param  options a bit field of access options.
+     * @param  type the entry type.
+     * @param  template if not {@code null}, then the new entry shall inherit
+     *         as much properties from this entry as possible - with the
+     *         exception of its name and type.
+     * @return A new entry for the given name.
+     * @throws CharConversionException If the entry name contains characters
+     *         which cannot get encoded.
+     * @see    #mknod
+     */
+    private E newEntry(
+            final BitField<FsAccessOption> options,
+            final String name,
+            final Type type,
+            final @CheckForNull Entry template)
+    throws CharConversionException {
+        assert null != type;
+        assert !isRoot(name);
+        driver.checkEncodable(name);
+        return driver.newEntry(options, name, type, template);
+    }
+
+    /**
+     * Returns a protective copy of the set of archive file system listeners.
+     *
+     * @return A clone of the set of archive file system listeners.
+     */
+    @SuppressWarnings("unchecked")
+    final ArchiveFileSystemTouchListener<? super E>[]
+    getArchiveFileSystemTouchListeners() {
+        return null == touchListener
+                ? new ArchiveFileSystemTouchListener[0]
+                : new ArchiveFileSystemTouchListener[] { touchListener };
+    }
+
+    /**
+     * Adds the given listener to the set of archive file system listeners.
+     *
+     * @param  listener the listener for archive file system events.
+     * @throws TooManyListenersException if a listener has already been added.
+     */
+    final void addArchiveFileSystemTouchListener(
+            final ArchiveFileSystemTouchListener<? super E> listener)
+    throws TooManyListenersException {
+        if (null != touchListener)
+            throw new TooManyListenersException();
+        touchListener = Objects.requireNonNull(listener);
+    }
+
+    /**
+     * Removes the given listener from the set of archive file system listeners.
+     *
+     * @param  listener the listener for archive file system events.
+     */
+    final void removeArchiveFileSystemTouchListener(
+            final @CheckForNull ArchiveFileSystemTouchListener<? super E> listener) {
+        if (touchListener == listener)
+            touchListener = null;
+    }
+
+    /** Splits a given path name into its parent path name and base name. */
+    private static final class PathSplitter
+    extends de.truezip.kernel.util.PathSplitter {
+        PathSplitter() {
+            super(SEPARATOR_CHAR, false);
+        }
+
+        @Override
+        public String getParentPath() {
+            final String path = super.getParentPath();
+            return null != path ? path : ROOT_PATH;
+        }
+    } // Splitter
+
+    /**
+     * The master archive entry table.
+     * 
      * @param <E> The type of the archive entries.
      */
-    private static final class EntryTable<E extends FsArchiveEntry> {
+    private static final class EntryTable<E extends FsArchiveEntry>
+    implements Iterable<FsCovariantEntry<E>> {
 
         /**
          * The map of covariant file system entries.
@@ -654,11 +671,12 @@ implements Iterable<FsCovariantEntry<E>> {
             this.map = new LinkedHashMap<>(initialCapacity);
         }
 
-        int getSize() {
+        int size() {
             return map.size();
         }
 
-        Iterator<FsCovariantEntry<E>> iterator() {
+        @Override
+        public Iterator<FsCovariantEntry<E>> iterator() {
             return map.values().iterator();
         }
 
@@ -678,18 +696,4 @@ implements Iterable<FsCovariantEntry<E>> {
             return map.remove(path);
         }
     } // EntryTable
-
-    /** Splits a given path name into its parent path name and base name. */
-    private static final class PathSplitter
-    extends de.truezip.kernel.util.PathSplitter {
-        PathSplitter() {
-            super(SEPARATOR_CHAR, false);
-        }
-
-        @Override
-        public String getParentPath() {
-            final String path = super.getParentPath();
-            return null != path ? path : ROOT_PATH;
-        }
-    } // Splitter
 }

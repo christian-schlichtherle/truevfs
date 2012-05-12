@@ -87,7 +87,9 @@ extends BasicArchiveController<E> {
      * This is an abstract class: The state is implemented in the subclasses.
      */
     private interface MountState<E extends FsArchiveEntry> {
-        ArchiveFileSystem<E> autoMount( BitField<FsAccessOption> options, boolean autoCreate)
+        ArchiveFileSystem<E> autoMount(
+                BitField<FsAccessOption> options,
+                boolean autoCreate)
         throws IOException;
 
         @Nullable ArchiveFileSystem<E> getFileSystem();
@@ -115,7 +117,7 @@ extends BasicArchiveController<E> {
         @Override
         public void setFileSystem(final ArchiveFileSystem<E> fileSystem) {
             // Passing in null may happen by sync(*).
-            if (fileSystem != null)
+            if (null != fileSystem)
                 mountState = new MountedFileSystem(fileSystem);
         }
     } // ResetFileSystem

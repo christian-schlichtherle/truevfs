@@ -65,7 +65,7 @@ extends FileSystemArchiveController<E>
 implements ArchiveFileSystemTouchListener<E> {
 
     private static final BitField<FsAccessOption>
-            MOUNT_OPTIONS = BitField.of(FsAccessOption.CACHE);
+            MOUNT_OPTIONS = BitField.of(CACHE);
 
     private static final BitField<Access> WRITE_ACCESS = BitField.of(WRITE);
 
@@ -78,14 +78,15 @@ implements ArchiveFileSystemTouchListener<E> {
     private final FsEntryName name;
 
     /**
-     * An {@link InputArchive} object used to mount the (virtual) archive file system
-     * and read the entries from the archive file.
+     * The (possibly cached) {@link InputArchive} which is used to mount the
+     * (virtual) archive file system and read the entries from the target
+     * archive file.
      */
     private @CheckForNull InputArchive<E> inputArchive;
 
     /**
-     * The (possibly temporary) {@link OutputArchive} we are writing newly
-     * created or modified entries to.
+     * The (possibly cached) {@link OutputArchive} which is used to write the
+     * entries to the target archive file.
      */
     private @CheckForNull OutputArchive<E> outputArchive;
 
@@ -124,6 +125,11 @@ implements ArchiveFileSystemTouchListener<E> {
         return true;
     }
 
+    @Override
+    public FsController<?> getParent() {
+        return parent;
+    }
+
     @Nullable InputArchive<E> getInputArchive() throws NeedsSyncException {
         final InputArchive<E> ia = inputArchive;
         if (null != ia && ia.isClosed())
@@ -132,10 +138,10 @@ implements ArchiveFileSystemTouchListener<E> {
     }
 
     private void setInputArchive(final @CheckForNull InputArchive<E> ia) {
-        assert null == ia || null == this.inputArchive;
+        assert null == ia || null == inputArchive;
         if (null != ia)
             setTouched(true);
-        this.inputArchive = ia;
+        inputArchive = ia;
     }
 
     @Nullable OutputArchive<E> getOutputArchive() throws NeedsSyncException {
@@ -146,30 +152,41 @@ implements ArchiveFileSystemTouchListener<E> {
     }
 
     private void setOutputArchive(final @CheckForNull OutputArchive<E> oa) {
-        assert null == oa || null == this.outputArchive;
+        assert null == oa || null == outputArchive;
         if (null != oa)
             setTouched(true);
-        this.outputArchive = oa;
+        outputArchive = oa;
     }
 
     @Override
-    public FsController<?> getParent() {
-        return parent;
+    public void preTouch(
+            BitField<FsAccessOption> options,
+            ArchiveFileSystemEvent<? extends E> event)
+    throws IOException {
+        assert event.getSource() == getFileSystem();
+        outputArchive(options);
+    }
+
+    @Override
+    public void postTouch(
+            BitField<FsAccessOption> options,
+            ArchiveFileSystemEvent<? extends E> event) {
+        assert event.getSource() == getFileSystem();
     }
 
     @Override
     void mount(BitField<FsAccessOption> options, final boolean autoCreate)
     throws IOException {
         try {
-            mount0(autoCreate, options);
+            mount0(options, autoCreate);
         } finally {
             assert invariants();
         }
     }
 
     private void mount0(
-            final boolean autoCreate,
-            final BitField<FsAccessOption> options)
+            final BitField<FsAccessOption> options,
+            final boolean autoCreate)
     throws IOException {
         // HC SUNT DRACONES!
         
@@ -179,9 +196,6 @@ implements ArchiveFileSystemTouchListener<E> {
             pe = parent.stat(options, name);
         } catch (final FalsePositiveArchiveException ex) {
             throw new AssertionError(ex);
-        } catch (final ControlFlowException ex) {
-            assert ex instanceof NeedsLockRetryException : ex;
-            throw ex;
         } catch (final IOException inaccessibleEntry) {
             if (autoCreate)
                 throw inaccessibleEntry;
@@ -210,17 +224,14 @@ implements ArchiveFileSystemTouchListener<E> {
                 is = driver.newInput(getModel(), MOUNT_OPTIONS, parent, name);
             } catch (final FalsePositiveArchiveException ex) {
                 throw new AssertionError(ex);
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException : ex;
-                throw ex;
             } catch (final IOException ex) {
                 throw pe.isType(SPECIAL)
                         ? new FalsePositiveArchiveException(ex)
                         : new PersistentFalsePositiveArchiveException(ex);
             }
-            final InputArchive<E> ia = new InputArchive<>(is);
             fs = newPopulatedFileSystem(driver, is, pe, ro);
-            setInputArchive(ia);
+            setInputArchive(new InputArchive<>(is));
+            assert isTouched();
         }
 
         // Register file system.
@@ -238,28 +249,9 @@ implements ArchiveFileSystemTouchListener<E> {
             return false;
         } catch (final FalsePositiveArchiveException ex) {
             throw new AssertionError(ex);
-        } catch (final ControlFlowException ex) {
-            assert ex instanceof NeedsLockRetryException : ex;
-            throw ex;
         } catch (final IOException ex) {
             return true;
         }
-    }
-
-    @Override
-    public void preTouch(
-            ArchiveFileSystemEvent<? extends E> event,
-            BitField<FsAccessOption> options)
-    throws IOException {
-        assert event.getSource() == getFileSystem();
-        outputArchive(options);
-    }
-
-    @Override
-    public void postTouch(
-            ArchiveFileSystemEvent<? extends E> event,
-            BitField<FsAccessOption> options) {
-        assert event.getSource() == getFileSystem();
     }
 
     /**
@@ -353,15 +345,6 @@ implements ArchiveFileSystemTouchListener<E> {
             }
 
             @Override
-            public SeekableByteChannel channel() throws IOException {
-                try {
-                    return super.channel();
-                } catch (OutputClosedException discarded) {
-                    throw NeedsSyncException.get();
-                }
-            }
-
-            @Override
             public OutputStream stream() throws IOException {
                 try {
                     return super.stream();
@@ -369,81 +352,18 @@ implements ArchiveFileSystemTouchListener<E> {
                     throw NeedsSyncException.get();
                 }
             }
+
+            @Override
+            public SeekableByteChannel channel() throws IOException {
+                try {
+                    return super.channel();
+                } catch (OutputClosedException discarded) {
+                    throw NeedsSyncException.get();
+                }
+            }
         } // Output
 
         return new Output();
-    }
-
-    @Override
-    void checkSync(
-            final BitField<FsAccessOption> options,
-            final FsEntryName name,
-            final @CheckForNull Access intention)
-    throws NeedsSyncException {
-        // HC SUNT DRACONES!
-
-        // If no file system exists, then pass the test.
-        final ArchiveFileSystem<E> fs = getFileSystem();
-        if (null == fs)
-            return;
-
-        // If GROWing and the driver supports the respective access method,
-        // then pass the test.
-        if (options.get(GROW)) {
-            if (null == intention) {
-                if (driver.getRedundantMetaDataSupport())
-                    return;
-            } else if (WRITE == intention) {
-                if (driver.getRedundantContentSupport()) {
-                    getOutputArchive();
-                    return;
-                }
-            }
-        }
-
-        // If the file system does not contain an entry with the given name,
-        // then pass the test.
-        final FsCovariantEntry<E> fse = fs.entry(name);
-        if (null == fse)
-            return;
-
-        // If the entry name addresses the file system root, then pass the test
-        // because the root entry cannot get input or output anyway.
-        if (name.isRoot())
-            return;
-
-        String aen; // archive entry name
-
-        // Check if the entry is already written to the output archive.
-        {
-            final OutputArchive<E> oa = getOutputArchive();
-            if (null != oa) {
-                aen = fse.getEntry().getName();
-                if (null != oa.entry(aen))
-                    throw NeedsSyncException.get();
-            } else {
-                aen = null;
-            }
-        }
-
-        // If our intention is not reading the entry then pass the test.
-        if (READ != intention)
-            return;
-
-        // Check if the entry is present in the input archive.
-        final E iae; // input archive entry
-        {
-            final InputArchive<E> ia = getInputArchive();
-            if (null != ia) {
-                if (null == aen)
-                    aen = fse.getEntry().getName();
-                iae = ia.entry(aen);
-            } else {
-                iae = null;
-            }
-        }
-        if (null == iae)
-            throw NeedsSyncException.get();
     }
 
     @Override
@@ -491,7 +411,7 @@ implements ArchiveFileSystemTouchListener<E> {
             if (null != ia && ia.isClosed())
                 return;
             assert null == ia || !ia.isClosed();
-            is = null != ia  ? ia.getClutch() : new DummyInputService<E>();
+            is = null != ia ? ia.getClutch() : new DummyInputService<E>();
         }
 
         copy(handler, getFileSystem(), is, os);
@@ -507,30 +427,30 @@ implements ArchiveFileSystemTouchListener<E> {
         for (final FsCovariantEntry<E> fse : fs) {
             for (final E ae : fse.getEntries()) {
                 final String aen = ae.getName();
-                if (null != os.entry(aen))
-                    continue; // entry has already been output
-                try {
-                    if (DIRECTORY == ae.getType()) {
-                        if (!fse.isRoot()) // never output the root directory!
-                            if (UNKNOWN != ae.getTime(WRITE)) // never output a ghost directory!
-                                os.output(ae).stream().close();
-                    } else if (null != is.entry(aen)) {
-                        IOSockets.copy(is.input(aen), os.output(ae));
-                    } else {
-                        // The file system entry is a newly created
-                        // non-directory entry which hasn't received any
-                        // content yet, e.g. as a result of mknod()
-                        // => output an empty file system entry.
-                        for (final Size size : ALL_SIZES)
-                            ae.setSize(size, UNKNOWN);
-                        ae.setSize(DATA, 0);
-                        os.output(ae).stream().close();
+                if (null == os.entry(aen)) {
+                    try {
+                        if (DIRECTORY == ae.getType()) {
+                            if (!fse.isRoot()) // never output the root directory!
+                                if (UNKNOWN != ae.getTime(WRITE)) // never output a ghost directory!
+                                    os.output(ae).stream().close();
+                        } else if (null != is.entry(aen)) {
+                            IOSockets.copy(is.input(aen), os.output(ae));
+                        } else {
+                            // The file system entry is a newly created
+                            // non-directory entry which hasn't received any
+                            // content yet, e.g. as a result of mknod()
+                            // => output an empty file system entry.
+                            for (final Size size : ALL_SIZES)
+                                ae.setSize(size, UNKNOWN);
+                            ae.setSize(DATA, 0);
+                            os.output(ae).stream().close();
+                        }
+                    } catch (final IOException ex) {
+                        if (null != warning || !(ex instanceof InputException))
+                            throw handler.fail(new FsSyncException(getModel(), ex));
+                        warning = ex;
+                        handler.warn(new FsSyncWarningException(getModel(), ex));
                     }
-                } catch (final IOException ex) {
-                    if (null != warning || !(ex instanceof InputException))
-                        throw handler.fail(new FsSyncException(getModel(), ex));
-                    warning = ex;
-                    handler.warn(new FsSyncWarningException(getModel(), ex));
                 }
             }
         }
@@ -659,4 +579,76 @@ implements ArchiveFileSystemTouchListener<E> {
             return (DisconnectingOutputService<E>) container;
         }
     } // OutputArchive
+
+    @Override
+    void checkSync(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final @CheckForNull Access intention)
+    throws NeedsSyncException {
+        // HC SUNT DRACONES!
+
+        // If no file system exists, then pass the test.
+        final ArchiveFileSystem<E> fs = getFileSystem();
+        if (null == fs)
+            return;
+
+        // If GROWing and the driver supports the respective access method,
+        // then pass the test.
+        if (options.get(GROW)) {
+            if (null == intention) {
+                if (driver.getRedundantMetaDataSupport())
+                    return;
+            } else if (WRITE == intention) {
+                if (driver.getRedundantContentSupport()) {
+                    getOutputArchive();
+                    return;
+                }
+            }
+        }
+
+        // If the file system does not contain an entry with the given name,
+        // then pass the test.
+        final FsCovariantEntry<E> fse = fs.stat(options, name);
+        if (null == fse)
+            return;
+
+        // If the entry name addresses the file system root, then pass the test
+        // because the root entry cannot get input or output anyway.
+        if (name.isRoot())
+            return;
+
+        String aen; // archive entry name
+
+        // Check if the entry is already written to the output archive.
+        {
+            final OutputArchive<E> oa = getOutputArchive();
+            if (null != oa) {
+                aen = fse.getEntry().getName();
+                if (null != oa.entry(aen))
+                    throw NeedsSyncException.get();
+            } else {
+                aen = null;
+            }
+        }
+
+        // If our intention is not reading the entry then pass the test.
+        if (READ != intention)
+            return;
+
+        // Check if the entry is present in the input archive.
+        final E iae; // input archive entry
+        {
+            final InputArchive<E> ia = getInputArchive();
+            if (null != ia) {
+                if (null == aen)
+                    aen = fse.getEntry().getName();
+                iae = ia.entry(aen);
+            } else {
+                iae = null;
+            }
+        }
+        if (null == iae)
+            throw NeedsSyncException.get();
+    }
 }
