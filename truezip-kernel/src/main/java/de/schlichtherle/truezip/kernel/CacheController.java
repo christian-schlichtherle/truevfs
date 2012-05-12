@@ -5,8 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import static de.schlichtherle.truezip.kernel.CacheEntry.Strategy.WRITE_BACK;
-import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
-import static de.truezip.kernel.FsAccessOption.GROW;
+import static de.truezip.kernel.FsAccessOption.*;
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;
 import static de.truezip.kernel.FsSyncOption.CLEAR_CACHE;
 import static de.truezip.kernel.FsSyncOptions.SYNC;
@@ -100,21 +99,20 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     public InputSocket<?> input(
             final BitField<FsAccessOption> options, final FsEntryName name) {
         /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
-        final class Input extends DelegatingInputSocket<Entry> {
+        class Input extends DelegatingInputSocket<Entry> {
             @Override
             protected InputSocket<?> getSocket() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
-                    if (!options.get(FsAccessOption.CACHE))
+                    if (!options.get(CACHE))
                         return controller.input(options, name);
                     //checkWriteLockedByCurrentThread();
                     cache = new EntryCache(name);
                 }
                 return cache.input(options);
             }
-        } // Input
-
+        }
         return new Input();
     }
 
@@ -124,27 +122,29 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
     final Entry template) {
         /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
-        final class Output extends DelegatingOutputSocket<Entry> {
+        class Output extends DelegatingOutputSocket<Entry> {
             @Override
             protected OutputSocket<?> getSocket() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
-                    if (!options.get(FsAccessOption.CACHE))
+                    if (!options.get(CACHE))
                         return controller.output(options, name, template);
                     //checkWriteLockedByCurrentThread();
                     cache = new EntryCache(name);
                 }
                 return cache.output(options, template);
             }
-        } // Output
-
+        }
         return new Output();
     }
 
     @Override
-    public void mknod(  final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
-    final Entry template)
+    public void mknod(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final Type type,
+            final @CheckForNull Entry template)
     throws IOException {
         assert isWriteLockedByCurrentThread();
         controller.mknod(options, name, type, template);
@@ -154,7 +154,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public void unlink( final BitField<FsAccessOption> options, final FsEntryName name)
+    public void unlink(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name)
     throws IOException {
         assert isWriteLockedByCurrentThread();
         controller.unlink(options, name);
@@ -252,7 +254,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
         EntryCache(final FsEntryName name) {
             this.name = name;
-            this.cache = WRITE_BACK.newCache(CacheController.this.pool);
+            this.cache = WRITE_BACK.newCache(pool);
         }
 
         InputSocket<?> input(BitField<FsAccessOption> options) {
@@ -285,7 +287,14 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             final BitField<FsAccessOption> options;
 
             Input(final BitField<FsAccessOption> options) {
-                this.options = options.clear(FsAccessOption.CACHE); // consume
+                this.options = options.clear(CACHE); // consume
+            }
+
+            @Override
+            public Entry localTarget() throws IOException {
+                // Bypass the super class implementation to keep the
+                // socket even upon an exception!
+                return getBoundSocket().localTarget();
             }
 
             @Override
@@ -296,27 +305,26 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             @Override
             public InputStream stream() throws IOException {
                 assert isWriteLockedByCurrentThread();
+                class Stream extends DecoratingInputStream {
+                    @CreatesObligation
+                    Stream() throws IOException {
+                        // Bypass the super class implementation to keep the
+                        // channel even upon an exception!
+                        //super(Input.super.stream());
+                        super(getBoundSocket().stream());
+                        assert getModel().isTouched();
+                    }
+
+                    @Override
+                    @DischargesObligation
+                    public void close() throws IOException {
+                        assert isWriteLockedByCurrentThread();
+                        in.close();
+                        register();
+                    }
+                }
                 return new Stream();
             }
-
-            final class Stream extends DecoratingInputStream {
-                @CreatesObligation
-                Stream() throws IOException {
-                    // Bypass the super class implementation to keep the
-                    // channel even upon an exception!
-                    //super(Input.super.stream());
-                    super(getBoundSocket().stream());
-                    assert getModel().isTouched();
-                }
-
-                @Override
-                @DischargesObligation
-                public void close() throws IOException {
-                    assert isWriteLockedByCurrentThread();
-                    in.close();
-                    register();
-                }
-            } // Stream
 
             @Override
             public SeekableByteChannel channel(){
@@ -335,7 +343,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             Output( final BitField<FsAccessOption> options,
                     final @CheckForNull Entry template) {
-                this.options = options.clear(FsAccessOption.CACHE); // consume
+                this.options = options.clear(CACHE); // consume
                 this.template = template;
             }
 
@@ -350,7 +358,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             @Override
             public Entry localTarget() throws IOException {
                 // Bypass the super class implementation to keep the
-                // channel even upon an exception!
+                // socket even upon an exception!
                 return getBoundSocket().localTarget();
             }
 
@@ -365,7 +373,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 @CreatesObligation
                 Stream() throws IOException {
                     // Bypass the super class implementation to keep the
-                    // channel even upon an exception!
+                    // socket even upon an exception!
                     //super(Output.super.stream());
                     super(getBoundSocket().stream());
                     register();
@@ -391,7 +399,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 @CreatesObligation
                 Channel() throws IOException {
                     // Bypass the super class implementation to keep the
-                    // channel even upon an exception!
+                    // socket even upon an exception!
                     //super(Output.super.channel());
                     super(getBoundSocket().channel());
                     register();
@@ -416,9 +424,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 register();
             }
 
-            void mknod( BitField<FsAccessOption> mknodOpts,
+            void mknod( final BitField<FsAccessOption> _mknodOpts,
                         final @CheckForNull Entry template)
             throws IOException {
+                BitField<FsAccessOption> mknodOpts = _mknodOpts;
                 while (true) {
                     try {
                         controller.mknod(mknodOpts, name, FILE, template);
@@ -432,9 +441,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                         // resolve the issue locally, that is if we were asked
                         // to create the entry exclusively or this is a
                         // non-recursive file system operation.
-                        final BitField<FsSyncOption> syncOpts;
-                        if (mknodOpts.get(EXCLUSIVE)
-                                || SYNC == (syncOpts = SyncController.modify(SYNC)))
+                        if (mknodOpts.get(EXCLUSIVE))
+                            throw mknodEx;
+                        final BitField<FsSyncOption> syncOpts = SyncController.modify(SYNC);
+                        if (SYNC == syncOpts)
                             throw mknodEx;
 
                         // Try to resolve the issue locally.
@@ -444,7 +454,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                         // the mknod().
                         try {
                             controller.sync(syncOpts);
-                            continue; // sync() succeeded, now repeat mknod()
+                            //continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             syncEx.addSuppressed(mknodEx);
 
@@ -474,22 +484,20 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                             //throw FsNeedsLockRetryException.get(getModel());
 
                             // Check if we can retry the mknod with GROW set.
-                            final BitField<FsAccessOption> oldMknodOpts = mknodOpts;
-                            mknodOpts = oldMknodOpts.set(GROW);
-                            if (oldMknodOpts != mknodOpts)
-                                continue;
-
-                            // Finally, the mknod failed because the entry
-                            // has already been output to the target archive
-                            // file - so what?!
-                            // This should mark only a volatile issue because
-                            // the next sync() will sort it out once all the
-                            // I/O resources have been closed.
-                            // Let's log the sync exception - mind that it has
-                            // suppressed the mknod exception - and continue
-                            // anyway...
-                            logger.log(Level.FINE, "ignoring", syncEx);
-                            break;
+                            mknodOpts = mknodOpts.set(GROW);
+                            if (mknodOpts == _mknodOpts) {
+                                // Finally, the mknod failed because the entry
+                                // has already been output to the target archive
+                                // file - so what?!
+                                // This should mark only a volatile issue because
+                                // the next sync() will sort it out once all the
+                                // I/O resources have been closed.
+                                // Let's log the sync exception - mind that it has
+                                // suppressed the mknod exception - and continue
+                                // anyway...
+                                logger.log(Level.FINE, "ignoring", syncEx);
+                                break;
+                            }
                         }
                     }
                 }

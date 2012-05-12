@@ -27,14 +27,14 @@ extends EventListener {
      *
      * @throws IOException at the discretion of the implementation.
      */
-    void preTouch(  ArchiveFileSystemEvent<? extends E> event,
-                    BitField<FsAccessOption> options)
+    void preTouch(  BitField<FsAccessOption> options,
+                    ArchiveFileSystemEvent<? extends E> event)
     throws IOException;
 
     /**
      * Called immediately after the source archive file system has been
      * modified (touched) for the first time.
      */
-    void postTouch( ArchiveFileSystemEvent<? extends E> event,
-                    BitField<FsAccessOption> options);
+    void postTouch( BitField<FsAccessOption> options,
+                    ArchiveFileSystemEvent<? extends E> event);
 }

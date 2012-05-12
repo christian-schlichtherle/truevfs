@@ -94,7 +94,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         assert isWriteLockedByCurrentThread();
-
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         waitIdle(options, builder);
         closeAll(builder);

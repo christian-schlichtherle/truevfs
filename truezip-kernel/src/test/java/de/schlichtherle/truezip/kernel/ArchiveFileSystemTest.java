@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import static de.truezip.kernel.FsAccessOptions.NONE;
 import static de.truezip.kernel.FsEntryName.ROOT;
 import static de.truezip.kernel.FsEntryName.SEPARATOR;
 import de.truezip.kernel.*;
@@ -75,13 +76,13 @@ public final class ArchiveFileSystemTest {
         }
 
         @Override
-        public void preTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
+        public void preTouch(BitField<FsAccessOption> options, ArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
         }
 
         @Override
-        public void postTouch(ArchiveFileSystemEvent<?> event, BitField<FsAccessOption> options) {
+        public void postTouch(BitField<FsAccessOption> options, ArchiveFileSystemEvent<?> event) {
             assertThat(event, notNullValue());
             assertThat(event.getSource(), sameInstance((Object) fileSystem));
         }
@@ -133,8 +134,8 @@ public final class ArchiveFileSystemTest {
                     driver, archive, null, false);
 
         // Check file system.
-        assert paramss.length <= fileSystem.getSize();
-        assertNotNull(fileSystem.entry(ROOT));
+        assert paramss.length <= fileSystem.size();
+        assertNotNull(fileSystem.stat(NONE, ROOT));
         params: for (String[] params : paramss) {
             final String aen = params[0];
             if (1 == params.length)
@@ -148,7 +149,7 @@ public final class ArchiveFileSystemTest {
                 final FsEntryName entryName = new FsEntryName(
                         new UriBuilder().path(cen).getUri());
                 assertEquals(cen, entryName.getPath());
-                assertEquals(cen, fileSystem.entry(entryName).getName());
+                assertEquals(cen, fileSystem.stat(NONE, entryName).getName());
             }
 
             // Test if an archive entry with a name matching path is present when iterating

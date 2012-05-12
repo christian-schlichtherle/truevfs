@@ -15,6 +15,7 @@ import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import de.truezip.kernel.cio.*;
+import de.truezip.kernel.io.InputException;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.BitField;
 import java.io.IOException;
@@ -103,7 +104,7 @@ extends LockModelController {
             BitField<FsAccessOption> options,
             FsEntryName name)
     throws IOException {
-        return autoMount(options).entry(name);
+        return autoMount(options).stat(options, name);
     }
 
     @Override
@@ -112,7 +113,7 @@ extends LockModelController {
             FsEntryName name,
             BitField<Access> types)
     throws IOException {
-        autoMount(options).checkAccess(name, types);
+        autoMount(options).checkAccess(options, name, types);
     }
 
     @Override
@@ -127,7 +128,7 @@ extends LockModelController {
             Map<Access, Long> times)
     throws IOException {
         checkSync(options, name, null);
-        return autoMount(options).setTime(name, times, options);
+        return autoMount(options).setTime(options, name, times);
     }
 
     @Override
@@ -137,132 +138,134 @@ extends LockModelController {
             BitField<Access> types, long value)
     throws IOException {
         checkSync(options, name, null);
-        return autoMount(options).setTime(name, types, value, options);
+        return autoMount(options).setTime(options, name, types, value);
     }
 
     @Override
     public final InputSocket<?> input(
-            BitField<FsAccessOption> options,
-            FsEntryName name) {
-        return new Input(options, name);
+            final BitField<FsAccessOption> options,
+            final FsEntryName name) {
+        Objects.requireNonNull(options);
+        Objects.requireNonNull(name);
+
+        @NotThreadSafe
+        class Input extends DelegatingInputSocket<E> {
+            @Override
+            public E localTarget() throws IOException {
+                peerTarget(); // may sync() if in same target archive file!
+                checkSync(options, name, READ);
+                final FsCovariantEntry<E> ce = autoMount(options).stat(options, name);
+                if (null == ce)
+                    throw new NoSuchFileException(name.toString());
+                return ce.getEntry();
+            }
+
+            @Override
+            protected InputSocket<E> getSocket() throws IOException {
+                final FsArchiveEntry ae = localTarget();
+                final Type type = ae.getType();
+                if (FILE != type)
+                    throw new FileSystemException(name.toString(), null,
+                            "Expected a FILE entry, but is a " + type + " entry!");
+                return input(ae.getName());
+            }
+        }
+        return new Input();
     }
-
-    @NotThreadSafe
-    private final class Input extends DelegatingInputSocket<FsArchiveEntry> {
-        final BitField<FsAccessOption> options;
-        final FsEntryName name;
-
-        Input(final BitField<FsAccessOption> options, final FsEntryName name) {
-            this.options = Objects.requireNonNull(options);
-            this.name = Objects.requireNonNull(name);
-        }
-
-        @Override
-        public FsArchiveEntry localTarget() throws IOException {
-            peerTarget(); // may sync() if in same target archive file!
-            checkSync(options, name, READ);
-            final FsCovariantEntry<E> fse = autoMount(options).entry(name);
-            if (null == fse)
-                throw new NoSuchFileException(name.toString());
-            return fse.getEntry();
-        }
-
-        @Override
-        protected InputSocket<E> getSocket()
-        throws IOException {
-            final FsArchiveEntry ae = localTarget();
-            final Type type = ae.getType();
-            if (FILE != type)
-                throw new FileSystemException(name.toString(), null,
-                        "Expected a FILE entry, but is a " + type + " entry!");
-            return input(ae.getName());
-        }
-    } // Input
 
     abstract InputSocket<E> input(String name);
 
     @Override
     public final OutputSocket<?> output(
-            BitField<FsAccessOption> options,
-            FsEntryName name,
-            @CheckForNull Entry template) {
-        return new Output(options, name, template);
-    }
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final @CheckForNull Entry template) {
+        Objects.requireNonNull(options);
+        Objects.requireNonNull(name);
 
-    @NotThreadSafe
-    private final class Output extends AbstractOutputSocket<FsArchiveEntry> {
-        final BitField<FsAccessOption> options;
-        final FsEntryName name;
-        final @CheckForNull Entry template;
-
-        Output(
-                final BitField<FsAccessOption> options,
-                final FsEntryName name,
-                final @CheckForNull Entry template) {
-            this.options = Objects.requireNonNull(options);
-            this.name = Objects.requireNonNull(name);
-            this.template = template;
-        }
-
-        ArchiveFileSystemOperation<E> mknod() throws IOException {
-            checkSync(options, name, WRITE);
-            // Start creating or overwriting the archive entry.
-            // This will fail if the entry already exists as a directory.
-            return autoMount(options, !name.isRoot() && options.get(CREATE_PARENTS))
-                    .mknod(options, name, FILE, template);
-        }
-
-        @Override
-        public FsArchiveEntry localTarget() throws IOException {
-            final E ae = mknod().get().getEntry();
-            if (options.get(APPEND)) {
-                // A proxy entry must get returned here in order to inhibit
-                // a peer target to recognize the type of this entry and
-                // switch to Raw Data Copy (RDC) mode.
-                // This would not work when APPENDing.
-                return new ProxyEntry(ae);
+        @NotThreadSafe
+        class Output extends AbstractOutputSocket<FsArchiveEntry> {
+            @Override
+            public FsArchiveEntry localTarget() throws IOException {
+                final E ae = mknod().get().getEntry();
+                if (options.get(APPEND)) {
+                    // A proxy entry must get returned here in order to inhibit
+                    // a peer target to recognize the type of this entry and
+                    // switch to Raw Data Copy (RDC) mode.
+                    // This would not work when APPENDing.
+                    return new ProxyEntry(ae);
+                }
+                return ae;
             }
-            return ae;
-        }
 
-        @Override
-        @edu.umd.cs.findbugs.annotations.SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE") // false positive
-        public OutputStream stream() throws IOException {
-            final ArchiveFileSystemOperation<E> mknod = mknod();
-            final E ae = mknod.get().getEntry();
-            try (final InputStream in = append()) {
-                final OutputSocket<? extends E> os = output(options, ae);
-                if (null == in) // do NOT bind when appending!
-                    os.bind(this);
-                final OutputStream out = os.stream();
+            @Override
+            @edu.umd.cs.findbugs.annotations.SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE") // false positive
+            public OutputStream stream() throws IOException {
+                final ArchiveFileSystemOperation<E> op = mknod();
+                final E ae = op.get().getEntry();
+                final InputStream in = append();
+                Throwable ex = null;
                 try {
-                    mknod.commit();
-                    if (null != in)
-                        Streams.cat(in, out);
-                } catch (final Throwable ex2) {
+                    final OutputSocket<? extends E> os = output(options, ae);
+                    if (null == in) // do NOT bind when appending!
+                        os.bind(this);
+                    final OutputStream out = os.stream();
                     try {
-                        out.close();
-                    } catch (final Throwable ex3) {
-                        ex2.addSuppressed(ex3);
+                        op.commit();
+                        if (null != in)
+                            Streams.cat(in, out);
+                    } catch (final Throwable ex2) {
+                        try {
+                            out.close();
+                        } catch (final Throwable ex3) {
+                            ex2.addSuppressed(ex3);
+                        }
+                        throw ex2;
                     }
+                    return out;
+                } catch (final Throwable ex2) {
+                    ex = ex2;
                     throw ex2;
+                } finally {
+                    if (null != in) {
+                        try {
+                            in.close();
+                        } catch (final IOException ex2) {
+                            final IOException ex3 = new InputException(ex2);
+                            if (null == ex)
+                                throw ex3;
+                            ex.addSuppressed(ex3);
+                        } catch (final Throwable ex2) {
+                            if (null == ex)
+                                throw ex2;
+                            ex.addSuppressed(ex2);
+                        }
+                    }
                 }
-                return out;
             }
-        }
 
-        @CheckForNull InputStream append() {
-            if (options.get(APPEND)) {
-                try {
-                    return new Input(options, name).stream();
-                } catch (IOException ignored) {
-                    // When appending, there is no need for the entry to be
-                    // readable, so we can safely ignore this - fall through!
-                }
+            ArchiveFileSystemOperation<E> mknod() throws IOException {
+                checkSync(options, name, WRITE);
+                // Start creating or overwriting the archive entry.
+                // This will fail if the entry already exists as a directory.
+                return autoMount(options, !name.isRoot() && options.get(CREATE_PARENTS))
+                        .mknod(options, name, FILE, template);
             }
-            return null;
+
+            @CheckForNull InputStream append() {
+                if (options.get(APPEND)) {
+                    try {
+                        return input(options, name).stream();
+                    } catch (IOException ignored) {
+                        // When appending, there is no need for the entry to be
+                        // readable or even exist, so this can get safely ignored.
+                    }
+                }
+                return null;
+            }
         }
-    } // Output
+        return new Output();
+    }
 
     private static final class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>
@@ -332,10 +335,10 @@ extends LockModelController {
     throws IOException {
         checkSync(options, name, null);
         final ArchiveFileSystem<E> fs = autoMount(options);
-        fs.unlink(name, options);
+        fs.unlink(options, name);
         if (name.isRoot()) {
             // Check for any archive entries with absolute entry names.
-            final int size = fs.getSize() - 1; // mind the ROOT entry
+            final int size = fs.size() - 1; // mind the ROOT entry
             if (0 != size)
                 logger.log(Level.WARNING, "unlink.absolute",
                         new Object[] { getMountPoint(), size });
