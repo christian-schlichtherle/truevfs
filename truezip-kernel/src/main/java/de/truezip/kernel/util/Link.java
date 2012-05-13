@@ -43,7 +43,7 @@ public interface Link<T> {
         /** This reference type never clears the target of a link. */
         STRONG {
             @Override
-            <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+            <T> Link<T> newLink(@CheckForNull T target, ReferenceQueue<? super T> queue) {
                 return new Strong<>(target);
             }
         },
@@ -54,7 +54,7 @@ public interface Link<T> {
          */
         SOFT {
             @Override
-            <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+            <T> Link<T> newLink(@CheckForNull T target, ReferenceQueue<? super T> queue) {
                 return new Soft<>(target, queue);
             }
         },
@@ -65,7 +65,7 @@ public interface Link<T> {
          */
         WEAK {
             @Override
-            <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+            <T> Link<T> newLink(@CheckForNull T target, ReferenceQueue<? super T> queue) {
                 return new Weak<>(target, queue);
             }
         },
@@ -76,24 +76,24 @@ public interface Link<T> {
          */
         PHANTOM {
             @Override
-            public <T> Link<T> newLink(T target, ReferenceQueue<? super T> queue) {
+            public <T> Link<T> newLink(@CheckForNull T target, ReferenceQueue<? super T> queue) {
                 return new Phantom<>(target, queue);
             }
         };
 
         /** Returns a new typed link to the given nullable target. */
-        public <T> Link<T> newLink(T target) {
+        abstract <T> Link<T> newLink(@CheckForNull T target, @CheckForNull ReferenceQueue<? super T> queue);
+
+        /** Returns a new typed link to the given nullable target. */
+        public <T> Link<T> newLink(@CheckForNull T target) {
             return newLink(target, null);
         }
 
-        /** Returns a new typed link to the given nullable target. */
-        abstract <T> Link<T> newLink(T target, @CheckForNull ReferenceQueue<? super T> queue);
-
         /** A strong reference. */
         private static final class Strong<T> implements Link<T> {
-            private final T target;
+            private final @CheckForNull T target;
 
-            Strong(final T target) {
+            Strong(final @CheckForNull T target) {
                 this.target = target;
             }
 
@@ -118,11 +118,6 @@ public interface Link<T> {
             }
 
             @Override
-            public T get() {
-                return super.get();
-            }
-
-            @Override
             public String toString() {
                 return String.format("%s[target=%s]",
                         getClass().getName(),
@@ -138,11 +133,6 @@ public interface Link<T> {
             }
 
             @Override
-            public T get() {
-                return super.get();
-            }
-
-            @Override
             public String toString() {
                 return String.format("%s[target=%s]",
                         getClass().getName(),
@@ -155,11 +145,6 @@ public interface Link<T> {
         implements Link<T> {
             Phantom(T target, ReferenceQueue<? super T> queue) {
                 super(target, queue);
-            }
-
-            @Override
-            public T get() {
-                return super.get();
             }
 
             @Override
