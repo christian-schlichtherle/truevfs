@@ -118,15 +118,15 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    protected FsController<?> instrument(
-            FsController<?> controller,
+    protected FsController<? extends FsModel> instrument(
+            FsController<? extends FsModel> controller,
             InstrumentingManager context) {
         return new JmxApplicationController(controller, this);
     }
 
     @Override
-    protected FsController<?> instrument(
-            FsController<?> controller,
+    protected FsController<? extends FsModel> instrument(
+            FsController<? extends FsModel> controller,
             InstrumentingCompositeDriver context) {
         return new JmxKernelController(controller, this);
     }

@@ -36,12 +36,12 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
         return model; //new InstrumentingModel(model, this);
     }
 
-    protected abstract FsController<?> instrument(
-            FsController<?> controller,
+    protected abstract FsController<? extends FsModel> instrument(
+            FsController<? extends FsModel> controller,
             InstrumentingManager context);
 
-    protected abstract FsController<?> instrument(
-            FsController<?> controller,
+    protected abstract FsController<? extends FsModel> instrument(
+            FsController<? extends FsModel> controller,
             InstrumentingCompositeDriver context);
 
     protected <B extends IOBuffer<B>> InputSocket<B> instrument(

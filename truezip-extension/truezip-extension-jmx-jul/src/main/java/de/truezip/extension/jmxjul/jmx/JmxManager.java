@@ -10,7 +10,6 @@ import de.truezip.kernel.FsSyncException;
 import de.truezip.kernel.FsSyncOption;
 import de.truezip.kernel.FsSyncWarningException;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.ExceptionHandler;
 import javax.annotation.concurrent.Immutable;
 
 /**

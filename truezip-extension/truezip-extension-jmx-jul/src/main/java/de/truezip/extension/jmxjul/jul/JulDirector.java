@@ -9,6 +9,7 @@ import de.truezip.extension.jmxjul.InstrumentingController;
 import de.truezip.extension.jmxjul.InstrumentingDirector;
 import de.truezip.extension.jmxjul.InstrumentingManager;
 import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsModel;
 import de.truezip.kernel.cio.*;
 import javax.annotation.concurrent.Immutable;
 
@@ -28,12 +29,12 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
     }
 
     @Override
-    protected FsController<?> instrument(FsController<?> controller, InstrumentingManager context) {
+    protected FsController<? extends FsModel> instrument(FsController<? extends FsModel> controller, InstrumentingManager context) {
         return controller;
     }
 
     @Override
-    protected FsController<?> instrument(FsController<?> controller, InstrumentingCompositeDriver context) {
+    protected FsController<? extends FsModel> instrument(FsController<? extends FsModel> controller, InstrumentingCompositeDriver context) {
         return new InstrumentingController<>(controller, this);
     }
 

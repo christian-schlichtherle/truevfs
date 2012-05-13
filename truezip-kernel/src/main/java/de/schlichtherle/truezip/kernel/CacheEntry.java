@@ -48,7 +48,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-class CacheEntry
+public class CacheEntry
 implements Entry, Flushable, Releasable<IOException>, Closeable {
 
     private final Strategy strategy;
@@ -92,7 +92,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    public CacheEntry configure(final InputSocket<?> input) {
+    public CacheEntry configure(final InputSocket<? extends Entry> input) {
         this.input = Objects.requireNonNull(input);
         return this;
     }
@@ -110,7 +110,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *         backing store.
      * @return {@code this}
      */
-    public CacheEntry configure(final OutputSocket<?> output) {
+    public CacheEntry configure(final OutputSocket<? extends Entry> output) {
         this.output = Objects.requireNonNull(output);
         return this;
     }
@@ -148,6 +148,34 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * @return An input socket for reading the cached entry data.
      */
     public InputSocket<Entry> input() {
+        class Input extends AbstractInputSocket<Entry> {
+            @CheckForNull Buffer buffer;
+
+            InputSocket<? extends Entry> socket() throws IOException {
+                return (buffer = getInputBufferPool().allocate()).input();
+            }
+
+            InputSocket<? extends Entry> boundSocket() throws IOException {
+                return socket().bind(this);
+            }
+
+            @Override
+            public Entry localTarget() throws IOException {
+                final Buffer buffer = this.buffer;
+                return null != buffer ? buffer : new ProxyEntry(
+                        input/*.bind(this)*/.localTarget()); // do NOT bind!
+            }
+
+            @Override
+            public InputStream stream() throws IOException {
+                return boundSocket().stream();
+            }
+
+            @Override
+            public SeekableByteChannel channel() throws IOException {
+                return boundSocket().channel();
+            }
+        }
         return new Input();
     }
 
@@ -157,6 +185,34 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * @return An output socket for writing the cached entry data.
      */
     public OutputSocket<Entry> output() {
+        class Output extends AbstractOutputSocket<Entry> {
+            @CheckForNull Buffer buffer;
+
+            OutputSocket<? extends Entry> socket() throws IOException {
+                return (buffer = getOutputBufferPool().allocate()).output();
+            }
+
+            OutputSocket<? extends Entry> boundSocket() throws IOException {
+                return socket().bind(this);
+            }
+
+            @Override
+            public Entry localTarget() throws IOException {
+                final Buffer buffer = this.buffer;
+                return null != buffer ? buffer : new ProxyEntry(
+                        output/*.bind(this)*/.localTarget()); // do NOT bind!
+            }
+
+            @Override
+            public OutputStream stream() throws IOException {
+                return boundSocket().stream();
+            }
+
+            @Override
+            public SeekableByteChannel channel() throws IOException {
+                return boundSocket().channel();
+            }
+        }
         return new Output();
     }
 
@@ -224,7 +280,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
     /** Provides different cache strategies. */
     @Immutable
     @SuppressWarnings("PackageVisibleInnerClass")
-    enum Strategy {
+    public enum Strategy {
 
         /**
          * A write-through cache flushes any written data as soon as the
@@ -265,64 +321,6 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
         abstract CacheEntry.OutputBufferPool newOutputBufferPool(CacheEntry cache);
     } // Strategy
-
-    private final class Input extends AbstractInputSocket<Entry> {
-        @CheckForNull Buffer buffer;
-
-        InputSocket<? extends Entry> getSocket() throws IOException {
-            return (buffer = getInputBufferPool().allocate()).input();
-        }
-
-        InputSocket<? extends Entry> getBoundSocket() throws IOException {
-            return getSocket().bind(this);
-        }
-
-        @Override
-        public Entry localTarget() throws IOException {
-            final Buffer buffer = this.buffer;
-            return null != buffer ? buffer : new ProxyEntry(
-                    input/*.bind(this)*/.localTarget()); // do NOT bind!
-        }
-
-        @Override
-        public InputStream stream() throws IOException {
-            return getBoundSocket().stream();
-        }
-
-        @Override
-        public SeekableByteChannel channel() throws IOException {
-            return getBoundSocket().channel();
-        }
-    } // Input
-
-    private final class Output extends AbstractOutputSocket<Entry> {
-        @CheckForNull Buffer buffer;
-
-        OutputSocket<? extends Entry> getSocket() throws IOException {
-            return (buffer = getOutputBufferPool().allocate()).output();
-        }
-
-        OutputSocket<? extends Entry> getBoundSocket() throws IOException {
-            return getSocket().bind(this);
-        }
-
-        @Override
-        public Entry localTarget() throws IOException {
-            final Buffer buffer = this.buffer;
-            return null != buffer ? buffer : new ProxyEntry(
-                    output/*.bind(this)*/.localTarget()); // do NOT bind!
-        }
-
-        @Override
-        public OutputStream stream() throws IOException {
-            return getBoundSocket().stream();
-        }
-
-        @Override
-        public SeekableByteChannel channel() throws IOException {
-            return getBoundSocket().channel();
-        }
-    } // Output
 
     /** Used to proxy the backing store entries. */
     @Immutable
@@ -441,16 +439,6 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
             return data.isPermitted(type, entity);
         }
 
-        @Override
-        public InputSocket<Buffer> input() {
-            return new Input();
-        }
-
-        @Override
-        public OutputSocket<Buffer> output() {
-            return new Output();
-        }
-
         void load(InputSocket<?> input) throws IOException {
             IOSockets.copy(input, data.output());
         }
@@ -466,128 +454,131 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
             data.release();
         }
 
-        @NotThreadSafe
-        final class Input extends AbstractInputSocket<Buffer> {
-            final InputSocket<?> socket = data.input();
+        @Override
+        public InputSocket<Buffer> input() {
+            class Input extends AbstractInputSocket<Buffer> {
+                final InputSocket<?> socket = data.input();
 
-            InputSocket<?> getBoundSocket() {
-                return socket.bind(this);
-            }
-
-            @Override
-            public Buffer localTarget() throws IOException {
-                return Buffer.this;
-            }
-
-            @Override
-            public InputStream stream() throws IOException {
-                return new Stream();
-            }
-
-            final class Stream extends DecoratingInputStream {
-                boolean closed;
-
-                Stream() throws IOException {
-                    super(getBoundSocket().stream());
+                InputSocket<?> getBoundSocket() {
+                    return socket.bind(this);
                 }
 
                 @Override
-                @DischargesObligation
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    // HC SUNT DRACONES!
-                    in.close();
-                    getInputBufferPool().release(Buffer.this);
-                    closed = true;
-                }
-            } // Stream
-
-            @Override
-            public SeekableByteChannel channel() throws IOException {
-                return new Channel();
-            }
-
-            final class Channel extends DecoratingReadOnlyChannel {
-                boolean closed;
-
-                Channel() throws IOException {
-                    super(getBoundSocket().channel());
+                public Buffer localTarget() throws IOException {
+                    return Buffer.this;
                 }
 
                 @Override
-                @DischargesObligation
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    // HC SUNT DRACONES!
-                    channel.close();
-                    getInputBufferPool().release(Buffer.this);
-                    closed = true;
-                }
-            } // Channel
-        } // Input
+                public InputStream stream() throws IOException {
+                    class Stream extends DecoratingInputStream {
+                        boolean closed;
 
-        @NotThreadSafe
-        final class Output extends AbstractOutputSocket<Buffer> {
-            final OutputSocket<?> socket = data.output();
+                        Stream() throws IOException {
+                            super(getBoundSocket().stream());
+                        }
 
-            OutputSocket<?> getBoundSocket() {
-                return socket.bind(this);
-            }
-
-            @Override
-            public Buffer localTarget() throws IOException {
-                return Buffer.this;
-            }
-
-            @Override
-            public OutputStream stream() throws IOException {
-                return new Stream();
-            }
-
-            final class Stream extends DecoratingOutputStream {
-                boolean closed;
-
-                Stream() throws IOException {
-                    super(getBoundSocket().stream());
+                        @Override
+                        @DischargesObligation
+                        public void close() throws IOException {
+                            if (closed)
+                                return;
+                            // HC SUNT DRACONES!
+                            in.close();
+                            getInputBufferPool().release(Buffer.this);
+                            closed = true;
+                        }
+                    }
+                    return new Stream();
                 }
 
                 @Override
-                @DischargesObligation
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    // HC SUNT DRACONES!
-                    out.close();
-                    getOutputBufferPool().release(Buffer.this);
-                    closed = true;
+                public SeekableByteChannel channel() throws IOException {
+                    class Channel extends DecoratingReadOnlyChannel {
+                        boolean closed;
+
+                        Channel() throws IOException {
+                            super(getBoundSocket().channel());
+                        }
+
+                        @Override
+                        @DischargesObligation
+                        public void close() throws IOException {
+                            if (closed)
+                                return;
+                            // HC SUNT DRACONES!
+                            channel.close();
+                            getInputBufferPool().release(Buffer.this);
+                            closed = true;
+                        }
+                    }
+                    return new Channel();
                 }
-            } // Stream
-
-            @Override
-            public SeekableByteChannel channel() throws IOException {
-                return new Channel();
             }
+            return new Input();
+        }
 
-            final class Channel extends DecoratingSeekableChannel {
-                boolean closed;
 
-                Channel() throws IOException {
-                    super(getBoundSocket().channel());
+        @Override
+        public OutputSocket<Buffer> output() {
+            class Output extends AbstractOutputSocket<Buffer> {
+                final OutputSocket<?> socket = data.output();
+
+                OutputSocket<?> getBoundSocket() {
+                    return socket.bind(this);
                 }
 
                 @Override
-                @DischargesObligation
-                public void close() throws IOException {
-                    if (closed)
-                        return;
-                    // HC SUNT DRACONES!
-                    channel.close();
-                    getOutputBufferPool().release(Buffer.this);
-                    closed = true;
+                public Buffer localTarget() throws IOException {
+                    return Buffer.this;
                 }
-            } // Channel
-        } // Output
+
+                @Override
+                public OutputStream stream() throws IOException {
+                    class Stream extends DecoratingOutputStream {
+                        boolean closed;
+
+                        Stream() throws IOException {
+                            super(getBoundSocket().stream());
+                        }
+
+                        @Override
+                        @DischargesObligation
+                        public void close() throws IOException {
+                            if (closed)
+                                return;
+                            // HC SUNT DRACONES!
+                            out.close();
+                            getOutputBufferPool().release(Buffer.this);
+                            closed = true;
+                        }
+                    }
+                    return new Stream();
+                }
+
+                @Override
+                public SeekableByteChannel channel() throws IOException {
+                    class Channel extends DecoratingSeekableChannel {
+                        boolean closed;
+
+                        Channel() throws IOException {
+                            super(getBoundSocket().channel());
+                        }
+
+                        @Override
+                        @DischargesObligation
+                        public void close() throws IOException {
+                            if (closed)
+                                return;
+                            // HC SUNT DRACONES!
+                            channel.close();
+                            getOutputBufferPool().release(Buffer.this);
+                            closed = true;
+                        }
+                    }
+                    return new Channel();
+                }
+            }
+            return new Output();
+        }
     } // IOBuffer
 }

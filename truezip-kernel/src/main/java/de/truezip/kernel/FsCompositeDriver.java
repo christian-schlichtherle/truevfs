@@ -41,8 +41,8 @@ public interface FsCompositeDriver {
      *         can get found for the scheme of the given mount point.
      * @see    FsDriver#newController
      */
-    FsController<?> newController(
+    FsController<? extends FsModel> newController(
             FsManager manager,
             FsModel model,
-            @CheckForNull FsController<?> parent);
+            @CheckForNull FsController<? extends FsModel> parent);
 }

@@ -69,7 +69,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-abstract class ControlFlowException extends RuntimeException {
+public abstract class ControlFlowException extends RuntimeException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
@@ -84,11 +84,11 @@ abstract class ControlFlowException extends RuntimeException {
     static final boolean TRACEABLE = Boolean
             .getBoolean(ControlFlowException.class.getName() + ".traceable");
 
-    ControlFlowException() {
+    public ControlFlowException() {
         super(null, null, TRACEABLE, TRACEABLE);
     }
 
-    ControlFlowException(final Throwable cause) {
+    public ControlFlowException(final Throwable cause) {
         super(null, cause, TRACEABLE, TRACEABLE);
     }
 }

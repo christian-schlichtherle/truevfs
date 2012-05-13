@@ -111,7 +111,7 @@ public interface FsController<M extends FsModel> {
      * 
      * @return The nullable controller for the parent file system.
      */
-    @Nullable FsController<?> getParent();
+    @Nullable FsController<? extends FsModel> getParent();
 
     /**
      * Returns {@code true} if and only if the file system is read-only.

@@ -42,7 +42,7 @@ extends IOSocket<E, Entry>, Sink {
      * @return The nullable peer socket to which this socket is connected for
      *         copying.
      */
-    @CheckForNull InputSocket<?> getPeerSocket();
+    @CheckForNull InputSocket<? extends Entry> getPeerSocket();
 
     /**
      * Inherits the {@linkplain #getPeerSocket peer socket} from the given
@@ -52,7 +52,7 @@ extends IOSocket<E, Entry>, Sink {
      * @return {@code this}
      * @throws IllegalArgumentException if {@code this} == {@code to}.
      */
-    OutputSocket<E> bind(OutputSocket<?> to);
+    OutputSocket<E> bind(OutputSocket<? extends Entry> to);
 
     /**
      * Connects this output socket to the given {@code peer} input socket.
@@ -62,7 +62,7 @@ extends IOSocket<E, Entry>, Sink {
      * @param  peer the nullable peer input socket to connect to.
      * @return {@code this}
      */
-    OutputSocket<E> connect(@CheckForNull InputSocket<?> peer);
+    OutputSocket<E> connect(@CheckForNull InputSocket<? extends Entry> peer);
 
     /**
      * {@inheritDoc}

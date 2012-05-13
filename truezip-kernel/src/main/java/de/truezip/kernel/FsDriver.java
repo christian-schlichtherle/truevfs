@@ -51,10 +51,10 @@ public abstract class FsDriver {
      *         point and parent file system controller.
      * @see    FsCompositeDriver#newController
      */
-    public abstract FsController<?> newController(
+    public abstract FsController<? extends FsModel> newController(
             FsManager manager,
             FsModel model,
-            @Nullable FsController<?> parent);
+            @Nullable FsController<? extends FsModel> parent);
 
     /**
      * Returns a string representation of this object for debugging and logging

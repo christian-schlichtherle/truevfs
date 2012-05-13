@@ -20,7 +20,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class SyncShutdownHook {
+public final class SyncShutdownHook {
 
     private static final Runtime runtime = Runtime.getRuntime();
     private static final Hook hook = new Hook();
@@ -38,7 +38,7 @@ final class SyncShutdownHook {
      *        is {@linkplain #run run}.
      * @see   #cancel
      */
-    static void register(final FsManager manager) {
+    public static void register(final FsManager manager) {
         final Hook hook = SyncShutdownHook.hook;
         if (hook.manager != manager) {
             synchronized (hook) {
@@ -55,7 +55,7 @@ final class SyncShutdownHook {
      * 
      * @see #register
      */
-    static void cancel() {
+    public static void cancel() {
         final Hook hook = SyncShutdownHook.hook;
         if (hook.manager != null) {
             synchronized (hook) {

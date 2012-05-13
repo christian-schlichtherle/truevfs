@@ -19,12 +19,12 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-final class NeedsSyncException extends ControlFlowException {
+public final class NeedsSyncException extends ControlFlowException {
 
     private static final @Nullable NeedsSyncException
             SINGLETON = TRACEABLE ? null : new NeedsSyncException();
 
-    static NeedsSyncException get() {
+    public static NeedsSyncException get() {
         return TRACEABLE ? new NeedsSyncException() : SINGLETON;
     }
 

@@ -38,7 +38,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ResourceManager {
+public final class ResourceManager {
 
     /**
      * The initial capacity for the hash map accounts for the number of
@@ -56,7 +56,7 @@ final class ResourceManager {
     private final Condition condition;
 
     /**
-     * Constructs a new resource accountant with the given lock.
+     * Constructs a new resource manager with the given lock.
      * You MUST MAKE SURE not to use two instances of this class which share
      * the same lock!
      * Otherwise {@link #waitOtherThreads} will not work as designed!
@@ -67,7 +67,7 @@ final class ResourceManager {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    ResourceManager(final Lock lock) {
+    public ResourceManager(final Lock lock) {
         this.condition = (this.lock = lock).newCondition();
     }
 
@@ -76,7 +76,7 @@ final class ResourceManager {
      * 
      * @param resource the closeable resource to start accounting for.
      */
-    void start(final @WillNotClose Closeable resource) {
+    public void start(final @WillNotClose Closeable resource) {
         accounts.put(resource, new Account());
     }
 
@@ -87,7 +87,7 @@ final class ResourceManager {
      * 
      * @param resource the closeable resource to stop accounting for.
      */
-    void stop(final @WillNotClose Closeable resource) {
+    public void stop(final @WillNotClose Closeable resource) {
         if (null != accounts.remove(resource)) {
             lock.lock();
             try {
@@ -125,7 +125,7 @@ final class ResourceManager {
      * @return The number of closeable resources which have been accounted for
      *         by <em>all</em> threads.
      */
-    int waitOtherThreads(final long timeout) {
+    public int waitOtherThreads(final long timeout) {
         lock.lock();
         try {
             try {
@@ -168,7 +168,7 @@ final class ResourceManager {
      * @return The number of closeable resources which have been accounted for
      *         by the <em>current</em> thread.
      */
-    int localResources() {
+    public int localResources() {
         int n = 0;
         final Thread currentThread = Thread.currentThread();
         for (final Account account : accounts.values())
@@ -190,7 +190,7 @@ final class ResourceManager {
      * @return The number of closeable resources which have been accounted for
      *         by <em>all</em> threads.
      */
-    int totalResources() {
+    public int totalResources() {
         int n = 0;
         for (final Account account : accounts.values())
             if (account.getManager() == this)
@@ -206,7 +206,7 @@ final class ResourceManager {
      * for closeable resources again unless the caller also locks the lock
      * provided to the constructor - use with care!
      */
-    void closeAllResources() throws IOException {
+    public void closeAllResources() throws IOException {
         lock.lock();
         try {
             final ExceptionBuilder<IOException, IOException>
