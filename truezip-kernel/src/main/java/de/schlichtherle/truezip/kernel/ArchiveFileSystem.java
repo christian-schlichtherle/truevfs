@@ -384,7 +384,7 @@ implements Iterable<FsCovariantEntry<E>> {
                 final @CheckForNull Entry template)
         throws IOException {
             splitter.split(path);
-            final String parentPath = splitter.getParentPath(); // could equal ROOT_PATH
+            final String parentPath = splitter.getParentPath(); // may equal ROOT_PATH
             final String memberName = splitter.getMemberName();
 
             // Lookup parent entry, creating it if necessary and allowed.
@@ -421,15 +421,15 @@ implements Iterable<FsCovariantEntry<E>> {
             FsCovariantEntry<E> parentCE = segments[0].entry;
             E parentAE = parentCE.getEntry(DIRECTORY);
             for (int i = 1; i < size ; i++) {
-                final Segment<E> link = segments[i];
-                final FsCovariantEntry<E> entryCE = link.entry;
-                final E entryAE = entryCE.getEntry();
-                master.add(entryCE.getName(), entryAE);
-                if (master.get(parentCE.getName()).add(link.member)
+                final Segment<E> segment = segments[i];
+                final FsCovariantEntry<E> memberCE = segment.entry;
+                final E memberAE = memberCE.getEntry();
+                master.add(memberCE.getName(), memberAE);
+                if (master.get(parentCE.getName()).add(segment.name)
                         && UNKNOWN != parentAE.getTime(WRITE)) // never touch ghost directories!
                     parentAE.setTime(WRITE, getTimeMillis());
-                parentCE = entryCE;
-                parentAE = entryAE;
+                parentCE = memberCE;
+                parentAE = memberAE;
             }
             if (UNKNOWN == parentAE.getTime(WRITE))
                 parentAE.setTime(WRITE, getTimeMillis());
@@ -450,18 +450,20 @@ implements Iterable<FsCovariantEntry<E>> {
      * @param <E> The type of the archive entries.
      */
     private static final class Segment<E extends FsArchiveEntry> {
-        final @Nullable String member;
+        final @Nullable String name;
         final FsCovariantEntry<E> entry;
 
         /**
          * Constructs a new {@code SegmentLink}.
          *
-         * @param member the nullable member name of the entry name.
-         * @param entry the covariant file system entry for the member name.
+         * @param name the nullable member name for the covariant file system
+         *        entry.
+         * @param entry the covariant file system entry for the nullable member
+         *        name.
          */
-        Segment(final @CheckForNull String member,
+        Segment(final @CheckForNull String name,
                 final FsCovariantEntry<E> entry) {
-            this.member = member;
+            this.name = name;
             this.entry = entry;
         }
     } // Segment
