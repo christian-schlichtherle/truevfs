@@ -36,7 +36,6 @@ import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.TooManyListenersException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
@@ -62,7 +61,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 final class TargetArchiveController<E extends FsArchiveEntry>
 extends FileSystemArchiveController<E>
-implements ArchiveFileSystemTouchListener<E> {
+implements ArchiveFileSystem.TouchListener {
 
     private static final BitField<FsAccessOption>
             MOUNT_OPTIONS = BitField.of(CACHE);
@@ -159,19 +158,8 @@ implements ArchiveFileSystemTouchListener<E> {
     }
 
     @Override
-    public void preTouch(
-            BitField<FsAccessOption> options,
-            ArchiveFileSystemEvent<? extends E> event)
-    throws IOException {
-        assert event.getSource() == getFileSystem();
+    public void preTouch(BitField<FsAccessOption> options) throws IOException {
         outputArchive(options);
-    }
-
-    @Override
-    public void postTouch(
-            BitField<FsAccessOption> options,
-            ArchiveFileSystemEvent<? extends E> event) {
-        assert event.getSource() == getFileSystem();
     }
 
     @Override
@@ -235,11 +223,7 @@ implements ArchiveFileSystemTouchListener<E> {
         }
 
         // Register file system.
-        try {
-            fs.addArchiveFileSystemTouchListener(this);
-        } catch (final TooManyListenersException ex) {
-            throw new AssertionError(ex);
-        }
+        fs.setTouchListener(this);
         setFileSystem(fs);
     }
 

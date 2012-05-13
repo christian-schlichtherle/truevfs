@@ -188,7 +188,7 @@ extends LockModelController {
         class Output extends AbstractOutputSocket<FsArchiveEntry> {
             @Override
             public FsArchiveEntry localTarget() throws IOException {
-                final E ae = mknod().get().getEntry();
+                final E ae = mknod().head().getEntry();
                 if (options.get(APPEND)) {
                     // A proxy entry must get returned here in order to inhibit
                     // a peer target to recognize the type of this entry and
@@ -202,8 +202,8 @@ extends LockModelController {
             @Override
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE") // false positive
             public OutputStream stream() throws IOException {
-                final ArchiveFileSystemOperation<E> op = mknod();
-                final E ae = op.get().getEntry();
+                final ArchiveFileSystem<E>.Mknod tx = mknod();
+                final E ae = tx.head().getEntry();
                 final InputStream in = append();
                 Throwable ex = null;
                 try {
@@ -212,7 +212,7 @@ extends LockModelController {
                         os.bind(this);
                     final OutputStream out = os.stream();
                     try {
-                        op.commit();
+                        tx.commit();
                         if (null != in)
                             Streams.cat(in, out);
                     } catch (final Throwable ex2) {
@@ -245,7 +245,7 @@ extends LockModelController {
                 }
             }
 
-            ArchiveFileSystemOperation<E> mknod() throws IOException {
+            ArchiveFileSystem<E>.Mknod mknod() throws IOException {
                 checkSync(options, name, WRITE);
                 // Start creating or overwriting the archive entry.
                 // This will fail if the entry already exists as a directory.
