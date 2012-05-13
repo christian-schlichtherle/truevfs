@@ -176,6 +176,7 @@ extends LockModelController {
     abstract InputSocket<E> input(String name);
 
     @Override
+    @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE")
     public final OutputSocket<?> output(
             final BitField<FsAccessOption> options,
             final FsEntryName name,
