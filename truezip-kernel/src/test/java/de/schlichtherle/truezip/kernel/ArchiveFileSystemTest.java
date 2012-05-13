@@ -21,7 +21,6 @@ import de.truezip.kernel.mock.MockArchiveDriver;
 import de.truezip.kernel.mock.MockArchiveDriverEntry;
 import de.truezip.kernel.util.BitField;
 import de.truezip.kernel.util.UriBuilder;
-import java.util.TooManyListenersException;
 import static org.hamcrest.CoreMatchers.*;
 import org.junit.After;
 import static org.junit.Assert.*;
@@ -44,7 +43,7 @@ public final class ArchiveFileSystemTest {
     }
 
     @Test
-    public void testListener() throws TooManyListenersException {
+    public void testListener() {
         final ArchiveFileSystem<?> fs =
                 newEmptyFileSystem(new MockArchiveDriver());
 
