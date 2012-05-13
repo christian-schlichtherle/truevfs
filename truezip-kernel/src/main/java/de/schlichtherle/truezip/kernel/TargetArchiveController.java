@@ -390,7 +390,7 @@ implements ArchiveFileSystemTouchListener<E> {
     private void copy(final FsSyncExceptionBuilder handler)
     throws FsSyncException {
         // Skip (In|Out)putArchive for better performance.
-        // This is safe because the FsResourceController has already shut down
+        // This is safe because the ResourceController has already shut down
         // all concurrent access by closing the respective resources (streams,
         // channels etc).
         // The Disconnecting(In|Out)putService should not get skipped however:

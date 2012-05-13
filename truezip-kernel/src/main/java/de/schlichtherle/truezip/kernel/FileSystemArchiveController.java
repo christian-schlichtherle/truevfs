@@ -82,10 +82,7 @@ extends BasicArchiveController<E> {
             boolean autoCreate)
     throws IOException;
 
-    /**
-     * Represents the mount state of the archive file system.
-     * This is an abstract class: The state is implemented in the subclasses.
-     */
+    /** Represents the mount state of the archive file system. */
     private interface MountState<E extends FsArchiveEntry> {
         ArchiveFileSystem<E> autoMount(
                 BitField<FsAccessOption> options,
@@ -144,7 +141,7 @@ extends BasicArchiveController<E> {
         @Override
         public void setFileSystem(final ArchiveFileSystem<E> fileSystem) {
             if (null != fileSystem)
-                throw new IllegalArgumentException("File system already mounted!");
+                throw new IllegalStateException("File system already mounted!");
             mountState = new ResetFileSystem();
         }
     } // MountedFileSystem
