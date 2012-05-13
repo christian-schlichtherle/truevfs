@@ -123,7 +123,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
             @Override
             public OutputStream stream() throws IOException {
-                final OutputSocket<? extends E> output = getBoundSocket();
+                final OutputSocket<? extends E> output = boundSocket();
                 return isBusy() ? new BufferedEntryOutputStream(output)
                                 : new EntryOutputStream(output);
             }

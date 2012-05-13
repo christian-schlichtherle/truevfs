@@ -153,7 +153,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             public Entry localTarget() throws IOException {
                 while (true) {
                     try {
-                        return getBoundSocket().localTarget();
+                        return boundSocket().localTarget();
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -164,7 +164,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             public InputStream stream() throws IOException {
                 while (true) {
                     try {
-                        return new SyncInputStream(getBoundSocket().stream());
+                        return new SyncInputStream(boundSocket().stream());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -175,7 +175,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             public SeekableByteChannel channel() throws IOException {
                 while (true) {
                     try {
-                        return new SyncSeekableChannel(getBoundSocket().channel());
+                        return new SyncSeekableChannel(boundSocket().channel());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -201,7 +201,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             public Entry localTarget() throws IOException {
                 while (true) {
                     try {
-                        return getBoundSocket().localTarget();
+                        return boundSocket().localTarget();
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -212,7 +212,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             public SeekableByteChannel channel() throws IOException {
                 while (true) {
                     try {
-                        return new SyncSeekableChannel(getBoundSocket().channel());
+                        return new SyncSeekableChannel(boundSocket().channel());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }
@@ -223,7 +223,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             public OutputStream stream() throws IOException {
                 while (true) {
                     try {
-                        return new SyncOutputStream(getBoundSocket().stream());
+                        return new SyncOutputStream(boundSocket().stream());
                     } catch (NeedsSyncException ex) {
                         sync(ex);
                     }

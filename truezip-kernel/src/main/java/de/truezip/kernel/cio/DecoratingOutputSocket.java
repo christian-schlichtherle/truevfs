@@ -30,7 +30,7 @@ extends DelegatingOutputSocket<E> {
     }
 
     @Override
-    protected OutputSocket<? extends E> getSocket() throws IOException {
+    protected OutputSocket<? extends E> socket() throws IOException {
         return socket;
     }
 

@@ -146,7 +146,7 @@ public class MockController extends FsAbstractController<FsModel> {
 
         class Input extends DelegatingInputSocket<Entry> {
             @Override
-            protected InputSocket<? extends Entry> getSocket()
+            protected InputSocket<? extends Entry> socket()
             throws IOException {
                 checkAllExceptions(this);
                 final IOEntry<?> buffer = map.get(name);
@@ -159,7 +159,7 @@ public class MockController extends FsAbstractController<FsModel> {
             public SeekableByteChannel channel()
             throws IOException {
                 return new ThrowingSeekableChannel(
-                        getBoundSocket().channel(),
+                        boundSocket().channel(),
                         config.getThrowControl());
             }
 
@@ -167,7 +167,7 @@ public class MockController extends FsAbstractController<FsModel> {
             public InputStream stream()
             throws IOException {
                 return new ThrowingInputStream(
-                        getBoundSocket().stream(),
+                        boundSocket().stream(),
                         config.getThrowControl());
             }
         } // Input
@@ -186,7 +186,7 @@ public class MockController extends FsAbstractController<FsModel> {
 
         class Output extends DelegatingOutputSocket<Entry> {
             @Override
-            protected OutputSocket<? extends Entry> getSocket()
+            protected OutputSocket<? extends Entry> socket()
             throws IOException {
                 checkAllExceptions(this);
                 final IOEntry<?> n = new ByteArrayIOBuffer(
@@ -201,7 +201,7 @@ public class MockController extends FsAbstractController<FsModel> {
             public SeekableByteChannel channel()
             throws IOException {
                 return new ThrowingSeekableChannel(
-                        getBoundSocket().channel(),
+                        boundSocket().channel(),
                         config.getThrowControl());
             }
 
@@ -209,7 +209,7 @@ public class MockController extends FsAbstractController<FsModel> {
             public OutputStream stream()
             throws IOException {
                 return new ThrowingOutputStream(
-                        getBoundSocket().stream(),
+                        boundSocket().stream(),
                         config.getThrowControl());
             }
         } // Output

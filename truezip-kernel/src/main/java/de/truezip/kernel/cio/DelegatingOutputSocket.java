@@ -26,7 +26,7 @@ extends AbstractOutputSocket<E> {
      * @return The delegate socket.
      * @throws IOException on any I/O error. 
      */
-    protected abstract OutputSocket<? extends E> getSocket()
+    protected abstract OutputSocket<? extends E> socket()
     throws IOException;
 
     /**
@@ -35,23 +35,23 @@ extends AbstractOutputSocket<E> {
      * @return The bound delegate socket.
      * @throws IOException on any I/O error. 
      */
-    protected final OutputSocket<? extends E> getBoundSocket()
+    protected final OutputSocket<? extends E> boundSocket()
     throws IOException {
-        return getSocket().bind(this);
+        return socket().bind(this);
     }
 
     @Override
     public E localTarget() throws IOException {
-        return getBoundSocket().localTarget();
+        return boundSocket().localTarget();
     }
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        return getBoundSocket().channel();
+        return boundSocket().channel();
     }
 
     @Override
     public OutputStream stream() throws IOException {
-        return getBoundSocket().stream();
+        return boundSocket().stream();
     }
 }

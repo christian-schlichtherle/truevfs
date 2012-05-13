@@ -104,7 +104,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
-        protected OutputSocket<? extends E> getSocket() throws IOException {
+        protected OutputSocket<? extends E> socket() throws IOException {
             checkOpenService();
             return socket;
         }
@@ -112,13 +112,13 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         public OutputStream stream() throws IOException {
             return new DisconnectingOutputStream(
-                    getBoundSocket().stream());
+                    boundSocket().stream());
         }
 
         @Override
         public SeekableByteChannel channel() throws IOException {
             return new DisconnectingSeekableChannel(
-                    getBoundSocket().channel());
+                    boundSocket().channel());
         }
     } // Output
 

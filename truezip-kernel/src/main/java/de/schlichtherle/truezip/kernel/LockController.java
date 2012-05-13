@@ -207,7 +207,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 class GetLocalTarget implements IOOperation<Entry> {
                     @Override
                     public Entry apply() throws IOException {
-                        return getBoundSocket().localTarget();
+                        return boundSocket().localTarget();
                     }
                 }
                 return fastWriteLocked(new GetLocalTarget());
@@ -218,7 +218,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 class NewStream implements IOOperation<InputStream> {
                     @Override
                     public InputStream apply() throws IOException {
-                        return new LockInputStream(getBoundSocket().stream());
+                        return new LockInputStream(boundSocket().stream());
                     }
                 }
                 return timedWriteLocked(new NewStream());
@@ -229,7 +229,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 class NewChannel implements IOOperation<SeekableByteChannel> {
                     @Override
                     public SeekableByteChannel apply() throws IOException {
-                        return new LockSeekableChannel(getBoundSocket().channel());
+                        return new LockSeekableChannel(boundSocket().channel());
                     }
                 }
                 return timedWriteLocked(new NewChannel());
@@ -256,7 +256,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 class GetLocalTarget implements IOOperation<Entry> {
                     @Override
                     public Entry apply() throws IOException {
-                        return getBoundSocket().localTarget();
+                        return boundSocket().localTarget();
                     }
                 }
                 return fastWriteLocked(new GetLocalTarget());
@@ -267,7 +267,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 class NewStream implements IOOperation<OutputStream> {
                     @Override
                     public OutputStream apply() throws IOException {
-                        return new LockOutputStream(getBoundSocket().stream());
+                        return new LockOutputStream(boundSocket().stream());
                     }
                 }
                 return timedWriteLocked(new NewStream());
@@ -278,7 +278,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 class NewChannel implements IOOperation<SeekableByteChannel> {
                     @Override
                     public SeekableByteChannel apply() throws IOException {
-                        return new LockSeekableChannel(getBoundSocket().channel());
+                        return new LockSeekableChannel(boundSocket().channel());
                     }
                 }
                 return timedWriteLocked(new NewChannel());

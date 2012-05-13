@@ -13,7 +13,7 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * An input socket which obtains its delegate socket lazily and
+ * An input lazySocket which obtains its delegate lazySocket lazily and
  * {@link #reset()}s it upon any {@link Throwable}.
  *
  * @see    ClutchOutputSocket
@@ -25,23 +25,24 @@ public abstract class ClutchInputSocket<E extends Entry>
 extends DecoratingInputSocket<E> {
 
     @Override
-    protected final InputSocket<? extends E> getSocket() throws IOException {
+    protected final InputSocket<? extends E> socket() throws IOException {
         final InputSocket<? extends E> socket = this.socket;
-        return null != socket ? socket : (this.socket = socket());
+        return null != socket ? socket : (this.socket = lazySocket());
     };
 
     /**
-     * Returns the input socket for lazy initialization.
+     * Returns the input lazySocket for lazy initialization.
      * 
-     * @return the input socket for lazy initialization.
+     * @return the input lazySocket for lazy initialization.
      * @throws IOException on any I/O error. 
      */
-    protected abstract InputSocket<? extends E> socket() throws IOException;
+    protected abstract InputSocket<? extends E> lazySocket()
+    throws IOException;
 
     @Override
     public E localTarget() throws IOException {
         try {
-            return getBoundSocket().localTarget();
+            return boundSocket().localTarget();
         } catch (final Throwable ex) {
             reset();
             throw ex;
@@ -51,7 +52,7 @@ extends DecoratingInputSocket<E> {
     @Override
     public InputStream stream() throws IOException {
         try {
-            return getBoundSocket().stream();
+            return boundSocket().stream();
         } catch (final Throwable ex) {
             reset();
             throw ex;
@@ -62,7 +63,7 @@ extends DecoratingInputSocket<E> {
     public SeekableByteChannel channel()
     throws IOException {
         try {
-            return getBoundSocket().channel();
+            return boundSocket().channel();
         } catch (final Throwable ex) {
             reset();
             throw ex;
