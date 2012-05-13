@@ -27,19 +27,19 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     protected final D director;
 
     public InstrumentingController(
-            final FsController<?> controller,
+            final FsController<? extends FsModel> controller,
             final D director) {
         super(controller);
         this.director = Objects.requireNonNull(director);
     }
 
     @Override
-    public InputSocket<?> input(BitField<FsAccessOption> options, FsEntryName name) {
+    public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsEntryName name) {
         return director.instrument(controller.input(options, name), this);
     }
 
     @Override
-    public OutputSocket<?> output(BitField<FsAccessOption> options, FsEntryName name, Entry template) {
+    public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsEntryName name, Entry template) {
         return director.instrument(controller.output(options, name, template), this);
     }
 }

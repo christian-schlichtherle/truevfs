@@ -37,7 +37,7 @@ extends FsAbstractController<M> {
     }
 
     @Override
-    public FsController<?> getParent() {
+    public FsController<? extends FsModel> getParent() {
         return controller.getParent();
     }
 
@@ -88,14 +88,14 @@ extends FsAbstractController<M> {
     }
 
     @Override
-    public InputSocket<?> input(
+    public InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
             FsEntryName name) {
         return controller.input(options, name);
     }
 
     @Override
-    public OutputSocket<?> output(
+    public OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsEntryName name,
             Entry template) {

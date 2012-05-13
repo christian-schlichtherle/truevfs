@@ -4,8 +4,9 @@
  */
 package de.truezip.extension.jmxjul.jmx;
 
-import de.truezip.kernel.FsController;
 import de.truezip.extension.jmxjul.InstrumentingController;
+import de.truezip.kernel.FsController;
+import de.truezip.kernel.FsModel;
 
 /**
  * @author  Christian Schlichtherle
@@ -13,7 +14,7 @@ import de.truezip.extension.jmxjul.InstrumentingController;
 abstract class JmxController
 extends InstrumentingController<JmxDirector> {
 
-    JmxController(FsController<?> controller, JmxDirector director) {
+    JmxController(FsController<? extends FsModel> controller, JmxDirector director) {
         super(controller, director);
     }
 

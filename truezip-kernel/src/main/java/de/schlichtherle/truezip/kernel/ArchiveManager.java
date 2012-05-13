@@ -68,7 +68,7 @@ final class ArchiveManager extends FsManager {
             final FsModel model = new FsModel(mountPoint, null);
             return driver.newController(this, model, null);
         }
-        FsController<?> controller = target(schedulers.get(mountPoint));
+        FsController<? extends FsModel> controller = target(schedulers.get(mountPoint));
         if (null == controller) {
             if (null == parent)
                 parent = controller(driver, mountPoint.getParent(), null);
@@ -77,74 +77,6 @@ final class ArchiveManager extends FsManager {
             model.setController(controller = driver.newController(this, model, parent));
         }
         return controller;
-    }
-
-    @Override
-    public final FsController<?> newController(
-            final FsArchiveDriver<?> driver,
-            final FsModel model,
-            final FsController<?> parent) {
-        assert !(model instanceof LockModel);
-        final LockModel lmodel = new LockModel(model);
-        // HC SUNT DRACONES!
-        // The FalsePositiveArchiveController decorates the FinalizeController
-        // so that the decorated controller (chain) does not need to resolve
-        // operations on false positive archive files.
-        // The FinalizeController decorates the driver's controllers so that
-        // each and every resource which may get opened by the decorated
-        // controller (chain) is ensured to get closed.
-        // The driver's controllers decorate the LockController because the
-        // former shall not get guarded by the file system locks but should
-        // otherwise not need to be concerned with most other aspects of
-        // implementing a virtual file system - other than passing on a
-        // FalsePositiveException or a NeedsLockRetryException.
-        // The LockController decorates the SyncController so that
-        // the decorated controller (chain) doesn't need to be thread safe.
-        // The SyncController decorates the CacheController because the
-        // selective entry cache needs to get flushed on a NeedsSyncException.
-        // The CacheController decorates the ResourceController because the
-        // cache entries terminate streams and channels and shall not stop the
-        // decorated controller (chain) from getting synced.
-        // The ResourceController decorates the TargetArchiveController so that
-        // trying to sync the file system while any stream or channel to the
-        // latter is open gets detected and properly dealt with.
-        return  new FalsePositiveArchiveController(
-                    new FinalizeController(
-                        driver.decorate(
-                            new LockController(
-                                new SyncController(
-                                    new CacheController(driver.getIOPool(),
-                                        new ResourceController(
-                                            new TargetArchiveController<>(
-                                                driver, lmodel, parent))))))));
-    }
-
-    @Override
-    public synchronized int size() {
-        return schedulers.size();
-    }
-
-    @Override
-    public Iterator<FsController<?>> iterator() {
-        return getControllers().iterator();
-    }
-
-    private synchronized Set<FsController<?>> getControllers() {
-        final Set<FsController<?>>
-                snapshot = new TreeSet<>(ReverseControllerComparator.INSTANCE);
-        for (final Link<FsController<?>> link : schedulers.values()) {
-            final FsController<?> controller = target(link);
-            if (null != controller)
-                snapshot.add(controller);
-        }
-        return snapshot;
-    }
-
-    @Override
-    public void sync(BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException {
-        SyncShutdownHook.cancel();
-        super.sync(options);
     }
 
     /**
@@ -200,6 +132,67 @@ final class ArchiveManager extends FsManager {
         }
     } // ScheduledModel
 
+    @Override
+    public final FsController<?> newController(
+            final FsArchiveDriver<?> driver,
+            final FsModel model,
+            final FsController<?> parent) {
+        assert !(model instanceof LockModel);
+        final LockModel lmodel = new LockModel(model);
+        // HC SUNT DRACONES!
+        // The FalsePositiveArchiveController decorates the FinalizeController
+        // so that the decorated controller (chain) does not need to resolve
+        // operations on false positive archive files.
+        // The FinalizeController decorates the driver's controllers so that
+        // each and every resource which may get opened by the decorated
+        // controller (chain) is ensured to get closed.
+        // The driver's controllers decorate the LockController because the
+        // former shall not get guarded by the file system locks but should
+        // otherwise not need to be concerned with most other aspects of
+        // implementing a virtual file system - other than passing on a
+        // FalsePositiveException or a NeedsLockRetryException.
+        // The LockController decorates the SyncController so that
+        // the decorated controller (chain) doesn't need to be thread safe.
+        // The SyncController decorates the CacheController because the
+        // selective entry cache needs to get flushed on a NeedsSyncException.
+        // The CacheController decorates the ResourceController because the
+        // cache entries terminate streams and channels and shall not stop the
+        // decorated controller (chain) from getting synced.
+        // The ResourceController decorates the TargetArchiveController so that
+        // trying to sync the file system while any stream or channel to the
+        // latter is open gets detected and properly dealt with.
+        return  new FalsePositiveArchiveController(
+                    new FinalizeController(
+                        driver.decorate(
+                            new LockController(
+                                new SyncController(
+                                    new CacheController(driver.getIOPool(),
+                                        new ResourceController(
+                                            new TargetArchiveController<>(
+                                                driver, lmodel, parent))))))));
+    }
+
+    @Override
+    public synchronized int size() {
+        return schedulers.size();
+    }
+
+    @Override
+    public synchronized Iterator<FsController<?>> iterator() {
+        return controllers().iterator();
+    }
+
+    private Set<FsController<?>> controllers() {
+        final Set<FsController<?>>
+                snapshot = new TreeSet<>(ReverseControllerComparator.INSTANCE);
+        for (final Link<FsController<?>> link : schedulers.values()) {
+            final FsController<?> controller = target(link);
+            if (null != controller)
+                snapshot.add(controller);
+        }
+        return snapshot;
+    }
+
     /**
      * Orders file system controllers so that all file systems appear before
      * any of their parent file systems.
@@ -210,9 +203,16 @@ final class ArchiveManager extends FsManager {
                 = new ReverseControllerComparator();
 
         @Override
-        public int compare(FsController<?> o1, FsController<?> o2) {
-            return o2.getModel().getMountPoint().toHierarchicalUri()
-                    .compareTo(o1.getModel().getMountPoint().toHierarchicalUri());
+        public int compare(FsController<?> a, FsController<?> b) {
+            return b.getModel().getMountPoint().toHierarchicalUri()
+                    .compareTo(a.getModel().getMountPoint().toHierarchicalUri());
         }
     } // ReverseControllerComparator
+
+    @Override
+    public void sync(BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
+        SyncShutdownHook.cancel();
+        super.sync(options);
+    }
 }

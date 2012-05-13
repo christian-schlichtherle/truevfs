@@ -21,9 +21,9 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-class FalsePositiveArchiveException extends ControlFlowException {
+public class FalsePositiveArchiveException extends ControlFlowException {
 
-    FalsePositiveArchiveException(IOException cause) {
+    public FalsePositiveArchiveException(IOException cause) {
         super(cause);
     }
 

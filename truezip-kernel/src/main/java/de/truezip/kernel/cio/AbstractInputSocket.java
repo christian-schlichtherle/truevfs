@@ -27,12 +27,12 @@ implements InputSocket<E> {
     private @CheckForNull OutputSocket<?> peer;
 
     @Override
-    public final OutputSocket<?> getPeerSocket() {
+    public final OutputSocket<? extends Entry> getPeerSocket() {
         return peer;
     }
 
     @Override
-    public final InputSocket<E> bind(final InputSocket<?> to) {
+    public final InputSocket<E> bind(final InputSocket<? extends Entry> to) {
         if (this == to)
             throw new IllegalArgumentException();
         this.peer = to.getPeerSocket();
@@ -40,7 +40,8 @@ implements InputSocket<E> {
     }
 
     @Override
-    public final InputSocket<E> connect(final @CheckForNull OutputSocket<?> np) {
+    public final InputSocket<E> connect(
+            final @CheckForNull OutputSocket<? extends Entry> np) {
         final OutputSocket<?> op = peer;
         if (op != np) {
             if (null != op) {

@@ -149,10 +149,10 @@ extends FsDriver {
      * {@code model.getParent().equals(parent.getModel())} is {@code true}.
      */
     @Override
-    public final FsController<?> newController(
+    public final FsController<? extends FsModel> newController(
             FsManager manager,
             FsModel model,
-            @Nonnull FsController<?> parent) {
+            @Nonnull FsController<? extends FsModel> parent) {
         assert parent.getModel().equals(model.getParent());
         return manager.newController(this, model, parent);
     }

@@ -21,10 +21,10 @@ public abstract class FsAbstractCompositeDriver
 implements FsCompositeDriver, FsDriverProvider {
 
     @Override
-    public final FsController<?> newController(
+    public final FsController<? extends FsModel> newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController<?> parent) {
+            final @CheckForNull FsController<? extends FsModel> parent) {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());

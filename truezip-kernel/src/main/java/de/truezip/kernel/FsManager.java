@@ -20,7 +20,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsManager implements Iterable<FsController<?>> {
+public abstract class FsManager
+implements Iterable<FsController<? extends FsModel>> {
 
     /**
      * Returns a thread-safe file system controller for the given mount point.
@@ -34,7 +35,7 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      *         create a new file system controller if required.
      * @return A thread-safe file system controller for the given mount point.
      */
-    public abstract FsController<?> controller(
+    public abstract FsController<? extends FsModel> controller(
             FsCompositeDriver driver,
             FsMountPoint mountPoint);
 
@@ -46,10 +47,10 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      * @param parent the parent file system controller.
      * @return A new archive file system controller.
      */
-    public abstract FsController<?> newController(
-            FsArchiveDriver<?> driver,
+    public abstract FsController<? extends FsModel> newController(
+            FsArchiveDriver<? extends FsArchiveEntry> driver,
             FsModel model,
-            FsController<?> parent);
+            FsController<? extends FsModel> parent);
 
     /**
      * Returns the number of federated file systems managed by this instance.
@@ -72,7 +73,7 @@ public abstract class FsManager implements Iterable<FsController<?>> {
      *         managed by this instance.
      */
     @Override
-    public abstract Iterator<FsController<?>> iterator();
+    public abstract Iterator<FsController<? extends FsModel>> iterator();
 
     /**
      * Commits all unsynchronized changes to the contents of all federated file

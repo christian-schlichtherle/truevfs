@@ -16,12 +16,12 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-final class NeedsLockRetryException extends ControlFlowException {
+public final class NeedsLockRetryException extends ControlFlowException {
 
     private static final @Nullable NeedsLockRetryException
             SINGLETON = TRACEABLE ? null : new NeedsLockRetryException();
 
-    static NeedsLockRetryException get() {
+    public static NeedsLockRetryException get() {
         return TRACEABLE ? new NeedsLockRetryException() : SINGLETON;
     }
 

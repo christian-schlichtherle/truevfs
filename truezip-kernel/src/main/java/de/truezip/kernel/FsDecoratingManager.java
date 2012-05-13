@@ -32,16 +32,16 @@ extends FsManager {
     }
 
     @Override
-    public FsController<?>
+    public FsController<? extends FsModel>
     controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
         return manager.controller(driver, mountPoint);
     }
 
     @Override
-    public FsController<?> newController(
-            FsArchiveDriver<?> driver,
+    public FsController<? extends FsModel> newController(
+            FsArchiveDriver<? extends FsArchiveEntry> driver,
             FsModel model,
-            FsController<?> parent) {
+            FsController<? extends FsModel> parent) {
         assert false : "This method should never get called on this class!";
         return manager.newController(driver, model, parent);
     }
@@ -52,7 +52,7 @@ extends FsManager {
     }
 
     @Override
-    public Iterator<FsController<?>> iterator() {
+    public Iterator<FsController<? extends FsModel>> iterator() {
         return manager.iterator();
     }
 
