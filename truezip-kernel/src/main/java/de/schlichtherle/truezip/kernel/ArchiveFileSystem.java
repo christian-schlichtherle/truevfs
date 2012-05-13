@@ -50,7 +50,7 @@ implements Iterable<FsCovariantEntry<E>> {
     private final FsArchiveDriver<E> driver;
     private final EntryTable<E> master;
 
-    /** Whether or not this file system has been modified (touched). */
+    /** Whether or not this file system has been modified. */
     private boolean touched;
 
     private @CheckForNull ArchiveFileSystemTouchListener<? super E>
@@ -79,7 +79,7 @@ implements Iterable<FsCovariantEntry<E>> {
         for (final Access access : ALL_ACCESS)
             root.setTime(access, time);
         master.add(ROOT_PATH, root);
-        this.touched = true;
+        touched = true;
     }
 
     /**
@@ -122,9 +122,10 @@ implements Iterable<FsCovariantEntry<E>> {
             : new ArchiveFileSystem<>(driver, archive, rootTemplate);
     }
 
-    ArchiveFileSystem(final FsArchiveDriver<E> driver,
-                        final @WillNotClose Container<E> archive,
-                        final @CheckForNull Entry rootTemplate) {
+    ArchiveFileSystem(
+            final FsArchiveDriver<E> driver,
+            final @WillNotClose Container<E> archive,
+            final @CheckForNull Entry rootTemplate) {
         // Allocate some extra capacity to create missing parent directories.
         this(driver, new EntryTable<E>(initialCapacity(archive.size() + OVERHEAD_SIZE)));
         // Load entries from source archive.
@@ -146,8 +147,7 @@ implements Iterable<FsCovariantEntry<E>> {
         // Now perform a file system check to create missing parent directories
         // and populate directories with their members - this must be done
         // separately!
-        for (final String path : paths)
-            fix(path);
+        for (final String path : paths) fix(path);
     }
 
     private ArchiveFileSystem(
@@ -680,20 +680,20 @@ implements Iterable<FsCovariantEntry<E>> {
             return map.values().iterator();
         }
 
-        FsCovariantEntry<E> add(final String path, final E ae) {
-            FsCovariantEntry<E> ce = map.get(path);
+        FsCovariantEntry<E> add(final String name, final E ae) {
+            FsCovariantEntry<E> ce = map.get(name);
             if (null == ce)
-                map.put(path, ce = new FsCovariantEntry<>(path));
+                map.put(name, ce = new FsCovariantEntry<>(name));
             ce.putEntry(ae.getType(), ae);
             return ce;
         }
 
-        @Nullable FsCovariantEntry<E> get(String path) {
-            return map.get(path);
+        @Nullable FsCovariantEntry<E> get(String name) {
+            return map.get(name);
         }
 
-        @Nullable FsCovariantEntry<E> remove(String path) {
-            return map.remove(path);
+        @Nullable FsCovariantEntry<E> remove(String name) {
+            return map.remove(name);
         }
     } // EntryTable
 }
