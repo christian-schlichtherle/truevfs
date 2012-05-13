@@ -53,12 +53,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public InputStream stream() throws IOException {
-                return new FinalizeInputStream(getBoundSocket().stream());
+                return new FinalizeInputStream(boundSocket().stream());
             }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return new FinalizeSeekableChannel(getBoundSocket().channel());
+                return new FinalizeSeekableChannel(boundSocket().channel());
             }
         } // Input
 
@@ -78,12 +78,12 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public OutputStream stream() throws IOException {
-                return new FinalizeOutputStream(getBoundSocket().stream());
+                return new FinalizeOutputStream(boundSocket().stream());
             }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return new FinalizeSeekableChannel(getBoundSocket().channel());
+                return new FinalizeSeekableChannel(boundSocket().channel());
             }
         } // Output
 

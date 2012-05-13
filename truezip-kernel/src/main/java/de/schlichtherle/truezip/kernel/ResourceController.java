@@ -53,12 +53,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public InputStream stream() throws IOException {
-                return new ResourceInputStream(getBoundSocket().stream());
+                return new ResourceInputStream(boundSocket().stream());
             }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return new ResourceSeekableChannel(getBoundSocket().channel());
+                return new ResourceSeekableChannel(boundSocket().channel());
             }
         } // Input
 
@@ -78,12 +78,12 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
             @Override
             public OutputStream stream() throws IOException {
-                return new ResourceOutputStream(getBoundSocket().stream());
+                return new ResourceOutputStream(boundSocket().stream());
             }
 
             @Override
             public SeekableByteChannel channel() throws IOException {
-                return new ResourceSeekableChannel(getBoundSocket().channel());
+                return new ResourceSeekableChannel(boundSocket().channel());
             }
         } // Output
 

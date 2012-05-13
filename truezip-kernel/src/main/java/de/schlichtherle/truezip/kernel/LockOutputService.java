@@ -28,7 +28,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-class LockOutputService<E extends Entry>
+public class LockOutputService<E extends Entry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     /** The lock on which this object synchronizes. */
@@ -39,7 +39,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * 
      * @param output the service to decorate.
      */
-    LockOutputService(@WillCloseWhenClosed OutputService<E> output) {
+    public LockOutputService(@WillCloseWhenClosed OutputService<E> output) {
         super(output);
     }
 
@@ -100,7 +100,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 final OutputStream in;
                 lock.lock();
                 try {
-                    in = getBoundSocket().stream();
+                    in = boundSocket().stream();
                 } finally {
                     lock.unlock();
                 }
@@ -113,7 +113,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 final SeekableByteChannel channel;
                 lock.lock();
                 try {
-                    channel = getBoundSocket().channel();
+                    channel = boundSocket().channel();
                 } finally {
                     lock.unlock();
                 }

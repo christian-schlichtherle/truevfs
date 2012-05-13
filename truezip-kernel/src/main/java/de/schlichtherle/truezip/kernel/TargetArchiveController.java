@@ -294,7 +294,7 @@ implements ArchiveFileSystemTouchListener<E> {
     InputSocket<E> input(final String name) {
         class Input extends ClutchInputSocket<E> {
             @Override
-            protected InputSocket<E> socket() throws IOException {
+            protected InputSocket<E> lazySocket() throws IOException {
                 return getInputArchive().input(name);
             }
 
@@ -335,7 +335,7 @@ implements ArchiveFileSystemTouchListener<E> {
             final E entry) {
         final class Output extends ClutchOutputSocket<E> {
             @Override
-            protected OutputSocket<E> socket() throws IOException {
+            protected OutputSocket<E> lazySocket() throws IOException {
                 return outputArchive(options).output(entry);
             }
 

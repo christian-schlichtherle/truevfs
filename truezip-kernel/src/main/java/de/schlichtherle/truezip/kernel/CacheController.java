@@ -40,9 +40,9 @@ import javax.annotation.concurrent.NotThreadSafe;
  * <ul>
  * <li>Caching and buffering for an entry needs to get activated by using the
  *     method
- *     {@link #input input socket} with the input option
+ *     {@link #input input lazySocket} with the input option
  *     {@link FsAccessOption#CACHE} or the method
- *     {@link #output output socket} with the output option
+ *     {@link #output output lazySocket} with the output option
  *     {@link FsAccessOption#CACHE}.
  * <li>Unless a write operation succeeds, upon each read operation the entry
  *     data gets copied from the backing store for buffering purposes only.
@@ -98,10 +98,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     public InputSocket<?> input(
             final BitField<FsAccessOption> options, final FsEntryName name) {
-        /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
+        /** This class requires ON-DEMAND LOOKUP of its delegate lazySocket! */
         class Input extends DelegatingInputSocket<Entry> {
             @Override
-            protected InputSocket<?> getSocket() {
+            protected InputSocket<?> socket() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
@@ -121,10 +121,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     public OutputSocket<?> output(
             final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
     final Entry template) {
-        /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
+        /** This class requires ON-DEMAND LOOKUP of its delegate lazySocket! */
         class Output extends DelegatingOutputSocket<Entry> {
             @Override
-            protected OutputSocket<?> getSocket() {
+            protected OutputSocket<?> socket() {
                 assert isWriteLockedByCurrentThread();
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
@@ -257,15 +257,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             this.cache = WRITE_BACK.newCache(pool);
         }
 
-        InputSocket<?> input(BitField<FsAccessOption> options) {
-            return cache.configure(new Input(options)).input();
-        }
-
-        OutputSocket<?> output( BitField<FsAccessOption> options,
-                                @CheckForNull Entry template) {
-            return new Output(options, template);
-        }
-
         void flush() throws IOException {
             cache.flush();
         }
@@ -276,6 +267,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
         void register() {
             caches.put(name, this);
+        }
+
+        InputSocket<?> input(BitField<FsAccessOption> options) {
+            return cache.configure(new Input(options)).input();
         }
 
         /**
@@ -291,15 +286,15 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
 
             @Override
-            public Entry localTarget() throws IOException {
-                // Bypass the super class implementation to keep the
-                // socket even upon an exception!
-                return getBoundSocket().localTarget();
+            protected InputSocket<? extends Entry> lazySocket() {
+                return controller.input(options, name);
             }
 
             @Override
-            protected InputSocket<? extends Entry> socket() {
-                return controller.input(options, name);
+            public Entry localTarget() throws IOException {
+                // Bypass the super class implementation to keep the
+                // lazySocket even upon an exception!
+                return boundSocket().localTarget();
             }
 
             @Override
@@ -311,7 +306,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                         // Bypass the super class implementation to keep the
                         // channel even upon an exception!
                         //super(Input.super.stream());
-                        super(getBoundSocket().stream());
+                        super(boundSocket().stream());
                         assert getModel().isTouched();
                     }
 
@@ -332,6 +327,11 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
         } // Input
 
+        OutputSocket<?> output( BitField<FsAccessOption> options,
+                                @CheckForNull Entry template) {
+            return new Output(options, template);
+        }
+
         /**
          * This class requires LAZY INITIALIZATION of its channel, but NO
          * automatic decoupling on exceptions!
@@ -348,7 +348,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             }
 
             @Override
-            protected OutputSocket<? extends Entry> socket() {
+            protected OutputSocket<? extends Entry> lazySocket() {
                 return cache.configure( controller.output(
                                             options.clear(EXCLUSIVE), name,
                                             template))
@@ -358,8 +358,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             @Override
             public Entry localTarget() throws IOException {
                 // Bypass the super class implementation to keep the
-                // socket even upon an exception!
-                return getBoundSocket().localTarget();
+                // lazySocket even upon an exception!
+                return boundSocket().localTarget();
             }
 
             @Override
@@ -373,9 +373,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 @CreatesObligation
                 Stream() throws IOException {
                     // Bypass the super class implementation to keep the
-                    // socket even upon an exception!
+                    // lazySocket even upon an exception!
                     //super(Output.super.stream());
-                    super(getBoundSocket().stream());
+                    super(boundSocket().stream());
                     register();
                 }
 
@@ -399,9 +399,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 @CreatesObligation
                 Channel() throws IOException {
                     // Bypass the super class implementation to keep the
-                    // socket even upon an exception!
+                    // lazySocket even upon an exception!
                     //super(Output.super.channel());
-                    super(getBoundSocket().channel());
+                    super(boundSocket().channel());
                     register();
                 }
 

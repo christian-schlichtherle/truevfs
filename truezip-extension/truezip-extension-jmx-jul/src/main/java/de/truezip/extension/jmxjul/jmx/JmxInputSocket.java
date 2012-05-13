@@ -29,11 +29,11 @@ extends InstrumentingInputSocket<E> {
 
     @Override
     public InputStream stream() throws IOException {
-        return new JmxInputStream(getBoundSocket().stream(), stats);
+        return new JmxInputStream(boundSocket().stream(), stats);
     }
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        return new JmxSeekableChannel(getBoundSocket().channel(), stats);
+        return new JmxSeekableChannel(boundSocket().channel(), stats);
     }
 }

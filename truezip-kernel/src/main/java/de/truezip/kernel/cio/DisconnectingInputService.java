@@ -104,7 +104,7 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
-        protected InputSocket<? extends E> getSocket() throws IOException {
+        protected InputSocket<? extends E> socket() throws IOException {
             checkOpenService();
             return socket;
         }
@@ -112,13 +112,13 @@ extends DecoratingInputService<E, InputService<E>> {
         @Override
         public InputStream stream() throws IOException {
             return new DisconnectingInputStream(
-                    getBoundSocket().stream());
+                    boundSocket().stream());
         }
 
         @Override
         public SeekableByteChannel channel() throws IOException {
             return new DisconnectingSeekableChannel(
-                    getBoundSocket().channel());
+                    boundSocket().channel());
         }
     } // Input
 

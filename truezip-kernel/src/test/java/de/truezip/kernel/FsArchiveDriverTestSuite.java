@@ -456,14 +456,14 @@ extends FsArchiveDriverTestBase<D> {
                 public InputStream stream()
                 throws IOException {
                     return new TestInputStream(
-                            getBoundSocket().stream());
+                            boundSocket().stream());
                 }
 
                 @Override
                 public SeekableByteChannel channel()
                 throws IOException {
                     return new TestSeekableChannel(
-                            getBoundSocket().channel());
+                            boundSocket().channel());
                 }
             } // Input
 
@@ -487,14 +487,14 @@ extends FsArchiveDriverTestBase<D> {
                 public SeekableByteChannel channel()
                 throws IOException {
                     return new TestSeekableChannel(
-                            getBoundSocket().channel());
+                            boundSocket().channel());
                 }
 
                 @Override
                 public OutputStream stream()
                 throws IOException {
                     return new TestOutputStream(
-                            getBoundSocket().stream());
+                            boundSocket().stream());
                 }
             } // Output
 

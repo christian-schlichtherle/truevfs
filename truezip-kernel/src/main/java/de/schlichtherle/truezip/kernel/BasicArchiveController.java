@@ -161,7 +161,7 @@ extends LockModelController {
             }
 
             @Override
-            protected InputSocket<E> getSocket() throws IOException {
+            protected InputSocket<E> socket() throws IOException {
                 final FsArchiveEntry ae = localTarget();
                 final Type type = ae.getType();
                 if (FILE != type)
