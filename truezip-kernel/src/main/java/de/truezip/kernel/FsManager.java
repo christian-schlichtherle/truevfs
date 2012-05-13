@@ -61,16 +61,14 @@ implements Iterable<FsController<? extends FsModel>> {
 
     /**
      * Returns an iterator over the controllers of all federated file systems
-     * managed by this instance.
-     * <p>
-     * Note that the iterated file system controllers must be ordered so that
-     * all file systems appear before any of their parent file systems.
-     * <p>
+     * managed by this instance in sorted order.
+     * The iterated file system controllers must be ordered so that all file
+     * systems appear before any of their parent file systems.
      * Last, but not least: The iterator must be consistent in multithreaded
      * environments!
      *
      * @return An iterator over the controllers of all federated file systems
-     *         managed by this instance.
+     *         managed by this instance in sorted order.
      */
     @Override
     public abstract Iterator<FsController<? extends FsModel>> iterator();
