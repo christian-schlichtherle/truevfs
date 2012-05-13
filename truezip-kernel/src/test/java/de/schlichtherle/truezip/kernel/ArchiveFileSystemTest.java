@@ -4,10 +4,15 @@
  */
 package de.schlichtherle.truezip.kernel;
 
+import de.schlichtherle.truezip.kernel.ArchiveFileSystem.TouchListener;
+import static de.schlichtherle.truezip.kernel.ArchiveFileSystem.newEmptyFileSystem;
+import de.truezip.kernel.FsAccessOption;
 import static de.truezip.kernel.FsAccessOptions.NONE;
+import de.truezip.kernel.FsCovariantEntry;
+import de.truezip.kernel.FsEntryName;
 import static de.truezip.kernel.FsEntryName.ROOT;
 import static de.truezip.kernel.FsEntryName.SEPARATOR;
-import de.truezip.kernel.*;
+import de.truezip.kernel.TestConfig;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
@@ -39,36 +44,29 @@ public final class ArchiveFileSystemTest {
     }
 
     @Test
-    public void testListeners() throws TooManyListenersException {
-        final ArchiveFileSystem<?>
-                fs = ArchiveFileSystem.newEmptyFileSystem(
-                    new MockArchiveDriver());
+    public void testListener() throws TooManyListenersException {
+        final ArchiveFileSystem<?> fs =
+                newEmptyFileSystem(new MockArchiveDriver());
 
-        try {
-            fs.addArchiveFileSystemTouchListener(null);
-        } catch (NullPointerException expected) {
-        }
-        assertThat(fs.getArchiveFileSystemTouchListeners(), notNullValue());
-        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(0));
+        assertThat(fs.getTouchListener(), is(nullValue()));
 
         final Listener listener1 = new Listener(fs);
-        fs.addArchiveFileSystemTouchListener(listener1);
-        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(1));
+        fs.setTouchListener(listener1);
+        assertThat(fs.getTouchListener(), is(sameInstance((TouchListener) listener1)));
 
         try {
-            fs.addArchiveFileSystemTouchListener(new Listener(fs));
+            fs.setTouchListener(new Listener(fs));
             fail();
-        } catch (TooManyListenersException expected) {
+        } catch (IllegalStateException expected) {
         }
-        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(1));
+        assertThat(fs.getTouchListener(), is(sameInstance((TouchListener) listener1)));
 
-        fs.removeArchiveFileSystemTouchListener(listener1);
-        fs.removeArchiveFileSystemTouchListener(listener1);
-        assertThat(fs.getArchiveFileSystemTouchListeners().length, is(0));
+        fs.setTouchListener(null);
+        fs.setTouchListener(null);
+        assertThat(fs.getTouchListener(), is(nullValue()));
     }
 
-    private static class Listener
-    implements ArchiveFileSystemTouchListener<FsArchiveEntry> {
+    private static class Listener implements TouchListener {
         final ArchiveFileSystem<?> fileSystem;
 
         Listener(final ArchiveFileSystem<?> fileSystem) {
@@ -76,15 +74,7 @@ public final class ArchiveFileSystemTest {
         }
 
         @Override
-        public void preTouch(BitField<FsAccessOption> options, ArchiveFileSystemEvent<?> event) {
-            assertThat(event, notNullValue());
-            assertThat(event.getSource(), sameInstance((Object) fileSystem));
-        }
-
-        @Override
-        public void postTouch(BitField<FsAccessOption> options, ArchiveFileSystemEvent<?> event) {
-            assertThat(event, notNullValue());
-            assertThat(event.getSource(), sameInstance((Object) fileSystem));
+        public void preTouch(BitField<FsAccessOption> options) {
         }
     }
 

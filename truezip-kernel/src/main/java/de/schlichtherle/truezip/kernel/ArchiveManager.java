@@ -80,12 +80,13 @@ final class ArchiveManager extends FsManager {
     }
 
     /**
-     * A model which schedules its controller for
-     * {@link #sync(BitField) synchronization} by &quot;observing&quot; its
-     * {@code touched} property.
-     * Extending its sub-class to register for updates to the {@code touched}
-     * property is simpler, faster and requires a smaller memory footprint than
-     * the alternative observer pattern.
+   * A model which schedules its controller for
+   * {@linkplain #sync(BitField) synchronization} by &quot;observing&quot; its
+   * {@code touched} property.
+   * <p>
+   * Extending the super-class to register for updates to the {@code touched}
+   * property is simpler, faster and requires a smaller memory footprint than
+   * the alternative observer pattern.
      */
     private final class ScheduledModel extends FsModel {
         FsController<?> controller;
@@ -179,10 +180,10 @@ final class ArchiveManager extends FsManager {
 
     @Override
     public synchronized Iterator<FsController<?>> iterator() {
-        return controllers().iterator();
+        return sortedControllers().iterator();
     }
 
-    private Set<FsController<?>> controllers() {
+    private Set<FsController<?>> sortedControllers() {
         final Set<FsController<?>>
                 snapshot = new TreeSet<>(ReverseControllerComparator.INSTANCE);
         for (final Link<FsController<?>> link : schedulers.values()) {

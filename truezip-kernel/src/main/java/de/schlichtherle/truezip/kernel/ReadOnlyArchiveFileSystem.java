@@ -79,7 +79,7 @@ extends ArchiveFileSystem<E> {
     }
 
     @Override
-    ArchiveFileSystemOperation<E> mknod(
+    Mknod mknod(
             BitField<FsAccessOption> options,
             FsEntryName name,
             Entry.Type type,

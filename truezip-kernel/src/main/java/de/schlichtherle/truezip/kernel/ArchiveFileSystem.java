@@ -53,8 +53,7 @@ implements Iterable<FsCovariantEntry<E>> {
     /** Whether or not this file system has been modified. */
     private boolean touched;
 
-    private @CheckForNull ArchiveFileSystemTouchListener<? super E>
-            touchListener;
+    private @CheckForNull TouchListener touchListener;
 
     /**
      * Returns a new empty archive file system and ensures its integrity.
@@ -308,7 +307,7 @@ implements Iterable<FsCovariantEntry<E>> {
      *         be linked into this archive file system upon a call to its
      *         {@link ArchiveFileSystemOperation#commit} method.
      */
-    ArchiveFileSystemOperation<E> mknod(
+    Mknod mknod(
             final BitField<FsAccessOption> options,
             final FsEntryName name,
             final Entry.Type type,
@@ -332,7 +331,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
         if (template instanceof FsCovariantEntry<?>)
             template = ((FsCovariantEntry<?>) template).getEntry(type);
-        return new PathLink(options, path, type, template);
+        return new Mknod(options, path, type, template);
     }
 
     private static String typeName(final FsCovariantEntry<?> entry) {
@@ -347,57 +346,65 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * TODO: This implementation yields a potential issue: The state of the
-     * file system may be altered between the construction of an instance and
-     * the call to the {@link #commit} method, which may render the operation
-     * illegal and corrupt the file system.
-     * As long as only the ArchiveControllers in this package are used, this
-     * should not happen, however.
+     * Represents an {@linkplain #mknod} transaction.
+     * The transaction get committed by calling {@link #commit}.
+     * The state of the archive file system will not change until this method
+     * gets called.
+     * The head of the chain of covariant file system entries to commit can get
+     * obtained by calling {@link #head}.
+     * <p>
+     * TODO: The current implementation yields a potential issue: The state of
+     * the file system may get altered between the construction of this
+     * transaction and the call to its {@link #commit} method.
+     * However, the change may render this operation illegal and so the file
+     * system may get corrupted upon a call to {@link #commit}.
+     * To avoid this, the caller must not allow concurrent changes to this
+     * archive file system.
      */
-    private final class PathLink implements ArchiveFileSystemOperation<E> {
+    final class Mknod {
         final BitField<FsAccessOption> options;
-        final SegmentLink<E>[] links;
         long time = UNKNOWN;
+        final Segment<E>[] segments;
 
-        PathLink(
+        private Mknod(
                 final BitField<FsAccessOption> options,
                 final String path,
                 final Entry.Type type,
                 final @CheckForNull Entry template)
         throws IOException {
             this.options = options;
-            links = newSegmentLinks(1, path, type, template);
+            segments = newSegments(1, path, type, template);
         }
 
         @SuppressWarnings("unchecked")
-        private SegmentLink<E>[] newSegmentLinks(
+        private Segment<E>[] newSegments(
                 final int level,
                 final String path,
                 final Entry.Type type,
-                @CheckForNull final Entry template)
+                final @CheckForNull Entry template)
         throws IOException {
             splitter.split(path);
             final String parentPath = splitter.getParentPath(); // could equal ROOT_PATH
             final String memberName = splitter.getMemberName();
-            final SegmentLink<E>[] elements;
 
             // Lookup parent entry, creating it if necessary and allowed.
+            final Segment<E>[] elements;
             final FsCovariantEntry<E> parentEntry = master.get(parentPath);
             final FsCovariantEntry<E> newEntry;
             if (null != parentEntry) {
                 if (!parentEntry.isType(DIRECTORY))
                     throw new NotDirectoryException(path);
-                elements = new SegmentLink[level + 1];
-                elements[0] = new SegmentLink<>(null, parentEntry);
+                elements = new Segment[level + 1];
+                elements[0] = new Segment<>(null, parentEntry);
                 newEntry = new FsCovariantEntry<>(path);
                 newEntry.putEntry(type, newEntry(options, path, type, template));
-                elements[1] = new SegmentLink<>(memberName, newEntry);
+                elements[1] = new Segment<>(memberName, newEntry);
             } else if (options.get(CREATE_PARENTS)) {
-                elements = newSegmentLinks(level + 1, parentPath, DIRECTORY, null);
+                elements = newSegments(level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<>(path);
                 newEntry.putEntry(type, newEntry(options, path, type, template));
                 elements[elements.length - level]
-                        = new SegmentLink<>(memberName, newEntry);
+                        = new Segment<>(memberName, newEntry);
             } else {
                 throw new NoSuchFileException(path, null,
                         "Missing parent directory entry!");
@@ -405,16 +412,16 @@ implements Iterable<FsCovariantEntry<E>> {
             return elements;
         }
 
-        @Override
-        public void commit() throws IOException {
-            assert 2 <= links.length;
+        /** Executes this archive file system operation. */
+        void commit() throws IOException {
+            assert 2 <= segments.length;
 
             touch(options);
-            final int size = links.length;
-            FsCovariantEntry<E> parentCE = links[0].entry;
+            final int size = segments.length;
+            FsCovariantEntry<E> parentCE = segments[0].entry;
             E parentAE = parentCE.getEntry(DIRECTORY);
             for (int i = 1; i < size ; i++) {
-                final SegmentLink<E> link = links[i];
+                final Segment<E> link = segments[i];
                 final FsCovariantEntry<E> entryCE = link.entry;
                 final E entryAE = entryCE.getEntry();
                 master.add(entryCE.getName(), entryAE);
@@ -432,41 +439,32 @@ implements Iterable<FsCovariantEntry<E>> {
             return UNKNOWN != time ? time : (time = System.currentTimeMillis());
         }
 
-        @Override
-        public FsCovariantEntry<E> get() {
-            return links[links.length - 1].get();
+        FsCovariantEntry<E> head() {
+            return segments[segments.length - 1].entry;
         }
-    } // class PathLink
+    } // Mknod
 
     /**
-     * A data class which represents a segment for use by
-     * {@link PathLink}.
+     * A case class which represents a segment for use by {@link Mknod}.
      * 
      * @param <E> The type of the archive entries.
      */
-    private static final class SegmentLink<E extends FsArchiveEntry>
-    implements Link<FsCovariantEntry<E>> {
+    private static final class Segment<E extends FsArchiveEntry> {
         final @Nullable String member;
         final FsCovariantEntry<E> entry;
 
         /**
          * Constructs a new {@code SegmentLink}.
          *
-         * @param base the nullable base name of the entry name.
-         * @param entry the non-{@code null} file system entry for the entry
-         *        name.
+         * @param member the nullable member name of the entry name.
+         * @param entry the covariant file system entry for the member name.
          */
-        SegmentLink(final @CheckForNull String base,
-                    final FsCovariantEntry<E> entry) {
+        Segment(final @CheckForNull String member,
+                final FsCovariantEntry<E> entry) {
+            this.member = member;
             this.entry = entry;
-            this.member = base;
         }
-
-        @Override
-        public FsCovariantEntry<E> get() {
-            return entry;
-        }
-    } // class SegmentLink
+    } // Segment
 
     /**
      * Tests the named file system entry and then - unless its the file system
@@ -527,30 +525,6 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * Marks this (virtual) archive file system as touched and notifies the
-     * listener if and only if the touch status is changing.
-     *
-     * @throws IOException If the listener's preTouch implementation vetoed
-     *         the operation for any reason.
-     */
-    private void touch(final BitField<FsAccessOption> options)
-    throws IOException {
-        if (!touched) {
-            final ArchiveFileSystemTouchListener<? super E> tl = touchListener;
-            if (null != tl) {
-                final ArchiveFileSystemEvent<E>
-                        e = new ArchiveFileSystemEvent<>(this);
-                // HC SUNT DRACONES!
-                tl.preTouch(options, e);
-                touched = true;
-                tl.postTouch(options, e);
-            } else {
-                touched = true;
-            }
-        }
-    }
-
-    /**
      * Returns a new archive entry.
      * This is just a factory method and the returned file system entry is not
      * (yet) linked into this (virtual) archive file system.
@@ -599,42 +573,52 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * Returns a protective copy of the set of archive file system listeners.
+     * Marks this (virtual) archive file system as touched and notifies the
+     * listener if and only if the touch status is changing.
      *
-     * @return A clone of the set of archive file system listeners.
+     * @throws IOException If the listener's preTouch implementation vetoed
+     *         the operation for any reason.
      */
-    @SuppressWarnings("unchecked")
-    final ArchiveFileSystemTouchListener<? super E>[]
-    getArchiveFileSystemTouchListeners() {
-        return null == touchListener
-                ? new ArchiveFileSystemTouchListener[0]
-                : new ArchiveFileSystemTouchListener[] { touchListener };
+    private void touch(final BitField<FsAccessOption> options)
+    throws IOException {
+        if (!touched) {
+            final TouchListener tl = touchListener;
+            if (null != tl) tl.preTouch(options);
+            touched = true;
+        }
+    }
+
+    /** Gets the archive file system touch listener. */
+    final TouchListener getTouchListener() {
+        return touchListener;
     }
 
     /**
-     * Adds the given listener to the set of archive file system listeners.
+     * Sets the archive file system touch listener.
      *
      * @param  listener the listener for archive file system events.
-     * @throws TooManyListenersException if a listener has already been added.
+     * @throws IllegalStateException if {@code listener} is not null and the
+     *         touch listener has already been set.
      */
-    final void addArchiveFileSystemTouchListener(
-            final ArchiveFileSystemTouchListener<? super E> listener)
-    throws TooManyListenersException {
-        if (null != touchListener)
-            throw new TooManyListenersException();
-        touchListener = Objects.requireNonNull(listener);
+    final void setTouchListener(final TouchListener listener) {
+        if (null != listener && null != touchListener)
+            throw new IllegalStateException("The touch listener has already been set!");
+        touchListener = listener;
     }
 
-    /**
-     * Removes the given listener from the set of archive file system listeners.
-     *
-     * @param  listener the listener for archive file system events.
-     */
-    final void removeArchiveFileSystemTouchListener(
-            final @CheckForNull ArchiveFileSystemTouchListener<? super E> listener) {
-        if (touchListener == listener)
-            touchListener = null;
-    }
+    /** Used to notify implementations of an event in this file system. */
+    @SuppressWarnings("PackageVisibleInnerClass")
+    interface TouchListener extends EventListener {
+        /**
+         * Called immediately before the source archive file system is going to
+         * get modified (touched) for the first time.
+         * If this method throws an {@code IOException}), then the modification
+         * is effectively vetoed.
+         *
+         * @throws IOException at the discretion of the implementation.
+         */
+        void preTouch(BitField<FsAccessOption> options) throws IOException;
+    } // TouchListener
 
     /** Splits a given path name into its parent path name and base name. */
     private static final class PathSplitter
