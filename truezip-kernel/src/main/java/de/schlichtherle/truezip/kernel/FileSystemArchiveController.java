@@ -103,7 +103,7 @@ extends BasicArchiveController<E> {
             checkWriteLockedByCurrentThread();
             mount(options, autoCreate);
             assert this != mountState;
-            return mountState.autoMount(options, autoCreate);
+            return mountState.getFileSystem();
         }
 
         @Override
