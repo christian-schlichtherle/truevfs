@@ -49,33 +49,27 @@ public final class FsDefaultManager extends FsManager {
     public synchronized FsController<?> getController(
             FsMountPoint mountPoint,
             FsCompositeDriver driver) {
-        return getController(mountPoint, driver, null);
+        return getController0(mountPoint, driver);
     }
 
-    private FsController<?> getController(
+    private FsController<?> getController0(
             final FsMountPoint mountPoint,
-            final FsCompositeDriver driver,
-            @CheckForNull FsController<?> parent) {
+            final FsCompositeDriver driver) {
         if (null == mountPoint.getParent()) {
-            if (null != parent)
-                throw new IllegalArgumentException("Parent/member mismatch!");
-            final FsModel model = new FsDefaultModel(mountPoint, null);
-            return driver.newController(model, null);
+            final FsModel m = new FsDefaultModel(mountPoint, null);
+            return driver.newController(m, null);
         }
-        FsFalsePositiveController
-                controller = getTarget(schedulers.get(mountPoint));
-        if (null == controller) {
-            if (null == parent)
-                parent = getController(mountPoint.getParent(), driver, null);
-            final ScheduledModel model = new ScheduledModel(
-                    mountPoint, parent.getModel());
+        FsFalsePositiveController c = getTarget(schedulers.get(mountPoint));
+        if (null == c) {
+            final FsController<?> p = getController0(mountPoint.getParent(), driver);
+            final ScheduledModel m = new ScheduledModel(mountPoint, p.getModel());
             // HC SUNT DRACONES!
-            model.setController(controller =
+            m.setController(c =
                     new FsFalsePositiveController(
-                            new FsFinalizeController<FsModel>(
-                                driver.newController(model, parent))));
+                        new FsFinalizeController<FsModel>(
+                            driver.newController(m, p))));
         }
-        return controller;
+        return c;
     }
 
     @Override
