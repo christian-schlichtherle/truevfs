@@ -380,15 +380,6 @@ implements ArchiveFileSystem.TouchListener {
         // The Disconnecting(In|Out)putService should not get skipped however:
         // If these would throw an (In|Out)putClosedException, then this would
         // be an artifact of a bug.
-        final OutputService<E> os;
-        {
-            final OutputArchive<E> oa = outputArchive;
-            if (null == oa || oa.isClosed())
-                return;
-            assert !oa.isClosed();
-            os = oa.getClutch();
-        }
-
         final InputService<E> is;
         {
             final InputArchive<E> ia = inputArchive;
@@ -398,17 +389,17 @@ implements ArchiveFileSystem.TouchListener {
             is = null != ia ? ia.getClutch() : new DummyInputService<E>();
         }
 
-        copy(handler, getFileSystem(), is, os);
-    }
+        final OutputService<E> os;
+        {
+            final OutputArchive<E> oa = outputArchive;
+            if (null == oa || oa.isClosed())
+                return;
+            assert !oa.isClosed();
+            os = oa.getClutch();
+        }
 
-    private <E extends FsArchiveEntry> void copy(
-            final FsSyncExceptionBuilder handler,
-            final ArchiveFileSystem<E> fs,
-            final InputService<E> is,
-            final OutputService<E> os)
-    throws FsSyncException {
         IOException warning = null;
-        for (final FsCovariantEntry<E> fse : fs) {
+        for (final FsCovariantEntry<E> fse : getFileSystem()) {
             for (final E ae : fse.getEntries()) {
                 final String aen = ae.getName();
                 if (null == os.entry(aen)) {
