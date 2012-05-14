@@ -516,11 +516,8 @@ implements Iterable<E>, Closeable {
      * @throws IOException if any other I/O error occurs.
      */
     public void recoverLostEntries() throws IOException {
-        assertOpen();
-        assert null != rof; // makes FindBugs happy
         final long length = this.length;
-        final ReadOnlyFile
-                rof = new SafeBufferedReadOnlyFile(this.rof, length);
+        final ReadOnlyFile rof = new SafeBufferedReadOnlyFile(rof(), length);
         while (0 < this.postamble) {
             long fp = length - postamble;
             rof.seek(fp);
@@ -826,7 +823,7 @@ implements Iterable<E>, Closeable {
      */
     @CreatesObligation
     public InputStream getPreambleInputStream() throws IOException {
-        assertOpen();
+        rof();
         return new ReadOnlyFileInputStream(
                 new EntryReadOnlyFile(0, preamble));
     }
@@ -857,7 +854,7 @@ implements Iterable<E>, Closeable {
      */
     @CreatesObligation
     public InputStream getPostambleInputStream() throws IOException {
-        assertOpen();
+        rof();
         return new ReadOnlyFileInputStream(
                 new EntryReadOnlyFile(length - postamble, postamble));
     }
@@ -976,7 +973,7 @@ implements Iterable<E>, Closeable {
             @CheckForNull Boolean check,
             final boolean process)
     throws IOException {
-        assertOpen();
+        final ReadOnlyFile rof = rof();
         if (name == null)
             throw new NullPointerException();
         final ZipEntry entry = entries.get(name);
@@ -985,8 +982,6 @@ implements Iterable<E>, Closeable {
         long fp = entry.getOffset();
         assert UNKNOWN != fp;
         fp = mapper.map(fp);
-        final ReadOnlyFile rof = this.rof;
-        assert null != rof;
         rof.seek(fp);
         final byte[] lfh = new byte[LFH_MIN_LEN];
         rof.readFully(lfh);
@@ -1088,10 +1083,12 @@ implements Iterable<E>, Closeable {
         return (int) size;
     }
 
-    /** Asserts that this ZIP file is still open for reading its entries. */
-    final void assertOpen() throws ZipException {
-        if (null == this.rof)
+    /** Checks that this ZIP file is still open for reading its entries. */
+    private ReadOnlyFile rof() throws ZipException {
+        final ReadOnlyFile rof = this.rof;
+        if (null == rof)
             throw new ZipException("ZIP file closed!");
+        return rof;
     }
 
     /**
@@ -1122,8 +1119,7 @@ implements Iterable<E>, Closeable {
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         EntryReadOnlyFile(final long start, final long length)
         throws IOException {
-            super(RawZipFile.this.rof, start, length);
-            assert null != RawZipFile.this.rof;
+            super(rof(), start, length);
             RawZipFile.this.open++;
         }
 
