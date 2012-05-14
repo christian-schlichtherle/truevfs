@@ -703,7 +703,7 @@ implements Iterable<FsCovariantEntry<E>> {
         }
 
         Iterator<FsCovariantEntry<E>> iterator() {
-            return map.values().iterator();
+            return Collections.unmodifiableCollection(map.values()).iterator();
         }
 
         FsCovariantEntry<E> add(final String path, final E ae) {
