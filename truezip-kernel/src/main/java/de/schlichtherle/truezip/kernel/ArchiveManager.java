@@ -55,28 +55,23 @@ final class ArchiveManager extends FsManager {
     public synchronized FsController<?> controller(
             FsCompositeDriver driver,
             FsMountPoint mountPoint) {
-        return controller(driver, mountPoint, null);
+        return controller0(driver, mountPoint);
     }
 
-    private FsController<?> controller(
+    private FsController<?> controller0(
             final FsCompositeDriver driver,
-            final FsMountPoint mountPoint,
-            @CheckForNull FsController<?> parent) {
+            final FsMountPoint mountPoint) {
         if (null == mountPoint.getParent()) {
-            if (null != parent)
-                throw new IllegalArgumentException("Parent/member mismatch!");
-            final FsModel model = new FsModel(mountPoint, null);
-            return driver.newController(this, model, null);
+            final FsModel m = new FsModel(mountPoint, null);
+            return driver.newController(this, m, null);
         }
-        FsController<? extends FsModel> controller = target(schedulers.get(mountPoint));
-        if (null == controller) {
-            if (null == parent)
-                parent = controller(driver, mountPoint.getParent(), null);
-            final ScheduledModel model = new ScheduledModel(
-                    mountPoint, parent.getModel());
-            model.setController(controller = driver.newController(this, model, parent));
+        FsController<? extends FsModel> c = target(schedulers.get(mountPoint));
+        if (null == c) {
+            final FsController<?> p = controller0(driver, mountPoint.getParent());
+            final ScheduledModel m = new ScheduledModel(mountPoint, p.getModel());
+            m.setController(c = driver.newController(this, m, p));
         }
-        return controller;
+        return c;
     }
 
     /**
