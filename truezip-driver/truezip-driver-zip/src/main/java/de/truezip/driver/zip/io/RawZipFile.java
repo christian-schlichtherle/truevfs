@@ -490,9 +490,9 @@ implements Closeable, Iterable<E> {
      */
     public RawZipFile<E> recoverLostEntries()
     throws ZipException, EOFException, IOException {
+        final long length = this.length;
         final SeekableByteChannel
                 channel = new SafeBufferedReadOnlyChannel(channel(), length);
-        final long length = this.length;
         while (0 < postamble) {
             long pos = length - postamble;
             final PowerBuffer lfh = PowerBuffer
@@ -1051,7 +1051,7 @@ implements Closeable, Iterable<E> {
         return (int) size;
     }
 
-    /** Asserts that this ZIP file is still open for reading its entries. */
+    /** Checks that this ZIP file is still open for reading its entries. */
     private SeekableByteChannel channel() throws ZipException {
         final SeekableByteChannel channel = this.channel;
         if (null == channel)
