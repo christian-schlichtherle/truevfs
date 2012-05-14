@@ -85,7 +85,7 @@ extends FsArchiveController<E> {
             checkWriteLockedByCurrentThread();
             mount(autoCreate);
             assert this != mountState;
-            return mountState.autoMount(autoCreate);
+            return mountState.getFileSystem();
         }
 
         @Override
