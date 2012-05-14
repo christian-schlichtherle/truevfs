@@ -72,7 +72,7 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     private ArchiveFileSystem(final FsArchiveDriver<E> driver) {
-        this(driver, new EntryTable<E>(initialCapacity(OVERHEAD_SIZE)));
+        this(driver, new EntryTable<E>(OVERHEAD_SIZE));
         final E root = newEntry(ROOT_PATH, DIRECTORY, null);
         final long time = System.currentTimeMillis();
         for (final Access access : ALL_ACCESS)
@@ -126,7 +126,7 @@ implements Iterable<FsCovariantEntry<E>> {
             final @WillNotClose Container<E> archive,
             final @CheckForNull Entry rootTemplate) {
         // Allocate some extra capacity to create missing parent directories.
-        this(driver, new EntryTable<E>(initialCapacity(archive.size() + OVERHEAD_SIZE)));
+        this(driver, new EntryTable<E>(archive.size() + OVERHEAD_SIZE));
         // Load entries from source archive.
         final List<String> paths = new ArrayList<>(archive.size());
         final PathNormalizer normalizer = new PathNormalizer(SEPARATOR_CHAR);
@@ -653,8 +653,8 @@ implements Iterable<FsCovariantEntry<E>> {
          */
         final Map<String, FsCovariantEntry<E>> map;
 
-        EntryTable(int initialCapacity) {
-            this.map = new LinkedHashMap<>(initialCapacity);
+        EntryTable(int initialSize) {
+            this.map = new LinkedHashMap<>(initialCapacity(initialSize));
         }
 
         int size() {
