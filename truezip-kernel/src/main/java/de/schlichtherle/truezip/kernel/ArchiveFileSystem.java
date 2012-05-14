@@ -130,12 +130,12 @@ implements Iterable<FsCovariantEntry<E>> {
         // Load entries from source archive.
         final List<String> paths = new ArrayList<>(archive.size());
         final PathNormalizer normalizer = new PathNormalizer(SEPARATOR_CHAR);
-        for (final E entry : archive) {
+        for (final E ae : archive) {
             final String path = cutTrailingSeparators(
                 normalizer.normalize(
-                    entry.getName().replace('\\', SEPARATOR_CHAR)), // fix illegal Windoze file name separators
+                    ae.getName().replace('\\', SEPARATOR_CHAR)), // fix illegal Windoze file name separators
                 SEPARATOR_CHAR);
-            master.add(path, entry);
+            master.add(path, ae);
             if (!path.startsWith(SEPARATOR)
                     && !(".." + SEPARATOR).startsWith(path.substring(0, Math.min(3, path.length()))))
                 paths.add(path);
@@ -174,13 +174,13 @@ implements Iterable<FsCovariantEntry<E>> {
         // directory as its parameter, so we may NOT skip the following test.
         if (!isRoot(name)) {
             splitter.split(name);
-            final String parentPath = splitter.getParentPath();
-            final String memberName = splitter.getMemberName();
-            FsCovariantEntry<E> parent = master.get(parentPath);
-            if (null == parent || !parent.isType(DIRECTORY))
-                parent = master.add(parentPath, newEntry(parentPath, DIRECTORY, null));
-            parent.add(memberName);
-            fix(parentPath);
+            final String pp = splitter.getParentPath();
+            final String mn = splitter.getMemberName();
+            FsCovariantEntry<E> pce = master.get(pp);
+            if (null == pce || !pce.isType(DIRECTORY))
+                pce = master.add(pp, newEntry(pp, DIRECTORY, null));
+            pce.add(mn);
+            fix(pp);
         }
     }
 
@@ -221,8 +221,8 @@ implements Iterable<FsCovariantEntry<E>> {
     final FsCovariantEntry<E> stat(
             final BitField<FsAccessOption> options,
             final FsEntryName name) {
-        final FsCovariantEntry<E> entry = master.get(name.getPath());
-        return null == entry ? null : entry.clone(driver);
+        final FsCovariantEntry<E> ce = master.get(name.getPath());
+        return null == ce ? null : ce.clone(driver);
     }
 
     void checkAccess(
@@ -311,27 +311,28 @@ implements Iterable<FsCovariantEntry<E>> {
             final BitField<FsAccessOption> options,
             final FsEntryName name,
             final Entry.Type type,
-            @CheckForNull Entry template)
+            final @CheckForNull Entry template)
     throws IOException {
         Objects.requireNonNull(type);
         if (FILE != type && DIRECTORY != type) // TODO: Add support for other types.
             throw new FileSystemException(name.toString(), null,
                     "Can only create file or directory entries, but not a " + typeName(type) + " entry!");
         final String path = name.getPath();
-        final FsCovariantEntry<E> oldEntry = master.get(path);
-        if (null != oldEntry) {
-            if (!oldEntry.isType(FILE))
+        final FsCovariantEntry<E> ce = master.get(path);
+        if (null != ce) {
+            if (!ce.isType(FILE))
                 throw new FileAlreadyExistsException(name.toString(), null,
-                        "Cannot replace a " + typeName(oldEntry) + " entry!");
+                        "Cannot replace a " + typeName(ce) + " entry!");
             if (FILE != type)
                 throw new FileAlreadyExistsException(name.toString(), null,
                         "Can only replace a file entry with a file entry, but not a " + typeName(type) + " entry!");
             if (options.get(EXCLUSIVE))
                 throw new FileAlreadyExistsException(name.toString());
         }
-        if (template instanceof FsCovariantEntry<?>)
-            template = ((FsCovariantEntry<?>) template).getEntry(type);
-        return new Mknod(options, path, type, template);
+        final Entry e = template instanceof FsCovariantEntry<?>
+                ? ((FsCovariantEntry<?>) template).getEntry(type)
+                : template;
+        return new Mknod(options, path, type, e);
     }
 
     private static String typeName(final FsCovariantEntry<?> entry) {
@@ -388,28 +389,28 @@ implements Iterable<FsCovariantEntry<E>> {
             final String memberName = splitter.getMemberName();
 
             // Lookup parent entry, creating it if necessary and allowed.
-            final Segment<E>[] elements;
-            final FsCovariantEntry<E> parentEntry = master.get(parentPath);
-            final FsCovariantEntry<E> newEntry;
-            if (null != parentEntry) {
-                if (!parentEntry.isType(DIRECTORY))
+            final Segment<E>[] segments;
+            final FsCovariantEntry<E> pce = master.get(parentPath);
+            final FsCovariantEntry<E> mce;
+            if (null != pce) {
+                if (!pce.isType(DIRECTORY))
                     throw new NotDirectoryException(path);
-                elements = new Segment[level + 1];
-                elements[0] = new Segment<>(null, parentEntry);
-                newEntry = new FsCovariantEntry<>(path);
-                newEntry.putEntry(type, newEntry(options, path, type, template));
-                elements[1] = new Segment<>(memberName, newEntry);
+                segments = new Segment[level + 1];
+                segments[0] = new Segment<>(null, pce);
+                mce = new FsCovariantEntry<>(path);
+                mce.putEntry(type, newEntry(options, path, type, template));
+                segments[1] = new Segment<>(memberName, mce);
             } else if (options.get(CREATE_PARENTS)) {
-                elements = newSegments(level + 1, parentPath, DIRECTORY, null);
-                newEntry = new FsCovariantEntry<>(path);
-                newEntry.putEntry(type, newEntry(options, path, type, template));
-                elements[elements.length - level]
-                        = new Segment<>(memberName, newEntry);
+                segments = newSegments(level + 1, parentPath, DIRECTORY, null);
+                mce = new FsCovariantEntry<>(path);
+                mce.putEntry(type, newEntry(options, path, type, template));
+                segments[segments.length - level]
+                        = new Segment<>(memberName, mce);
             } else {
                 throw new NoSuchFileException(path, null,
                         "Missing parent directory entry!");
             }
-            return elements;
+            return segments;
         }
 
         /** Executes this archive file system operation. */
@@ -418,21 +419,21 @@ implements Iterable<FsCovariantEntry<E>> {
 
             touch(options);
             final int size = segments.length;
-            FsCovariantEntry<E> parentCE = segments[0].entry;
-            E parentAE = parentCE.getEntry(DIRECTORY);
+            FsCovariantEntry<E> pce = segments[0].entry;
+            E pae = pce.getEntry(DIRECTORY);
             for (int i = 1; i < size ; i++) {
                 final Segment<E> segment = segments[i];
-                final FsCovariantEntry<E> memberCE = segment.entry;
-                final E memberAE = memberCE.getEntry();
-                master.add(memberCE.getName(), memberAE);
-                if (master.get(parentCE.getName()).add(segment.name)
-                        && UNKNOWN != parentAE.getTime(WRITE)) // never touch ghost directories!
-                    parentAE.setTime(WRITE, getTimeMillis());
-                parentCE = memberCE;
-                parentAE = memberAE;
+                final FsCovariantEntry<E> mce = segment.entry;
+                final E mae = mce.getEntry();
+                master.add(mce.getName(), mae);
+                if (master.get(pce.getName()).add(segment.name)
+                        && UNKNOWN != pae.getTime(WRITE)) // never touch ghost directories!
+                    pae.setTime(WRITE, getTimeMillis());
+                pce = mce;
+                pae = mae;
             }
-            if (UNKNOWN == parentAE.getTime(WRITE))
-                parentAE.setTime(WRITE, getTimeMillis());
+            if (UNKNOWN == pae.getTime(WRITE))
+                pae.setTime(WRITE, getTimeMillis());
         }
 
         private long getTimeMillis() {
@@ -483,17 +484,17 @@ implements Iterable<FsCovariantEntry<E>> {
     throws IOException {
         // Test.
         final String path = name.getPath();
-        final FsCovariantEntry<E> ce = master.get(path);
-        if (null == ce)
+        final FsCovariantEntry<E> mce = master.get(path);
+        if (null == mce)
             throw new NoSuchFileException(name.toString());
-        if (ce.isType(DIRECTORY)) {
-            final int size = ce.getMembers().size();
+        if (mce.isType(DIRECTORY)) {
+            final int size = mce.getMembers().size();
             if (0 != size)
                 throw new DirectoryNotEmptyException(name.toString());
         }
         if (name.isRoot()) {
             // Removing the root entry MUST get silently ignored in order to
-            // make the controller logic work, even when facing ControlFlow
+            // make the controller logic work.
             return;
         }
 
@@ -507,15 +508,15 @@ implements Iterable<FsCovariantEntry<E>> {
             // already physically present in the archive file (ZIP).
             // This signal will be ignored by drivers which do no support a
             // central directory (TAR).
-            final E ae = ce.getEntry();
+            final E mae = mce.getEntry();
             for (final Size type : ALL_SIZES)
-                ae.setSize(type, UNKNOWN);
+                mae.setSize(type, UNKNOWN);
             for (final Access type : ALL_ACCESS)
-                ae.setTime(type, UNKNOWN);
+                mae.setTime(type, UNKNOWN);
         }
         splitter.split(path);
-        final String parentPath = splitter.getParentPath();
-        final FsCovariantEntry<E> pce = master.get(parentPath);
+        final String pp = splitter.getParentPath();
+        final FsCovariantEntry<E> pce = master.get(pp);
         assert null != pce : "The parent directory of \"" + name.toString()
                     + "\" is missing - archive file system is corrupted!";
         final boolean ok = pce.remove(splitter.getMemberName());
