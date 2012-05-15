@@ -65,11 +65,6 @@ public class HttpController extends FsAbstractController<FsModel>  {
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
-        return false;
-    }
-
-    @Override
     public HttpEntry stat(
             final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {

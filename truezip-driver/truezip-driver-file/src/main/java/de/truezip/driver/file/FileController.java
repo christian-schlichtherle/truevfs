@@ -57,11 +57,6 @@ final class FileController extends FsAbstractController<FsModel>  {
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
-        return false;
-    }
-
-    @Override
     public FileEntry stat(
             final BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {

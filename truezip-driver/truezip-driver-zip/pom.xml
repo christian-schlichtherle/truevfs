@@ -27,12 +27,12 @@
     </description>
 
     <dependencies>
-        <!--dependency>
+        <dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-kernel-ee</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
-        </dependency-->
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truezip-file</artifactId>

@@ -42,11 +42,6 @@ extends FsAbstractController<M> {
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
-        return controller.isReadOnly();
-    }
-
-    @Override
     public @Nullable FsEntry stat(
             BitField<FsAccessOption> options,
             FsEntryName name)

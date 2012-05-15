@@ -194,19 +194,6 @@ implements Iterable<FsCovariantEntry<E>> {
     }
 
     /**
-     * Returns {@code true} if and only if this archive file system is
-     * read-only.
-     * <p>
-     * The implementation in the class {@link ArchiveFileSystem} always
-     * returns {@code false}.
-     * 
-     * @return Whether or not the this archive file system is read-only.
-     */
-    boolean isReadOnly() {
-        return false;
-    }
-
-    /**
      * Returns a covariant file system entry or {@code null} if no file system
      * entry exists for the given name.
      * Modifying the returned object graph is either not supported (i.e. throws
@@ -234,11 +221,9 @@ implements Iterable<FsCovariantEntry<E>> {
             throw new NoSuchFileException(name.toString());
     }
 
-    final void setReadOnly(FsEntryName name)
-    throws IOException {
-        if (!isReadOnly())
-            throw new FileSystemException(name.toString(), null,
-                "Cannot set read-only state!");
+    void setReadOnly(FsEntryName name) throws IOException {
+        throw new FileSystemException(name.toString(), null,
+            "Cannot set read-only state!");
     }
 
     boolean setTime(
