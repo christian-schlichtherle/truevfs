@@ -68,17 +68,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
-        while (true) {
-            try {
-                return controller.isReadOnly();
-            } catch (NeedsSyncException ex) {
-                sync(ex);
-            }
-        }
-    }
-
-    @Override
     public FsEntry stat(BitField<FsAccessOption> options, final FsEntryName name)
     throws IOException {
         while (true) {

@@ -110,17 +110,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
-        class IsReadOnly implements IOOperation<Boolean> {
-            @Override
-            public Boolean apply() throws IOException {
-                return controller.isReadOnly();
-            }
-        }
-        return timedReadOrWriteLocked(new IsReadOnly());
-    }
-
-    @Override
     public FsEntry stat(
             final BitField<FsAccessOption> options,
             final FsEntryName name)

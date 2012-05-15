@@ -81,12 +81,6 @@ public class MockController extends FsAbstractController<FsModel> {
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
-        checkAllExceptions(this);
-        return false;
-    }
-
-    @Override
     public FsEntry stat(
             BitField<FsAccessOption> options, FsEntryName name)
     throws IOException {

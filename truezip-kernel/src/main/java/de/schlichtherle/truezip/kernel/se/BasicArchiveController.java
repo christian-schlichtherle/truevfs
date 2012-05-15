@@ -97,11 +97,6 @@ extends LockModelController {
     throws IOException;
 
     @Override
-    public final boolean isReadOnly() throws IOException {
-        return autoMount(NONE).isReadOnly();
-    }
-
-    @Override
     public final FsEntry stat(
             BitField<FsAccessOption> options,
             FsEntryName name)

@@ -37,17 +37,6 @@ extends ArchiveFileSystem<E> {
         super(driver, archive, rootTemplate);
     }
 
-    /**
-     * Returns {@code true} to indicate that this archive file system is
-     * read-only.
-     * 
-     * @return {@code true}
-     */
-    @Override
-    boolean isReadOnly() {
-        return true;
-    }
-
     @Override
     void checkAccess(
             final BitField<FsAccessOption> options,
@@ -58,6 +47,9 @@ extends ArchiveFileSystem<E> {
             throw new FsReadOnlyFileSystemException();
         super.checkAccess(options, name, types);
     }
+
+    @Override
+    void setReadOnly(FsEntryName name) { }
 
     @Override
     boolean setTime(

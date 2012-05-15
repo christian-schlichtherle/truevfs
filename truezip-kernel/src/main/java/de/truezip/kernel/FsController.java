@@ -114,14 +114,6 @@ public interface FsController<M extends FsModel> {
     @Nullable FsController<? extends FsModel> getParent();
 
     /**
-     * Returns {@code true} if and only if the file system is read-only.
-     * 
-     * @return {@code true} if and only if the file system is read-only.
-     * @throws IOException on any I/O error.
-     */
-    boolean isReadOnly() throws IOException;
-
-    /**
      * Returns the file system entry for the given {@code name} or {@code null}
      * if it doesn't exist.
      * Modifying the returned entry does not show any effect on the file system

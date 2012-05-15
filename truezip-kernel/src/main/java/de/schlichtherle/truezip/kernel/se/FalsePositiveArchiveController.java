@@ -167,18 +167,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public boolean isReadOnly() throws IOException {
-        class IsReadOnly implements Operation<Boolean> {
-            @Override
-            public Boolean apply(FsController<?> c, FsEntryName n)
-            throws IOException {
-                return c.isReadOnly();
-            }
-        }
-        return apply(ROOT, new IsReadOnly());
-    }
-
-    @Override
     public @Nullable FsEntry stat(
             final BitField<FsAccessOption> options,
             final FsEntryName name)
