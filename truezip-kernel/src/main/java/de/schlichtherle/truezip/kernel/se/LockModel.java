@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
+import de.schlichtherle.truezip.kernel.NeedsWriteLockException;
 import de.truezip.kernel.FsDecoratingModel;
 import de.truezip.kernel.FsModel;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

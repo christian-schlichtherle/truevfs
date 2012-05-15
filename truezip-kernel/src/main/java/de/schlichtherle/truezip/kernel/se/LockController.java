@@ -2,11 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
-import static de.schlichtherle.truezip.kernel.LockingStrategy.FAST_LOCK;
-import de.schlichtherle.truezip.kernel.LockingStrategy.Operation;
-import static de.schlichtherle.truezip.kernel.LockingStrategy.TIMED_LOCK;
+import static de.schlichtherle.truezip.kernel.se.LockingStrategy.FAST_LOCK;
+import de.schlichtherle.truezip.kernel.se.LockingStrategy.Operation;
+import de.schlichtherle.truezip.kernel.NeedsWriteLockException;
+import static de.schlichtherle.truezip.kernel.se.LockingStrategy.TIMED_LOCK;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;

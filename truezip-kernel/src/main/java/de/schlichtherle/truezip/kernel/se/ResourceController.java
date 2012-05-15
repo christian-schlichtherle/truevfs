@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
+import de.schlichtherle.truezip.kernel.ResourceManager;
 import static de.truezip.kernel.FsSyncOption.FORCE_CLOSE_IO;
 import static de.truezip.kernel.FsSyncOption.WAIT_CLOSE_IO;
 import de.truezip.kernel.*;

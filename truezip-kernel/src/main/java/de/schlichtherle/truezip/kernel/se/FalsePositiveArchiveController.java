@@ -2,8 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
+import de.schlichtherle.truezip.kernel.ControlFlowException;
+import de.schlichtherle.truezip.kernel.FalsePositiveArchiveException;
+import de.schlichtherle.truezip.kernel.NeedsLockRetryException;
+import de.schlichtherle.truezip.kernel.PersistentFalsePositiveArchiveException;
 import static de.truezip.kernel.FsEntryName.ROOT;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
