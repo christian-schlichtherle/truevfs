@@ -147,7 +147,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *
      * @return An input socket for reading the cached entry data.
      */
-    public InputSocket<Entry> input() {
+    public InputSocket<? extends Entry> input() {
         class Input extends AbstractInputSocket<Entry> {
             @CheckForNull Buffer buffer;
 
@@ -184,7 +184,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      *
      * @return An output socket for writing the cached entry data.
      */
-    public OutputSocket<Entry> output() {
+    public OutputSocket<? extends Entry> output() {
         class Output extends AbstractOutputSocket<Entry> {
             @CheckForNull Buffer buffer;
 
