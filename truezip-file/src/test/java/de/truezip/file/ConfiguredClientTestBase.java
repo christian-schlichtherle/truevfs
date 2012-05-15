@@ -4,7 +4,7 @@
  */
 package de.truezip.file;
 
-import de.schlichtherle.truezip.kernel.ArchiveManagerService;
+import de.schlichtherle.truezip.kernel.se.ArchiveManagerService;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsArchiveDriverTestBase;
 import de.truezip.kernel.FsMountPoint;

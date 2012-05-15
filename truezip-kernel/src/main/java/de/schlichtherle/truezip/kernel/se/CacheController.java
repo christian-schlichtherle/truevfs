@@ -2,8 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
+import de.schlichtherle.truezip.kernel.CacheEntry;
+import de.schlichtherle.truezip.kernel.ClutchInputSocket;
+import de.schlichtherle.truezip.kernel.ClutchOutputSocket;
+import de.schlichtherle.truezip.kernel.NeedsSyncException;
 import static de.schlichtherle.truezip.kernel.CacheEntry.Strategy.WRITE_BACK;
 import static de.truezip.kernel.FsAccessOption.*;
 import static de.truezip.kernel.FsSyncOption.ABORT_CHANGES;

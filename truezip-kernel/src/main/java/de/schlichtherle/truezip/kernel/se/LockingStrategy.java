@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
+import de.schlichtherle.truezip.kernel.NeedsLockRetryException;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;

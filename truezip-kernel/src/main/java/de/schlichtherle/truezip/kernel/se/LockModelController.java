@@ -2,33 +2,32 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
-import de.truezip.kernel.FsController;
-import de.truezip.kernel.FsDecoratingController;
+import de.schlichtherle.truezip.kernel.NeedsWriteLockException;
+import de.truezip.kernel.FsAbstractController;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract file system controller which requires an
- * {@link LockModel} so that it can forward its additional method
- * calls to this model for the convenience of the sub-class.
+ * {@link LockModel} so that it can forward calls to its additional
+ * protected methods to this model for the convenience of sub-classes.
  *
- * @param  <C> The type of the decorated file system controller.
+ * @see    LockModel
  * @author Christian Schlichtherle
  */
 @Immutable
-abstract class DecoratingLockModelController<
-        C extends FsController<? extends LockModel>>
-extends FsDecoratingController<LockModel, C>  {
+abstract class LockModelController
+extends FsAbstractController<LockModel>  {
 
-    DecoratingLockModelController(C controller) {
-        super(controller);
+    LockModelController(LockModel model) {
+        super(model);
     }
 
     //
-    // These methods are an exact copy of LockModelController.*
+    // These methods are an exact copy of DecoratingLockModelController.*
     //
 
     ReadLock readLock() {

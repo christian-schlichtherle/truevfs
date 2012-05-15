@@ -4,7 +4,7 @@
  */
 package de.truezip.extension.jmxjul;
 
-import de.schlichtherle.truezip.kernel.ArchiveManagerService;
+import de.schlichtherle.truezip.kernel.se.ArchiveManagerService;
 import de.truezip.extension.jmxjul.jmx.JmxDirector;
 import de.truezip.extension.jmxjul.jul.JulDirector;
 import de.truezip.kernel.FsManager;

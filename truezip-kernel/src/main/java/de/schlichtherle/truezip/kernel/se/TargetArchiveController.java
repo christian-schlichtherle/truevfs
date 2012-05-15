@@ -2,10 +2,19 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.kernel;
+package de.schlichtherle.truezip.kernel.se;
 
-import static de.schlichtherle.truezip.kernel.ArchiveFileSystem.newEmptyFileSystem;
-import static de.schlichtherle.truezip.kernel.ArchiveFileSystem.newPopulatedFileSystem;
+import de.schlichtherle.truezip.kernel.ClutchInputSocket;
+import de.schlichtherle.truezip.kernel.ClutchOutputSocket;
+import de.schlichtherle.truezip.kernel.ControlFlowException;
+import de.schlichtherle.truezip.kernel.FalsePositiveArchiveException;
+import de.schlichtherle.truezip.kernel.LockInputService;
+import de.schlichtherle.truezip.kernel.LockOutputService;
+import de.schlichtherle.truezip.kernel.NeedsLockRetryException;
+import de.schlichtherle.truezip.kernel.NeedsSyncException;
+import de.schlichtherle.truezip.kernel.PersistentFalsePositiveArchiveException;
+import static de.schlichtherle.truezip.kernel.se.ArchiveFileSystem.newEmptyFileSystem;
+import static de.schlichtherle.truezip.kernel.se.ArchiveFileSystem.newPopulatedFileSystem;
 import static de.truezip.kernel.FsAccessOption.CACHE;
 import static de.truezip.kernel.FsAccessOption.GROW;
 import static de.truezip.kernel.FsAccessOptions.ACCESS_PREFERENCES_MASK;
