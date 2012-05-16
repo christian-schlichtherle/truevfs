@@ -2,8 +2,8 @@
 #macro(configuring $suffix $file $modules_need $artifactId)
 * Configuring Archive Detection
 
-    You may wonder how TrueZIP gets configured to treat a file name with a
-    $suffix suffix as a $file file instead of a plain old file.
+    You may be wondering how TrueZIP gets configured to treat a file name with
+    a $suffix suffix as a $file file instead of a plain old file.
     For now, let it suffice to say that TrueZIP follows the
     convention-over-configuration principle as much as possible,
     so there are reasonable defaults for everything in order to relieve you
@@ -11,16 +11,28 @@
 
     For the previous examples to work, the JARs of the driver $modules_need
     to be present on the run time class path.
-    You can achieve this by adding the Maven artifactId $artifactId as a
-    dependency to the POM of your Maven build.
+    You can do this by adding the Maven artifactId $artifactId as a dependency
+    to the POM of your Maven build.
 
     For more information about configuring the client APIs, please refer to the
     article
     {{{../truezip-file/configuration.html}Configuring TrueZIP File*}}.
 
+** False Positive Archive Files
+
+    Sometimes a file system entry may have a suffix which is configured to get
+    recognized as an archive file, however the file is not an archive file or
+    not even a file, e.g. a directory. This is called a
+    <false positive archive file> or <false positive> for short.
+
+    TrueZIP safely detects any false positives and treats them according to
+    their true state, that is, like a plain file or directory.
+    This finding will be remembered until the next call to <<<TVFS.umount()>>>,
+    so the performance impact is minimal.
+
 #end ## configuring
 #macro(cleaningUp)
-* Cleaning Up
+* Committing Changes / Cleaning Up
 
     If your application has created or changed one or more archive files,
     then these changes need to get committed sometime.

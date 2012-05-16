@@ -67,7 +67,7 @@ Getting started with a Shell
 $ mvn archetype:generate -B \
     -DarchetypeGroupId=de.schlichtherle.truezip \
     -DarchetypeArtifactId=truezip-archetype-file \
-    -DarchetypeVersion=LATEST \
+    -DarchetypeVersion=${project.version} \
     -DgroupId=com.company \
     -DartifactId=project \
     -Dversion=0.1-SNAPSHOT \
