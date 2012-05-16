@@ -89,84 +89,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public FsController<? extends FsModel> getParent() {
-        final FsController<?> parent = this.parent;
-        return null != parent ? parent : (this.parent = controller.getParent());
-    }
-
-    FsEntryName parent(FsEntryName name) {
-        return getPath().resolve(name).getEntryName();
-    }
-
-    private FsPath getPath() {
-        final FsPath path = this.path;
-        return null != path ? path : (this.path = getMountPoint().getPath());
-    }
-
-    private interface Operation<V> {
-        @Nullable V apply(FsController<?> controller, FsEntryName name)
-        throws IOException;
-    } // IOOperation
-
-    private interface State {
-        @Nullable <V> V apply(FsEntryName name, Operation<V> operation)
-        throws IOException;
-    } // State
-
-    @Immutable
-    private final class TryChild implements State {
-        @Override
-        public <V> V apply(FsEntryName name, Operation<V> operation)
-        throws IOException {
-            return operation.apply(controller, name);
-        }
-    } // TryChild
-
-    @Immutable
-    private final class UseParent implements State {
-        final IOException originalCause;
-
-        UseParent(final FalsePositiveArchiveException ex) {
-            this.originalCause = ex.getCause();
-        }
-
-        @Override
-        public <V> V apply(
-                final FsEntryName name,
-                final Operation<V> operation)
-        throws IOException {
-            try {
-                return operation.apply(getParent(), parent(name));
-            } catch (final FalsePositiveArchiveException ex) {
-                throw new AssertionError(ex);
-            } catch (final ControlFlowException ex) {
-                assert ex instanceof NeedsLockRetryException : ex;
-                throw ex;
-            } catch (final IOException ex) {
-                if (originalCause != ex)
-                    originalCause.addSuppressed(ex);
-                throw originalCause;
-            }
-        }
-    } // UseParent
-
-    @Nullable <V> V apply(
-            final FsEntryName name,
-            final Operation<V> operation)
-    throws IOException {
-        final State state = this.state;
-        try {
-            return state.apply(name, operation);
-        } catch (final PersistentFalsePositiveArchiveException ex) {
-            assert state instanceof TryChild;
-            return (this.state = new UseParent(ex)).apply(name, operation);
-        } catch (final FalsePositiveArchiveException ex) {
-            assert state instanceof TryChild;
-            return new UseParent(ex).apply(name, operation);
-        }
-    }
-
-    @Override
     public @Nullable FsEntry stat(
             final BitField<FsAccessOption> options,
             final FsEntryName name)
@@ -421,4 +343,82 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
         state = new TryChild();
     }
+
+    @Nullable <V> V apply(
+            final FsEntryName name,
+            final Operation<V> operation)
+    throws IOException {
+        final State state = this.state;
+        try {
+            return state.apply(name, operation);
+        } catch (final PersistentFalsePositiveArchiveException ex) {
+            assert state instanceof TryChild;
+            return (this.state = new UseParent(ex)).apply(name, operation);
+        } catch (final FalsePositiveArchiveException ex) {
+            assert state instanceof TryChild;
+            return new UseParent(ex).apply(name, operation);
+        }
+    }
+
+    @Override
+    public FsController<? extends FsModel> getParent() {
+        final FsController<?> parent = this.parent;
+        return null != parent ? parent : (this.parent = controller.getParent());
+    }
+
+    FsEntryName parent(FsEntryName name) {
+        return getPath().resolve(name).getEntryName();
+    }
+
+    private FsPath getPath() {
+        final FsPath path = this.path;
+        return null != path ? path : (this.path = getMountPoint().getPath());
+    }
+
+    private interface Operation<V> {
+        @Nullable V apply(FsController<?> controller, FsEntryName name)
+        throws IOException;
+    } // IOOperation
+
+    private interface State {
+        @Nullable <V> V apply(FsEntryName name, Operation<V> operation)
+        throws IOException;
+    } // State
+
+    @Immutable
+    private final class TryChild implements State {
+        @Override
+        public <V> V apply(FsEntryName name, Operation<V> operation)
+        throws IOException {
+            return operation.apply(controller, name);
+        }
+    } // TryChild
+
+    @Immutable
+    private final class UseParent implements State {
+        final IOException originalCause;
+
+        UseParent(final FalsePositiveArchiveException ex) {
+            this.originalCause = ex.getCause();
+        }
+
+        @Override
+        public <V> V apply(
+                final FsEntryName name,
+                final Operation<V> operation)
+        throws IOException {
+            try {
+                return operation.apply(getParent(), parent(name));
+            } catch (final FalsePositiveArchiveException ex) {
+                throw new AssertionError(ex);
+            } catch (final ControlFlowException ex) {
+                assert ex instanceof NeedsLockRetryException : ex;
+                throw ex;
+            } catch (final IOException ex) {
+                if (originalCause != ex)
+                    originalCause.addSuppressed(ex);
+                throw originalCause;
+            }
+        }
+    } // UseParent
 }
