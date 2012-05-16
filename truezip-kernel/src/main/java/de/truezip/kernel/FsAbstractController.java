@@ -77,8 +77,10 @@ implements FsController<M> {
             final Map<Access, Long> times)
     throws IOException {
         boolean ok = true;
-        for (final Map.Entry<Access, Long> e : times.entrySet())
-            ok &= setTime(options, name, BitField.of(e.getKey()), e.getValue());
+        for (final Map.Entry<Access, Long> e : times.entrySet()) {
+            final long value = e.getValue();
+            ok &= 0 <= value && setTime(options, name, BitField.of(e.getKey()), value);
+        }
         return ok;
     }
 
