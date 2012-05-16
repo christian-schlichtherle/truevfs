@@ -238,9 +238,9 @@ implements Iterable<FsCovariantEntry<E>> {
         touch(options);
         final E ae = ce.getEntry();
         boolean ok = true;
-        for (final Map.Entry<Access, Long> time : times.entrySet()) {
-            final long value = time.getValue();
-            ok &= 0 <= value && ae.setTime(time.getKey(), value);
+        for (final Map.Entry<Access, Long> e : times.entrySet()) {
+            final long value = e.getValue();
+            ok &= 0 <= value && ae.setTime(e.getKey(), value);
         }
         return ok;
     }
