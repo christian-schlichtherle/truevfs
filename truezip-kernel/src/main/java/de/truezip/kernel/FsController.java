@@ -185,8 +185,6 @@ public interface FsController<M extends FsModel> {
      * bit field for the file system entry with the given name.
      * If {@code false} is returned or an {@link IOException} is thrown, then
      * still some of the last access times may have been set.
-     * Whether or not this is an atomic operation is specific to the
-     * implementation.
      * 
      * @param  options the options for accessing the file system entry.
      * @param  name the name of the file system entry.
