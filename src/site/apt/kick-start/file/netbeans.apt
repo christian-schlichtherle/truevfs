@@ -49,7 +49,7 @@ Getting started with NetBeans
 
     You need to have the following software installed:
 
-    * {{{http://www.netbeans.org}NetBeans&#160;7.0}}
+    * {{{http://www.netbeans.org}NetBeans&#160;7.0}} or later.
 
     * JSE&#160;6 for applications using the TrueZIP&#160;File* API.
 

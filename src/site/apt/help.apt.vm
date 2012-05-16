@@ -7,18 +7,18 @@
 Getting Help
 
     The documentation on this site is generally split across modules,
-    so please check the section <<Sub-Modules>> in the navigation bar on the
+    so please check the section <Sub-Modules> in the navigation bar on the
     left of this page.
     If you need help with the client APIs, please check the comprehensive
-    {{{../apidocs/index.html}Javadoc}}.
+    {{{../apidocs/index.html}<<Javadoc>>}}.
     This is updated for every release, so it may be worth to recheck if have
     you been missing something in the past.
 
-    Please also check the {{{../faq.html}Frequently Asked Questions}}.
+    Please also check the {{{../faq.html}<<Frequently Asked Questions>>}}.
 
     For any bug report, improvement request, feature request, task request,
     help request etc. please subscribe to the
-    {{{../mail-lists.html}User Mailing List}} and post it there.
+    {{{../mail-lists.html}<<User Mailing List>>}} and post it there.
     If you have an account on {{{http://java.net}java.net}}, your subscription
     will get immediately accepted, otherwise you'll have to wait until it gets
     manually accepted.
@@ -27,12 +27,12 @@ Getting Help
 
     Once your question or issue has been regarded as a bug report, improvement
     request, feature request or task request it gets tracked in
-    {{{http://java.net/jira/browse/TRUEZIP}JIRA}}.
+    {{{http://java.net/jira/browse/TRUEZIP}<<JIRA>>}}.
     You can then use JIRA to monitor and discuss its progress, vote for it, add
     file attachments, download hotfixes etc.
     JIRA is also used to schedule new TrueZIP versions and prepare their
     Release Notes.
 
     Finally, if you want to stay up to date please check
-    {{{http://truezip.schlichtherle.de}The&#160;TrueZIP&#160;Blog}}
+    {{{http://truezip.schlichtherle.de}<<The&#160;TrueZIP&#160;Blog>>}}
     for the latest news and announcements.
