@@ -23,7 +23,7 @@ import javax.annotation.concurrent.ThreadSafe;
 final class LockModel extends FsDecoratingModel<FsModel> {
 
     /** The lock on which the file system controllers shall synchronize. */
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(true);
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     LockModel(FsModel model) {
         super(model);
