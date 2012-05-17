@@ -13,7 +13,6 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 import static de.schlichtherle.truezip.util.Links.getTarget;
 import java.io.IOException;
 import java.util.*;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
