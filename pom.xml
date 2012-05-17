@@ -290,7 +290,7 @@ system space.
                              See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
                              See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
                              -->
-                        <argLine>-server -Xms650m -Xmx650m -XX:+UseBiasedLocking</argLine>
+                        <argLine>-server -Xms650m -Xmx650m</argLine>
                         <systemPropertyVariables>
                             <!-- While running the tests with isolated
                                  file system managers yields better performance
