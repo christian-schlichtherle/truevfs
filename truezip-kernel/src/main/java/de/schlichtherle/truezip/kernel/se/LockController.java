@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.kernel.se;
 
+import de.schlichtherle.truezip.kernel.NeedsWriteLockException;
 import static de.schlichtherle.truezip.kernel.se.LockingStrategy.FAST_LOCK;
 import de.schlichtherle.truezip.kernel.se.LockingStrategy.Operation;
-import de.schlichtherle.truezip.kernel.NeedsWriteLockException;
 import static de.schlichtherle.truezip.kernel.se.LockingStrategy.TIMED_LOCK;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
@@ -75,38 +75,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     WriteLock writeLock() {
         return this.writeLock;
-    }
-
-    <T, X extends Exception> T fastWriteLocked(Operation<T, X> operation)
-    throws X {
-        assert !isReadLockedByCurrentThread()
-                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
-        return FAST_LOCK.apply(writeLock(), operation);
-    }
-
-    <T, X extends Exception> T timedReadOrWriteLocked(Operation<T, X> operation)
-    throws X {
-        try {
-            return timedReadLocked(operation);
-        } catch (NeedsWriteLockException discard) {
-            return timedWriteLocked(operation);
-        }
-    }
-
-    <T, X extends Exception> T timedReadLocked(Operation<T, X> operation)
-    throws X {
-        return TIMED_LOCK.apply(readLock(), operation);
-    }
-
-    <T, X extends Exception> T timedWriteLocked(Operation<T, X> operation)
-    throws X {
-        assert !isReadLockedByCurrentThread()
-                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
-        return TIMED_LOCK.apply(writeLock(), operation);
-    }
-
-    @SuppressWarnings("MarkerInterface")
-    private interface IOOperation<V> extends Operation<V, IOException> {
     }
 
     @Override
@@ -224,8 +192,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 }
                 return timedWriteLocked(new NewChannel());
             }
-
-        } // Input
+        }
         return new Input();
     }
 
@@ -273,9 +240,58 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 }
                 return timedWriteLocked(new NewChannel());
             }
-        } // Output
-
+        }
         return new Output();
+    }
+
+    private final class LockInputStream
+    extends DecoratingInputStream {
+        LockInputStream(@WillCloseWhenClosed InputStream in) {
+            super(in);
+        }
+
+        @Override
+        @DischargesObligation
+        public void close() throws IOException {
+            close(in);
+        }
+    } // LockInputStream
+
+    private final class LockOutputStream
+    extends DecoratingOutputStream {
+        LockOutputStream(@WillCloseWhenClosed OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        @DischargesObligation
+        public void close() throws IOException {
+            close(out);
+        }
+    } // LockOutputStream
+
+    private final class LockSeekableChannel
+    extends DecoratingSeekableChannel {
+        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+            super(channel);
+        }
+
+        @Override
+        @DischargesObligation
+        public void close() throws IOException {
+            close(channel);
+        }
+    } // LockSeekableChannel
+
+    void close(final Closeable closeable) throws IOException {
+        class Close implements IOOperation<Void> {
+            @Override
+            public Void apply() throws IOException {
+                closeable.close();
+                return null;
+            }
+        }
+        timedWriteLocked(new Close());
     }
 
     @Override
@@ -323,53 +339,35 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         timedWriteLocked(new Sync());
     }
 
-    void close(final Closeable closeable) throws IOException {
-        class Close implements IOOperation<Void> {
-            @Override
-            public Void apply() throws IOException {
-                closeable.close();
-                return null;
-            }
-        }
-        timedWriteLocked(new Close());
+    @SuppressWarnings("MarkerInterface")
+    private interface IOOperation<V> extends Operation<V, IOException> {
     }
 
-    private final class LockInputStream
-    extends DecoratingInputStream {
-        LockInputStream(@WillCloseWhenClosed InputStream in) {
-            super(in);
-        }
+    <T, X extends Exception> T fastWriteLocked(Operation<T, X> operation)
+    throws X {
+        assert !isReadLockedByCurrentThread()
+                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
+        return FAST_LOCK.apply(writeLock(), operation);
+    }
 
-        @Override
-        @DischargesObligation
-        public void close() throws IOException {
-            close(in);
+    <T, X extends Exception> T timedReadOrWriteLocked(Operation<T, X> operation)
+    throws X {
+        try {
+            return timedReadLocked(operation);
+        } catch (NeedsWriteLockException discard) {
+            return timedWriteLocked(operation);
         }
-    } // LockInputStream
+    }
 
-    private final class LockOutputStream
-    extends DecoratingOutputStream {
-        LockOutputStream(@WillCloseWhenClosed OutputStream out) {
-            super(out);
-        }
+    <T, X extends Exception> T timedReadLocked(Operation<T, X> operation)
+    throws X {
+        return TIMED_LOCK.apply(readLock(), operation);
+    }
 
-        @Override
-        @DischargesObligation
-        public void close() throws IOException {
-            close(out);
-        }
-    } // LockOutputStream
-
-    private final class LockSeekableChannel
-    extends DecoratingSeekableChannel {
-        LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
-            super(channel);
-        }
-
-        @Override
-        @DischargesObligation
-        public void close() throws IOException {
-            close(channel);
-        }
-    } // LockSeekableChannel
+    <T, X extends Exception> T timedWriteLocked(Operation<T, X> operation)
+    throws X {
+        assert !isReadLockedByCurrentThread()
+                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
+        return TIMED_LOCK.apply(writeLock(), operation);
+    }
 }
