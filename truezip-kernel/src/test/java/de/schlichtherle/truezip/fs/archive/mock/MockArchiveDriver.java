@@ -13,7 +13,7 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.Maps;
+import de.schlichtherle.truezip.util.HashMaps;
 import java.io.CharConversionException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -46,7 +46,7 @@ extends FsCharsetArchiveDriver<MockArchiveDriverEntry> {
             config = TestConfig.get();
         this.config = config;
         this.containers = new ConcurrentHashMap<FsMountPoint, MockArchiveDriverEntryContainer>(
-                Maps.initialCapacity(config.getNumEntries()));
+                HashMaps.initialCapacity(config.getNumEntries()));
     }
 
     private IOPoolProvider getIOPoolProvider() {

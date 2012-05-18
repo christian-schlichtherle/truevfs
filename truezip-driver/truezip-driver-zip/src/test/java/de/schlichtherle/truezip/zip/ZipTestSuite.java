@@ -10,7 +10,7 @@ import de.schlichtherle.truezip.util.ArrayHelper;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import de.schlichtherle.truezip.util.Maps;
+import de.schlichtherle.truezip.util.HashMaps;
 import static de.schlichtherle.truezip.zip.Constants.FORCE_ZIP64_EXT;
 import java.io.*;
 import java.nio.charset.Charset;
@@ -425,7 +425,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      */
     private void createTestZipFile(final int nEntries) throws IOException {
         final HashSet<String>
-                set = new HashSet<String>(Maps.initialCapacity(nEntries));
+                set = new HashSet<String>(HashMaps.initialCapacity(nEntries));
 
         {
             ZipOutputStream zout

@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.entry.Entry.Size;
 import de.schlichtherle.truezip.socket.ByteArrayIOBuffer;
 import de.schlichtherle.truezip.socket.IOEntry;
 import de.schlichtherle.truezip.util.ArrayHelper;
-import de.schlichtherle.truezip.util.Maps;
+import de.schlichtherle.truezip.util.HashMaps;
 import static de.schlichtherle.truezip.zip.ZipEntry.STORED;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ public final class ManySmallEntriesTest {
         final IOEntry<?> buffer = new ByteArrayIOBuffer("zip", ZIP_SIZE);
         final byte[] data = DATA_STRING.getBytes(DATA_CHARSET);
         final HashSet<String> set = new HashSet<String>(
-                Maps.initialCapacity(NUM_ENTRIES));
+                HashMaps.initialCapacity(NUM_ENTRIES));
 
         final ZipOutputStream zos = new ZipOutputStream(
                 buffer.getOutputSocket().newOutputStream());

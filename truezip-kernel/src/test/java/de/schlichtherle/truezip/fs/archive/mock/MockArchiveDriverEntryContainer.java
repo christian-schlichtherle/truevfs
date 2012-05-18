@@ -14,7 +14,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
-import de.schlichtherle.truezip.util.Maps;
+import de.schlichtherle.truezip.util.HashMaps;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +44,7 @@ implements EntryContainer<MockArchiveDriverEntry> {
             config = TestConfig.get();
         return new MockArchiveDriverEntryContainer(
                 new LinkedHashMap<String, MockArchiveDriverEntry>(
-                    Maps.initialCapacity(config.getNumEntries())),
+                    HashMaps.initialCapacity(config.getNumEntries())),
                 config);
     }
 

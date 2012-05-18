@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
-import de.schlichtherle.truezip.util.Maps;
+import de.schlichtherle.truezip.util.HashMaps;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.net.URISyntaxException;
@@ -62,7 +62,7 @@ public abstract class FsDriverService implements FsDriverProvider {
      */
     public static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
         final Map<FsScheme, FsDriver> drivers = new HashMap<FsScheme, FsDriver>(
-                Maps.initialCapacity(config.length) * 2); // heuristics
+                HashMaps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = toSchemes(param[0]);
             final FsDriver newDriver = ServiceLocator

@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.ExceptionHandler;
-import de.schlichtherle.truezip.util.Maps;
+import de.schlichtherle.truezip.util.HashMaps;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,7 +47,7 @@ final class FsResourceManager {
      * available processors, a 90% blocking factor for typical I/O and a 2/3
      * map resize threshold.
      */
-    private static final int INITIAL_CAPACITY = Maps.initialCapacity(
+    private static final int INITIAL_CAPACITY = HashMaps.initialCapacity(
             Runtime.getRuntime().availableProcessors() * 10);
 
     /**

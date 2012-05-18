@@ -10,7 +10,7 @@ import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsScheme;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.spi.FsDriverService;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;
 import java.net.URISyntaxException;

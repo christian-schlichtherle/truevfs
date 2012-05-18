@@ -24,6 +24,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
+import de.schlichtherle.truezip.util.HashMaps;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -324,17 +325,17 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link ZipDriver}
-     * returns {@code ZipOutputStream#OVERHEAD_SIZE}.
+     * returns {@code HashMaps#OVERHEAD_SIZE}.
      * 
      * @since      TrueZIP 7.3
-     * @return     {@code ZipOutputStream#OVERHEAD_SIZE}
+     * @return     {@code HashMaps#OVERHEAD_SIZE}
      * @deprecated This method is reserved for future use - do <em>not</em> use
      *             or override this method!
      */
     @Deprecated
     @Override
     public int getOverheadSize() {
-        return ZipOutputStream.OVERHEAD_SIZE;
+        return HashMaps.OVERHEAD_SIZE;
     }
 
     /**
