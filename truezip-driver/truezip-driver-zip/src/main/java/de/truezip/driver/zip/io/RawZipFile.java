@@ -11,7 +11,7 @@ import static de.truezip.driver.zip.io.WinZipAesUtils.overhead;
 import static de.truezip.driver.zip.io.ZipEntry.*;
 import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
 import de.truezip.kernel.io.*;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;

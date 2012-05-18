@@ -11,8 +11,8 @@ import static de.truezip.kernel.cio.Entry.Size.DATA;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.*;
-import de.truezip.kernel.util.Maps;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.OVERHEAD_SIZE;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -45,12 +45,6 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 @NotThreadSafe
 public final class TarOutputService
 implements OutputService<TarDriverEntry> {
-
-    /**
-     * The number of entries which can be initially accomodated by
-     * the internal hash map without resizing it, which is {@value}.
-     */
-    public static final int OVERHEAD_SIZE = Maps.OVERHEAD_SIZE;
 
     /** Maps entry names to tar entries [String -> TarDriverEntry]. */
     private final Map<String, TarDriverEntry>

@@ -8,7 +8,7 @@ import static de.truezip.driver.zip.io.ZipEntry.STORED;
 import de.truezip.kernel.cio.ByteArrayIOBuffer;
 import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.IOEntry;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;

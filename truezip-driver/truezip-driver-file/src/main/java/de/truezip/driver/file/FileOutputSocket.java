@@ -12,7 +12,7 @@ import static de.truezip.kernel.cio.Entry.Access.*;
 import static de.truezip.kernel.cio.Entry.UNKNOWN;
 import de.truezip.kernel.cio.IOSockets;
 import de.truezip.kernel.util.BitField;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

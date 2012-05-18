@@ -4,7 +4,7 @@
  */
 package de.truezip.driver.zip.io;
 
-import de.truezip.kernel.util.Maps;
+import de.truezip.kernel.util.HashMaps;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import javax.annotation.concurrent.ThreadSafe;
@@ -31,7 +31,7 @@ implements ZipOutputStreamParameters {
      */
     @Override
     public int getOverheadSize() {
-        return Maps.OVERHEAD_SIZE;
+        return HashMaps.OVERHEAD_SIZE;
     }
 
     /**

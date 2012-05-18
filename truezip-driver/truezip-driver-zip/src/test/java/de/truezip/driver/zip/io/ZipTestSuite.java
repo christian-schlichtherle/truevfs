@@ -8,7 +8,7 @@ import static de.truezip.driver.zip.io.Constants.FORCE_ZIP64_EXT;
 import static de.truezip.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.truezip.kernel.util.ConcurrencyUtils.TaskFactory;
 import static de.truezip.kernel.util.ConcurrencyUtils.runConcurrent;
-import de.truezip.kernel.util.Maps;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -365,8 +365,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      * The field {@code file} is used to determine the ZIP file.
      */
     private void createTestZipFile(final int nEntries) throws IOException {
-        final HashSet<String>
-                set = new HashSet<>(Maps.initialCapacity(nEntries));
+        final HashSet<String> set = new HashSet<>(initialCapacity(nEntries));
 
         try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
             for (int i = 0; i < nEntries; i++) {

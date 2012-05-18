@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.kernel;
 
 import de.truezip.kernel.util.ExceptionBuilder;
-import de.truezip.kernel.util.Maps;
+import de.truezip.kernel.util.HashMaps;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import java.io.Closeable;
 import java.io.IOException;
@@ -45,7 +45,7 @@ public final class ResourceManager {
      * available processors, a 90% blocking factor for typical I/O and a 2/3
      * map resize threshold.
      */
-    private static final int INITIAL_CAPACITY = Maps.initialCapacity(
+    private static final int INITIAL_CAPACITY = HashMaps.initialCapacity(
             Runtime.getRuntime().availableProcessors() * 10);
 
     /** The pool of all accounted closeable resources. */

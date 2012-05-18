@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truezip.kernel.se;
 
-import de.truezip.kernel.util.Link;
 import static de.truezip.kernel.FsAccessOption.CREATE_PARENTS;
 import static de.truezip.kernel.FsAccessOption.EXCLUSIVE;
 import static de.truezip.kernel.FsAccessOptions.NONE;
@@ -17,8 +16,8 @@ import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
 import static de.truezip.kernel.cio.Entry.*;
 import de.truezip.kernel.util.BitField;
-import static de.truezip.kernel.util.Maps.OVERHEAD_SIZE;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.OVERHEAD_SIZE;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.kernel.util.PathNormalizer;
 import static de.truezip.kernel.util.Paths.cutTrailingSeparators;
 import static de.truezip.kernel.util.Paths.isRoot;

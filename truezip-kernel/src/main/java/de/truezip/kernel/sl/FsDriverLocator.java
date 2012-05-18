@@ -8,7 +8,7 @@ import de.truezip.kernel.FsDriver;
 import de.truezip.kernel.FsDriverProvider;
 import de.truezip.kernel.FsScheme;
 import de.truezip.kernel.spi.FsDriverService;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.kernel.util.ServiceLocator;
 import java.util.*;
 import static java.util.logging.Level.CONFIG;

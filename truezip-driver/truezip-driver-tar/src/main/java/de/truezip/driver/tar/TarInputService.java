@@ -8,14 +8,15 @@ import static de.truezip.driver.tar.TarDriver.DEFAULT_BLKSIZE;
 import static de.truezip.driver.tar.TarDriver.DEFAULT_RCDSIZE;
 import de.truezip.kernel.FsArchiveDriver;
 import de.truezip.kernel.FsModel;
-import de.truezip.kernel.cio.*;
 import de.truezip.kernel.cio.Entry.Type;
 import static de.truezip.kernel.cio.Entry.Type.DIRECTORY;
 import static de.truezip.kernel.cio.Entry.Type.FILE;
+import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.io.Streams;
 import de.truezip.kernel.util.ExceptionBuilder;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.OVERHEAD_SIZE;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
@@ -54,8 +55,7 @@ implements InputService<TarDriverEntry> {
 
     /** Maps entry names to I/O pool entries. */
     private final Map<String, TarDriverEntry>
-            entries = new LinkedHashMap<>(
-                    initialCapacity(TarOutputService.OVERHEAD_SIZE));
+            entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
     private final TarDriver driver;
 

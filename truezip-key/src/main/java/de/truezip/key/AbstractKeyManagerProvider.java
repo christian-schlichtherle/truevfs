@@ -4,7 +4,7 @@
  */
 package de.truezip.key;
 
-import de.truezip.kernel.util.Maps;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.kernel.util.ServiceLocator;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +47,7 @@ public abstract class AbstractKeyManagerProvider implements KeyManagerProvider {
      */
     public static Map<Class<?>, KeyManager<?>> newMap(final Object[][] config) {
         final Map<Class<?>, KeyManager<?>> managers = new HashMap<>(
-                Maps.initialCapacity(config.length));
+                initialCapacity(config.length));
         for (final Object[] param : config) {
             final Class<?> type = Objects.requireNonNull(
                     ServiceLocator.promote(param[0], Class.class));
