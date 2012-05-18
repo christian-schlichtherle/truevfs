@@ -18,7 +18,8 @@ import de.schlichtherle.truezip.socket.IOPool.Entry;
 import de.schlichtherle.truezip.socket.InputShop;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.util.JSE7;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import static de.schlichtherle.truezip.util.HashMaps.OVERHEAD_SIZE;
+import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
@@ -59,10 +60,10 @@ implements InputShop<TarDriverEntry> {
     private static final int CHECKSUM_OFFSET
             = NAMELEN + MODELEN + UIDLEN + GIDLEN + SIZELEN + MODTIMELEN;
 
-    /** Maps entry names to I/O pool entries. */
+    /** HashMaps entry names to I/O pool entries. */
     private final Map<String, TarDriverEntry>
             entries = new LinkedHashMap<String, TarDriverEntry>(
-                    initialCapacity(TarOutputShop.OVERHEAD_SIZE));
+                    initialCapacity(OVERHEAD_SIZE));
 
     private final TarDriver driver;
 

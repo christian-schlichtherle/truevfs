@@ -23,8 +23,8 @@ import static de.schlichtherle.truezip.io.Paths.cutTrailingSeparators;
 import static de.schlichtherle.truezip.io.Paths.isRoot;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.Link;
-import de.schlichtherle.truezip.util.Maps;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import static de.schlichtherle.truezip.util.HashMaps.OVERHEAD_SIZE;
+import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.util.*;
@@ -43,22 +43,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class FsArchiveFileSystem<E extends FsArchiveEntry>
+class FsArchiveFileSystem<E extends FsArchiveEntry>
 implements Iterable<FsCovariantEntry<E>> {
-
-    /**
-     * The number of entries which can be additionally accomodated by
-     * the internal hash map without resizing it, which is {@value}.
-     * When a new file system is created, this constant is used in order to
-     * compute the initial capacity of the internal hash map.
-     * When an existing file system is mounted, this constant is added to the
-     * number of entries in order to compute the initial capacity of the
-     * internal hash map.
-     * 
-     * @see    Maps#initialCapacity(int)
-     * @since  TrueZIP 7.3
-     */
-    public static final int OVERHEAD_SIZE = (64 - 1) * 3 / 4; // consider 75% load factor
 
     private static final String ROOT_PATH = ROOT.getPath();
 

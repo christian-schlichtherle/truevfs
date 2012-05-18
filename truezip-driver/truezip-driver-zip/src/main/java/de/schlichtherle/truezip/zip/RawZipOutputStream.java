@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.zip;
 import de.schlichtherle.truezip.crypto.param.AesKeyStrength;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.LEDataOutputStream;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.ExtraField.WINZIP_AES_ID;
 import static de.schlichtherle.truezip.zip.WinZipAesEntryExtraField.VV_AE_1;
@@ -61,7 +61,7 @@ implements Iterable<E> {
 
     /**
      * The list of ZIP entries started to be written so far.
-     * Maps entry names to zip entries.
+     * HashMaps entry names to zip entries.
      */
     private final Map<String, E> entries;
 

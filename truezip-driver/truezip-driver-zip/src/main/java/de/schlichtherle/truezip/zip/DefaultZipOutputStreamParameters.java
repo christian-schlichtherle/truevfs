@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.util.HashMaps;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import javax.annotation.concurrent.ThreadSafe;
@@ -27,11 +28,11 @@ implements ZipOutputStreamParameters {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link DefaultZipOutputStreamParameters}
-     * returns {@code ZipOutputStream#OVERHEAD_SIZE}.
+     * returns {@code HashMaps#OVERHEAD_SIZE}.
      */
     @Override
     public int getOverheadSize() {
-        return ZipOutputStream.OVERHEAD_SIZE;
+        return HashMaps.OVERHEAD_SIZE;
     }
 
     /**

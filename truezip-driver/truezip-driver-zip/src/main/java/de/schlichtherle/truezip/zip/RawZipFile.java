@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.rof.BufferedReadOnlyFile;
 import de.schlichtherle.truezip.rof.IntervalReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFileInputStream;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
 import de.schlichtherle.truezip.util.Pool;
 import static de.schlichtherle.truezip.zip.Constants.*;
 import static de.schlichtherle.truezip.zip.ExtraField.WINZIP_AES_ID;
@@ -101,10 +101,10 @@ implements Iterable<E>, Closeable {
     /** The encoded file comment. */
     private @CheckForNull byte[] comment;
 
-    /** Maps entry names to zip entries. */
+    /** HashMaps entry names to zip entries. */
     private Map<String, E> entries;
 
-    /** Maps offsets specified in the ZIP file to real offsets in the file. */
+    /** HashMaps offsets specified in the ZIP file to real offsets in the file. */
     private PositionMapper mapper = new PositionMapper();
 
     /** The number of open resources for reading the entries in this ZIP file. */

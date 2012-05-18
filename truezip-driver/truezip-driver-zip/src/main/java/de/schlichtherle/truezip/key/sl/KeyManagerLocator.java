@@ -8,7 +8,7 @@ import de.schlichtherle.truezip.fs.spi.FsDriverService;
 import de.schlichtherle.truezip.key.AbstractKeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.spi.KeyManagerService;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
 import de.schlichtherle.truezip.util.ServiceLocator;
 import java.util.*;
 import static java.util.logging.Level.CONFIG;

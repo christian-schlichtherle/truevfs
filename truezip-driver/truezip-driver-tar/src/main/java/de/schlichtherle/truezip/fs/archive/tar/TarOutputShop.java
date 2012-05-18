@@ -7,7 +7,6 @@ package de.schlichtherle.truezip.fs.archive.tar;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem;
 import static de.schlichtherle.truezip.fs.archive.tar.TarDriver.DEFAULT_BLKSIZE;
 import static de.schlichtherle.truezip.fs.archive.tar.TarDriver.DEFAULT_RCDSIZE;
 import de.schlichtherle.truezip.io.*;
@@ -15,7 +14,8 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.JSE7;
-import static de.schlichtherle.truezip.util.Maps.initialCapacity;
+import de.schlichtherle.truezip.util.HashMaps;
+import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -58,13 +58,14 @@ implements OutputShop<TarDriverEntry> {
      * the internal hash map without resizing it, which is {@value}.
      * 
      * @since  TrueZIP 7.3
+     * @deprecated since TrueZIP 7.5.5
      */
-    public static final int OVERHEAD_SIZE = FsArchiveFileSystem.OVERHEAD_SIZE;
+    public static final int OVERHEAD_SIZE = HashMaps.OVERHEAD_SIZE;
 
-    /** Maps entry names to tar entries [String -> TarDriverEntry]. */
+    /** HashMaps entry names to tar entries [String -> TarDriverEntry]. */
     private final Map<String, TarDriverEntry> entries
             = new LinkedHashMap<String, TarDriverEntry>(
-                    initialCapacity(OVERHEAD_SIZE));
+                    initialCapacity(HashMaps.OVERHEAD_SIZE));
 
     private final IOPool<?> pool;
     private boolean busy;
