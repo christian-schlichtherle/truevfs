@@ -5,9 +5,8 @@
 package de.schlichtherle.truezip.kernel.se;
 
 import de.schlichtherle.truezip.kernel.NeedsWriteLockException;
-import static de.schlichtherle.truezip.kernel.se.LockingStrategy.FAST_LOCK;
 import de.schlichtherle.truezip.kernel.se.LockingStrategy.Operation;
-import static de.schlichtherle.truezip.kernel.se.LockingStrategy.TIMED_LOCK;
+import static de.schlichtherle.truezip.kernel.se.LockingStrategy.*;
 import de.truezip.kernel.*;
 import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Type;
@@ -291,7 +290,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 return null;
             }
         }
-        timedWriteLocked(new Close());
+        deadWriteLocked(new Close());
     }
 
     @Override
@@ -369,5 +368,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
         assert !isReadLockedByCurrentThread()
                 : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
         return TIMED_LOCK.apply(writeLock(), operation);
+    }
+
+    <T, X extends Exception> T deadWriteLocked(Operation<T, X> operation)
+    throws X {
+        return DEAD_LOCK.apply(writeLock(), operation);
     }
 }
